@@ -1,3 +1,4 @@
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights} from './studio-model.js';
 export const BASE = {
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
   hole:0, holeX:0, holeY:0, holeShape:0, cut:0, cutX:.7, cutY:.1, edge:.015,
@@ -27,21 +28,24 @@ export const MOODS = [
  {name:'Lava',colors:['#5a1542','#e62e51','#ff8b2b','#ffe298']},
  {name:'Notte',colors:['#171134','#3b258e','#5779de','#a792ef']}
 ];
+MOODS.push(...MORE_MOODS);
 // label, minimum, maximum, step. All controls drive the same continuous field.
 export const META = {
+ ...EXTRA_META,
  volume:['Volume',.08,1.5,.01],stretchX:['Larghezza',.45,1.7,.01],stretchY:['Altezza',.45,1.7,.01],stretchZ:['Profondità',.45,1.7,.01],deform:['Deformazione',0,.75,.01],asymmetry:['Asimmetria',-.6,.6,.01],twist:['Torsione',-2.5,2.5,.01],waves:['Increspature',0,.4,.01],waveScale:['Frequenza onde',1,9,.1],hole:['Apertura del vuoto',0,.95,.01],holeX:['Vuoto · orizzontale',-.8,.8,.01],holeY:['Vuoto · verticale',-.8,.8,.01],holeShape:['Vuoto · rotondo / quadrato',0,1,.01],cut:['Dimensione del ritaglio',0,1.6,.01],cutX:['Ritaglio · orizzontale',-1.4,1.4,.01],cutY:['Ritaglio · verticale',-1.4,1.4,.01],edge:['Contorno sfumato',0,.45,.005],
  transparency:['Trasparenza',0,1,.01],refraction:['Rifrazione',1,2.4,.01],thickness:['Spessore ottico',0,2,.01],metal:['Metallicità',0,1,.01],roughness:['Rugosità',0,1,.01],gloss:['Lucentezza',0,1,.01],iridescence:['Iridescenza',0,1,.01],emission:['Luce propria',0,1,.01],gradientAngle:['Direzione gradiente',-180,180,1],gradientScale:['Distribuzione colori',.2,3,.01],gradientOffset:['Posizione colori',0,1,.01],colorSoftness:['Transizioni sfumate',0,1,.01],glow:['Diffusione alone',0,1,.01],grain:['Grana',0,.2,.005],
  lightAngle:['Angolo orizzontale',-180,180,1],lightHeight:['Altezza della luce',-85,85,1],lightPower:['Intensità',0,4,.01],lightSize:['Ampiezza riflesso',.05,1,.01],light2Angle:['Angolo orizzontale',-180,180,1],light2Height:['Altezza della luce',-85,85,1],light2Power:['Intensità',0,4,.01],light2Size:['Ampiezza riflesso',.05,1,.01],
  bgAngle:['Direzione sfondo',-180,180,1],scale:['Dimensione figura',.35,1.7,.01],positionX:['Posizione orizzontale',-1.5,1.5,.01],positionY:['Posizione verticale',-1.5,1.5,.01],rotateX:['Rotazione verticale',-180,180,1],rotateY:['Rotazione orizzontale',-180,180,1],motion:['Ampiezza del movimento',0,1,.01],duration:['Durata ciclo (secondi)',2,20,.5],speed:['Velocità',.25,2,.25]
 };
 export const GROUPS={
- shape:['volume','stretchX','stretchY','stretchZ','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','cut','cutX','cutY','edge'],
- material:['transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission'],
- color:['palette','gradientAngle','gradientScale','gradientOffset','colorSoftness','glow','grain'],
- light:['lightAngle','lightHeight','lightPower','lightSize','lightColor','light2Angle','light2Height','light2Power','light2Size','light2Color'],
- background:['background','background2','bgAngle']
+ shape:['volume','stretchX','stretchY','stretchZ','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','cut','cutX','cutY','edge','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','holeAspect','cutAspect'],
+ material:['transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture'],
+ color:['palette','gradientAngle','gradientScale','gradientOffset','colorSoftness','glow'],
+ light:['lights'],
+ background:['background','background2','bgAngle'],
+ photo:['exposure','brightness','contrast','saturation','temperature','photoTint','gamma','blacks','highlights','vignette','lensDistortion','grainSize','grain']
 };
-export function preset(i){return {...structuredClone(BASE),...structuredClone(PRESETS[i].values)}}
+export function preset(i){const s={...structuredClone(BASE),...structuredClone(EXTRA_BASE),...structuredClone(PRESETS[i].values)};s.lights=legacyLights(s);if(i===1){s.animateShape=false;s.motions.volume.enabled=false;s.motions.deform.enabled=false;}return s}
 export function random(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let a=Math.imul(t^t>>>15,1|t);a^=a+Math.imul(a^a>>>7,61|a);return((a^a>>>14)>>>0)/4294967296}}
 function mixColor(a,b,t){return '#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-t)+parseInt(b.slice(i,i+2),16)*t).toString(16).padStart(2,'0')).join('')}
-export function randomize(state,seed,amount,scope,locks){const r=random(seed),out=structuredClone(state);for(const [group,keys] of Object.entries(GROUPS)){if(locks[group]||(scope!=='all'&&scope!==group))continue;for(const k of keys){if(k==='palette'){const palette=MOODS[Math.floor(r()*MOODS.length)].colors;out.palette=out.palette.map((c,i)=>mixColor(c,palette[i],amount));continue}if(typeof out[k]==='string'){const color=k.startsWith('background')?MOODS[Math.floor(r()*MOODS.length)].colors[0]:MOODS[Math.floor(r()*MOODS.length)].colors[2];out[k]=mixColor(out[k],color,amount);continue}const m=META[k];if(!m)continue;let target=m[1]+r()*(m[2]-m[1]);if(k==='hole'||k==='cut')target=r()<.65?0:target*.65;if(k==='edge')target*=.5;if(k==='lightPower'||k==='light2Power')target=Math.max(.4,target);out[k]=Math.max(m[1],Math.min(m[2],out[k]+(target-out[k])*amount))}}out.seed=seed;return out}
+export function randomize(state,seed,amount,scope,locks){const r=random(seed),out=structuredClone(state);for(const [group,keys] of Object.entries(GROUPS)){if(locks[group]||(scope!=='all'&&scope!==group))continue;for(const k of keys){if(k==='lights'){out.lights=out.lights.map(l=>({...l,x:l.x+(r()*8-4-l.x)*amount,y:l.y+(r()*8-4-l.y)*amount,z:l.z+(r()*8-4-l.z)*amount,power:l.power+(r()*3+.5-l.power)*amount,color:mixColor(l.color,MOODS[Math.floor(r()*MOODS.length)].colors[0],amount)}));continue}if(k==='palette'){const palette=MOODS[Math.floor(r()*MOODS.length)].colors;out.palette=out.palette.map((c,i)=>mixColor(c,palette[i%palette.length],amount));continue}if(typeof out[k]==='string'){const color=k.startsWith('background')?MOODS[Math.floor(r()*MOODS.length)].colors[0]:MOODS[Math.floor(r()*MOODS.length)].colors[2];out[k]=mixColor(out[k],color,amount);continue}const m=META[k];if(!m)continue;let target=m[1]+r()*(m[2]-m[1]);if(k==='hole'||k==='cut')target=r()<.65?0:target*.65;if(k==='edge')target*=.5;if(k==='lightPower'||k==='light2Power')target=Math.max(.4,target);out[k]=Math.max(m[1],Math.min(m[2],out[k]+(target-out[k])*amount))}}out.seed=seed;return out}
