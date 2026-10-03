@@ -39,7 +39,7 @@ export const META = {
 };
 export const GROUPS={
  shape:['volume','stretchX','stretchY','stretchZ','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','cut','cutX','cutY','edge','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','holeAspect','cutAspect'],
- material:['transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture','hollow','wallThickness','translucency','scattering','scatterDirection','thinFilm','filmThickness'],
+ material:['transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture','hollow','wallThickness','translucency','scattering','scatterDirection','thinFilm','filmThickness','subsurface','sssRadius','sssColor'],
  color:['palette','gradientAngle','gradientScale','gradientOffset','colorSoftness','glow'],
  light:['lights'],
  background:['background','background2','bgAngle'],
