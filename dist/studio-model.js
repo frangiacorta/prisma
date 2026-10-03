@@ -8,14 +8,16 @@ export const TRACK_META={
 export const EXTRA_BASE={
  roundness:0,taper:0,bendX:0,bendY:0,lobeAmount:0,lobes:5,pinch:0,rimRound:0,holeAspect:1,cutAspect:1,rotateZ:0,
  coat:0,coatRoughness:.1,fresnel:1,iridShift:0,iridScale:1,dispersion:0,absorption:.15,tintStrength:.15,anisotropy:0,anisotropyAngle:0,surfaceTexture:0,
+ hollow:0,wallThickness:.08,translucency:0,scattering:0,scatterDirection:.25,thinFilm:0,filmThickness:420,
  exposure:0,brightness:0,contrast:1,saturation:1,temperature:0,photoTint:0,gamma:1,blacks:0,highlights:0,vignette:0,lensDistortion:0,grainSize:1,photoAll:false,
  motions:Object.fromEntries(Object.keys(TRACK_META).map(k=>[k,track(k==='rotateY'?360:k==='volume'?.12:k==='deform'?.048:k==='twist'?.4:k.startsWith('rotate')?30:.2,k==='volume'||k==='deform',k==='rotateY'||k==='gradientOffset'?'cycle':'wave')]))
 };
-export function newLight(id=1){return{id,enabled:true,type:'circle',color:'#e0eaff',x:-1.4,y:1.8,z:2.5,power:1.8,size:.9,length:.6,roll:0,softness:.3,cone:30,grid:5,orbit:{...track(35),axis:'y'},pulse:track(.3)}}
-export function legacyLights(s){const build=(id,p)=>{const angle=s[p+'Angle']*Math.PI/180,height=s[p+'Height']*Math.PI/180;return{...newLight(id),type:'bar',x:3.2*Math.sin(angle)*Math.cos(height),y:3.2*Math.sin(height),z:3.2*Math.cos(angle)*Math.cos(height),color:s[p+'Color'],power:s[p+'Power'],size:1.7,length:s[p+'Size']*.6,softness:s[p+'Size'],enabled:id===1||s.light2}};return[build(1,'light'),build(2,'light2')]}
+export function newLight(id=1){return{id,enabled:true,visible:true,type:'circle',color:'#e0eaff',x:-1.4,y:1.8,z:2.5,power:1.8,size:.9,length:.6,roll:0,softness:.3,cone:30,grid:5,orbit:{...track(35),axis:'y'},pulse:track(.3)}}
+export function legacyLights(s){const build=(id,p)=>{const angle=s[p+'Angle']*Math.PI/180,height=s[p+'Height']*Math.PI/180;return{...newLight(id),visible:false,type:'bar',x:3.2*Math.sin(angle)*Math.cos(height),y:3.2*Math.sin(height),z:3.2*Math.cos(angle)*Math.cos(height),color:s[p+'Color'],power:s[p+'Power'],size:1.7,length:s[p+'Size']*.6,softness:s[p+'Size'],enabled:id===1||s.light2}};return[build(1,'light'),build(2,'light2')]}
 export const EXTRA_META={
  roundness:['Sfera / cubo morbido',0,1,.01],taper:['Affusolamento',-.8,.8,.01],bendX:['Curvatura orizzontale',-.7,.7,.01],bendY:['Curvatura verticale',-.7,.7,.01],lobeAmount:['Petali e lobi',0,.4,.01],lobes:['Numero di lobi',2,12,1],pinch:['Strozzatura centrale',0,.65,.01],rimRound:['Raccordo dei ritagli',0,.15,.005],holeAspect:['Proporzioni del vuoto',.3,2.5,.01],cutAspect:['Proporzioni del ritaglio',.3,2.5,.01],rotateZ:['Rotazione sul piano',-180,180,1],
  coat:['Vernice trasparente',0,1,.01],coatRoughness:['Rugosità della vernice',0,1,.01],fresnel:['Riflessi sui bordi',0,2,.01],iridShift:['Tinta iridescente',0,1,.01],iridScale:['Ampiezza iridescenza',.1,4,.01],dispersion:['Dispersione cromatica',0,1,.01],absorption:['Assorbimento',0,2,.01],tintStrength:['Tinta interna',0,1,.01],anisotropy:['Riflessi allungati',0,1,.01],anisotropyAngle:['Direzione della satinatura',-180,180,1],surfaceTexture:['Microtexture',0,1,.01],
+ hollow:['Vuotezza interna',0,1,.01],wallThickness:['Spessore della parete',.003,1,.001],translucency:['Traslucenza / controluce',0,1,.01],scattering:['Diffusione interna · scattering',0,1,.01],scatterDirection:['Direzione della diffusione',-.8,.8,.01],thinFilm:['Pellicola iridescente',0,1,.01],filmThickness:['Spessore pellicola (nm)',80,1200,1],
  exposure:['Esposizione (EV)',-3,3,.05],brightness:['Luminosità',-.5,.5,.01],contrast:['Contrasto',.2,2.5,.01],saturation:['Saturazione',0,2.5,.01],temperature:['Temperatura',-1,1,.01],photoTint:['Tinta verde / magenta',-1,1,.01],gamma:['Gamma',.5,2,.01],blacks:['Ombre',-.4,.4,.01],highlights:['Alte luci',-.6,.6,.01],vignette:['Vignettatura',0,1,.01],lensDistortion:['Distorsione lente',-.6,.6,.01],grainSize:['Dimensione grana',.5,5,.1]
 };
 export const MORE_MOODS=[
@@ -33,12 +35,17 @@ export const MORE_MOODS=[
  {name:'Arcobaleno',colors:['#ff5179','#ffa553','#f9ee80','#85ecb2','#54c9f4','#a384ff']}
 ];
 export const MATERIAL_STYLES=[
- {name:'Acqua',values:{metal:0,transparency:.96,refraction:1.33,roughness:.03,gloss:1,coat:0,iridescence:.1,dispersion:.08,absorption:.02,tintStrength:.05}},
- {name:'Vetro',values:{metal:0,transparency:.86,refraction:1.5,roughness:.07,gloss:1,coat:.2,dispersion:.3,absorption:.2,tintStrength:.18}},
+ {name:'Acqua',values:{metal:0,transparency:1,refraction:1.333,roughness:0,gloss:1,coat:0,iridescence:0,dispersion:.035,absorption:.008,tintStrength:.015}},
+ {name:'Vetro',values:{metal:0,transparency:1,refraction:1.5,roughness:.02,gloss:1,coat:0,iridescence:0,dispersion:.15,absorption:.015,tintStrength:.035}},
  {name:'Cromo',values:{metal:1,transparency:0,roughness:.04,gloss:1,coat:.3,anisotropy:0,iridescence:.12}},
  {name:'Satinato',values:{metal:.88,transparency:0,roughness:.4,gloss:.7,anisotropy:.85,coat:0,surfaceTexture:.2}},
  {name:'Perla',values:{metal:.2,transparency:.15,roughness:.25,gloss:.75,iridescence:.9,iridScale:2,coat:.45}},
  {name:'Ceramica',values:{metal:0,transparency:0,roughness:.2,gloss:.6,iridescence:0,coat:.9,coatRoughness:.08}},
  {name:'Opaco',values:{metal:0,transparency:0,roughness:1,gloss:0,iridescence:0,coat:0,anisotropy:0}},
- {name:'Olio',values:{metal:.48,transparency:.25,roughness:.05,gloss:1,iridescence:1,iridScale:3.2,coat:.75,dispersion:.6}}
-];
+ {name:'Olio',values:{metal:.48,transparency:.25,roughness:.05,gloss:1,iridescence:1,iridScale:3.2,coat:.75,dispersion:.6}},
+ {name:'Bolla di sapone',values:{metal:0,transparency:1,refraction:1.333,roughness:0,gloss:1,iridescence:.6,hollow:1,wallThickness:.003,thinFilm:1,filmThickness:420,absorption:0,tintStrength:0}},
+ {name:'Palloncino chiaro',values:{metal:0,transparency:.97,refraction:1.38,roughness:.035,gloss:1,iridescence:.08,hollow:1,wallThickness:.025,absorption:.04,tintStrength:.09,scattering:.06}},
+ {name:'Vetro satinato',values:{metal:0,transparency:1,refraction:1.5,roughness:.48,gloss:.8,iridescence:0,scattering:.5,translucency:.45}},
+ {name:'Carta in controluce',values:{metal:0,transparency:.04,refraction:1.12,roughness:.85,gloss:.08,iridescence:0,hollow:1,wallThickness:.025,translucency:.78,scattering:.95,scatterDirection:.3,absorption:.22,tintStrength:.25,surfaceTexture:.3}},
+ {name:'Pelle sottile',values:{metal:0,transparency:.1,refraction:1.4,roughness:.4,gloss:.38,iridescence:0,hollow:1,wallThickness:.075,translucency:.7,scattering:.85,scatterDirection:.65,absorption:.4,tintStrength:.7,surfaceTexture:.18}}
+].map(m=>({...m,values:{hollow:0,wallThickness:.08,translucency:0,scattering:0,scatterDirection:.25,thinFilm:0,filmThickness:420,thickness:1,absorption:.05,tintStrength:.05,dispersion:0,fresnel:1,iridScale:1,iridShift:0,anisotropy:0,surfaceTexture:0,coat:0,emission:0,...m.values}}));
