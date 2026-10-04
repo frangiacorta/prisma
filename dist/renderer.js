@@ -846,10 +846,11 @@ function motionInterval(s,key){
 function previewPlan(source){
  const rotateCrown=crownRotationReusable(source),keys=FIELD_KEYS.concat(GROWTH_KEYS).filter(k=>k!=='twist'&&!(rotateCrown&&k==='petalPhase'));
  const moving=keys.filter(k=>source.motions?.[k]?.enabled&&(source.motions[k].amplitude||0)>0),dynamic=moving.length>0;
- const descriptor=keys.map(k=>[source[k]??0,source.motions?.[k]?.enabled?JSON.stringify(source.motions[k]):'off'].join(':')).join('|')+'|'+(source.motion??.3)+'|'+rotateCrown;
+ const cullSafe=!(source.edge>0||source.glow>0||motionInterval(source,'volume')[0]<.2);
+ const descriptor=keys.map(k=>[source[k]??0,source.motions?.[k]?.enabled?JSON.stringify(source.motions[k]):'off'].join(':')).join('|')+'|'+(source.motion??.3)+'|'+rotateCrown+'|'+cullSafe;
  const sharp=motionInterval(source,'petalSharp'),fine=(source.petalAmount||0)>.25&&(sharp[1]>.75||(source.petalWidth??.24)<.12);
  const fineResolution=!dynamic?112:(source.petalWidth??.24)<.12?128:moving.every(k=>k==='petalSharp')?80:112;
- return {descriptor,dynamic,rotateCrown,fine,fineResolution};
+ return {descriptor,dynamic,rotateCrown,fine,fineResolution,cullSafe};
 }
 function animatedBounds(source){
  // Share a coordinate grid across the loop, without combining unrelated
@@ -1082,7 +1083,7 @@ export class Renderer{
    u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,0,0]);
    u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*Math.PI/180,0]);
    u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);f('uSeed',(s.seed%1000)*.013);
-   f('uBakeRadius',atlasBounds(s,this.growthRadius).radius);f('uFieldEncoding',+this.fieldHalfFloat);u('uFieldAtlas',this.fieldAtlas);u('uFieldMin',this.fieldMin);u('uFieldMax',this.fieldMax);
+   f('uBakeRadius',plan.cullSafe?atlasBounds(s,this.growthRadius).radius:10000);f('uFieldEncoding',+this.fieldHalfFloat);u('uFieldAtlas',this.fieldAtlas);u('uFieldMin',this.fieldMin);u('uFieldMax',this.fieldMax);
    g.drawArrays(g.TRIANGLES,0,3);this.fieldWarmed=true;
    if(warmup)this.bakeWarmups=(this.bakeWarmups||0)+1;
    else{this.fieldKey=key;this.fieldResolution=resolution;this.bakeUploads=(this.bakeUploads||0)+1;}
