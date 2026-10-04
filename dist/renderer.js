@@ -670,6 +670,165 @@ MODERN_FRAG=MODERN_FRAG.replace('for(int bounce=0;bounce<INTERFACE_STEPS;bounce+
 // there unless the soft silhouette actually needs surface shading.
 MODERN_FRAG=MODERN_FRAG.replace('closest=max(0.,field(point));normal=surfaceNormal(point);','closest=max(0.,field(point));');
 MODERN_FRAG=MODERN_FRAG.replace('if(hit||coverage>.001)surface=shade(point,normal,direction,hit,issue);','if(hit||coverage>.001){if(!hit)normal=surfaceNormal(point);surface=shade(point,normal,direction,hit,issue);}');
+// Preview geometry is evaluated once into a normalized SDF atlas. Optical rays
+// sample the cached field instead of inlining the entire procedural sculpture
+// at every ray step, normal, scattering sample and refractive interface.
+// Half floats preserve smooth distances; decoded RGBA8 texels provide a
+// portable fallback when float render-target extensions are unavailable.
+const ATLAS_PREVIEW=8192,ATLAS_BAKE=16384;
+const ATLAS_FLAGS=`#define ANALYTIC_SHAPE 0
+#define CROWN_ENABLED 1
+#define FLOWER_ENABLED 1
+#define LEGACY_HEDGE_ENABLED 1
+#define ORGANIC_ENABLED 1
+#define STEM_ENABLED 1
+`;
+let BAKE_FRAG=MODERN_FRAG.slice(0,MODERN_FRAG.indexOf('// Shared solid/cavity field.'));
+BAKE_FRAG=BAKE_FRAG.replace('#version 300 es','#version 300 es\n'+ATLAS_FLAGS);
+// Uniform loop bounds prevent drivers expanding nine copies of the cone
+// kernel during first-use JIT; the runtime value remains exactly three cells.
+BAKE_FRAG=BAKE_FRAG.replaceAll('for(int j=-1;j<=1;j++){','for(int j=-1;j<int(uRuntime.z);j++){').replaceAll('for(int k=-1;k<=1;k++){','for(int k=-1;k<int(uRuntime.z);k++){');
+BAKE_FRAG=BAKE_FRAG.replace('vec3 p=transform(world);float volume=max(.06,uShape.x*uShape.w);p/=vec3(uShape.y,uShape.z,volume);','vec3 p=world;float volume=1.;');
+BAKE_FRAG=BAKE_FRAG.replace('return vec3(d,hole,cut)*min(min(uShape.y,uShape.z),volume)*uFrame.x*.5;','return vec3(d,hole,cut);');
+BAKE_FRAG=shaderFunction(BAKE_FRAG,'field',`float field(vec3 p){vec3 parts=fieldParts(p);return smax(smax(parts.x,parts.y,uExtraShape2.w),parts.z,uExtraShape2.w);}`);
+BAKE_FRAG=shaderFunction(BAKE_FRAG,'crownField',`float crownField(vec3 p){
+ if(uPetalSpread.x<.0001)return flowerField(p);
+ if(uPetalSpread.x>.9999)return hedgeField(p);
+ return mix(flowerField(p),hedgeField(p),uPetalSpread.x);
+}`);
+BAKE_FRAG+=`
+uniform vec4 uFieldAtlas;
+uniform float uFieldEncoding;
+uniform vec3 uFieldMin,uFieldMax;
+void main(){
+ float n=uFieldAtlas.x,stride=n+2.,tiles=uFieldAtlas.y;
+ vec2 cell=floor(gl_FragCoord.xy/stride),pixel=mod(floor(gl_FragCoord.xy),stride)-1.;
+ float slice=cell.x+cell.y*tiles;
+ vec3 index=vec3(clamp(pixel,vec2(0.),vec2(n-1.)),min(slice,n-1.));
+ vec3 p=mix(uFieldMin,uFieldMax,index/(n-1.));
+ float distance=field(p);if(uFieldEncoding>.5){fragColor=vec4(distance,0.,0.,1.);return;}
+ float value=clamp(distance/(2.*uFieldAtlas.w)+.5,0.,1.-1./65025.);
+ float high=floor(value*255.)/255.,low=fract(value*255.);
+ fragColor=vec4(high,low,0.,1.);
+}
+`;
+let PREVIEW_FRAG=MODERN_FRAG.replace(CROWN_GEOMETRY.replace('float stemField',STEM_GEOMETRY+'float stemField'),'');
+PREVIEW_FRAG=PREVIEW_FRAG.replace('uniform float uGeometryRadius;',`uniform float uGeometryRadius;
+uniform highp sampler2D uFieldTexture;
+uniform vec4 uFieldAtlas;
+uniform float uFieldEncoding;
+uniform vec3 uFieldMin,uFieldMax;`);
+PREVIEW_FRAG=shaderFunction(PREVIEW_FRAG,'fieldParts',`float atlasTexel(ivec2 pixel){return (dot(texelFetch(uFieldTexture,pixel,0).rg,vec2(1.,1./255.))-.5)*2.*uFieldAtlas.w;}
+float atlasSlice(vec2 index,float slice){
+ float stride=uFieldAtlas.x+2.,tiles=uFieldAtlas.y;vec2 tile=vec2(mod(slice,tiles),floor(slice/tiles));
+ vec2 pixel=tile*stride+vec2(1.)+index;
+ if(uFieldEncoding>.5)return texture(uFieldTexture,(pixel+vec2(.5))/uFieldAtlas.z).r;
+ // UNORM linear filtering may quantize interpolated channel values before RG
+ // decoding. Decode texels first, then interpolate in high precision instead.
+ ivec2 q=ivec2(floor(pixel));vec2 f=fract(pixel);
+ return mix(mix(atlasTexel(q),atlasTexel(q+ivec2(1,0)),f.x),mix(atlasTexel(q+ivec2(0,1)),atlasTexel(q+ivec2(1,1)),f.x),f.y);
+}
+float cachedGeometry(vec3 p){
+ float n=uFieldAtlas.x;vec3 clamped=clamp(p,uFieldMin,uFieldMax),index=(clamped-uFieldMin)/(uFieldMax-uFieldMin)*(n-1.);
+ float z0=floor(index.z),z1=min(n-1.,z0+1.);
+ return mix(atlasSlice(index.xy,z0),atlasSlice(index.xy,z1),fract(index.z))+length(p-clamped);
+}`);
+PREVIEW_FRAG=shaderFunction(PREVIEW_FRAG,'field',`float field(vec3 world){
+ vec3 size=vec3(uShape.y,uShape.z,max(.06,uShape.x*uShape.w)),p=transform(world)/size;
+ float d=uScatter.y>.5?length(p)-1.:cachedGeometry(p);
+ return d*min(min(size.x,size.y),size.z)*uFrame.x*.5;
+}`);
+PREVIEW_FRAG=shaderFunction(PREVIEW_FRAG,'surfaceGradient',`vec3 surfaceGradient(vec3 world){
+ vec3 size=axes(),p=transform(world)/size,gradient;
+ if(uScatter.y>.5)gradient=p/max(.000001,length(p))/size;
+ else{
+  vec3 e=(uFieldMax-uFieldMin)/max(1.,uFieldAtlas.x-1.)*.55;
+  gradient=vec3(cachedGeometry(p+vec3(e.x,0,0))-cachedGeometry(p-vec3(e.x,0,0)),cachedGeometry(p+vec3(0,e.y,0))-cachedGeometry(p-vec3(0,e.y,0)),cachedGeometry(p+vec3(0,0,e.z))-cachedGeometry(p-vec3(0,0,e.z)))/(e*size);
+ }
+ gradient.yz=rot(-uOther.y)*gradient.yz;gradient.xz=rot(-uOther.x)*gradient.xz;gradient.xy=rot(-uExtraShape3.z)*gradient.xy;
+ return gradient;
+}`);
+PREVIEW_FRAG=shaderFunction(PREVIEW_FRAG,'surfaceNormal',`vec3 surfaceNormal(vec3 p){vec3 n=surfaceGradient(p);return length(n)>.000001?normalize(n):vec3(0,0,1);}`);
+PREVIEW_FRAG=shaderFunction(PREVIEW_FRAG,'rayEpsilon',`float rayEpsilon(){
+ float original=min(.00003,max(.000002,wallDepth()*.02));
+ if(uScatter.y>.5)return original;
+ float voxel=min(min(uShape.y,uShape.z),max(.06,uShape.x*uShape.w))*uFrame.x*(uFieldMax.x-uFieldMin.x)/max(1.,uFieldAtlas.x-1.);
+ return max(original,min(wallDepth()*.04,voxel*.002));
+}`);
+PREVIEW_FRAG=shaderFunction(PREVIEW_FRAG,'traceBoundary',`bool traceBoundary(vec3 origin,vec3 direction,float maximum,bool outerOnly,out vec3 point,out float travel){
+ float eps=rayEpsilon();
+ if(uScatter.y>.5){float t=firstRoot(ellipsoidRoots(origin,direction,1.));if(!outerOnly&&hasCavity())t=min(t,firstRoot(ellipsoidRoots(origin,direction,uInterior.x*(1.-uInterior.y))));travel=t;point=origin+direction*t;return t<maximum;}
+ vec2 interval=objectInterval(origin,direction);float t=max(0.,interval.x),end=min(maximum,interval.y);
+ if(t>end){travel=end;point=origin+direction*max(0.,end);return false;}
+ float previousT=t,previousD=traceField(origin+direction*t,outerOnly),a=t,b=t,da=previousD;bool found=false;
+ for(int j=0;j<int(min(uBudget.x,128.));j++){
+  if(t>end)break;point=origin+direction*t;float d=traceField(point,outerOnly);
+  if(j>0&&d*previousD<0.){a=previousT;b=t;da=previousD;found=true;break;}
+  if(abs(d)<eps&&t>eps*3.){
+   // A near-zero value can be the boundary we have just left, especially at
+   // grazing refraction angles. Require a sign crossing before changing media.
+   float probe=eps*4.,slope=abs((traceField(point+direction*probe,outerOnly)-d)/probe);
+   float ahead=min(end-t,clamp(eps*8./max(.015,slope),eps*8.,.025*uFrame.x));
+   if(ahead<=0.)break;float after=traceField(origin+direction*(t+ahead),outerOnly);
+   if(previousD*after<0.){a=previousT;b=t+ahead;da=previousD;found=true;break;}
+   previousT=t;previousD=d;t+=ahead;continue;
+  }
+  previousT=t;previousD=d;t+=max(min(abs(d)*uRuntime.y*1.5,.22*uFrame.x),eps*2.);
+ }
+ if(found){for(int k=0;k<8;k++){float m=(a+b)*.5,dm=traceField(origin+direction*m,outerOnly);if(da*dm>0.){a=m;da=dm;}else b=m;}travel=(a+b)*.5;}
+ else travel=end;
+ point=origin+direction*travel;return found;
+}`);
+// The cached preview has bounded path complexity. Full exports keep all spectral
+// rays and exact interfaces. The central ray preserves geometric refraction;
+// neighboring terminal directions provide a soft, low-cost chromatic spread.
+PREVIEW_FRAG=PREVIEW_FRAG.replace(/#if DISPERSION_ENABLED[\s\S]*?#else\n   glass=transmitted\(p,geometricNormal,rd,base,vec3\(1\.\),max\(1\.,uMat\.y\),issue\);\n   #endif/,`glass=transmitted(p,geometricNormal,rd,base,vec3(1.),max(1.,uMat.y),issue);`);
+
+PREVIEW_FRAG=shaderFunction(PREVIEW_FRAG,'terminalScene',`vec4 terminalScene(vec3 origin,vec3 direction,float rough){
+ float unused;vec4 scene=sceneRay(origin,direction,unused);
+ vec3 tangent=normalize(cross(direction,abs(direction.y)>.98?vec3(1,0,0):vec3(0,1,0))),up=cross(direction,tangent);
+ if(rough>.04){float spread=rough*rough*.2;
+  vec4 average=sceneRay(origin,normalize(direction+tangent*spread),unused)+sceneRay(origin,normalize(direction-tangent*spread),unused)+sceneRay(origin,normalize(direction+up*spread),unused)+sceneRay(origin,normalize(direction-up*spread),unused);
+  scene=mix(scene,average*.25,min(1.,rough));
+ }
+ if(uOptics.y>.005){float spread=uOptics.y*.035*clamp((uMat.y-1.)*2.,0.,1.);
+  vec4 warm=sceneRay(origin,normalize(direction+tangent*spread+up*spread*.22),unused),cool=sceneRay(origin,normalize(direction-tangent*spread-up*spread*.22),unused);
+  scene.rgb=mix(scene.rgb,vec3(warm.r,(warm.g+scene.g*2.+cool.g)*.25,cool.b),.72);
+  scene.a=max(scene.a,(warm.a+cool.a)*.5);
+ }
+ if(uBgMode!=2.)scene.rgb+=environment(direction,origin,rough)*uEnvironment.w*clamp((uMat.y-1.)*3.,0.,1.)*(1.-scene.a);
+ return scene;
+}`);
+// Keep bounded optical loops dynamic as well: eager constant unrolling makes
+// first-use compilation disproportionately slow on several WebGL drivers.
+PREVIEW_FRAG=PREVIEW_FRAG.replace('for(int bounce=0;bounce<INTERFACE_STEPS;bounce++){if(bounce>=int(uBudget.y))break;','for(int bounce=0;bounce<int(min(uBudget.y,4.));bounce++){');
+PREVIEW_FRAG=PREVIEW_FRAG.replace('for(int k=0;k<LENGTH_SAMPLES;k++){if(k>=int(samples))break;','for(int k=0;k<int(min(samples,8.));k++){');
+PREVIEW_FRAG=PREVIEW_FRAG.replace('for(int k=0;k<SCATTER_SAMPLES;k++){if(k>=int(uBudget.w))break;','for(int k=0;k<int(min(uBudget.w,2.));k++){');
+// Integrate the same 24 spectral wavelengths as the exact renderer, with
+// CIE weights computed once on the CPU. Dynamic shader loops then stay compact
+// without evaluating seven wavelength-only Gaussian functions per sample.
+const FILM_SPECTRUM=(()=>{
+ const data=new Float32Array(72),white=new Float32Array(3),gaussian=(x,c,l,r)=>Math.exp(-.5*((x-c)*(x<c?l:r))**2);
+ for(let j=0;j<24;j++){
+  const w=390+j*15,response=[1.056*gaussian(w,599.8,.0264,.0323)+.362*gaussian(w,442.,.0624,.0374)-.065*gaussian(w,501.1,.049,.0382),.821*gaussian(w,568.8,.0213,.0247)+.286*gaussian(w,530.9,.0613,.0322),1.217*gaussian(w,437.,.0845,.0278)+.681*gaussian(w,459.,.0385,.0725)];
+  data.set(response,j*3);for(let k=0;k<3;k++)white[k]+=response[k];
+ }
+ return {data,white};
+})();
+PREVIEW_FRAG=PREVIEW_FRAG.replace('uniform float uGeometryRadius;','uniform float uGeometryRadius;\nuniform vec3 uFilmResponse[24],uFilmWhite;');
+PREVIEW_FRAG=PREVIEW_FRAG.replace('vec3 xyz=vec3(0.),white=vec3(0.);','vec3 xyz=vec3(0.),white=uFilmWhite;');
+PREVIEW_FRAG=PREVIEW_FRAG.replace('for(int j=0;j<24;j++){','for(int j=0;j<int(min(24.,uFilmMotion.w));j++){');
+PREVIEW_FRAG=PREVIEW_FRAG.replace('vec3 response=cie(wavelength);xyz+=response*dot(reflection,vec2(.5));white+=response;','vec3 response=uFilmResponse[j];xyz+=response*dot(reflection,vec2(.5));');
+const FIELD_KEYS=['deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','petalAmount','petalCoverage','stemAmount','stemRadius','stemBend'];
+function analyticShape(s){return !['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);}
+function atlasBounds(s,growthRadius){
+ // Twist preserves radius. Deformation, ripples and lobes only add their
+ // bounded amplitudes; they must not expand every volume to a nine-unit box.
+ const unwarped={...s,deform:0,waves:0,twist:0,lobeAmount:0};
+ let radius=geometryRadius(unwarped,growthRadius)+(s.deform||0)+(s.waves||0)*.17+(s.lobeAmount||0);
+ return {min:[-radius,-radius,-radius],max:[radius,radius,radius],radius,range:Math.max(2,radius*2)};
+}
+
 const RESOLVE=`#version 300 es
 precision highp float;uniform sampler2D uImage;uniform vec4 uGrain;uniform float uAll;out vec4 fragColor;
 void main(){vec4 a=texelFetch(uImage,ivec2(gl_FragCoord.xy),0);bool opaque=uGrain.w>.5;float noise=(fract(sin(dot(floor(gl_FragCoord.xy/max(.5,uGrain.y))+uGrain.z,vec2(127.1,311.7)))*43758.5453123)-.5)*uGrain.x;
@@ -793,14 +952,18 @@ function rendererVariant(s,options={}){
  const transmission=modern?s.transparency:s.transparency+(1-s.transparency)*(s.translucency||0),crown=modern&&(s.petalAmount||0)+(s.stemAmount||0)>.000001;
  const amount=Math.min(1,((s.petalBlend||0)+(s.petalRoot||0)+(s.petalRandom||0))*20),spread=s.petalCoverage||0,petals=crown&&(s.petalAmount||0)>.000001;
  const volume=(s.scattering||0)+(s.translucency||0)+(s.subsurface||0)>.0001&&(!modern||transmission>.0001&&s.thinShell<.999);
+ // A sculpting slider never changes the preview program. Analytic spheres and
+ // the cached procedural field share the same shader and runtime uniform.
+ if(modern&&options.preview&&options.quality!=='full')return 8+4096+ATLAS_PREVIEW+(s.thinShell>=.999?16:0)+ +volume+((s.subsurface||0)>.0001?2:0)+(transmission>.0001?2048:0);
  return (modern?8:0)+(modern&&s.thinShell>=.999?16:0)+(modern&&analytic?32:0)+(crown?64:0)+ +volume+((s.subsurface||0)>.0001&&(!modern?transmission<.999:true)?2:0)+((s.dispersion||0)>.005?4:0)
   +(petals&&spread<=.9999?128:0)+(petals&&spread>=.0001&&amount<.999999?256:0)+(petals&&spread>=.0001&&amount>.000001?512:0)+(crown&&(s.stemAmount||0)>.000001?1024:0)+(modern&&transmission>.0001?2048:0)+(modern&&options.preview&&options.quality!=='full'?4096:0);
 }
 function variantSource(key){
+ if(key===ATLAS_BAKE)return BAKE_FRAG;
  const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4};
  let defines=Object.entries(flags).map(([name,bit])=>'#define '+name+' '+ +!!(key&bit)).join('\n');
- if(key&8)defines+='\n#define TRACE_STEPS '+(key&4096?128:224)+'\n#define INTERFACE_STEPS '+(key&4096?8:32)+'\n#define LENGTH_SAMPLES '+(key&4096?8:16)+'\n#define SCATTER_SAMPLES '+(key&4096?2:4)+'\n#define SPECTRAL_SAMPLES '+(key&4096?3:5);
- return (key&8?MODERN_FRAG:FRAG).replace('#version 300 es','#version 300 es\n'+defines);
+ if(key&8)defines+='\n#define TRACE_STEPS '+(key&ATLAS_PREVIEW?128:key&4096?128:224)+'\n#define INTERFACE_STEPS '+(key&ATLAS_PREVIEW?4:key&4096?8:32)+'\n#define LENGTH_SAMPLES '+(key&4096?8:16)+'\n#define SCATTER_SAMPLES '+(key&4096?2:4)+'\n#define SPECTRAL_SAMPLES '+(key&4096?3:5);
+ return (key&ATLAS_PREVIEW?PREVIEW_FRAG:key&8?MODERN_FRAG:FRAG).replace('#version 300 es','#version 300 es\n'+defines);
 }
 export class Renderer{
  constructor(canvas){
@@ -827,9 +990,11 @@ export class Renderer{
   for(let i=0;i<count;i++){const u=g.getActiveUniform(v.program,i);v.locations[u.name.replace('[0]','')]=g.getUniformLocation(v.program,u.name);}v.ready=true;
  }
  prepare(source,phase=0,options={}){
-  const v=this.variant(rendererVariant(sampleFrame(source,phase),options));
-  if(!v.ready&&this.parallelExtension&&!this.gl.getProgramParameter(v.program,this.parallelExtension.COMPLETION_STATUS_KHR))return false;
-  this.finishVariant(v);return true;
+  const key=rendererVariant(sampleFrame(source,phase),options),programs=[this.variant(key)];
+  // Compile the small geometry kernel while the first sphere is preparing, so
+  // the first touch of the petal slider never starts a new driver compilation.
+  if(key&ATLAS_PREVIEW)programs.push(this.variant(ATLAS_BAKE));
+  let ready=true;for(const v of programs){if(!v.ready&&this.parallelExtension&&!this.gl.getProgramParameter(v.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}this.finishVariant(v);}return ready;
  }
  async prepareAsync(source,phase=0,options={}){
   const started=Date.now();while(true){if(options.cancelled?.())return false;if(this.prepare(source,phase,options))return true;if(Date.now()-started>120000)throw new Error('La preparazione richiede troppo tempo. Riprova con l’anteprima fluida.');await new Promise(r=>setTimeout(r,16));}
@@ -840,11 +1005,55 @@ export class Renderer{
   if(key!==this.growthKey){const table=growthTable(s);this.growthRows=table.rowData;this.growthRadius=table.radiusBound;if(!this.growthTexture){this.growthTexture=g.createTexture();g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,this.growthTexture);g.texStorage2D(g.TEXTURE_2D,1,g.RGBA32F,96,8);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);}g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,this.growthTexture);g.texSubImage2D(g.TEXTURE_2D,0,0,0,96,8,g.RGBA,g.FLOAT,table.data);this.growthKey=key;this.growthUploads=(this.growthUploads||0)+1;}
   g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,this.growthTexture);g.uniform1i(this.locations.uGrowth,1);g.uniform2fv(this.locations.uGrowthRows,this.growthRows);g.activeTexture(g.TEXTURE0);
  }
+ ensurePreviewField(s,options){
+  const g=this.gl;
+  if(!this.fieldTexture){
+   this.fieldHalfFloat=!!g.getExtension('EXT_color_buffer_float');this.fieldTexture=g.createTexture();g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fieldTexture);
+   g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);
+   g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);
+   // A 1×1 byte placeholder makes some drivers JIT a second optical pipeline
+   // when the first real float atlas appears. Start with the real format and
+   // sampling layout, even while the analytic sphere does not read its data.
+   this.fieldSize=350;g.texImage2D(g.TEXTURE_2D,0,this.fieldHalfFloat?g.R16F:g.RGBA8,350,350,0,this.fieldHalfFloat?g.RED:g.RGBA,this.fieldHalfFloat?g.HALF_FLOAT:g.UNSIGNED_BYTE,null);
+   this.fieldAtlas=[48,7,350,2];this.fieldMin=[-1,-1,-1];this.fieldMax=[1,1,1];g.activeTexture(g.TEXTURE0);
+  }
+  const warmup=analyticShape(s);if(warmup&&this.fieldWarmed)return;
+  const key=FIELD_KEYS.concat(GROWTH_KEYS).map(k=>s[k]??0).join('|'),fine=(s.petalAmount||0)>.25&&((s.petalSharp||0)>.75||(s.petalWidth??.24)<.12),resolution=warmup?48:options.quality==='fast'?(fine?112:48):(fine?144:96);
+  if(!warmup&&key===this.fieldKey&&this.fieldResolution>=resolution)return;
+  const target=g.getParameter(g.DRAW_FRAMEBUFFER_BINDING),viewport=g.getParameter(g.VIEWPORT),scissorBox=g.getParameter(g.SCISSOR_BOX),scissor=g.isEnabled(g.SCISSOR_TEST),blend=g.isEnabled(g.BLEND),dither=g.isEnabled(g.DITHER);
+  try{
+   this.useVariant(ATLAS_BAKE);this.uploadGrowth(s);
+   const bounds=atlasBounds(s,this.growthRadius),tiles=Math.ceil(Math.sqrt(resolution)),size=tiles*(resolution+2);
+   this.fieldAtlas=[resolution,tiles,size,bounds.range];this.fieldMin=bounds.min;this.fieldMax=bounds.max;
+   if(this.fieldSize!==size){g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fieldTexture);g.texImage2D(g.TEXTURE_2D,0,this.fieldHalfFloat?g.R16F:g.RGBA8,size,size,0,this.fieldHalfFloat?g.RED:g.RGBA,this.fieldHalfFloat?g.HALF_FLOAT:g.UNSIGNED_BYTE,null);this.fieldSize=size;}
+   if(!this.fieldFramebuffer)this.fieldFramebuffer=g.createFramebuffer();
+   g.bindFramebuffer(g.DRAW_FRAMEBUFFER,this.fieldFramebuffer);g.framebufferTexture2D(g.DRAW_FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,this.fieldTexture,0);
+   if(g.checkFramebufferStatus(g.DRAW_FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE)throw new Error('Impossibile preparare la forma. La creazione è conservata.');
+   g.viewport(0,0,size,size);g.disable(g.SCISSOR_TEST);g.disable(g.BLEND);g.disable(g.DITHER);
+   // Touch the real bake pipeline during initial preparation, at four pixels
+   // only and without changing texture dimensions or its sample format.
+   if(warmup){g.enable(g.SCISSOR_TEST);g.scissor(0,0,2,2);}
+   const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v);
+   u('uRuntime',[0,0,2,0]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uOther',[0,0,s.waves,0]);
+   u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);
+   u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,0,0]);
+   u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*Math.PI/180,0]);
+   u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);f('uSeed',(s.seed%1000)*.013);
+   f('uFieldEncoding',+this.fieldHalfFloat);u('uFieldAtlas',this.fieldAtlas);u('uFieldMin',this.fieldMin);u('uFieldMax',this.fieldMax);
+   g.drawArrays(g.TRIANGLES,0,3);this.fieldWarmed=true;
+   if(warmup)this.bakeWarmups=(this.bakeWarmups||0)+1;
+   else{this.fieldKey=key;this.fieldResolution=resolution;this.bakeUploads=(this.bakeUploads||0)+1;}
+  }finally{
+   g.bindFramebuffer(g.DRAW_FRAMEBUFFER,target);g.viewport(...viewport);
+   g.scissor(...scissorBox);g[scissor?'enable':'disable'](g.SCISSOR_TEST);g[blend?'enable':'disable'](g.BLEND);g[dither?'enable':'disable'](g.DITHER);g.activeTexture(g.TEXTURE0);
+  }
+ }
+ bindPreviewField(){const g=this.gl;g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fieldTexture);g.uniform1i(this.locations.uFieldTexture,2);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);g.uniform1f(this.locations.uFieldEncoding,+this.fieldHalfFloat);g.uniform4fv(this.locations.uFieldAtlas,this.fieldAtlas);g.uniform3fv(this.locations.uFieldMin,this.fieldMin);g.uniform3fv(this.locations.uFieldMax,this.fieldMax);g.activeTexture(g.TEXTURE0);}
  pollCompletion(){const g=this.gl;if(this.completionSync&&!g.isContextLost()){const status=g.clientWaitSync(this.completionSync,0,0);if(status===g.ALREADY_SIGNALED||status===g.CONDITION_SATISFIED){g.deleteSync(this.completionSync);this.completionSync=null;this.completedFrames++;return true;}}return false;}
  async waitForGpu(options={}){const start=Date.now();while(this.completionSync){this.assertAvailable();if(this.pollCompletion())break;if(options.cancelled?.())return false;if(Date.now()-start>120000)throw new Error('Il calcolo richiede troppo tempo. La creazione è conservata.');await new Promise(r=>setTimeout(r,4));}return !options.cancelled?.();}
- draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);const analytic=!!(key&32)||!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);this.useVariant(key);if(key&512)this.uploadGrowth(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
- if(s.renderVersion>=2){u('uBudget',key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
- if(s.renderVersion>=2){u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);u('uFilmMotion',[phase*Math.round(s.filmCycles||1),s.filmFlow||0,s.filmSwirl||0,0]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
+ draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);const analytic=!!(key&32)||analyticShape(s),timer=options.preview?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW)this.ensurePreviewField(s,options);this.useVariant(key);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(key&512)this.uploadGrowth(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
+ if(s.renderVersion>=2){u('uBudget',key&ATLAS_PREVIEW?(options.quality==='fast'?[this.fieldResolution>=96?128:96,3,4,1]:[128,4,8,2]):key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
+ if(s.renderVersion>=2){u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);u('uFilmMotion',[phase*Math.round(s.filmCycles||1),s.filmFlow||0,s.filmSwirl||0,key&ATLAS_PREVIEW?24:0]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
  u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);
 
@@ -853,7 +1062,7 @@ export class Renderer{
  u('uPhoto1',[s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1]);u('uPhoto2',[s.temperature||0,s.photoTint||0,s.vignette||0,s.lensDistortion||0]);u('uPhoto3',[s.blacks||0,s.highlights||0,s.grainSize||1,0]);u('uPhoto4',[s.gamma||1,+!!s.photoAll,0,0]);
  const palette=s.palette.slice(0,12);while(palette.length<12)palette.push(palette[palette.length-1]||'#ffffff');g.uniform3fv(this.locations.uPalette,palette.flatMap(rgb));g.uniform1i(this.locations.uPaletteCount,Math.max(1,Math.min(12,s.palette.length)));
  const active=s.lights.filter(l=>l.enabled).slice(0,8),pos=[],colors=[],props=[],extra=[];const types={circle:0,bar:1,spot:2,diffuser:3,grid:4,ring:5,orb:6};for(let i=0;i<8;i++){const l=active[i];pos.push(...(l?[l.x,l.y,l.z,l.power]:[0,0,0,0]));colors.push(...rgb(l?.color||'#000000'));props.push(...(l?[l.size,l.length,l.roll*rad,types[l.type]??0]:[1,1,0,0]));extra.push(...(l?[l.softness,Math.tan(l.cone*rad),l.grid,+!!l.visible]:[.3,1,4,0]))}g.uniform4fv(this.locations.uLights,pos);g.uniform3fv(this.locations.uLightColors,colors);g.uniform4fv(this.locations.uLightProps,props);g.uniform4fv(this.locations.uLightExtra,extra);g.uniform1i(this.locations.uLightCount,active.length);
- u('uBg',rgb(s.background));u('uBg2',rgb(s.background2));u('uBackdrop',[s.bgHeight??-.65,s.bgSoftness??1.1,s.bgWash??.12,s.bgShade??.06]);f('uBgMode',{solid:0,gradient:1,transparent:2,studio:3}[s.bgMode]??0);f('uBgAngle',s.bgAngle*rad);f('uSeed',(s.seed%1000)*.013);const timer=options.preview?this.beginGpuTimer():null;g.drawArrays(g.TRIANGLES,0,3);this.endGpuTimer(timer);if(this.completionSync)g.deleteSync(this.completionSync);this.completionSync=g.fenceSync(g.SYNC_GPU_COMMANDS_COMPLETE,0);g.flush();return true;}
+ u('uBg',rgb(s.background));u('uBg2',rgb(s.background2));u('uBackdrop',[s.bgHeight??-.65,s.bgSoftness??1.1,s.bgWash??.12,s.bgShade??.06]);f('uBgMode',{solid:0,gradient:1,transparent:2,studio:3}[s.bgMode]??0);f('uBgAngle',s.bgAngle*rad);f('uSeed',(s.seed%1000)*.013);g.drawArrays(g.TRIANGLES,0,3);this.endGpuTimer(timer);if(this.completionSync)g.deleteSync(this.completionSync);this.completionSync=g.fenceSync(g.SYNC_GPU_COMMANDS_COMPLETE,0);g.flush();return true;}
  pixels(){const {gl,canvas}=this,raw=new Uint8Array(canvas.width*canvas.height*4);gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,raw);const flipped=new Uint8Array(raw.length),row=canvas.width*4;for(let y=0;y<canvas.height;y++)flipped.set(raw.subarray(y*row,(y+1)*row),(canvas.height-y-1)*row);return flipped}
  async drawTiled(source,phase,width,height,options={}){
   const g=this.gl,key=rendererVariant(sampleFrame(source,phase),options),volume=(source.scattering||0)+(source.translucency||0)+(source.subsurface||0)>.0001;
@@ -891,7 +1100,7 @@ export class Renderer{
    g.useProgram(this.resolveProgram);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,texture);g.uniform1i(g.getUniformLocation(this.resolveProgram,'uImage'),0);g.uniform4fv(g.getUniformLocation(this.resolveProgram,'uGrain'),[source.grain||0,source.grainSize||1,(source.seed%1000)*.013,+!(source.bgMode==='transparent'&&!options.preview)]);g.uniform1f(g.getUniformLocation(this.resolveProgram,'uAll'),+!!source.photoAll);g.drawArrays(g.TRIANGLES,0,3);return true;
   }finally{if(!this.disposed&&!this.contextWasLost&&!g.isContextLost()){g.disable(g.BLEND);g.bindFramebuffer(g.FRAMEBUFFER,null);g.deleteTexture(texture);g.deleteFramebuffer(framebuffer);}this.accumulation=null;}
  }
- dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
+ dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.fieldTexture)g.deleteTexture(this.fieldTexture);if(this.fieldFramebuffer)g.deleteFramebuffer(this.fieldFramebuffer);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
 }
 // Included verbatim in exported HTML: no imports, network or application state.
 export function startWallpaper(canvas,source){
@@ -912,5 +1121,5 @@ export function startWallpaper(canvas,source){
   }catch(error){failure(error);}
  }
  raf=requestAnimationFrame(frame);
- return {stop(){stopped=true;cancelAnimationFrame(raf);renderer.dispose();status.remove();},getStats(){return {paused,limit,width:canvas.width,height:canvas.height,gpuMilliseconds:renderer.gpuMilliseconds,growthUploads:renderer.growthUploads||0};}};
+ return {stop(){stopped=true;cancelAnimationFrame(raf);renderer.dispose();status.remove();},getStats(){return {paused,limit,width:canvas.width,height:canvas.height,gpuMilliseconds:renderer.gpuMilliseconds,growthUploads:renderer.growthUploads||0,bakeUploads:renderer.bakeUploads||0,bakeWarmups:renderer.bakeWarmups||0,fieldResolution:renderer.fieldResolution||0};}};
 }
