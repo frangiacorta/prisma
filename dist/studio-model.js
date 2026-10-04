@@ -6,6 +6,7 @@ export const TRACK_META={
  rotateY:['Rotazione orizzontale',0,360,1],rotateX:['Rotazione verticale',0,180,1],rotateZ:['Rotazione sul piano',0,360,1],volume:['Volume',0,.6,.01],deform:['Deformazione',0,.4,.01],twist:['Torsione',0,2,.01],waves:['Increspature',0,.3,.01],hole:['Apertura del vuoto',0,.6,.01],cut:['Ritaglio',0,.8,.01],scale:['Dimensione',0,.7,.01],positionX:['Posizione orizzontale',0,1.2,.01],positionY:['Posizione verticale',0,1.2,.01],gradientOffset:['Scorrimento colori',0,1,.01],iridescence:['Iridescenza',0,.7,.01],roughness:['Rugosità',0,.6,.01],transparency:['Trasparenza',0,.7,.01]
 };
 export const EXTRA_BASE={
+ bgHeight:-.65,bgSoftness:1.1,bgWash:.12,bgShade:.06,
  roundness:0,taper:0,bendX:0,bendY:0,lobeAmount:0,lobes:5,pinch:0,rimRound:0,holeAspect:1,cutAspect:1,rotateZ:0,
  coat:0,coatRoughness:.1,fresnel:1,iridShift:0,iridScale:1,dispersion:0,absorption:.15,tintStrength:.15,anisotropy:0,anisotropyAngle:0,surfaceTexture:0,
  hollow:0,wallThickness:.08,translucency:0,scattering:0,scatterDirection:.25,thinFilm:0,filmThickness:420,subsurface:0,sssRadius:.35,sssColor:'#ffc49b',
@@ -15,6 +16,7 @@ export const EXTRA_BASE={
 export function newLight(id=1){return{id,enabled:true,visible:true,type:'circle',color:'#e0eaff',x:-1.4,y:1.8,z:2.5,power:1.8,size:.9,length:.6,roll:0,softness:.3,cone:30,grid:5,orbit:{...track(35),axis:'y'},pulse:track(.3)}}
 export function legacyLights(s){const build=(id,p)=>{const angle=s[p+'Angle']*Math.PI/180,height=s[p+'Height']*Math.PI/180;return{...newLight(id),visible:true,type:'bar',x:3.2*Math.sin(angle)*Math.cos(height),y:3.2*Math.sin(height),z:3.2*Math.cos(angle)*Math.cos(height),color:s[p+'Color'],power:s[p+'Power'],size:1.7,length:s[p+'Size']*.6,softness:s[p+'Size'],enabled:id===1||s.light2}};return[build(1,'light'),build(2,'light2')]}
 export const EXTRA_META={
+ bgHeight:['Altezza della sfumatura',-2,2,.01],bgSoftness:['Morbidezza del fondale',.15,2.5,.01],bgWash:['Luce centrale',0,1,.01],bgShade:['Ombra ai bordi',0,.5,.01],
  roundness:['Sfera / cubo morbido',0,1,.01],taper:['Affusolamento',-.8,.8,.01],bendX:['Curvatura orizzontale',-.7,.7,.01],bendY:['Curvatura verticale',-.7,.7,.01],lobeAmount:['Petali e lobi',0,.4,.01],lobes:['Numero di lobi',2,12,1],pinch:['Strozzatura centrale',0,.65,.01],rimRound:['Raccordo dei ritagli',0,.15,.005],holeAspect:['Proporzioni del vuoto',.3,2.5,.01],cutAspect:['Proporzioni del ritaglio',.3,2.5,.01],rotateZ:['Rotazione sul piano',-180,180,1],
  coat:['Vernice trasparente',0,1,.01],coatRoughness:['Rugosità della vernice',0,1,.01],fresnel:['Riflessi sui bordi',0,2,.01],iridShift:['Tinta iridescente',0,1,.01],iridScale:['Ampiezza iridescenza',.1,4,.01],dispersion:['Dispersione cromatica',0,1,.01],absorption:['Assorbimento',0,2,.01],tintStrength:['Tinta interna',0,1,.01],anisotropy:['Riflessi allungati',0,1,.01],anisotropyAngle:['Direzione della satinatura',-180,180,1],surfaceTexture:['Microtexture',0,1,.01],
  hollow:['Vuotezza interna',0,1,.01],wallThickness:['Spessore della parete',.003,1,.001],translucency:['Traslucenza / controluce',0,1,.01],scattering:['Diffusione interna · scattering',0,1,.01],scatterDirection:['Direzione della diffusione',-.8,.8,.01],thinFilm:['Pellicola iridescente',0,1,.01],filmThickness:['Spessore pellicola (nm)',80,1200,1],
@@ -52,6 +54,16 @@ export const LEGACY_MATERIAL_STYLES=[
 ].map(m=>({...m,values:{hollow:0,wallThickness:.08,translucency:0,scattering:0,scatterDirection:.25,thinFilm:0,filmThickness:420,subsurface:0,sssRadius:.35,sssColor:'#ffc49b',thickness:1,absorption:.05,tintStrength:.05,dispersion:0,fresnel:1,iridScale:1,iridShift:0,anisotropy:0,surfaceTexture:0,coat:0,emission:0,...m.values}}));
 
 export const ENVIRONMENTS=[['studio','Studio'],['sunset','Tramonto'],['neon','Neon'],['sky','Cielo'],['aquarium','Acquario'],['aurora','Aurora'],['city','Notte in città']];
+export const BACKDROPS=[
+ {name:'Azzurro polvere',colors:['#d0dbea','#929ba7']},
+ {name:'Perla',colors:['#e1e3e8','#aaaeb6']},
+ {name:'Cipria',colors:['#e8d6dc','#a89aa6']},
+ {name:'Salvia',colors:['#d8e3dc','#98aaa3']},
+ {name:'Crema',colors:['#ece5d8','#b1a699']},
+ {name:'Lavanda',colors:['#dfdcf0','#a5a0b7']},
+ {name:'Ghiaccio',colors:['#dce8ef','#98adb8']},
+ {name:'Grigio galleria',colors:['#eeeeed','#a9aaa8']}
+];
 export const MODERN_BASE={renderVersion:2,environment:'studio',environmentAngle:0,environmentPower:1,environmentRefraction:0,environmentRotate:false,environmentCycles:1,internalColor:'#e6f5ff',fullness:1,thinShell:0,filmFlow:0,filmSwirl:0,filmCycles:1,grounding:0};
 const clear={...MODERN_BASE,metal:0,transparency:1,refraction:1.5,roughness:.02,gloss:1,iridescence:0,emission:0,coat:0,coatRoughness:.06,fresnel:1,hollow:0,wallThickness:1,thickness:1,translucency:0,scattering:0,subsurface:0,sssRadius:.55,sssColor:'#ffd0ac',scatterDirection:.25,thinFilm:0,filmThickness:420,absorption:.012,tintStrength:.03,dispersion:0,anisotropy:0,anisotropyAngle:0,surfaceTexture:0,iridScale:1,iridShift:0,glow:0,grounding:.35};
 export const MATERIAL_STYLES=[

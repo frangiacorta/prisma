@@ -1,6 +1,6 @@
 import {Renderer,fieldAt,sampleFrame} from './renderer.js';
 import {buildPanel,pathValue,pathMeta,writePath} from './panels.js';
-import {MAX_COLORS,MAX_LIGHTS,newLight,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,EXTRA_BASE} from './studio-model.js';
+import {MAX_COLORS,MAX_LIGHTS,newLight,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,EXTRA_BASE,BACKDROPS} from './studio-model.js';
 import {BASE,PRESETS,MOODS,META,GROUPS,preset,randomize} from './model.js';
 import {newCreation,material,upgrade,setFullness,motionPreset,surprise,similar,hasMotion,normalizeCreation} from './creative-model.js';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -47,6 +47,7 @@ $('#controls').addEventListener('click',e=>{const m=e.target.closest('[data-mood
 $('#controls').addEventListener('input',e=>{const el=e.target;if(el.dataset.path)setNested(el.dataset.path,el.value);if(el.dataset.numberPath&&el.value!=='')setNested(el.dataset.numberPath,el.value);if(el.dataset.pathColor){writePath(state,el.dataset.pathColor,el.value);mark()}});
 $('#controls').addEventListener('change',e=>{const el=e.target;if(el.dataset.pathCheck){writePath(state,el.dataset.pathCheck,el.checked);syncMasterStates();mark();renderControls();if(el.checked&&(/motions|orbit|pulse/.test(el.dataset.pathCheck)))setPlaying(true)}if(el.dataset.pathSelect){remember();writePath(state,el.dataset.pathSelect,el.dataset.pathSelect.endsWith('.direction')?Number(el.value):el.value);mark();renderControls()}if(el.dataset.numberPath)el.value=pathValue(state,el.dataset.numberPath);if(el.dataset.paletteHex!==undefined){if(/^#[0-9a-f]{6}$/i.test(el.value)){remember();state.palette[Number(el.dataset.paletteHex)]=el.value.toLowerCase();mark();renderControls()}else{el.value=state.palette[Number(el.dataset.paletteHex)];toast('Usa un codice come #7c85ff')}}});
 $('#controls').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.backdrop!==undefined){const backdrop=BACKDROPS[Number(b.dataset.backdrop)];if(backdrop){remember();Object.assign(state,{bgMode:'studio',background:backdrop.colors[0],background2:backdrop.colors[1],bgHeight:-.65,bgSoftness:1.1,bgWash:.12,bgShade:.06});mark();renderControls();toast(`Fondale ${backdrop.name}`);}}
  if(b.id==='add-color'&&state.palette.length<MAX_COLORS){remember();state.palette.push(MOODS[Math.floor(Math.random()*MOODS.length)].colors[0]);mark();renderControls()}
  if(b.dataset.colorRemove!==undefined&&state.palette.length>1){remember();state.palette.splice(Number(b.dataset.colorRemove),1);mark();renderControls()}
  if(b.dataset.colorMove!==undefined){const i=Number(b.dataset.colorMove),j=i+Number(b.dataset.direction);if(j>=0&&j<state.palette.length){remember();[state.palette[i],state.palette[j]]=[state.palette[j],state.palette[i]];mark();renderControls()}}

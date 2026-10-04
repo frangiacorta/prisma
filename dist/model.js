@@ -42,7 +42,7 @@ export const GROUPS={
  material:['transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture','hollow','wallThickness','translucency','scattering','scatterDirection','thinFilm','filmThickness','subsurface','sssRadius','sssColor','fullness','internalColor','thinShell','renderVersion'],
  color:['palette','gradientAngle','gradientScale','gradientOffset','colorSoftness','glow'],
  light:['lights','environment','environmentAngle','environmentPower','environmentRefraction','environmentRotate','environmentCycles'],
- background:['background','background2','bgAngle'],
+ background:['background','background2','bgAngle','bgMode','bgHeight','bgSoftness','bgWash','bgShade'],
  photo:['exposure','brightness','contrast','saturation','temperature','photoTint','gamma','blacks','highlights','vignette','lensDistortion','grainSize','grain']
 };
 export function preset(i){const s={...structuredClone(BASE),...structuredClone(EXTRA_BASE),...structuredClone(PRESETS[i].values)};s.lights=legacyLights(s);if(i===1){s.animateShape=false;s.motions.volume.enabled=false;s.motions.deform.enabled=false;}return s}

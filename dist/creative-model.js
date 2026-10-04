@@ -38,7 +38,7 @@ export function normalizeCreation(raw){
  const s=preset(0);for(const [k,meta] of Object.entries(META)){if(Number.isFinite(raw[k]))s[k]=clamp(k,raw[k]);}
  for(const k of ['background','background2','internalColor','sssColor'])if(/^#[0-9a-f]{6}$/i.test(raw[k]||''))s[k]=raw[k];
  if(Array.isArray(raw.palette)&&raw.palette.length&&raw.palette.every(c=>/^#[0-9a-f]{6}$/i.test(c)))s.palette=raw.palette.slice(0,12);
- if(['solid','gradient','transparent'].includes(raw.bgMode))s.bgMode=raw.bgMode;
+ if(['solid','gradient','transparent','studio'].includes(raw.bgMode))s.bgMode=raw.bgMode;
  Object.assign(s,{...MODERN_BASE,renderVersion:raw.renderVersion>=2?2:1});
  for(const k of Object.keys(MODERN_BASE))if(typeof raw[k]===typeof MODERN_BASE[k]&&k!=='renderVersion')s[k]=typeof raw[k]==='number'&&META[k]?clamp(k,raw[k]):raw[k];
  if(!['studio','sunset','neon','sky','aquarium','aurora','city'].includes(s.environment))s.environment='studio';

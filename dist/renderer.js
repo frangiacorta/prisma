@@ -25,6 +25,7 @@ uniform vec4 uExtraShape,uExtraShape2,uExtraShape3,uCoat,uOptics,uTexture,uPhoto
 uniform vec4 uInterior,uScatter,uRuntime,uTransport;
 uniform vec3 uSssColor;
 uniform vec3 uPalette[12],uBg,uBg2;
+uniform vec4 uBackdrop;
 uniform vec4 uLights[8],uLightProps[8],uLightExtra[8];
 uniform vec3 uLightColors[8];
 uniform int uPaletteCount,uLightCount;
@@ -114,7 +115,16 @@ bool traceBoundary(vec3 origin,vec3 direction,float maximum,bool outerOnly,out v
  point=origin+direction*travel;return found;
 }
 vec3 palette(float t){float v=fract(t)*float(uPaletteCount);int i=int(floor(v)),j=(i+1)%uPaletteCount;float f=smoothstep(.5-max(.012,uGradient.w)*.5,.5+max(.012,uGradient.w)*.5,fract(v));return mix(uPalette[i],uPalette[j],f);}
-vec3 bg(vec2 p){float t=dot(p,vec2(cos(uBgAngle),sin(uBgAngle)))*.35+.5;return mix(uBg,uBg2,uBgMode==1.?clamp(t,0.,1.):0.);}
+vec3 bg(vec2 p){
+ if(uBgMode==3.){
+  float t=1.-smoothstep(uBackdrop.x-uBackdrop.y,uBackdrop.x+uBackdrop.y,p.y);
+  vec3 color=mix(uBg,uBg2,t);
+  float wash=exp(-dot(p/vec2(2.6,3.8),p/vec2(2.6,3.8))*1.8);
+  color=mix(color,min(vec3(1.),color+vec3(.08)),wash*uBackdrop.z);
+  return color*(1.-uBackdrop.w*smoothstep(.8,3.2,length(p/vec2(1.,1.3))));
+ }
+ float t=dot(p,vec2(cos(uBgAngle),sin(uBgAngle)))*.35+.5;return mix(uBg,uBg2,uBgMode==1.?clamp(t,0.,1.):0.);
+}
 bool transparentExport(){return uBgMode==2.&&uRuntime.x<.5;}
 vec3 backdrop(vec3 origin,vec3 direction){float z=-max(3.,max(max(uShape.y,uShape.z),uShape.x*uShape.w)*uFrame.x*1.6+1.);float t=(z-origin.z)/(abs(direction.z)>.0001?direction.z:-.0001);vec2 p=(origin+direction*max(0.,t)).xy;if(uBgMode==2.){if(transparentExport())return vec3(1.);float cell=.17;vec2 square=p/cell,width=vec2(max(.02,3.4/min(uResolution.x,uResolution.y)/cell));vec2 a=square-width*.5,b=square+width*.5;vec2 stripe=((.5-abs(mod(b,2.)-1.))-(.5-abs(mod(a,2.)-1.)))/width;float checker=.5-.5*stripe.x*stripe.y;return mix(vec3(.57),vec3(.87),clamp(checker,0.,1.));}return bg(p);}
 float fixture(vec2 q,vec4 props,vec4 extra){float width=max(.04,props.x),height=max(.04,props.y),soft=max(.015,extra.x),d;
@@ -477,7 +487,7 @@ export class Renderer{
  u('uPhoto1',[s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1]);u('uPhoto2',[s.temperature||0,s.photoTint||0,s.vignette||0,s.lensDistortion||0]);u('uPhoto3',[s.blacks||0,s.highlights||0,s.grainSize||1,0]);u('uPhoto4',[s.gamma||1,+!!s.photoAll,0,0]);
  const palette=s.palette.slice(0,12);while(palette.length<12)palette.push(palette[palette.length-1]||'#ffffff');g.uniform3fv(this.locations.uPalette,palette.flatMap(rgb));g.uniform1i(this.locations.uPaletteCount,Math.max(1,Math.min(12,s.palette.length)));
  const active=s.lights.filter(l=>l.enabled).slice(0,8),pos=[],colors=[],props=[],extra=[];const types={circle:0,bar:1,spot:2,diffuser:3,grid:4,ring:5,orb:6};for(let i=0;i<8;i++){const l=active[i];pos.push(...(l?[l.x,l.y,l.z,l.power]:[0,0,0,0]));colors.push(...rgb(l?.color||'#000000'));props.push(...(l?[l.size,l.length,l.roll*rad,types[l.type]??0]:[1,1,0,0]));extra.push(...(l?[l.softness,Math.tan(l.cone*rad),l.grid,+!!l.visible]:[.3,1,4,0]))}g.uniform4fv(this.locations.uLights,pos);g.uniform3fv(this.locations.uLightColors,colors);g.uniform4fv(this.locations.uLightProps,props);g.uniform4fv(this.locations.uLightExtra,extra);g.uniform1i(this.locations.uLightCount,active.length);
- u('uBg',rgb(s.background));u('uBg2',rgb(s.background2));f('uBgMode',{solid:0,gradient:1,transparent:2}[s.bgMode]);f('uBgAngle',s.bgAngle*rad);f('uSeed',(s.seed%1000)*.013);g.drawArrays(g.TRIANGLES,0,3)}
+ u('uBg',rgb(s.background));u('uBg2',rgb(s.background2));u('uBackdrop',[s.bgHeight??-.65,s.bgSoftness??1.1,s.bgWash??.12,s.bgShade??.06]);f('uBgMode',{solid:0,gradient:1,transparent:2,studio:3}[s.bgMode]??0);f('uBgAngle',s.bgAngle*rad);f('uSeed',(s.seed%1000)*.013);g.drawArrays(g.TRIANGLES,0,3)}
  pixels(){const {gl,canvas}=this,raw=new Uint8Array(canvas.width*canvas.height*4);gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,raw);const flipped=new Uint8Array(raw.length),row=canvas.width*4;for(let y=0;y<canvas.height;y++)flipped.set(raw.subarray(y*row,(y+1)*row),(canvas.height-y-1)*row);return flipped}
  async drawAccumulated(source,phase,width,height,options={}){
   const samples=Math.max(1,Math.min(64,options.samples||16)),g=this.gl;
