@@ -2,10 +2,14 @@ export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
 export function track(amplitude=1,enabled=false,mode='wave'){return{enabled,amplitude,cycles:1,phase:0,direction:1,curve:'sine',mode}}
+export const SHAPE_TRACKS=['volume','deform','twist','waves','hole','cut','petalOpen','petalCurl','petalInflate','petalSharp','petalPhase','stemBend'];
 export const TRACK_META={
+ petalOpen:['Apertura dei petali',0,.6,.01],petalCurl:['Arricciatura dei petali',0,1,.01],petalInflate:['Gonfiore dei petali',0,.7,.01],petalSharp:['Petali / punte',0,.7,.01],petalPhase:['Rotazione della corona',0,360,1],stemBend:['Oscillazione del gambo',0,.8,.01],colorWavePhase:['Onde di colore',0,1,.01],
  rotateY:['Rotazione orizzontale',0,360,1],rotateX:['Rotazione verticale',0,180,1],rotateZ:['Rotazione sul piano',0,360,1],volume:['Volume',0,.6,.01],deform:['Deformazione',0,.4,.01],twist:['Torsione',0,2,.01],waves:['Increspature',0,.3,.01],hole:['Apertura del vuoto',0,.6,.01],cut:['Ritaglio',0,.8,.01],scale:['Dimensione',0,.7,.01],positionX:['Posizione orizzontale',0,1.2,.01],positionY:['Posizione verticale',0,1.2,.01],gradientOffset:['Scorrimento colori',0,1,.01],iridescence:['Iridescenza',0,.7,.01],roughness:['Rugosità',0,.6,.01],transparency:['Trasparenza',0,.7,.01]
 };
 export const EXTRA_BASE={
+ petalAmount:0,petalCount:12,petalOpen:.65,petalCurl:0,petalLength:1.05,petalWidth:.24,petalInflate:.6,petalSharp:0,petalCoverage:0,petalRows:5,petalPhase:0,stemAmount:0,stemRadius:.09,stemBend:0,
+ colorWaveAmount:0,colorWaveHeight:1,colorWaveRadius:0,colorWaveSwirl:0,colorWaveBands:1,colorWaveWarp:.2,colorWavePhase:0,groundShadow:1,groundCaustic:1,
  bgHeight:-.65,bgSoftness:1.1,bgWash:.12,bgShade:.06,
  roundness:0,taper:0,bendX:0,bendY:0,lobeAmount:0,lobes:5,pinch:0,rimRound:0,holeAspect:1,cutAspect:1,rotateZ:0,
  coat:0,coatRoughness:.1,fresnel:1,iridShift:0,iridScale:1,dispersion:0,absorption:.15,tintStrength:.15,anisotropy:0,anisotropyAngle:0,surfaceTexture:0,
@@ -14,8 +18,24 @@ export const EXTRA_BASE={
  motions:Object.fromEntries(Object.keys(TRACK_META).map(k=>[k,track(k==='rotateY'?360:k==='volume'?.12:k==='deform'?.048:k==='twist'?.4:k.startsWith('rotate')?30:.2,k==='volume'||k==='deform',k==='rotateY'||k==='gradientOffset'?'cycle':'wave')]))
 };
 export function newLight(id=1){return{id,enabled:true,visible:true,type:'circle',color:'#e0eaff',x:-1.4,y:1.8,z:2.5,power:1.8,size:.9,length:.6,roll:0,softness:.3,cone:30,grid:5,orbit:{...track(35),axis:'y'},pulse:track(.3)}}
+export const LIGHT_SOURCES=[
+ {name:'Barra neon',values:{type:'bar',size:.05,length:1.1,softness:.06,power:2.8,color:'#66eaff',x:1.25,y:.1,z:1.8,roll:15}},
+ {name:'Anello alogeno',values:{type:'ring',size:.95,length:.95,softness:.08,power:2.2,color:'#ffe5b0',x:0,y:.15,z:2.1}},
+ {name:'Softbox',values:{type:'diffuser',size:.9,length:1.3,softness:.65,power:1.5,color:'#f2f6ff',x:-1.7,y:1.4,z:2.5}},
+ {name:'Faro',values:{type:'spot',size:.35,softness:.15,cone:25,power:2.6,color:'#ffd8bd',x:1.5,y:1.3,z:2.3}}
+];
+export const LIGHT_RIGS=[
+ {name:'Neon cyan e rosa',lights:[{...LIGHT_SOURCES[0].values,x:-1.35,roll:-12,color:'#70eaff'},{...LIGHT_SOURCES[0].values,x:1.35,roll:12,color:'#ff6bca'}]},
+ {name:'Anello alogeno',lights:[{...LIGHT_SOURCES[1].values,visible:false},{type:'bar',size:.08,length:1.1,x:-1.6,y:.4,z:-1.1,power:1.4,color:'#a7cfff',visible:false,softness:.15}]},
+ {name:'Doppio anello',lights:[{...LIGHT_SOURCES[1].values,size:1.35,z:-1.7,color:'#ffcd8e'},{...LIGHT_SOURCES[1].values,size:1.55,z:-2.6,color:'#a0dfff',power:1.4}]},
+ {name:'Tunnel di neon',lights:[{type:'ring',size:1.3,z:-1.5,power:2.1,color:'#6688ff',softness:.045},{type:'ring',size:1.45,z:-2.5,power:1.8,color:'#eb68ff',softness:.045},{type:'ring',size:1.6,z:-3.5,power:1.4,color:'#72f0de',softness:.045}]},
+ {name:'Neon incrociati',lights:[{...LIGHT_SOURCES[0].values,x:-1.1,y:.35,roll:-45,color:'#be74ff'},{...LIGHT_SOURCES[0].values,x:1.1,y:-.2,roll:45,color:'#6fe5ff'},{...LIGHT_SOURCES[0].values,x:0,y:1.4,z:-1.7,roll:90,color:'#ffd584',power:1.8}]},
+ {name:'Studio diffuso',lights:[{...LIGHT_SOURCES[2].values,visible:false},{...LIGHT_SOURCES[2].values,x:1.6,y:-.2,z:1.5,size:.65,length:.9,power:.9,color:'#dfd6ff',visible:false}]}
+];
 export function legacyLights(s){const build=(id,p)=>{const angle=s[p+'Angle']*Math.PI/180,height=s[p+'Height']*Math.PI/180;return{...newLight(id),visible:true,type:'bar',x:3.2*Math.sin(angle)*Math.cos(height),y:3.2*Math.sin(height),z:3.2*Math.cos(angle)*Math.cos(height),color:s[p+'Color'],power:s[p+'Power'],size:1.7,length:s[p+'Size']*.6,softness:s[p+'Size'],enabled:id===1||s.light2}};return[build(1,'light'),build(2,'light2')]}
 export const EXTRA_META={
+ petalAmount:['Petali e punte',0,1,.01],petalCount:['Numero di petali / punte',3,24,1],petalOpen:['Apertura',0,1,.01],petalCurl:['Arricciatura',-1,1,.01],petalLength:['Lunghezza',.15,1.8,.01],petalWidth:['Larghezza dei petali',.025,.45,.005],petalInflate:['Gonfiore',0,1,.01],petalSharp:['Acutezza delle punte',0,1,.01],petalCoverage:['Corona / superficie sferica',0,1,.01],petalRows:['File sulla sfera',2,8,1],petalPhase:['Rotazione della corona',0,360,1],stemAmount:['Lunghezza del gambo',0,1,.01],stemRadius:['Spessore del gambo',.015,.2,.005],stemBend:['Curvatura del gambo',-1,1,.01],
+ colorWaveAmount:['Onde di colore',0,1,.01],colorWaveHeight:['Fasce lungo la figura',-2,2,.01],colorWaveRadius:['Fasce radiali',-2,2,.01],colorWaveSwirl:['Vortice cromatico',-1,1,.01],colorWaveBands:['Numero delle fasce',.25,4,.01],colorWaveWarp:['Ondulazione dei colori',0,1,.01],colorWavePhase:['Posizione delle onde',0,1,.001],groundShadow:['Ombra sul fondale',0,1,.01],groundCaustic:['Caustica luminosa',0,1,.01],
  bgHeight:['Altezza della sfumatura',-2,2,.01],bgSoftness:['Morbidezza del fondale',.15,2.5,.01],bgWash:['Luce centrale',0,1,.01],bgShade:['Ombra ai bordi',0,.5,.01],
  roundness:['Sfera / cubo morbido',0,1,.01],taper:['Affusolamento',-.8,.8,.01],bendX:['Curvatura orizzontale',-.7,.7,.01],bendY:['Curvatura verticale',-.7,.7,.01],lobeAmount:['Petali e lobi',0,.4,.01],lobes:['Numero di lobi',2,12,1],pinch:['Strozzatura centrale',0,.65,.01],rimRound:['Raccordo dei ritagli',0,.15,.005],holeAspect:['Proporzioni del vuoto',.3,2.5,.01],cutAspect:['Proporzioni del ritaglio',.3,2.5,.01],rotateZ:['Rotazione sul piano',-180,180,1],
  coat:['Vernice trasparente',0,1,.01],coatRoughness:['Rugosità della vernice',0,1,.01],fresnel:['Riflessi sui bordi',0,2,.01],iridShift:['Tinta iridescente',0,1,.01],iridScale:['Ampiezza iridescenza',.1,4,.01],dispersion:['Dispersione cromatica',0,1,.01],absorption:['Assorbimento',0,2,.01],tintStrength:['Tinta interna',0,1,.01],anisotropy:['Riflessi allungati',0,1,.01],anisotropyAngle:['Direzione della satinatura',-180,180,1],surfaceTexture:['Microtexture',0,1,.01],
@@ -96,7 +116,8 @@ export const MATERIAL_STYLES=[
  {name:'Opaco',values:{transparency:0,roughness:1,gloss:0}},
  {name:'Olio iridescente',values:{metal:.35,transparency:.65,roughness:.04,coat:.6,thinFilm:.9,iridescence:1,filmThickness:620,dispersion:.08}},
  {name:'Carta in controluce',values:{thinShell:1,hollow:1,wallThickness:.03,fullness:.03,transparency:.06,roughness:.85,gloss:.08,translucency:.8,subsurface:.7,sssRadius:.7,sssColor:'#fff0d6',internalColor:'#fff0d6',scattering:.3,absorption:.04}},
- {name:'Pelle sottile',values:{thinShell:1,hollow:1,wallThickness:.075,fullness:.075,transparency:.1,roughness:.32,gloss:.85,coat:.15,subsurface:.8,sssRadius:.9,sssColor:'#ffc9aa',internalColor:'#e8ad8c',translucency:.6,scattering:.2,tintStrength:.14}}
+ {name:'Pelle sottile',values:{thinShell:1,hollow:1,wallThickness:.075,fullness:.075,transparency:.1,roughness:.32,gloss:.85,coat:.15,subsurface:.8,sssRadius:.9,sssColor:'#ffc9aa',internalColor:'#e8ad8c',translucency:.6,scattering:.2,tintStrength:.14}},
+ {name:'Silicone satinato',values:{transparency:0,roughness:.38,gloss:.65,coat:.12,subsurface:.5,sssRadius:.6,scattering:.12,sssColor:'#ff9da9',internalColor:'#ffa0bc',tintStrength:.14,grounding:0}}
 ].map(m=>({...m,values:{...clear,...m.values}}));
 Object.assign(EXTRA_META,{fullness:['Spessore',0,1,.001],environmentAngle:['Rotazione ambiente',-180,180,1],environmentPower:['Intensità ambiente',0,3,.01],environmentRefraction:['Ambiente nelle rifrazioni',0,.5,.01],environmentCycles:['Giri nel loop',1,4,1],filmFlow:['Colori che colano',0,1,.01],filmSwirl:['Vortici della pellicola',0,1,.01],filmCycles:['Giri dei colori nel loop',1,4,1],grounding:['Ombra e caustica',0,1,.01]});
 

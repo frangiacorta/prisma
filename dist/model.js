@@ -45,6 +45,10 @@ export const GROUPS={
  background:['background','background2','bgAngle','bgMode','bgHeight','bgSoftness','bgWash','bgShade'],
  photo:['exposure','brightness','contrast','saturation','temperature','photoTint','gamma','blacks','highlights','vignette','lensDistortion','grainSize','grain']
 };
+GROUPS.shape.push('petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','stemAmount','stemRadius','stemBend');
+GROUPS.shape.push('rotateX','rotateY','rotateZ');
+GROUPS.color.push('colorWaveAmount','colorWaveHeight','colorWaveRadius','colorWaveSwirl','colorWaveBands','colorWaveWarp','colorWavePhase');
+GROUPS.background.push('grounding','groundShadow','groundCaustic');
 export function preset(i){const s={...structuredClone(BASE),...structuredClone(EXTRA_BASE),...structuredClone(PRESETS[i].values)};s.lights=legacyLights(s);if(i===1){s.animateShape=false;s.motions.volume.enabled=false;s.motions.deform.enabled=false;}return s}
 export function random(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let a=Math.imul(t^t>>>15,1|t);a^=a+Math.imul(a^a>>>7,61|a);return((a^a>>>14)>>>0)/4294967296}}
 function mixColor(a,b,t){return '#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-t)+parseInt(b.slice(i,i+2),16)*t).toString(16).padStart(2,'0')).join('')}

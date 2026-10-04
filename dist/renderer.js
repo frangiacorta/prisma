@@ -3,11 +3,11 @@ const TAU=Math.PI*2;
 function motionWave(t,phase){const a=phase*Math.round(t.cycles||1)*(t.direction||1)+(t.phase||0)*Math.PI/180;const x=Math.sin(a);return t.curve==='triangle'?2/Math.PI*Math.asin(x):t.curve==='soft'?x*Math.abs(x):x}
 export function sampleFrame(source,phase=0){
  const s={...source,lights:(source.lights||[]).map(l=>({...l}))};
- const limits={volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1]};
+ const limits={volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],stemBend:[-1,1]};
  for(const [key,t] of Object.entries(source.motions||{})){
-  if(!t.enabled)continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset');
-  const value=continuous?(phase/TAU*Math.round(t.cycles||1)*(t.direction||1)+(t.phase||0)/360)*(key.startsWith('rotate')?360:1):motionWave(t,phase)*(t.amplitude||0)*(source.motion??.3)/.3;
-  s[key]=source[key]+value;if(limits[key])s[key]=Math.max(limits[key][0],Math.min(limits[key][1],s[key]));
+  if(!t.enabled)continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset'||key==='colorWavePhase'||key==='petalPhase');
+  const value=continuous?(phase/TAU*Math.round(t.cycles||1)*(t.direction||1)+(t.phase||0)/360)*(key.startsWith('rotate')||key==='petalPhase'?360:1):motionWave(t,phase)*(t.amplitude||0)*(source.motion??.3)/.3;
+  s[key]=(source[key]||0)+value;if(limits[key])s[key]=Math.max(limits[key][0],Math.min(limits[key][1],s[key]));
  }
  if(!source.motions){if(source.animateRotation)s.rotateY+=phase*180/Math.PI;if(source.animateShape){s.volume*=1+Math.sin(phase)*source.motion*.4;s.deform+=Math.sin(phase)*source.motion*.16}if(source.animateColor)s.gradientOffset+=phase/TAU;}
  for(const l of s.lights){if(l.orbit?.enabled){const t=l.orbit,a=t.mode==='cycle'?phase*Math.round(t.cycles||1)*(t.direction||1)+(t.phase||0)*Math.PI/180:motionWave(t,phase)*t.amplitude*Math.PI/180*(source.motion??.3)/.3;const cs=Math.cos(a),sn=Math.sin(a);if(t.axis==='x'){[l.y,l.z]=[l.y*cs-l.z*sn,l.y*sn+l.z*cs]}else if(t.axis==='z'){[l.x,l.y]=[l.x*cs-l.y*sn,l.x*sn+l.y*cs]}else{[l.x,l.z]=[l.x*cs-l.z*sn,l.x*sn+l.z*cs]}}if(l.pulse?.enabled)l.power=Math.max(0,l.power*(1+motionWave(l.pulse,phase)*l.pulse.amplitude*(source.motion??.3)/.3))}
@@ -229,7 +229,109 @@ function shaderFunction(source,name,replacement){
  while(depth){depth+=(source[end]==='{')-(source[end]==='}');end++;}
  return source.slice(0,start)+replacement+source.slice(end);
 }
-let MODERN_FRAG=FRAG.replace('uniform vec2 uResolution;','uniform vec2 uResolution;\nuniform vec4 uEnvironment,uFilmMotion,uSampling,uModern;\nuniform vec3 uInternalColor;');
+let MODERN_FRAG=FRAG.replace('uniform vec2 uResolution;','uniform vec2 uResolution;\nuniform vec4 uEnvironment,uFilmMotion,uSampling,uModern,uPetals,uPetalTip,uPetalSpread,uStem,uColorWave,uColorAxis;\nuniform vec3 uInternalColor;');
+const CROWN_GEOMETRY=`
+#if CROWN_ENABLED
+// Exact rounded-cone distance, including spherical end caps. Each petal is a
+// continuous chain of tapered cones along a quadratic curve, never a texture.
+float roundCone(vec3 p,vec3 a,vec3 b,float ra,float rb){
+ vec3 ba=b-a,pa=p-a;float l2=dot(ba,ba),rr=ra-rb;
+ if(l2<.000001||rr*rr>=l2)return min(length(pa)-ra,length(p-b)-rb);
+ float a2=l2-rr*rr,il2=1./l2,y=dot(pa,ba),z=y-l2;
+ vec3 radial=pa*l2-ba*y;float x2=dot(radial,radial),y2=y*y*l2,z2=z*z*l2,k=sign(rr)*rr*rr*x2;
+ if(sign(z)*a2*z2>k)return sqrt(x2+z2)*il2-rb;
+ if(sign(y)*a2*y2<k)return sqrt(x2+y2)*il2-ra;
+ return (sqrt(max(0.,x2*a2*il2))+y*rr)*il2-ra;
+}
+vec3 petalCurve(vec3 a,vec3 b,vec3 c,float t){return mix(mix(a,b,t),mix(b,c,t),t);}
+float curvedPetal(vec3 p,vec3 a,vec3 b,vec3 c){
+ float width=uPetalTip.y*(.65+uPetalTip.z*.55),sharp=uPetalTip.w;
+ float middle=width*mix(1.,.42,sharp),root=max(.025,width*.5),tip=max(.0015,middle*mix(.9,.008,sharp));
+ vec3 p1=petalCurve(a,b,c,1./3.),p2=petalCurve(a,b,c,2./3.);
+ float d=roundCone(p,a,p1,root,middle);
+ d=-smax(-d,-roundCone(p,p1,p2,middle,middle*mix(.9,.45,sharp)),.025*(1.-sharp));
+ return -smax(-d,-roundCone(p,p2,c,middle*mix(.9,.45,sharp),tip),.025*(1.-sharp));
+}
+float flowerField(vec3 p){
+ float count=max(3.,floor(uPetals.y+.5)),step=2.*PI/count,angle=atan(p.z,p.x)-uPetalSpread.z;
+ float folded=mod(angle+step*.5,step)-step*.5,r=length(p.xz);
+ vec3 q=vec3(r*cos(folded),p.y,r*sin(folded));
+ float opening=.28+uPetals.z*1.48,root=.17+uPetals.z*.25,lengthOfPetal=uPetalTip.x;
+ vec3 a=vec3(root,-.12,0),b=a+vec3(sin(opening),cos(opening),0)*lengthOfPetal*.65;
+ float curled=opening-uPetals.w*1.4;vec3 c=a+vec3(sin(curled),cos(curled),0)*lengthOfPetal;
+ float petal=curvedPetal(q,a,b,c),collar=length(vec2(r-root,p.y+.12))-max(.035,uPetalTip.y*.47);
+ return -smax(-petal,-collar,.035);
+}
+float hedgeField(vec3 p){
+ float radius=length(p),rows=max(2.,floor(uPetalSpread.y+.5)),step=PI/rows;
+ float phi=acos(clamp(p.y/max(.00001,radius),-1.,1.)),theta=atan(p.z,p.x)-uPetalSpread.z;
+ float nearest=floor(phi/step),core=.62+uPetals.z*.14,d=radius-core;
+ if(radius<core*.45)return d;
+ for(int j=-1;j<=1;j++){
+  float row=clamp(nearest+float(j),0.,rows-1.),latitude=(row+.5)*step;
+  float count=max(3.,floor(uPetals.y*sin(latitude)+.5)),sector=2.*PI/count;
+  float longitude=floor((theta+sector*.5)/sector)*sector+uPetalSpread.z;
+  vec3 axis=vec3(sin(latitude)*cos(longitude),cos(latitude),sin(latitude)*sin(longitude));
+  vec3 tangent=vec3(cos(latitude)*cos(longitude),-sin(latitude),cos(latitude)*sin(longitude));
+  vec3 a=axis*core*.92,b=a+axis*uPetalTip.x*.65;
+  vec3 c=a+(axis*cos(uPetals.w*.65)+tangent*sin(uPetals.w*.65))*uPetalTip.x;
+  d=-smax(-d,-curvedPetal(p,a,b,c),.035*(1.-uPetalTip.w));
+ }
+ return d;
+}
+float crownField(vec3 p){float spread=uPetalSpread.x;if(spread<.0001)return flowerField(p);if(spread>.9999)return hedgeField(p);return mix(flowerField(p),hedgeField(p),spread);}
+float stemField(vec3 p){
+ float len=uStem.x*3.,radius=uStem.y*min(1.,uStem.x*8.),bend=uStem.z;
+ vec3 a=vec3(0,-.14,0),b=vec3(bend*.35,-.14-len*.45,0),c=vec3(-bend*.55,-.14-len,0);
+ return curvedStem(p,a,b,c,radius);
+}
+#endif
+`;
+// Separate stem helper so petal taper never affects its thickness.
+const STEM_GEOMETRY=`float curvedStem(vec3 p,vec3 a,vec3 b,vec3 c,float radius){vec3 m=petalCurve(a,b,c,.5);return min(roundCone(p,a,m,radius,radius),roundCone(p,m,c,radius,radius));}\n`;
+MODERN_FRAG=MODERN_FRAG.replace('vec3 fieldParts(vec3 world){',CROWN_GEOMETRY.replace('float stemField',STEM_GEOMETRY+'float stemField')+'\nvec3 fieldParts(vec3 world){');
+MODERN_FRAG=MODERN_FRAG.replace('float d=norm-1.-uWarp.x*w-uOther.z*ripple*.17-lobe;',`float d=norm-1.-uWarp.x*w-uOther.z*ripple*.17-lobe;
+ #if CROWN_ENABLED
+ if(uPetals.x>.000001)d=mix(d,crownField(p)-uWarp.x*w*.35-uOther.z*ripple*.08,uPetals.x);
+ if(uStem.x>.000001)d=-smax(-d,-stemField(p),.08*min(1.,uStem.x*8.));
+ #endif
+`);
+MODERN_FRAG=MODERN_FRAG.replace('vec3 surfaceNormal(vec3 p){vec3 n=surfaceGradient(p);',`vec3 surfaceNormal(vec3 p){vec3 n;
+ #if CROWN_ENABLED
+ float e=.00012*uFrame.x;vec3 x=vec3(e,0,0),y=vec3(0,e,0),z=vec3(0,0,e);n=vec3(field(p+x)-field(p-x),field(p+y)-field(p-y),field(p+z)-field(p-z));
+ #else
+ n=surfaceGradient(p);
+ #endif
+`);
+// A true SDF needs one distance lookup per step. Derivatives are only useful
+// very close to the interface, where we bracket an accurate entry or exit.
+MODERN_FRAG=MODERN_FRAG.replace('float derivative=(field(point+direction*.0005)-field(point-direction*.0005))/.001,outer=field(point);if(!outerOnly&&hasCavity()&&-outer-wallDepth()>outer)derivative=-derivative;',`float derivative=1.;
+ #if CROWN_ENABLED
+ if(abs(d)<eps){
+ #endif
+ derivative=(field(point+direction*.0005)-field(point-direction*.0005))/.001;
+ float outer=field(point);if(!outerOnly&&hasCavity()&&-outer-wallDepth()>outer)derivative=-derivative;
+ #if CROWN_ENABLED
+ }
+ #endif
+`);
+MODERN_FRAG=MODERN_FRAG.replace('previousT=t;previousD=d;t+=max(min(stepSize,.18*uFrame.x),eps*1.5);',`previousT=t;previousD=d;
+ #if CROWN_ENABLED
+ stepSize=abs(d)*uRuntime.y*2.;
+ #endif
+ t+=max(min(stepSize,.18*uFrame.x),eps*1.5);`);
+MODERN_FRAG=MODERN_FRAG.replace('vec3 bg(vec2 p){',`float colorCoordinate(vec3 p){
+ float phase=uColorWave.w*2.*PI,r=length(p.xz),angle=r>.00001?atan(p.z,p.x):0.;
+ float spiral=sin(angle+r*2.-phase)*r/(r+.18)*uColorAxis.z*.32;
+ float warp=sin(p.y*2.4+sin(p.x*2.1+phase))*uColorWave.z*.22;
+ return (p.y*uColorAxis.x*.35+r*uColorAxis.y*.35+spiral+warp)*uColorWave.y+uColorWave.w;
+}
+vec3 surfacePalette(vec3 p,vec3 base){
+ if(uColorWave.x<.000001)return base;
+ return mix(base,palette(colorCoordinate(p)),uColorWave.x);
+}
+vec3 bg(vec2 p){`);
+MODERN_FRAG=MODERN_FRAG.replaceAll('palette(dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*uGradient.y*.3+uGradient.z)','surfacePalette(p,palette(dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*uGradient.y*.3+uGradient.z))');
 MODERN_FRAG=shaderFunction(MODERN_FRAG,'environment',`vec3 environment(vec3 direction,vec3 p,float rough){
  vec3 r=normalize(direction);r.xz=rot(uEnvironment.y)*r.xz;
  float blur=rough*rough*.85;vec3 a=palette(.12),b=palette(.57),white=vec3(1.);
@@ -270,7 +372,8 @@ vec3 soapFilm(vec3 local,float facing){
  float angle=atan(local.y,local.x);
  float thickness=uScatter.w*(1.+.09*sin(local.x*1.7+local.y*2.6)-.1*local.y
    +flow*.22*sin(local.y*4.8+phase+swirl*sin(angle*3.-phase)*1.2)
-   +swirl*.17*sin(angle*3.-phase+local.y*2.));
+   +swirl*.17*sin(angle*3.-phase+local.y*2.)
+   +uColorWave.x*.25*sin(colorCoordinate(local)*2.*PI));
  float n1=1.333,n2=mix(mix(max(1.001,uMat.y),2.2,uMat.z*.55),1.,clamp(uModern.x,0.,1.));
  float ci=max(.001,facing),c1=sqrt(max(.001,1.-(1.-ci*ci)/(n1*n1))),c2=sqrt(max(.001,1.-(1.-ci*ci)/(n2*n2)));
  vec2 r01=vec2((ci-n1*c1)/(ci+n1*c1),(n1*ci-c1)/(n1*ci+c1));
@@ -284,7 +387,8 @@ vec3 soapFilm(vec3 local,float facing){
  return clamp(xyzRGB(xyz)/max(vec3(.001),xyzRGB(white)),0.,1.);
 }`);
 MODERN_FRAG=shaderFunction(MODERN_FRAG,'absorptionCoefficient',`vec3 absorptionCoefficient(vec3 tint){
- return (vec3(uOptics.z*.7)+(vec3(1.)-uInternalColor)*uOptics.w*1.7
+ vec3 interiorTint=mix(uInternalColor,tint,uColorWave.x);
+ return (vec3(uOptics.z*.7)+(vec3(1.)-interiorTint)*uOptics.w*1.7
    +(vec3(1.)-uSssColor)*uTransport.x*.16/max(.08,uTransport.y))*max(.001,uSurface.y);
 }`);
 MODERN_FRAG=shaderFunction(MODERN_FRAG,'sceneEmitters',`vec4 sceneEmitters(vec3 origin,vec3 direction,float maximum,out float nearest){
@@ -415,10 +519,10 @@ vec3 photo(vec3 radiance,vec2 uv){
 MODERN_FRAG=MODERN_FRAG.replace('float width=max(.04,props.x)', 'if(props.w>5.5)return 1.-smoothstep(.8,1.05,length(q/max(.03,props.x)));float width=max(.04,props.x)');
 MODERN_FRAG=MODERN_FRAG.replace('return bg(p);}', `vec3 color=bg(p);if(uModern.y>.001){
  vec2 center=uFrame.yz+vec2(0,-uShape.z*uFrame.x*.95),q=(p-center)/vec2(max(.1,uShape.y*uFrame.x),.18*uFrame.x);
- float shadow=exp(-dot(q,q)*1.4);color*=1.-shadow*uModern.y*.22;
+ float shadow=exp(-dot(q,q)*1.4);color*=1.-shadow*uModern.y*uModern.z*.22;
  float lens=max(.08,uMat.y-1.),focus=.75+min(.8,lens),ring=exp(-pow((length(q/vec2(focus,1.))- .7)/.22,2.));
- color+=mix(vec3(1.),uInternalColor,.25)*ring*uModern.y*uMat.x*(1.-uMat.w)*.15;
- }return color;}`);
+ color+=mix(vec3(1.),uInternalColor,.25)*ring*uModern.y*uModern.w*uMat.x*(1.-uMat.w)*.15;
+  }return color;}`);
 MODERN_FRAG=MODERN_FRAG.replace('vec3 reflectTint=mix(vec3(1.),max(vec3(.15),irid),uSurface.x*.5);','vec3 reflectTint=vec3(1.);');
 MODERN_FRAG=MODERN_FRAG.replace('coverage=endScene.a;radiance+=beta*endScene.rgb;}','coverage=endScene.a;radiance+=beta*environment(direction,origin,uMat.w);}') ;
 MODERN_FRAG=MODERN_FRAG.replace('(gl_FragCoord.xy-.5*uResolution)','(gl_FragCoord.xy+uSampling.xy-.5*uResolution)');
@@ -444,6 +548,7 @@ MODERN_FRAG=specializeAnalytic(MODERN_FRAG,'surfaceGradient',`vec3 size=vec3(uSh
 MODERN_FRAG=specializeAnalytic(MODERN_FRAG,'traceBoundary',`float t=firstRoot(ellipsoidRoots(origin,direction,1.));if(!outerOnly&&hasCavity())t=min(t,firstRoot(ellipsoidRoots(origin,direction,uInterior.x*(1.-uInterior.y))));travel=t;point=origin+direction*t;return t<maximum;`);
 MODERN_FRAG=MODERN_FRAG.replace('if(uModern.x>.999||!hit){glass=straight;}else{', '#if THIN_SHELL_ENABLED\n glass=straight;\n#else\n if(uModern.x>.999||!hit){glass=straight;}else{');
 MODERN_FRAG=MODERN_FRAG.replace('glass=mix(glass,straight,clamp(uModern.x,0.,1.));\n  }','glass=mix(glass,straight,clamp(uModern.x,0.,1.));\n  }\n#endif');
+MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos),specular=', 'vec3 base=surfacePalette(local,palette(pos)),specular=');
 const RESOLVE=`#version 300 es
 precision highp float;uniform sampler2D uImage;uniform vec4 uGrain;uniform float uAll;out vec4 fragColor;
 void main(){vec4 a=texelFetch(uImage,ivec2(gl_FragCoord.xy),0);bool opaque=uGrain.w>.5;float noise=(fract(sin(dot(floor(gl_FragCoord.xy/max(.5,uGrain.y))+uGrain.z,vec2(127.1,311.7)))*43758.5453123)-.5)*uGrain.x;
@@ -463,22 +568,57 @@ export function fieldAt(s,point){
  const norm=Math.pow(p.reduce((n,v)=>n+Math.pow(Math.abs(v),exponent),0),1/exponent);
  const wave=Math.sin(p[0]*3.4+seed)*Math.sin(p[1]*2.6)*Math.cos(p[2]*3+.6),ripple=Math.sin(p[0]*s.waveScale*2)*Math.sin(p[1]*s.waveScale*1.7)*Math.sin(p[2]*s.waveScale*1.6+1);
  const lobe=Math.sin(Math.atan2(p[1],p[0])*(s.lobes||5))*(s.lobeAmount||0)*(1-Math.min(1,Math.abs(p[2]))*.65);
- let d=norm-1-s.deform*wave-s.waves*ripple*.17-lobe;const pow=2+s.holeShape*5;
+ let d=norm-1-s.deform*wave-s.waves*ripple*.17-lobe;
+ if(s.renderVersion>=2){if((s.petalAmount||0)>.000001)d=d*(1-s.petalAmount)+(crownAt(s,p)-s.deform*wave*.35-s.waves*ripple*.08)*s.petalAmount;if((s.stemAmount||0)>.000001)d=softMin(d,stemAt(s,p),.08*Math.min(1,s.stemAmount*8));}
+ const pow=2+s.holeShape*5;
  const hole=s.hole>.001?s.hole-Math.pow(Math.pow(Math.abs((p[0]-s.holeX)/(s.holeAspect||1)),pow)+Math.pow(Math.abs(p[1]-s.holeY),pow),1/pow):-10000;
  const cut=s.cut>.001?s.cut-Math.hypot((p[0]-s.cutX)/(s.cutAspect||1),p[1]-s.cutY):-10000;
  const scale=Math.min(...axes)*s.scale*.5,k=(s.rimRound||0)*scale;
  const maximum=(a,b)=>{if(k<.0001)return Math.max(a,b);const h=Math.max(k-Math.abs(a-b),0)/k;return Math.max(a,b)+h*h*k*.25;};
  d=maximum(maximum(d*scale,hole*scale),cut*scale);return d;
 }
+function softMin(a,b,k){if(k<.000001)return Math.min(a,b);const h=Math.max(k-Math.abs(a-b),0)/k;return Math.min(a,b)-h*h*k*.25;}
+const vectorSub=(a,b)=>a.map((v,i)=>v-b[i]),vectorDot=(a,b)=>a.reduce((n,v,i)=>n+v*b[i],0);
+function coneAt(p,a,b,ra,rb){
+ const ba=vectorSub(b,a),pa=vectorSub(p,a),l2=vectorDot(ba,ba),rr=ra-rb;
+ if(l2<.000001||rr*rr>=l2)return Math.min(Math.hypot(...pa)-ra,Math.hypot(...vectorSub(p,b))-rb);
+ const a2=l2-rr*rr,il2=1/l2,y=vectorDot(pa,ba),z=y-l2,radial=pa.map((v,i)=>v*l2-ba[i]*y),x2=vectorDot(radial,radial),y2=y*y*l2,z2=z*z*l2,k=Math.sign(rr)*rr*rr*x2;
+ if(Math.sign(z)*a2*z2>k)return Math.sqrt(x2+z2)*il2-rb;
+ if(Math.sign(y)*a2*y2<k)return Math.sqrt(x2+y2)*il2-ra;
+ return (Math.sqrt(Math.max(0,x2*a2*il2))+y*rr)*il2-ra;
+}
+function curveAt(a,b,c,t){return a.map((v,i)=>v*(1-t)*(1-t)+b[i]*2*t*(1-t)+c[i]*t*t);}
+function petalAt(s,p,a,b,c){
+ const width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),sharp=s.petalSharp||0,middle=width*(1-sharp*.58),root=Math.max(.025,width*.5),tip=Math.max(.0015,middle*(.9*(1-sharp)+.008*sharp));
+ const p1=curveAt(a,b,c,1/3),p2=curveAt(a,b,c,2/3),endRadius=middle*(.9*(1-sharp)+.45*sharp),k=.025*(1-sharp);
+ return softMin(softMin(coneAt(p,a,p1,root,middle),coneAt(p,p1,p2,middle,endRadius),k),coneAt(p,p2,c,endRadius,tip),k);
+}
+function flowerAt(s,p){
+ const count=Math.max(3,Math.floor((s.petalCount||12)+.5)),step=TAU/count,angle=Math.atan2(p[2],p[0])-(s.petalPhase||0)*Math.PI/180,folded=((angle+step*.5)%step+step)%step-step*.5,r=Math.hypot(p[0],p[2]);
+ const q=[r*Math.cos(folded),p[1],r*Math.sin(folded)],open=.28+(s.petalOpen??.65)*1.48,root=.17+(s.petalOpen??.65)*.25,len=s.petalLength??1.05,a=[root,-.12,0],b=[root+Math.sin(open)*len*.65,-.12+Math.cos(open)*len*.65,0],curl=open-(s.petalCurl||0)*1.4,c=[root+Math.sin(curl)*len,-.12+Math.cos(curl)*len,0];
+ return softMin(petalAt(s,q,a,b,c),Math.hypot(r-root,p[1]+.12)-Math.max(.035,(s.petalWidth??.24)*.47),.035);
+}
+function hedgeAt(s,p){
+ const radius=Math.hypot(...p),rows=Math.max(2,Math.floor((s.petalRows||5)+.5)),step=Math.PI/rows,phi=Math.acos(Math.max(-1,Math.min(1,p[1]/Math.max(.00001,radius)))),theta=Math.atan2(p[2],p[0])-(s.petalPhase||0)*Math.PI/180,nearest=Math.floor(phi/step),core=.62+(s.petalOpen??.65)*.14;
+ let d=radius-core;if(radius<core*.45)return d;
+ for(let j=-1;j<=1;j++){
+  const row=Math.max(0,Math.min(rows-1,nearest+j)),latitude=(row+.5)*step,count=Math.max(3,Math.floor((s.petalCount||12)*Math.sin(latitude)+.5)),sector=TAU/count,longitude=Math.floor((theta+sector*.5)/sector)*sector+(s.petalPhase||0)*Math.PI/180;
+  const axis=[Math.sin(latitude)*Math.cos(longitude),Math.cos(latitude),Math.sin(latitude)*Math.sin(longitude)],tangent=[Math.cos(latitude)*Math.cos(longitude),-Math.sin(latitude),Math.cos(latitude)*Math.sin(longitude)],a=axis.map(v=>v*core*.92),b=a.map((v,i)=>v+axis[i]*(s.petalLength??1.05)*.65),angle=(s.petalCurl||0)*.65,c=a.map((v,i)=>v+(axis[i]*Math.cos(angle)+tangent[i]*Math.sin(angle))*(s.petalLength??1.05));
+  d=softMin(d,petalAt(s,p,a,b,c),.035*(1-(s.petalSharp||0)));
+ }
+ return d;
+}
+function crownAt(s,p){const spread=s.petalCoverage||0;return spread<.0001?flowerAt(s,p):spread>.9999?hedgeAt(s,p):flowerAt(s,p)*(1-spread)+hedgeAt(s,p)*spread;}
+function stemAt(s,p){const len=s.stemAmount*3,radius=(s.stemRadius??.09)*Math.min(1,s.stemAmount*8),bend=s.stemBend||0,a=[0,-.14,0],b=[bend*.35,-.14-len*.45,0],c=[-bend*.55,-.14-len,0],m=curveAt(a,b,c,.5);return Math.min(coneAt(p,a,m,radius,radius),coneAt(p,m,c,radius,radius));}
 export class Renderer{
  constructor(canvas){
  this.canvas=canvas;const gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true});if(!gl)throw new Error('Questo browser non supporta WebGL 2. Prova un browser aggiornato con accelerazione grafica attiva.');this.gl=gl;this.programs=new Map();this.vertexShader=this.compileShader(gl.VERTEX_SHADER,VERT);
  this.buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);this.maxSize=Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE),gl.getParameter(gl.MAX_TEXTURE_SIZE),4096);
  }
  compileShader(type,source){const g=this.gl,shader=g.createShader(type);g.shaderSource(shader,source);g.compileShader(shader);if(!g.getShaderParameter(shader,g.COMPILE_STATUS))throw new Error(g.getShaderInfoLog(shader));return shader;}
- useVariant(key){let variant=this.programs.get(key);const g=this.gl;if(!variant){const source=(key&8?MODERN_FRAG:FRAG).replace('#version 300 es','#version 300 es'+(key&8?'\n#define ANALYTIC_SHAPE '+(key&32?1:0)+'\n#define THIN_SHELL_ENABLED '+(key&16?1:0):'')+'\n#define VOLUME_ENABLED '+(key&1?1:0)+'\n#define SSS_ENABLED '+(key&2?1:0)+'\n#define DISPERSION_ENABLED '+(key&4?1:0)),fragment=this.compileShader(g.FRAGMENT_SHADER,source),program=g.createProgram();g.attachShader(program,this.vertexShader);g.attachShader(program,fragment);g.linkProgram(program);g.deleteShader(fragment);if(!g.getProgramParameter(program,g.LINK_STATUS))throw new Error(g.getProgramInfoLog(program));const locations={};for(let i=0;i<g.getProgramParameter(program,g.ACTIVE_UNIFORMS);i++){const u=g.getActiveUniform(program,i);locations[u.name.replace('[0]','')]=g.getUniformLocation(program,u.name)}variant={program,locations};this.programs.set(key,variant)}this.program=variant.program;this.locations=variant.locations;g.useProgram(this.program);}
- draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){const s=sampleFrame(source,phase),c=this.canvas,g=this.gl;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);const analytic=!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch'].some(k=>Math.abs(s[k]||0)>.000001);const volume=(s.scattering||0)+(s.translucency||0)+(s.subsurface||0)>.0001,transmission=s.renderVersion>=2?s.transparency:s.transparency+(1-s.transparency)*(s.translucency||0);this.useVariant((s.renderVersion>=2?8+(s.thinShell>=.999?16:0)+(analytic?32:0):0)+ +volume+((s.subsurface||0)>.0001&&transmission<.999?2:0)+((s.dispersion||0)>.005?4:0));const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
- if(s.renderVersion>=2){u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);u('uFilmMotion',[phase*Math.round(s.filmCycles||1),s.filmFlow||0,s.filmSwirl||0,0]);u('uModern',[s.thinShell||0,s.grounding||0,0,0]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));}
+ useVariant(key){let variant=this.programs.get(key);const g=this.gl;if(!variant){const source=(key&8?MODERN_FRAG:FRAG).replace('#version 300 es','#version 300 es'+(key&8?'\n#define ANALYTIC_SHAPE '+(key&32?1:0)+'\n#define THIN_SHELL_ENABLED '+(key&16?1:0):'')+'\n#define CROWN_ENABLED '+(key&64?1:0)+'\n#define VOLUME_ENABLED '+(key&1?1:0)+'\n#define SSS_ENABLED '+(key&2?1:0)+'\n#define DISPERSION_ENABLED '+(key&4?1:0)),fragment=this.compileShader(g.FRAGMENT_SHADER,source),program=g.createProgram();g.attachShader(program,this.vertexShader);g.attachShader(program,fragment);g.linkProgram(program);g.deleteShader(fragment);if(!g.getProgramParameter(program,g.LINK_STATUS))throw new Error(g.getProgramInfoLog(program));const locations={};for(let i=0;i<g.getProgramParameter(program,g.ACTIVE_UNIFORMS);i++){const u=g.getActiveUniform(program,i);locations[u.name.replace('[0]','')]=g.getUniformLocation(program,u.name)}variant={program,locations};this.programs.set(key,variant)}this.program=variant.program;this.locations=variant.locations;g.useProgram(this.program);}
+ draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){const s=sampleFrame(source,phase),c=this.canvas,g=this.gl;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);const analytic=!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);const volume=(s.scattering||0)+(s.translucency||0)+(s.subsurface||0)>.0001,transmission=s.renderVersion>=2?s.transparency:s.transparency+(1-s.transparency)*(s.translucency||0);this.useVariant((s.renderVersion>=2?8+(s.thinShell>=.999?16:0)+(analytic?32:0)+((s.petalAmount||0)+(s.stemAmount||0)>.000001?64:0):0)+ +volume+((s.subsurface||0)>.0001&&transmission<.999?2:0)+((s.dispersion||0)>.005?4:0));const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
+ if(s.renderVersion>=2){u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);u('uFilmMotion',[phase*Math.round(s.filmCycles||1),s.filmFlow||0,s.filmSwirl||0,0]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
  u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);
 
