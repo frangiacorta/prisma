@@ -27,16 +27,16 @@ export function similar(s,seed,count=8,strength=.7){const r=random(seed),profile
  if(amount===0)return v;
  for(const [k,a] of [['stretchX',.2],['stretchY',.2],['deform',.15],['asymmetry',.13],['twist',.5],['rotateX',25],['rotateY',25]])v[k]=clamp(k,(v[k]||0)+delta()*a*shape*amount);
  for(const [k,a] of [['metal',.22],['transparency',.16],['roughness',.2],['iridescence',.28],['coat',.16],['filmThickness',170],['gradientAngle',35],['gradientScale',.35],['gradientOffset',.18],['colorWavePhase',.2]])v[k]=clamp(k,(v[k]??EXTRA_BASE[k]??0)+delta()*a*color*amount);
- if(v.petalAmount>0){for(const [k,a] of [['petalOpen',.28],['petalCurl',.35],['petalLength',.3],['petalWidth',.065],['petalInflate',.25],['petalSharp',.22],['petalCoverage',.18]])v[k]=clamp(k,v[k]+delta()*a*shape*amount);v.petalCount=clamp('petalCount',Math.round(v.petalCount+delta()*4*shape*amount));}
+ if(v.petalAmount>0){for(const [k,a] of [['petalOpen',.28],['petalCurl',.35],['petalLength',.3],['petalWidth',.065],['petalInflate',.25],['petalSharp',.22],['petalCoverage',.18],['petalBlend',.15],['petalRoot',.15],['petalRandom',.12]])v[k]=clamp(k,v[k]+delta()*a*shape*amount);v.petalCount=clamp('petalCount',Math.round(v.petalCount+delta()*4*shape*amount));}
  v.environmentAngle=clamp('environmentAngle',(v.environmentAngle||0)+delta()*95*light*amount);
  const angle=(i%2?-1:1)*(25+r()*45)*color*amount;v.palette=v.palette.map(c=>hue(c,angle));for(const k of ['internalColor','sssColor'])if(v[k])v[k]=hue(v[k],angle);
  v.lights=v.lights.map(l=>({...l,x:Math.max(-5,Math.min(5,l.x+delta()*.5*light*amount)),y:Math.max(-5,Math.min(5,l.y+delta()*.5*light*amount)),z:Math.max(-5,Math.min(5,l.z+delta()*.4*light*amount)),power:Math.max(.1,Math.min(6,l.power*(1+delta()*.4*light*amount)))}));v.seed=(s.seed+Math.round(delta()*70*amount))>>>0;return v;
 });}
 export const SCULPT_EXAMPLES=[
  {name:'Rosetta',values:{petalOpen:.66,petalWidth:.3,petalLength:.8,petalInflate:.95,petalCurl:.05}},
- {name:'Riccio',values:{petalCoverage:1,petalSharp:.86,petalWidth:.13,petalLength:.72,petalCount:18,petalRows:7}},
- {name:'Borchie',values:{petalCoverage:1,petalSharp:.9,petalWidth:.22,petalLength:.32,petalCount:14,petalRows:6}},
- {name:'Aghi',values:{petalCoverage:1,petalSharp:1,petalWidth:.05,petalLength:.95,petalCount:18,petalRows:7}}
+ {name:'Riccio',values:{petalCoverage:1,petalSharp:.86,petalWidth:.13,petalLength:.72,petalCount:18,petalRows:7,petalBlend:.78,petalRoot:.55,petalRandom:.22,petalCurl:.18}},
+ {name:'Borchie',values:{petalCoverage:1,petalSharp:.9,petalWidth:.22,petalLength:.32,petalCount:14,petalRows:6,petalBlend:.85,petalRoot:.65,petalRandom:.16,petalCurl:.08}},
+ {name:'Aghi',values:{petalCoverage:1,petalSharp:1,petalWidth:.05,petalLength:.95,petalCount:18,petalRows:7,petalBlend:.72,petalRoot:.45,petalRandom:.25,petalCurl:.22}}
 ];
 export function sculpt(s,index){upgrade(s);const base=preset(1);for(const k of GROUPS.shape)s[k]=base[k];Object.assign(s,{petalAmount:1,rotateX:35,rotateY:0,rotateZ:0,...SCULPT_EXAMPLES[index].values});for(const k of SHAPE_TRACKS)s.motions[k].enabled=false;return s;}
 export function bloomExample(){const s=newCreation();material(s,18);sculpt(s,0);Object.assign(s,{stemAmount:.68,stemBend:.18,scale:.85,positionY:.55,sssColor:'#ffffff',subsurface:.12,petalOpen:.62,petalCurl:.08,petalWidth:.32,petalInflate:1,rotateX:38,palette:['#173bd2','#fb3266','#82aa4d','#ede5be','#0a1226'],colorWaveAmount:1,colorWaveHeight:.7,colorWaveRadius:.75,colorWaveSwirl:.3,colorWaveBands:1.15,colorWaveWarp:.35,bgMode:'studio',background:'#d0dbea',background2:'#929ba7',grounding:0});motionPreset(s,'bloom');s.motions.colorWavePhase={...s.motions.colorWavePhase,enabled:true,mode:'cycle',cycles:1,direction:1,phase:0};s.environmentPower=.7;s.lights.forEach((l,i)=>Object.assign(l,{visible:false,color:i?'#cadbff':'#ffffff',power:i?.7:1.7}));return s;}

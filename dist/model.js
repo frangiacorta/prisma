@@ -45,7 +45,7 @@ export const GROUPS={
  background:['background','background2','bgAngle','bgMode','bgHeight','bgSoftness','bgWash','bgShade'],
  photo:['exposure','brightness','contrast','saturation','temperature','photoTint','gamma','blacks','highlights','vignette','lensDistortion','grainSize','grain']
 };
-GROUPS.shape.push('petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','stemAmount','stemRadius','stemBend');
+GROUPS.shape.push('petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','petalBlend','petalRoot','petalRandom','stemAmount','stemRadius','stemBend');
 GROUPS.shape.push('rotateX','rotateY','rotateZ');
 GROUPS.color.push('colorWaveAmount','colorWaveHeight','colorWaveRadius','colorWaveSwirl','colorWaveBands','colorWaveWarp','colorWavePhase');
 GROUPS.background.push('grounding','groundShadow','groundCaustic');
