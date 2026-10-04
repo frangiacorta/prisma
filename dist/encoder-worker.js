@@ -73,17 +73,27 @@ async function finishSegment(restart){
  encoder.finalize();const fs=encoder.FS,name=encoder.outputFilename,bytes=fs.readFile(name);stats.largestSoftwareSegment=Math.max(stats.largestSoftwareSegment,bytes.length);remuxSegment(bytes);closeEncoder();stats.softwareSegments++;if(restart)await softwareEncoder();
 }
 async function initialize(data){
- closeEncoder();await sink?.discard();config=data;frameNumber=0;segmentFrames=0;encoderError=null;nativePending=0;
+ closeEncoder();await sink?.discard();frameNumber=0;segmentFrames=0;encoderError=null;nativePending=0;
  if(!Number.isInteger(data.width)||!Number.isInteger(data.height)||data.width<64||data.height<64||data.width>4096||data.height>4096||data.width%2||data.height%2||![30,60].includes(data.fps))throw new Error('Dimensioni o frequenza video non valide.');
- if(!Number.isInteger(data.totalFrames)||data.totalFrames<1||data.totalFrames>216000)throw new Error('Durata video non valida (massimo un’ora a 60 fps).');
+ // A tab opened before streaming export was deployed sends no frame count and
+ // expects `buffer` at finish. Keep that wire protocol working across deploys.
+ // Explicitly invalid counts must never be mistaken for this legacy protocol.
+ const hasFrameCount=Object.prototype.hasOwnProperty.call(data,'totalFrames');
+ if(!hasFrameCount&&data.protocol===2)throw new Error('Manca il numero di fotogrammi del video. Ricarica la pagina e riprova.');
+ if(hasFrameCount&&(!Number.isFinite(data.totalFrames)||!Number.isInteger(data.totalFrames)))throw new Error('Il numero di fotogrammi del video non è valido. Ricarica la pagina e riprova.');
+ if(hasFrameCount&&data.totalFrames<1)throw new Error('Il video deve contenere almeno un fotogramma.');
+ const maxFrames=data.fps*3600;
+ if(hasFrameCount&&data.totalFrames>maxFrames)throw new Error('Il video supera un’ora. Riduci la durata del loop o aumenta la velocità.');
+ config={...data,totalFrames:hasFrameCount?data.totalFrames:null,maxFrames,legacy:!hasFrameCount};
  const name=/^[a-zA-Z0-9_-]+\.mp4$/.test(data.storageName||'')?data.storageName:`video-${crypto.randomUUID()}.mp4`;
  sink=await new OutputSink().open(name,data.memoryOnly);stats={backend:'software',storage:sink.access?'disk':'memory',frames:0,encodedFrames:0,maxPendingFrames:0,softwareSegments:0,largestSoftwareSegment:0};
- muxer=new Mp4Muxer.Muxer({target:new Mp4Muxer.StreamTarget({onData:(bytes,position)=>sink.write(bytes,position),chunked:true,chunkSize:BLOCK}),video:{codec:'avc',width:data.width,height:data.height,frameRate:data.fps},fastStart:{expectedVideoChunks:data.totalFrames}});
+ muxer=new Mp4Muxer.Muxer({target:new Mp4Muxer.StreamTarget({onData:(bytes,position)=>sink.write(bytes,position),chunked:true,chunkSize:BLOCK}),video:{codec:'avc',width:data.width,height:data.height,frameRate:data.fps},fastStart:hasFrameCount?{expectedVideoChunks:data.totalFrames}:false});
  if(await nativeEncoder())stats.backend='native';else await softwareEncoder();
  return {ready:true,storageName:sink.access?name:null,stats:{...stats}};
 }
 async function addFrame(data){
- check();if(!encoder||frameNumber>=config.totalFrames)throw new Error('Numero di fotogrammi non valido.');
+ check();if(!encoder)throw new Error('La codifica del video non è attiva.');
+ if(frameNumber>=(config.totalFrames??config.maxFrames))throw new Error(config.legacy?'Il video supera un’ora. Riduci la durata del loop o aumenta la velocità.':'Sono arrivati più fotogrammi del previsto.');
  const pixels=data.pixels;if(!(pixels instanceof Uint8Array)||pixels.length!==config.width*config.height*4)throw new Error('Fotogramma video non valido.');
  if(stats.backend==='native'){
   const timestamp=Math.round(frameNumber*1e6/config.fps),duration=Math.round((frameNumber+1)*1e6/config.fps)-timestamp,frame=new VideoFrame(pixels,{format:'RGBA',codedWidth:config.width,codedHeight:config.height,timestamp,duration});
@@ -91,14 +101,18 @@ async function addFrame(data){
   const queueLimit=Math.max(1,Math.min(8,Math.floor(64*1024*1024/(config.width*config.height*4))));
   if(nativePending>=queueLimit){await encoder.flush();check();}
   frameNumber++;
- }else{encoder.addFrameRgba(pixels);segmentFrames++;frameNumber++;stats.maxPendingFrames=Math.max(stats.maxPendingFrames,segmentFrames);if(segmentFrames>=config.fps)await finishSegment(frameNumber<config.totalFrames);}
+ }else{encoder.addFrameRgba(pixels);segmentFrames++;frameNumber++;stats.maxPendingFrames=Math.max(stats.maxPendingFrames,segmentFrames);if(segmentFrames>=config.fps)await finishSegment(config.totalFrames===null||frameNumber<config.totalFrames);}
  stats.frames=frameNumber;check();return {frame:true,frames:frameNumber};
 }
 async function finish(){
- check();if(frameNumber!==config.totalFrames)throw new Error(`Il video è incompleto: ${frameNumber} di ${config.totalFrames} fotogrammi.`);
- if(stats.backend==='native'){await encoder.flush();check();closeEncoder();}else if(segmentFrames&&encoder)await finishSegment(false);
+ check();if(!frameNumber)throw new Error('Il video non contiene fotogrammi.');
+ if(config.totalFrames!==null&&frameNumber!==config.totalFrames)throw new Error(`Il video è incompleto: ${frameNumber} di ${config.totalFrames} fotogrammi.`);
+ if(stats.backend==='native'){await encoder.flush();check();closeEncoder();}else{if(segmentFrames&&encoder)await finishSegment(false);closeEncoder();}
  if(stats.encodedFrames!==frameNumber)throw new Error('La codifica non ha restituito tutti i fotogrammi.');
- muxer.finalize();const storageName=sink.file?sink.name:null,blob=await sink.finish();stats.bytes=blob.size;muxer=null;return {blob,storageName,stats:{...stats}};
+ muxer.finalize();const storageName=sink.file?sink.name:null,blob=await sink.finish();stats.bytes=blob.size;muxer=null;
+ // Blob is a BlobPart, so the old client's new Blob([result.buffer]) remains
+ // compatible without copying a potentially large file into an ArrayBuffer.
+ return {blob,...(config.legacy?{buffer:blob}:{}),storageName,stats:{...stats}};
 }
 let pending=Promise.resolve();
 self.onmessage=({data})=>{pending=pending.then(async()=>{try{let result;if(data.type==='init')result=await initialize(data);else if(data.type==='frame')result=await addFrame(data);else if(data.type==='finish')result=await finish();else if(data.type==='abort'){closeEncoder();await sink?.discard();result={aborted:true};}else throw new Error('Comando di esportazione sconosciuto.');self.postMessage({id:data.id,...result});}catch(e){closeEncoder();await sink?.discard();self.postMessage({id:data.id,error:e.name==='QuotaExceededError'?'Spazio temporaneo su disco insufficiente. Libera spazio e riprova.':e.message||String(e)});}});};
