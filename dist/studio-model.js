@@ -62,7 +62,19 @@ export const BACKDROPS=[
  {name:'Crema',colors:['#ece5d8','#b1a699']},
  {name:'Lavanda',colors:['#dfdcf0','#a5a0b7']},
  {name:'Ghiaccio',colors:['#dce8ef','#98adb8']},
- {name:'Grigio galleria',colors:['#eeeeed','#a9aaa8']}
+ {name:'Grigio galleria',colors:['#eeeeed','#a9aaa8']},
+ {name:'Nero puro',colors:['#000000','#000000'],dark:true,mode:'solid',wash:0,shade:0},
+ {name:'Nero carbone',colors:['#070708','#070708'],dark:true,mode:'solid',wash:0,shade:0},
+ {name:'Grafite pieno',colors:['#191a1d','#191a1d'],dark:true,mode:'solid',wash:0,shade:0},
+ {name:'Ardesia piena',colors:['#303237','#303237'],dark:true,mode:'solid',wash:0,shade:0},
+ {name:'Grigio fumo',colors:['#3d3f43','#3d3f43'],dark:true,mode:'solid',wash:0,shade:0},
+ {name:'Nero velluto',colors:['#15161a','#010102'],dark:true,wash:0,shade:.15},
+ {name:'Antracite',colors:['#26282d','#0a0b0d'],dark:true,wash:.012,shade:.1},
+ {name:'Notte blu',colors:['#0c1321','#010204'],dark:true,wash:.006,shade:.15},
+ {name:'Petrolio profondo',colors:['#0b1718','#010405'],dark:true,wash:.006,shade:.12},
+ {name:'Prugna nera',colors:['#1a0e1a','#040104'],dark:true,wash:.006,shade:.12},
+ {name:'Bruno fumé',colors:['#1e1713','#050403'],dark:true,wash:.006,shade:.12},
+ {name:'Argento scuro',colors:['#35383e','#111216'],dark:true,wash:.015,shade:.1}
 ];
 export const MODERN_BASE={renderVersion:2,environment:'studio',environmentAngle:0,environmentPower:1,environmentRefraction:0,environmentRotate:false,environmentCycles:1,internalColor:'#e6f5ff',fullness:1,thinShell:0,filmFlow:0,filmSwirl:0,filmCycles:1,grounding:0};
 const clear={...MODERN_BASE,metal:0,transparency:1,refraction:1.5,roughness:.02,gloss:1,iridescence:0,emission:0,coat:0,coatRoughness:.06,fresnel:1,hollow:0,wallThickness:1,thickness:1,translucency:0,scattering:0,subsurface:0,sssRadius:.55,sssColor:'#ffd0ac',scatterDirection:.25,thinFilm:0,filmThickness:420,absorption:.012,tintStrength:.03,dispersion:0,anisotropy:0,anisotropyAngle:0,surfaceTexture:0,iridScale:1,iridShift:0,glow:0,grounding:.35};
