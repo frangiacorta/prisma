@@ -1,6 +1,6 @@
 import {META,MOODS,GROUPS} from './model.js';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track} from './studio-model.js';
-import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS} from './creative-model.js';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js';
+import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
@@ -20,6 +20,7 @@ export function applyDescriptionPlan(current,plan){
   if(o.type==='set'){const value=scalar(o.key,o.value);if(GROUPS.material.includes(o.key)||/^(environment|film|petal|stem|colorWave|ground)/.test(o.key))upgrade(s);s[o.key]=value;if(o.key==='fullness')setFullness(s,value);notes.push(META[o.key][0]);}
   else if(o.type==='shape'){upgrade(s);shape(s,o.name);notes.push('Forma: '+o.name);}
   else if(o.type==='material'){if(!Number.isInteger(o.index)||!MATERIAL_STYLES[o.index])throw Error('Materia non disponibile');material(s,o.index);notes.push('Materia: '+MATERIAL_STYLES[o.index].name);}
+  else if(o.type==='textureStyle'){if(!Number.isInteger(o.index)||!TEXTURE_STYLES[o.index])throw Error('Texture non disponibile');textureStyle(s,o.index);notes.push('Texture: '+TEXTURE_STYLES[o.index].name);}
   else if(o.type==='palette'){if(!Array.isArray(o.colors)||!o.colors.length||o.colors.length>MAX_COLORS||!o.colors.every(isColor))throw Error('Palette non valida');s.palette=o.colors.map(c=>c.toLowerCase());notes.push('Palette');}
   else if(o.type==='addColor'){if(!isColor(o.color)||s.palette.length>=MAX_COLORS)throw Error('Puoi usare fino a 12 colori');s.palette.push(o.color.toLowerCase());notes.push('Colore aggiunto');}
   else if(o.type==='removeColor'){if(s.palette.length<=1)throw Error('Conserva almeno un colore');if(!Number.isInteger(o.index)||o.index<0||o.index>=s.palette.length)throw Error('Colore non trovato');s.palette.splice(o.index,1);notes.push('Colore rimosso');}
@@ -56,17 +57,20 @@ const growthAttributes=[
 ];
 const growthWords='spine|spina|punte|punta|aghi|ago|borchie|borchia|petali|petalo|radici|radice|corde|corda|rigonfiamenti|rigonfiamento|protuberanze|bozzi';
 const growthRe=new RegExp('\\b(?:'+growthWords+')\\b');
-const typoWords={nerborute:'nerborute',nervorute:'nerborute',nerborutee:'nerborute',raidi:'radici',radic:'radici',spie:'spine',spnie:'spine',petaali:'petali',petli:'petali',attorcigliarsdi:'attorcigliarsi',gradualemnte:'gradualmente',comuqne:'comunque',sfodo:'sfondo',rabdomizzazione:'randomizzazione',traspareza:'trasparenza',trasparenxa:'trasparenza',metalllo:'metallo',nerveose:'nervose',nerboruti:'nerborute'};
+const textureAttributes=[['grinz\\w*|rugh[ae]|rughette','textureWrinkles',.3],['piegh[ae]|pieghett\\w*','textureFolds',.3],['abras\\w*|usur\\w*|graffi\\w*|logor\\w*|consumat\\w*|rovinat\\w*','textureWear',.3],['increspat\\w*','textureRipples',.3]];
+const textureKeys=['textureWrinkles','textureFolds','textureWear','textureRipples'];
+const textureAliases=[['grinze','textureWrinkles'],['rughe','textureWrinkles'],['pieghe','textureFolds'],['abrasioni','textureWear'],['usura','textureWear'],['graffi','textureWear'],['increspature della superficie','textureRipples'],['increspature superficie','textureRipples'],['increspature della texture','textureRipples'],['rilievo della superficie','textureDepth'],['rilievo superficie','textureDepth'],['rilievo texture','textureDepth'],['profondita texture','textureDepth'],['scala della texture','textureScale'],['scala texture','textureScale'],['scala della trama','textureScale'],['scala trama','textureScale'],['densita texture','textureScale'],['organicita texture','textureOrganic'],['irregolarita della texture','textureOrganic'],['irregolarita della superficie','textureOrganic'],['irregolarita texture','textureOrganic'],['regolarita della texture','textureOrganic',true],['regolarita della superficie','textureOrganic',true],['regolarita texture','textureOrganic',true],['direzione texture','textureAngle']];
+const typoWords={nerborute:'nerborute',nervorute:'nerborute',nerborutee:'nerborute',raidi:'radici',radic:'radici',spie:'spine',spnie:'spine',petaali:'petali',petli:'petali',attorcigliarsdi:'attorcigliarsi',gradualemnte:'gradualmente',comuqne:'comunque',sfodo:'sfondo',rabdomizzazione:'randomizzazione',traspareza:'trasparenza',trasparenxa:'trasparenza',metalllo:'metallo',nerveose:'nervose',nerboruti:'nerborute',irregikarita:'irregolarita',amniera:'maniera'};
 const commandText=text=>normalize(text).replace(/\b[a-z]+\b/g,w=>typoWords[w]||w).replace(/\bsfondo di base\b/g,'sfondo').replace(/\b(dallas|dellas)\b/g,'dalla');
 function escapeRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
 const setting=(key,value)=>({type:'set',key,value:Math.max(META[key][1],Math.min(META[key][2],value))});
-const aliases=[['metallo','metal'],['trasparente','transparency'],['iridescente','iridescence'],['lucido','gloss'],['rugosita','roughness'],['spessore','fullness'],['vuotezza','hollow'],['scattering','scattering'],['sss','subsurface'],['sfumatura','edge'],['alone','glow'],['caustica','groundCaustic'],['ombra','groundShadow'],['dimensione','scale'],['lunghezza spine','petalLength'],['acutezza','petalSharp'],['curvatura spine','petalCurl'],['fusione','petalBlend'],['radici','petalRoot'],['irregolarita','petalRandom'],['crescita','petalGrowth'],['sinuosita','petalWander'],['avvolgimento','petalCoil'],['rientro','petalReentry'],['nodi','petalKnots'],['nervature','petalRidges'],['disordine','petalDisorder'],['durata','duration'],['durata del loop','duration'],['durata del ciclo','duration'],['loop di','duration'],['loop da','duration'],['velocita del movimento','speed'],['velocita animazione','speed'],...Object.entries(META).flatMap(([key,m])=>[[normalize(key),key],[normalize(m[0]).replace(/\s*·.*$/,''),key]])].sort((a,b)=>b[0].length-a[0].length);
+const aliases=[...textureAliases,['metallo','metal'],['trasparente','transparency'],['iridescente','iridescence'],['lucido','gloss'],['rugosita','roughness'],['spessore','fullness'],['vuotezza','hollow'],['scattering','scattering'],['sss','subsurface'],['sfumatura','edge'],['alone','glow'],['caustica','groundCaustic'],['ombra','groundShadow'],['dimensione','scale'],['lunghezza spine','petalLength'],['acutezza','petalSharp'],['curvatura spine','petalCurl'],['fusione','petalBlend'],['radici','petalRoot'],['irregolarita','petalRandom'],['crescita','petalGrowth'],['sinuosita','petalWander'],['avvolgimento','petalCoil'],['rientro','petalReentry'],['nodi','petalKnots'],['nervature','petalRidges'],['disordine','petalDisorder'],['durata','duration'],['durata del loop','duration'],['durata del ciclo','duration'],['loop di','duration'],['loop da','duration'],['velocita del movimento','speed'],['velocita animazione','speed'],...Object.entries(META).flatMap(([key,m])=>[[normalize(key),key],[normalize(m[0]).replace(/\s*·.*$/,''),key]])].sort((a,b)=>b[0].length-a[0].length);
 
 // Each recognized phrase is claimed separately. Residual requests remain visible
 // in the UI, including when another part of the same sentence was understood.
 export function interpretDescription(text,current){
  if(typeof text!=='string'||text.trim().length<2||text.length>1600)throw Error('Scrivi una descrizione tra 2 e 1600 caratteri.');
- const clauses=commandText(text).split(/[,;\n](?!\d)|\s+(?:ma|pero)\s+|\s+e\s+(?=(?:sfondo|fondale|palette|luce|luci|aggiung\w*|tog\w*|rimuov\w*|rend\w*|fai|metti|sposta\w*|senza|non|meno|piu|con\s+(?:sfondo|palette|luce)|spine|petali|radici|corde)\b)|\s+(?:con|su)\s+(?=(?:sfondo|fondale|palette|luce|luci)\b)/).map(q=>q.trim()).filter(Boolean);
+ const clauses=commandText(text).split(/[,;\n](?!\d)|\s+(?:ma|pero)\s+|\s+e\s+(?=(?:sfondo|fondale|palette|luce|luci|texture|trama|superficie|aggiung\w*|tog\w*|rimuov\w*|rend\w*|fai|metti|sposta\w*|senza|non|meno|piu|con\s+(?:sfondo|palette|luce|texture|trama|superficie)|spine|petali|radici|corde)\b)|\s+(?:con|su)\s+(?=(?:sfondo|fondale|palette|luce|luci)\b)/).map(q=>q.trim()).filter(Boolean);
  const operations=[],unrecognized=[];let working=structuredClone(current),scope=current.petalAmount>0?'growth':'shape';
  const push=(...ops)=>{operations.push(...ops);working=applyDescriptionPlan(working,{operations:ops}).state;};
  for(const clause of clauses){
@@ -81,12 +85,14 @@ export function interpretDescription(text,current){
   const lightTarget=/\b(?:luce|luci|neon|faro|softbox|alogeno)\b/.test(clause)&&!/\b(?:luce propria|luce centrale|alte luci|luce interna della materia)\b/.test(clause);
   const backgroundTarget=/\b(?:sfondo|background|fondale)\b/.test(clause)&&!/\b(?:ombra|caustica)\b/.test(clause);
   const explicitGrowth=growthRe.test(clause),colorTarget=/\b(?:palette|colore|colori|mood)\b/.test(clause);
-  if(backgroundTarget)scope='background';else if(lightTarget)scope='light';else if(explicitGrowth)scope='growth';else if(colorTarget)scope='color';else if(/\b(?:sfera|figura|oggetto|volume|trasparen\w*|metallo|contrasto|grana|caustica|alone)\b/.test(clause))scope='shape';
-  const growth=explicitGrowth||scope==='growth';
+  const textureTarget=/\b(?:texture|trama|superficie|materia|materiale|grinz\w*|rugh[ae]|rughette|piegh[ae]|pieghett\w*|abras\w*|usur\w*|graffi\w*)\b/.test(clause);
+  if(backgroundTarget)scope='background';else if(lightTarget)scope='light';else if(textureTarget)scope='texture';else if(explicitGrowth)scope='growth';else if(colorTarget)scope='color';else if(/\b(?:sfera|figura|oggetto|volume|trasparen\w*|metallo|contrasto|grana|caustica|alone)\b/.test(clause))scope='shape';
+  const texture=scope==='texture',growth=!texture&&(explicitGrowth||scope==='growth');
   claim(/\b(?:(disattiv\w*|spegni|senza|non)\s+(?:il\s+)?|(?:attiv\w*|metti|voglio)\s+(?:il\s+)?)?loop perfetto\b/,m=>push({type:'loop',perfect:!m[1]}));
   claim(/\b(?:movimento libero|loop libero)\b/,()=>push({type:'loop',perfect:false}));
   // All independent numeric assignments in one sentence are applied, not just the first.
-  if(!lightTarget&&!backgroundTarget){for(const [label,key] of aliases){if(!META[key])continue;claim(new RegExp('(?:^|\\b)'+escapeRe(label)+'\\s*(?:[:=]|(?:a|al|di|del|circa)\\s+)?\\s*(-?\\d+(?:[.,]\\d+)?)\\s*(%|percento|per cento)?(?:\\s*(?:secondi|secondo|sec|gradi|nm|x)\\b)?(?=\\s|$|[.!?])'),m=>{let value=Number(m[1].replace(',','.'));if(m[2])value=META[key][1]+(META[key][2]-META[key][1])*value/100;push(setting(key,value));});}}
+  const scopedAliases=texture?[['irregolarita','textureOrganic'],['regolarita','textureOrganic',true],['scala','textureScale'],['densita','textureScale'],['rilievo','textureDepth'],['direzione','textureAngle']]:[];
+  if(!lightTarget&&!backgroundTarget){for(const [label,key,inverse] of [...scopedAliases,...aliases]){if(!META[key]||label==='increspature'&&(key==='textureRipples'&&!texture||key==='waves'&&texture))continue;claim(new RegExp('(?:^|\\b)'+escapeRe(label)+'\\s*(?:[:=]|(?:a|al|di|del|circa)\\s+)?\\s*(-?\\d+(?:[.,]\\d+)?)\\s*(%|percento|per cento)?(?:\\s*(?:secondi|secondo|sec|gradi|nm|x)\\b)?(?=\\s|$|[.!?])'),m=>{let value=Number(m[1].replace(',','.'));if(m[2])value=META[key][1]+(META[key][2]-META[key][1])*value/100;if(inverse)value=META[key][1]+META[key][2]-value;push(setting(key,value));});}}
   if(backgroundTarget){
    const colors=values(),transparent=/\btrasparen\w*/.test(clause),mode=transparent?'transparent':/gradient|sfumat/.test(clause)?'gradient':'solid';
    if(colors.length||transparent){push({type:'background',mode,colors:colors.length?colors:undefined});claim(/\b(?:sfondo|fondale|background|trasparen\w*|gradient\w*|sfumat\w*|uniforme|pieno|piena|puro|pura)\b/);claimColors();}
@@ -110,7 +116,7 @@ export function interpretDescription(text,current){
    const form=shapeNames.filter(name=>!(name==='sfera'&&explicitGrowth)).sort((a,b)=>b.length-a.length).find(name=>new RegExp('\\b'+escapeRe(name)+'\\b').test(shapeText));
    const relational=/\b(?:attorno|intorno|dalla|della|nella|sulla|sotto|dentro|avvol\w*|attorcigl\w*|rientr\w*|entr\w*|usc\w*)\b/.test(clause);
    const descriptive=/\b(?:piu|meno|senza|non|curv\w*|cort\w*|lung\w*|appuntit\w*|organic\w*|nod\w*|sinuos\w*|nerborut\w*)\b/.test(clause);
-   if(form&&!flags(clause.indexOf(form)).negative&&!(form==='sfera'&&(relational||growth))&&(!descriptive||/\b(?:crea|trasforma|diventa|diventino|tipo|come)\b/.test(clause))){
+   if(form&&(!texture||/\b(?:crea|trasforma|diventa|diventino)\b/.test(clause))&&!flags(clause.indexOf(form)).negative&&!(form==='sfera'&&(relational||growth))&&(!descriptive||/\b(?:crea|trasforma|diventa|diventino|tipo|come)\b/.test(clause))){
     const sculptIndex=SCULPT_EXAMPLES.findIndex(q=>normalize(q.name)===form);
     if(sculptIndex>=0&&working.petalAmount>0){for(const [key,value] of Object.entries(SCULPT_EXAMPLES[sculptIndex].values))push(setting(key,value));}
     else push({type:'shape',name:form});claim(new RegExp('\\b'+escapeRe(form)+'\\b'));if(form==='sfera')claim(/\bperfett[ao]\b/);
@@ -126,7 +132,22 @@ export function interpretDescription(text,current){
     if(/\b(?:rigonfiament\w*|protuberanze|bozzi)\b/.test(clause)&&/\b(?:piccol\w*|lievi|appena)\b/.test(clause)){push(setting('petalLength',.15),setting('petalGrowth',.45));claim(/\b(?:piccol\w*|lievi)\b/);}
    }
    const materialAliases=[...MATERIAL_STYLES.map((q,i)=>[normalize(q.name),i]),['vetro',MATERIAL_STYLES.findIndex(q=>q.name==='Biglia di vetro')],['acqua',1],['bolla',0],['cromo',11],['metallo',11],['silicone',18],...['opaca','opache','opachi'].map(w=>[w,14]),...['satinata','satinate','satinati'].map(w=>[w,12])].sort((a,b)=>b[0].length-a[0].length);
+   if(texture)for(const [word] of materialAliases)claim(new RegExp('\\b(?:del|della|sul|sulla|dal|dalla)\\s+'+escapeRe(word)+'\\b'));
    if(!/\b(?:piu|meno|senza|non)\b/.test(clause)&&!colorTarget){for(const [word,index] of materialAliases){if(claim(new RegExp('\\b'+escapeRe(word)+'\\b'),()=>push({type:'material',index})))break;}}
+   if(texture){
+    const removeTexture=claim(/\b(?:togli\w*|rimuov\w*|elimina\w*|senza|spegni)\s+(?:(?:la|le|tutte|ogni)\s+)*(?:texture|trama)\b/);
+    if(removeTexture)for(const key of [...textureKeys,'surfaceTexture'])push(setting(key,0));
+    else{
+     for(const [pattern,key,delta] of textureAttributes)claim(new RegExp('\\b(?:'+pattern+')\\b'),m=>adjust(key,delta,m));
+     claim(/\b(?:organic\w*|irregolar\w*|casual\w*|naturali)\b/,m=>adjust('textureOrganic',.2,m));
+     claim(/\b(?:regolar\w*|ordinat\w*|geometric\w*)\b/,m=>adjust('textureOrganic',-.2,m));
+     claim(/\b(?:fini|fine|fitta|fitte|fitto|fitti|dens[aoei]|piccol\w*)\b/,m=>adjust('textureScale',.6,m));
+     claim(/\b(?:gross\w*|larg\w*|ampi\w*|grand\w*|radi|rada|rade)\b/,m=>adjust('textureScale',-.35,m));
+     claim(/\b(?:rilievo|profond\w*|marcat\w*|evident\w*|forte|forti)\b/,m=>adjust('textureDepth',.2,m));
+     claim(/\b(?:legger\w*|delicat\w*|tenu\w*|superficial\w*|morbid\w*)\b/,m=>adjust('textureDepth',-.15,m));
+    }
+    if(operations.slice(start).some(o=>o.type==='textureStyle'||o.type==='set'&&/^(texture|surfaceTexture)/.test(o.key)))claim(/\b(?:texture|trama|superficie|materia|materiale|maniera)\b/);
+   }
    const colors=values();
    if(/\b(?:rimuov\w*|togli\w*|elimina\w*)\b/.test(clause)&&/\b(?:colore\s*(?:\d+|ultimo|finale)|ultimo colore)\b/.test(clause)){const m=clause.match(/colore\s*(\d+)/);push({type:'removeColor',index:m?Number(m[1])-1:working.palette.length-1});claim(/\b(?:colore\s*(?:\d+|ultimo|finale)|ultimo colore)\b/);}
    else if(colors.length){
@@ -137,7 +158,7 @@ export function interpretDescription(text,current){
     else push({type:'palette',colors});claimColors();
    }
    const mood=MOODS.find(q=>new RegExp('\\b'+escapeRe(normalize(q.name))+'\\b').test(clause));if(mood&&/\b(?:palette|mood)\b/.test(clause)){push({type:'palette',colors:mood.colors});claim(new RegExp('\\b'+escapeRe(normalize(mood.name))+'\\b'));}
-   for(const [pattern,key,delta] of attributes){if(growth&&['deform','scale','roughness'].includes(key))continue;claim(new RegExp('\\b(?:'+pattern+')\\b'),m=>adjust(key,delta,m));}
+   for(const [pattern,key,delta] of attributes){if(growth&&['deform','scale','roughness'].includes(key)||texture&&['deform','scale'].includes(key))continue;claim(new RegExp('\\b(?:'+pattern+')\\b'),m=>adjust(key,delta,m));}
   }
   if(claim(/\b(?:ferma(?:re)?|stop|senza movimento|senza animazione)\b/))push({type:'stopMotion'});
   else{
@@ -167,4 +188,4 @@ export function interpretDescription(text,current){
  return {operations,unrecognized:[...new Set(unrecognized)]};
 }
 
-export function descriptionCatalog(){return {parameters:Object.fromEntries(Object.entries(META).map(([k,m])=>[k,{label:m[0],min:m[1],max:m[2],step:m[3]}])),materials:MATERIAL_STYLES.map((m,index)=>({index,name:m.name})),shapes:shapeNames,lightTypes:LIGHT_TYPES,lightParameters:LIGHT_META,maxLights:MAX_LIGHTS,maxColors:MAX_COLORS,motionPresets:MOTION_PRESETS.map(([id,name])=>({id,name})),motionTracks:Object.fromEntries(Object.entries(TRACK_META).map(([key,m])=>[key,{label:m[0],minAmplitude:m[1],maxAmplitude:m[2],step:m[3]}])),motionTrackOperation:{type:'motionTrack',key:'petalGrowth',values:{enabled:true,amplitude:.5,cycles:1,phase:270,direction:1,curve:'sine',mode:'wave'}},loopOperation:{type:'loop',perfect:true}};}
+export function descriptionCatalog(){return {parameters:Object.fromEntries(Object.entries(META).map(([k,m])=>[k,{label:m[0],min:m[1],max:m[2],step:m[3]}])),materials:MATERIAL_STYLES.map((m,index)=>({index,name:m.name})),textureStyles:TEXTURE_STYLES.map((m,index)=>({index,name:m.name})),textureStyleOperation:{type:'textureStyle',index:0},shapes:shapeNames,lightTypes:LIGHT_TYPES,lightParameters:LIGHT_META,maxLights:MAX_LIGHTS,maxColors:MAX_COLORS,motionPresets:MOTION_PRESETS.map(([id,name])=>({id,name})),motionTracks:Object.fromEntries(Object.entries(TRACK_META).map(([key,m])=>[key,{label:m[0],minAmplitude:m[1],maxAmplitude:m[2],step:m[3]}])),motionTrackOperation:{type:'motionTrack',key:'petalGrowth',values:{enabled:true,amplitude:.5,cycles:1,phase:270,direction:1,curve:'sine',mode:'wave'}},loopOperation:{type:'loop',perfect:true}};}

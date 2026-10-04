@@ -1,9 +1,10 @@
 import {preset,MOODS,META,GROUPS,random} from './model.js';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS} from './studio-model.js';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
 export function material(s,index){Object.assign(s,MATERIAL_STYLES[index].values);s.materialName=MATERIAL_STYLES[index].name;return s;}
+export function textureStyle(s,index){if(!TEXTURE_STYLES[index])throw Error('Scegli una texture disponibile.');upgrade(s);Object.assign(s,TEXTURE_STYLES[index].values);return s;}
 export function newCreation(){const s=preset(1);material(s,0);Object.assign(s,{background:'#000000',background2:'#152535',palette:['#7ccfff','#d9aeff','#ffb8d2','#a9f1e5'],grain:0,glow:0,edge:0,rotateX:0,rotateY:0,scale:.92,duration:12});for(const t of Object.values(s.motions))t.enabled=false;s.lights.forEach(l=>l.visible=false);return s;}
 
 export const MOTION_PRESETS=[['emerge','Spuntano e rientrano'],['wrap','Si avvolgono alla sfera'],['roots','Radici in movimento'],['bloom','Petali che si aprono'],['chromatic','Onde cromatiche'],['breathe','Bolla che respira'],['reflect','Riflessi che girano'],['film','Colori che colano e vorticano'],['orbit','Luce che orbita'],['wave','Forma che ondeggia']];
@@ -36,6 +37,7 @@ export function similar(s,seed,count=8,strength=.7){const r=random(seed),profile
  for(const [k,a] of [['stretchX',.2],['stretchY',.2],['deform',.15],['asymmetry',.13],['twist',.5],['rotateX',25],['rotateY',25]])v[k]=clamp(k,(v[k]||0)+delta()*a*shape*amount);
  for(const [k,a] of [['metal',.22],['transparency',.16],['roughness',.2],['iridescence',.28],['coat',.16],['filmThickness',170],['gradientAngle',35],['gradientScale',.35],['gradientOffset',.18],['colorWavePhase',.2]])v[k]=clamp(k,(v[k]??EXTRA_BASE[k]??0)+delta()*a*color*amount);
  if(v.petalAmount>0){for(const [k,a] of [['petalOpen',.28],['petalCurl',.35],['petalLength',.3],['petalWidth',.065],['petalInflate',.25],['petalSharp',.22],['petalCoverage',.18],['petalBlend',.15],['petalRoot',.15],['petalRandom',.12],['petalGrowth',.14],['petalWander',.2],['petalCoil',.23],['petalReentry',.2],['petalKnots',.18],['petalRidges',.18],['petalDisorder',.18]])v[k]=clamp(k,(v[k]??EXTRA_BASE[k]??0)+delta()*a*shape*amount);v.petalCount=clamp('petalCount',Math.round(v.petalCount+delta()*4*shape*amount));}
+ if(['textureWrinkles','textureFolds','textureWear','textureRipples'].some(k=>(v[k]||0)>0)){for(const [k,a] of [['textureDepth',.1],['textureScale',.25],['textureOrganic',.12],['textureAngle',25],['textureWrinkles',.12],['textureFolds',.12],['textureWear',.12],['textureRipples',.12]])v[k]=clamp(k,(v[k]??EXTRA_BASE[k])+delta()*a*color*amount);}
  v.environmentAngle=clamp('environmentAngle',(v.environmentAngle||0)+delta()*95*light*amount);
  const angle=(i%2?-1:1)*(25+r()*45)*color*amount;v.palette=v.palette.map(c=>hue(c,angle));for(const k of ['internalColor','sssColor'])if(v[k])v[k]=hue(v[k],angle);
  v.lights=v.lights.map(l=>({...l,x:Math.max(-5,Math.min(5,l.x+delta()*.5*light*amount)),y:Math.max(-5,Math.min(5,l.y+delta()*.5*light*amount)),z:Math.max(-5,Math.min(5,l.z+delta()*.4*light*amount)),power:Math.max(.1,Math.min(6,l.power*(1+delta()*.4*light*amount)))}));v.seed=(s.seed+Math.round(delta()*70*amount))>>>0;return v;

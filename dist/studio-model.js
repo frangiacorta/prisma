@@ -9,6 +9,7 @@ export const TRACK_META={
  rotateY:['Rotazione orizzontale',0,360,1],rotateX:['Rotazione verticale',0,180,1],rotateZ:['Rotazione sul piano',0,360,1],volume:['Volume',0,.6,.01],deform:['Deformazione',0,.4,.01],twist:['Torsione',0,2,.01],waves:['Increspature',0,.3,.01],hole:['Apertura del vuoto',0,.6,.01],cut:['Ritaglio',0,.8,.01],scale:['Dimensione',0,.7,.01],positionX:['Posizione orizzontale',0,1.2,.01],positionY:['Posizione verticale',0,1.2,.01],gradientOffset:['Scorrimento colori',0,1,.01],iridescence:['Iridescenza',0,.7,.01],roughness:['Rugosità',0,.6,.01],transparency:['Trasparenza',0,.7,.01]
 };
 export const EXTRA_BASE={
+ textureDepth:.35,textureScale:1,textureOrganic:.65,textureAngle:0,textureWrinkles:0,textureFolds:0,textureWear:0,textureRipples:0,
  petalGrowth:1,petalWander:0,petalCoil:0,petalReentry:0,petalKnots:0,petalRidges:0,petalDisorder:0,
  petalAmount:0,petalCount:12,petalOpen:.65,petalCurl:0,petalLength:1.05,petalWidth:.24,petalInflate:.6,petalSharp:0,petalCoverage:0,petalRows:5,petalPhase:0,petalBlend:0,petalRoot:0,petalRandom:0,stemAmount:0,stemRadius:.09,stemBend:0,
  colorWaveAmount:0,colorWaveHeight:1,colorWaveRadius:0,colorWaveSwirl:0,colorWaveBands:1,colorWaveWarp:.2,colorWavePhase:0,groundShadow:1,groundCaustic:1,
@@ -36,6 +37,7 @@ export const LIGHT_RIGS=[
 ];
 export function legacyLights(s){const build=(id,p)=>{const angle=s[p+'Angle']*Math.PI/180,height=s[p+'Height']*Math.PI/180;return{...newLight(id),visible:true,type:'bar',x:3.2*Math.sin(angle)*Math.cos(height),y:3.2*Math.sin(height),z:3.2*Math.cos(angle)*Math.cos(height),color:s[p+'Color'],power:s[p+'Power'],size:1.7,length:s[p+'Size']*.6,softness:s[p+'Size'],enabled:id===1||s.light2}};return[build(1,'light'),build(2,'light2')]}
 export const EXTRA_META={
+ textureDepth:['Rilievo',0,1,.01],textureScale:['Densità della texture',.25,8,.05],textureOrganic:['Organicità',0,1,.01],textureAngle:['Direzione della texture',-180,180,1],textureWrinkles:['Grinze',0,1,.01],textureFolds:['Pieghe',0,1,.01],textureWear:['Abrasioni',0,1,.01],textureRipples:['Increspature',0,1,.01],
  petalGrowth:['Emersione',0,1,.01],petalWander:['Sinuosità',0,1,.01],petalCoil:['Avvolgimento',-1,1,.01],petalReentry:['Rientro nella sfera',0,1,.01],petalKnots:['Nodosità',0,1,.01],petalRidges:['Nervature',0,1,.01],petalDisorder:['Disordine',0,1,.01],
  petalAmount:['Petali e punte',0,1,.01],petalCount:['Numero di petali / punte',3,24,1],petalOpen:['Apertura',0,1,.01],petalCurl:['Arricciatura',-1,1,.01],petalLength:['Lunghezza',.15,1.8,.01],petalWidth:['Larghezza dei petali',.025,.45,.005],petalInflate:['Gonfiore',0,1,.01],petalSharp:['Acutezza delle punte',0,1,.01],petalCoverage:['Corona / superficie sferica',0,1,.01],petalRows:['File sulla sfera',2,8,1],petalPhase:['Rotazione della corona',0,360,1],petalBlend:['Fusione con la sfera',0,1,.01],petalRoot:['Ampiezza delle radici',0,1,.01],petalRandom:['Irregolarità delle punte',0,1,.01],stemAmount:['Lunghezza del gambo',0,1,.01],stemRadius:['Spessore del gambo',.015,.2,.005],stemBend:['Curvatura del gambo',-1,1,.01],
  colorWaveAmount:['Onde di colore',0,1,.01],colorWaveHeight:['Fasce lungo la figura',-2,2,.01],colorWaveRadius:['Fasce radiali',-2,2,.01],colorWaveSwirl:['Vortice cromatico',-1,1,.01],colorWaveBands:['Numero delle fasce',.25,4,.01],colorWaveWarp:['Ondulazione dei colori',0,1,.01],colorWavePhase:['Posizione delle onde',0,1,.001],groundShadow:['Ombra sul fondale',0,1,.01],groundCaustic:['Caustica luminosa',0,1,.01],
@@ -46,6 +48,13 @@ export const EXTRA_META={
  subsurface:['Subsurface scattering · SSS',0,1,.01],sssRadius:['Distanza di diffusione SSS',.03,2,.01],
  exposure:['Esposizione (EV)',-3,3,.05],brightness:['Luminosità',-.5,.5,.01],contrast:['Contrasto',.2,2.5,.01],saturation:['Saturazione',0,2.5,.01],temperature:['Temperatura',-1,1,.01],photoTint:['Tinta verde / magenta',-1,1,.01],gamma:['Gamma',.5,2,.01],blacks:['Ombre',-.4,.4,.01],highlights:['Alte luci',-.6,.6,.01],vignette:['Vignettatura',0,1,.01],lensDistortion:['Distorsione lente',-.6,.6,.01],grainSize:['Dimensione grana',.5,5,.1]
 };
+const textureBase={textureDepth:.35,textureScale:1,textureOrganic:.65,textureAngle:0,textureWrinkles:0,textureFolds:0,textureWear:0,textureRipples:0,surfaceTexture:0};
+export const TEXTURE_STYLES=[
+ {name:'Grinze morbide',values:{textureDepth:.34,textureScale:1.15,textureOrganic:.8,textureAngle:25,textureWrinkles:.72,textureFolds:.12}},
+ {name:'Pieghe ampie',values:{textureDepth:.55,textureScale:.55,textureOrganic:.55,textureAngle:-30,textureFolds:.85,textureWrinkles:.15}},
+ {name:'Abraso',values:{textureDepth:.38,textureScale:1.7,textureOrganic:.9,textureAngle:15,textureWear:.82,surfaceTexture:.12}},
+ {name:'Increspature',values:{textureDepth:.38,textureScale:1.25,textureOrganic:.48,textureAngle:45,textureRipples:.78,textureWrinkles:.08}}
+].map(style=>({...style,values:{...textureBase,...style.values}}));
 export const MORE_MOODS=[
  {name:'Cyberpunk',colors:['#0e163d','#0de3ff','#ed21cc','#f9ee44','#ad4aff']},
  {name:'Boreale',colors:['#112344','#00a99d','#74ffd9','#9583e7','#d5baff']},

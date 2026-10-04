@@ -1,4 +1,4 @@
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights} from './studio-model.js';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js';
 export const BASE = {
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
   hole:0, holeX:0, holeY:0, holeShape:0, cut:0, cutX:.7, cutY:.1, edge:.015,
@@ -10,13 +10,37 @@ export const BASE = {
   animateRotation:false, animateShape:true, animateColor:false, animateLight:false, motion:.3, duration:8, speed:1, perfectLoop:true,
   seed:2408
 };
+const compositionBase={
+ volume:1,stretchX:1,stretchY:1,stretchZ:1,deform:0,asymmetry:0,twist:0,waves:0,waveScale:3.5,hole:0,holeX:0,holeY:0,holeShape:0,cut:0,cutX:.7,cutY:.1,edge:0,
+ scale:.88,positionX:0,positionY:0,rotateX:15,rotateY:-15,rotateZ:0,background:'#000000',background2:'#000000',bgMode:'solid',glow:0,grain:0,grounding:0,
+ animateRotation:false,animateShape:false,animateColor:false,animateLight:false,motions:Object.fromEntries(Object.entries(EXTRA_BASE.motions).map(([k,t])=>[k,{...t,enabled:false}])),duration:12,speed:1,perfectLoop:true
+};
+function compositionLights(warm='#ffe0bf',cool='#b4ccff'){return [
+ {...newLight(1),visible:false,type:'diffuser',x:-2,y:2.1,z:2.6,size:1.7,length:1.9,softness:.75,power:1.6,color:warm},
+ {...newLight(2),visible:false,type:'bar',x:1.8,y:.3,z:1.6,size:.45,length:1.7,softness:.5,power:.85,color:cool}
+];}
 export const PRESETS = [
  {name:'Aurora liquida',label:'Vetro · iridescenza', values:{}},
  {name:'Vetro orbitale',label:'Acqua · trasparenza',values:{deform:0,asymmetry:0,twist:0,waves:0,metal:0,transparency:.94,iridescence:.22,palette:['#417cff','#92e6ff','#ccd6ff','#8c9fff'],refraction:1.33,background:'#070c18',lightPower:1.8,emission:0}},
  {name:'Mercurio',label:'Metallo · fluidità',values:{deform:.48,twist:1.1,asymmetry:.22,stretchY:.9,metal:1,transparency:0,iridescence:.28,roughness:.11,palette:['#7c95bd','#dae8fb','#8a75bd','#eabccb'],background:'#0b0d12',lightPower:2.1}},
- {name:'Eclisse rosa',label:'Semiluna · luce',values:{deform:0,asymmetry:0,twist:0,waves:0,volume:.45,cut:.9,cutX:.4,cutY:.16,metal:.3,transparency:.08,iridescence:.3,emission:.8,glow:.7,palette:['#ed4eaf','#9c44f4','#ff91ca','#e858fb'],background:'#07060c',rotateX:0,rotateY:0}},
- {name:'Anello aurora',label:'Vuoto · riflessi',values:{hole:.57,holeShape:0,volume:.36,deform:.08,asymmetry:0,twist:.15,metal:.75,transparency:.1,iridescence:.9,rotateX:24,rotateY:-16,palette:['#3c79ff','#e267fb','#6dffe0','#ffb084']}},
- {name:'Nebbia pastello',label:'Macchia · gradiente',values:{volume:.12,deform:.45,asymmetry:.18,twist:.2,stretchX:1.18,stretchY:.87,edge:.38,metal:0,transparency:0,roughness:1,gloss:0,iridescence:0,emission:.12,lightPower:.2,light2Power:0,glow:.2,palette:['#b2e5df','#b4a8ee','#f3a8ca','#a9d5f2'],background:'#eff0f6',gradientScale:1.4,rotateX:0,rotateY:0,grain:.05}}
+ {name:'Radici di rame',label:'Radici intrecciate · rame vissuto',values:{
+  ...MATERIAL_STYLES[11].values,...compositionBase,materialName:'Metallo liquido',roughness:.24,gloss:.95,coat:.18,iridescence:.035,environment:'studio',environmentPower:.9,
+  petalAmount:1,petalCoverage:1,petalCount:8,petalRows:3,petalLength:1.2,petalWidth:.13,petalSharp:.28,petalBlend:.8,petalRoot:.22,petalRandom:.3,petalWander:.52,petalCoil:.6,petalReentry:.78,petalKnots:.28,petalDisorder:.7,petalGrowth:1,scale:.78,rotateX:28,rotateY:-22,
+  palette:['#3d180e','#985233','#dc9868','#ffe0ad'],internalColor:'#a65c37',gradientAngle:28,gradientScale:.8,colorSoftness:.95,
+  textureDepth:.3,textureScale:1.5,textureOrganic:.85,textureAngle:20,textureWear:.32,textureWrinkles:.12,surfaceTexture:.035,lights:compositionLights('#ffe1bc','#b9d4e5')
+ }},
+ {name:'Corallo perlaceo',label:'Rigonfiamenti · perla e grinze',values:{
+  ...MATERIAL_STYLES[9].values,...compositionBase,materialName:'Perla',roughness:.28,coat:.42,subsurface:.25,sssColor:'#ffb9ae',environment:'sunset',environmentPower:.8,
+  petalAmount:1,petalCoverage:1,petalCount:8,petalRows:3,petalLength:.32,petalWidth:.23,petalSharp:0,petalInflate:1,petalBlend:.84,petalRoot:.4,petalRandom:.32,petalGrowth:.75,petalWander:.08,petalKnots:.18,petalDisorder:.75,deform:.025,asymmetry:.025,scale:.97,rotateX:20,rotateY:-12,
+  palette:['#d68480','#f6c2bd','#ffe7d9','#b8dfd6'],internalColor:'#ffe0d5',gradientAngle:45,gradientScale:.7,colorSoftness:1,
+  textureDepth:.27,textureScale:1.15,textureOrganic:.82,textureAngle:25,textureWrinkles:.5,textureFolds:.06,lights:compositionLights('#ffe5d6','#d3edf0')
+ }},
+ {name:'Vela increspata',label:'Vela satinata · pieghe e onde',values:{
+  ...MATERIAL_STYLES[12].values,...compositionBase,materialName:'Satinato',metal:.48,roughness:.33,coat:.25,coatRoughness:.18,gloss:.9,iridescence:.16,anisotropy:.55,surfaceTexture:0,environment:'aurora',environmentPower:.85,
+  volume:.32,stretchX:1.22,stretchY:.96,stretchZ:1,deform:.16,asymmetry:.12,twist:.6,waves:.025,waveScale:2.5,taper:.12,bendY:.25,lobeAmount:.06,lobes:3,pinch:.08,scale:1,rotateX:20,rotateY:-22,rotateZ:-18,
+  palette:['#26395b','#79afb7','#d0e9df','#b7a9df'],internalColor:'#bddeda',gradientAngle:-25,gradientScale:.85,colorSoftness:.95,
+  textureDepth:.43,textureScale:.7,textureOrganic:.58,textureAngle:35,textureFolds:.64,textureRipples:.36,textureWrinkles:.06,lights:compositionLights('#e5f1ff','#cebeeb')
+ }}
 ];
 export const MOODS = [
  {name:'Aurora',colors:['#7157ff','#42deeb','#fb6fd4','#ffc889']},
@@ -39,7 +63,7 @@ export const META = {
 };
 export const GROUPS={
  shape:['volume','stretchX','stretchY','stretchZ','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','cut','cutX','cutY','edge','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','holeAspect','cutAspect'],
- material:['transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture','hollow','wallThickness','translucency','scattering','scatterDirection','thinFilm','filmThickness','subsurface','sssRadius','sssColor','fullness','internalColor','thinShell','renderVersion'],
+ material:['transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture','textureDepth','textureScale','textureOrganic','textureAngle','textureWrinkles','textureFolds','textureWear','textureRipples','hollow','wallThickness','translucency','scattering','scatterDirection','thinFilm','filmThickness','subsurface','sssRadius','sssColor','fullness','internalColor','thinShell','renderVersion'],
  color:['palette','gradientAngle','gradientScale','gradientOffset','colorSoftness','glow'],
  light:['lights','environment','environmentAngle','environmentPower','environmentRefraction','environmentRotate','environmentCycles'],
  background:['background','background2','bgAngle','bgMode','bgHeight','bgSoftness','bgWash','bgShade'],
@@ -49,7 +73,7 @@ GROUPS.shape.push('petalAmount','petalCount','petalOpen','petalCurl','petalLengt
 GROUPS.shape.push('rotateX','rotateY','rotateZ');
 GROUPS.color.push('colorWaveAmount','colorWaveHeight','colorWaveRadius','colorWaveSwirl','colorWaveBands','colorWaveWarp','colorWavePhase');
 GROUPS.background.push('grounding','groundShadow','groundCaustic');
-export function preset(i){const s={...structuredClone(BASE),...structuredClone(EXTRA_BASE),...structuredClone(PRESETS[i].values)};s.lights=legacyLights(s);if(i===1){s.animateShape=false;s.motions.volume.enabled=false;s.motions.deform.enabled=false;}return s}
+export function preset(i){const s={...structuredClone(BASE),...structuredClone(EXTRA_BASE),...structuredClone(PRESETS[i].values)};s.lights=PRESETS[i].values.lights?structuredClone(PRESETS[i].values.lights):legacyLights(s);if(i===1){s.animateShape=false;s.motions.volume.enabled=false;s.motions.deform.enabled=false;}return s}
 export function random(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let a=Math.imul(t^t>>>15,1|t);a^=a+Math.imul(a^a>>>7,61|a);return((a^a>>>14)>>>0)/4294967296}}
 function mixColor(a,b,t){return '#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-t)+parseInt(b.slice(i,i+2),16)*t).toString(16).padStart(2,'0')).join('')}
 export function randomize(state,seed,amount,scope,locks){const r=random(seed),out=structuredClone(state);for(const [group,keys] of Object.entries(GROUPS)){if(locks[group]||(scope!=='all'&&scope!==group))continue;for(const k of keys){if(k==='lights'){out.lights=out.lights.map(l=>({...l,x:l.x+(r()*8-4-l.x)*amount,y:l.y+(r()*8-4-l.y)*amount,z:l.z+(r()*8-4-l.z)*amount,power:l.power+(r()*3+.5-l.power)*amount,color:mixColor(l.color,MOODS[Math.floor(r()*MOODS.length)].colors[0],amount)}));continue}if(k==='palette'){const palette=MOODS[Math.floor(r()*MOODS.length)].colors;out.palette=out.palette.map((c,i)=>mixColor(c,palette[i%palette.length],amount));continue}if(typeof out[k]==='string'){if(!/^#[0-9a-f]{6}$/i.test(out[k]))continue;const color=k.startsWith('background')?MOODS[Math.floor(r()*MOODS.length)].colors[0]:MOODS[Math.floor(r()*MOODS.length)].colors[2];out[k]=mixColor(out[k],color,amount);continue}const m=META[k];if(!m)continue;let target=m[1]+r()*(m[2]-m[1]);if(k==='hole'||k==='cut')target=r()<.65?0:target*.65;if(k==='edge')target*=.5;if(k==='lightPower'||k==='light2Power')target=Math.max(.4,target);out[k]=Math.max(m[1],Math.min(m[2],out[k]+(target-out[k])*amount))}}out.seed=seed;return out}

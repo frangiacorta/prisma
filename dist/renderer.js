@@ -231,7 +231,7 @@ function shaderFunction(source,name,replacement){
  while(depth){depth+=(source[end]==='{')-(source[end]==='}');end++;}
  return source.slice(0,start)+replacement+source.slice(end);
 }
-let MODERN_FRAG=FRAG.replace('precision highp float;','precision highp float;\nprecision highp int;').replace('uniform vec2 uResolution;','uniform vec2 uResolution;\nuniform vec4 uEnvironment,uFilmMotion,uSampling,uModern,uPetals,uPetalTip,uPetalSpread,uStem,uColorWave,uColorAxis,uOrganic,uBudget;\nuniform vec3 uInternalColor;\nuniform highp sampler2D uGrowth;\nuniform vec2 uGrowthRows[8];\nuniform highp sampler2D uRootTree;\nuniform vec4 uRoots;');
+let MODERN_FRAG=FRAG.replace('precision highp float;','precision highp float;\nprecision highp int;').replace('uniform vec2 uResolution;','uniform vec2 uResolution;\nuniform vec4 uEnvironment,uFilmMotion,uSampling,uModern,uPetals,uPetalTip,uPetalSpread,uStem,uColorWave,uColorAxis,uOrganic,uBudget;\nuniform vec3 uInternalColor;\nuniform vec4 uMaterialDetail,uMaterialLayers;\nuniform highp sampler2D uGrowth;\nuniform vec2 uGrowthRows[8];\nuniform highp sampler2D uRootTree;\nuniform vec4 uRoots;');
 const CROWN_GEOMETRY=`
 #if CROWN_ENABLED
 // Exact rounded-cone distance, including spherical end caps. Each petal is a
@@ -553,12 +553,72 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'terminalScene',`vec4 terminalScene(vec3 
  if(uBgMode!=2.)scene.rgb+=environment(direction,origin,rough)*uEnvironment.w*clamp((uMat.y-1.)*3.,0.,1.)*(1.-scene.a);
  return scene;
 }`);
+MODERN_FRAG=MODERN_FRAG.replace('vec4 shade(',`// Analytic, object-anchored height gradients: surface detail never changes the
+// SDF, ray/interface normals, atlas cache, or the number of tracing steps.
+vec4 materialRelief(vec3 local,vec3 geometricNormal,vec3 rd){
+ vec3 size=axes(),q=local/size;float density=uMaterialDetail.y,organic=uMaterialDetail.z;
+ q.xy=rot(uMaterialDetail.w)*q.xy;q*=density;
+ vec3 ka=vec3(3.1,2.3,1.7),kb=vec3(-1.8,3.7,2.9),kc=vec3(2.7,-1.5,4.1);
+ float a=dot(q,ka)+uSeed,b=dot(q,kb)-uSeed*.7,c=dot(q,kc)+.4;
+ float sa=sin(a),sb=sin(b),sc=sin(c),ca=cos(a),cb=cos(b),cc=cos(c);
+ float warp=.55*sa+.3*sb+.15*sc;vec3 warpGradient=.55*ca*ka+.3*cb*kb+.15*cc*kc;
+ // Conservative projected pixel footprint. Unresolved frequencies fade out
+ // before Nyquist, including grazing angles and small/resized previews.
+ float view=max(.12,abs(dot(geometricNormal,-rd)));
+ float footprint=3.4*density/(min(uResolution.x,uResolution.y)*max(.05,uFrame.x)*max(.06,min(min(size.x,size.y),size.z))*view);
+ vec3 gradient=vec3(0.);float roughening=0.;
+ if(uMaterialLayers.x>.000001){
+  vec3 k=vec3(4.,32.,3.);float phase=dot(q,k)+organic*5.*warp;
+  vec3 derivative=k+organic*5.*warpGradient;
+  float band=1.-smoothstep(.22,.48,1.75*length(derivative)*footprint/(2.*PI));
+  float ridge=.5+.5*sin(phase);
+  gradient+=derivative*(2.*ridge*ridge*ridge*cos(phase))*.045*uMaterialLayers.x*band;
+ }
+ if(uMaterialLayers.y>.000001){
+  vec3 k=vec3(1.,8.,1.3);float phase=dot(q,k)+organic*2.6*warp;
+  vec3 derivative=k+organic*2.6*warpGradient;
+  float band=1.-smoothstep(.22,.48,length(derivative)*footprint/(2.*PI));
+  gradient+=derivative*cos(phase)*.08*uMaterialLayers.y*band;
+ }
+ if(uMaterialLayers.z>.000001){
+  float wearBand=1.-smoothstep(.22,.48,12.*footprint/(2.*PI));
+  float wearPatch=mix(.5+.5*sin(q.y*9.),.5+.5*sa*sb*cc,organic);
+  vec3 patchGradient=mix(vec3(0.,4.5*cos(q.y*9.),0.),.5*(ka*ca*sb*cc+kb*sa*cb*cc-kc*sa*sb*sc),organic);
+  vec3 k=vec3(57.,3.,7.);float scratch=dot(q,k)+organic*3.*warp;
+  vec3 derivative=k+organic*3.*warpGradient;
+  float band=1.-smoothstep(.2,.45,length(derivative)*footprint/(2.*PI));
+  gradient+=(patchGradient*(.044+.007*sin(scratch)*band)*wearBand+derivative*cos(scratch)*(.007*wearPatch)*band)*uMaterialLayers.z;
+  roughening=uMaterialLayers.z*(.18+.42*mix(.5,wearPatch,wearBand));
+ }
+ if(uMaterialLayers.w>.000001){
+  vec3 k=vec3(2.,15.,4.);float phase=dot(q,k)+organic*3.6*warp;
+  vec3 derivative=k+organic*3.6*warpGradient;
+  float band=1.-smoothstep(.22,.48,length(derivative)*footprint/(2.*PI));
+  gradient+=derivative*cos(phase)*.05*uMaterialLayers.w*band;
+ }
+ gradient*=density*uMaterialDetail.x;gradient.xy=rot(-uMaterialDetail.w)*gradient.xy;gradient/=size;
+ gradient.yz=rot(-uOther.y)*gradient.yz;gradient.xz=rot(-uOther.x)*gradient.xz;gradient.xy=rot(-uExtraShape3.z)*gradient.xy;
+ gradient-=geometricNormal*dot(gradient,geometricNormal);
+ gradient*=min(1.,1.05/max(.000001,length(gradient)))*smoothstep(.035,.28,view);
+ return vec4(gradient,roughening);
+}
+vec3 reliefNormal(vec3 original,vec3 geometricNormal,vec3 rd,vec3 gradient){
+ vec3 n=normalize(original-gradient);
+ // A perturbed shading normal must never reflect into the physical surface.
+ if(dot(reflect(rd,n),geometricNormal)<.001)n=normalize(mix(n,geometricNormal,.75));
+ if(dot(reflect(rd,n),geometricNormal)<0.)n=geometricNormal;
+ return n;
+}
+`+'\nvec4 shade(');
 MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometricNormal,vec3 rd,bool hit,out float issue){
  issue=0.;vec3 local=transform(p),n=geometricNormal;
  float textureFilter=1.-smoothstep(.28,.65,84.*3.4/min(uResolution.x,uResolution.y)/(2.*PI));
  if(uTexture.z>.001)n=normalize(n+vec3(sin(local.y*84.),cos(local.x*71.),sin(local.z*69.))*uTexture.z*.045*textureFilter);
+ float localRoughness=uMat.w,coatRoughness=uCoat.y;
+ bool reliefActive=dot(uMaterialLayers,vec4(1.))>.000001;
+ if(reliefActive){vec4 detail=materialRelief(local,geometricNormal,rd);n=reliefNormal(n,geometricNormal,rd,detail.xyz);localRoughness=clamp(localRoughness+detail.w*(1.-localRoughness),0.,1.);coatRoughness=clamp(coatRoughness+detail.w*.25,0.,1.);}
  float facing=max(dot(n,-rd),0.),pos=dot(local,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z;
- vec3 base=palette(pos),specular=environment(reflect(rd,n),p,uMat.w);
+ vec3 base=palette(pos),specular=environment(reflect(rd,n),p,localRoughness);
  vec3 dielectricF=fresnel(facing,1.,max(1.,uMat.y),local),diffuseLight=environment(n,p,1.)*.14;
  for(int i=0;i<uLightCount;i++){
   vec3 off=uLights[i].xyz-p;float cosine=max(dot(n,normalize(off)),0.);
@@ -585,8 +645,10 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
    glass=transmitted(p,geometricNormal,rd,base,vec3(1.),max(1.,uMat.y),issue);
    #endif
    // The ray solver already contains the entry reflection. Account for it once in the surface stack.
-   glass.rgb=max(vec3(0.),glass.rgb-specular*dielectricF);
-   glass.a=clamp((glass.a-max(max(dielectricF.r,dielectricF.g),dielectricF.b))/max(.001,1.-dielectricF.r),0.,1.);
+   vec3 entrySpecular=specular,entryF=dielectricF;
+   if(reliefActive){entrySpecular=environment(reflect(rd,geometricNormal),p,uMat.w);entryF=fresnel(max(dot(geometricNormal,-rd),0.),1.,max(1.,uMat.y),local);}
+   glass.rgb=max(vec3(0.),glass.rgb-entrySpecular*entryF);
+   glass.a=clamp((glass.a-max(max(entryF.r,entryF.g),entryF.b))/max(.001,1.-entryF.r),0.,1.);
    glass=mix(glass,straight,clamp(uModern.x,0.,1.));
   }
  }
@@ -606,7 +668,7 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  below=below*(vec3(1.)-filmF)+specular*filmF;
  alpha=1.-(1.-alpha)*(1.-max(max(filmF.r,filmF.g),filmF.b));
  if(uCoat.x>.001){vec3 coatF=fresnel(facing,1.,1.5,local)*uCoat.x;
-  below=below*(vec3(1.)-coatF)+environment(reflect(rd,n),p,uCoat.y)*coatF;
+  below=below*(vec3(1.)-coatF)+environment(reflect(rd,n),p,coatRoughness)*coatF;
   alpha=1.-(1.-alpha)*(1.-max(max(coatF.r,coatF.g),coatF.b));
  }
  below+=base*uSurface.w*(1.-transmission+transmission*pow(1.-facing,3.));
@@ -1226,7 +1288,7 @@ export class Renderer{
  async waitForGpu(options={}){const start=Date.now();while(this.completionSync){this.assertAvailable();if(this.pollCompletion())break;if(options.cancelled?.())return false;if(Date.now()-start>120000)throw new Error('Il calcolo richiede troppo tempo. La creazione è conservata.');await new Promise(r=>setTimeout(r,4));}return !options.cancelled?.();}
  draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options,source),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);let analytic=!!(key&32)||analyticShape(s);const timer=options.preview?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW){this.ensurePreviewField(s,options,source);analytic=this.cachedShapeAnalytic;}this.useVariant(key);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(key&512)this.uploadGrowth(s);if(key&32768)this.uploadRoots(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
  if(s.renderVersion>=2){u('uBudget',key&ATLAS_PREVIEW?(options.quality==='fast'?[this.fieldResolution>=96?128:96,3,4,1]:[128,4,8,2]):key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
- if(s.renderVersion>=2){u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,key&ATLAS_PREVIEW?24:0]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
+ if(s.renderVersion>=2){u('uMaterialDetail',[s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad]);u('uMaterialLayers',[s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0]);u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,key&ATLAS_PREVIEW?24:0]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
  u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);
 
