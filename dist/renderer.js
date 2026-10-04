@@ -229,7 +229,7 @@ function shaderFunction(source,name,replacement){
  while(depth){depth+=(source[end]==='{')-(source[end]==='}');end++;}
  return source.slice(0,start)+replacement+source.slice(end);
 }
-let MODERN_FRAG=FRAG.replace('precision highp float;','precision highp float;\nprecision highp int;').replace('uniform vec2 uResolution;','uniform vec2 uResolution;\nuniform vec4 uEnvironment,uFilmMotion,uSampling,uModern,uPetals,uPetalTip,uPetalSpread,uStem,uColorWave,uColorAxis,uOrganic;\nuniform vec3 uInternalColor;');
+let MODERN_FRAG=FRAG.replace('precision highp float;','precision highp float;\nprecision highp int;').replace('uniform vec2 uResolution;','uniform vec2 uResolution;\nuniform vec4 uEnvironment,uFilmMotion,uSampling,uModern,uPetals,uPetalTip,uPetalSpread,uStem,uColorWave,uColorAxis,uOrganic,uBudget;\nuniform vec3 uInternalColor;\nuniform highp sampler2D uGrowth;\nuniform vec2 uGrowthRows[8];');
 const CROWN_GEOMETRY=`
 #if CROWN_ENABLED
 // Exact rounded-cone distance, including spherical end caps. Each petal is a
@@ -244,6 +244,7 @@ float roundCone(vec3 p,vec3 a,vec3 b,float ra,float rb){
  return (sqrt(max(0.,x2*a2*il2))+y*rr)*il2-ra;
 }
 vec3 petalCurve(vec3 a,vec3 b,vec3 c,float t){return mix(mix(a,b,t),mix(b,c,t),t);}
+#if FLOWER_ENABLED || LEGACY_HEDGE_ENABLED
 float curvedPetal(vec3 p,vec3 a,vec3 b,vec3 c){
  float width=uPetalTip.y*(.65+uPetalTip.z*.55),sharp=uPetalTip.w;
  float middle=width*mix(1.,.42,sharp),root=max(.025,width*.5),tip=max(.0015,middle*mix(.9,.008,sharp));
@@ -252,6 +253,8 @@ float curvedPetal(vec3 p,vec3 a,vec3 b,vec3 c){
  d=-smax(-d,-roundCone(p,p1,p2,middle,middle*mix(.9,.45,sharp)),.025*(1.-sharp));
  return -smax(-d,-roundCone(p,p2,c,middle*mix(.9,.45,sharp),tip),.025*(1.-sharp));
 }
+#endif
+#if FLOWER_ENABLED
 float flowerField(vec3 p){
  float count=max(3.,floor(uPetals.y+.5)),step=2.*PI/count,angle=atan(p.z,p.x)-uPetalSpread.z;
  float folded=mod(angle+step*.5,step)-step*.5,r=length(p.xz);
@@ -262,6 +265,8 @@ float flowerField(vec3 p){
  float petal=curvedPetal(q,a,b,c),collar=length(vec2(r-root,p.y+.12))-max(.035,uPetalTip.y*.47);
  return -smax(-petal,-collar,.035);
 }
+#endif
+#if LEGACY_HEDGE_ENABLED
 float legacyHedgeField(vec3 p){
  float radius=length(p),rows=max(2.,floor(uPetalSpread.y+.5)),step=PI/rows;
  float phi=acos(clamp(p.y/max(.00001,radius),-1.,1.)),theta=atan(p.z,p.x)-uPetalSpread.z;
@@ -279,13 +284,11 @@ float legacyHedgeField(vec3 p){
  }
  return d;
 }
+#endif
 // A buried, flared root joins the body with its own fillet. Tip sharpness
 // never changes this blend. Search neighboring growth cells to avoid seams.
-float growthRandom(float row,float column,uint lane){
- uint h=uint(row)*1664525u+uint(column)*1013904223u+uint(uOrganic.w)+lane*747796405u;
- h=(h^(h>>16u))*2246822519u;h=(h^(h>>13u))*3266489917u;h=h^(h>>16u);
- return float(h&65535u)/65535.*2.-1.;
-}
+#if ORGANIC_ENABLED
+// Growth transforms are cached once per shape update, not rebuilt per ray step.
 float organicHedgeField(vec3 p){
  float radius=length(p),core=.62+uPetals.z*.14,body=radius-core;
  if(radius<core*.4)return body;
@@ -294,44 +297,60 @@ float organicHedgeField(vec3 p){
  float width=uPetalTip.y*(.65+uPetalTip.z*.55),rootRadius=min(.42,max(.025,width*.5+uOrganic.y*.28+uOrganic.x*.04));
  float minLength=uPetalTip.x*(1.-uOrganic.z*.32);
  float rootBlend=min(.035*(1.-uPetalTip.w)+uOrganic.x*(.12+uOrganic.y*.32),max(.008,(minLength-core*.08)*.6)),spines=100.;
- float amount=min(1.,(uOrganic.x+uOrganic.y+uOrganic.z)*20.);
  for(int j=-1;j<=1;j++){
   float row=nearest+float(j);if(row<0.||row>=rows)continue;
-  float latitude=(row+.5)*step,count=max(3.,floor(uPetals.y*sin(latitude)+.5)),sector=2.*PI/count;
-  float stagger=mod(row,2.)*.5*amount,cell=floor(theta/sector-stagger+.5);
+  vec2 rowData=uGrowthRows[int(row)];float count=rowData.x,sector=2.*PI/count;
+  float cell=floor(theta/sector-rowData.y+.5);
   for(int k=-1;k<=1;k++){
-   float column=mod(cell+float(k)+count,count),longitude=(column+stagger)*sector+uPetalSpread.z;
-   float lengthOfSpine=uPetalTip.x*(1.+growthRandom(row,column,0u)*uOrganic.z*.32);
-   float thickness=rootRadius*(1.+growthRandom(row,column,1u)*uOrganic.z*.18);
-   vec3 axis=vec3(sin(latitude)*cos(longitude),cos(latitude),sin(latitude)*sin(longitude));
-   vec3 tangent=vec3(cos(latitude)*cos(longitude),-sin(latitude),cos(latitude)*sin(longitude));
-   vec3 across=vec3(-sin(longitude),0,cos(longitude));
+   int column=int(mod(cell+float(k)+count,count))*4;
+   vec4 growth=texelFetch(uGrowth,ivec2(column,int(row)),0),root=texelFetch(uGrowth,ivec2(column+1,int(row)),0);
+   vec4 tipData=texelFetch(uGrowth,ivec2(column+2,int(row)),0),bendData=texelFetch(uGrowth,ivec2(column+3,int(row)),0);
+   vec3 axis=growth.xyz;float lengthOfSpine=growth.w,thickness=root.w;
    float height=clamp((dot(p,axis)-core)/max(.1,lengthOfSpine),0.,1.);
-   vec3 bend=tangent*(uPetals.w*.65+growthRandom(row,column,2u)*uOrganic.z*.18)+across*growthRandom(row,column,3u)*uOrganic.z*.12;
+   vec3 bend=bendData.xyz;
    vec3 q=p-bend*lengthOfSpine*height*height;
-   vec3 a=axis*core*(.92-uOrganic.x*.22),c=axis*(core*.92+lengthOfSpine);
-   float tip=max(.0015,width*mix(.9,.008,uPetalTip.w));
-   thickness=min(thickness,length(c-a)*.85+tip);
+   vec3 a=root.xyz,c=tipData.xyz;float tip=tipData.w;
    float lower=length(q-a-axis*clamp(dot(q-a,axis),0.,length(c-a)))-max(thickness,tip);
-   float warpBound=1.+2.*length(bend);
+   float warpBound=bendData.w;
    if(lower/warpBound>min(body,spines)+rootBlend)continue;
    spines=-smax(-spines,-roundCone(q,a,c,thickness,tip)/warpBound,rootBlend*.4);
   }
  }
  return -smax(-body,-spines,rootBlend);
 }
+#endif
+#if ORGANIC_ENABLED || LEGACY_HEDGE_ENABLED
 float hedgeField(vec3 p){
+ #if ORGANIC_ENABLED && LEGACY_HEDGE_ENABLED
  float amount=clamp((uOrganic.x+uOrganic.y+uOrganic.z)*20.,0.,1.);
  if(amount<.000001)return legacyHedgeField(p);
  float organic=organicHedgeField(p);if(amount>.999999)return organic;
  return mix(legacyHedgeField(p),organic,amount);
+ #elif ORGANIC_ENABLED
+ return organicHedgeField(p);
+ #else
+ return legacyHedgeField(p);
+ #endif
 }
-float crownField(vec3 p){float spread=uPetalSpread.x;if(spread<.0001)return flowerField(p);if(spread>.9999)return hedgeField(p);return mix(flowerField(p),hedgeField(p),spread);}
+#endif
+float crownField(vec3 p){
+ #if FLOWER_ENABLED && (ORGANIC_ENABLED || LEGACY_HEDGE_ENABLED)
+ float spread=uPetalSpread.x;return mix(flowerField(p),hedgeField(p),spread);
+ #elif FLOWER_ENABLED
+ return flowerField(p);
+ #elif ORGANIC_ENABLED || LEGACY_HEDGE_ENABLED
+ return hedgeField(p);
+ #else
+ return 0.;
+ #endif
+}
+#if STEM_ENABLED
 float stemField(vec3 p){
  float len=uStem.x*3.,radius=uStem.y*min(1.,uStem.x*8.),bend=uStem.z;
  vec3 a=vec3(0,-.14,0),b=vec3(bend*.35,-.14-len*.45,0),c=vec3(-bend*.55,-.14-len,0);
  return curvedStem(p,a,b,c,radius);
 }
+#endif
 #endif
 `;
 // Separate stem helper so petal taper never affects its thickness.
@@ -340,9 +359,23 @@ MODERN_FRAG=MODERN_FRAG.replace('vec3 fieldParts(vec3 world){',CROWN_GEOMETRY.re
 MODERN_FRAG=MODERN_FRAG.replace('float d=norm-1.-uWarp.x*w-uOther.z*ripple*.17-lobe;',`float d=norm-1.-uWarp.x*w-uOther.z*ripple*.17-lobe;
  #if CROWN_ENABLED
  if(uPetals.x>.000001)d=mix(d,crownField(p)-uWarp.x*w*.35-uOther.z*ripple*.08,uPetals.x);
+ #if STEM_ENABLED
  if(uStem.x>.000001)d=-smax(-d,-stemField(p),.08*min(1.,uStem.x*8.));
  #endif
+ #endif
 `);
+// Uniform zero controls should cost nothing in the common unwarped crown.
+// Every nonzero value still follows the same continuous procedural field.
+MODERN_FRAG=MODERN_FRAG.replace('p.xz=rot(uWarp.z*p.y*.7)*p.xz;','if(uWarp.z!=0.)p.xz=rot(uWarp.z*p.y*.7)*p.xz;');
+MODERN_FRAG=MODERN_FRAG.replace('p.x*=1.+uExtraShape2.z*exp(-p.y*p.y*4.);','if(uExtraShape2.z!=0.)p.x*=1.+uExtraShape2.z*exp(-p.y*p.y*4.);');
+MODERN_FRAG=MODERN_FRAG.replace('float w=sin(p.x*3.4+uSeed)*sin(p.y*2.6)*cos(p.z*3.+.6);','float w=0.;if(uWarp.x!=0.)w=sin(p.x*3.4+uSeed)*sin(p.y*2.6)*cos(p.z*3.+.6);');
+MODERN_FRAG=MODERN_FRAG.replace('float ripple=sin(p.x*uWarp.w*2.)*sin(p.y*uWarp.w*1.7)*sin(p.z*uWarp.w*1.6+1.);','float ripple=0.;if(uOther.z!=0.)ripple=sin(p.x*uWarp.w*2.)*sin(p.y*uWarp.w*1.7)*sin(p.z*uWarp.w*1.6+1.);');
+MODERN_FRAG=MODERN_FRAG.replace('float norm=pow(pow(abs(p.x),exponent)+pow(abs(p.y),exponent)+pow(abs(p.z),exponent),1./exponent);','float norm=exponent==2.?length(p):pow(pow(abs(p.x),exponent)+pow(abs(p.y),exponent)+pow(abs(p.z),exponent),1./exponent);');
+MODERN_FRAG=MODERN_FRAG.replace('float lobe=sin(atan(p.y,p.x)*uExtraShape2.y)*uExtraShape2.x*(1.-min(1.,abs(p.z))*.65);','float lobe=0.;if(uExtraShape2.x!=0.)lobe=sin(atan(p.y,p.x)*uExtraShape2.y)*uExtraShape2.x*(1.-min(1.,abs(p.z))*.65);');
+MODERN_FRAG=MODERN_FRAG.replace(`float innerPower=2.+uVoid.w*5.;vec2 hp=abs((p.xy-uVoid.yz)/vec2(uExtraShape3.x,1.));
+ float inner=pow(pow(hp.x,innerPower)+pow(hp.y,innerPower),1./innerPower)-uVoid.x;
+ float hole=uVoid.x>.001?-inner:-10000.,cut=uCut.x>.001?uCut.x-length((p.xy-uCut.yz)/vec2(uExtraShape3.y,1.)):-10000.;`,
+ `float hole=-10000.,cut=-10000.;if(uVoid.x>.001){float innerPower=2.+uVoid.w*5.;vec2 hp=abs((p.xy-uVoid.yz)/vec2(uExtraShape3.x,1.));hole=uVoid.x-pow(pow(hp.x,innerPower)+pow(hp.y,innerPower),1./innerPower);}if(uCut.x>.001)cut=uCut.x-length((p.xy-uCut.yz)/vec2(uExtraShape3.y,1.));`);
 MODERN_FRAG=MODERN_FRAG.replace('vec3 surfaceNormal(vec3 p){vec3 n=surfaceGradient(p);',`vec3 surfaceNormal(vec3 p){vec3 n;
  #if CROWN_ENABLED
  float e=.00012*uFrame.x;vec3 x=vec3(e,0,0),y=vec3(0,e,0),z=vec3(0,0,e);n=vec3(field(p+x)-field(p-x),field(p+y)-field(p-y),field(p+z)-field(p-z));
@@ -596,6 +629,47 @@ MODERN_FRAG=specializeAnalytic(MODERN_FRAG,'traceBoundary',`float t=firstRoot(el
 MODERN_FRAG=MODERN_FRAG.replace('if(uModern.x>.999||!hit){glass=straight;}else{', '#if THIN_SHELL_ENABLED\n glass=straight;\n#else\n if(uModern.x>.999||!hit){glass=straight;}else{');
 MODERN_FRAG=MODERN_FRAG.replace('glass=mix(glass,straight,clamp(uModern.x,0.,1.));\n  }','glass=mix(glass,straight,clamp(uModern.x,0.,1.));\n  }\n#endif');
 MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos),specular=', 'vec3 base=surfacePalette(local,palette(pos)),specular=');
+// Preview budgets are normalized independently: changing sample counts never
+// changes optical density or scattering strength. Full exports retain 16/4.
+MODERN_FRAG=MODERN_FRAG.replace('for(int j=0;j<int(uRuntime.w)*14;j++){','for(int j=0;j<TRACE_STEPS;j++){if(j>=int(uBudget.x))break;');
+MODERN_FRAG=MODERN_FRAG.replace('for(int bounce=0;bounce<int(uRuntime.w)*2;bounce++){','for(int bounce=0;bounce<INTERFACE_STEPS;bounce++){if(bounce>=int(uBudget.y))break;');
+MODERN_FRAG=shaderFunction(MODERN_FRAG,'materialLength',`float materialLength(vec3 a,vec3 b){
+ vec3 delta=b-a;float lengthOfRay=length(delta);if(lengthOfRay<.0001)return 0.;vec3 direction=delta/lengthOfRay;
+ if(uScatter.y>.5){vec2 outer=ellipsoidRoots(a,direction,1.);float distance=max(0.,min(lengthOfRay,outer.y)-max(0.,outer.x));if(hasCavity()){vec2 inner=ellipsoidRoots(a,direction,uInterior.x*(1.-uInterior.y));distance-=max(0.,min(lengthOfRay,inner.y)-max(0.,inner.x));}return max(0.,distance);}
+ float occupied=0.,samples=max(1.,uBudget.z);
+ for(int k=0;k<LENGTH_SAMPLES;k++){if(k>=int(samples))break;vec3 q=a+delta*(float(k)+.5)/samples;occupied+=materialField(q)<0.?1.:0.;}
+ return occupied*lengthOfRay/samples;
+}`);
+MODERN_FRAG=MODERN_FRAG.replace('for(int k=0;k<int(uRuntime.w)/4;k++){float s=distance*(float(k)+.5)/4.;','for(int k=0;k<SCATTER_SAMPLES;k++){if(k>=int(uBudget.w))break;float s=distance*(float(k)+.5)/max(1.,uBudget.w);');
+MODERN_FRAG=MODERN_FRAG.replace('incident*sigmaS*distance/4.;','incident*sigmaS*distance/max(1.,uBudget.w);');
+MODERN_FRAG=MODERN_FRAG.replace('for(int k=0;k<5;k++){\n    float wavelength=',`for(int k=0;k<SPECTRAL_SAMPLES;k++){
+    #if PREVIEW_ENABLED
+    float wavelength=k==0?.650:k==1?.510:.435;
+    vec3 weight=k==0?vec3(1.,.15,0):k==1?vec3(0,.70,.20):vec3(0,.15,.80);
+    #else
+    float wavelength=`);
+MODERN_FRAG=MODERN_FRAG.replace('vec3(0,0,.30);\n    float status;', 'vec3(0,0,.30);\n    #endif\n    float status;');
+MODERN_FRAG=MODERN_FRAG.replace(' if(transmission>.0001){', ' #if TRANSMISSION_ENABLED\n if(transmission>.0001){');
+MODERN_FRAG=MODERN_FRAG.replace(' vec3 below=(vec3(1.)-dielectricF)', ' #endif\n vec3 below=(vec3(1.)-dielectricF)');
+function guardShaderFunction(source,name,condition){
+ const start=source.search(new RegExp('(?:vec[234]|float|bool|void)\\s+'+name+'\\s*\\(')),open=source.indexOf('{',start);
+ let end=open+1,depth=1;while(depth){depth+=(source[end]==='{')-(source[end]==='}');end++;}
+ return source.slice(0,start)+'\n#if '+condition+'\n'+source.slice(start,end)+'\n#endif\n'+source.slice(end);
+}
+MODERN_FRAG=guardShaderFunction(MODERN_FRAG,'transmitted','TRANSMISSION_ENABLED && !THIN_SHELL_ENABLED');
+MODERN_FRAG=MODERN_FRAG.replace('uniform vec3 uInternalColor;','uniform vec3 uInternalColor;\nuniform float uGeometryRadius;');
+MODERN_FRAG=MODERN_FRAG.replace('extent=axes()*4.5;','extent=axes()*uGeometryRadius;');
+MODERN_FRAG=MODERN_FRAG.replace('for(int bounce=0;bounce<INTERFACE_STEPS;bounce++){if(bounce>=int(uBudget.y))break;',`for(int bounce=0;bounce<INTERFACE_STEPS;bounce++){if(bounce>=int(uBudget.y))break;
+ #if PREVIEW_ENABLED
+ if(max(max(beta.r,beta.g),beta.b)<.0005){finished=true;break;}
+ #else
+ if(max(max(beta.r,beta.g),beta.b)<.000001){finished=true;break;}
+ #endif
+`);
+// Most wallpaper pixels miss the object; do not evaluate six field samples
+// there unless the soft silhouette actually needs surface shading.
+MODERN_FRAG=MODERN_FRAG.replace('closest=max(0.,field(point));normal=surfaceNormal(point);','closest=max(0.,field(point));');
+MODERN_FRAG=MODERN_FRAG.replace('if(hit||coverage>.001)surface=shade(point,normal,direction,hit,issue);','if(hit||coverage>.001){if(!hit)normal=surfaceNormal(point);surface=shade(point,normal,direction,hit,issue);}');
 const RESOLVE=`#version 300 es
 precision highp float;uniform sampler2D uImage;uniform vec4 uGrain;uniform float uAll;out vec4 fragColor;
 void main(){vec4 a=texelFetch(uImage,ivec2(gl_FragCoord.xy),0);bool opaque=uGrain.w>.5;float noise=(fract(sin(dot(floor(gl_FragCoord.xy/max(.5,uGrain.y))+uGrain.z,vec2(127.1,311.7)))*43758.5453123)-.5)*uGrain.x;
@@ -686,18 +760,90 @@ function organicHedgeAt(s,p){
 function hedgeAt(s,p){const amount=Math.max(0,Math.min(1,((s.petalBlend||0)+(s.petalRoot||0)+(s.petalRandom||0))*20));if(amount<.000001)return legacyHedgeAt(s,p);const organic=organicHedgeAt(s,p);return amount>.999999?organic:legacyHedgeAt(s,p)*(1-amount)+organic*amount;}
 function crownAt(s,p){const spread=s.petalCoverage||0;return spread<.0001?flowerAt(s,p):spread>.9999?hedgeAt(s,p):flowerAt(s,p)*(1-spread)+hedgeAt(s,p)*spread;}
 function stemAt(s,p){const len=s.stemAmount*3,radius=(s.stemRadius??.09)*Math.min(1,s.stemAmount*8),bend=s.stemBend||0,a=[0,-.14,0],b=[bend*.35,-.14-len*.45,0],c=[-bend*.55,-.14-len,0],m=curveAt(a,b,c,.5);return Math.min(coneAt(p,a,m,radius,radius),coneAt(p,m,c,radius,radius));}
+const GROWTH_KEYS=['petalRows','petalCount','petalOpen','petalLength','petalWidth','petalInflate','petalSharp','petalCurl','petalBlend','petalRoot','petalRandom','petalPhase','seed'];
+export function growthTable(s){
+ const data=new Float32Array(96*8*4),rowData=new Float32Array(16),rows=Math.max(2,Math.min(8,Math.floor((s.petalRows||5)+.5)));
+ const core=.62+(s.petalOpen??.65)*.14,width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),sharp=s.petalSharp||0,random=s.petalRandom||0;
+ const rootRadius=Math.min(.42,Math.max(.025,width*.5+(s.petalRoot||0)*.28+(s.petalBlend||0)*.04)),amount=Math.min(1,((s.petalBlend||0)+(s.petalRoot||0)+random)*20),phase=(((s.petalPhase||0)%360+360)%360)*Math.PI/180;
+ const blend=Math.min(.035*(1-sharp)+(s.petalBlend||0)*(.12+(s.petalRoot||0)*.32),Math.max(.008,((s.petalLength??1.05)*(1-random*.32)-core*.08)*.6));let radiusBound=core;
+ for(let row=0;row<rows;row++){
+  const latitude=(row+.5)*Math.PI/rows,count=Math.max(3,Math.min(24,Math.floor((s.petalCount||12)*Math.sin(latitude)+.5))),stagger=(row%2)*.5*amount;
+  rowData.set([count,stagger],row*2);
+  for(let column=0;column<count;column++){
+   const longitude=(column+stagger)*TAU/count+phase,noise=lane=>growthRandom(row,column,s.seed,lane),length=(s.petalLength??1.05)*(1+noise(0)*random*.32);
+   const axis=[Math.sin(latitude)*Math.cos(longitude),Math.cos(latitude),Math.sin(latitude)*Math.sin(longitude)],tangent=[Math.cos(latitude)*Math.cos(longitude),-Math.sin(latitude),Math.cos(latitude)*Math.sin(longitude)],across=[-Math.sin(longitude),0,Math.cos(longitude)];
+   const bend=tangent.map((v,i)=>v*((s.petalCurl||0)*.65+noise(2)*random*.18)+across[i]*noise(3)*random*.12),a=axis.map(v=>v*core*(.92-(s.petalBlend||0)*.22)),c=axis.map(v=>v*(core*.92+length));
+   const tip=Math.max(.0015,width*(.9*(1-sharp)+.008*sharp)),thickness=Math.min(rootRadius*(1+noise(1)*random*.18),Math.hypot(...vectorSub(c,a))*.85+tip);
+   radiusBound=Math.max(radiusBound,Math.max(Math.hypot(...a),Math.hypot(...c))+Math.max(thickness,tip)+Math.hypot(...bend)*length+blend*2);
+   data.set([...axis,length,...a,thickness,...c,tip,...bend,1+2*Math.hypot(...bend)],(row*96+column*4)*4);
+  }
+ }
+ return {data,rowData,radiusBound};
+}
+function geometryRadius(s,growthRadius=0){
+ if(['deform','asymmetry','twist','waves','taper','bendX','bendY','lobeAmount','pinch'].some(k=>Math.abs(s[k]||0)>.000001))return 4.5;
+ const width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),length=s.petalLength??1.05;
+ const flower=.17+(s.petalOpen??.65)*.25+length+width+.15,hedge=.62+(s.petalOpen??.65)*.14+length+width+.2;
+ let radius=1.;if((s.petalAmount||0)>.000001){if((s.petalCoverage||0)<.9999)radius=Math.max(radius,flower);if((s.petalCoverage||0)>.0001)radius=Math.max(radius,hedge,growthRadius);}
+ if((s.stemAmount||0)>.000001)radius=Math.max(radius,s.stemAmount*3+Math.abs(s.stemBend||0)*.55+(s.stemRadius??.09)+.25);
+ return radius+.02;
+}
+function rendererVariant(s,options={}){
+ const modern=s.renderVersion>=2,analytic=!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);
+ const transmission=modern?s.transparency:s.transparency+(1-s.transparency)*(s.translucency||0),crown=modern&&(s.petalAmount||0)+(s.stemAmount||0)>.000001;
+ const amount=Math.min(1,((s.petalBlend||0)+(s.petalRoot||0)+(s.petalRandom||0))*20),spread=s.petalCoverage||0,petals=crown&&(s.petalAmount||0)>.000001;
+ const volume=(s.scattering||0)+(s.translucency||0)+(s.subsurface||0)>.0001&&(!modern||transmission>.0001&&s.thinShell<.999);
+ return (modern?8:0)+(modern&&s.thinShell>=.999?16:0)+(modern&&analytic?32:0)+(crown?64:0)+ +volume+((s.subsurface||0)>.0001&&(!modern?transmission<.999:true)?2:0)+((s.dispersion||0)>.005?4:0)
+  +(petals&&spread<=.9999?128:0)+(petals&&spread>=.0001&&amount<.999999?256:0)+(petals&&spread>=.0001&&amount>.000001?512:0)+(crown&&(s.stemAmount||0)>.000001?1024:0)+(modern&&transmission>.0001?2048:0)+(modern&&options.preview&&options.quality!=='full'?4096:0);
+}
+function variantSource(key){
+ const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4};
+ let defines=Object.entries(flags).map(([name,bit])=>'#define '+name+' '+ +!!(key&bit)).join('\n');
+ if(key&8)defines+='\n#define TRACE_STEPS '+(key&4096?128:224)+'\n#define INTERFACE_STEPS '+(key&4096?8:32)+'\n#define LENGTH_SAMPLES '+(key&4096?8:16)+'\n#define SCATTER_SAMPLES '+(key&4096?2:4)+'\n#define SPECTRAL_SAMPLES '+(key&4096?3:5);
+ return (key&8?MODERN_FRAG:FRAG).replace('#version 300 es','#version 300 es\n'+defines);
+}
 export class Renderer{
  constructor(canvas){
- this.canvas=canvas;const gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!gl)throw new Error('Questo browser non supporta WebGL 2. Prova un browser aggiornato con accelerazione grafica attiva.');this.gl=gl;this.programs=new Map();this.vertexShader=this.compileShader(gl.VERTEX_SHADER,VERT);this.timerExtension=gl.getExtension('EXT_disjoint_timer_query_webgl2');this.timerQueries=[];this.gpuMilliseconds=null;this.gpuSample=0;
- this.buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);this.maxSize=Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE),gl.getParameter(gl.MAX_TEXTURE_SIZE),4096);
+ this.canvas=canvas;const gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!gl)throw new Error('Questo browser non supporta WebGL 2. Prova un browser aggiornato con accelerazione grafica attiva.');this.gl=gl;this.programs=new Map();this.programClock=0;this.disposed=false;this.parallelExtension=gl.getExtension('KHR_parallel_shader_compile');this.recoveryExtension=gl.getExtension('WEBGL_lose_context');this.vertexShader=this.compileShader(gl.VERTEX_SHADER,VERT);this.timerExtension=gl.getExtension('EXT_disjoint_timer_query_webgl2');this.timerQueries=[];this.gpuMilliseconds=null;this.gpuSample=0;this.completedFrames=0;
+ this.buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);this.maxSize=Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE),gl.getParameter(gl.MAX_TEXTURE_SIZE),4096);this.onContextLost=()=>{this.contextWasLost=true;};canvas.addEventListener('webglcontextlost',this.onContextLost);
  }
  hardwareInfo(){const g=this.gl,e=g.getExtension('WEBGL_debug_renderer_info');let name='GPU WebGL 2';try{name=g.getParameter(e?e.UNMASKED_RENDERER_WEBGL:g.RENDERER)||name;}catch{}return {name,software:/swiftshader|llvmpipe|softpipe|software rasterizer|software adapter/i.test(name),powerPreference:g.getContextAttributes()?.powerPreference||'default',timingAvailable:!!this.timerExtension};}
  pollGpuTime(){const g=this.gl,e=this.timerExtension;if(!e)return;if(g.getParameter(e.GPU_DISJOINT_EXT)){for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];this.gpuMilliseconds=null;return;}while(this.timerQueries.length&&g.getQueryParameter(this.timerQueries[0],g.QUERY_RESULT_AVAILABLE)){const q=this.timerQueries.shift(),ns=g.getQueryParameter(q,g.QUERY_RESULT);g.deleteQuery(q);if(Number.isFinite(ns)&&ns>0){this.gpuMilliseconds=ns/1e6;this.gpuSample++;}}}
  beginGpuTimer(){this.pollGpuTime();if(!this.timerExtension||this.timerQueries.length>=3)return null;const q=this.gl.createQuery();if(q)this.gl.beginQuery(this.timerExtension.TIME_ELAPSED_EXT,q);return q;}
  endGpuTimer(q){if(!q)return;this.gl.endQuery(this.timerExtension.TIME_ELAPSED_EXT);this.timerQueries.push(q);}
- compileShader(type,source){const g=this.gl,shader=g.createShader(type);g.shaderSource(shader,source);g.compileShader(shader);if(!g.getShaderParameter(shader,g.COMPILE_STATUS))throw new Error(g.getShaderInfoLog(shader));return shader;}
- useVariant(key){let variant=this.programs.get(key);const g=this.gl;if(!variant){const source=(key&8?MODERN_FRAG:FRAG).replace('#version 300 es','#version 300 es'+(key&8?'\n#define ANALYTIC_SHAPE '+(key&32?1:0)+'\n#define THIN_SHELL_ENABLED '+(key&16?1:0):'')+'\n#define CROWN_ENABLED '+(key&64?1:0)+'\n#define VOLUME_ENABLED '+(key&1?1:0)+'\n#define SSS_ENABLED '+(key&2?1:0)+'\n#define DISPERSION_ENABLED '+(key&4?1:0)),fragment=this.compileShader(g.FRAGMENT_SHADER,source),program=g.createProgram();g.attachShader(program,this.vertexShader);g.attachShader(program,fragment);g.linkProgram(program);g.deleteShader(fragment);if(!g.getProgramParameter(program,g.LINK_STATUS))throw new Error(g.getProgramInfoLog(program));const locations={};for(let i=0;i<g.getProgramParameter(program,g.ACTIVE_UNIFORMS);i++){const u=g.getActiveUniform(program,i);locations[u.name.replace('[0]','')]=g.getUniformLocation(program,u.name)}variant={program,locations};this.programs.set(key,variant)}this.program=variant.program;this.locations=variant.locations;g.useProgram(this.program);}
- draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){const s=sampleFrame(source,phase),c=this.canvas,g=this.gl;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);const analytic=!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);const volume=(s.scattering||0)+(s.translucency||0)+(s.subsurface||0)>.0001,transmission=s.renderVersion>=2?s.transparency:s.transparency+(1-s.transparency)*(s.translucency||0);this.useVariant((s.renderVersion>=2?8+(s.thinShell>=.999?16:0)+(analytic?32:0)+((s.petalAmount||0)+(s.stemAmount||0)>.000001?64:0):0)+ +volume+((s.subsurface||0)>.0001&&transmission<.999?2:0)+((s.dispersion||0)>.005?4:0));const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
+ assertAvailable(){if(this.disposed||this.gl.isContextLost())throw new Error('La grafica è temporaneamente sospesa. La creazione è conservata.');}
+ compileShader(type,source){const g=this.gl,shader=g.createShader(type);g.shaderSource(shader,source);g.compileShader(shader);if(!g.getShaderParameter(shader,g.COMPILE_STATUS)){const message=g.getShaderInfoLog(shader);g.deleteShader(shader);throw new Error(message||'Impossibile preparare questo effetto.');}return shader;}
+ variant(key){
+  this.assertAvailable();let v=this.programs.get(key);const g=this.gl;
+  if(!v){const fragment=g.createShader(g.FRAGMENT_SHADER),program=g.createProgram();g.shaderSource(fragment,variantSource(key));g.compileShader(fragment);g.attachShader(program,this.vertexShader);g.attachShader(program,fragment);g.linkProgram(program);v={program,fragment,ready:false,used:0};this.programs.set(key,v);}
+  v.used=++this.programClock;
+  if(this.programs.size>12){const candidates=[...this.programs].filter(([k,x])=>k!==key&&x.program!==this.program).sort((a,b)=>a[1].used-b[1].used);while(this.programs.size>12&&candidates.length){const [k,x]=candidates.shift();if(x.fragment)g.deleteShader(x.fragment);g.deleteProgram(x.program);this.programs.delete(k);}}
+  return v;
+ }
+ finishVariant(v){
+  if(v.ready)return;const g=this.gl;
+  if(!g.getProgramParameter(v.program,g.LINK_STATUS)){const message=g.getShaderInfoLog(v.fragment)||g.getProgramInfoLog(v.program);throw new Error(message||'Impossibile preparare questo effetto.');}
+  g.deleteShader(v.fragment);v.fragment=null;v.locations={};const count=g.getProgramParameter(v.program,g.ACTIVE_UNIFORMS);
+  for(let i=0;i<count;i++){const u=g.getActiveUniform(v.program,i);v.locations[u.name.replace('[0]','')]=g.getUniformLocation(v.program,u.name);}v.ready=true;
+ }
+ prepare(source,phase=0,options={}){
+  const v=this.variant(rendererVariant(sampleFrame(source,phase),options));
+  if(!v.ready&&this.parallelExtension&&!this.gl.getProgramParameter(v.program,this.parallelExtension.COMPLETION_STATUS_KHR))return false;
+  this.finishVariant(v);return true;
+ }
+ async prepareAsync(source,phase=0,options={}){
+  const started=Date.now();while(true){if(options.cancelled?.())return false;if(this.prepare(source,phase,options))return true;if(Date.now()-started>120000)throw new Error('La preparazione richiede troppo tempo. Riprova con l’anteprima fluida.');await new Promise(r=>setTimeout(r,16));}
+ }
+ useVariant(key){const v=this.variant(key);this.finishVariant(v);this.program=v.program;this.locations=v.locations;this.gl.useProgram(this.program);}
+ uploadGrowth(s){
+  const key=GROWTH_KEYS.map(k=>s[k]).join('|'),g=this.gl;
+  if(key!==this.growthKey){const table=growthTable(s);this.growthRows=table.rowData;this.growthRadius=table.radiusBound;if(!this.growthTexture){this.growthTexture=g.createTexture();g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,this.growthTexture);g.texStorage2D(g.TEXTURE_2D,1,g.RGBA32F,96,8);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);}g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,this.growthTexture);g.texSubImage2D(g.TEXTURE_2D,0,0,0,96,8,g.RGBA,g.FLOAT,table.data);this.growthKey=key;this.growthUploads=(this.growthUploads||0)+1;}
+  g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,this.growthTexture);g.uniform1i(this.locations.uGrowth,1);g.uniform2fv(this.locations.uGrowthRows,this.growthRows);g.activeTexture(g.TEXTURE0);
+ }
+ pollCompletion(){const g=this.gl;if(this.completionSync&&!g.isContextLost()){const status=g.clientWaitSync(this.completionSync,0,0);if(status===g.ALREADY_SIGNALED||status===g.CONDITION_SATISFIED){g.deleteSync(this.completionSync);this.completionSync=null;this.completedFrames++;return true;}}return false;}
+ async waitForGpu(options={}){const start=Date.now();while(this.completionSync){this.assertAvailable();if(this.pollCompletion())break;if(options.cancelled?.())return false;if(Date.now()-start>120000)throw new Error('Il calcolo richiede troppo tempo. La creazione è conservata.');await new Promise(r=>setTimeout(r,4));}return !options.cancelled?.();}
+ draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);const analytic=!!(key&32)||!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);this.useVariant(key);if(key&512)this.uploadGrowth(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
+ if(s.renderVersion>=2){u('uBudget',key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
  if(s.renderVersion>=2){u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);u('uFilmMotion',[phase*Math.round(s.filmCycles||1),s.filmFlow||0,s.filmSwirl||0,0]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
  u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);
@@ -707,30 +853,64 @@ export class Renderer{
  u('uPhoto1',[s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1]);u('uPhoto2',[s.temperature||0,s.photoTint||0,s.vignette||0,s.lensDistortion||0]);u('uPhoto3',[s.blacks||0,s.highlights||0,s.grainSize||1,0]);u('uPhoto4',[s.gamma||1,+!!s.photoAll,0,0]);
  const palette=s.palette.slice(0,12);while(palette.length<12)palette.push(palette[palette.length-1]||'#ffffff');g.uniform3fv(this.locations.uPalette,palette.flatMap(rgb));g.uniform1i(this.locations.uPaletteCount,Math.max(1,Math.min(12,s.palette.length)));
  const active=s.lights.filter(l=>l.enabled).slice(0,8),pos=[],colors=[],props=[],extra=[];const types={circle:0,bar:1,spot:2,diffuser:3,grid:4,ring:5,orb:6};for(let i=0;i<8;i++){const l=active[i];pos.push(...(l?[l.x,l.y,l.z,l.power]:[0,0,0,0]));colors.push(...rgb(l?.color||'#000000'));props.push(...(l?[l.size,l.length,l.roll*rad,types[l.type]??0]:[1,1,0,0]));extra.push(...(l?[l.softness,Math.tan(l.cone*rad),l.grid,+!!l.visible]:[.3,1,4,0]))}g.uniform4fv(this.locations.uLights,pos);g.uniform3fv(this.locations.uLightColors,colors);g.uniform4fv(this.locations.uLightProps,props);g.uniform4fv(this.locations.uLightExtra,extra);g.uniform1i(this.locations.uLightCount,active.length);
- u('uBg',rgb(s.background));u('uBg2',rgb(s.background2));u('uBackdrop',[s.bgHeight??-.65,s.bgSoftness??1.1,s.bgWash??.12,s.bgShade??.06]);f('uBgMode',{solid:0,gradient:1,transparent:2,studio:3}[s.bgMode]??0);f('uBgAngle',s.bgAngle*rad);f('uSeed',(s.seed%1000)*.013);const timer=options.preview?this.beginGpuTimer():null;g.drawArrays(g.TRIANGLES,0,3);this.endGpuTimer(timer)}
+ u('uBg',rgb(s.background));u('uBg2',rgb(s.background2));u('uBackdrop',[s.bgHeight??-.65,s.bgSoftness??1.1,s.bgWash??.12,s.bgShade??.06]);f('uBgMode',{solid:0,gradient:1,transparent:2,studio:3}[s.bgMode]??0);f('uBgAngle',s.bgAngle*rad);f('uSeed',(s.seed%1000)*.013);const timer=options.preview?this.beginGpuTimer():null;g.drawArrays(g.TRIANGLES,0,3);this.endGpuTimer(timer);if(this.completionSync)g.deleteSync(this.completionSync);this.completionSync=g.fenceSync(g.SYNC_GPU_COMMANDS_COMPLETE,0);g.flush();return true;}
  pixels(){const {gl,canvas}=this,raw=new Uint8Array(canvas.width*canvas.height*4);gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,raw);const flipped=new Uint8Array(raw.length),row=canvas.width*4;for(let y=0;y<canvas.height;y++)flipped.set(raw.subarray(y*row,(y+1)*row),(canvas.height-y-1)*row);return flipped}
+ async drawTiled(source,phase,width,height,options={}){
+  const g=this.gl,key=rendererVariant(sampleFrame(source,phase),options),volume=(source.scattering||0)+(source.translucency||0)+(source.subsurface||0)>.0001;
+  const recommended=key&2048&&!(key&16)&&!(key&32)?(volume?128:key&64?256:512):512,tile=Math.max(32,Math.min(512,options.tileSize||recommended));
+  if(options.preview||Math.max(width,height)<=tile){this.draw(source,phase,width,height,options);const ok=await this.waitForGpu(options);if(ok)options.tileProgress?.(1);return ok;}
+  const total=Math.ceil(width/tile)*Math.ceil(height/tile);let count=0;
+  g.enable(g.SCISSOR_TEST);
+  try{for(let y=0;y<height;y+=tile)for(let x=0;x<width;x+=tile){
+   if(options.cancelled?.())return false;g.scissor(x,y,Math.min(tile,width-x),Math.min(tile,height-y));
+   this.draw(source,phase,width,height,options);if(!await this.waitForGpu(options))return false;options.tileProgress?.(++count/total);
+  }return true;}finally{g.disable(g.SCISSOR_TEST);}
+ }
  async drawAccumulated(source,phase,width,height,options={}){
   const samples=Math.max(1,Math.min(64,options.samples||16)),g=this.gl;
-  if((source.renderVersion||1)<2||samples===1){this.draw(source,phase,width,height);return true;}
+  if(!await this.prepareAsync(source,phase,options))return false;
+  if((source.renderVersion||1)<2||samples===1)return this.drawTiled(source,phase,width,height,{...options,tileProgress:options.progress});
   const ext=g.getExtension('EXT_color_buffer_float');
-  if(!ext){this.draw(source,phase,width,height);return true;}
+  if(!ext)return this.drawTiled(source,phase,width,height,{...options,tileProgress:options.progress});
   if(this.canvas.width!==width||this.canvas.height!==height){this.canvas.width=width;this.canvas.height=height;}
   const texture=g.createTexture(),framebuffer=g.createFramebuffer();
+  this.accumulation={texture,framebuffer};
   g.bindTexture(g.TEXTURE_2D,texture);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.NEAREST);g.texImage2D(g.TEXTURE_2D,0,g.RGBA16F,width,height,0,g.RGBA,g.HALF_FLOAT,null);
   g.bindFramebuffer(g.FRAMEBUFFER,framebuffer);g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,texture,0);
   try{
-   if(g.checkFramebufferStatus(g.FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE){g.bindFramebuffer(g.FRAMEBUFFER,null);this.draw(source,phase,width,height);return true;}
+   if(g.checkFramebufferStatus(g.FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE){g.bindFramebuffer(g.FRAMEBUFFER,null);this.draw(source,phase,width,height,options);return true;}
    g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);g.enable(g.BLEND);g.blendFunc(g.ONE,g.ONE);
    const stable={...source,grain:0};
    for(let n=0;n<samples;n++){
     if(options.cancelled?.())return false;
-    this.draw(stable,phase,width,height,{jitter:jitterSample(n),accumulate:true,weight:1/samples,preview:options.preview});
+    if(!await this.drawTiled(stable,phase,width,height,{jitter:jitterSample(n),accumulate:true,weight:1/samples,preview:options.preview,quality:options.quality,cancelled:options.cancelled,tileSize:options.tileSize,tileProgress:f=>options.progress?.((n+f)/samples)}))return false;
     options.progress?.((n+1)/samples);await new Promise(resolve=>setTimeout(resolve,0));
    }
    g.disable(g.BLEND);g.bindFramebuffer(g.FRAMEBUFFER,null);
    if(!this.resolveProgram){const f=this.compileShader(g.FRAGMENT_SHADER,RESOLVE),program=g.createProgram();g.attachShader(program,this.vertexShader);g.attachShader(program,f);g.linkProgram(program);g.deleteShader(f);if(!g.getProgramParameter(program,g.LINK_STATUS))throw Error(g.getProgramInfoLog(program));this.resolveProgram=program;}
    g.useProgram(this.resolveProgram);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,texture);g.uniform1i(g.getUniformLocation(this.resolveProgram,'uImage'),0);g.uniform4fv(g.getUniformLocation(this.resolveProgram,'uGrain'),[source.grain||0,source.grainSize||1,(source.seed%1000)*.013,+!(source.bgMode==='transparent'&&!options.preview)]);g.uniform1f(g.getUniformLocation(this.resolveProgram,'uAll'),+!!source.photoAll);g.drawArrays(g.TRIANGLES,0,3);return true;
-  }finally{g.disable(g.BLEND);g.bindFramebuffer(g.FRAMEBUFFER,null);g.deleteTexture(texture);g.deleteFramebuffer(framebuffer);}
+  }finally{if(!this.disposed&&!this.contextWasLost&&!g.isContextLost()){g.disable(g.BLEND);g.bindFramebuffer(g.FRAMEBUFFER,null);g.deleteTexture(texture);g.deleteFramebuffer(framebuffer);}this.accumulation=null;}
  }
- dispose(){for(const q of this.timerQueries)this.gl.deleteQuery(q);this.timerQueries=[];if(this.resolveProgram)this.gl.deleteProgram(this.resolveProgram);this.gl.deleteBuffer(this.buffer);for(const {program} of this.programs.values())this.gl.deleteProgram(program);this.gl.deleteShader(this.vertexShader);this.gl.getExtension('WEBGL_lose_context')?.loseContext()}
+ dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
+}
+// Included verbatim in exported HTML: no imports, network or application state.
+export function startWallpaper(canvas,source){
+ let renderer=new Renderer(canvas),stopped=false,paused=false,recoveries=0,raf=0,first=true,limit=320,fast=0,last=0,lastGpu=0,start=performance.now();
+ const status=document.createElement('div');status.style.cssText='position:fixed;bottom:16px;left:16px;right:16px;text-align:center;font:14px system-ui;color:white;pointer-events:none';status.textContent='Preparo il wallpaper…';canvas.after(status);
+ function failure(error){paused=true;status.hidden=false;status.textContent=error?.message||'La grafica è temporaneamente sospesa.';}
+ canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();failure();});
+ canvas.addEventListener('webglcontextrestored',()=>{if(recoveries++>0)return;renderer.dispose({loseContext:false});renderer=new Renderer(canvas);paused=false;first=true;limit=192;lastGpu=0;});
+ function frame(t){
+  if(stopped)return;raf=requestAnimationFrame(frame);if(document.hidden||paused)return;
+  try{renderer.pollGpuTime();if(renderer.gpuSample!==lastGpu){lastGpu=renderer.gpuSample;const ms=renderer.gpuMilliseconds;if(ms>25){limit=Math.max(160,limit*Math.max(.4,Math.min(.9,Math.sqrt(20/ms))));fast=0;}else if(ms<12&&++fast>20){limit=Math.min(900,limit*1.08);fast=0;}}
+   if(renderer.pollCompletion()){status.hidden=true;if(first){first=false;last=0;}}
+   if(renderer.completionSync||t-last<16)return;
+   const phase=((t-start)/1000*(source.speed||1)/(source.duration||12)*TAU)%TAU,options={preview:true,quality:'fast'};
+   if(!renderer.prepare(source,phase,options))return;
+   const max=first?Math.min(192,limit):limit,scale=Math.min(1.25,devicePixelRatio||1,max/Math.max(1,innerWidth,innerHeight));
+   renderer.draw(source,phase,Math.max(1,Math.round(innerWidth*scale)),Math.max(1,Math.round(innerHeight*scale)),options);last=t;
+  }catch(error){failure(error);}
+ }
+ raf=requestAnimationFrame(frame);
+ return {stop(){stopped=true;cancelAnimationFrame(raf);renderer.dispose();status.remove();},getStats(){return {paused,limit,width:canvas.width,height:canvas.height,gpuMilliseconds:renderer.gpuMilliseconds,growthUploads:renderer.growthUploads||0};}};
 }

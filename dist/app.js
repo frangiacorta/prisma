@@ -5,6 +5,7 @@ import {BASE,PRESETS,MOODS,META,GROUPS,preset,randomize} from './model.js';
 import {newCreation,material,upgrade,setFullness,motionPreset,surprise,similar,hasMotion,normalizeCreation,sculpt,bloomExample,lightRig} from './creative-model.js';
 import {interpretDescription,applyDescriptionPlan,descriptionCatalog} from './description.js';
 import {PreviewQuality,PREVIEW_MODES} from './preview-quality.js';
+import {RenderSession} from './render-session.js';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const paths={photo:'M4 7h4l2-3h4l2 3h4v14H4ZM12 10a4 4 0 1 0 0 8 4 4 0 0 0 0-8',undo:'M3 9h10a7 7 0 0 1 0 14M3 9l5-5M3 9l5 5',redo:'M21 9H11a7 7 0 0 0 0 14M21 9l-5-5M21 9l-5 5',download:'M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5',reset:'M3 11a9 9 0 1 1 2 7M3 4v7h7',frame:'M5 3H3v5m16-5h2v5M3 16v5h5m13-5v5h-5',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',orbit:'M12 3a9 9 0 1 0 9 9M3 12h18M12 3c-5 5-5 13 0 18 4-4 5-10 2-15M18 3h3v3',move:'M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3m12-6 3 3-3 3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1',focus:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8',play:'m9 5 11 7-11 7Z',pause:'M8 5v14M16 5v14',sliders:'M4 5h6m4 0h6M4 12h11m4 0h1M4 19h1m4 0h11M10 2v6m5 1v6M5 16v6',shuffle:'M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 3-2 5-5m3-5c1-1 2-2 4-2h3m-4-4 4 4-4 4',shape:'M12 3c6-2 12 7 8 13-4 8-17 3-17-3 0-4 5-9 9-10Z',material:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M5 7c9-1 5 9 14 10M7 5c8 1 2 11 10 14',palette:'M12 3a9 9 0 0 0 0 18c3 0 3-3 2-4-2-2 0-4 2-3 7 1 5-11-4-11M7 10h.01M10 6h.01M15 6h.01',motion:'M3 8c4-9 8 14 12 5s5-6 6-4M3 16c4-9 8 7 12 3',background:'M3 3h18v18H3ZM3 16l6-7 5 6 3-3 4 4',lock:'M6 10h12v11H6ZM8 10V6a4 4 0 0 1 8 0v4',unlock:'M6 10h12v11H6ZM8 10V6a4 4 0 0 1 8 0'};
 const icon=name=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${paths[name]||paths.shape}"/></svg>`;
@@ -14,12 +15,15 @@ let randomAnchor=structuredClone(state),locks={},randomAmount=.45,randomScope='a
 let selectedLightId=1,refining=false,refined=false,lastEdit=performance.now(),lastGpuSample=0;
 let previewMode='auto';try{const value=localStorage.getItem('prisma-preview-quality');if(Object.hasOwn(PREVIEW_MODES,value))previewMode=value;}catch{}
 const previewQuality=new PreviewQuality(previewMode);
+let storage;try{storage=localStorage;}catch{}
+const renderSession=new RenderSession(storage);
+let gpuPaused=renderSession.blocked,startupWarm=true,automaticRecoveries=0,manualRecoveryRequested=false,preparingSince=0,submissionTime=0,previewRevision=0,thumbnailWork=0,lastCompletedFrames=0;
 try{const saved=JSON.parse(localStorage.getItem('prisma-current-v2')||'null');if(saved?.state){state=normalizeCreation(saved.state);ratio=saved.ratio||1;phase=saved.phase||0;}}catch{}
 const canvas=$('#art'),board=$('#artboard');
 function toast(msg){$('#toast').textContent=msg;$('#toast').classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').classList.remove('show'),3200)}
 function remember(before=state){history.push(structuredClone(before));if(history.length>50)history.shift();future=[];historyButtons()}
 function historyButtons(){$('#undo').disabled=!history.length;$('#redo').disabled=!future.length;$('#description-undo').disabled=!history.length}historyButtons();
-function mark(manual=true){dirty=true;refined=false;lastEdit=performance.now();scheduleSave();if(manual){randomAnchor=structuredClone(state);$('#art-name').textContent='La tua esplorazione';activePreset=-1;$$('.preset').forEach(x=>x.classList.remove('active'))}syncHandles();syncTransport()}
+function mark(manual=true){dirty=true;refined=false;previewRevision++;lastEdit=performance.now();scheduleSave();if(manual){randomAnchor=structuredClone(state);$('#art-name').textContent='La tua esplorazione';activePreset=-1;$$('.preset').forEach(x=>x.classList.remove('active'))}syncHandles();syncTransport()}
 function clampValue(key,value){const m=META[key];return m?Math.max(m[1],Math.min(m[2],Number(value))):value}
 function setValue(key,value,record=false){if(record)remember();if(GROUPS.material.includes(key)||/^(environment|film|petal|stem|colorWave|ground)/.test(key))upgrade(state);state[key]=clampValue(key,value);if(key==='fullness')setFullness(state,state.fullness);mark();syncValue(key)}
 function format(key,v){return META[key]?.[3]>=1?Math.round(v):Number(v.toFixed(3))}
@@ -99,20 +103,48 @@ $('#light-handles').addEventListener('keydown',e=>{const h=e.target.closest('[da
 function setPlaying(value){playing=value;lastTick=0;$('#play').innerHTML=icon(playing?'pause':'play');$('#play').setAttribute('aria-label',playing?'Metti in pausa':'Avvia animazione');$('#play-label').textContent=playing?'Movimento in corso':'Esplora il movimento'}
 $('#play').onclick=()=>setPlaying(!playing);$('#motion-tab').onclick=()=>showTab('motion');$('#timeline').oninput=e=>{phase=+e.target.value/1000*Math.PI*2;dirty=true};
 function syncTransport(){$('#loop-time').textContent=`${Number((state.duration/state.speed).toFixed(1))} s · LOOP`;if($('#effective-duration'))$('#effective-duration').textContent=`${(state.duration/state.speed).toFixed(1)} s`}
-function frame(time){
- if(document.hidden){lastTick=0;requestAnimationFrame(frame);return;}
- if(!lastTick)lastTick=time;const dt=Math.min((time-lastTick)/1000,.1);lastTick=time;
- if(playing&&!document.hidden){phase=(phase+dt*state.speed/state.duration*Math.PI*2)%(Math.PI*2);dirty=true;refined=false;$('#timeline').value=phase/(Math.PI*2)*1000;}
- if(renderer&&dirty&&!refining&&time-lastDraw>(window.innerWidth<700?33:16)){
-  const w=board.clientWidth,h=board.clientHeight,interactive=playing||time-lastEdit<350||!!drag||!!lightDrag;
-  if(w&&h){const [width,height]=previewQuality.size(w,h,devicePixelRatio||1,interactive),before=performance.now();renderer.draw(state,phase,width,height,{preview:true});const cost=performance.now()-before,fresh=renderer.gpuSample!==lastGpuSample;lastGpuSample=renderer.gpuSample;const elapsed=fresh?renderer.gpuMilliseconds:cost,interval=playing&&lastDraw?time-lastDraw:0;previewQuality.observe(Math.max(elapsed||0,interval>0&&interval<1000?interval:0),time);$('#preview-size').textContent=`${width} × ${height}`;dirty=false;lastDraw=time;}
- }
- if(renderer&&!playing&&!dirty&&!refining&&!refined&&state.renderVersion>=2&&time-lastEdit>450&&!drag&&!lightDrag&&!$('dialog[open]')){
-  const samples=previewQuality.refinementSamples();refined=true;if(samples>1){refining=true;renderer.drawAccumulated(state,phase,canvas.width,canvas.height,{samples,preview:true,cancelled:()=>dirty||playing||document.hidden}).catch(console.error).finally(()=>refining=false);}
- }
- requestAnimationFrame(frame);
+function renderMessage(message,recover=false){
+ const box=$('#render-error');box.replaceChildren();const text=document.createElement('p');text.textContent=message;box.append(text);box.hidden=false;box.classList.toggle('preparing',!recover);
+ if(recover){const actions=document.createElement('div');actions.className='recovery-actions';const retry=document.createElement('button');retry.className='primary';retry.textContent='Riprova anteprima';retry.onclick=retryPreview;const download=document.createElement('button');download.className='outline';download.textContent='Scarica progetto';download.onclick=()=>$('#project-download').click();actions.append(retry,download);box.append(actions);}
 }
-$('#performance-open').onclick=()=>{const info=renderer?.hardwareInfo();$('#gpu-name').textContent=info?.name||'GPU non rilevata';$('#gpu-software').hidden=!info?.software;$('#preview-quality').value=previewQuality.mode;$('#performance-dialog').showModal();};
+function suspendPreview(error){gpuPaused=true;preparingSince=0;refining=false;refined=false;previewRevision++;setPlaying(false);renderSession.begin();persistCurrent();renderMessage(error?.message||'La grafica è stata sospesa. La creazione è conservata; puoi modificarla o scaricarla.',true);console.error(error);}
+function rebuildPreview(){
+ try{renderer?.dispose({loseContext:false});renderer=new Renderer(canvas);lastGpuSample=0;lastCompletedFrames=0;submissionTime=0;startupWarm=true;gpuPaused=false;preparingSince=0;previewQuality.recover();dirty=true;refined=false;renderSession.begin();renderMessage('Ripristino l’anteprima…');}catch(error){suspendPreview(error);}
+}
+function retryPreview(){
+ if(renderer?.gl.isContextLost()){manualRecoveryRequested=true;renderMessage('Ripristino la grafica. La tua creazione è conservata…');renderer.recoveryExtension?.restoreContext();setTimeout(()=>{if(renderer?.gl.isContextLost())renderMessage('La grafica non è ancora disponibile. Puoi riprovare o scaricare la creazione.',true);},3000);return;}
+ rebuildPreview();
+}
+function frame(time){
+ requestAnimationFrame(frame);
+ if($('#performance-dialog').open&&time-(frame.statsTime||0)>400){updatePerformanceInfo();frame.statsTime=time;}
+ if(document.hidden){lastTick=0;return;}
+ if(!renderer||gpuPaused)return;
+ try{
+  renderer.pollGpuTime();renderer.pollCompletion();const completed=renderer.completedFrames!==lastCompletedFrames;lastCompletedFrames=renderer.completedFrames;
+  if(renderer.gpuSample!==lastGpuSample){lastGpuSample=renderer.gpuSample;const settled=!playing&&time-lastEdit>350&&!drag&&!lightDrag;if(previewQuality.observe(renderer.gpuMilliseconds,time,{gpu:true,settled})){dirty=true;refined=false;}if(settled&&renderer.gpuMilliseconds<previewQuality.profile.budget*.65&&previewQuality.limit<previewQuality.profile.max){dirty=true;refined=false;}}
+  if(completed){renderSession.complete();$('#render-error').hidden=true;if(!renderer.timerExtension&&submissionTime&&previewQuality.observe(time-submissionTime,time,{gpu:true})){dirty=true;refined=false;}submissionTime=0;
+   if(startupWarm){startupWarm=false;if(previewQuality.lastCost<previewQuality.profile.budget*1.4)dirty=true;}
+  }
+  if(!lastTick)lastTick=time;const dt=Math.min((time-lastTick)/1000,.1);lastTick=time;
+  if(playing){phase=(phase+dt*state.speed/state.duration*Math.PI*2)%(Math.PI*2);dirty=true;refined=false;$('#timeline').value=phase/(Math.PI*2)*1000;}
+  // Keep at most one preview draw in flight. The UI can run while the GPU works.
+  if(renderer.completionSync||refining||busy||thumbnailWork)return;
+  if(dirty&&time-lastDraw>(window.innerWidth<700?33:16)){
+   const w=board.clientWidth,h=board.clientHeight,interactive=playing||time-lastEdit<350||!!drag||!!lightDrag;
+   if(w&&h){const options={preview:true,quality:startupWarm||interactive||previewQuality.lastCost>40?'fast':'balanced'};
+    if(!renderer.prepare(state,phase,options)){if(!preparingSince){preparingSince=time;renderSession.begin();persistCurrent();renderMessage('Preparo l’anteprima…');}if(time-preparingSince>120000)throw Error('La preparazione richiede troppo tempo. Riprova con l’anteprima fluida.');return;}
+    preparingSince=0;let [width,height]=previewQuality.size(w,h,devicePixelRatio||1,interactive);if(startupWarm&&Math.max(width,height)>192){const scale=192/Math.max(width,height);width=Math.max(1,Math.round(width*scale));height=Math.max(1,Math.round(height*scale));}
+    renderSession.begin();const before=performance.now();if(renderer.draw(state,phase,width,height,options)){const cost=performance.now()-before;if(cost>previewQuality.profile.budget)previewQuality.observe(cost,time);$('#preview-size').textContent=`${width} × ${height}`;dirty=false;lastDraw=time;submissionTime=time;}
+   }
+  }
+  if(!playing&&!dirty&&!refined&&state.renderVersion>=2&&time-lastEdit>650&&!drag&&!lightDrag&&!$('dialog[open]')){
+   const samples=previewQuality.refinementSamples();refined=true;if(samples>1){const revision=previewRevision,activeRenderer=renderer;refining=true;renderSession.begin();activeRenderer.drawAccumulated(structuredClone(state),phase,canvas.width,canvas.height,{samples,preview:true,quality:'balanced',cancelled:()=>revision!==previewRevision||playing||document.hidden||gpuPaused||renderer!==activeRenderer}).catch(error=>{if(renderer===activeRenderer&&!gpuPaused&&revision===previewRevision)suspendPreview(error);}).finally(()=>{if(renderer===activeRenderer)refining=false;});}
+  }
+ }catch(error){suspendPreview(error);}
+}
+function updatePerformanceInfo(){const ms=renderer?.gpuMilliseconds;$('#gpu-frame-info').textContent=gpuPaused?'Anteprima sospesa · creazione conservata':`Anteprima ${canvas.width} × ${canvas.height}${Number.isFinite(ms)?` · tempo GPU ${ms.toFixed(1)} ms`:' · misurazione in corso'}`;}
+$('#performance-open').onclick=()=>{const info=renderer?.hardwareInfo();$('#gpu-name').textContent=info?.name||'GPU non rilevata';$('#gpu-software').hidden=!info?.software;$('#preview-quality').value=previewQuality.mode;updatePerformanceInfo();$('#performance-dialog').showModal();};
 $('#preview-quality').onchange=e=>{previewQuality.setMode(e.target.value);try{localStorage.setItem('prisma-preview-quality',previewQuality.mode);}catch{}mark(false);toast('Qualità dell’anteprima aggiornata · download invariati');};
 const groupNames={shape:'Forma',material:'Materia',color:'Colori',light:'Luci',background:'Sfondo',photo:'Foto'};
 function renderLocks(){$('#lock-options').innerHTML=Object.entries(groupNames).map(([g,name])=>`<button class="lock ${locks[g]?'locked':''}" data-lock="${g}" aria-pressed="${!!locks[g]}">${icon(locks[g]?'lock':'unlock')}${name}</button>`).join('')}
@@ -142,10 +174,10 @@ const waitPaint=()=>new Promise(r=>setTimeout(r,0));
 function workerRequest(message,transfer=[]){return new Promise((resolve,reject)=>{const w=worker;const receive=e=>{w.removeEventListener('message',receive);w.removeEventListener('error',fail);if(e.data.error)reject(new Error(e.data.error));else resolve(e.data)};const fail=e=>{w.removeEventListener('message',receive);reject(new Error(e.message||'Impossibile codificare il video.'))};w.addEventListener('message',receive);w.addEventListener('error',fail);w.postMessage(message,transfer)})}
 $('#export-cancel').onclick=()=>{cancelled=true;$('#export-cancel').disabled=true;$('#progress-text').textContent='Interruzione in corso…'};
 $('#export-dialog').addEventListener('cancel',e=>{if(busy){e.preventDefault();cancelled=true}});
-async function download(){if(busy)return;const snapshot=structuredClone(state),capturePhase=phase,resumePlaying=playing;setPlaying(false);cancelled=false;$('#export-cancel').disabled=false;$('#export-message').textContent='';
+async function download(){if(busy)return;const snapshot=structuredClone(state),capturePhase=phase,resumePlaying=playing;setPlaying(false);previewRevision++;cancelled=false;$('#export-cancel').disabled=false;$('#export-message').textContent='';
  try{if(exportType!=='wallpaper'){exportWidth=+$('#export-width').value;exportHeight=+$('#export-height').value;if(!Number.isInteger(exportWidth)||!Number.isInteger(exportHeight)||exportWidth<64||exportHeight<64||exportWidth>4096||exportHeight>4096)throw new Error('Scegli dimensioni intere tra 64 e 4096 pixel.');if(exportType==='video'&&(exportWidth%2||exportHeight%2))throw new Error('Per il video, larghezza e altezza devono essere numeri pari.');updateExportSize(exportWidth,exportHeight)}
- busyUI(true);progress(0,'Preparo la tua creazione…');await waitPaint();
- if(exportType==='wallpaper'){const source=await fetch('./renderer.js').then(r=>{if(!r.ok)throw new Error('Impossibile preparare il wallpaper.');return r.text()});const exported={...snapshot,bgMode:snapshot.bgMode==='transparent'?'solid':snapshot.bgMode};const html=`<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prisma Wallpaper</title><style>html,body{margin:0;overflow:hidden;background:${snapshot.background};width:100%;height:100%}canvas{width:100%;height:100%;display:block}</style><canvas id="art"></canvas><script type="module">${source}\nconst s=${JSON.stringify(exported)};const renderer=new Renderer(document.getElementById('art'));let start=performance.now(),last=0,quality=1,good=0;function frame(t){if(t-last>15&&!document.hidden){const elapsed=t-last;if(last&&elapsed>30){quality=Math.max(.4,quality*.94);good=0;}else if(++good>120){quality=Math.min(1,quality*1.03);good=0;}const scale=Math.min(1.25,devicePixelRatio,1440/Math.max(innerWidth,innerHeight))*quality;renderer.draw(s,((t-start)/1000*s.speed/s.duration*2*Math.PI)%(2*Math.PI),Math.max(1,Math.round(innerWidth*scale)),Math.max(1,Math.round(innerHeight*scale)));last=t}requestAnimationFrame(frame)}requestAnimationFrame(frame);<\/script></html>`;save(new Blob([html],{type:'text/html'}),'prisma-wallpaper.html');toast('Wallpaper HTML scaricato');return}
+ busyUI(true);progress(0,'Preparo la tua creazione…');await waitPaint();if(exportType!=='wallpaper'&&renderer&&!renderer.gl.isContextLost())await renderer.waitForGpu({cancelled:()=>cancelled});if(cancelled)return;
+ if(exportType==='wallpaper'){const source=await fetch('./renderer.js').then(r=>{if(!r.ok)throw new Error('Impossibile preparare il wallpaper.');return r.text()});const exported={...snapshot,bgMode:snapshot.bgMode==='transparent'?'solid':snapshot.bgMode};const serialized=JSON.stringify(exported).replace(/</g,'\\u003c');const html=`<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prisma Wallpaper</title><style>html,body{margin:0;overflow:hidden;background:${snapshot.background};width:100%;height:100%}canvas{width:100%;height:100%;display:block}</style><canvas id="art"></canvas><script type="module">${source}\nstartWallpaper(document.getElementById('art'),${serialized});<\/script></html>`;save(new Blob([html],{type:'text/html'}),'prisma-wallpaper.html');toast('Wallpaper HTML scaricato');return}
  const output=document.createElement('canvas');exportRenderer=new Renderer(output);if(exportWidth>exportRenderer.maxSize||exportHeight>exportRenderer.maxSize)throw new Error(`Questo dispositivo supporta al massimo ${exportRenderer.maxSize} pixel per lato.`);
  if(exportType==='image'){const format=$('#file-format').value;if(format==='jpeg'&&snapshot.bgMode==='transparent')snapshot.bgMode='solid';await exportRenderer.drawAccumulated(snapshot,capturePhase,exportWidth,exportHeight,{samples:16,cancelled:()=>cancelled,progress:f=>progress(f*.8,`Rifinisco l’immagine · ${Math.round(f*100)}%`)});progress(.8,'Preparo il file alla risoluzione scelta…');await waitPaint();if(cancelled)return;const mime=`image/${format}`;const blob=await new Promise(r=>output.toBlob(r,mime,.95));if(!blob)throw new Error('Memoria insufficiente: prova una risoluzione più piccola.');if(blob.type!==mime)throw new Error('Il browser non supporta questo formato. Scegli PNG.');save(blob,`prisma-${snapshot.seed}-${exportWidth}x${exportHeight}.${format==='jpeg'?'jpg':format}`);toast('Immagine scaricata');}
  else{if(!hasMotion(snapshot))throw new Error('Attiva almeno un movimento nel pannello Movimento.');if(snapshot.bgMode==='transparent')snapshot.bgMode='solid';worker=new Worker('./encoder-worker.js');const duration=snapshot.duration/snapshot.speed,total=Math.round(duration*exportFps);await workerRequest({type:'init',width:exportWidth,height:exportHeight,fps:exportFps});for(let n=0;n<total;n++){if(cancelled)break;progress(n/total,`Creo il loop · ${n+1} / ${total} fotogrammi · ${Math.round(n/total*100)}%`);await waitPaint();await exportRenderer.drawAccumulated(snapshot,n/total*Math.PI*2,exportWidth,exportHeight,{samples:snapshot.renderVersion>=2?2:1,cancelled:()=>cancelled});if(cancelled)break;const pixels=exportRenderer.pixels();await workerRequest({type:'frame',pixels},[pixels.buffer])}if(cancelled){toast('Esportazione interrotta');return}progress(.99,'Finalizzo il video MP4…');const result=await workerRequest({type:'finish'});save(new Blob([result.buffer],{type:'video/mp4'}),`prisma-loop-${exportWidth}x${exportHeight}.mp4`);toast('Video MP4 scaricato');}
@@ -153,8 +185,9 @@ async function download(){if(busy)return;const snapshot=structuredClone(state),c
  }catch(error){$('#export-message').textContent=error.message||'L’esportazione non è riuscita. Prova una risoluzione inferiore.';console.error(error)}finally{worker?.terminate();worker=null;exportRenderer?.dispose();exportRenderer=null;busyUI(false);if(resumePlaying)setPlaying(true);dirty=true}
 }$('#download').onclick=download;
 // Creations and favorites stay on this device; project files are portable.
-let saveTimer,thumbnailRenderer,variants=[],variantGeneration=0;
-function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem('prisma-current-v2',JSON.stringify({state,ratio,phase}));}catch{}},500);}
+let saveTimer,thumbnailRenderer,variants=[],variantGeneration=0,thumbnailQueue=Promise.resolve();
+function persistCurrent(){try{localStorage.setItem('prisma-current-v2',JSON.stringify({state,ratio,phase}));}catch{}}
+function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(persistCurrent,500);}
 function adopt(next,title='La tua esplorazione',snapshot={}){
  state=next;activePreset=-1;phase=snapshot.phase??0;ratio=snapshot.ratio??ratio;setPlaying(false);mark(false);randomAnchor=structuredClone(state);$$('.preset').forEach(p=>p.classList.remove('active'));$('#seed').value=state.seed;$('#art-name').textContent=title;const option=[...$('#aspect').options].find(o=>Math.abs(+o.value-ratio)<.001);$('#aspect').value=option?.value||'';fitBoard();renderControls();syncMasterStates();syncTransport();
 }
@@ -188,17 +221,20 @@ function doSurprise(){
  for(const [group,keys] of Object.entries(GROUPS))if(locks[group])for(const key of keys)next[key]=structuredClone(state[key]);
  if(locks.shape)next.seed=state.seed;adopt(next,'Una nuova possibilità');toast('Una nuova combinazione di forma, materia e luce');
 }
-async function thumbnail(s,atPhase=0,atRatio=ratio){
- if(!thumbnailRenderer)thumbnailRenderer=new Renderer(document.createElement('canvas'));
- const width=atRatio>=1?192:Math.round(192*atRatio),height=atRatio>=1?Math.round(192/atRatio):192;
- thumbnailRenderer.draw(s,atPhase,width,height);return thumbnailRenderer.canvas.toDataURL('image/webp',.88);
+function thumbnail(s,atPhase=0,atRatio=ratio,cancelled=()=>false){
+ const job=thumbnailQueue.then(async()=>{thumbnailWork++;previewRevision++;refined=false;
+ try{if(cancelled())return null;if(renderer&&!renderer.gl.isContextLost()&&!await renderer.waitForGpu({cancelled}))return null;if(!thumbnailRenderer||thumbnailRenderer.gl.isContextLost()){thumbnailRenderer?.dispose({loseContext:false});thumbnailRenderer=new Renderer(document.createElement('canvas'));}
+  const width=atRatio>=1?160:Math.round(160*atRatio),height=atRatio>=1?Math.round(160/atRatio):160;
+  const options={preview:true,quality:'fast',cancelled};if(!await thumbnailRenderer.prepareAsync(s,atPhase,options))return null;thumbnailRenderer.draw(s,atPhase,width,height,options);if(!await thumbnailRenderer.waitForGpu(options))return null;return thumbnailRenderer.canvas.toDataURL('image/webp',.88);
+ }finally{thumbnailWork--;}
+ });thumbnailQueue=job.catch(()=>{});return job;
 }
 async function showVariants(){
  const generation=++variantGeneration,captured=structuredClone(state),capturedPhase=phase,capturedRatio=ratio;variants=[];$('#variants-grid').replaceChildren();$('#variants-status').textContent='Creo otto varianti vicine…';$('#similar-again').disabled=true;if(!$('#variants-dialog').open)$('#variants-dialog').showModal();
  const seed=crypto.getRandomValues(new Uint32Array(1))[0],options=similar(captured,seed,8,+$('#similar-intensity').value/100);
  try{for(let i=0;i<options.length;i++){
   if(generation!==variantGeneration||!$('#variants-dialog').open)break;const s=options[i];for(const [group,keys] of Object.entries(GROUPS))if(locks[group])for(const key of keys)s[key]=structuredClone(captured[key]);
-  if(locks.shape)s.seed=captured.seed;const url=await thumbnail(s,capturedPhase,capturedRatio);if(generation!==variantGeneration||!$('#variants-dialog').open)break;const button=document.createElement('button');button.className='creation-card';button.dataset.variant=String(i);const img=document.createElement('img');img.src=url;img.alt=`Variante ${i+1}`;const label=document.createElement('span');label.textContent=`Variante ${i+1}`;button.append(img,label);$('#variants-grid').append(button);variants.push({state:s,phase:capturedPhase,ratio:capturedRatio});$('#variants-status').textContent=`${i+1} / 8 · Tocca quella che preferisci`;await waitPaint();
+  if(locks.shape)s.seed=captured.seed;const url=await thumbnail(s,capturedPhase,capturedRatio,()=>generation!==variantGeneration||!$('#variants-dialog').open);if(!url||generation!==variantGeneration||!$('#variants-dialog').open)break;const button=document.createElement('button');button.className='creation-card';button.dataset.variant=String(i);const img=document.createElement('img');img.src=url;img.alt=`Variante ${i+1}`;const label=document.createElement('span');label.textContent=`Variante ${i+1}`;button.append(img,label);$('#variants-grid').append(button);variants.push({state:s,phase:capturedPhase,ratio:capturedRatio});$('#variants-status').textContent=`${i+1} / 8 · Tocca quella che preferisci`;await waitPaint();
  }}catch(error){if(generation===variantGeneration)$('#variants-status').textContent=error.message;}finally{if(generation===variantGeneration)$('#similar-again').disabled=false;}
 }
 $('#similar').onclick=showVariants;$('#similar-again').onclick=showVariants;
@@ -226,7 +262,10 @@ $('#wallpaper-guide').onchange=e=>{const mode=e.target.value;guide.hidden=mode==
 
 renderTabs();renderControls();renderLocks();syncHandles();syncTransport();const initialAspect=[...$('#aspect').options].find(o=>Math.abs(+o.value-ratio)<.001);$('#aspect').value=initialAspect?.value||'';
 $('#art-name').textContent=state.materialName||'La tua creazione';$('#seed').value=state.seed;
-try{renderer=new Renderer(canvas);makePresets();fitBoard();requestAnimationFrame(frame)}catch(e){$('#render-error').hidden=false;$('#render-error').textContent=e.message;console.error(e)}
-canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();setPlaying(false);$('#render-error').hidden=false;$('#render-error').textContent='La grafica è stata sospesa dal dispositivo. Ricarica la pagina per riprendere.'});
+makePresets();fitBoard();window.prismaReady=true;
+canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();suspendPreview(new Error('La grafica è stata sospesa. La creazione è conservata; puoi modificarla o scaricarla.'));});
+canvas.addEventListener('webglcontextrestored',()=>{if(manualRecoveryRequested||automaticRecoveries<1){if(!manualRecoveryRequested)automaticRecoveries++;manualRecoveryRequested=false;rebuildPreview();}else renderMessage('La grafica è tornata disponibile. Riprova l’anteprima quando vuoi.',true);});
+try{renderer=new Renderer(canvas);if(gpuPaused)renderMessage('La precedente anteprima si è interrotta. La creazione e i preferiti sono conservati. Riparto solo quando scegli “Riprova anteprima”.',true);else{renderSession.begin();persistCurrent();renderMessage('Preparo l’anteprima…');}}catch(error){suspendPreview(error);}
+requestAnimationFrame(frame);
 // Browser agents use exactly the same validated state and actions as the controls.
 const modelContext=document.modelContext;if(modelContext?.registerTool){const controller=new AbortController();const tools=[{name:'read_creation',title:'Leggi la creazione',description:'Read the current shape, material, colors, lights and motion parameters.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:()=>structuredClone(state)},{name:'configure_creation',title:'Modifica la creazione',description:'Set numeric parameters in the same editor. Applies only valid known parameters.',inputSchema:{type:'object',properties:{parameters:{type:'object',additionalProperties:{type:'number'}}},required:['parameters'],additionalProperties:false},annotations:{readOnlyHint:false},execute:input=>{if(!input||!input.parameters||Array.isArray(input.parameters)||typeof input.parameters!=='object')throw new Error('parameters must be an object');const entries=Object.entries(input.parameters);for(const [k,v] of entries)if(!META[k]||typeof v!=='number'||!Number.isFinite(v)||v<META[k][1]||v>META[k][2])throw new Error(`Invalid parameter: ${k}`);remember();if(entries.some(([k])=>GROUPS.material.includes(k)||/^(environment|film|petal|stem|colorWave|ground)/.test(k)))upgrade(state);for(const [k,v] of entries){state[k]=v;if(k==='fullness')setFullness(state,v);}mark();renderControls();return {updated:entries.map(([k])=>k)}}},{name:'load_creation_preset',title:'Carica un esempio',description:'Load one of the six starting configurations in the editor.',inputSchema:{type:'object',properties:{index:{type:'integer',minimum:0,maximum:5}},required:['index'],additionalProperties:false},annotations:{readOnlyHint:false},execute:input=>{if(!Number.isInteger(input?.index)||input.index<0||input.index>=PRESETS.length)throw new Error('Invalid preset index');applyPreset(input.index);return{name:PRESETS[input.index].name}}}];tools.push({name:'read_description_controls',title:'Leggi i controlli disponibili',description:'Read the actual editor parameter ranges, material presets, shapes and light types for planning a requested change.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute:descriptionCatalog},{name:'apply_description_plan',title:'Applica una modifica alla creazione',description:'Apply an atomic validated plan using the existing shape, material, palette, light and motion controls. Unknown operations fail without changing the creation.',inputSchema:{type:'object',properties:{operations:{type:'array',maxItems:100,items:{type:'object'}}},required:['operations'],additionalProperties:false},annotations:{readOnlyHint:false},execute:input=>{const r=applyTextPlan(input);$('#description-status').textContent=r.changed?'Modificati: '+r.notes.join(' · '):'Questi valori sono già impostati.';return{changed:r.changed,updated:r.notes}}});for(const tool of tools){try{Promise.resolve(modelContext.registerTool(tool,{signal:controller.signal})).catch(()=>{})}catch{}}window.addEventListener('pagehide',()=>controller.abort(),{once:true})}
