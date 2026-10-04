@@ -1,15 +1,16 @@
 import {META,MOODS,GROUPS} from './model.js';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS} from './studio-model.js';
-import {material,sculpt,motionPreset,upgrade,setFullness} from './creative-model.js';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track} from './studio-model.js';
+import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS} from './creative-model.js';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
 const namedColors={nero:'#000000',nera:'#000000',bianco:'#ffffff',bianca:'#ffffff',rosso:'#ff305e',rossa:'#ff305e',rosa:'#ff69b4',blu:'#365eff',azzurro:'#87cfff',azzurra:'#87cfff',ciano:'#4de5ef',cyan:'#4de5ef',viola:'#ad75ff',verde:'#75d9a5',giallo:'#ffe18b',gialla:'#ffe18b',arancione:'#ff985c',grigio:'#6c7280',grigia:'#6c7280',argento:'#c8d3e0',oro:'#e6bc64',lavanda:'#b7a3ea',salvia:'#a6bbaa',corallo:'#ff736d',turchese:'#49cec3',petrolio:'#145461',crema:'#eee1c9',avorio:'#f5eedc'};
-function colorsIn(text){const result=[];const re=/#(?:[0-9a-f]{6}|[0-9a-f]{3})\b|\b(?:nero|nera|bianco|bianca|rosso|rossa|rosa|blu|azzurro|azzurra|ciano|cyan|viola|verde|giallo|gialla|arancione|grigio|grigia|argento|oro|lavanda|salvia|corallo|turchese|petrolio|crema|avorio)\b/gi;for(const m of text.matchAll(re)){let c=m[0][0]==='#'?m[0].toLowerCase():namedColors[m[0].toLowerCase()];if(c.length===4)c='#'+c.slice(1).split('').map(q=>q+q).join('');result.push(c);}return result;}
+for(const [forms,base] of [['neri nere','nero'],['bianchi bianche','bianco'],['rossi rosse','rosso'],['azzurri azzurre','azzurro'],['verdi','verde'],['gialli gialle','giallo'],['grigi grigie','grigio'],['arancioni','arancione']])for(const word of forms.split(' '))namedColors[word]=namedColors[base];
+function colorsIn(text){const result=[];const re=new RegExp('#(?:[0-9a-f]{6}|[0-9a-f]{3})\\b|\\b(?:'+Object.keys(namedColors).join('|')+')\\b','gi');for(const m of text.matchAll(re)){let c=m[0][0]==='#'?m[0].toLowerCase():namedColors[m[0].toLowerCase()];if(c.length===4)c='#'+c.slice(1).split('').map(q=>q+q).join('');result.push(c);}return result;}
 function scalar(key,value){const m=Object.hasOwn(META,key)?META[key]:null;if(!m||!Number.isFinite(value)||value<m[1]||value>m[2])throw Error('Valore non valido per '+(m?.[0]||key));return m[3]>=1?Math.round(value):value;}
-const shapeNames=['sfera','goccia','blob','macchia','disco','anello','semiluna','riccio','borchie','aghi','rosetta'];
-function shape(s,name){if(!shapeNames.includes(name))throw Error('Forma non disponibile');for(const k of ['deform','asymmetry','twist','waves','hole','cut','edge','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','petalBlend','petalRoot','petalRandom','stemAmount'])s[k]=0;for(const k of ['volume','stretchX','stretchY','stretchZ','holeAspect','cutAspect'])s[k]=1;for(const k of SHAPE_TRACKS)s.motions[k].enabled=false;
- if(name==='goccia')Object.assign(s,{taper:.38,stretchY:1.18,stretchX:.9});if(name==='blob')Object.assign(s,{deform:.3,asymmetry:.13,twist:.3});if(name==='macchia')Object.assign(s,{volume:.08,stretchX:1.2,deform:.34,edge:.22});if(name==='disco')s.volume=.1;if(name==='anello')Object.assign(s,{hole:.55,volume:.45});if(name==='semiluna')Object.assign(s,{cut:.9,cutX:.4,cutY:.1,volume:.5});const i=['rosetta','riccio','borchie','aghi'].indexOf(name);if(i>=0)sculpt(s,i);return s;}
+const shapeNames=[...new Set(['sfera','goccia','blob','macchia','disco','anello','semiluna',...SCULPT_EXAMPLES.map(q=>normalize(q.name))])];
+function shape(s,name){if(!shapeNames.includes(name))throw Error('Forma non disponibile');for(const k of ['deform','asymmetry','twist','waves','hole','cut','edge','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','petalBlend','petalRoot','petalRandom','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemAmount'])s[k]=0;s.petalGrowth=1;for(const k of ['volume','stretchX','stretchY','stretchZ','holeAspect','cutAspect'])s[k]=1;for(const k of SHAPE_TRACKS)if(s.motions[k])s.motions[k].enabled=false;
+ if(name==='goccia')Object.assign(s,{taper:.38,stretchY:1.18,stretchX:.9});if(name==='blob')Object.assign(s,{deform:.3,asymmetry:.13,twist:.3});if(name==='macchia')Object.assign(s,{volume:.08,stretchX:1.2,deform:.34,edge:.22});if(name==='disco')s.volume=.1;if(name==='anello')Object.assign(s,{hole:.55,volume:.45});if(name==='semiluna')Object.assign(s,{cut:.9,cutX:.4,cutY:.1,volume:.5});const i=SCULPT_EXAMPLES.findIndex(q=>normalize(q.name)===name);if(i>=0)sculpt(s,i);return s;}
 
 // Atomic, allowlisted operations shared by text commands and browser agents.
 // No generated code is evaluated and an invalid plan never changes the editor.
@@ -26,7 +27,21 @@ export function applyDescriptionPlan(current,plan){
   else if(o.type==='background'){if(!['solid','gradient','transparent','studio'].includes(o.mode))throw Error('Sfondo non valido');if(o.colors&&(!Array.isArray(o.colors)||!o.colors.length||!o.colors.every(isColor)))throw Error('Colori dello sfondo non validi');s.bgMode=o.mode;if(o.colors){s.background=o.colors[0];s.background2=o.colors[1]||o.colors[0];}notes.push('Sfondo');}
   else if(o.type==='environment'){if(!['studio','sky','sunset','neon','aurora','aquarium','city'].includes(o.name))throw Error('Ambiente non valido');upgrade(s);s.environment=o.name;notes.push('Ambiente riflesso');}
   else if(o.type==='light'){upgrade(s);if(o.action==='remove'){const i=s.lights.findIndex(l=>l.id===o.id);if(i<0)throw Error('Luce non trovata');s.lights.splice(i,1);notes.push('Luce rimossa');continue;}let l;if(o.action==='add'){if(s.lights.length>=MAX_LIGHTS)throw Error('Puoi usare fino a 8 luci');l=newLight(Math.max(0,...s.lights.map(q=>q.id))+1);}else if(o.action==='edit'){l=s.lights.find(q=>q.id===o.id);if(!l)throw Error('Luce non trovata');}else throw Error('Azione luce non valida');for(const [k,v] of Object.entries(o.values||{})){if(Object.hasOwn(LIGHT_META,k)){const m=LIGHT_META[k];if(!Number.isFinite(v)||v<m[1]||v>m[2])throw Error('Valore luce non valido');l[k]=m[3]>=1?Math.round(v):v;}else if(k==='color'&&isColor(v))l.color=v;else if(k==='type'&&LIGHT_TYPES.some(q=>q[0]===v))l.type=v;else if(['visible','enabled'].includes(k)&&typeof v==='boolean')l[k]=v;else throw Error('Proprietà luce non valida');}if(o.action==='add')s.lights.push(l);notes.push(o.action==='add'?'Luce aggiunta':'Luce spostata / modificata');}
-  else if(o.type==='motionPreset'){if(!['bloom','chromatic','breathe','reflect','film','orbit','wave'].includes(o.name))throw Error('Movimento non disponibile');motionPreset(s,o.name);notes.push('Movimento');}
+  else if(o.type==='motionPreset'){if(!MOTION_PRESETS.some(q=>q[0]===o.name))throw Error('Movimento non disponibile');motionPreset(s,o.name);notes.push('Movimento');}
+  else if(o.type==='loop'){if(typeof o.perfect!=='boolean')throw Error('Modalità loop non valida');s.perfectLoop=o.perfect;if(o.perfect){for(const t of Object.values(s.motions||{}))t.cycles=Math.max(1,Math.round(t.cycles||1));for(const l of s.lights||[])for(const t of [l.orbit,l.pulse])if(t)t.cycles=Math.max(1,Math.round(t.cycles||1));for(const key of ['environmentCycles','filmCycles'])if(Number.isFinite(s[key]))s[key]=Math.max(1,Math.round(s[key]));}notes.push(o.perfect?'Loop perfetto attivo':'Movimento libero');}
+  else if(o.type==='motionTrack'){
+   if(!Object.hasOwn(TRACK_META,o.key)||!o.values||typeof o.values!=='object'||Array.isArray(o.values))throw Error('Movimento non disponibile');
+   const values={};for(const [key,value] of Object.entries(o.values)){
+    if(key==='enabled'&&typeof value==='boolean')values[key]=value;
+    else if(key==='amplitude'&&Number.isFinite(value)&&value>=TRACK_META[o.key][1]&&value<=TRACK_META[o.key][2])values[key]=value;
+    else if(key==='cycles'&&Number.isFinite(value)&&value>=(s.perfectLoop===false?.1:1)&&value<=8&&(s.perfectLoop===false||Number.isInteger(value)))values[key]=value;
+    else if(key==='phase'&&Number.isFinite(value)&&value>=0&&value<=360)values[key]=value;
+    else if(key==='direction'&&(value===1||value===-1))values[key]=value;
+    else if(key==='curve'&&['sine','soft','triangle'].includes(value))values[key]=value;
+    else if(key==='mode'&&(['wave'].includes(value)||(value==='cycle'&&/^(rotate[XYZ]|gradientOffset|colorWavePhase|petalPhase)$/.test(o.key))))values[key]=value;
+    else throw Error('Proprietà del movimento non valida');
+   }upgrade(s);s.motions[o.key]={...(s.motions[o.key]||track()),...values};notes.push('Movimento: '+TRACK_META[o.key][0]);
+  }
   else if(o.type==='stopMotion'){for(const t of Object.values(s.motions))t.enabled=false;for(const l of s.lights){l.orbit.enabled=false;l.pulse.enabled=false;}s.environmentRotate=false;s.filmFlow=0;s.filmSwirl=0;notes.push('Animazione ferma');}
   else throw Error('Comando non disponibile');
  }
@@ -34,49 +49,122 @@ export function applyDescriptionPlan(current,plan){
 }
 
 const attributes=[
- ['trasparen(?:za|te|ti)','transparency',.2],['metall(?:o|ico|ica|ici|izzata|izzato)','metal',.2],['iridescen(?:za|te|ti)','iridescence',.2],['lucen(?:tezza|te|ti)|lucid(?:o|a|e|i)','gloss',.2],['rugos(?:ita|o|a)|ruvid(?:o|a)','roughness',.2],['spessor(?:e)|pien(?:ezza|o|a)','fullness',.2],['vuot(?:ezza|o|a)','hollow',.2],['scattering|diffusione interna','scattering',.2],['subsurface|sss|sottopelle','subsurface',.2],['organica|organico|organicita','deform',.08],['allungat(?:a|o)|alta|alto','stretchY',.2],['schiacciat(?:a|o)|appiattit(?:a|o)|piatta|piatto','volume',-.2],['grand(?:e|i)','scale',.15],['piccol(?:a|o|e|i)','scale',-.15],['contrasto','contrast',.2],['luminosita|luminos(?:a|o)','brightness',.1],['scur(?:a|o)','brightness',-.1],['esposizione','exposure',.35],['saturazione|saturat(?:a|o)','saturation',.2],['grana','grain',.025],['distorsione','lensDistortion',.1],['alone|bagliore','glow',.1],['caustica','groundCaustic',.2],['ombra(?: sul fondale)?','groundShadow',.2],['sfumat(?:a|o|e|i)|morbidezza del contorno','edge',.08],['acut(?:a|o|e|i)|affilat(?:a|o|e|i)','petalSharp',.2]
+ ['trasparen(?:za|te|ti)','transparency',.2],['metall(?:o|ico|ica|ici|izzata|izzato)','metal',.2],['iridescen(?:za|te|ti)','iridescence',.2],['lucen(?:tezza|te|ti)|lucid(?:o|a|e|i)','gloss',.2],['rugos(?:ita|o|a|e|i)|ruvid(?:o|a|e|i)','roughness',.2],['spessore|pien(?:ezza|o|a)','fullness',.2],['vuot(?:ezza|o|a)','hollow',.2],['scattering|diffusione interna','scattering',.2],['subsurface|sss|sottopelle','subsurface',.2],['organic(?:a|o|he|i|ita)','deform',.08],['allungat(?:a|o)|alta|alto','stretchY',.2],['schiacciat(?:a|o)|appiattit(?:a|o)|piatta|piatto','volume',-.2],['grand(?:e|i)','scale',.15],['piccol(?:a|o|e|i)','scale',-.15],['contrasto','contrast',.2],['luminosita|luminos(?:a|o)','brightness',.1],['scur(?:a|o)','brightness',-.1],['esposizione','exposure',.35],['saturazione|saturat(?:a|o)','saturation',.2],['grana','grain',.025],['distorsione(?: lente)?','lensDistortion',.1],['alone|bagliore','glow',.1],['caustica','groundCaustic',.2],['ombra(?: sul fondale)?','groundShadow',.2],['sfumat(?:a|o|e|i)|morbidezza del contorno','edge',.08]
 ];
-function aliases(){const extra=[['metallo','metal'],['trasparente','transparency'],['iridescente','iridescence'],['lucentezza','gloss'],['lucido','gloss'],['rugosita','roughness'],['spessore','fullness'],['vuotezza','hollow'],['scattering','scattering'],['sss','subsurface'],['sfumatura','edge'],['alone','glow'],['caustica','groundCaustic'],['ombra','groundShadow'],['dimensione','scale'],['lunghezza spine','petalLength'],['acutezza','petalSharp'],['curvatura spine','petalCurl'],['fusione','petalBlend'],['radici','petalRoot'],['irregolarita','petalRandom'],['durata','duration']];return [...extra,...Object.entries(META).flatMap(([key,m])=>[[normalize(key),key],[normalize(m[0]).replace(/\s*·.*$/,''),key]])].sort((a,b)=>b[0].length-a[0].length);}
+const growthAttributes=[
+ ['curv\\w*|arricci\\w*|piegat\\w*','petalCurl',.22],['cort\\w*','petalLength',-.2],['lung\\w*','petalLength',.2],['appuntit\\w*|acut\\w*|affilat\\w*','petalSharp',.2],['arrotondat\\w*|spuntat\\w*','petalSharp',-.2],['larg\\w*|grass\\w*|spess\\w*','petalWidth',.05],['sottil\\w*|fin[ei]','petalWidth',-.045],['gonfi\\w*|bombat\\w*','petalInflate',.2],['sinuos\\w*|tortuos\\w*|ondulat\\w*|serpeggi\\w*|stort\\w*|distor\\w*','petalWander',.25],['nod\\w*|bitorzol\\w*|nervos\\w*|nerborut\\w*|irruvid\\w*|rovina\\w*|rugos\\w*|ruvid\\w*','petalKnots',.3],['nervatur\\w*|costolat\\w*|striat\\w*|rigat\\w*','petalRidges',.3],['irregolar\\w*|disordinat\\w*|casual\\w*|sfalsat\\w*|sfasat\\w*|asimmetric\\w*|spars[ei]|distribuzione','petalDisorder',.3],['geometric\\w*|ordinat\\w*|regolar\\w*|simmetric\\w*','petalDisorder',-.3],['avvol\\w*|attorcigl\\w*|intrecc\\w*','petalCoil',.3],['radicat\\w*|rientr\\w*','petalReentry',.25]
+];
+const growthWords='spine|spina|punte|punta|aghi|ago|borchie|borchia|petali|petalo|radici|radice|corde|corda|rigonfiamenti|rigonfiamento|protuberanze|bozzi';
+const growthRe=new RegExp('\\b(?:'+growthWords+')\\b');
+const typoWords={nerborute:'nerborute',nervorute:'nerborute',nerborutee:'nerborute',raidi:'radici',radic:'radici',spie:'spine',spnie:'spine',petaali:'petali',petli:'petali',attorcigliarsdi:'attorcigliarsi',gradualemnte:'gradualmente',comuqne:'comunque',sfodo:'sfondo',rabdomizzazione:'randomizzazione',traspareza:'trasparenza',trasparenxa:'trasparenza',metalllo:'metallo',nerveose:'nervose',nerboruti:'nerborute'};
+const commandText=text=>normalize(text).replace(/\b[a-z]+\b/g,w=>typoWords[w]||w).replace(/\bsfondo di base\b/g,'sfondo').replace(/\b(dallas|dellas)\b/g,'dalla');
 function escapeRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
-const keyAliases=aliases();
 const setting=(key,value)=>({type:'set',key,value:Math.max(META[key][1],Math.min(META[key][2],value))});
+const aliases=[['metallo','metal'],['trasparente','transparency'],['iridescente','iridescence'],['lucido','gloss'],['rugosita','roughness'],['spessore','fullness'],['vuotezza','hollow'],['scattering','scattering'],['sss','subsurface'],['sfumatura','edge'],['alone','glow'],['caustica','groundCaustic'],['ombra','groundShadow'],['dimensione','scale'],['lunghezza spine','petalLength'],['acutezza','petalSharp'],['curvatura spine','petalCurl'],['fusione','petalBlend'],['radici','petalRoot'],['irregolarita','petalRandom'],['crescita','petalGrowth'],['sinuosita','petalWander'],['avvolgimento','petalCoil'],['rientro','petalReentry'],['nodi','petalKnots'],['nervature','petalRidges'],['disordine','petalDisorder'],['durata','duration'],['durata del loop','duration'],['durata del ciclo','duration'],['loop di','duration'],['loop da','duration'],['velocita del movimento','speed'],['velocita animazione','speed'],...Object.entries(META).flatMap(([key,m])=>[[normalize(key),key],[normalize(m[0]).replace(/\s*·.*$/,''),key]])].sort((a,b)=>b[0].length-a[0].length);
 
-// This is deliberately a local command interpreter, not an AI model.
-// Unsupported clauses are reported, never represented as understood.
+// Each recognized phrase is claimed separately. Residual requests remain visible
+// in the UI, including when another part of the same sentence was understood.
 export function interpretDescription(text,current){
- if(typeof text!=='string'||text.trim().length<2||text.length>1600)throw Error('Scrivi una descrizione tra 2 e 1600 caratteri.');const operations=[],unrecognized=[];
- const clauses=normalize(text).split(/[,;\n](?!\d)|\s+e\s+(?=(?:sfondo|aggiung|tog|rimuov|rend|fai|metti|sposta|trasparen|metallo|luce|luci|palette|senza)\b)/).map(q=>q.trim()).filter(Boolean);
- let working=structuredClone(current);
- for(const clause of clauses){const start=operations.length,colors=colorsIn(clause),negative=/\b(?:senza|togli|togliere|rimuov\w*|elimina\w*|spegni|zero|nessun\w*|no)\b/.test(clause)||/^non\s+(?:trasparen|metall|iridescen|lucid|rugos)/.test(clause),less=/\bmeno\b/.test(clause),strong=/\b(?:molto|tant\w*|massim\w*|completamente)\b/.test(clause),factor=strong?1.7:1;
-  if(/\b(?:non cambiare|mantieni|conserva|lascia invariat)/.test(clause))continue;
-  let materialWords='',exact=false;for(const [label,key] of keyAliases){const re=new RegExp('(?:^|\\b)'+escapeRe(label)+'\\s*(?:[:=]|(?:a|al|di|del|circa)\\s+)?\\s*(-?\\d+(?:[.,]\\d+)?)\\s*(%|percento|per cento)?(?:\\s|$)','i'),m=clause.match(re);if(m){let v=Number(m[1].replace(',','.'));if(m[2])v=META[key][1]+(META[key][2]-META[key][1])*v/100;operations.push(setting(key,v));exact=true;break;}}
-  if(!exact){
-   const form=shapeNames.find(q=>new RegExp('\\b'+q+'\\b').test(clause));if(form&& !/\bspine|punte|aghi|borchie|petali\b/.test(clause.replace(form,''))&&!/\bpiu|meno|non\b/.test(clause))operations.push({type:'shape',name:form});
-   if(/\bspine|punte|aghi|borchie|petali\b/.test(clause)){
-    if(/\borganic\w*|integrat\w*|fuse|fus[ae]|raccordat\w*|naturali\b/.test(clause)){if(working.petalAmount<=0)operations.push({type:'shape',name:'riccio'});operations.push(setting('petalBlend',Math.max(.8,working.petalBlend)),setting('petalRoot',Math.max(.55,working.petalRoot)),setting('petalRandom',Math.max(.24,working.petalRandom)));}
-    if(/\bcurv\w*|arricci\w*|piegat\w*\b/.test(clause))operations.push(setting('petalCurl',working.petalCurl+(less?-.22:.22)*factor));
-    if(/\bcort\w*|lung\w*\b/.test(clause))operations.push(setting('petalLength',working.petalLength+(/\bcort\w*\b/.test(clause)?-.2:.2)*factor));
-    if(/\bappuntit\w*|acut\w*|affilat\w*\b/.test(clause))operations.push(setting('petalSharp',working.petalSharp+(less?-.2:.2)*factor));
-    if(/\birregolar\w*|casuali\b/.test(clause))operations.push(setting('petalRandom',working.petalRandom+(less?-.2:.2)*factor));
-    if(negative)operations.push(setting('petalAmount',0));
+ if(typeof text!=='string'||text.trim().length<2||text.length>1600)throw Error('Scrivi una descrizione tra 2 e 1600 caratteri.');
+ const clauses=commandText(text).split(/[,;\n](?!\d)|\s+(?:ma|pero)\s+|\s+e\s+(?=(?:sfondo|fondale|palette|luce|luci|aggiung\w*|tog\w*|rimuov\w*|rend\w*|fai|metti|sposta\w*|senza|non|meno|piu|con\s+(?:sfondo|palette|luce)|spine|petali|radici|corde)\b)|\s+(?:con|su)\s+(?=(?:sfondo|fondale|palette|luce|luci)\b)/).map(q=>q.trim()).filter(Boolean);
+ const operations=[],unrecognized=[];let working=structuredClone(current),scope=current.petalAmount>0?'growth':'shape';
+ const push=(...ops)=>{operations.push(...ops);working=applyDescriptionPlan(working,{operations:ops}).state;};
+ for(const clause of clauses){
+  const start=operations.length,mask=Array(clause.length).fill(false);
+  const consume=(index,length)=>{for(let i=index;i<index+length;i++)mask[i]=true;};
+  const remaining=()=>[...clause].map((c,i)=>mask[i]?' ':c).join('');
+  const claim=(pattern,callback)=>{const re=new RegExp(pattern.source||pattern,'g');let any=false;for(const m of remaining().matchAll(re)){any=true;consume(m.index,m[0].length);callback?.(m);}return any;};
+  const values=()=>colorsIn(remaining());
+  const flags=index=>{const prefix=clause.slice(0,index),last=prefix.split(/\b(?:con|di colore)\b/).at(-1);return {negative:/\b(?:senza|togli\w*|rimuov\w*|elimina\w*|spegni|zero|nessun\w*|no|non)\b/.test(last),less:/\bmeno\b/.test(last),factor:/\b(?:molto|tant\w*|massim\w*|completamente)\b/.test(last)?1.7:/\b(?:poco|leggermente|appena)\b/.test(last)?.5:1,max:/\b(?:massim\w*|completamente)\b/.test(last)};};
+  const adjust=(key,delta,m)=>{const f=flags(m.index);push(setting(key,f.negative?(delta<0?META[key][2]:Math.max(0,META[key][1])):f.max?META[key][delta<0?1:2]:(working[key]??0)+delta*(f.less?-1:1)*f.factor));};
+  if(/\b(?:non (?:cambiare|toccare|modificare)|mantieni|conserva|lascia invariat)/.test(clause))continue;
+  const lightTarget=/\b(?:luce|luci|neon|faro|softbox|alogeno)\b/.test(clause)&&!/\b(?:luce propria|luce centrale|alte luci|luce interna della materia)\b/.test(clause);
+  const backgroundTarget=/\b(?:sfondo|background|fondale)\b/.test(clause)&&!/\b(?:ombra|caustica)\b/.test(clause);
+  const explicitGrowth=growthRe.test(clause),colorTarget=/\b(?:palette|colore|colori|mood)\b/.test(clause);
+  if(backgroundTarget)scope='background';else if(lightTarget)scope='light';else if(explicitGrowth)scope='growth';else if(colorTarget)scope='color';else if(/\b(?:sfera|figura|oggetto|volume|trasparen\w*|metallo|contrasto|grana|caustica|alone)\b/.test(clause))scope='shape';
+  const growth=explicitGrowth||scope==='growth';
+  claim(/\b(?:(disattiv\w*|spegni|senza|non)\s+(?:il\s+)?|(?:attiv\w*|metti|voglio)\s+(?:il\s+)?)?loop perfetto\b/,m=>push({type:'loop',perfect:!m[1]}));
+  claim(/\b(?:movimento libero|loop libero)\b/,()=>push({type:'loop',perfect:false}));
+  // All independent numeric assignments in one sentence are applied, not just the first.
+  if(!lightTarget&&!backgroundTarget){for(const [label,key] of aliases){if(!META[key])continue;claim(new RegExp('(?:^|\\b)'+escapeRe(label)+'\\s*(?:[:=]|(?:a|al|di|del|circa)\\s+)?\\s*(-?\\d+(?:[.,]\\d+)?)\\s*(%|percento|per cento)?(?:\\s*(?:secondi|secondo|sec|gradi|nm|x)\\b)?(?=\\s|$|[.!?])'),m=>{let value=Number(m[1].replace(',','.'));if(m[2])value=META[key][1]+(META[key][2]-META[key][1])*value/100;push(setting(key,value));});}}
+  if(backgroundTarget){
+   const colors=values(),transparent=/\btrasparen\w*/.test(clause),mode=transparent?'transparent':/gradient|sfumat/.test(clause)?'gradient':'solid';
+   if(colors.length||transparent){push({type:'background',mode,colors:colors.length?colors:undefined});claim(/\b(?:sfondo|fondale|background|trasparen\w*|gradient\w*|sfumat\w*|uniforme|pieno|piena|puro|pura)\b/);claimColors();}
+  }else if(lightTarget){
+   const target=clause.match(/\blu(?:ce|ci)\s*(\d+)/),id=target?+target[1]:working.lights.find(l=>l.enabled)?.id;
+   const remove=/\b(?:senza|togli\w*|rimuov\w*|elimina\w*|spegni)\b/.test(clause);
+   if(remove){const ids=/\b(?:tutte|luci)\b/.test(clause)&&!target?working.lights.map(l=>l.id):id?[id]:[];for(const lightId of ids)push({type:'light',action:'remove',id:lightId});claim(/\b(?:tutte|luce|luci|neon|faro|softbox|alogeno)\b(?:\s*\d+)?/);}
+   else{
+    const type=/\b(?:barra|neon)\b/.test(clause)?'bar':/\b(?:anello|alogeno)\b/.test(clause)?'ring':/\bfaro\b/.test(clause)?'spot':/\bgriglia\b/.test(clause)?'grid':/\b(?:softbox|diffusore)\b/.test(clause)?'diffuser':'circle';
+    const add=/\b(?:aggiung\w*|nuov\w*|inserisc\w*|metti)\b/.test(clause)||!id,light=working.lights.find(l=>l.id===id),v={};
+    if(add){Object.assign(v,{type,visible:true,power:1.8});if(type==='bar')Object.assign(v,{size:.06,length:1.2,softness:.06});}else if(/\b(?:barra|anello|faro|griglia|softbox|diffusore|neon)\b/.test(clause))v.type=type;
+    const colors=values();if(colors.length){v.color=colors[0];claimColors();}
+    claim(/\bdietro\b/,()=>v.z=-2);claim(/\bdavanti\b/,()=>v.z=2);claim(/\b(?:dentro|intern\w*)\b/,()=>Object.assign(v,{x:0,y:0,z:0,type:'orb',size:.12,length:.12}));claim(/\bsinistra\b/,()=>v.x=-1.7);claim(/\bdestra\b/,()=>v.x=1.7);claim(/\b(?:alto|sopra)\b/,()=>v.y=1.6);claim(/\b(?:basso|sotto)\b/,()=>v.y=-1.6);
+    claim(/\b(?:x|y|z|intensita|potenza|dimensione)\s*(?:[:=]|a)?\s*(-?\d+(?:[.,]\d+)?)/,m=>{const key=m[0].match(/^\w+/)[0],k={intensita:'power',potenza:'power',dimensione:'size'}[key]||key;v[k]=Math.max(LIGHT_META[k][1],Math.min(LIGHT_META[k][2],Number(m[1].replace(',','.'))));});
+    claim(/\b(?:forte|intens\w*|debole)\b/,m=>{const f=flags(m.index),negative=f.less||m[0]==='debole';v.power=Math.max(0,Math.min(6,(light?.power??1.8)+(negative?-.5:.5)*f.factor));});
+    if(add||Object.keys(v).length)push({type:'light',action:add?'add':'edit',id,values:v});
+    claim(/\b(?:luce|luci|neon|faro|softbox|alogeno|barra|anello|circolare|griglia|diffusore)\b(?:\s*\d+)?/);
    }
-   const materialAliases=[...MATERIAL_STYLES.map((q,i)=>[new RegExp('\\b'+escapeRe(normalize(q.name))+'\\b'),i]).sort((a,b)=>b[0].source.length-a[0].source.length),[/\bbolla\b/,0],[/\bcromo\b/,11],[/\b(?:acqua|vetro|cristallo|gelatina|ghiaccio|perla|ceramica|satinato|opaco|silicone)\b/,null]];if(!negative&&!less&&!/\b(?:piu|meno)\b/.test(clause)){for(const [re,index] of materialAliases){const m=clause.match(re);if(m){const i=index??MATERIAL_STYLES.findIndex(q=>normalize(q.name).includes(m[0]==='acqua'?'goccia':m[0]));if(i>=0){operations.push({type:'material',index:i});materialWords=m[0];}break;}}}
-   if(/\bsfondo|fondale|background\b/.test(clause)){const mode=/\btrasparen\w*\b/.test(clause)?'transparent':/gradient|sfumat/.test(clause)?'gradient':'solid';if(colors.length||mode==='transparent')operations.push({type:'background',mode,colors:colors.length?colors:undefined});}
-   else if(/\bluce|luci|neon|faro|softbox|alogeno\b/.test(clause)){
-    const target=clause.match(/\bluce\s*(\d+)/),id=target?+target[1]:working.lights.find(l=>l.enabled)?.id;
-    if(negative){if(id)operations.push({type:'light',action:'remove',id});}
-    else{const type=/\bbarra|neon\b/.test(clause)?'bar':/\banello|alogeno\b/.test(clause)?'ring':/\bfaro\b/.test(clause)?'spot':/\bgriglia\b/.test(clause)?'grid':/\bsoftbox|diffusore\b/.test(clause)?'diffuser':'circle';const add=/\baggiung\w*|nuov\w*|metti|inserisci\b/.test(clause)||!id,values={};if(add){Object.assign(values,{type,visible:true,power:1.8});if(type==='bar')Object.assign(values,{size:.06,length:1.2,softness:.06});}else if(/\bbarra|anello|faro|griglia|softbox|diffusore\b/.test(clause))values.type=type;if(colors.length)values.color=colors[0];if(/\bdietro\b/.test(clause))values.z=-2;if(/\bdavanti\b/.test(clause))values.z=2;if(/\bdentro|intern\w*\b/.test(clause))Object.assign(values,{x:0,y:0,z:0,type:'orb',size:.12,length:.12});if(/\bsinistra\b/.test(clause))values.x=-1.7;if(/\bdestra\b/.test(clause))values.x=1.7;if(/\balto|sopra\b/.test(clause))values.y=1.6;if(/\bbasso|sotto\b/.test(clause))values.y=-1.6;if(/\bpiu forte|piu intensa|meno intensa\b/.test(clause))values.power=(working.lights.find(l=>l.id===id)?.power||1.8)+(less?-.5:.5);if(add||Object.keys(values).length)operations.push({type:'light',action:add?'add':'edit',id,values});}
+  }else{
+   const shapeText=remaining();
+   const form=shapeNames.filter(name=>!(name==='sfera'&&explicitGrowth)).sort((a,b)=>b.length-a.length).find(name=>new RegExp('\\b'+escapeRe(name)+'\\b').test(shapeText));
+   const relational=/\b(?:attorno|intorno|dalla|della|nella|sulla|sotto|dentro|avvol\w*|attorcigl\w*|rientr\w*|entr\w*|usc\w*)\b/.test(clause);
+   const descriptive=/\b(?:piu|meno|senza|non|curv\w*|cort\w*|lung\w*|appuntit\w*|organic\w*|nod\w*|sinuos\w*|nerborut\w*)\b/.test(clause);
+   if(form&&!flags(clause.indexOf(form)).negative&&!(form==='sfera'&&(relational||growth))&&(!descriptive||/\b(?:crea|trasforma|diventa|diventino|tipo|come)\b/.test(clause))){
+    const sculptIndex=SCULPT_EXAMPLES.findIndex(q=>normalize(q.name)===form);
+    if(sculptIndex>=0&&working.petalAmount>0){for(const [key,value] of Object.entries(SCULPT_EXAMPLES[sculptIndex].values))push(setting(key,value));}
+    else push({type:'shape',name:form});claim(new RegExp('\\b'+escapeRe(form)+'\\b'));if(form==='sfera')claim(/\bperfett[ao]\b/);
    }
-   else if(negative&&/\bcolore\s*(?:\d+|ultimo|finale)|\bultimo colore\b/.test(clause)){const m=clause.match(/colore\s*(\d+)/);operations.push({type:'removeColor',index:m?Number(m[1])-1:working.palette.length-1});}
-   else if(colors.length){if(/\bsottopelle|sss\b/.test(clause))operations.push({type:'color',key:'sssColor',value:colors[0]});else if(/\binterno|interna\b/.test(clause))operations.push({type:'color',key:'internalColor',value:colors[0]});else if(/\baggiung\w*\b/.test(clause))for(const c of colors)operations.push({type:'addColor',color:c});else if(negative){const index=working.palette.findIndex(c=>colors.includes(c));if(index>=0)operations.push({type:'removeColor',index});}else operations.push({type:'palette',colors});}
-   const mood=MOODS.find(q=>clause.includes(normalize(q.name)));if(mood&&/palette|mood/.test(clause))operations.push({type:'palette',colors:mood.colors});
-   if(!/\bsfondo|fondale|luce|luci|neon\b/.test(clause)){const attributeState=applyDescriptionPlan(current,{operations}).state,attributeText=materialWords?clause.replace(materialWords,''):clause;for(const [pattern,key,delta] of attributes){if(new RegExp('\\b(?:'+pattern+')\\b').test(attributeText)&&!(key==='deform'&&/spine|punte|aghi|borchie|petali/.test(clause))){let v=negative?META[key][1]:/\bmassim\w*|completamente\b/.test(clause)?META[key][delta<0?1:2]:attributeState[key]+delta*(less?-1:1)*factor;operations.push(setting(key,v));}}}
-   if(/\bferma|stop|senza movimento|senza animazione\b/.test(clause))operations.push({type:'stopMotion'});
-   else{const movement=/riflessi.*gir|rotazione.*riflessi/.test(clause)?'reflect':/luce.*orbit/.test(clause)?'orbit':/colori.*(?:col|vortic)/.test(clause)?'film':/respir/.test(clause)?'breathe':/ondegg/.test(clause)?'wave':/petali.*(?:aprono|apertura)/.test(clause)?'bloom':null;if(movement)operations.push({type:'motionPreset',name:movement});if(/\bpiu lent\w*|rallenta|rilassant\w*\b/.test(clause))operations.push(setting('duration',Math.max(16,working.duration+4)));if(/\bpiu veloc\w*|accelera\b/.test(clause))operations.push(setting('duration',working.duration-3));}
+   if(growth){
+    if(claim(new RegExp('\\b(?:senza|togli\\w*|rimuov\\w*|elimina\\w*)\\s+(?:(?:le|i|gli|tutte|tutti)\\s+)*(?:'+growthWords+')\\b')))push(setting('petalAmount',0));
+    const growthRequest=remaining();
+    const attributesRequested=growthAttributes.some(([p])=>new RegExp('\\b(?:'+p+')\\b').test(growthRequest))||/organic|integrat|fuse|fusi|raccordat|naturali|entrano|escono/.test(growthRequest);
+    if(working.petalAmount===0&&attributesRequested)push({type:'shape',name:/\b(?:radici|corde)\b/.test(clause)?(/corde/.test(clause)?'corde':'radici'):'riccio'});
+    claim(/\b(?:organic\w*|integrat\w*|fus[aei]|raccordat\w*|naturali)\b/,m=>{adjust('petalBlend',.25,m);adjust('petalRoot',.2,m);adjust('petalRandom',.12,m);});
+    let reentryClaimed=false;claim(/\b(?:entr\w*|usc\w*|escono|esca\w*)\b/g,m=>{if(!reentryClaimed){adjust('petalReentry',.45,m);reentryClaimed=true;}});
+    for(const [pattern,key,delta] of growthAttributes)claim(new RegExp('\\b(?:'+pattern+')\\b'),m=>adjust(key,delta,m));
+    if(/\b(?:rigonfiament\w*|protuberanze|bozzi)\b/.test(clause)&&/\b(?:piccol\w*|lievi|appena)\b/.test(clause)){push(setting('petalLength',.15),setting('petalGrowth',.45));claim(/\b(?:piccol\w*|lievi)\b/);}
+   }
+   const materialAliases=[...MATERIAL_STYLES.map((q,i)=>[normalize(q.name),i]),['vetro',MATERIAL_STYLES.findIndex(q=>q.name==='Biglia di vetro')],['acqua',1],['bolla',0],['cromo',11],['metallo',11],['silicone',18],...['opaca','opache','opachi'].map(w=>[w,14]),...['satinata','satinate','satinati'].map(w=>[w,12])].sort((a,b)=>b[0].length-a[0].length);
+   if(!/\b(?:piu|meno|senza|non)\b/.test(clause)&&!colorTarget){for(const [word,index] of materialAliases){if(claim(new RegExp('\\b'+escapeRe(word)+'\\b'),()=>push({type:'material',index})))break;}}
+   const colors=values();
+   if(/\b(?:rimuov\w*|togli\w*|elimina\w*)\b/.test(clause)&&/\b(?:colore\s*(?:\d+|ultimo|finale)|ultimo colore)\b/.test(clause)){const m=clause.match(/colore\s*(\d+)/);push({type:'removeColor',index:m?Number(m[1])-1:working.palette.length-1});claim(/\b(?:colore\s*(?:\d+|ultimo|finale)|ultimo colore)\b/);}
+   else if(colors.length){
+    if(/\b(?:sottopelle|sss)\b/.test(clause)){push({type:'color',key:'sssColor',value:colors[0]});claim(/\b(?:sottopelle|sss)\b/);}
+    else if(/\b(?:interno|interna)\b/.test(clause)){push({type:'color',key:'internalColor',value:colors[0]});claim(/\b(?:interno|interna)\b/);}
+    else if(/\baggiung\w*\b/.test(clause))for(const color of colors)push({type:'addColor',color});
+    else if(/\b(?:rimuov\w*|togli\w*|elimina\w*|senza)\b/.test(clause)){for(const color of colors){const index=working.palette.indexOf(color);if(index>=0)push({type:'removeColor',index});}}
+    else push({type:'palette',colors});claimColors();
+   }
+   const mood=MOODS.find(q=>new RegExp('\\b'+escapeRe(normalize(q.name))+'\\b').test(clause));if(mood&&/\b(?:palette|mood)\b/.test(clause)){push({type:'palette',colors:mood.colors});claim(new RegExp('\\b'+escapeRe(normalize(mood.name))+'\\b'));}
+   for(const [pattern,key,delta] of attributes){if(growth&&['deform','scale','roughness'].includes(key))continue;claim(new RegExp('\\b(?:'+pattern+')\\b'),m=>adjust(key,delta,m));}
   }
-  if(operations.length===start)unrecognized.push(clause);else working=applyDescriptionPlan(current,{operations}).state;
+  if(claim(/\b(?:ferma(?:re)?|stop|senza movimento|senza animazione)\b/))push({type:'stopMotion'});
+  else{
+   const animated=/\b(?:anima\w*|movimento|muov\w*|loop|continu\w*|lentamente)\b/.test(clause),r=remaining();
+   let movement=/riflessi.*gir|rotazione.*riflessi/.test(clause)?'reflect':/luce.*orbit/.test(clause)?'orbit':/colori.*(?:col|vortic)/.test(clause)?'film':/respir/.test(clause)?'breathe':/ondegg/.test(clause)?'wave':/petali.*(?:aprono|apertura)/.test(clause)?'bloom':null;
+   if(/\b(?:compar\w*|scompar\w*|sparir\w*|spunt\w*|emerg\w*|crescan\w*)\b/.test(clause))movement='emerge';
+   if(animated&&growth&&/\b(?:attorcigl\w*|avvol\w*|intrecc\w*)\b/.test(clause))movement='wrap';
+   if(animated&&/\bradici\b/.test(clause)&&/\b(?:entr\w*|escono|usc\w*|rientr\w*)\b/.test(clause))movement='roots';
+   const stopSpecificMotion=/\b(?:non\s+(?:anima\w*|muov\w*|farle|farli|farla|farlo|falle|falli|devono|deve|compar\w*|sparir\w*|attorcigl\w*)|senza\s+(?:anima\w*|movimento))\b/.test(clause);
+   if(movement){
+    if(stopSpecificMotion){const keys=movement==='emerge'?['petalGrowth']:movement==='wrap'?['petalCoil']:movement==='roots'?['petalGrowth','petalCoil','petalWander','petalReentry']:[];if(keys.length)for(const key of keys)push({type:'motionTrack',key,values:{enabled:false}});else push({type:'stopMotion'});}
+    else push({type:'motionPreset',name:movement});claim(/\b(?:riflessi|gir\w*|rotazione|orbit\w*|colori|colano|vortic\w*|respir\w*|ondegg\w*|aprono|apertura|compar\w*|scompar\w*|sparir\w*|spunt\w*|emerg\w*|crescan\w*|movimento|anima\w*|muov\w*|loop|ciclo|continu\w*|gradualmente|lentamente)\b/);
+   }
+   if(claim(/\b(?:piu lent\w*|rallenta\w*|rilassant\w*)\b/))push(setting('duration',Math.max(16,working.duration+4)));
+   if(claim(/\b(?:piu veloc\w*|accelera\w*)\b/))push(setting('duration',working.duration-3));
+   const rotation=remaining().match(/\b(?:ruota|ruotare|ruoti|ruotano|ruotando|gira|girare|giri|girano|girando|rotazione)\b/);
+   if(!movement&&rotation&&!lightTarget){const key=/\b(?:verticale|asse x)\b/.test(clause)?'rotateX':/\b(?:sul piano|asse z)\b/.test(clause)?'rotateZ':'rotateY';push({type:'motionTrack',key,values:{enabled:true,mode:'cycle',cycles:1,direction:/\b(?:inverso|contrario)\b/.test(clause)?-1:1}});claim(/\b(?:ruota|ruotare|ruoti|ruotano|ruotando|gira|girare|giri|girano|girando|rotazione|verticale|orizzontale|inverso|contrario|movimento|anima\w*|continu\w*|lentamente)\b/);claim(/\b(?:asse [xyz]|sul piano)\b/);}
+   if(animated&&growth&&!movement&&!rotation){const key=/\bcurv\w*|arricci\w*/.test(clause)?'petalCurl':/\b(?:nod\w*|nervos\w*|nerborut\w*)/.test(clause)?'petalKnots':/sinuos|serpeggi|ondulat/.test(clause)?'petalWander':null;if(key){push({type:'motionTrack',key,values:{enabled:true,mode:'wave',amplitude:Math.min(.18,TRACK_META[key][2]),cycles:1,phase:0,curve:'sine'}});claim(/\b(?:movimento|anima\w*|muov\w*|continu\w*|lentamente|loop)\b/);}}
+  }
+  function claimColors(){claim(/#(?:[0-9a-f]{6}|[0-9a-f]{3})\b/);claim(new RegExp('\\b(?:'+Object.keys(namedColors).join('|')+')\\b'));}
+  // Target nouns and grammatical glue are not unsupported requests. Adjectives,
+  // effects and object names that were not matched above remain in the feedback.
+  let residue=remaining().replace(new RegExp('\\b(?:'+growthWords+'|sfondo|fondale|background|palette|mood|colore|colori|figura|oggetto|superficie|sfera|geometricamente)\\b','g'),' ')
+   .replace(/\b(?:a|al|alla|alle|allo|agli|ai|all|anche|con|che|come|da|dal|dalla|dalle|dallo|della|delle|dello|del|dei|degli|di|dentro|attorno|intorno|e|ed|o|oppure|gli|i|il|la|le|lo|un|una|uno|l|in|nel|nella|nelle|nello|nei|non|si|su|sul|sulla|sulle|sullo|per|poi|piu|meno|molto|tanto|tante|tanti|poco|po|leggermente|appena|completamente|massimo|massima|senza|togli\w*|rimuov\w*|elimina\w*|aggiung\w*|metti|mettile|mettili|mettila|mettilo|fai|falle|falli|fallo|falla|farle|farli|farlo|farla|rend\w*|crea|creare|vorrei|voglio|puoi|potresti|possano|possono|deve|devono|tipo|sembrare|sembri|sembra|diventa|diventino|trasforma\w*|comunque|per favore|quasi|pure)\b/g,' ').replace(/[.!?:=()%]/g,' ').replace(/\s+/g,' ').trim();
+  if(residue)unrecognized.push(residue);else if(operations.length===start&&!mask.some(Boolean))unrecognized.push(clause);
  }
- return {operations,unrecognized};
+ return {operations,unrecognized:[...new Set(unrecognized)]};
 }
 
-export function descriptionCatalog(){return {parameters:Object.fromEntries(Object.entries(META).map(([k,m])=>[k,{label:m[0],min:m[1],max:m[2],step:m[3]}])),materials:MATERIAL_STYLES.map((m,index)=>({index,name:m.name})),shapes:shapeNames,lightTypes:LIGHT_TYPES,lightParameters:LIGHT_META,maxLights:MAX_LIGHTS,maxColors:MAX_COLORS};}
+export function descriptionCatalog(){return {parameters:Object.fromEntries(Object.entries(META).map(([k,m])=>[k,{label:m[0],min:m[1],max:m[2],step:m[3]}])),materials:MATERIAL_STYLES.map((m,index)=>({index,name:m.name})),shapes:shapeNames,lightTypes:LIGHT_TYPES,lightParameters:LIGHT_META,maxLights:MAX_LIGHTS,maxColors:MAX_COLORS,motionPresets:MOTION_PRESETS.map(([id,name])=>({id,name})),motionTracks:Object.fromEntries(Object.entries(TRACK_META).map(([key,m])=>[key,{label:m[0],minAmplitude:m[1],maxAmplitude:m[2],step:m[3]}])),motionTrackOperation:{type:'motionTrack',key:'petalGrowth',values:{enabled:true,amplitude:.5,cycles:1,phase:270,direction:1,curve:'sine',mode:'wave'}},loopOperation:{type:'loop',perfect:true}};}

@@ -7,7 +7,7 @@ export const BASE = {
   lightAngle:-35, lightHeight:40, lightPower:1.8, lightSize:.55, lightColor:'#dff5ff', light2:true, light2Angle:130, light2Height:-25, light2Power:1.1, light2Size:.45, light2Color:'#b9a1ff',
   background:'#080a12', background2:'#26204a', bgMode:'solid', bgAngle:35,
   scale:1, positionX:0, positionY:0, rotateX:-8, rotateY:15,
-  animateRotation:false, animateShape:true, animateColor:false, animateLight:false, motion:.3, duration:8, speed:1,
+  animateRotation:false, animateShape:true, animateColor:false, animateLight:false, motion:.3, duration:8, speed:1, perfectLoop:true,
   seed:2408
 };
 export const PRESETS = [
@@ -35,7 +35,7 @@ export const META = {
  volume:['Volume',.08,1.5,.01],stretchX:['Larghezza',.45,1.7,.01],stretchY:['Altezza',.45,1.7,.01],stretchZ:['Profondità',.45,1.7,.01],deform:['Deformazione',0,.75,.01],asymmetry:['Asimmetria',-.6,.6,.01],twist:['Torsione',-2.5,2.5,.01],waves:['Increspature',0,.4,.01],waveScale:['Frequenza onde',1,9,.1],hole:['Apertura del vuoto',0,.95,.01],holeX:['Vuoto · orizzontale',-.8,.8,.01],holeY:['Vuoto · verticale',-.8,.8,.01],holeShape:['Vuoto · rotondo / quadrato',0,1,.01],cut:['Dimensione del ritaglio',0,1.6,.01],cutX:['Ritaglio · orizzontale',-1.4,1.4,.01],cutY:['Ritaglio · verticale',-1.4,1.4,.01],edge:['Contorno sfumato',0,.45,.005],
  transparency:['Trasparenza',0,1,.01],refraction:['Rifrazione',1,2.4,.01],thickness:['Spessore ottico',0,2,.01],metal:['Metallicità',0,1,.01],roughness:['Rugosità',0,1,.01],gloss:['Lucentezza',0,1,.01],iridescence:['Iridescenza',0,1,.01],emission:['Luce propria',0,1,.01],gradientAngle:['Direzione gradiente',-180,180,1],gradientScale:['Distribuzione colori',.2,3,.01],gradientOffset:['Posizione colori',0,1,.01],colorSoftness:['Transizioni sfumate',0,1,.01],glow:['Diffusione alone',0,1,.01],grain:['Grana',0,.2,.005],
  lightAngle:['Angolo orizzontale',-180,180,1],lightHeight:['Altezza della luce',-85,85,1],lightPower:['Intensità',0,4,.01],lightSize:['Ampiezza riflesso',.05,1,.01],light2Angle:['Angolo orizzontale',-180,180,1],light2Height:['Altezza della luce',-85,85,1],light2Power:['Intensità',0,4,.01],light2Size:['Ampiezza riflesso',.05,1,.01],
- bgAngle:['Direzione sfondo',-180,180,1],scale:['Dimensione figura',.35,1.7,.01],positionX:['Posizione orizzontale',-1.5,1.5,.01],positionY:['Posizione verticale',-1.5,1.5,.01],rotateX:['Rotazione verticale',-180,180,1],rotateY:['Rotazione orizzontale',-180,180,1],motion:['Intensità delle oscillazioni',0,1,.01],duration:['Durata ciclo (secondi)',2,120,.5],speed:['Velocità',.25,2,.25]
+ bgAngle:['Direzione sfondo',-180,180,1],scale:['Dimensione figura',.35,1.7,.01],positionX:['Posizione orizzontale',-1.5,1.5,.01],positionY:['Posizione verticale',-1.5,1.5,.01],rotateX:['Rotazione verticale',-180,180,1],rotateY:['Rotazione orizzontale',-180,180,1],motion:['Intensità delle oscillazioni',0,1,.01],duration:['Durata di base (secondi)',2,300,.5],speed:['Velocità globale',.25,2,.05]
 };
 export const GROUPS={
  shape:['volume','stretchX','stretchY','stretchZ','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','cut','cutX','cutY','edge','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','holeAspect','cutAspect'],
@@ -45,7 +45,7 @@ export const GROUPS={
  background:['background','background2','bgAngle','bgMode','bgHeight','bgSoftness','bgWash','bgShade'],
  photo:['exposure','brightness','contrast','saturation','temperature','photoTint','gamma','blacks','highlights','vignette','lensDistortion','grainSize','grain']
 };
-GROUPS.shape.push('petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','petalBlend','petalRoot','petalRandom','stemAmount','stemRadius','stemBend');
+GROUPS.shape.push('petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemAmount','stemRadius','stemBend');
 GROUPS.shape.push('rotateX','rotateY','rotateZ');
 GROUPS.color.push('colorWaveAmount','colorWaveHeight','colorWaveRadius','colorWaveSwirl','colorWaveBands','colorWaveWarp','colorWavePhase');
 GROUPS.background.push('grounding','groundShadow','groundCaustic');

@@ -1,18 +1,19 @@
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 const TAU=Math.PI*2;
-const MOTION_LIMITS={volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],stemBend:[-1,1]};
-function motionWave(t,phase){const a=phase*Math.round(t.cycles||1)*(t.direction||1)+(t.phase||0)*Math.PI/180;const x=Math.sin(a);return t.curve==='triangle'?2/Math.PI*Math.asin(x):t.curve==='soft'?x*Math.abs(x):x}
+const MOTION_LIMITS={volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
+function motionCycles(value,source){const n=Math.max(.1,Number(value)||1);return source?.perfectLoop===false?n:Math.max(1,Math.round(n));}
+function motionWave(t,phase,source){const a=phase*motionCycles(t.cycles,source)*(t.direction||1)+(t.phase||0)*Math.PI/180;const x=Math.sin(a);return t.curve==='triangle'?2/Math.PI*Math.asin(x):t.curve==='soft'?x*Math.abs(x):x}
 export function sampleFrame(source,phase=0){
  const s={...source,lights:(source.lights||[]).map(l=>({...l}))};
 
  for(const [key,t] of Object.entries(source.motions||{})){
   if(!t.enabled)continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset'||key==='colorWavePhase'||key==='petalPhase');
-  const value=continuous?(phase/TAU*Math.round(t.cycles||1)*(t.direction||1)+(t.phase||0)/360)*(key.startsWith('rotate')||key==='petalPhase'?360:1):motionWave(t,phase)*(t.amplitude||0)*(source.motion??.3)/.3;
-  s[key]=(source[key]||0)+value;if(MOTION_LIMITS[key])s[key]=Math.max(MOTION_LIMITS[key][0],Math.min(MOTION_LIMITS[key][1],s[key]));
+  const value=continuous?(phase/TAU*motionCycles(t.cycles,source)*(t.direction||1)+(t.phase||0)/360)*(key.startsWith('rotate')||key==='petalPhase'?360:1):motionWave(t,phase,source)*(t.amplitude||0)*(source.motion??.3)/.3;
+  s[key]=(source[key]??(key==='petalGrowth'?1:0))+value;if(MOTION_LIMITS[key])s[key]=Math.max(MOTION_LIMITS[key][0],Math.min(MOTION_LIMITS[key][1],s[key]));
  }
  if(!source.motions){if(source.animateRotation)s.rotateY+=phase*180/Math.PI;if(source.animateShape){s.volume*=1+Math.sin(phase)*source.motion*.4;s.deform+=Math.sin(phase)*source.motion*.16}if(source.animateColor)s.gradientOffset+=phase/TAU;}
- for(const l of s.lights){if(l.orbit?.enabled){const t=l.orbit,a=t.mode==='cycle'?phase*Math.round(t.cycles||1)*(t.direction||1)+(t.phase||0)*Math.PI/180:motionWave(t,phase)*t.amplitude*Math.PI/180*(source.motion??.3)/.3;const cs=Math.cos(a),sn=Math.sin(a);if(t.axis==='x'){[l.y,l.z]=[l.y*cs-l.z*sn,l.y*sn+l.z*cs]}else if(t.axis==='z'){[l.x,l.y]=[l.x*cs-l.y*sn,l.x*sn+l.y*cs]}else{[l.x,l.z]=[l.x*cs-l.z*sn,l.x*sn+l.z*cs]}}if(l.pulse?.enabled)l.power=Math.max(0,l.power*(1+motionWave(l.pulse,phase)*l.pulse.amplitude*(source.motion??.3)/.3))}
- if(source.environmentRotate)s.environmentAngle=(source.environmentAngle||0)+phase*180/Math.PI*Math.round(source.environmentCycles||1);
+ for(const l of s.lights){if(l.orbit?.enabled){const t=l.orbit,a=t.mode==='cycle'?phase*motionCycles(t.cycles,source)*(t.direction||1)+(t.phase||0)*Math.PI/180:motionWave(t,phase,source)*t.amplitude*Math.PI/180*(source.motion??.3)/.3;const cs=Math.cos(a),sn=Math.sin(a);if(t.axis==='x'){[l.y,l.z]=[l.y*cs-l.z*sn,l.y*sn+l.z*cs]}else if(t.axis==='z'){[l.x,l.y]=[l.x*cs-l.y*sn,l.x*sn+l.y*cs]}else{[l.x,l.z]=[l.x*cs-l.z*sn,l.x*sn+l.z*cs]}}if(l.pulse?.enabled)l.power=Math.max(0,l.power*(1+motionWave(l.pulse,phase,source)*l.pulse.amplitude*(source.motion??.3)/.3))}
+ if(source.environmentRotate)s.environmentAngle=(source.environmentAngle||0)+phase*180/Math.PI*motionCycles(source.environmentCycles,source);
  return s;
 }
 const VERT=`#version 300 es
@@ -230,7 +231,7 @@ function shaderFunction(source,name,replacement){
  while(depth){depth+=(source[end]==='{')-(source[end]==='}');end++;}
  return source.slice(0,start)+replacement+source.slice(end);
 }
-let MODERN_FRAG=FRAG.replace('precision highp float;','precision highp float;\nprecision highp int;').replace('uniform vec2 uResolution;','uniform vec2 uResolution;\nuniform vec4 uEnvironment,uFilmMotion,uSampling,uModern,uPetals,uPetalTip,uPetalSpread,uStem,uColorWave,uColorAxis,uOrganic,uBudget;\nuniform vec3 uInternalColor;\nuniform highp sampler2D uGrowth;\nuniform vec2 uGrowthRows[8];');
+let MODERN_FRAG=FRAG.replace('precision highp float;','precision highp float;\nprecision highp int;').replace('uniform vec2 uResolution;','uniform vec2 uResolution;\nuniform vec4 uEnvironment,uFilmMotion,uSampling,uModern,uPetals,uPetalTip,uPetalSpread,uStem,uColorWave,uColorAxis,uOrganic,uBudget;\nuniform vec3 uInternalColor;\nuniform highp sampler2D uGrowth;\nuniform vec2 uGrowthRows[8];\nuniform highp sampler2D uRootTree;\nuniform vec4 uRoots;');
 const CROWN_GEOMETRY=`
 #if CROWN_ENABLED
 // Exact rounded-cone distance, including spherical end caps. Each petal is a
@@ -245,6 +246,27 @@ float roundCone(vec3 p,vec3 a,vec3 b,float ra,float rb){
  return (sqrt(max(0.,x2*a2*il2))+y*rr)*il2-ra;
 }
 vec3 petalCurve(vec3 a,vec3 b,vec3 c,float t){return mix(mix(a,b,t),mix(b,c,t),t);}
+#if ROOTS_ENABLED
+// Stackless, spatially accelerated curved roots. Nodes have an escape index:
+// a distant subtree is skipped in one step, independent of the root count.
+vec4 rootNode(int index,int lane){int q=index*4+lane;return texelFetch(uRootTree,ivec2(q%256,q/256),0);}
+float rootsField(vec3 p){
+ float core=.62+uPetals.z*.14,flattening=mix(.2,1.,uPetalSpread.x);
+ float body=(length(p/vec3(1.,flattening,1.))-core)*flattening;
+ if(uRoots.y<.000001||length(p)<core*flattening*.35)return body;
+ float best=100.,blend=uRoots.z;int node=0;
+ for(int visit=0;visit<int(uRoots.x);visit++){
+  if(node>=int(uRoots.x))break;
+  vec4 low=rootNode(node,0),high=rootNode(node,1);
+  vec3 outside=max(max(low.xyz-p,p-high.xyz),vec3(0.));
+  float bound=length(outside)+min(max(max(low.x-p.x,p.x-high.x),max(max(low.y-p.y,p.y-high.y),max(low.z-p.z,p.z-high.z))),0.);
+  if(bound>min(best,body)+blend){node=int(low.w);continue;}
+  if(high.w>.5){vec4 a=rootNode(node,2),b=rootNode(node,3);float d=roundCone(p,a.xyz,b.xyz,a.w,b.w);best=min(best,d);}
+  node++;
+ }
+ return -smax(-body,-best,blend);
+}
+#endif
 #if FLOWER_ENABLED || LEGACY_HEDGE_ENABLED
 float curvedPetal(vec3 p,vec3 a,vec3 b,vec3 c){
  float width=uPetalTip.y*(.65+uPetalTip.z*.55),sharp=uPetalTip.w;
@@ -334,7 +356,7 @@ float hedgeField(vec3 p){
  #endif
 }
 #endif
-float crownField(vec3 p){
+float crownBase(vec3 p){
  #if FLOWER_ENABLED && (ORGANIC_ENABLED || LEGACY_HEDGE_ENABLED)
  float spread=uPetalSpread.x;return mix(flowerField(p),hedgeField(p),spread);
  #elif FLOWER_ENABLED
@@ -344,6 +366,13 @@ float crownField(vec3 p){
  #else
  return 0.;
  #endif
+}
+float crownField(vec3 p){
+ #if ROOTS_ENABLED
+ if(uRoots.w>.999999)return rootsField(p);
+ if(uRoots.w>.000001)return mix(crownBase(p),rootsField(p),uRoots.w);
+ #endif
+ return crownBase(p);
 }
 #if STEM_ENABLED
 float stemField(vec3 p){
@@ -683,6 +712,7 @@ const ATLAS_FLAGS=`#define ANALYTIC_SHAPE 0
 #define LEGACY_HEDGE_ENABLED 1
 #define ORGANIC_ENABLED 1
 #define STEM_ENABLED 1
+#define ROOTS_ENABLED 1
 `;
 let BAKE_FRAG=MODERN_FRAG.slice(0,MODERN_FRAG.indexOf('// Shared solid/cavity field.'));
 BAKE_FRAG=BAKE_FRAG.replace('#version 300 es','#version 300 es\n'+ATLAS_FLAGS);
@@ -692,7 +722,7 @@ BAKE_FRAG=BAKE_FRAG.replaceAll('for(int j=-1;j<=1;j++){','for(int j=-1;j<int(uRu
 BAKE_FRAG=BAKE_FRAG.replace('vec3 p=transform(world);float volume=max(.06,uShape.x*uShape.w);p/=vec3(uShape.y,uShape.z,volume);','vec3 p=world;float volume=1.;');
 BAKE_FRAG=BAKE_FRAG.replace('return vec3(d,hole,cut)*min(min(uShape.y,uShape.z),volume)*uFrame.x*.5;','return vec3(d,hole,cut);');
 BAKE_FRAG=shaderFunction(BAKE_FRAG,'field',`float field(vec3 p){vec3 parts=fieldParts(p);return smax(smax(parts.x,parts.y,uExtraShape2.w),parts.z,uExtraShape2.w);}`);
-BAKE_FRAG=shaderFunction(BAKE_FRAG,'crownField',`float crownField(vec3 p){
+BAKE_FRAG=shaderFunction(BAKE_FRAG,'crownBase',`float crownBase(vec3 p){
  if(uPetalSpread.x<.0001)return flowerField(p);
  if(uPetalSpread.x>.9999)return hedgeField(p);
  return mix(flowerField(p),hedgeField(p),uPetalSpread.x);
@@ -847,9 +877,9 @@ function previewPlan(source){
  const rotateCrown=crownRotationReusable(source),keys=FIELD_KEYS.concat(GROWTH_KEYS).filter(k=>k!=='twist'&&!(rotateCrown&&k==='petalPhase'));
  const moving=keys.filter(k=>source.motions?.[k]?.enabled&&(source.motions[k].amplitude||0)>0),dynamic=moving.length>0;
  const cullSafe=!(source.edge>0||source.glow>0||motionInterval(source,'volume')[0]<.2);
- const descriptor=keys.map(k=>[source[k]??0,source.motions?.[k]?.enabled?JSON.stringify(source.motions[k]):'off'].join(':')).join('|')+'|'+(source.motion??.3)+'|'+rotateCrown+'|'+cullSafe;
- const sharp=motionInterval(source,'petalSharp'),fine=(source.petalAmount||0)>.25&&(sharp[1]>.75||(source.petalWidth??.24)<.12);
- const fineResolution=!dynamic?112:(source.petalWidth??.24)<.12?128:moving.every(k=>k==='petalSharp')?80:112;
+ const descriptor=keys.map(k=>[source[k]??0,source.motions?.[k]?.enabled?JSON.stringify(source.motions[k]):'off'].join(':')).join('|')+'|'+(source.motion??.3)+'|'+rotateCrown+'|'+cullSafe+'|'+(source.perfectLoop!==false);
+ const roots=rootWeight(source)>.000001||ROOT_KEYS.some(k=>source.motions?.[k]?.enabled);const sharp=motionInterval(source,'petalSharp'),fine=roots||(source.petalAmount||0)>.25&&(sharp[1]>.75||(source.petalWidth??.24)<.12);
+ const fineResolution=roots?(dynamic?((source.petalWidth??.24)<.08?80:64):80):!dynamic?112:(source.petalWidth??.24)<.12?128:moving.every(k=>k==='petalSharp')?80:112;
  return {descriptor,dynamic,rotateCrown,fine,fineResolution,cullSafe};
 }
 function animatedBounds(source){
@@ -952,9 +982,11 @@ function organicHedgeAt(s,p){
  return softMin(body,spines,blend);
 }
 function hedgeAt(s,p){const amount=Math.max(0,Math.min(1,((s.petalBlend||0)+(s.petalRoot||0)+(s.petalRandom||0))*20));if(amount<.000001)return legacyHedgeAt(s,p);const organic=organicHedgeAt(s,p);return amount>.999999?organic:legacyHedgeAt(s,p)*(1-amount)+organic*amount;}
-function crownAt(s,p){const spread=s.petalCoverage||0;return spread<.0001?flowerAt(s,p):spread>.9999?hedgeAt(s,p):flowerAt(s,p)*(1-spread)+hedgeAt(s,p)*spread;}
+function crownBaseAt(s,p){const spread=s.petalCoverage||0;return spread<.0001?flowerAt(s,p):spread>.9999?hedgeAt(s,p):flowerAt(s,p)*(1-spread)+hedgeAt(s,p)*spread;}
+function crownAt(s,p){const weight=rootWeight(s);if(weight>.999999)return rootFieldAt(s,p);const base=crownBaseAt(s,p);return weight>.000001?base*(1-weight)+rootFieldAt(s,p)*weight:base;}
 function stemAt(s,p){const len=s.stemAmount*3,radius=(s.stemRadius??.09)*Math.min(1,s.stemAmount*8),bend=s.stemBend||0,a=[0,-.14,0],b=[bend*.35,-.14-len*.45,0],c=[-bend*.55,-.14-len,0],m=curveAt(a,b,c,.5);return Math.min(coneAt(p,a,m,radius,radius),coneAt(p,m,c,radius,radius));}
-const GROWTH_KEYS=['petalRows','petalCount','petalOpen','petalLength','petalWidth','petalInflate','petalSharp','petalCurl','petalBlend','petalRoot','petalRandom','petalPhase','seed'];
+const ROOT_KEYS=['petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder'];
+const GROWTH_KEYS=[...ROOT_KEYS,'petalRows','petalCount','petalOpen','petalLength','petalWidth','petalInflate','petalSharp','petalCurl','petalBlend','petalRoot','petalRandom','petalPhase','seed'];
 export function growthTable(s,storage){
  const data=storage?.data||new Float32Array(96*8*4),rowData=storage?.rowData||new Float32Array(16);data.fill(0);rowData.fill(0);const rows=Math.max(2,Math.min(8,Math.floor((s.petalRows||5)+.5)));
  const core=.62+(s.petalOpen??.65)*.14,width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),sharp=s.petalSharp||0,random=s.petalRandom||0;
@@ -972,13 +1004,98 @@ export function growthTable(s,storage){
    data.set([...axis,length,...a,thickness,...c,tip,...bend,1+2*Math.hypot(...bend)],(row*96+column*4)*4);
   }
  }
- return {data,rowData,radiusBound};
+ return {data,rowData,radiusBound:rootWeight(s)>.999999?rootRadiusBound(s):Math.max(radiusBound,rootWeight(s)>0?rootRadiusBound(s):0)};
 }
+// Advanced appendages use a fixed budget of twelve tapered curve segments.
+// Geometry and BVH storage are reused; animation refits the existing tree.
+// No per-pixel all-roots search and no rebuilding/sorting during a loop.
+const ROOT_SEGMENTS=12,ROOT_TEXTURE_WIDTH=256,ROOT_TEXTURE_HEIGHT=128;
+function rootWeight(s){return Math.min(1,10*Math.max(1-(s.petalGrowth??1),...ROOT_KEYS.slice(1).map(k=>Math.abs(s[k]||0))));}
+function rootRadiusBound(s){
+ const core=.62+(s.petalOpen??.65)*.14,random=s.petalRandom||0,len=(s.petalLength??1.05)*(1+random*.32),width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),baseGrowth=s.petalGrowth??1,growth=Math.min(1,baseGrowth*(1+(s.petalDisorder||0)*.35*(1-baseGrowth)));
+ const root=Math.min(.42,Math.max(.025,width*.5+(s.petalRoot||0)*.28+(s.petalBlend||0)*.04)),tip=Math.max(.0015,width*(.9*(1-(s.petalSharp||0))+.008*(s.petalSharp||0))),reentry=s.petalReentry||0;
+ const rise=len*(growth*(1-reentry)*(1-.8*Math.abs(s.petalCoil||0))+Math.sin(Math.min(.5,growth)*Math.PI)*reentry*.68),wander=(s.petalWander||0)*len*.52*growth,curl=(Math.abs(s.petalCurl||0)*.65+random*.18)*len*growth*growth;
+ const radius=Math.max(root*(1+random*.18),tip)*(1+(s.petalKnots||0)*.32+(s.petalRidges||0)*.12);
+ return Math.max(core,core-root*(1-random*.18)*1.1+rise+wander+curl+radius)+rootBlend(s)*.5+.025;
+}
+function rootBlend(s){return .015+(s.petalBlend||0)*(.09+(s.petalRoot||0)*.16);}
+export function rootGeometry(s,storage){
+ const rows=Math.max(2,Math.min(8,Math.floor((s.petalRows||5)+.5))),ringCount=Math.max(3,Math.min(24,Math.round(s.petalCount||12)));
+ const spread=s.petalCoverage||0;let roots=spread<.999999?ringCount:0;for(let row=0;row<rows&&spread>.000001;row++)roots+=Math.max(3,Math.min(24,Math.round((s.petalCount||12)*Math.sin((row+.5)*Math.PI/rows))));
+ const count=roots*ROOT_SEGMENTS,nodeCount=count*2-1;
+ if(!storage)storage={segments:new Float32Array(2560*8),data:new Float32Array(ROOT_TEXTURE_WIDTH*ROOT_TEXTURE_HEIGHT*4),order:new Uint16Array(2560),right:new Int32Array(5120),leaf:new Int32Array(5120)};
+ const {segments,data}=storage,core=.62+(s.petalOpen??.65)*.14,flat=.2+.8*spread;
+ const width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),sharp=s.petalSharp||0,random=s.petalRandom||0,disorder=s.petalDisorder||0,growth=s.petalGrowth??1;
+ const rootRadius=Math.min(.42,Math.max(.025,width*.5+(s.petalRoot||0)*.28+(s.petalBlend||0)*.04)),tipRadius=Math.max(.0015,width*(.9*(1-sharp)+.008*sharp));
+ const phase=(((s.petalPhase||0)%360+360)%360)*Math.PI/180,wander=s.petalWander||0,coil=s.petalCoil||0,reentry=s.petalReentry||0,knots=s.petalKnots||0,ridges=s.petalRidges||0,blend=rootBlend(s);
+ let segment=0,actualRadius=core;
+ // Include the ring and spherical distribution throughout the morph. Their
+ // lengths and radii emerge continuously; no topology popping at coverage=0.
+ for(let row=-1;row<rows;row++){
+  if(row<0&&spread>=.999999||row>=0&&spread<=.000001)continue;
+  const ring=row<0,latitude=ring?Math.PI*.5:(row+.5)*Math.PI/rows,cells=ring?ringCount:Math.max(3,Math.min(24,Math.round((s.petalCount||12)*Math.sin(latitude)))),participation=ring?1-spread:spread;
+  for(let column=0;column<cells;column++){
+   const noise=lane=>growthRandom(row+1,column,s.seed,lane),lat=latitude+noise(4)*disorder*Math.PI/rows*.42*(ring?.3:1),lon=(column+(row%2)*.5)*TAU/cells+phase+noise(5)*disorder*TAU/cells*.43;
+   const ax=Math.sin(lat)*Math.cos(lon),ay=Math.cos(lat),az=Math.sin(lat)*Math.sin(lon),tx=Math.cos(lat)*Math.cos(lon),ty=-Math.sin(lat),tz=Math.cos(lat)*Math.sin(lon),bx=-Math.sin(lon),bz=Math.cos(lon);
+   const len=(s.petalLength??1.05)*(1+noise(0)*random*.32),thickness=rootRadius*(1+noise(1)*random*.18),seedPhase=noise(6)*Math.PI;
+   const localGrowth=Math.max(0,Math.min(1,growth*(1+noise(7)*disorder*.35*(1-growth))))*participation;
+   const bend=(s.petalCurl||0)*.65+noise(2)*random*.18,turn=coil*4.6*(1+noise(3)*disorder*.25)+reentry*(1.35+len*.55),sideTurn=noise(8)*disorder*.7;
+   const base=core-thickness*1.1-blend*.4,bodyScale=ring?flat:1;
+   let prevX=0,prevY=0,prevZ=0,prevR=0;
+   for(let j=0;j<=ROOT_SEGMENTS;j++){
+    const t=j/ROOT_SEGMENTS,u=t*localGrowth,angle=turn*u;
+    const rise=len*(u*(1-reentry)*(1-.8*Math.abs(coil))+Math.sin(Math.PI*u)*reentry*.68);
+    const radial=base+rise,ca=Math.cos(angle),sa=Math.sin(angle),sweepX=tx*Math.cos(sideTurn)+bx*Math.sin(sideTurn),sweepY=ty*Math.cos(sideTurn),sweepZ=tz*Math.cos(sideTurn)+bz*Math.sin(sideTurn);
+    const meander=wander*len*.19*u*(1-reentry*u)*(Math.sin(u*TAU*1.4+seedPhase)-Math.sin(seedPhase)),meander2=wander*len*.14*u*(1-reentry*u)*Math.sin(u*TAU+seedPhase);
+    const curl=bend*len*u*u*(1-reentry*u),dx=(ax*ca+sweepX*sa)*radial+tx*(meander+curl)+bx*meander2,dy=((ay*ca+sweepY*sa)*radial+ty*(meander+curl))*bodyScale,dz=(az*ca+sweepZ*sa)*radial+tz*(meander+curl)+bz*meander2;
+    // The small, phase-shifted swellings disturb the tube itself instead of
+    // faking roughness in the lighting; silhouettes and SSS follow them.
+    const profile=1+knots*.32*Math.sin(u*TAU*2.2+seedPhase)*Math.sin(Math.PI*t)+ridges*.12*Math.sin(u*TAU*4.5+seedPhase+.7)*Math.sin(Math.PI*t);
+    const radius=Math.max(.0001,(thickness*(1-t)+tipRadius*t)*profile*Math.min(1,localGrowth*6));
+    if(j){const q=segment++*8;segments[q]=prevX;segments[q+1]=prevY;segments[q+2]=prevZ;segments[q+3]=prevR;segments[q+4]=dx;segments[q+5]=dy;segments[q+6]=dz;segments[q+7]=radius;}
+    actualRadius=Math.max(actualRadius,Math.hypot(dx,dy,dz)+radius+blend*.25);prevX=dx;prevY=dy;prevZ=dz;prevR=radius;
+   }
+  }
+ }
+ const topology=rows+'|'+ringCount+'|'+roots+'|'+(spread<.999999)+'|'+(spread>.000001);
+ if(storage.topology!==topology){
+  for(let i=0;i<count;i++)storage.order[i]=i;
+  let cursor=0;
+  const center=(index,axis)=>(segments[index*8+axis]+segments[index*8+4+axis])*.5;
+  function build(start,end){
+   const node=cursor++,n=end-start;if(n===1){storage.leaf[node]=storage.order[start];storage.right[node]=-1;data[node*16+3]=cursor;return node;}
+   let axis=0,best=-1;for(let k=0;k<3;k++){let lo=Infinity,hi=-Infinity;for(let i=start;i<end;i++){const v=center(storage.order[i],k);lo=Math.min(lo,v);hi=Math.max(hi,v);}if(hi-lo>best){best=hi-lo;axis=k;}}
+   // In-place median partition, with no temporary per-node arrays.
+   const middle=(start+end)>>1;let lo=start,hi=end-1;
+   while(lo<hi){const pivot=center(storage.order[(lo+hi)>>1],axis);let i=lo,j=hi;while(i<=j){while(center(storage.order[i],axis)<pivot)i++;while(center(storage.order[j],axis)>pivot)j--;if(i<=j){const v=storage.order[i];storage.order[i++]=storage.order[j];storage.order[j--]=v;}}if(middle<=j)hi=j;else if(middle>=i)lo=i;else break;}
+   storage.leaf[node]=-1;build(start,middle);storage.right[node]=build(middle,end);data[node*16+3]=cursor;return node;
+  }
+  build(0,count);storage.topology=topology;storage.builds=(storage.builds||0)+1;
+ }
+ for(let node=nodeCount-1;node>=0;node--){
+  const q=node*16,leaf=storage.leaf[node];
+  if(leaf>=0){const k=leaf*8,ra=segments[k+3],rb=segments[k+7];for(let axis=0;axis<3;axis++){data[q+axis]=Math.min(segments[k+axis]-ra,segments[k+4+axis]-rb);data[q+4+axis]=Math.max(segments[k+axis]+ra,segments[k+4+axis]+rb);}data[q+7]=1;for(let j=0;j<8;j++)data[q+8+j]=segments[k+j];}
+  else{const a=(node+1)*16,b=storage.right[node]*16;for(let axis=0;axis<3;axis++){data[q+axis]=Math.min(data[a+axis],data[b+axis]);data[q+4+axis]=Math.max(data[a+4+axis],data[b+4+axis]);}data[q+7]=0;}
+ }
+ storage.count=count;storage.nodeCount=nodeCount;storage.roots=roots;storage.radiusBound=actualRadius+.025;storage.refits=(storage.refits||0)+1;return storage;
+}
+let cpuRootsKey='',cpuRoots;
+function rootFieldAt(s,p){
+ const core=.62+(s.petalOpen??.65)*.14,flat=.2+.8*(s.petalCoverage||0),body=(Math.hypot(p[0],p[1]/flat,p[2])-core)*flat;
+ if((s.petalGrowth??1)<.000001||Math.hypot(...p)<core*flat*.35)return body;
+ const key=GROWTH_KEYS.map(k=>s[k]??0).join('|')+'|'+(s.petalCoverage||0);
+ if(key!==cpuRootsKey){cpuRoots=rootGeometry(s,cpuRoots);cpuRootsKey=key;}
+ const {data,nodeCount}=cpuRoots,blend=rootBlend(s);let best=100,node=0;
+ while(node<nodeCount){const q=node*16;let outside=0,inside=-Infinity;for(let axis=0;axis<3;axis++){const d=Math.max(data[q+axis]-p[axis],p[axis]-data[q+4+axis]);outside+=Math.max(0,d)**2;inside=Math.max(inside,d);}const bound=Math.sqrt(outside)+Math.min(0,inside);if(bound>Math.min(best,body)+blend){node=data[q+3];continue;}if(data[q+7]>.5)best=Math.min(best,coneAt(p,[data[q+8],data[q+9],data[q+10]],[data[q+12],data[q+13],data[q+14]],data[q+11],data[q+15]));node++;}
+ return softMin(body,best,blend);
+}
+
 function geometryRadius(s,growthRadius=0){
+ if(rootWeight(s)>0&&!growthRadius)growthRadius=rootRadiusBound(s);
  if(['deform','asymmetry','twist','waves','taper','bendX','bendY','lobeAmount','pinch'].some(k=>Math.abs(s[k]||0)>.000001))return 4.5;
  const width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),length=s.petalLength??1.05;
  const flower=.17+(s.petalOpen??.65)*.25+length+width+.15,hedge=.62+(s.petalOpen??.65)*.14+length+width+.2;
- let radius=1.;if((s.petalAmount||0)>.000001){if((s.petalCoverage||0)<.9999)radius=Math.max(radius,flower);if((s.petalCoverage||0)>.0001)radius=Math.max(radius,hedge,growthRadius);}
+ let radius=1.;if((s.petalAmount||0)>.000001){if(rootWeight(s)>.999999)radius=Math.max(radius,growthRadius);else{if((s.petalCoverage||0)<.9999)radius=Math.max(radius,flower);if((s.petalCoverage||0)>.0001)radius=Math.max(radius,hedge,growthRadius);if(rootWeight(s)>0)radius=Math.max(radius,growthRadius);}}
  if((s.stemAmount||0)>.000001)radius=Math.max(radius,s.stemAmount*3+Math.abs(s.stemBend||0)*.55+(s.stemRadius??.09)+.25);
  return radius+.02;
 }
@@ -996,12 +1113,13 @@ function rendererVariant(s,options={},source=s){
   const scattering=(source.scattering||0)+(source.translucency||0)+(source.subsurface||0)>.0001&&transmitting&&source.thinShell<.999;
   return 8+4096+ATLAS_PREVIEW+(s.thinShell>=.999?16:0)+ +scattering+((s.subsurface||0)>.0001?2:0)+(transmitting?2048:0);
  }
+ const originalPetals=petals&&rootWeight(s)<.999999;
  return (modern?8:0)+(modern&&s.thinShell>=.999?16:0)+(modern&&analytic?32:0)+(crown?64:0)+ +volume+((s.subsurface||0)>.0001&&(!modern?transmission<.999:true)?2:0)+((s.dispersion||0)>.005?4:0)
-  +(petals&&spread<=.9999?128:0)+(petals&&spread>=.0001&&amount<.999999?256:0)+(petals&&spread>=.0001&&amount>.000001?512:0)+(crown&&(s.stemAmount||0)>.000001?1024:0)+(modern&&transmission>.0001?2048:0)+(modern&&options.preview&&options.quality!=='full'?4096:0);
+  +(originalPetals&&spread<=.9999?128:0)+(originalPetals&&spread>=.0001&&amount<.999999?256:0)+(originalPetals&&spread>=.0001&&amount>.000001?512:0)+(crown&&(s.stemAmount||0)>.000001?1024:0)+(modern&&transmission>.0001?2048:0)+(modern&&options.preview&&options.quality!=='full'?4096:0)+(petals&&rootWeight(s)>.000001?32768:0);
 }
 function variantSource(key){
  if(key===ATLAS_BAKE)return BAKE_FRAG;
- const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4};
+ const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4,ROOTS_ENABLED:32768};
  let defines=Object.entries(flags).map(([name,bit])=>'#define '+name+' '+ +!!(key&bit)).join('\n');
  if(key&8)defines+='\n#define TRACE_STEPS '+(key&ATLAS_PREVIEW?128:key&4096?128:224)+'\n#define INTERFACE_STEPS '+(key&ATLAS_PREVIEW?4:key&4096?8:32)+'\n#define LENGTH_SAMPLES '+(key&4096?8:16)+'\n#define SCATTER_SAMPLES '+(key&4096?2:4)+'\n#define SPECTRAL_SAMPLES '+(key&4096?3:5);
  return (key&ATLAS_PREVIEW?PREVIEW_FRAG:key&8?MODERN_FRAG:FRAG).replace('#version 300 es','#version 300 es\n'+defines);
@@ -1046,6 +1164,17 @@ export class Renderer{
   if(key!==this.growthKey){const table=growthTable(s,this.growthStorage);this.growthStorage=table;this.growthRows=table.rowData;this.growthRadius=table.radiusBound;if(!this.growthTexture){this.growthTexture=g.createTexture();g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,this.growthTexture);g.texStorage2D(g.TEXTURE_2D,1,g.RGBA32F,96,8);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);}g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,this.growthTexture);g.texSubImage2D(g.TEXTURE_2D,0,0,0,96,8,g.RGBA,g.FLOAT,table.data);this.growthKey=key;this.growthUploads=(this.growthUploads||0)+1;}
   g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,this.growthTexture);g.uniform1i(this.locations.uGrowth,1);g.uniform2fv(this.locations.uGrowthRows,this.growthRows);g.activeTexture(g.TEXTURE0);
  }
+ uploadRoots(s){
+  const g=this.gl,weight=rootWeight(s),key=GROWTH_KEYS.map(k=>s[k]??0).join('|')+'|'+(s.petalCoverage||0);
+  if(!this.rootTexture){this.rootTexture=g.createTexture();g.activeTexture(g.TEXTURE3);g.bindTexture(g.TEXTURE_2D,this.rootTexture);g.texStorage2D(g.TEXTURE_2D,1,g.RGBA32F,ROOT_TEXTURE_WIDTH,ROOT_TEXTURE_HEIGHT);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);}
+  g.activeTexture(g.TEXTURE3);g.bindTexture(g.TEXTURE_2D,this.rootTexture);
+  if(weight>.000001&&key!==this.rootKey){
+   this.rootStorage=rootGeometry(s,this.rootStorage);this.rootKey=key;this.rootUploads=(this.rootUploads||0)+1;
+   const height=Math.ceil(this.rootStorage.nodeCount*4/ROOT_TEXTURE_WIDTH);g.texSubImage2D(g.TEXTURE_2D,0,0,0,ROOT_TEXTURE_WIDTH,height,g.RGBA,g.FLOAT,this.rootStorage.data.subarray(0,ROOT_TEXTURE_WIDTH*height*4));
+  }
+  if(weight>.999999&&this.rootStorage)this.growthRadius=this.rootStorage.radiusBound;
+  g.uniform1i(this.locations.uRootTree,3);g.uniform4fv(this.locations.uRoots,[this.rootStorage?.nodeCount||0,s.petalGrowth??1,rootBlend(s),weight]);g.activeTexture(g.TEXTURE0);
+ }
  ensurePreviewField(frame,options,source=frame){
   const g=this.gl,plan=previewPlan(source);
   if(plan.descriptor!==this.fieldPlanKey){this.fieldPlanKey=plan.descriptor;this.motionBounds=plan.dynamic?animatedBounds(source):null;}
@@ -1066,7 +1195,7 @@ export class Renderer{
   if(!warmup&&key===this.fieldKey&&this.fieldResolution>=resolution)return;
   const target=g.getParameter(g.DRAW_FRAMEBUFFER_BINDING),viewport=g.getParameter(g.VIEWPORT),scissorBox=g.getParameter(g.SCISSOR_BOX),scissor=g.isEnabled(g.SCISSOR_TEST),blend=g.isEnabled(g.BLEND),dither=g.isEnabled(g.DITHER);
   try{
-   this.useVariant(ATLAS_BAKE);this.uploadGrowth(s);
+   this.useVariant(ATLAS_BAKE);this.uploadGrowth(s);this.uploadRoots(s);
    const bounds=this.motionBounds||atlasBounds(s,this.growthRadius),tiles=Math.ceil(Math.sqrt(resolution)),size=tiles*(resolution+2);
    this.fieldAtlas=[resolution,tiles,size,bounds.range];this.fieldMin=bounds.min;this.fieldMax=bounds.max;
    if(this.fieldSize!==size){this.fieldAllocations=(this.fieldAllocations||0)+1;g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fieldTexture);g.texImage2D(g.TEXTURE_2D,0,this.fieldHalfFloat?g.R16F:g.RGBA8,size,size,0,this.fieldHalfFloat?g.RED:g.RGBA,this.fieldHalfFloat?g.HALF_FLOAT:g.UNSIGNED_BYTE,null);this.fieldSize=size;}
@@ -1095,9 +1224,9 @@ export class Renderer{
  bindPreviewField(){const g=this.gl;g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fieldTexture);g.uniform1i(this.locations.uFieldTexture,2);g.uniform2fv(this.locations.uFieldWarp,this.fieldWarp||[0,0]);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);g.uniform1f(this.locations.uFieldEncoding,+this.fieldHalfFloat);g.uniform4fv(this.locations.uFieldAtlas,this.fieldAtlas);g.uniform3fv(this.locations.uFieldMin,this.fieldMin);g.uniform3fv(this.locations.uFieldMax,this.fieldMax);g.activeTexture(g.TEXTURE0);}
  pollCompletion(){const g=this.gl;if(this.completionSync&&!g.isContextLost()){const status=g.clientWaitSync(this.completionSync,0,0);if(status===g.ALREADY_SIGNALED||status===g.CONDITION_SATISFIED){g.deleteSync(this.completionSync);this.completionSync=null;this.completedFrames++;return true;}}return false;}
  async waitForGpu(options={}){const start=Date.now();while(this.completionSync){this.assertAvailable();if(this.pollCompletion())break;if(options.cancelled?.())return false;if(Date.now()-start>120000)throw new Error('Il calcolo richiede troppo tempo. La creazione è conservata.');await new Promise(r=>setTimeout(r,4));}return !options.cancelled?.();}
- draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options,source),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);let analytic=!!(key&32)||analyticShape(s);const timer=options.preview?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW){this.ensurePreviewField(s,options,source);analytic=this.cachedShapeAnalytic;}this.useVariant(key);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(key&512)this.uploadGrowth(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
+ draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options,source),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);let analytic=!!(key&32)||analyticShape(s);const timer=options.preview?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW){this.ensurePreviewField(s,options,source);analytic=this.cachedShapeAnalytic;}this.useVariant(key);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(key&512)this.uploadGrowth(s);if(key&32768)this.uploadRoots(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
  if(s.renderVersion>=2){u('uBudget',key&ATLAS_PREVIEW?(options.quality==='fast'?[this.fieldResolution>=96?128:96,3,4,1]:[128,4,8,2]):key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
- if(s.renderVersion>=2){u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);u('uFilmMotion',[phase*Math.round(s.filmCycles||1),s.filmFlow||0,s.filmSwirl||0,key&ATLAS_PREVIEW?24:0]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
+ if(s.renderVersion>=2){u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,key&ATLAS_PREVIEW?24:0]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
  u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);
 
@@ -1144,7 +1273,7 @@ export class Renderer{
    g.useProgram(this.resolveProgram);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,texture);g.uniform1i(g.getUniformLocation(this.resolveProgram,'uImage'),0);g.uniform4fv(g.getUniformLocation(this.resolveProgram,'uGrain'),[source.grain||0,source.grainSize||1,(source.seed%1000)*.013,+!(source.bgMode==='transparent'&&!options.preview)]);g.uniform1f(g.getUniformLocation(this.resolveProgram,'uAll'),+!!source.photoAll);g.drawArrays(g.TRIANGLES,0,3);return true;
   }finally{if(!this.disposed&&!this.contextWasLost&&!g.isContextLost()){g.disable(g.BLEND);g.bindFramebuffer(g.FRAMEBUFFER,null);g.deleteTexture(texture);g.deleteFramebuffer(framebuffer);}this.accumulation=null;}
  }
- dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.fieldTexture)g.deleteTexture(this.fieldTexture);if(this.fieldFramebuffer)g.deleteFramebuffer(this.fieldFramebuffer);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
+ dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.rootTexture)g.deleteTexture(this.rootTexture);if(this.fieldTexture)g.deleteTexture(this.fieldTexture);if(this.fieldFramebuffer)g.deleteFramebuffer(this.fieldFramebuffer);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
 }
 // Included verbatim in exported HTML: no imports, network or application state.
 export function startWallpaper(canvas,source){
