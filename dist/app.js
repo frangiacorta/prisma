@@ -1,10 +1,10 @@
-import {Renderer,fieldAt,sampleFrame} from './renderer.js?v=organic-texture-1';
+import {Renderer,fieldAt,sampleFrame} from './renderer.js?v=complex-export-1';
 import {buildPanel,pathValue,pathMeta,writePath} from './panels.js';
 import {MAX_COLORS,MAX_LIGHTS,newLight,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,EXTRA_BASE,BACKDROPS,SHAPE_TRACKS,LIGHT_SOURCES} from './studio-model.js';
 import {BASE,PRESETS,MOODS,META,GROUPS,preset,randomize} from './model.js';
 import {newCreation,material,upgrade,setFullness,motionPreset,surprise,similar,hasMotion,normalizeCreation,sculpt,bloomExample,lightRig,textureStyle} from './creative-model.js';
 import {interpretDescription,applyDescriptionPlan,descriptionCatalog} from './description.js?v=motion-language-1';
-import {PreviewQuality,PREVIEW_MODES} from './preview-quality.js';
+import {PreviewQuality,PREVIEW_MODES} from './preview-quality.js?v=complex-export-1';
 import {cleanPresetName,favoriteName,favoriteDate,uniqueDownloadName,presetDocument,readPreset} from './preset-files.js';
 import {VideoExportSession} from './video-export.js?v=stream-3';
 import {RenderSession} from './render-session.js?v=roots-cache-1';
@@ -22,10 +22,44 @@ const renderSession=new RenderSession(storage);
 let gpuPaused=renderSession.blocked,startupWarm=true,automaticRecoveries=0,manualRecoveryRequested=false,preparingSince=0,submissionTime=0,previewRevision=0,thumbnailWork=0,lastCompletedFrames=0;
 try{const saved=JSON.parse(localStorage.getItem('prisma-current-v2')||'null');if(saved?.state){state=normalizeCreation(saved.state);ratio=saved.ratio||1;phase=saved.phase||0;}}catch{}
 const canvas=$('#art'),board=$('#artboard');
+// A complete paused preview replaces the interactive image only when ready.
+// Its bounded tiles run on a separate surface, so cancellation never exposes
+// a half-rendered image or changes the current creation.
+const idleCanvas=document.createElement('canvas');idleCanvas.id='art-refined';idleCanvas.hidden=true;idleCanvas.setAttribute('aria-hidden','true');idleCanvas.style.cssText='position:absolute;inset:0;pointer-events:none;';canvas.after(idleCanvas);
+let idleRenderer=null,idleJob=null,idleGeneration=0,previewSubmission=null;
+function cancelIdlePreview(hide=true){idleGeneration++;if(hide)idleCanvas.hidden=true;}
+async function awaitIdleStop(){cancelIdlePreview();if(idleJob)await idleJob.promise;}
+function refineIdlePreview(){
+ const plan=previewQuality.idlePlan(board.clientWidth,board.clientHeight,devicePixelRatio||1),revision=previewRevision,generation=idleGeneration,atPhase=phase,source=structuredClone(state),boardWidth=board.clientWidth,boardHeight=board.clientHeight;
+ refined=true;refining=true;const job={promise:null};idleJob=job;
+ const stale=()=>generation!==idleGeneration||revision!==previewRevision||phase!==atPhase||playing||document.hidden||gpuPaused||busy||thumbnailWork>0||!!$('dialog[open]')||board.clientWidth!==boardWidth||board.clientHeight!==boardHeight;
+ job.promise=(async()=>{
+  try{
+   if(stale())return;
+   if(!idleRenderer||idleRenderer.gl.isContextLost()){idleRenderer?.dispose({loseContext:false});idleRenderer=new Renderer(idleCanvas);}
+   renderSession.begin();$('#preview-size').textContent=`${canvas.width} × ${canvas.height} · rifinisco…`;
+   const complete=await idleRenderer.drawAccumulated(source,atPhase,plan.width,plan.height,{...plan,preview:true,cancelled:stale});
+   if(complete&&!stale()){idleCanvas.hidden=false;$('#preview-size').textContent=`${plan.width} × ${plan.height}`;}
+  }catch(error){
+   // A failed optional refinement must not take the working interactive canvas
+   // away, nor retry the same costly pass in an endless animation-frame loop.
+   idleCanvas.hidden=true;if(!stale())console.warn('Rifinitura anteprima non disponibile:',error);
+  }finally{
+   // A cancelled tile can still be in flight. Drain it before letting another
+   // preview/export/thumbnail submit work on a second context.
+   try{if(idleRenderer&&!idleRenderer.gl.isContextLost())await idleRenderer.waitForGpu();}catch{}
+   if(idleCanvas.hidden)$('#preview-size').textContent=`${canvas.width} × ${canvas.height}`;
+   if(stale())refined=false;
+   if(!gpuPaused)renderSession.complete();
+   if(idleJob===job){idleJob=null;refining=false;}
+  }
+ })();
+}
+idleCanvas.addEventListener('webglcontextlost',e=>{e.preventDefault();cancelIdlePreview();});
 function toast(msg){$('#toast').textContent=msg;$('#toast').classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').classList.remove('show'),3200)}
 function remember(before=state){history.push(structuredClone(before));if(history.length>50)history.shift();future=[];historyButtons()}
 function historyButtons(){$('#undo').disabled=!history.length;$('#redo').disabled=!future.length;$('#description-undo').disabled=!history.length}historyButtons();
-function mark(manual=true){dirty=true;refined=false;previewRevision++;lastEdit=performance.now();scheduleSave();if(manual){randomAnchor=structuredClone(state);$('#art-name').textContent='La tua esplorazione';activePreset=-1;$$('.preset').forEach(x=>x.classList.remove('active'))}syncHandles();syncTransport()}
+function mark(manual=true){cancelIdlePreview();dirty=true;refined=false;previewRevision++;lastEdit=performance.now();scheduleSave();if(manual){randomAnchor=structuredClone(state);$('#art-name').textContent='La tua esplorazione';activePreset=-1;$$('.preset').forEach(x=>x.classList.remove('active'))}syncHandles();syncTransport()}
 function controlMeta(key){const m=META[key];return m&&['environmentCycles','filmCycles'].includes(key)&&state.perfectLoop!==false?[m[0],1,m[2],1]:m}
 function clampValue(key,value){const m=controlMeta(key);return m?Math.max(m[1],Math.min(m[2],m[3]>=1?Math.round(Number(value)):Number(value))):value}
 function setValue(key,value,record=false){if(record)remember();if(GROUPS.material.includes(key)||/^(environment|film|petal|stem|colorWave|ground)/.test(key))upgrade(state);state[key]=clampValue(key,value);if(key==='fullness')setFullness(state,state.fullness);mark();syncValue(key)}
@@ -80,13 +114,13 @@ $('#controls').addEventListener('click',e=>{const b=e.target.closest('button');i
  if(b.id==='perfect-sphere'){remember();for(const k of ['deform','asymmetry','twist','waves','hole','cut','edge','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','petalBlend','petalRoot','petalRandom','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemAmount'])state[k]=0;for(const k of ['volume','stretchX','stretchY','stretchZ','holeAspect','cutAspect','petalGrowth'])state[k]=1;for(const k of SHAPE_TRACKS)state.motions[k].enabled=false;syncMasterStates();mark();renderControls();toast('Sfera perfetta · materia e colori conservati')}
  if(b.id==='reset-photo'){remember();for(const k of GROUPS.photo)state[k]=EXTRA_BASE[k];state.grain=0;state.photoAll=false;mark();renderControls()}
 });
-function applyPreset(i){remember();state=preset(i);activePreset=i;randomAnchor=structuredClone(state);phase=0;dirty=true;$('#art-name').textContent=PRESETS[i].name;$('#seed').value=state.seed;$$('.preset').forEach((p,j)=>p.classList.toggle('active',i===j));renderControls();syncTransport();syncHandles()}
+function applyPreset(i){remember();state=preset(i);activePreset=i;randomAnchor=structuredClone(state);phase=0;mark(false);$('#art-name').textContent=PRESETS[i].name;$('#seed').value=state.seed;$$('.preset').forEach((p,j)=>p.classList.toggle('active',i===j));renderControls();syncTransport();syncHandles()}
 function makePresets(){$('#presets').innerHTML=PRESETS.map((p,i)=>`<button class="preset" data-preset="${i}" aria-label="Carica ${p.name}"><img class="preset-image" alt="" loading="lazy" src="presets/${i}.webp"><span class="preset-name">${p.name}</span><span class="preset-sub">${p.label}</span></button>`).join('');}
 $('#presets').addEventListener('click',e=>{const p=e.target.closest('[data-preset]');if(p)applyPreset(+p.dataset.preset)});$('#reset').onclick=()=>{remember();adopt(newCreation(),'Bolla di sapone');};
 function undo(){if(!history.length)return;future.push(structuredClone(state));state=history.pop();syncMasterStates();if(!hasMotion(state))setPlaying(false);mark(false);randomAnchor=structuredClone(state);renderControls();historyButtons();$('#seed').value=state.seed;$('#art-name').textContent='La tua esplorazione'}
 function redo(){if(!future.length)return;history.push(structuredClone(state));state=future.pop();syncMasterStates();if(!hasMotion(state))setPlaying(false);mark(false);randomAnchor=structuredClone(state);renderControls();historyButtons();$('#seed').value=state.seed}$('#undo').onclick=undo;$('#redo').onclick=redo;
 document.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea')||$('dialog[open]'))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo()}if(e.code==='Space'){e.preventDefault();setPlaying(!playing)}});
-function fitBoard(){const v=$('#viewport'),maxW=v.clientWidth,maxH=v.clientHeight;let w=maxW,h=w/ratio;if(h>maxH){h=maxH;w=h*ratio}board.style.width=`${Math.floor(w)}px`;board.style.height=`${Math.floor(h)}px`;dirty=true}
+function fitBoard(){const v=$('#viewport'),maxW=v.clientWidth,maxH=v.clientHeight;let w=maxW,h=w/ratio;if(h>maxH){h=maxH;w=h*ratio}const width=`${Math.floor(w)}px`,height=`${Math.floor(h)}px`;if(board.style.width!==width||board.style.height!==height){cancelIdlePreview();previewRevision++;refined=false;lastEdit=performance.now();board.style.width=width;board.style.height=height;dirty=true}}
 new ResizeObserver(fitBoard).observe($('#viewport'));$('#aspect').onchange=e=>{ratio=+e.target.value;fitBoard()};
 $('#fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else if($('#viewport').requestFullscreen)await $('#viewport').requestFullscreen();else toast('Usa la modalità a schermo intero del browser.')}catch{toast('Schermo intero non disponibile in questo browser.')}};
 function setMode(m){mode=m;['rotate','move','light'].forEach(k=>$(`#${k}-tool`).classList.toggle('active',k===m));$('#light-handles').hidden=m!=='light';$('#gesture-hint').textContent={rotate:'Trascina per ruotare · scorri per ingrandire',move:'Trascina per spostare la figura',light:'Trascina le luci · scorri sui punti per la profondità'}[m];syncHandles()}
@@ -105,16 +139,16 @@ $('#light-handles').addEventListener('pointermove',e=>{if(!lightDrag)return;cons
 for(const type of ['pointerup','pointercancel'])$('#light-handles').addEventListener(type,()=>lightDrag=null);
 $('#light-handles').addEventListener('wheel',e=>{const h=e.target.closest('[data-light-id]');if(!h)return;e.preventDefault();const l=state.lights.find(l=>l.id===Number(h.dataset.lightId));remember();l.z=Math.max(-5,Math.min(5,l.z-e.deltaY*.01));mark();syncNested(`lights.${l.id}.z`)},{passive:false});
 $('#light-handles').addEventListener('keydown',e=>{const h=e.target.closest('[data-light-id]');if(!h||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();const l=state.lights.find(l=>l.id===Number(h.dataset.lightId));remember();const key=e.shiftKey?'z':e.key==='ArrowLeft'||e.key==='ArrowRight'?'x':'y';l[key]=Math.max(-5,Math.min(5,l[key]+(e.key==='ArrowRight'||e.key==='ArrowUp'?.15:-.15)));mark();syncNested(`lights.${l.id}.${key}`)});
-function setPlaying(value){playing=value;lastTick=0;$('#play').innerHTML=icon(playing?'pause':'play');$('#play').setAttribute('aria-label',playing?'Metti in pausa':'Avvia animazione');$('#play-label').textContent=playing?'Movimento in corso':'Esplora il movimento'}
-$('#play').onclick=()=>setPlaying(!playing);$('#motion-tab').onclick=()=>showTab('motion');$('#timeline').oninput=e=>{phase=+e.target.value/1000*Math.PI*2;dirty=true};
+function setPlaying(value){if(playing!==value){cancelIdlePreview();previewRevision++;refined=false;dirty=true;lastEdit=performance.now();}playing=value;lastTick=0;$('#play').innerHTML=icon(playing?'pause':'play');$('#play').setAttribute('aria-label',playing?'Metti in pausa':'Avvia animazione');$('#play-label').textContent=playing?'Movimento in corso':'Esplora il movimento'}
+$('#play').onclick=()=>setPlaying(!playing);$('#motion-tab').onclick=()=>showTab('motion');$('#timeline').oninput=e=>{phase=+e.target.value/1000*Math.PI*2;mark(false)};
 function syncTransport(){$('#loop-time').textContent=`${Number((state.duration/state.speed).toFixed(1))} s · LOOP`;if($('#effective-duration'))$('#effective-duration').textContent=`${(state.duration/state.speed).toFixed(1)} s`}
 function renderMessage(message,recover=false){
  const box=$('#render-error');box.replaceChildren();const text=document.createElement('p');text.textContent=message;box.append(text);box.hidden=false;box.classList.toggle('preparing',!recover);
  if(recover){const actions=document.createElement('div');actions.className='recovery-actions';const retry=document.createElement('button');retry.className='primary';retry.textContent='Riprova anteprima';retry.onclick=retryPreview;const download=document.createElement('button');download.className='outline';download.textContent='Scarica progetto';download.onclick=()=>$('#project-download').click();actions.append(retry,download);box.append(actions);}
 }
-function suspendPreview(error){gpuPaused=true;preparingSince=0;refining=false;refined=false;previewRevision++;setPlaying(false);renderSession.begin();persistCurrent();renderMessage(error?.message||'La grafica è stata sospesa. La creazione è conservata; puoi modificarla o scaricarla.',true);console.error(error);}
+function suspendPreview(error){cancelIdlePreview();gpuPaused=true;preparingSince=0;refining=false;refined=false;previewRevision++;setPlaying(false);renderSession.begin();persistCurrent();renderMessage(error?.message||'La grafica è stata sospesa. La creazione è conservata; puoi modificarla o scaricarla.',true);console.error(error);}
 function rebuildPreview(){
- try{renderer?.dispose({loseContext:false});renderer=new Renderer(canvas);lastGpuSample=0;lastCompletedFrames=0;submissionTime=0;startupWarm=true;gpuPaused=false;preparingSince=0;previewQuality.recover();dirty=true;refined=false;renderSession.begin();renderMessage('Ripristino l’anteprima…');}catch(error){suspendPreview(error);}
+ try{cancelIdlePreview();renderer?.dispose({loseContext:false});renderer=new Renderer(canvas);lastGpuSample=0;lastCompletedFrames=0;submissionTime=0;startupWarm=true;gpuPaused=false;preparingSince=0;previewQuality.recover();dirty=true;refined=false;renderSession.begin();renderMessage('Ripristino l’anteprima…');}catch(error){suspendPreview(error);}
 }
 function retryPreview(){
  if(renderer?.gl.isContextLost()){manualRecoveryRequested=true;renderMessage('Ripristino la grafica. La tua creazione è conservata…');renderer.recoveryExtension?.restoreContext();setTimeout(()=>{if(renderer?.gl.isContextLost())renderMessage('La grafica non è ancora disponibile. Puoi riprovare o scaricare la creazione.',true);},3000);return;}
@@ -123,32 +157,38 @@ function retryPreview(){
 function frame(time){
  requestAnimationFrame(frame);
  if($('#performance-dialog').open&&time-(frame.statsTime||0)>400){updatePerformanceInfo();frame.statsTime=time;}
- if(document.hidden){lastTick=0;return;}
+ if(document.hidden){cancelIdlePreview();refined=false;lastTick=0;return;}
  if(!renderer||gpuPaused)return;
  try{
+  if(idleJob&&(busy||thumbnailWork||$('dialog[open]')))cancelIdlePreview();
   renderer.pollGpuTime();renderer.pollCompletion();const completed=renderer.completedFrames!==lastCompletedFrames;lastCompletedFrames=renderer.completedFrames;
-  if(renderer.gpuSample!==lastGpuSample){lastGpuSample=renderer.gpuSample;const settled=!playing&&time-lastEdit>350&&!drag&&!lightDrag;if(previewQuality.observe(renderer.gpuMilliseconds,time,{gpu:true,settled})){dirty=true;refined=false;}if(settled&&renderer.gpuMilliseconds<previewQuality.profile.budget*.65&&previewQuality.limit<previewQuality.profile.max){dirty=true;refined=false;}}
-  if(completed){renderSession.complete();$('#render-error').hidden=true;if(!renderer.timerExtension&&submissionTime&&previewQuality.observe(time-submissionTime,time,{gpu:true})){dirty=true;refined=false;}submissionTime=0;
-   if(startupWarm){startupWarm=false;if(previewQuality.lastCost<previewQuality.profile.budget*1.4)dirty=true;}
+  if(renderer.gpuSample!==lastGpuSample){lastGpuSample=renderer.gpuSample;const observation=previewSubmission||{interactive:false};if(previewQuality.observe(renderer.gpuMilliseconds,time,{gpu:true,...observation})){dirty=true;refined=false;}}
+  if(completed){renderSession.complete();$('#render-error').hidden=true;if(!renderer.timerExtension&&submissionTime&&previewQuality.observe(time-submissionTime,time,{gpu:true,...(previewSubmission||{interactive:false})})){dirty=true;refined=false;}submissionTime=0;
+   if(startupWarm){startupWarm=false;dirty=true;}
   }
   if(!lastTick)lastTick=time;const dt=Math.max(0,(time-lastTick)/1000);lastTick=time;
   if(playing){phase=(phase+dt*state.speed/state.duration*Math.PI*2)%(Math.PI*2);dirty=true;refined=false;$('#timeline').value=phase/(Math.PI*2)*1000;}
-  // Keep at most one preview draw in flight. The UI can run while the GPU works.
-  if(renderer.completionSync||refining||busy||thumbnailWork)return;
+  // Keep at most one preview draw in flight. Idle refinement drains a cancelled
+  // tile before returning this shared GPU slot to the interactive canvas.
+  if(renderer.completionSync||refining||idleJob||busy||thumbnailWork)return;
   if(dirty&&time-lastDraw>(window.innerWidth<700?33:16)){
    const w=board.clientWidth,h=board.clientHeight,interactive=playing||time-lastEdit<350||!!drag||!!lightDrag;
-   if(w&&h){const options={preview:true,quality:previewQuality.mode==='fluid'||startupWarm||interactive||previewQuality.lastCost>40?'fast':'balanced'};
+   if(w&&h){const options={preview:true,quality:'fast'};
     if(!renderer.prepare(state,phase,options)){if(!preparingSince){preparingSince=time;renderSession.begin();persistCurrent();renderMessage('Preparo l’anteprima…');}if(time-preparingSince>120000)throw Error('La preparazione richiede troppo tempo. Riprova con l’anteprima fluida.');return;}
-    preparingSince=0;let [width,height]=previewQuality.size(w,h,devicePixelRatio||1,interactive);if(startupWarm&&Math.max(width,height)>192){const scale=192/Math.max(width,height);width=Math.max(1,Math.round(width*scale));height=Math.max(1,Math.round(height*scale));}
-    renderSession.begin();const before=performance.now();if(renderer.draw(state,phase,width,height,options)){const cost=performance.now()-before;if(cost>previewQuality.profile.budget)previewQuality.observe(cost,time);$('#preview-size').textContent=`${width} × ${height}`;dirty=false;lastDraw=time;submissionTime=time;}
+    const justPrepared=!!preparingSince;preparingSince=0;let [width,height]=previewQuality.size(w,h,devicePixelRatio||1,interactive);if(startupWarm&&Math.max(width,height)>192){const scale=192/Math.max(width,height);width=Math.max(1,Math.round(width*scale));height=Math.max(1,Math.round(height*scale));}
+    renderSession.begin();const before=performance.now(),bakes=renderer.bakeUploads||0;if(renderer.draw(state,phase,width,height,options)){const cost=performance.now()-before;
+     // Initial field/JIT work is one-off; ongoing animated field bakes still
+     // count toward the motion budget and retain adaptive pixel reduction.
+     previewSubmission={interactive,warmup:startupWarm||justPrepared,preparing:!playing&&(renderer.bakeUploads||0)!==bakes};
+     previewQuality.lastCpuCost=cost;
+     $('#preview-size').textContent=`${width} × ${height}`;dirty=false;lastDraw=time;submissionTime=time;
+    }
    }
   }
-  if(!playing&&!dirty&&!refined&&state.renderVersion>=2&&time-lastEdit>650&&!drag&&!lightDrag&&!$('dialog[open]')){
-   const samples=previewQuality.refinementSamples();refined=true;if(samples>1){const revision=previewRevision,activeRenderer=renderer;refining=true;renderSession.begin();activeRenderer.drawAccumulated(structuredClone(state),phase,canvas.width,canvas.height,{samples,preview:true,quality:'balanced',cancelled:()=>revision!==previewRevision||playing||document.hidden||gpuPaused||renderer!==activeRenderer}).catch(error=>{if(renderer===activeRenderer&&!gpuPaused&&revision===previewRevision)suspendPreview(error);}).finally(()=>{if(renderer===activeRenderer)refining=false;});}
-  }
+  if(!playing&&!dirty&&!refined&&!renderer.completionSync&&time-lastEdit>650&&!drag&&!lightDrag&&!$('dialog[open]'))refineIdlePreview();
  }catch(error){suspendPreview(error);}
 }
-function updatePerformanceInfo(){const ms=renderer?.gpuMilliseconds;$('#gpu-frame-info').textContent=gpuPaused?'Anteprima sospesa · creazione conservata':`Anteprima ${canvas.width} × ${canvas.height}${Number.isFinite(ms)?` · tempo GPU ${ms.toFixed(1)} ms`:' · misurazione in corso'}`;}
+function updatePerformanceInfo(){const ms=renderer?.gpuMilliseconds,shown=idleCanvas.hidden?canvas:idleCanvas;$('#gpu-frame-info').textContent=gpuPaused?'Anteprima sospesa · creazione conservata':`Anteprima ${shown.width} × ${shown.height}${Number.isFinite(ms)?` · movimento GPU ${ms.toFixed(1)} ms`:' · misurazione in corso'}`;}
 $('#performance-open').onclick=()=>{const info=renderer?.hardwareInfo();$('#gpu-name').textContent=info?.name||'GPU non rilevata';$('#gpu-software').hidden=!info?.software;$('#preview-quality').value=previewQuality.mode;updatePerformanceInfo();$('#performance-dialog').showModal();};
 $('#preview-quality').onchange=e=>{previewQuality.setMode(e.target.value);try{localStorage.setItem('prisma-preview-quality',previewQuality.mode);}catch{}mark(false);toast('Qualità dell’anteprima aggiornata · download invariati');};
 const groupNames={shape:'Forma',material:'Materia',color:'Colori',light:'Luci',background:'Sfondo',photo:'Foto'};
@@ -178,12 +218,12 @@ function progress(fraction,msg){$('#progress-fill').style.width=`${fraction*100}
 const waitPaint=()=>new Promise(r=>setTimeout(r,0));
 $('#export-cancel').onclick=()=>{cancelled=true;videoSession?.abort();$('#export-cancel').disabled=true;$('#progress-text').textContent='Interruzione in corso…'};
 $('#export-dialog').addEventListener('cancel',e=>{if(busy){e.preventDefault();cancelled=true;videoSession?.abort()}});
-async function download(){if(busy)return;const snapshot=structuredClone(state),capturePhase=phase,resumePlaying=playing;setPlaying(false);previewRevision++;cancelled=false;$('#export-cancel').disabled=false;$('#export-message').textContent='';
+async function download(){if(busy)return;let rendererFailed=false;const snapshot=structuredClone(state),capturePhase=phase,resumePlaying=playing;setPlaying(false);previewRevision++;cancelled=false;$('#export-cancel').disabled=false;$('#export-message').textContent='';
  try{if(exportType!=='wallpaper'){exportWidth=+$('#export-width').value;exportHeight=+$('#export-height').value;if(!Number.isInteger(exportWidth)||!Number.isInteger(exportHeight)||exportWidth<64||exportHeight<64||exportWidth>4096||exportHeight>4096)throw new Error('Scegli dimensioni intere tra 64 e 4096 pixel.');if(exportType==='video'&&(exportWidth%2||exportHeight%2))throw new Error('Per il video, larghezza e altezza devono essere numeri pari.');updateExportSize(exportWidth,exportHeight)}
- busyUI(true);progress(0,'Preparo la tua creazione…');await waitPaint();if(exportType!=='wallpaper'&&renderer&&!renderer.gl.isContextLost())await renderer.waitForGpu({cancelled:()=>cancelled});if(cancelled)return;
- if(exportType==='wallpaper'){const source=await fetch('./renderer.js?v=organic-texture-1').then(r=>{if(!r.ok)throw new Error('Impossibile preparare il wallpaper.');return r.text()});const exported={...snapshot,bgMode:snapshot.bgMode==='transparent'?'solid':snapshot.bgMode};const serialized=JSON.stringify(exported).replace(/</g,'\\u003c');const html=`<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prisma Wallpaper</title><style>html,body{margin:0;overflow:hidden;background:${snapshot.background};width:100%;height:100%}canvas{width:100%;height:100%;display:block}</style><canvas id="art"></canvas><script type="module">${source}\nstartWallpaper(document.getElementById('art'),${serialized});<\/script></html>`;save(new Blob([html],{type:'text/html'}),uniqueDownloadName('prisma-wallpaper','html'));toast('Wallpaper HTML scaricato');return}
- const output=document.createElement('canvas');exportRenderer=new Renderer(output);if(exportWidth>exportRenderer.maxSize||exportHeight>exportRenderer.maxSize)throw new Error(`Questo dispositivo supporta al massimo ${exportRenderer.maxSize} pixel per lato.`);
- if(exportType==='image'){const format=$('#file-format').value;if(format==='jpeg'&&snapshot.bgMode==='transparent')snapshot.bgMode='solid';await exportRenderer.drawAccumulated(snapshot,capturePhase,exportWidth,exportHeight,{samples:16,cancelled:()=>cancelled,progress:f=>progress(f*.8,`Rifinisco l’immagine · ${Math.round(f*100)}%`)});progress(.8,'Preparo il file alla risoluzione scelta…');await waitPaint();if(cancelled)return;const mime=`image/${format}`;const blob=await new Promise(r=>output.toBlob(r,mime,.95));if(!blob)throw new Error('Memoria insufficiente: prova una risoluzione più piccola.');if(blob.type!==mime)throw new Error('Il browser non supporta questo formato. Scegli PNG.');save(blob,uniqueDownloadName(`prisma-${snapshot.seed}-${exportWidth}x${exportHeight}`,format==='jpeg'?'jpg':format));toast('Immagine scaricata');}
+ busyUI(true);progress(0,'Preparo la tua creazione…');await awaitIdleStop();await thumbnailQueue;await waitPaint();if(exportType!=='wallpaper'&&renderer&&!renderer.gl.isContextLost())await renderer.waitForGpu({cancelled:()=>cancelled});if(cancelled)return;
+ if(exportType==='wallpaper'){const source=await fetch('./renderer.js?v=complex-export-1').then(r=>{if(!r.ok)throw new Error('Impossibile preparare il wallpaper.');return r.text()});if(cancelled)return;const exported={...snapshot,bgMode:snapshot.bgMode==='transparent'?'solid':snapshot.bgMode};const serialized=JSON.stringify(exported).replace(/</g,'\\u003c');const html=`<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prisma Wallpaper</title><style>html,body{margin:0;overflow:hidden;background:${snapshot.background};width:100%;height:100%}canvas{width:100%;height:100%;display:block}</style><canvas id="art"></canvas><script type="module">${source}\nstartWallpaper(document.getElementById('art'),${serialized});<\/script></html>`;save(new Blob([html],{type:'text/html'}),uniqueDownloadName('prisma-wallpaper','html'));toast('Wallpaper HTML scaricato');return}
+ if(!exportRenderer||exportRenderer.gl.isContextLost()){exportRenderer?.dispose();exportRenderer=new Renderer(document.createElement('canvas'));}const output=exportRenderer.canvas;if(exportWidth>exportRenderer.maxSize||exportHeight>exportRenderer.maxSize)throw new Error(`Questo dispositivo supporta al massimo ${exportRenderer.maxSize} pixel per lato.`);
+ if(exportType==='image'){const format=$('#file-format').value;if(format==='jpeg'&&snapshot.bgMode==='transparent')snapshot.bgMode='solid';await exportRenderer.drawAccumulated(snapshot,capturePhase,exportWidth,exportHeight,{samples:16,cancelled:()=>cancelled,onStage:stage=>{if(stage==='preparing')progress(0,'Preparo il rendering dell’immagine…');else if(stage==='preparing-slow')progress(0,'Preparazione ancora in corso · puoi annullare in qualsiasi momento');},progress:f=>progress(f*.8,`Rifinisco l’immagine · ${Math.round(f*100)}%`)});progress(.8,'Preparo il file alla risoluzione scelta…');await waitPaint();if(cancelled)return;const mime=`image/${format}`;const blob=await new Promise(r=>output.toBlob(r,mime,.95));if(cancelled)return;if(!blob)throw new Error('Memoria insufficiente: prova una risoluzione più piccola.');if(blob.type!==mime)throw new Error('Il browser non supporta questo formato. Scegli PNG.');save(blob,uniqueDownloadName(`prisma-${snapshot.seed}-${exportWidth}x${exportHeight}`,format==='jpeg'?'jpg':format));toast('Immagine scaricata');}
  else{
   if(!hasMotion(snapshot))throw new Error('Attiva almeno un movimento nel pannello Movimento.');
   if(snapshot.bgMode==='transparent')snapshot.bgMode='solid';
@@ -198,7 +238,7 @@ async function download(){if(busy)return;const snapshot=structuredClone(state),c
    const remaining=frameMs>0?` · circa ${timeLabel(frameMs*(total-n)/1000)} restanti`:'';
    progress(n/total,`Creo il loop · ${(n+1).toLocaleString('it-IT')} / ${total.toLocaleString('it-IT')} fotogrammi · ${Math.round(n/total*100)}%${remaining}`);
    await waitPaint();
-   await exportRenderer.drawAccumulated(snapshot,n/total*Math.PI*2,exportWidth,exportHeight,{samples:snapshot.renderVersion>=2?2:1,cancelled:()=>cancelled});
+   await exportRenderer.drawAccumulated(snapshot,n/total*Math.PI*2,exportWidth,exportHeight,{samples:snapshot.renderVersion>=2?2:1,cancelled:()=>cancelled,onStage:stage=>{if(n===0&&stage==='preparing')progress(0,'Preparo il rendering del video…');else if(stage==='preparing-slow')progress(n/total,'Preparazione ancora in corso · puoi annullare in qualsiasi momento');},progress:f=>progress((n+f)/total,`Creo il loop · ${(n+1).toLocaleString('it-IT')} / ${total.toLocaleString('it-IT')} fotogrammi · ${Math.round((n+f)/total*100)}%${remaining}`)});
    if(cancelled)break;
    await videoSession.frame(exportRenderer.pixels());
    if(n===0){recentStart=performance.now();recentFrame=1;}
@@ -210,7 +250,7 @@ async function download(){if(busy)return;const snapshot=structuredClone(state),c
  }
 
  $('#export-message').textContent='Il file è pronto. Lo trovi nei download del browser.';
- }catch(error){if(cancelled||error.name==='AbortError'){toast('Esportazione interrotta');$('#export-message').textContent='Esportazione interrotta. La creazione è conservata.';}else{$('#export-message').textContent=error.message||'L’esportazione non è riuscita. Prova una risoluzione inferiore.';console.error(error)}}finally{videoSession?.dispose();videoSession=null;exportRenderer?.dispose();exportRenderer=null;busyUI(false);if(resumePlaying)setPlaying(true);dirty=true}
+ }catch(error){if(cancelled||error.name==='AbortError'){toast('Esportazione interrotta');$('#export-message').textContent='Esportazione interrotta. La creazione è conservata.';}else{rendererFailed=true;$('#export-message').textContent=error.message||'L’esportazione non è riuscita. Prova una risoluzione inferiore.';console.error(error)}}finally{if(cancelled)$('#export-message').textContent='Esportazione interrotta. La creazione è conservata.';videoSession?.dispose();videoSession=null;if(exportRenderer){try{if(!rendererFailed&&!exportRenderer.gl.isContextLost())await exportRenderer.waitForGpu();if(rendererFailed||!exportRenderer.releaseSurface()){exportRenderer.dispose();exportRenderer=null;}}catch{exportRenderer.dispose();exportRenderer=null;}}busyUI(false);if(resumePlaying)setPlaying(true);dirty=true}
 }$('#download').onclick=download;
 // Creations and favorites stay on this device; project files are portable.
 let saveTimer,thumbnailRenderer,variants=[],variantGeneration=0,thumbnailQueue=Promise.resolve();
@@ -252,10 +292,10 @@ function doSurprise(){
 }
 function thumbnail(s,atPhase=0,atRatio=ratio,cancelled=()=>false){
  const job=thumbnailQueue.then(async()=>{thumbnailWork++;previewRevision++;refined=false;
- try{if(cancelled())return null;if(renderer&&!renderer.gl.isContextLost()&&!await renderer.waitForGpu({cancelled}))return null;if(!thumbnailRenderer||thumbnailRenderer.gl.isContextLost()){thumbnailRenderer?.dispose({loseContext:false});thumbnailRenderer=new Renderer(document.createElement('canvas'));}
+ try{await awaitIdleStop();if(cancelled()||busy)return null;if(renderer&&!renderer.gl.isContextLost()&&!await renderer.waitForGpu({cancelled}))return null;if(!thumbnailRenderer||thumbnailRenderer.gl.isContextLost()){thumbnailRenderer?.dispose({loseContext:false});thumbnailRenderer=new Renderer(document.createElement('canvas'));}
   const width=atRatio>=1?160:Math.round(160*atRatio),height=atRatio>=1?Math.round(160/atRatio):160;
   const options={preview:true,quality:'fast',cancelled};if(!await thumbnailRenderer.prepareAsync(s,atPhase,options))return null;thumbnailRenderer.draw(s,atPhase,width,height,options);if(!await thumbnailRenderer.waitForGpu(options))return null;return thumbnailRenderer.canvas.toDataURL('image/webp',.88);
- }finally{thumbnailWork--;}
+ }finally{try{if(thumbnailRenderer&&!thumbnailRenderer.gl.isContextLost())await thumbnailRenderer.waitForGpu();}catch{}thumbnailWork--;}
  });thumbnailQueue=job.catch(()=>{});return job;
 }
 async function showVariants(){
