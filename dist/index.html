@@ -24,7 +24,7 @@
    <section class="description-bar" aria-labelledby="description-label">
     <div class="description-heading"><label id="description-label" for="creation-description">Descrivi la tua idea</label><span id="description-mode">Forma · materia · movimento</span></div>
     <form id="description-form" class="description-form"><textarea id="creation-description" rows="2" maxlength="1600" placeholder="Es. Radici nodose che entrano ed escono dalla sfera, blu e viola, sfondo nero" aria-describedby="description-help description-status"></textarea><button id="description-apply" class="primary" type="submit">Applica</button></form>
-    <div class="description-examples" aria-label="Esempi di richieste"><button type="button" data-description="Radici nodose che entrano ed escono dalla sfera">Radici nodose</button><button type="button" data-description="Piccoli rigonfiamenti della sfera">Rigonfiamenti</button><button type="button" data-description="Corde che si attorcigliano attorno alla sfera in movimento">Corde in movimento</button></div>
+    <div class="description-examples" aria-label="Esempi di richieste"><button type="button" data-description="Rendilo morbido nel movimento">Movimento morbido</button><button type="button" data-description="Radici nodose che entrano ed escono dalla sfera">Radici nodose</button><button type="button" data-description="Piccoli rigonfiamenti della sfera">Rigonfiamenti</button><button type="button" data-description="Corde che si attorcigliano attorno alla sfera in movimento">Corde in movimento</button></div>
     <p id="description-help" class="description-help">Descrivi forma, materia, colori, luci o movimento. Puoi combinare più modifiche e indicare valori precisi. Le parti non riconosciute vengono segnalate; puoi sempre annullare.</p>
     <div class="description-result"><p id="description-status" role="status" aria-live="polite"></p><button id="description-undo" class="quiet" type="button" hidden>Annulla</button></div>
    </section>
@@ -40,5 +40,5 @@
  <script>
  (()=>{function failed(){if(window.prismaReady)return;const box=document.getElementById('render-error');box.hidden=false;box.textContent='Il caricamento dell’editor si è interrotto. ';const button=document.createElement('button');button.className='primary';button.textContent='Ricarica editor';button.onclick=()=>location.reload();box.append(button);}window.addEventListener('error',e=>{if(e.target?.tagName==='SCRIPT')failed();},true);setTimeout(failed,15000);})();
  </script>
- <script type="module" src="app.js?v=organic-texture-1"></script>
+ <script type="module" src="app.js?v=motion-language-1"></script>
 </body></html>

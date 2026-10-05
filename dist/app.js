@@ -3,7 +3,7 @@ import {buildPanel,pathValue,pathMeta,writePath} from './panels.js';
 import {MAX_COLORS,MAX_LIGHTS,newLight,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,EXTRA_BASE,BACKDROPS,SHAPE_TRACKS,LIGHT_SOURCES} from './studio-model.js';
 import {BASE,PRESETS,MOODS,META,GROUPS,preset,randomize} from './model.js';
 import {newCreation,material,upgrade,setFullness,motionPreset,surprise,similar,hasMotion,normalizeCreation,sculpt,bloomExample,lightRig,textureStyle} from './creative-model.js';
-import {interpretDescription,applyDescriptionPlan,descriptionCatalog} from './description.js';
+import {interpretDescription,applyDescriptionPlan,descriptionCatalog} from './description.js?v=motion-language-1';
 import {PreviewQuality,PREVIEW_MODES} from './preview-quality.js';
 import {cleanPresetName,favoriteName,favoriteDate,uniqueDownloadName,presetDocument,readPreset} from './preset-files.js';
 import {VideoExportSession} from './video-export.js?v=stream-3';
@@ -83,8 +83,8 @@ $('#controls').addEventListener('click',e=>{const b=e.target.closest('button');i
 function applyPreset(i){remember();state=preset(i);activePreset=i;randomAnchor=structuredClone(state);phase=0;dirty=true;$('#art-name').textContent=PRESETS[i].name;$('#seed').value=state.seed;$$('.preset').forEach((p,j)=>p.classList.toggle('active',i===j));renderControls();syncTransport();syncHandles()}
 function makePresets(){$('#presets').innerHTML=PRESETS.map((p,i)=>`<button class="preset" data-preset="${i}" aria-label="Carica ${p.name}"><img class="preset-image" alt="" loading="lazy" src="presets/${i}.webp"><span class="preset-name">${p.name}</span><span class="preset-sub">${p.label}</span></button>`).join('');}
 $('#presets').addEventListener('click',e=>{const p=e.target.closest('[data-preset]');if(p)applyPreset(+p.dataset.preset)});$('#reset').onclick=()=>{remember();adopt(newCreation(),'Bolla di sapone');};
-function undo(){if(!history.length)return;future.push(structuredClone(state));state=history.pop();mark(false);randomAnchor=structuredClone(state);renderControls();historyButtons();$('#seed').value=state.seed;$('#art-name').textContent='La tua esplorazione'}
-function redo(){if(!future.length)return;history.push(structuredClone(state));state=future.pop();mark(false);randomAnchor=structuredClone(state);renderControls();historyButtons();$('#seed').value=state.seed}$('#undo').onclick=undo;$('#redo').onclick=redo;
+function undo(){if(!history.length)return;future.push(structuredClone(state));state=history.pop();syncMasterStates();if(!hasMotion(state))setPlaying(false);mark(false);randomAnchor=structuredClone(state);renderControls();historyButtons();$('#seed').value=state.seed;$('#art-name').textContent='La tua esplorazione'}
+function redo(){if(!future.length)return;history.push(structuredClone(state));state=future.pop();syncMasterStates();if(!hasMotion(state))setPlaying(false);mark(false);randomAnchor=structuredClone(state);renderControls();historyButtons();$('#seed').value=state.seed}$('#undo').onclick=undo;$('#redo').onclick=redo;
 document.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea')||$('dialog[open]'))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo()}if(e.code==='Space'){e.preventDefault();setPlaying(!playing)}});
 function fitBoard(){const v=$('#viewport'),maxW=v.clientWidth,maxH=v.clientHeight;let w=maxW,h=w/ratio;if(h>maxH){h=maxH;w=h*ratio}board.style.width=`${Math.floor(w)}px`;board.style.height=`${Math.floor(h)}px`;dirty=true}
 new ResizeObserver(fitBoard).observe($('#viewport'));$('#aspect').onchange=e=>{ratio=+e.target.value;fitBoard()};
@@ -222,7 +222,7 @@ function adopt(next,title='La tua esplorazione',snapshot={}){
 function applyTextPlan(plan){
  const result=applyDescriptionPlan(state,plan);
  if(result.changed){remember();state=result.state;syncMasterStates();mark();renderControls();$('#seed').value=state.seed;$('#description-undo').hidden=false;}
- if(plan.operations.some(o=>o.type==='motionPreset'||(o.type==='motionTrack'&&o.values?.enabled===true)))setPlaying(true);
+ if(plan.operations.some(o=>o.type==='motionPreset'||(o.type==='motionTrack'&&o.values?.enabled===true)||(o.type==='motionStyle'&&hasMotion(state))))setPlaying(true);
  if(plan.operations.some(o=>o.type==='stopMotion'))setPlaying(false);
  return result;
 }
