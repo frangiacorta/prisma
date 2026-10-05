@@ -1,0 +1,50 @@
+[
+  {
+    "index": 4,
+    "frames": 120,
+    "roots": 124,
+    "segments": 1488,
+    "nodes": 2975,
+    "builds": 1,
+    "refits": 120,
+    "maximumRadius": 1.4801427092375379,
+    "meanMs": 1.1057259333333358,
+    "maxMs": 18.025256
+  },
+  {
+    "index": 5,
+    "frames": 120,
+    "roots": 124,
+    "segments": 1488,
+    "nodes": 2975,
+    "builds": 1,
+    "refits": 120,
+    "maximumRadius": 1.7163130392347175,
+    "meanMs": 0.8035219666666639,
+    "maxMs": 9.866153999999995
+  },
+  {
+    "index": 6,
+    "frames": 120,
+    "roots": 124,
+    "segments": 1488,
+    "nodes": 2975,
+    "builds": 1,
+    "refits": 120,
+    "maximumRadius": 0.9015544522591542,
+    "meanMs": 0.8022383083333333,
+    "maxMs": 4.736147999999957
+  },
+  {
+    "index": 7,
+    "frames": 120,
+    "roots": 124,
+    "segments": 1488,
+    "nodes": 2975,
+    "builds": 1,
+    "refits": 120,
+    "maximumRadius": 1.5748531937990855,
+    "meanMs": 0.671276300000009,
+    "maxMs": 1.7975139999999783
+  }
+]

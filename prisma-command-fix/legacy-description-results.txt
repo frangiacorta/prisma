@@ -1,0 +1,15 @@
+{"text":"Spine più organiche e curve","notes":["Fusione con la sfera","Ampiezza delle radici","Irregolarità delle punte","Arricciatura"],"unrecognized":[]}
+{"text":"Trasparenza 80%, metallo 25%","notes":["Trasparenza","Metallicità"],"unrecognized":[]}
+{"text":"sfondo bianco","notes":["Sfondo"],"unrecognized":[]}
+{"text":"Sfera di vetro, sfondo nero","notes":["Forma: sfera","Materia: Biglia di vetro","Sfondo"],"unrecognized":[]}
+{"text":"Aggiungi una barra neon rosa dietro","notes":["Luce aggiunta"],"unrecognized":[]}
+{"text":"Togli caustica, meno contrasto","notes":["Caustica luminosa","Contrasto"],"unrecognized":[]}
+{"text":"Palette blu e viola, sfondo nero","notes":["Palette","Sfondo"],"unrecognized":[]}
+{"text":"Aggiungi #123abc","notes":["Colore aggiunto"],"unrecognized":[]}
+{"text":"Rimuovi #123abc","notes":["Colore rimosso"],"unrecognized":[]}
+{"text":"Contorno sfumato 60%, grana 5%","notes":["Contorno sfumato","Grana"],"unrecognized":[]}
+{"text":"Più trasparente, non cambiare colore","notes":["Trasparenza"],"unrecognized":[]}
+{"text":"Spine più corte, meno acute","notes":["Lunghezza","Acutezza delle punte"],"unrecognized":[]}
+{"text":"Luce che orbita, più lento","notes":["Movimento","Velocità globale: 0.75×"],"unrecognized":[]}
+{"text":"Vetro trasparente, sfondo trasparente","notes":["Materia: Biglia di vetro","Trasparenza","Sfondo"],"unrecognized":[]}
+Combined requests, independent scopes, actual controls, unsupported input, atomic validation: PASS

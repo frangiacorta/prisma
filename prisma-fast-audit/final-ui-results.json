@@ -1,0 +1,67 @@
+{
+  "firstFrameSeconds": 8.74079883399827,
+  "sliders": [
+    {
+      "amount": 0.05,
+      "frameSeconds": 0.4370617309905356,
+      "tabSwitchSeconds": 0.40475950999825727,
+      "maxHeartbeatMs": 293,
+      "draws": 4,
+      "completed": 2,
+      "width": 144,
+      "height": 144,
+      "lost": false
+    },
+    {
+      "amount": 0.15,
+      "frameSeconds": 0.09714302599604707,
+      "tabSwitchSeconds": 0.08077154100465123,
+      "maxHeartbeatMs": 31.100000008940697,
+      "draws": 6,
+      "completed": 3,
+      "width": 144,
+      "height": 144,
+      "lost": false
+    },
+    {
+      "amount": 0.35,
+      "frameSeconds": 0.12023417500313371,
+      "tabSwitchSeconds": 0.09506913999211974,
+      "maxHeartbeatMs": 25,
+      "draws": 8,
+      "completed": 4,
+      "width": 144,
+      "height": 144,
+      "lost": false
+    },
+    {
+      "amount": 0.7,
+      "frameSeconds": 0.09954904198821168,
+      "tabSwitchSeconds": 0.07149012299487367,
+      "maxHeartbeatMs": 17.700000002980232,
+      "draws": 10,
+      "completed": 5,
+      "width": 144,
+      "height": 144,
+      "lost": false
+    },
+    {
+      "amount": 1,
+      "frameSeconds": 0.09664454800076783,
+      "tabSwitchSeconds": 0.07952025599661283,
+      "maxHeartbeatMs": 22.100000008940697,
+      "draws": 12,
+      "completed": 6,
+      "width": 144,
+      "height": 144,
+      "lost": false
+    }
+  ],
+  "movement": {
+    "completed": 14,
+    "phase": "39",
+    "lost": false,
+    "maxHeartbeatMs": 133.5
+  },
+  "pageErrors": []
+}

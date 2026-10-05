@@ -1,0 +1,66 @@
+{
+  "hardware": {
+    "name": "ANGLE (Mesa, llvmpipe (LLVM 19.1.7 256 bits), OpenGL ES 3.2)",
+    "software": true,
+    "powerPreference": "high-performance",
+    "timingAvailable": true
+  },
+  "runs": [
+    {
+      "name": "uniform-motion",
+      "frames": 64,
+      "median": 30.30000001192093,
+      "p95": 47.1000000089407,
+      "max": 79.3999999910593,
+      "bakes": 0,
+      "growth": 0,
+      "allocations": 0,
+      "programs": 0,
+      "sizes": [
+        112
+      ]
+    },
+    {
+      "name": "threshold",
+      "frames": 64,
+      "median": 67.20000000298023,
+      "p95": 75.5,
+      "max": 82.79999999701977,
+      "bakes": 63,
+      "growth": 63,
+      "allocations": 0,
+      "programs": 0,
+      "sizes": [
+        80
+      ]
+    },
+    {
+      "name": "bloom",
+      "frames": 64,
+      "median": 10.200000002980232,
+      "p95": 18.900000005960464,
+      "max": 21.100000008940697,
+      "bakes": 63,
+      "growth": 63,
+      "allocations": 0,
+      "programs": 0,
+      "sizes": [
+        48
+      ]
+    },
+    {
+      "name": "needles-all",
+      "frames": 64,
+      "median": 72.79999999701977,
+      "p95": 88.3999999910593,
+      "max": 141.80000001192093,
+      "bakes": 63,
+      "growth": 63,
+      "allocations": 0,
+      "programs": 0,
+      "sizes": [
+        80
+      ]
+    }
+  ]
+}

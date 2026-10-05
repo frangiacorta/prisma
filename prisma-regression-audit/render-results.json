@@ -1,0 +1,185 @@
+{
+  "presets": [
+    {
+      "name": "Aurora liquida",
+      "difference": 0
+    },
+    {
+      "name": "Vetro orbitale",
+      "difference": 0
+    },
+    {
+      "name": "Mercurio",
+      "difference": 0
+    },
+    {
+      "name": "Eclisse rosa",
+      "difference": 0
+    },
+    {
+      "name": "Anello aurora",
+      "difference": 0
+    },
+    {
+      "name": "Nebbia pastello",
+      "difference": 0
+    }
+  ],
+  "fields": [
+    {
+      "i": 0,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 0,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 1,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 1,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 2,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 2,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 3,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 3,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 4,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 4,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 5,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 5,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 6,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 6,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    }
+  ],
+  "benchmarks": [
+    {
+      "name": "Riccio opaco",
+      "times": [
+        70.70000000298023,
+        67.69999998807907,
+        68.90000000596046,
+        67.20000000298023
+      ]
+    },
+    {
+      "name": "Riccio vetro",
+      "times": [
+        679.2999999970198,
+        658.3000000119209,
+        665.2000000029802,
+        684.3999999910593
+      ]
+    },
+    {
+      "name": "Riccio SSS",
+      "times": [
+        94.59999999403954,
+        76.20000000298023,
+        96.79999999701977,
+        84.1000000089407
+      ]
+    }
+  ],
+  "tiling": [
+    {
+      "mode": "solid",
+      "difference": 0
+    },
+    {
+      "mode": "solid",
+      "accumulated": true,
+      "difference": 0
+    },
+    {
+      "mode": "transparent",
+      "difference": 0
+    },
+    {
+      "mode": "transparent",
+      "accumulated": true,
+      "difference": 0
+    }
+  ],
+  "loops": [
+    {
+      "name": "Riccio opaco",
+      "difference": 0
+    },
+    {
+      "name": "Riccio vetro",
+      "difference": 0
+    },
+    {
+      "name": "Riccio SSS",
+      "difference": 0
+    }
+  ],
+  "cache": [
+    {
+      "unchangedGrowth": true
+    },
+    {
+      "changedGrowth": true
+    }
+  ]
+}

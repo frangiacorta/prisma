@@ -1,0 +1,19 @@
+{
+  "controls": [
+    "textureDepth",
+    "textureScale",
+    "textureOrganic",
+    "textureAngle",
+    "textureWrinkles",
+    "textureFolds",
+    "textureWear",
+    "textureRipples",
+    "surfaceTexture"
+  ],
+  "styleApplied": true,
+  "textureKeptOnLegacyMaterial": true,
+  "legacyWithTextureVersion": 2,
+  "resetClearsAllWeights": true,
+  "legacyAfterResetVersion": 1,
+  "errors": []
+}

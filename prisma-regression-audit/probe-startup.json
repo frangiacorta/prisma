@@ -1,0 +1,622 @@
+[
+  {
+    "seconds": 2.092,
+    "case": "startup",
+    "event": "navigation",
+    "value": "current default app"
+  },
+  {
+    "seconds": 4.139,
+    "case": "startup",
+    "event": "console",
+    "value": "begin compileShader undefined"
+  },
+  {
+    "seconds": 4.139,
+    "case": "startup",
+    "event": "console",
+    "value": "end compileShader 4ms"
+  },
+  {
+    "seconds": 4.139,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getShaderParameter 35713"
+  },
+  {
+    "seconds": 4.651,
+    "case": "startup",
+    "event": "console",
+    "value": "end getShaderParameter 509ms"
+  },
+  {
+    "seconds": 4.694,
+    "case": "startup",
+    "event": "console",
+    "value": "begin compileShader undefined"
+  },
+  {
+    "seconds": 4.694,
+    "case": "startup",
+    "event": "console",
+    "value": "end compileShader 2ms"
+  },
+  {
+    "seconds": 4.695,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getShaderParameter 35713"
+  },
+  {
+    "seconds": 4.751,
+    "case": "startup",
+    "event": "console",
+    "value": "end getShaderParameter 54ms"
+  },
+  {
+    "seconds": 4.751,
+    "case": "startup",
+    "event": "console",
+    "value": "begin linkProgram undefined"
+  },
+  {
+    "seconds": 4.752,
+    "case": "startup",
+    "event": "console",
+    "value": "end linkProgram 0ms"
+  },
+  {
+    "seconds": 4.752,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35714"
+  },
+  {
+    "seconds": 4.986,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 237ms"
+  },
+  {
+    "seconds": 4.986,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.986,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.986,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.986,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.987,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.988,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.988,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.988,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.989,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.989,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.989,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.991,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.992,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.992,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.992,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.992,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.992,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.992,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.993,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.993,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.993,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.993,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.993,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.993,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.993,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.993,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.994,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.994,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.994,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.994,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.994,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.994,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.995,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.995,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.996,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.996,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.996,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.997,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.997,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.997,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.997,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.997,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.997,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.998,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.998,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.998,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 4.999,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 4.999,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.0,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.001,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.001,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.002,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.002,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.003,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.003,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.004,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.004,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.004,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.004,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.005,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.006,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.006,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.006,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.006,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.007,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.007,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.007,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.008,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.009,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.01,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.012,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.012,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.013,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.013,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.013,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.013,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.014,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.014,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.014,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.014,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.014,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.014,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.014,
+    "case": "startup",
+    "event": "console",
+    "value": "begin getProgramParameter 35718"
+  },
+  {
+    "seconds": 5.015,
+    "case": "startup",
+    "event": "console",
+    "value": "end getProgramParameter 0ms"
+  },
+  {
+    "seconds": 5.015,
+    "case": "startup",
+    "event": "console",
+    "value": "begin drawArrays 0"
+  },
+  {
+    "seconds": 5.015,
+    "case": "startup",
+    "event": "console",
+    "value": "end drawArrays 0ms"
+  },
+  {
+    "seconds": 7.789,
+    "case": "startup",
+    "event": "console",
+    "value": "begin drawArrays 0"
+  },
+  {
+    "seconds": 7.79,
+    "case": "startup",
+    "event": "console",
+    "value": "end drawArrays 0ms"
+  },
+  {
+    "seconds": 19.676,
+    "case": "startup",
+    "event": "dom",
+    "value": {
+      "canvas": [
+        [
+          287,
+          287
+        ]
+      ],
+      "text": "prisma\nSTUDIO\nIl tuo laboratorio di forme\nEsporta\ncreazione\nPUNTI DI PARTENZA\nAurora liquida\nVetro \u00b7 iridescenza\nVetro orbitale\nAcqua \u00b7 trasparenza\nMercurio\nMetallo \u00b7 fluidit\u00e0\nEclisse rosa\nSemiluna \u00b7 luce\nAnello aurora\nVuoto \u00b7 riflessi\nNebbia pastell"
+    }
+  }
+]

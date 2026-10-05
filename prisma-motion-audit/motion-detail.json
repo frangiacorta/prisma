@@ -1,0 +1,131 @@
+{
+  "reuse": [
+    {
+      "name": "sphere-twist",
+      "bakes": 0,
+      "growth": 0,
+      "programs": 0,
+      "allocations": 0
+    },
+    {
+      "name": "crown-twist",
+      "bakes": 0,
+      "growth": 0,
+      "programs": 0,
+      "allocations": 0
+    },
+    {
+      "name": "crown-phase",
+      "bakes": 0,
+      "growth": 0,
+      "programs": 0,
+      "allocations": 0
+    },
+    {
+      "name": "transparency-zero",
+      "bakes": 0,
+      "growth": 0,
+      "programs": 0,
+      "allocations": 0
+    }
+  ],
+  "quality": [
+    {
+      "name": "twist-crown",
+      "iou": 0.9723400331919602,
+      "mae": 2.050192806119224
+    },
+    {
+      "name": "phase-crown",
+      "iou": 0.9812162916124233,
+      "mae": 2.2395122567601717
+    },
+    {
+      "name": "phase-flower-stem",
+      "iou": 0.9962009286618827,
+      "mae": 2.4456214689265536
+    },
+    {
+      "name": "twist-cut",
+      "iou": 0.9601020222262707,
+      "mae": 2.800885515496521
+    },
+    {
+      "name": "moving-threshold",
+      "phase": 0,
+      "iou": 0.9255569643180583,
+      "mae": 8.893868232224397
+    },
+    {
+      "name": "moving-threshold",
+      "phase": 1.5707963267948966,
+      "iou": 0.9624478442280946,
+      "mae": 3.8689788053949905
+    },
+    {
+      "name": "moving-threshold",
+      "phase": 3.141592653589793,
+      "iou": 0.9255569643180583,
+      "mae": 8.893868232224397
+    },
+    {
+      "name": "moving-threshold",
+      "phase": 4.71238898038469,
+      "iou": 0.9389747762408462,
+      "mae": 8.332293471981513
+    },
+    {
+      "name": "moving-needles",
+      "phase": 0,
+      "iou": 0.9685947480482612,
+      "mae": 2.228735421627893
+    },
+    {
+      "name": "moving-needles",
+      "phase": 1.5707963267948966,
+      "iou": 0.979639055992596,
+      "mae": 2.0371595024405607
+    },
+    {
+      "name": "moving-needles",
+      "phase": 3.141592653589793,
+      "iou": 0.9723244000700648,
+      "mae": 2.8606257130847297
+    },
+    {
+      "name": "moving-needles",
+      "phase": 4.71238898038469,
+      "iou": 0.9373987034035657,
+      "mae": 4.378430948778907
+    }
+  ],
+  "loop": [
+    {
+      "name": "bloom",
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "name": "needles",
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "name": "soap-film",
+      "max": 0,
+      "mean": 0
+    },
+    {
+      "name": "orbit",
+      "max": 0,
+      "mean": 0
+    }
+  ],
+  "stress": {
+    "frames": 240,
+    "programs": 0,
+    "allocations": 0,
+    "first60": 12.640000000099342,
+    "last60": 13.581666666766008
+  }
+}

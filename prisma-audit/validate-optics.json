@@ -1,0 +1,306 @@
+{
+  "indexMatchedAlpha": 0,
+  "whiteBackgroundMin": 255,
+  "internalSSSDifference": 239642,
+  "movedInternalDifference": 215020,
+  "transparentMetalDifference": 177048,
+  "highlights": {
+    "nonblack": 986,
+    "white": 0
+  },
+  "accumulationGL": 0,
+  "loops": [
+    {
+      "k": "breathe",
+      "difference": 0
+    },
+    {
+      "k": "reflect",
+      "difference": 0
+    },
+    {
+      "k": "film",
+      "difference": 0
+    },
+    {
+      "k": "orbit",
+      "difference": 0
+    },
+    {
+      "k": "wave",
+      "difference": 0
+    }
+  ],
+  "thickness": [
+    {
+      "value": 0,
+      "mean": 5.71044921875
+    },
+    {
+      "value": 0.01,
+      "mean": 5.876790364583333
+    },
+    {
+      "value": 0.04,
+      "mean": 7.719563802083333
+    },
+    {
+      "value": 0.06,
+      "mean": 8.941813151041666
+    },
+    {
+      "value": 0.08,
+      "mean": 10.632486979166666
+    },
+    {
+      "value": 0.09,
+      "mean": 11.4033203125
+    },
+    {
+      "value": 0.1,
+      "mean": 11.328043619791666
+    },
+    {
+      "value": 0.4,
+      "mean": 9.748046875
+    },
+    {
+      "value": 1,
+      "mean": 9.041910807291666
+    }
+  ],
+  "benchmarkSoftware": [
+    {
+      "name": "Bolla",
+      "times": [
+        9,
+        6,
+        6,
+        7,
+        6,
+        6
+      ]
+    },
+    {
+      "name": "Goccia",
+      "times": [
+        5713,
+        13,
+        14,
+        13,
+        15,
+        16
+      ]
+    },
+    {
+      "name": "Gelatina",
+      "times": [
+        12,
+        9,
+        8,
+        9,
+        9,
+        8
+      ]
+    }
+  ],
+  "surprises": [
+    {
+      "seed": 731,
+      "material": "Olio iridescente",
+      "visible": 195
+    },
+    {
+      "seed": 732,
+      "material": "Olio iridescente",
+      "visible": 221
+    },
+    {
+      "seed": 733,
+      "material": "Biglia di vetro",
+      "visible": 156
+    },
+    {
+      "seed": 734,
+      "material": "Satinato",
+      "visible": 244
+    },
+    {
+      "seed": 735,
+      "material": "Satinato",
+      "visible": 245
+    },
+    {
+      "seed": 736,
+      "material": "Bolla di sapone",
+      "visible": 186
+    },
+    {
+      "seed": 737,
+      "material": "Perla",
+      "visible": 201
+    },
+    {
+      "seed": 738,
+      "material": "Ghiaccio",
+      "visible": 142
+    },
+    {
+      "seed": 739,
+      "material": "Ghiaccio",
+      "visible": 153
+    },
+    {
+      "seed": 740,
+      "material": "Palloncino lucido",
+      "visible": 191
+    },
+    {
+      "seed": 741,
+      "material": "Cristallo",
+      "visible": 177
+    },
+    {
+      "seed": 742,
+      "material": "Metallo liquido",
+      "visible": 227
+    },
+    {
+      "seed": 743,
+      "material": "Satinato",
+      "visible": 244
+    },
+    {
+      "seed": 744,
+      "material": "Palloncino metallizzato",
+      "visible": 205
+    },
+    {
+      "seed": 745,
+      "material": "Bolla di sapone",
+      "visible": 179
+    },
+    {
+      "seed": 746,
+      "material": "Biglia di vetro",
+      "visible": 176
+    },
+    {
+      "seed": 747,
+      "material": "Metallo liquido",
+      "visible": 232
+    },
+    {
+      "seed": 748,
+      "material": "Cristallo",
+      "visible": 191
+    },
+    {
+      "seed": 749,
+      "material": "Olio iridescente",
+      "visible": 219
+    },
+    {
+      "seed": 750,
+      "material": "Perla",
+      "visible": 196
+    }
+  ],
+  "compatibility": [
+    {
+      "name": "Aurora liquida",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Vetro orbitale",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Mercurio",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Eclisse rosa",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Anello aurora",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Nebbia pastello",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Acqua",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Vetro",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Cromo",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Satinato",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Perla",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Ceramica",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Opaco",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Olio",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Bolla di sapone",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Palloncino chiaro",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Vetro satinato",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Carta in controluce",
+      "max": 0,
+      "sum": 0
+    },
+    {
+      "name": "Pelle sottile",
+      "max": 0,
+      "sum": 0
+    }
+  ]
+}

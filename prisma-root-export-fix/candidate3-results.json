@@ -1,0 +1,44 @@
+{
+  "results": [
+    {
+      "label": "full64-cold",
+      "width": 64,
+      "height": 36,
+      "prepareMs": 2327,
+      "drawMs": 23152.80000001192,
+      "ok": true,
+      "lost": false,
+      "error": 0,
+      "bakes": 0,
+      "fieldResolution": 0,
+      "lit": 1317
+    },
+    {
+      "label": "full64-warm",
+      "width": 64,
+      "height": 36,
+      "prepareMs": 0.09999999403953552,
+      "drawMs": 410.30000001192093,
+      "ok": true,
+      "lost": false,
+      "error": 0,
+      "bakes": 0,
+      "fieldResolution": 0,
+      "lit": 1317
+    },
+    {
+      "label": "full128",
+      "width": 128,
+      "height": 72,
+      "prepareMs": 0.09999999403953552,
+      "drawMs": 1888.199999988079,
+      "ok": true,
+      "lost": false,
+      "error": 0,
+      "bakes": 0,
+      "fieldResolution": 0,
+      "lit": 5299
+    }
+  ],
+  "unchangedSource": true
+}

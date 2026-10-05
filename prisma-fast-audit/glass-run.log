@@ -1,0 +1,13 @@
+BEGIN glass full internal=false
+GLASS {"quality":"full","insideLight":false,"coldMs":41273.5,"warmMs":1513,"brightPixels":0,"visiblePixels":2127,"meanChannelDifference":0,"alphaDiff":0}
+BEGIN glass fast internal=false
+GLASS {"quality":"fast","insideLight":false,"coldMs":11803.199999988079,"warmMs":34.6000000089407,"brightPixels":46,"visiblePixels":2254,"meanChannelDifference":13.528609664351851,"alphaDiff":0,"fieldResolution":112}
+BEGIN glass balanced internal=false
+GLASS {"quality":"balanced","insideLight":false,"coldMs":289,"warmMs":30.700000002980232,"brightPixels":32,"visiblePixels":2099,"meanChannelDifference":9.2392578125,"alphaDiff":0,"fieldResolution":144}
+BEGIN glass full internal=true
+GLASS {"quality":"full","insideLight":true,"coldMs":1463.5,"warmMs":1622.4000000059605,"brightPixels":0,"visiblePixels":2175,"meanChannelDifference":0,"alphaDiff":0,"fieldResolution":144}
+BEGIN glass fast internal=true
+GLASS {"quality":"fast","insideLight":true,"coldMs":31.600000008940697,"warmMs":30,"brightPixels":46,"visiblePixels":2315,"meanChannelDifference":13.184751157407407,"alphaDiff":0,"fieldResolution":144}
+BEGIN glass balanced internal=true
+GLASS {"quality":"balanced","insideLight":true,"coldMs":33.900000005960464,"warmMs":33.19999998807907,"brightPixels":32,"visiblePixels":2147,"meanChannelDifference":9.668764467592593,"alphaDiff":0,"fieldResolution":144}
+GLASS REFERENCE COMPARISON DONE

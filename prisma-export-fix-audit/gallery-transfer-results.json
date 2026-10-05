@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "sameDayNames": [
+    "Opaco \u00b7 000001",
+    "Opaco \u00b7 000002",
+    "Opaco \u00b7 000003"
+  ],
+  "dateTimes": [
+    "05/10/2026, 10:22:33",
+    "05/10/2026, 10:22:33",
+    "05/10/2026, 10:22:33"
+  ],
+  "renamePersisted": true,
+  "cardExportName": "Radici viola mie",
+  "uniqueCurrentFileNames": [
+    "prisma-preset-trasferimento-chrome-2026-10-04_22-58-02-412-2.json",
+    "prisma-preset-trasferimento-chrome-2026-10-04_22-58-02-508-3.json"
+  ],
+  "isolatedBrowserRoundTrip": [
+    "state",
+    "ratio",
+    "phase",
+    "name"
+  ],
+  "worksWithoutGPU": true,
+  "copyFallbackSelected": true,
+  "clipboardSuccess": true,
+  "errors": []
+}

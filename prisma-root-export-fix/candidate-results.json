@@ -1,0 +1,57 @@
+{
+  "results": [
+    {
+      "label": "preview64",
+      "width": 64,
+      "height": 36,
+      "prepareMs": 2097.4000000059605,
+      "drawMs": 16435.09999999404,
+      "ok": true,
+      "lost": false,
+      "error": 0,
+      "bakes": 1,
+      "fieldResolution": 80,
+      "lit": 1367
+    },
+    {
+      "label": "full64-cold",
+      "width": 64,
+      "height": 36,
+      "prepareMs": 2827.100000023842,
+      "drawMs": 39248.30000001192,
+      "ok": true,
+      "lost": false,
+      "error": 0,
+      "bakes": 1,
+      "fieldResolution": 80,
+      "lit": 1317
+    },
+    {
+      "label": "full64-warm",
+      "width": 64,
+      "height": 36,
+      "prepareMs": 0.09999999403953552,
+      "drawMs": 437.69999998807907,
+      "ok": true,
+      "lost": false,
+      "error": 0,
+      "bakes": 1,
+      "fieldResolution": 80,
+      "lit": 1317
+    },
+    {
+      "label": "full128",
+      "width": 128,
+      "height": 72,
+      "prepareMs": 0,
+      "drawMs": 830.5,
+      "ok": true,
+      "lost": false,
+      "error": 0,
+      "bakes": 1,
+      "fieldResolution": 80,
+      "lit": 5299
+    }
+  ],
+  "unchangedSource": true
+}

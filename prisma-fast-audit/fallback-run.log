@@ -1,0 +1,17 @@
+FALLBACK float petals .05 true 5826.6ms
+FALLBACK float petals .05 false 25.3ms
+FALLBACK float petals .35 true 17.4ms
+FALLBACK float petals .35 false 18.2ms
+FALLBACK float petals .7 true 22.8ms
+FALLBACK float petals .7 false 14.6ms
+FALLBACK float organic needles true 161.6ms
+FALLBACK float organic needles false 30.5ms
+FALLBACK packed petals .05 true 5036.7ms
+FALLBACK packed petals .05 false 22.0ms
+FALLBACK packed petals .35 true 26.7ms
+FALLBACK packed petals .35 false 23.0ms
+FALLBACK packed petals .7 true 27.7ms
+FALLBACK packed petals .7 false 20.4ms
+FALLBACK packed organic needles true 166.1ms
+FALLBACK packed organic needles false 51.5ms
+FLOAT AND PACKED FIELD FALLBACK PASS

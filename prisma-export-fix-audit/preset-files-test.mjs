@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {cleanPresetName,favoriteName,favoriteDate,uniqueDownloadName,presetDocument,readPreset} from '/workspace/prisma-studio/dist/preset-files.js';
+import {newCreation,sculpt,motionPreset} from '/workspace/prisma-studio/dist/creative-model.js';
+const date=new Date('2026-10-05T11:22:33.444Z');
+const names=Array.from({length:100},()=>uniqueDownloadName('Prisma - ràdici / <test>','json',date));
+assert.equal(new Set(names).size,100);assert(names.every(x=>/^[a-z0-9_-]+\.json$/.test(x)));
+assert.equal(cleanPresetName('  Radici\n   viola\u0000  '),'Radici viola');assert.equal(cleanPresetName('a'.repeat(200)).length,90);
+const state=newCreation();sculpt(state,7);motionPreset(state,'roots');state.perfectLoop=false;state.motions.petalGrowth.cycles=1.4;state.duration=122;state.speed=.95;state.animateShape=true;
+const snapshot={name:'Le mie radici viola',state,ratio:9/16,phase:1.234,date:date.toISOString(),thumbnail:'secret',id:'local-id'};
+const encoded=presetDocument(snapshot,date),decoded=readPreset(JSON.stringify(encoded));
+assert.deepEqual(decoded.state,state);assert.equal(decoded.phase,snapshot.phase);assert.equal(decoded.ratio,snapshot.ratio);assert.equal(decoded.name,snapshot.name);assert(!('thumbnail' in encoded));assert(!('id' in encoded));
+assert.deepEqual(readPreset(JSON.stringify(state)).state,state);assert.equal(readPreset(JSON.stringify({prismaProject:2,state,phase:0,ratio:1})).name,'Preset importato');
+for(const text of ['null','[]','{}','{"browserHistory":[]}','{"state":null}'])assert.throws(()=>readPreset(text));
+assert.equal(favoriteName({...snapshot,name:''}),'Bolla di sapone · ocalid');assert(favoriteDate(snapshot).includes('33'));
+assert.equal(favoriteName({...snapshot,name:'Personalizzato'}),'Personalizzato');
+assert.equal(favoriteDate({date:'not-a-date'}),'Data non disponibile');
+console.log(JSON.stringify({passed:true,uniqueFileNames:100,completeStateRoundTrip:true,phaseAndRatioExact:true,legacyRawAndProject:true,invalidFilesRejected:true,metadataOnlyCreation:true}));

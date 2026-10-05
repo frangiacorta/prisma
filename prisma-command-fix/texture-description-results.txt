@@ -1,0 +1,25 @@
+{"text":"Superficie con grinze e pieghe, più irregolare","operations":[{"type":"set","key":"textureWrinkles","value":0.3},{"type":"set","key":"textureFolds","value":0.3},{"type":"set","key":"textureOrganic","value":0.8500000000000001}],"unrecognized":[]}
+{"text":"Metallo abraso","operations":[{"type":"material","index":11},{"type":"set","key":"textureWear","value":0.3}],"unrecognized":[]}
+{"text":"Increspature della superficie più fini","operations":[{"type":"set","key":"textureRipples","value":0.3},{"type":"set","key":"textureScale","value":1.6}],"unrecognized":[]}
+{"text":"Texture più organica","operations":[{"type":"set","key":"textureOrganic","value":0.8500000000000001}],"unrecognized":[]}
+{"text":"Texture più regolare","operations":[{"type":"set","key":"textureOrganic","value":0.45}],"unrecognized":[]}
+{"text":"Rilievo superficie 80%, scala trama 2.5, grinze 40%, pieghe 15%, abrasioni 25%, increspature della superficie 65%","operations":[{"type":"set","key":"textureDepth","value":0.8},{"type":"set","key":"textureScale","value":2.5},{"type":"set","key":"textureWrinkles","value":0.4},{"type":"set","key":"textureFolds","value":0.15},{"type":"set","key":"textureWear","value":0.25},{"type":"set","key":"textureRipples","value":0.65}],"unrecognized":[]}
+{"text":"Togli texture","operations":[{"type":"set","key":"textureWrinkles","value":0},{"type":"set","key":"textureFolds","value":0},{"type":"set","key":"textureWear","value":0},{"type":"set","key":"textureRipples","value":0},{"type":"set","key":"surfaceTexture","value":0}],"unrecognized":[]}
+{"text":"Togli texture dal metallo","operations":[{"type":"set","key":"textureWrinkles","value":0},{"type":"set","key":"textureFolds","value":0},{"type":"set","key":"textureWear","value":0},{"type":"set","key":"textureRipples","value":0},{"type":"set","key":"surfaceTexture","value":0}],"unrecognized":[]}
+{"text":"Texture senza pieghe","operations":[{"type":"set","key":"textureFolds","value":0}],"unrecognized":[]}
+{"text":"Grinze sulle radici","operations":[{"type":"set","key":"textureWrinkles","value":0.3}],"unrecognized":[]}
+{"text":"Radici più irregolari","operations":[{"type":"set","key":"petalDisorder","value":0.7}],"unrecognized":[]}
+{"text":"Petali più piegati","operations":[{"type":"set","key":"petalCurl","value":0.22}],"unrecognized":[]}
+{"text":"Increspature 50%","operations":[{"type":"set","key":"waves","value":0.2}],"unrecognized":[]}
+{"text":"Texture con graffi e usura","operations":[{"type":"set","key":"textureWear","value":0.3},{"type":"set","key":"textureWear","value":0.6}],"unrecognized":[]}
+{"text":"Superficie della sfera più organica","operations":[{"type":"set","key":"textureOrganic","value":0.8500000000000001}],"unrecognized":[]}
+{"text":"Texture più fine e meno profonda","operations":[{"type":"set","key":"textureScale","value":1.6},{"type":"set","key":"textureDepth","value":0.14999999999999997}],"unrecognized":[]}
+Texture combinations, scope isolation, additive relative edits, removal, presets, atomic validation and unknown fragments: PASS
+{"text":"Regolarità della texture 80%","operations":[{"type":"set","key":"textureOrganic","value":0.19999999999999996}],"unrecognized":[]}
+{"text":"Irregikarita della texture 90%","operations":[{"type":"set","key":"textureOrganic","value":0.9}],"unrecognized":[]}
+{"text":"Texture in amniera più regolare","operations":[{"type":"set","key":"textureOrganic","value":0.45}],"unrecognized":[]}
+{"text":"Materia con increspature 40%","operations":[{"type":"set","key":"textureRipples","value":0.4}],"unrecognized":[]}
+{"text":"Texture irregolarità 85% direzione 45 gradi","operations":[{"type":"set","key":"textureOrganic","value":0.85},{"type":"set","key":"textureAngle","value":45}],"unrecognized":[]}
+{"text":"Texture regolarità 100%","operations":[{"type":"set","key":"textureOrganic","value":0}],"unrecognized":[]}
+{"text":"Grinze morbide","operations":[{"type":"set","key":"textureWrinkles","value":0.3},{"type":"set","key":"textureDepth","value":0.19999999999999998}],"unrecognized":[]}
+Inverse regularity, actual user typos, material scope and scoped numeric aliases: PASS

@@ -1,0 +1,11 @@
+{
+  "startup": true,
+  "favoriteCrown": true,
+  "contextRecovery": true,
+  "oldFailedBootMigration": true,
+  "safeReload": true,
+  "projectDownload": true,
+  "variants": 8,
+  "offlineCrownWallpaper": true,
+  "pageErrors": []
+}

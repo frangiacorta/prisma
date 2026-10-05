@@ -1,0 +1,122 @@
+{
+  "checks": [
+    {
+      "phase": 3.796510002108805,
+      "ms": 1561.6000000089407,
+      "max": 0,
+      "bad": 0,
+      "mean": 0
+    },
+    {
+      "phase": 5.367306328903702,
+      "ms": 176.09999999403954,
+      "max": 0,
+      "bad": 0,
+      "mean": 0
+    },
+    {
+      "phase": 6.938102655698598,
+      "ms": 179.80000001192093,
+      "max": 0,
+      "bad": 0,
+      "mean": 0
+    },
+    {
+      "phase": 8.508898982493495,
+      "ms": 192.1000000089407,
+      "max": 0,
+      "bad": 0,
+      "mean": 0
+    }
+  ],
+  "stats": {
+    "backend": "native",
+    "storage": "disk",
+    "frames": 1440,
+    "encodedFrames": 1440,
+    "maxPendingFrames": 1,
+    "softwareSegments": 0,
+    "largestSoftwareSegment": 0,
+    "bytes": 9646428
+  },
+  "totalFrames": 1440,
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "duration": 24,
+  "phase": 3.796510002108805,
+  "elapsedSec": 285.284799999997,
+  "maxFrameMs": 585.7000000029802,
+  "sampleHashes": [
+    {
+      "frame": 0,
+      "hash": 3181200319
+    },
+    {
+      "frame": 120,
+      "hash": 1466867017
+    },
+    {
+      "frame": 240,
+      "hash": 3194602138
+    },
+    {
+      "frame": 360,
+      "hash": 4196304041
+    },
+    {
+      "frame": 480,
+      "hash": 1728453402
+    },
+    {
+      "frame": 600,
+      "hash": 1959602156
+    },
+    {
+      "frame": 720,
+      "hash": 4099621044
+    },
+    {
+      "frame": 840,
+      "hash": 4266470892
+    },
+    {
+      "frame": 960,
+      "hash": 3665320727
+    },
+    {
+      "frame": 1080,
+      "hash": 371619211
+    },
+    {
+      "frame": 1200,
+      "hash": 3721132351
+    },
+    {
+      "frame": 1320,
+      "hash": 3766360959
+    }
+  ],
+  "probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "profile": "Constrained Baseline",
+        "width": 1920,
+        "height": 1080,
+        "pix_fmt": "yuv420p",
+        "r_frame_rate": "60/1",
+        "avg_frame_rate": "60/1",
+        "duration": "24.000000",
+        "nb_frames": "1440",
+        "nb_read_frames": "1440"
+      }
+    ],
+    "format": {
+      "duration": "24.000000",
+      "size": "9646428"
+    }
+  }
+}

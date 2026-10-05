@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {writeFileSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {newCreation,normalizeCreation,motionPreset} from '/workspace/prisma-studio/dist/creative-model.js';
+import {buildPanel,pathMeta} from '/workspace/prisma-studio/dist/panels.js';
+import {sampleFrame} from '/workspace/prisma-studio/dist/renderer.js';
+const {buildPanel:oldPanel}=await import('/workspace/prisma-roots-audit/old-panels.mjs');
+const h={slider:k=>`<input data-param="${k}">`,check:(k,l)=>`<input data-check="${k}">${l}`,colorField:k=>`<input data-color="${k}">`,section:(n,b)=>`<section data-section="${n}">${b}</section>`,details:(n,b)=>`<details><summary>${n}</summary>${b}</details>`,icon:()=>''};
+const attrs=html=>new Set([...html.matchAll(/(?:data-(?:param|check|color|path|number-path|path-check|path-select|path-color)|id)="([^"\n]+)"/g)].map(m=>m[0]));
+const result={};
+for(const tab of ['shape','material','color','light','motion','photo','background']){
+ const s=newCreation(),before=attrs(oldPanel(tab,s,h,1)),html=buildPanel(tab,s,h,1),after=attrs(html);
+ for(const control of before)assert(after.has(control),`${tab} lost ${control}`);
+ assert.equal((html.match(/<details>/g)||[]).length,(html.match(/<\/details>/g)||[]).length);
+ result[tab]={before:before.size,after:after.size};
+}
+const s=newCreation();
+const motion=buildPanel('motion',s,h,1);
+assert(motion.indexOf('data-param="speed"')<motion.indexOf('data-param="duration"'));
+assert(motion.indexOf('data-param="duration"')<motion.indexOf('data-motion-preset'));
+assert(motion.includes('data-check="perfectLoop"'));
+assert(buildPanel('shape',s,h,1).indexOf('data-param="volume"')<buildPanel('shape',s,h,1).indexOf('data-param="petalGrowth"'));
+assert(buildPanel('background',s,h,1).indexOf('id="bg-mode"')<buildPanel('background',s,h,1).indexOf('data-backdrop'));
+assert.deepEqual(pathMeta('motions.petalGrowth.cycles',s).slice(1),[1,8,1]);s.perfectLoop=false;assert.deepEqual(pathMeta('motions.petalGrowth.cycles',s).slice(1),[.1,8,.1]);
+assert.equal(normalizeCreation({}).perfectLoop,true);
+const q=newCreation();motionPreset(q,'emerge');q.motions.petalGrowth.cycles=1.5;q.perfectLoop=false;q.environmentCycles=1.5;q.filmCycles=1.5;
+const round=normalizeCreation(q);assert.equal(round.perfectLoop,false);assert.equal(round.motions.petalGrowth.cycles,1.5);assert.equal(round.environmentCycles,1.5);assert.equal(round.filmCycles,1.5);
+assert(Math.abs(sampleFrame(q,Math.PI*2).petalGrowth-sampleFrame(q,0).petalGrowth)>.9);
+q.perfectLoop=true;assert(Math.abs(sampleFrame(q,Math.PI*2).petalGrowth-sampleFrame(q,0).petalGrowth)<1e-8);
+console.log(JSON.stringify({passed:true,controlPreservation:result,perfectLoopDefault:true,fractionalCycleRoundTrip:true,rendererLoopBehavior:true}));

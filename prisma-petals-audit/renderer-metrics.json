@@ -1,0 +1,91 @@
+{
+  "loops": [
+    {
+      "name": "Bloom",
+      "difference": 0,
+      "moving": 481140
+    },
+    {
+      "name": "Petali",
+      "difference": 0,
+      "moving": 286947
+    },
+    {
+      "name": "Colori",
+      "difference": 0,
+      "moving": 67272
+    }
+  ],
+  "fields": [
+    {
+      "index": 0,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "index": 0,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "index": 1,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "index": 1,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "index": 3,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "index": 3,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    }
+  ],
+  "benchmarks": [
+    {
+      "name": "Bloom",
+      "times": [
+        182,
+        183,
+        194,
+        190
+      ]
+    },
+    {
+      "name": "Aghi",
+      "times": [
+        287,
+        296,
+        303,
+        289
+      ]
+    },
+    {
+      "name": "Vetro con petali",
+      "times": [
+        144,
+        142,
+        164,
+        144
+      ]
+    }
+  ],
+  "waveDifference": 365221,
+  "radialDifference": 475517,
+  "spiralDifference": 380504,
+  "causticDifference": 162584,
+  "shadowDifference": 25743
+}

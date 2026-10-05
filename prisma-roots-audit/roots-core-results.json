@@ -1,0 +1,107 @@
+{
+  "compatibility": [
+    {
+      "name": "Aurora liquida",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Vetro orbitale",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Mercurio",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Eclisse rosa",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Anello aurora",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Nebbia pastello",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Bolla moderna",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Rosetta",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Riccio",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Borchie",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Aghi",
+      "points": 400,
+      "maxDifference": 0
+    },
+    {
+      "name": "Bloom",
+      "points": 400,
+      "maxDifference": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Radici",
+      "inside": 16,
+      "outside": 784,
+      "radialVariation": 3.885780586188048e-16
+    },
+    {
+      "name": "Corde",
+      "inside": 13,
+      "outside": 787,
+      "radialVariation": 3.885780586188048e-16
+    },
+    {
+      "name": "Rigonfiamenti",
+      "inside": 6,
+      "outside": 794,
+      "radialVariation": 3.885780586188048e-16
+    },
+    {
+      "name": "Radici intrecciate",
+      "inside": 21,
+      "outside": 779,
+      "radialVariation": 3.885780586188048e-16
+    }
+  ],
+  "motions": [
+    {
+      "key": "emerge",
+      "minGrowth": 0,
+      "maxGrowth": 1
+    },
+    {
+      "key": "wrap",
+      "minGrowth": 1,
+      "maxGrowth": 1
+    },
+    {
+      "key": "roots",
+      "minGrowth": 0,
+      "maxGrowth": 1
+    }
+  ]
+}

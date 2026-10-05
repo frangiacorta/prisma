@@ -1,0 +1,53 @@
+{
+  "comparisons": [
+    {
+      "preset": 0,
+      "difference": 0
+    },
+    {
+      "preset": 1,
+      "difference": 0
+    },
+    {
+      "preset": 2,
+      "difference": 0
+    },
+    {
+      "preset": 3,
+      "difference": 0
+    },
+    {
+      "preset": 4,
+      "difference": 0
+    },
+    {
+      "preset": 5,
+      "difference": 0
+    },
+    {
+      "preset": "modern",
+      "difference": 0
+    }
+  ],
+  "info": {
+    "name": "ANGLE (Mesa, llvmpipe (LLVM 19.1.7 256 bits), OpenGL ES 3.2)",
+    "software": true,
+    "powerPreference": "high-performance",
+    "timingAvailable": true
+  },
+  "attrs": {
+    "alpha": true,
+    "antialias": false,
+    "depth": true,
+    "desynchronized": false,
+    "failIfMajorPerformanceCaveat": false,
+    "powerPreference": "high-performance",
+    "premultipliedAlpha": false,
+    "preserveDrawingBuffer": true,
+    "stencil": false,
+    "xrCompatible": false
+  },
+  "error": 0,
+  "timing": null,
+  "accumulated": true
+}

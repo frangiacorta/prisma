@@ -1,0 +1,22 @@
+{
+  "preview64": {
+    "differentChannels": 0,
+    "meanDifference": 0.0,
+    "maxDifference": 0
+  },
+  "full64-cold": {
+    "differentChannels": 0,
+    "meanDifference": 0.0,
+    "maxDifference": 0
+  },
+  "full64-warm": {
+    "differentChannels": 0,
+    "meanDifference": 0.0,
+    "maxDifference": 0
+  },
+  "full128": {
+    "differentChannels": 0,
+    "meanDifference": 0.0,
+    "maxDifference": 0
+  }
+}

@@ -1,0 +1,238 @@
+COMPAT {"name":"Aurora liquida","difference":0,"mean":0,"max":0,"changed":0}
+COMPAT {"name":"Vetro orbitale","difference":0,"mean":0,"max":0,"changed":0}
+COMPAT {"name":"Mercurio","difference":0,"mean":0,"max":0,"changed":0}
+COMPAT {"name":"Opaque","difference":0,"mean":0,"max":0,"changed":0}
+COMPAT {"name":"Glass","difference":0,"mean":0,"max":0,"changed":0}
+COMPAT {"name":"Metal","difference":0,"mean":0,"max":0,"changed":0}
+MATERIAL {"material":"Opaque","style":"Grinze morbide","difference":84232,"mean":0.5712348090277778,"max":30,"changed":16936}
+MATERIAL {"material":"Opaque","style":"Pieghe ampie","difference":75093,"mean":0.5092569986979166,"max":18,"changed":21017}
+MATERIAL {"material":"Opaque","style":"Abraso","difference":21834,"mean":0.1480712890625,"max":6,"changed":15255}
+MATERIAL {"material":"Opaque","style":"Increspature","difference":139533,"mean":0.9462687174479166,"max":28,"changed":22454}
+MATERIAL {"material":"Glass","style":"Grinze morbide","difference":54154,"mean":0.3672553168402778,"max":48,"changed":11802}
+MATERIAL {"material":"Glass","style":"Pieghe ampie","difference":73895,"mean":0.5011325412326388,"max":48,"changed":15580}
+MATERIAL {"material":"Glass","style":"Abraso","difference":136626,"mean":0.9265543619791666,"max":83,"changed":19549}
+MATERIAL {"material":"Glass","style":"Increspature","difference":100517,"mean":0.6816745334201388,"max":81,"changed":16024}
+MATERIAL {"material":"Metal","style":"Grinze morbide","difference":328489,"mean":2.2277086046006946,"max":194,"changed":18004}
+MATERIAL {"material":"Metal","style":"Pieghe ampie","difference":339558,"mean":2.3027750651041665,"max":169,"changed":21312}
+MATERIAL {"material":"Metal","style":"Abraso","difference":724414,"mean":4.912746853298611,"max":185,"changed":24225}
+MATERIAL {"material":"Metal","style":"Increspature","difference":533508,"mean":3.6180826822916665,"max":192,"changed":21762}
+CACHE {"bakes":0,"growth":0,"roots":0,"programs":0,"allocations":0}
+{
+  "hardware": {
+    "name": "ANGLE (Mesa, llvmpipe (LLVM 19.1.7 256 bits), OpenGL ES 3.2)",
+    "software": true,
+    "powerPreference": "high-performance",
+    "timingAvailable": true
+  },
+  "compatibility": [
+    {
+      "name": "Aurora liquida",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "changed": 0
+    },
+    {
+      "name": "Vetro orbitale",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "changed": 0
+    },
+    {
+      "name": "Mercurio",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "changed": 0
+    },
+    {
+      "name": "Opaque",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "changed": 0
+    },
+    {
+      "name": "Glass",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "changed": 0
+    },
+    {
+      "name": "Metal",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "changed": 0
+    }
+  ],
+  "materials": [
+    {
+      "material": "Opaque",
+      "style": "Grinze morbide",
+      "difference": 84232,
+      "mean": 0.5712348090277778,
+      "max": 30,
+      "changed": 16936
+    },
+    {
+      "material": "Opaque",
+      "style": "Pieghe ampie",
+      "difference": 75093,
+      "mean": 0.5092569986979166,
+      "max": 18,
+      "changed": 21017
+    },
+    {
+      "material": "Opaque",
+      "style": "Abraso",
+      "difference": 21834,
+      "mean": 0.1480712890625,
+      "max": 6,
+      "changed": 15255
+    },
+    {
+      "material": "Opaque",
+      "style": "Increspature",
+      "difference": 139533,
+      "mean": 0.9462687174479166,
+      "max": 28,
+      "changed": 22454
+    },
+    {
+      "material": "Glass",
+      "style": "Grinze morbide",
+      "difference": 54154,
+      "mean": 0.3672553168402778,
+      "max": 48,
+      "changed": 11802
+    },
+    {
+      "material": "Glass",
+      "style": "Pieghe ampie",
+      "difference": 73895,
+      "mean": 0.5011325412326388,
+      "max": 48,
+      "changed": 15580
+    },
+    {
+      "material": "Glass",
+      "style": "Abraso",
+      "difference": 136626,
+      "mean": 0.9265543619791666,
+      "max": 83,
+      "changed": 19549
+    },
+    {
+      "material": "Glass",
+      "style": "Increspature",
+      "difference": 100517,
+      "mean": 0.6816745334201388,
+      "max": 81,
+      "changed": 16024
+    },
+    {
+      "material": "Metal",
+      "style": "Grinze morbide",
+      "difference": 328489,
+      "mean": 2.2277086046006946,
+      "max": 194,
+      "changed": 18004
+    },
+    {
+      "material": "Metal",
+      "style": "Pieghe ampie",
+      "difference": 339558,
+      "mean": 2.3027750651041665,
+      "max": 169,
+      "changed": 21312
+    },
+    {
+      "material": "Metal",
+      "style": "Abraso",
+      "difference": 724414,
+      "mean": 4.912746853298611,
+      "max": 185,
+      "changed": 24225
+    },
+    {
+      "material": "Metal",
+      "style": "Increspature",
+      "difference": 533508,
+      "mean": 3.6180826822916665,
+      "max": 192,
+      "changed": 21762
+    }
+  ],
+  "sliders": [
+    {
+      "key": "textureDepth",
+      "ms": 11.700000002980232
+    },
+    {
+      "key": "textureScale",
+      "ms": 12.600000008940697
+    },
+    {
+      "key": "textureOrganic",
+      "ms": 10.5
+    },
+    {
+      "key": "textureAngle",
+      "ms": 9.299999997019768
+    },
+    {
+      "key": "textureWrinkles",
+      "ms": 11.899999991059303
+    },
+    {
+      "key": "textureFolds",
+      "ms": 13
+    },
+    {
+      "key": "textureWear",
+      "ms": 12.300000011920929
+    },
+    {
+      "key": "textureRipples",
+      "ms": 11.299999997019768
+    },
+    {
+      "key": "surfaceTexture",
+      "ms": 10.399999991059303
+    }
+  ],
+  "loop": [
+    {
+      "difference": 8,
+      "mean": 5.425347222222222e-05,
+      "max": 1,
+      "changed": 8
+    }
+  ],
+  "cache": {
+    "bakes": 0,
+    "growth": 0,
+    "roots": 0,
+    "programs": 0,
+    "allocations": 0
+  },
+  "offline": {
+    "paused": false,
+    "limit": 160,
+    "width": 160,
+    "height": 160,
+    "gpuMilliseconds": 2.937843,
+    "growthUploads": 1,
+    "bakeUploads": 0,
+    "bakeWarmups": 1,
+    "fieldResolution": 0,
+    "fieldAllocations": 0,
+    "completedFrames": 8,
+    "phase": 1.6754637220369963
+  },
+  "errors": []
+}
+TEXTURE DEFAULTS, 3 MATERIALS, NINE CONTROLS WITH ZERO REBAKES, NEW THUMBNAILS AND OFFLINE PASS

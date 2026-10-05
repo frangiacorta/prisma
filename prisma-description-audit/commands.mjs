@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {newCreation,sculpt} from '../prisma-studio/dist/creative-model.js';
+import {interpretDescription,applyDescriptionPlan} from '../prisma-studio/dist/description.js';
+const base=sculpt(newCreation(),3),original=structuredClone(base);
+function run(text,s=base){const plan=interpretDescription(text,s),result=applyDescriptionPlan(s,plan);console.log(JSON.stringify({text,notes:result.notes,unrecognized:plan.unrecognized}));return result.state;}
+let s=run('Spine più organiche e curve');assert(s.petalBlend>=.8);assert(s.petalCurl>base.petalCurl);assert.deepEqual(s.palette,base.palette);assert.equal(s.petalSharp,base.petalSharp);assert.deepEqual(base,original);
+s=run('Trasparenza 80%, metallo 25%');assert.equal(s.transparency,.8);assert.equal(s.metal,.25);
+s=run('sfondo bianco');assert.equal(s.background,'#ffffff');assert.deepEqual(s.palette,base.palette);
+s=run('Sfera di vetro, sfondo nero');assert.equal(s.petalAmount,0);assert.equal(s.materialName,'Biglia di vetro');assert.equal(s.background,'#000000');
+s=run('Aggiungi una barra neon rosa dietro');assert.equal(s.lights.length,base.lights.length+1);assert.equal(s.lights.at(-1).type,'bar');assert.equal(s.lights.at(-1).color,'#ff69b4');assert(s.lights.at(-1).z<0);
+s=run('Togli caustica, meno contrasto');assert.equal(s.groundCaustic,0);assert(s.contrast<base.contrast);
+s=run('Palette blu e viola, sfondo nero');assert.deepEqual(s.palette,['#365eff','#ad75ff']);assert.equal(s.background,'#000000');
+s=run('Aggiungi #123abc');assert.equal(s.palette.at(-1),'#123abc');s=run('Rimuovi #123abc',s);assert(!s.palette.includes('#123abc'));
+s=run('Contorno sfumato 60%, grana 5%');assert.equal(s.edge,.27);assert.equal(s.grain,.01);
+s=run('Più trasparente, non cambiare colore');assert(s.transparency>=base.transparency);assert.deepEqual(s.palette,base.palette);
+s=run('Spine più corte, meno acute');assert(s.petalLength<base.petalLength);
+s=run('Luce che orbita, più lento');assert(s.lights.some(l=>l.orbit.enabled));assert(s.duration>=16);
+s=run('Vetro trasparente, sfondo trasparente');assert.equal(s.materialName,'Biglia di vetro');assert.equal(s.bgMode,'transparent');
+const bad=interpretDescription('Disegna una giraffa fotografica',base);assert.equal(bad.operations.length,0);assert.equal(bad.unrecognized.length,1);
+assert.throws(()=>applyDescriptionPlan(base,{operations:[{type:'set',key:'metal',value:.8},{type:'set',key:'unknown',value:1}]}));assert.deepEqual(base,original);
+assert.throws(()=>applyDescriptionPlan(base,{operations:[{type:'palette',colors:['<script>']}]}));assert.throws(()=>applyDescriptionPlan(base,{operations:[{type:'set',key:'metal',value:Infinity}]}));
+console.log('Combined requests, independent scopes, actual controls, unsupported input, atomic validation: PASS');

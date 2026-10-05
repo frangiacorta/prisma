@@ -1,0 +1,20 @@
+GPU ANGLE (Mesa, llvmpipe (LLVM 19.1.7 256 bits), OpenGL ES 3.2)
+PREPARE bubble
+READY bubble 798ms
+DRAWN bubble 3005ms
+PREPARE organic matte
+READY organic matte 1455ms
+DRAWN organic matte 12434ms
+PREPARE organic glass
+READY organic glass 2501ms
+DRAWN organic glass 39903ms
+PREPARE organic sss
+READY organic sss 953ms
+DRAWN organic sss 13162ms
+PREPARE flower
+READY flower 684ms
+DRAWN flower 7964ms
+PREPARE mixed
+READY mixed 1452ms
+DRAWN mixed 23659ms
+[{"name": "bubble", "ms": 3005, "visible": true, "error": 0, "lost": false}, {"name": "organic matte", "ms": 12433.5, "visible": true, "error": 0, "lost": false}, {"name": "organic glass", "ms": 39902.59999999404, "visible": true, "error": 0, "lost": false}, {"name": "organic sss", "ms": 13161.79999999702, "visible": true, "error": 0, "lost": false}, {"name": "flower", "ms": 7964, "visible": true, "error": 0, "lost": false}, {"name": "mixed", "ms": 23658.60000000894, "visible": true, "error": 0, "lost": false}]

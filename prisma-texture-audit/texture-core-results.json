@@ -1,0 +1,23 @@
+{
+  "preserved": [
+    "Aurora liquida",
+    "Vetro orbitale",
+    "Mercurio"
+  ],
+  "styles": [
+    "Grinze morbide",
+    "Pieghe ampie",
+    "Abraso",
+    "Increspature"
+  ],
+  "presets": [
+    "Aurora liquida",
+    "Vetro orbitale",
+    "Mercurio",
+    "Radici di rame",
+    "Corallo perlaceo",
+    "Vela increspata"
+  ],
+  "roundTrip": true,
+  "geometryPoints": 3000
+}

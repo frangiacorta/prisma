@@ -1,0 +1,88 @@
+{
+  "compat": [
+    {
+      "i": 1,
+      "difference": 0
+    },
+    {
+      "i": 2,
+      "difference": 0
+    },
+    {
+      "i": 3,
+      "difference": 0
+    }
+  ],
+  "fields": [
+    {
+      "i": 1,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 1,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 2,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 2,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 3,
+      "plane": 0,
+      "mismatch": 0,
+      "boundary": 0
+    },
+    {
+      "i": 3,
+      "plane": 0.23,
+      "mismatch": 0,
+      "boundary": 0
+    }
+  ],
+  "loops": [
+    {
+      "difference": 0,
+      "moving": 217294
+    }
+  ],
+  "controls": [
+    {
+      "control": "irregularity",
+      "difference": 108648
+    },
+    {
+      "control": "roots",
+      "difference": 288901
+    },
+    {
+      "material": 0,
+      "visible": 384
+    },
+    {
+      "material": 2,
+      "visible": 801
+    },
+    {
+      "material": 18,
+      "visible": 718
+    }
+  ],
+  "restore": true,
+  "benchmark": [
+    360,
+    369,
+    360
+  ]
+}

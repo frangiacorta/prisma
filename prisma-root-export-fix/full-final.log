@@ -1,0 +1,14 @@
+{"stage": "prepare"}
+{"stage": "prepared", "ms": 3331.0999999940395}
+{"stage": "draw", "name": "full64-cold"}
+{"name": "full64-cold", "ms": 23662, "ok": true, "lost": false, "glError": 0, "png": null, "stage": "done"}
+{"stage": "draw", "name": "full64-warm"}
+{"name": "full64-warm", "ms": 405, "ok": true, "lost": false, "glError": 0, "png": null, "stage": "done"}
+{"stage": "draw", "name": "full128"}
+{"name": "full128", "ms": 1557, "ok": true, "lost": false, "glError": 0, "png": null, "stage": "done"}
+{"stage": "draw", "name": "center32"}
+{"name": "center32", "ms": 157, "ok": true, "lost": false, "glError": 0, "png": null, "stage": "done"}
+{"stage": "draw", "name": "center64"}
+{"name": "center64", "ms": 742, "ok": true, "lost": false, "glError": 0, "png": null, "stage": "done"}
+{"stage": "draw", "name": "center128"}
+{"name": "center128", "ms": 2561, "ok": true, "lost": false, "glError": 0, "png": null, "stage": "done"}

@@ -1,0 +1,40 @@
+{"stage": "render-start"}
+{"stage": "cancelled", "atProgress": "width: 2.22222%;", "seconds": 0.9623228189884685, "message": "", "programs": [34888]}
+{"stage": "PNG_CANCEL_RETRY_PASS", "errors": [], "samePixelsAndFileAsUncancelled": true}
+{"stage": "video-progress", "seconds": 5.000975180999376, "text": "Creo il loop \u00b7 2 / 60 fotogrammi \u00b7 3%", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 10.02830400998937, "text": "Creo il loop \u00b7 4 / 60 fotogrammi \u00b7 6%", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 15.11606477398891, "text": "Creo il loop \u00b7 6 / 60 fotogrammi \u00b7 9%", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 20.1970707619912, "text": "Creo il loop \u00b7 8 / 60 fotogrammi \u00b7 13%", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 25.21062411298044, "text": "Creo il loop \u00b7 10 / 60 fotogrammi \u00b7 15% \u00b7 circa 3 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 30.235956257005455, "text": "Creo il loop \u00b7 12 / 60 fotogrammi \u00b7 18% \u00b7 circa 3 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 35.24590943098883, "text": "Creo il loop \u00b7 13 / 60 fotogrammi \u00b7 21% \u00b7 circa 3 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 40.28873954899609, "text": "Creo il loop \u00b7 15 / 60 fotogrammi \u00b7 23% \u00b7 circa 3 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 45.29237349997857, "text": "Creo il loop \u00b7 17 / 60 fotogrammi \u00b7 27% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 50.36991227400722, "text": "Creo il loop \u00b7 18 / 60 fotogrammi \u00b7 29% \u00b7 circa 3 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 55.383258022979135, "text": "Creo il loop \u00b7 20 / 60 fotogrammi \u00b7 32% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 60.408091891004005, "text": "Creo il loop \u00b7 21 / 60 fotogrammi \u00b7 34% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 65.42099227299332, "text": "Creo il loop \u00b7 22 / 60 fotogrammi \u00b7 37% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 70.52514016398345, "text": "Creo il loop \u00b7 23 / 60 fotogrammi \u00b7 38% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 75.62197323999135, "text": "Creo il loop \u00b7 24 / 60 fotogrammi \u00b7 39% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 80.68929193197982, "text": "Creo il loop \u00b7 26 / 60 fotogrammi \u00b7 42% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 85.69144601697917, "text": "Creo il loop \u00b7 28 / 60 fotogrammi \u00b7 45% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 90.785520275007, "text": "Creo il loop \u00b7 29 / 60 fotogrammi \u00b7 48% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 95.80311996300588, "text": "Creo il loop \u00b7 31 / 60 fotogrammi \u00b7 51% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 100.81578152900329, "text": "Creo il loop \u00b7 33 / 60 fotogrammi \u00b7 53% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 105.90757621199009, "text": "Creo il loop \u00b7 35 / 60 fotogrammi \u00b7 57% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 110.9416664239834, "text": "Creo il loop \u00b7 36 / 60 fotogrammi \u00b7 60% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 115.97789175799699, "text": "Creo il loop \u00b7 38 / 60 fotogrammi \u00b7 63% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 121.01897160999943, "text": "Creo il loop \u00b7 40 / 60 fotogrammi \u00b7 66% \u00b7 circa 2 min restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 126.02968896998209, "text": "Creo il loop \u00b7 42 / 60 fotogrammi \u00b7 68% \u00b7 circa 57 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 131.06391657999484, "text": "Creo il loop \u00b7 43 / 60 fotogrammi \u00b7 71% \u00b7 circa 54 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 136.15101733698975, "text": "Creo il loop \u00b7 45 / 60 fotogrammi \u00b7 73% \u00b7 circa 48 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 141.2191914290015, "text": "Creo il loop \u00b7 46 / 60 fotogrammi \u00b7 75% \u00b7 circa 45 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 146.24758930600365, "text": "Creo il loop \u00b7 48 / 60 fotogrammi \u00b7 78% \u00b7 circa 39 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 151.27927837500465, "text": "Creo il loop \u00b7 49 / 60 fotogrammi \u00b7 81% \u00b7 circa 36 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 156.32942193499184, "text": "Creo il loop \u00b7 51 / 60 fotogrammi \u00b7 84% \u00b7 circa 32 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 161.3948288380052, "text": "Creo il loop \u00b7 53 / 60 fotogrammi \u00b7 88% \u00b7 circa 25 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 166.41786691799643, "text": "Creo il loop \u00b7 55 / 60 fotogrammi \u00b7 91% \u00b7 circa 19 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 171.46890117498697, "text": "Creo il loop \u00b7 57 / 60 fotogrammi \u00b7 93% \u00b7 circa 13 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 176.56937542097876, "text": "Creo il loop \u00b7 58 / 60 fotogrammi \u00b7 96% \u00b7 circa 10 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "video-progress", "seconds": 181.5727599709935, "text": "Creo il loop \u00b7 59 / 60 fotogrammi \u00b7 98% \u00b7 circa 7 s restanti", "message": "", "busy": true, "lost": false}
+{"stage": "VIDEO_PASS", "seconds": 186.78912529800436, "bytes": 55857, "errors": []}

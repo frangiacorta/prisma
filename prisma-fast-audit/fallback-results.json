@@ -1,0 +1,206 @@
+{
+  "runs": [
+    {
+      "mode": "float",
+      "name": "petals .05",
+      "diagnostic": true,
+      "ms": 5826.5999999940395,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 1,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "float",
+      "name": "petals .05",
+      "diagnostic": false,
+      "ms": 25.299999997019768,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 1,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "float",
+      "name": "petals .35",
+      "diagnostic": true,
+      "ms": 17.399999991059303,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 2,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "float",
+      "name": "petals .35",
+      "diagnostic": false,
+      "ms": 18.19999998807907,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 2,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "float",
+      "name": "petals .7",
+      "diagnostic": true,
+      "ms": 22.799999997019768,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 3,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "float",
+      "name": "petals .7",
+      "diagnostic": false,
+      "ms": 14.599999994039536,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 3,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "float",
+      "name": "organic needles",
+      "diagnostic": true,
+      "ms": 161.59999999403954,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 4,
+      "fieldResolution": 112
+    },
+    {
+      "mode": "float",
+      "name": "organic needles",
+      "diagnostic": false,
+      "ms": 30.5,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 4,
+      "fieldResolution": 112
+    },
+    {
+      "mode": "packed",
+      "name": "petals .05",
+      "diagnostic": true,
+      "ms": 5036.70000000298,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 1,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "packed",
+      "name": "petals .05",
+      "diagnostic": false,
+      "ms": 22,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 1,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "packed",
+      "name": "petals .35",
+      "diagnostic": true,
+      "ms": 26.700000002980232,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 2,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "packed",
+      "name": "petals .35",
+      "diagnostic": false,
+      "ms": 23,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 2,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "packed",
+      "name": "petals .7",
+      "diagnostic": true,
+      "ms": 27.69999998807907,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 3,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "packed",
+      "name": "petals .7",
+      "diagnostic": false,
+      "ms": 20.400000005960464,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 3,
+      "fieldResolution": 48
+    },
+    {
+      "mode": "packed",
+      "name": "organic needles",
+      "diagnostic": true,
+      "ms": 166.09999999403954,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 4,
+      "fieldResolution": 112
+    },
+    {
+      "mode": "packed",
+      "name": "organic needles",
+      "diagnostic": false,
+      "ms": 51.5,
+      "extensionActuallyAvailable": true,
+      "bakeUploads": 4,
+      "fieldResolution": 112
+    }
+  ],
+  "comparisons": [
+    {
+      "name": "petals .05",
+      "diagnostic": true,
+      "iou": 0.9998606854276957,
+      "meanChannelDifference": 0.020807208211416097,
+      "maxDifference": 1
+    },
+    {
+      "name": "petals .05",
+      "diagnostic": false,
+      "iou": 1,
+      "meanChannelDifference": 0.0082550048828125,
+      "maxDifference": 8
+    },
+    {
+      "name": "petals .35",
+      "diagnostic": true,
+      "iou": 1,
+      "meanChannelDifference": 0.025911409729998756,
+      "maxDifference": 1
+    },
+    {
+      "name": "petals .35",
+      "diagnostic": false,
+      "iou": 1,
+      "meanChannelDifference": 0.007283528645833333,
+      "maxDifference": 2
+    },
+    {
+      "name": "petals .7",
+      "diagnostic": true,
+      "iou": 0.9997315436241611,
+      "meanChannelDifference": 0.027434658073755818,
+      "maxDifference": 1
+    },
+    {
+      "name": "petals .7",
+      "diagnostic": false,
+      "iou": 1,
+      "meanChannelDifference": 0.006861368815104167,
+      "maxDifference": 48
+    },
+    {
+      "name": "organic needles",
+      "diagnostic": true,
+      "iou": 0.9994200053537967,
+      "meanChannelDifference": 0.0887906789875452,
+      "maxDifference": 147
+    },
+    {
+      "name": "organic needles",
+      "diagnostic": false,
+      "iou": 1,
+      "meanChannelDifference": 0.0777740478515625,
+      "maxDifference": 207
+    }
+  ]
+}

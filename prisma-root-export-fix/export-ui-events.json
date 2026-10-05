@@ -1,0 +1,42 @@
+[
+  {
+    "stage": "download-start",
+    "name": "user-roots-128.png"
+  },
+  {
+    "stage": "download-complete",
+    "name": "user-roots-128.png",
+    "seconds": 53.169896547013195,
+    "bytes": 7985,
+    "programs": [
+      34888
+    ],
+    "surface": [
+      1,
+      1
+    ],
+    "message": "Il file \u00e8 pronto. Lo trovi nei download del browser."
+  },
+  {
+    "stage": "download-start",
+    "name": "user-roots-128-repeat.png"
+  },
+  {
+    "stage": "download-complete",
+    "name": "user-roots-128-repeat.png",
+    "seconds": 45.064115040993784,
+    "bytes": 7985,
+    "programs": [
+      34888
+    ],
+    "surface": [
+      1,
+      1
+    ],
+    "message": "Il file \u00e8 pronto. Lo trovi nei download del browser."
+  },
+  {
+    "stage": "download-start",
+    "name": "user-roots-gentle-60fps.mp4"
+  }
+]

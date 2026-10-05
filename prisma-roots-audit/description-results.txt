@@ -1,0 +1,45 @@
+{"text":"Radici che entrano ed escono dalla sfera","notes":["Corona / superficie sferica","Numero di petali / punte","File sulla sfera","Lunghezza","Larghezza dei petali","Acutezza delle punte","Fusione con la sfera","Ampiezza delle radici","Irregolarità delle punte","Sinuosità","Avvolgimento","Rientro nella sfera","Nodosità","Nervature","Disordine"],"unrecognized":[]}
+{"text":"Spine nervose e nodose, meno geometricamente ordinate","notes":["Nodosità","Disordine"],"unrecognized":[]}
+{"text":"Piccoli rigonfiamenti di una sfera","notes":["Corona / superficie sferica","Numero di petali / punte","File sulla sfera","Lunghezza","Larghezza dei petali","Acutezza delle punte","Fusione con la sfera","Ampiezza delle radici","Emersione","Sinuosità","Nodosità","Disordine"],"unrecognized":[]}
+{"text":"Corde che si attorcigliano attorno alla sfera","notes":["Corona / superficie sferica","Numero di petali / punte","File sulla sfera","Lunghezza","Larghezza dei petali","Acutezza delle punte","Fusione con la sfera","Ampiezza delle radici","Irregolarità delle punte","Sinuosità","Avvolgimento","Rientro nella sfera","Nodosità","Nervature","Disordine"],"unrecognized":[]}
+{"text":"Falle comparire gradualemnte e poi sparire","notes":["Movimento"],"unrecognized":[]}
+{"text":"Spie nerborute, raidi che entrano ed escono dallas sfera, falle attorcigliarsdi nel movimento","notes":["Nodosità","Corona / superficie sferica","Numero di petali / punte","File sulla sfera","Lunghezza","Larghezza dei petali","Acutezza delle punte","Fusione con la sfera","Ampiezza delle radici","Irregolarità delle punte","Sinuosità","Avvolgimento","Rientro nella sfera","Nervature","Disordine","Movimento"],"unrecognized":[]}
+{"text":"Palette blu e viola e sfondo nero e aggiungi una luce rosa dietro","notes":["Palette","Sfondo","Luce aggiunta"],"unrecognized":[]}
+{"text":"Più curve e meno appuntite","notes":["Arricciatura","Acutezza delle punte"],"unrecognized":[]}
+{"text":"Spine più curve e senza grana","notes":["Arricciatura","Grana"],"unrecognized":[]}
+{"text":"Spine più curve e con occhi di drago","notes":["Arricciatura"],"unrecognized":["occhi drago"]}
+{"text":"Trasparenza 80% metallo 25% nodosità 60%","notes":["Trasparenza","Nodosità","Metallicità"],"unrecognized":[]}
+{"text":"Spine meno curve e più nodose","notes":["Arricciatura","Nodosità"],"unrecognized":[]}
+{"text":"Non cambiare materiale, spine più curve","notes":["Arricciatura"],"unrecognized":[]}
+{"text":"Radici in movimento che entrano ed escono","notes":["Corona / superficie sferica","Numero di petali / punte","File sulla sfera","Lunghezza","Larghezza dei petali","Acutezza delle punte","Fusione con la sfera","Ampiezza delle radici","Irregolarità delle punte","Sinuosità","Avvolgimento","Rientro nella sfera","Nodosità","Nervature","Disordine","Movimento"],"unrecognized":[]}
+{"text":"Anima i nodi delle radici","notes":["Nodosità","Movimento: Nodosità delle radici"],"unrecognized":[]}
+{"text":"Sfera perfetta","notes":["Forma: sfera"],"unrecognized":[]}
+User examples, typos, target scopes, unknown fragments, multiple numeric commands and atomic validation: PASS
+{"text":"Disattiva il loop perfetto, durata del loop 20 secondi, velocità del movimento 0,5x","notes":["Movimento libero","Durata di base (secondi)","Velocità globale"],"unrecognized":[]}
+{"text":"Attiva il loop perfetto","notes":["Loop perfetto attivo"],"unrecognized":[]}
+{"text":"Non farle comparire","notes":["Movimento: Emersione delle radici"],"unrecognized":[]}
+{"text":"Radici nere su sfondo bianco con luce blu dietro","notes":["Corona / superficie sferica","Numero di petali / punte","File sulla sfera","Lunghezza","Larghezza dei petali","Acutezza delle punte","Fusione con la sfera","Ampiezza delle radici","Irregolarità delle punte","Sinuosità","Avvolgimento","Rientro nella sfera","Nodosità","Nervature","Disordine","Palette","Sfondo","Luce spostata / modificata"],"unrecognized":[]}
+{"text":"Spine senza nodi e meno ordinate","notes":["Nodosità","Disordine"],"unrecognized":[]}
+{"text":"Crea una sfera opaca","notes":["Forma: sfera","Materia: Opaco"],"unrecognized":[]}
+Loop modes, precise duration/speed, motion negation, adjective colors and scoped negatives: PASS
+{"text":"Luce 1 intensità 3 x 1 z -2","notes":["Luce spostata / modificata"],"unrecognized":[]}
+{"text":"Rotazione verticale 45","notes":["Rotazione verticale"],"unrecognized":[]}
+Numeric light editing and static rotation: PASS
+{"text":"metallo","notes":["Materia: Metallo liquido"],"unrecognized":[]}
+{"text":"più metallo","notes":["Metallicità"],"unrecognized":[]}
+Material names and relative metallicity: PASS
+{"text":"Spine più organiche e curve","notes":["Fusione con la sfera","Ampiezza delle radici","Irregolarità delle punte","Arricciatura"],"unrecognized":[]}
+{"text":"Trasparenza 80%, metallo 25%","notes":["Trasparenza","Metallicità"],"unrecognized":[]}
+{"text":"sfondo bianco","notes":["Sfondo"],"unrecognized":[]}
+{"text":"Sfera di vetro, sfondo nero","notes":["Forma: sfera","Materia: Biglia di vetro","Sfondo"],"unrecognized":[]}
+{"text":"Aggiungi una barra neon rosa dietro","notes":["Luce aggiunta"],"unrecognized":[]}
+{"text":"Togli caustica, meno contrasto","notes":["Caustica luminosa","Contrasto"],"unrecognized":[]}
+{"text":"Palette blu e viola, sfondo nero","notes":["Palette","Sfondo"],"unrecognized":[]}
+{"text":"Aggiungi #123abc","notes":["Colore aggiunto"],"unrecognized":[]}
+{"text":"Rimuovi #123abc","notes":["Colore rimosso"],"unrecognized":[]}
+{"text":"Contorno sfumato 60%, grana 5%","notes":["Contorno sfumato","Grana"],"unrecognized":[]}
+{"text":"Più trasparente, non cambiare colore","notes":["Trasparenza"],"unrecognized":[]}
+{"text":"Spine più corte, meno acute","notes":["Lunghezza","Acutezza delle punte"],"unrecognized":[]}
+{"text":"Luce che orbita, più lento","notes":["Movimento","Durata di base (secondi)"],"unrecognized":[]}
+{"text":"Vetro trasparente, sfondo trasparente","notes":["Materia: Biglia di vetro","Trasparenza","Sfondo"],"unrecognized":[]}
+Combined requests, independent scopes, actual controls, unsupported input, atomic validation: PASS

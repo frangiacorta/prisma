@@ -1,0 +1,11 @@
+{
+  "width": 96,
+  "height": 160,
+  "r_frame_rate": "60/1",
+  "duration": "3.000000",
+  "nb_frames": "180",
+  "decoded_frames": 180,
+  "unique_frames": 180,
+  "loop_boundary_difference": 1.447873263888889,
+  "mean_adjacent_difference": 0.8456032258690255
+}

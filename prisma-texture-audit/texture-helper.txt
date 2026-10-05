@@ -1,0 +1,54 @@
+// Analytic, object-anchored height gradients: surface detail never changes the
+// SDF, ray/interface normals, atlas cache, or the number of tracing steps.
+vec4 materialRelief(vec3 local,vec3 geometricNormal,vec3 rd){
+ vec3 size=axes(),q=local/size;float density=uMaterialDetail.y,organic=uMaterialDetail.z;
+ q.xy=rot(uMaterialDetail.w)*q.xy;q*=density;
+ vec3 ka=vec3(3.1,2.3,1.7),kb=vec3(-1.8,3.7,2.9),kc=vec3(2.7,-1.5,4.1);
+ float a=dot(q,ka)+uSeed,b=dot(q,kb)-uSeed*.7,c=dot(q,kc)+.4;
+ float sa=sin(a),sb=sin(b),sc=sin(c),ca=cos(a),cb=cos(b),cc=cos(c);
+ float warp=.55*sa+.3*sb+.15*sc;vec3 warpGradient=.55*ca*ka+.3*cb*kb+.15*cc*kc;
+ // Conservative projected pixel footprint. Unresolved frequencies fade out
+ // before Nyquist, including grazing angles and small/resized previews.
+ float view=max(.12,abs(dot(geometricNormal,-rd)));
+ float footprint=3.4*density/(min(uResolution.x,uResolution.y)*max(.05,uFrame.x)*max(.06,min(min(size.x,size.y),size.z))*view);
+ vec3 gradient=vec3(0.);float roughening=0.;
+ if(uMaterialLayers.x>.000001){
+  vec3 k=vec3(4.,32.,3.);float phase=dot(q,k)+organic*5.*warp;
+  vec3 derivative=k+organic*5.*warpGradient;
+  float band=1.-smoothstep(.22,.48,length(derivative)*footprint/(2.*PI));
+  float ridge=.5+.5*sin(phase);
+  gradient+=derivative*(2.*ridge*ridge*ridge*cos(phase))*.045*uMaterialLayers.x*band;
+ }
+ if(uMaterialLayers.y>.000001){
+  vec3 k=vec3(1.,8.,1.3);float phase=dot(q,k)+organic*2.6*warp;
+  vec3 derivative=k+organic*2.6*warpGradient;
+  float band=1.-smoothstep(.22,.48,length(derivative)*footprint/(2.*PI));
+  gradient+=derivative*cos(phase)*.08*uMaterialLayers.y*band;
+ }
+ if(uMaterialLayers.z>.000001){
+  float patch=.5+.5*sa*sb*cc;vec3 patchGradient=.5*(ka*ca*sb*cc+kb*sa*cb*cc-kc*sa*sb*sc);
+  vec3 k=vec3(57.,3.,7.);float scratch=dot(q,k)+organic*3.*warp;
+  vec3 derivative=k+organic*3.*warpGradient;
+  float band=1.-smoothstep(.2,.45,length(derivative)*footprint/(2.*PI));
+  gradient+=(patchGradient*.044+derivative*cos(scratch)*(.007*patch)*band)*uMaterialLayers.z;
+  roughening=uMaterialLayers.z*(.18+.42*patch);
+ }
+ if(uMaterialLayers.w>.000001){
+  vec3 k=vec3(2.,15.,4.);float phase=dot(q,k)+organic*3.6*warp;
+  vec3 derivative=k+organic*3.6*warpGradient;
+  float band=1.-smoothstep(.22,.48,length(derivative)*footprint/(2.*PI));
+  gradient+=derivative*cos(phase)*.05*uMaterialLayers.w*band;
+ }
+ gradient*=density*uMaterialDetail.x;gradient.xy=rot(-uMaterialDetail.w)*gradient.xy;gradient/=size;
+ gradient.yz=rot(-uOther.y)*gradient.yz;gradient.xz=rot(-uOther.x)*gradient.xz;gradient.xy=rot(-uExtraShape3.z)*gradient.xy;
+ gradient-=geometricNormal*dot(gradient,geometricNormal);
+ gradient*=min(1.,1.05/max(.000001,length(gradient)))*smoothstep(.035,.28,view);
+ return vec4(gradient,roughening);
+}
+vec3 reliefNormal(vec3 original,vec3 geometricNormal,vec3 rd,vec3 gradient){
+ vec3 n=normalize(original-gradient);
+ // A perturbed shading normal must never reflect into the physical surface.
+ if(dot(reflect(rd,n),geometricNormal)<.001)n=normalize(mix(n,geometricNormal,.75));
+ if(dot(reflect(rd,n),geometricNormal)<0.)n=geometricNormal;
+ return n;
+}

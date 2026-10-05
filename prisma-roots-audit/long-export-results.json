@@ -1,0 +1,129 @@
+[
+  {
+    "ready": {
+      "backend": "native",
+      "storage": "disk",
+      "frames": 0,
+      "encodedFrames": 0,
+      "maxPendingFrames": 0,
+      "softwareSegments": 0,
+      "largestSoftwareSegment": 0
+    },
+    "final": {
+      "backend": "native",
+      "storage": "disk",
+      "frames": 7320,
+      "encodedFrames": 7320,
+      "maxPendingFrames": 4,
+      "softwareSegments": 0,
+      "largestSoftwareSegment": 0,
+      "bytes": 808137
+    },
+    "elapsedMs": 3697.2999999970198,
+    "size": 808137,
+    "storageName": "video-886c9d4d-84c1-4773-99cf-220f7569088d.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 128,
+          "height": 128,
+          "r_frame_rate": "60/1",
+          "duration": "122.000000",
+          "nb_frames": "7320",
+          "nb_read_frames": "7320"
+        }
+      ]
+    },
+    "name": "native-122sec"
+  },
+  {
+    "ready": {
+      "backend": "software",
+      "storage": "disk",
+      "frames": 0,
+      "encodedFrames": 0,
+      "maxPendingFrames": 0,
+      "softwareSegments": 0,
+      "largestSoftwareSegment": 0
+    },
+    "final": {
+      "backend": "software",
+      "storage": "disk",
+      "frames": 8000,
+      "encodedFrames": 8000,
+      "maxPendingFrames": 60,
+      "softwareSegments": 134,
+      "largestSoftwareSegment": 5679,
+      "bytes": 815774
+    },
+    "elapsedMs": 11411.20000000298,
+    "size": 815774,
+    "storageName": "video-480604b2-43f5-41b0-8720-b7f879b4adb3.mp4",
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 128,
+          "height": 128,
+          "r_frame_rate": "60/1",
+          "duration": "133.333333",
+          "nb_frames": "8000",
+          "nb_read_frames": "8000"
+        }
+      ]
+    },
+    "name": "software-8000frames"
+  },
+  {
+    "ready": {
+      "backend": "software",
+      "storage": "memory",
+      "frames": 0,
+      "encodedFrames": 0,
+      "maxPendingFrames": 0,
+      "softwareSegments": 0,
+      "largestSoftwareSegment": 0
+    },
+    "final": {
+      "backend": "software",
+      "storage": "memory",
+      "frames": 121,
+      "encodedFrames": 121,
+      "maxPendingFrames": 60,
+      "softwareSegments": 3,
+      "largestSoftwareSegment": 44447,
+      "bytes": 96236
+    },
+    "elapsedMs": 250.79999999701977,
+    "size": 96236,
+    "storageName": null,
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "width": 128,
+          "height": 128,
+          "r_frame_rate": "60/1",
+          "duration": "2.016667",
+          "nb_frames": "121",
+          "nb_read_frames": "121"
+        }
+      ]
+    },
+    "name": "software-memory"
+  },
+  {
+    "cancel": {
+      "error": "AbortError",
+      "elapsedMs": 0.29999999701976776,
+      "pending": 0
+    }
+  }
+]

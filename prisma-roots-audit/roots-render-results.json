@@ -1,0 +1,296 @@
+{
+  "hardware": {
+    "name": "ANGLE (Mesa, llvmpipe (LLVM 19.1.7 256 bits), OpenGL ES 3.2)",
+    "software": true,
+    "powerPreference": "high-performance",
+    "timingAvailable": true
+  },
+  "compatibility": [
+    {
+      "name": "Aurora liquida",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 4096,
+      "litB": 4096
+    },
+    {
+      "name": "Vetro orbitale",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 4096,
+      "litB": 4096
+    },
+    {
+      "name": "Mercurio",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 4096,
+      "litB": 4096
+    },
+    {
+      "name": "Eclisse rosa",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 4096,
+      "litB": 4096
+    },
+    {
+      "name": "Anello aurora",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 4096,
+      "litB": 4096
+    },
+    {
+      "name": "Nebbia pastello",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 4096,
+      "litB": 4096
+    },
+    {
+      "name": "Riccio",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 1347,
+      "litB": 1347
+    },
+    {
+      "name": "Aghi",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 1483,
+      "litB": 1483
+    }
+  ],
+  "quality": [
+    {
+      "name": "Radici",
+      "fast": {
+        "difference": 34747,
+        "mean": 0.5301971435546875,
+        "max": 255,
+        "iou": 0.9857235561323816,
+        "litA": 3082,
+        "litB": 3038
+      },
+      "balanced": {
+        "difference": 15680,
+        "mean": 0.2392578125,
+        "max": 255,
+        "iou": 0.9935107073329007,
+        "litA": 3082,
+        "litB": 3062
+      },
+      "exactMs": 26741.20000000298,
+      "fastMs": 5572.800000011921
+    },
+    {
+      "name": "Corde",
+      "fast": {
+        "difference": 39961,
+        "mean": 0.6097564697265625,
+        "max": 255,
+        "iou": 0.9881656804733728,
+        "litA": 3380,
+        "litB": 3340
+      },
+      "balanced": {
+        "difference": 18333,
+        "mean": 0.2797393798828125,
+        "max": 255,
+        "iou": 0.994378698224852,
+        "litA": 3380,
+        "litB": 3361
+      },
+      "exactMs": 228.20000000298023,
+      "fastMs": 357.29999999701977
+    },
+    {
+      "name": "Rigonfiamenti",
+      "fast": {
+        "difference": 6759,
+        "mean": 0.1031341552734375,
+        "max": 255,
+        "iou": 0.9928478543563068,
+        "litA": 1538,
+        "litB": 1527
+      },
+      "balanced": {
+        "difference": 3126,
+        "mean": 0.047698974609375,
+        "max": 255,
+        "iou": 0.9967490247074122,
+        "litA": 1538,
+        "litB": 1533
+      },
+      "exactMs": 133.80000001192093,
+      "fastMs": 339.90000000596046
+    },
+    {
+      "name": "Radici intrecciate",
+      "fast": {
+        "difference": 76701,
+        "mean": 1.1703643798828125,
+        "max": 255,
+        "iou": 0.9861619861619861,
+        "litA": 4912,
+        "litB": 4848
+      },
+      "balanced": {
+        "difference": 35998,
+        "mean": 0.549285888671875,
+        "max": 255,
+        "iou": 0.993485342019544,
+        "litA": 4912,
+        "litB": 4880
+      },
+      "exactMs": 266.30000001192093,
+      "fastMs": 213
+    }
+  ],
+  "controls": [
+    {
+      "key": "petalGrowth",
+      "difference": 1143851,
+      "mean": 17.453781127929688,
+      "max": 255,
+      "iou": 0.4681952662721893,
+      "litA": 1900,
+      "litB": 4055
+    },
+    {
+      "key": "petalWander",
+      "difference": 446409,
+      "mean": 6.8116607666015625,
+      "max": 255,
+      "iou": 0.8965837787590053,
+      "litA": 4073,
+      "litB": 4088
+    },
+    {
+      "key": "petalCoil",
+      "difference": 1259604,
+      "mean": 19.22003173828125,
+      "max": 255,
+      "iou": 0.6055786076532964,
+      "litA": 3895,
+      "litB": 3070
+    },
+    {
+      "key": "petalReentry",
+      "difference": 1209225,
+      "mean": 18.451309204101562,
+      "max": 255,
+      "iou": 0.6461538461538462,
+      "litA": 3815,
+      "litB": 4852
+    },
+    {
+      "key": "petalKnots",
+      "difference": 244559,
+      "mean": 3.7316741943359375,
+      "max": 255,
+      "iou": 0.9447500597943076,
+      "litA": 4043,
+      "litB": 4088
+    },
+    {
+      "key": "petalRidges",
+      "difference": 98833,
+      "mean": 1.5080718994140625,
+      "max": 255,
+      "iou": 0.9819380034171344,
+      "litA": 4048,
+      "litB": 4072
+    },
+    {
+      "key": "petalDisorder",
+      "difference": 1072536,
+      "mean": 16.3656005859375,
+      "max": 255,
+      "iou": 0.721089894872345,
+      "litA": 3902,
+      "litB": 4120
+    }
+  ],
+  "loop": [
+    {
+      "key": "emerge",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 1060,
+      "litB": 1060
+    },
+    {
+      "key": "wrap",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 2146,
+      "litB": 2146
+    },
+    {
+      "key": "roots",
+      "difference": 0,
+      "mean": 0,
+      "max": 0,
+      "iou": 1,
+      "litA": 1060,
+      "litB": 1060
+    }
+  ],
+  "motion": [
+    {
+      "frames": 120,
+      "median": 417.5,
+      "p95": 569.8000000119209,
+      "first30": 380.09666666736206,
+      "last30": 388.47333333293597,
+      "allocations": 0,
+      "createdTextures": 0,
+      "programs": 0,
+      "maxPending": 1,
+      "fieldResolution": 80
+    }
+  ],
+  "rigid": {
+    "bakes": 0,
+    "growth": 0,
+    "roots": 0
+  },
+  "offline": {
+    "paused": false,
+    "limit": 160,
+    "width": 160,
+    "height": 160,
+    "gpuMilliseconds": 19.75089,
+    "growthUploads": 49,
+    "bakeUploads": 49,
+    "bakeWarmups": 0,
+    "fieldResolution": 80,
+    "fieldAllocations": 1,
+    "completedFrames": 48,
+    "phase": 6.029920579422675
+  },
+  "errors": []
+}

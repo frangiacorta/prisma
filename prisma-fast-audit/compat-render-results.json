@@ -1,0 +1,60 @@
+{
+  "presets": [
+    {
+      "name": "Aurora liquida",
+      "difference": 0
+    },
+    {
+      "name": "Vetro orbitale",
+      "difference": 0
+    },
+    {
+      "name": "Mercurio",
+      "difference": 0
+    },
+    {
+      "name": "Eclisse rosa",
+      "difference": 0
+    },
+    {
+      "name": "Anello aurora",
+      "difference": 0
+    },
+    {
+      "name": "Nebbia pastello",
+      "difference": 0
+    }
+  ],
+  "tiling": [
+    {
+      "mode": "solid",
+      "difference": 0
+    },
+    {
+      "mode": "solid",
+      "accumulated": true,
+      "difference": 0
+    },
+    {
+      "mode": "transparent",
+      "difference": 0
+    },
+    {
+      "mode": "transparent",
+      "accumulated": true,
+      "difference": 0
+    }
+  ],
+  "previewAccumulation": [
+    {
+      "lit": 1513,
+      "glError": 0,
+      "lost": false,
+      "drawFramebufferRestored": true,
+      "readFramebufferRestored": true,
+      "blendDisabled": true,
+      "scissorDisabled": true,
+      "bakes": 1
+    }
+  ]
+}

@@ -1,0 +1,314 @@
+[
+  {
+    "text": "rendilo morbido nel movimento",
+    "plan": {
+      "operations": [
+        {
+          "type": "motionStyle",
+          "style": "gentle",
+          "scope": "all"
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "motion",
+      "speed",
+      "motions",
+      "lights"
+    ]
+  },
+  {
+    "text": "movimento più morbido",
+    "plan": {
+      "operations": [
+        {
+          "type": "motionStyle",
+          "style": "gentle",
+          "scope": "all"
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "motion",
+      "speed",
+      "motions",
+      "lights"
+    ]
+  },
+  {
+    "text": "rendi più morbida la rotazione",
+    "plan": {
+      "operations": [
+        {
+          "type": "motionStyle",
+          "style": "gentle",
+          "scope": "rotation"
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": false,
+    "diff": []
+  },
+  {
+    "text": "rendilo fluido",
+    "plan": {
+      "operations": [],
+      "unrecognized": [
+        "fluido"
+      ]
+    },
+    "changed": false,
+    "diff": []
+  },
+  {
+    "text": "movimento più fluido",
+    "plan": {
+      "operations": [
+        {
+          "type": "motionStyle",
+          "style": "smooth",
+          "scope": "all"
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "motion",
+      "speed",
+      "motions",
+      "lights"
+    ]
+  },
+  {
+    "text": "rendilo più lento",
+    "plan": {
+      "operations": [
+        {
+          "type": "motionStyle",
+          "style": "slower",
+          "scope": "all"
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "speed"
+    ]
+  },
+  {
+    "text": "rallenta il movimento",
+    "plan": {
+      "operations": [
+        {
+          "type": "motionStyle",
+          "style": "slower",
+          "scope": "all"
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "speed"
+    ]
+  },
+  {
+    "text": "movimento lento e rilassante",
+    "plan": {
+      "operations": [
+        {
+          "type": "motionStyle",
+          "style": "gentle",
+          "scope": "all"
+        },
+        {
+          "type": "motionStyle",
+          "style": "slower",
+          "scope": "all"
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "motion",
+      "speed",
+      "motions",
+      "lights"
+    ]
+  },
+  {
+    "text": "movimento meno brusco",
+    "plan": {
+      "operations": [
+        {
+          "type": "motionStyle",
+          "style": "gentle",
+          "scope": "all"
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "motion",
+      "speed",
+      "motions",
+      "lights"
+    ]
+  },
+  {
+    "text": "movimento senza scatti",
+    "plan": {
+      "operations": [
+        {
+          "type": "motionStyle",
+          "style": "smooth",
+          "scope": "all"
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "motion",
+      "speed",
+      "motions",
+      "lights"
+    ]
+  },
+  {
+    "text": "movimento più delicato",
+    "plan": {
+      "operations": [
+        {
+          "type": "motionStyle",
+          "style": "gentle",
+          "scope": "all"
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "motion",
+      "speed",
+      "motions",
+      "lights"
+    ]
+  },
+  {
+    "text": "non rendere il movimento più morbido",
+    "plan": {
+      "operations": [],
+      "unrecognized": []
+    },
+    "changed": false,
+    "diff": []
+  },
+  {
+    "text": "non cambiare il movimento, rendi la materia più ruvida",
+    "plan": {
+      "operations": [
+        {
+          "type": "set",
+          "key": "roughness",
+          "value": 0.22
+        }
+      ],
+      "unrecognized": [
+        "materia"
+      ]
+    },
+    "changed": true,
+    "diff": [
+      "roughness"
+    ]
+  },
+  {
+    "text": "rendi la texture più morbida",
+    "plan": {
+      "operations": [
+        {
+          "type": "set",
+          "key": "textureDepth",
+          "value": 0.19999999999999998
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "textureDepth"
+    ]
+  },
+  {
+    "text": "trasparenza 80%",
+    "plan": {
+      "operations": [
+        {
+          "type": "set",
+          "key": "transparency",
+          "value": 0.8
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "transparency"
+    ]
+  },
+  {
+    "text": "radici nodose che entrano ed escono dalla sfera",
+    "plan": {
+      "operations": [
+        {
+          "type": "shape",
+          "name": "radici"
+        },
+        {
+          "type": "set",
+          "key": "petalReentry",
+          "value": 0.8
+        },
+        {
+          "type": "set",
+          "key": "petalKnots",
+          "value": 0.8
+        }
+      ],
+      "unrecognized": []
+    },
+    "changed": true,
+    "diff": [
+      "deform",
+      "edge",
+      "rotateX",
+      "petalWander",
+      "petalCoil",
+      "petalReentry",
+      "petalKnots",
+      "petalRidges",
+      "petalDisorder",
+      "petalAmount",
+      "petalCount",
+      "petalLength",
+      "petalWidth",
+      "petalSharp",
+      "petalCoverage",
+      "petalRows",
+      "petalBlend",
+      "petalRoot",
+      "petalRandom",
+      "motions"
+    ]
+  }
+]

@@ -1,0 +1,30 @@
+HARDWARE {"name":"ANGLE (Mesa, llvmpipe (LLVM 19.1.7 256 bits), OpenGL ES 3.2)","software":true,"powerPreference":"high-performance","timingAvailable":true}
+BEGIN before 96px petalAmount=0
+CASE {"size":96,"amount":0,"first":{"prepareMs":247.6000000089407,"submitMs":3.3999999910593033,"gpuWaitMs":2144.9000000059605,"totalMs":2395.9000000059605,"maxHeartbeatGapMs":1761.6000000089407,"heartbeatTicks":83,"programs":1},"warm":[{"prepareMs":0.09999999403953552,"submitMs":0.30000001192092896,"gpuWaitMs":21.299999997019768,"totalMs":21.700000002980232,"maxHeartbeatGapMs":8.100000008940697,"heartbeatTicks":6,"programs":1},{"prepareMs":0.09999999403953552,"submitMs":0.6000000089406967,"gpuWaitMs":8.399999991059303,"totalMs":9.099999994039536,"maxHeartbeatGapMs":8.799999997019768,"heartbeatTicks":4,"programs":1},{"prepareMs":0.09999999403953552,"submitMs":0.30000001192092896,"gpuWaitMs":
+BEGIN before 96px petalAmount=0.05
+CASE {"size":96,"amount":0.05,"first":{"prepareMs":681.3999999910593,"submitMs":0.6000000089406967,"gpuWaitMs":7831.79999999702,"totalMs":8513.79999999702,"maxHeartbeatGapMs":11.099999994039536,"heartbeatTicks":1067,"programs":2},"warm":[{"prepareMs":0,"submitMs":0.3999999910593033,"gpuWaitMs":21.100000008940697,"totalMs":21.5,"maxHeartbeatGapMs":8,"heartbeatTicks":5,"programs":2},{"prepareMs":0,"submitMs":0.3999999910593033,"gpuWaitMs":13.100000008940697,"totalMs":13.5,"maxHeartbeatGapMs":8.100000008940697,"heartbeatTicks":4,"programs":2},{"prepareMs":0,"submitMs":0.3999999910593033,"gpuWaitMs":17,"totalMs":17.399999991059303,"maxHeartbeatGapMs":10,"heartbeatTicks":4,"programs":2}],"visible
+BEGIN before 96px petalAmount=0.15
+CASE {"size":96,"amount":0.15,"first":{"prepareMs":0,"submitMs":1.2999999970197678,"gpuWaitMs":36.1000000089407,"totalMs":37.400000005960464,"maxHeartbeatGapMs":10.199999988079071,"heartbeatTicks":7,"programs":2},"warm":[{"prepareMs":0,"submitMs":0.29999999701976776,"gpuWaitMs":37.70000000298023,"totalMs":38,"maxHeartbeatGapMs":8.299999997019768,"heartbeatTicks":7,"programs":2},{"prepareMs":0,"submitMs":0.29999999701976776,"gpuWaitMs":51.70000000298023,"totalMs":52,"maxHeartbeatGapMs":11.599999994039536,"heartbeatTicks":9,"programs":2},{"prepareMs":0.09999999403953552,"submitMs":0.4000000059604645,"gpuWaitMs":30.299999997019768,"totalMs":30.799999997019768,"maxHeartbeatGapMs":15.5,"heartbeat
+BEGIN before 96px petalAmount=0.35
+CASE {"size":96,"amount":0.35,"first":{"prepareMs":0,"submitMs":0.3999999910593033,"gpuWaitMs":36.70000000298023,"totalMs":37.099999994039536,"maxHeartbeatGapMs":10.899999991059303,"heartbeatTicks":7,"programs":2},"warm":[{"prepareMs":0,"submitMs":0.29999999701976776,"gpuWaitMs":295.90000000596046,"totalMs":296.20000000298023,"maxHeartbeatGapMs":9.199999988079071,"heartbeatTicks":39,"programs":2},{"prepareMs":0,"submitMs":0.19999998807907104,"gpuWaitMs":12.400000005960464,"totalMs":12.599999994039536,"maxHeartbeatGapMs":8.100000008940697,"heartbeatTicks":5,"programs":2},{"prepareMs":0,"submitMs":0.20000000298023224,"gpuWaitMs":13.400000005960464,"totalMs":13.600000008940697,"maxHeartbeatGapM
+BEGIN before 96px petalAmount=0.7
+CASE {"size":96,"amount":0.7,"first":{"prepareMs":0,"submitMs":0.20000000298023224,"gpuWaitMs":13.900000005960464,"totalMs":14.100000008940697,"maxHeartbeatGapMs":8.100000008940697,"heartbeatTicks":4,"programs":2},"warm":[{"prepareMs":0.09999999403953552,"submitMs":0.20000000298023224,"gpuWaitMs":8.299999997019768,"totalMs":8.599999994039536,"maxHeartbeatGapMs":10.5,"heartbeatTicks":4,"programs":2},{"prepareMs":0,"submitMs":0.5,"gpuWaitMs":8.299999997019768,"totalMs":8.799999997019768,"maxHeartbeatGapMs":8.100000008940697,"heartbeatTicks":3,"programs":2},{"prepareMs":0,"submitMs":0.29999999701976776,"gpuWaitMs":8.099999994039536,"totalMs":8.399999991059303,"maxHeartbeatGapMs":8.1000000089406
+BEGIN before 96px petalAmount=1
+CASE {"size":96,"amount":1,"first":{"prepareMs":0,"submitMs":0.30000001192092896,"gpuWaitMs":28.69999998807907,"totalMs":29,"maxHeartbeatGapMs":8.100000008940697,"heartbeatTicks":6,"programs":2},"warm":[{"prepareMs":0,"submitMs":0.7000000029802322,"gpuWaitMs":12.5,"totalMs":13.200000002980232,"maxHeartbeatGapMs":8.299999997019768,"heartbeatTicks":4,"programs":2},{"prepareMs":0.09999999403953552,"submitMs":0.20000000298023224,"gpuWaitMs":8.5,"totalMs":8.799999997019768,"maxHeartbeatGapMs":8.899999991059303,"heartbeatTicks":3,"programs":2},{"prepareMs":0,"submitMs":0.29999999701976776,"gpuWaitMs":8.599999994039536,"totalMs":8.899999991059303,"maxHeartbeatGapMs":8.100000008940697,"heartbeatTick
+ANIMATION 0 9.0ms
+ANIMATION 1 13.2ms
+ANIMATION 2 14.0ms
+ANIMATION 3 12.5ms
+ANIMATION 4 24.6ms
+ANIMATION 5 29.7ms
+ANIMATION 6 12.9ms
+ANIMATION 7 23.8ms
+ANIMATION 8 10.2ms
+ANIMATION 9 8.6ms
+ANIMATION 10 14.4ms
+ANIMATION 11 13.9ms
+Traceback (most recent call last):
+  File "/workspace/prisma-fast-audit/partial-petal-check.py", line 66, in <module>
+    assert all(c['difference']==0 for c in result['loops']), result['loops']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [{'difference': 96}]

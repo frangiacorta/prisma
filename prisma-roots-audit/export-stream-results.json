@@ -1,0 +1,46 @@
+[
+  {
+    "stats": {
+      "backend": "software",
+      "storage": "disk",
+      "frames": 360,
+      "encodedFrames": 360,
+      "maxPendingFrames": 60,
+      "softwareSegments": 6,
+      "largestSoftwareSegment": 4197257,
+      "bytes": 25189462
+    },
+    "playback": {
+      "duration": 6,
+      "currentTime": 5.9,
+      "readyState": 4,
+      "width": 256,
+      "height": 256
+    },
+    "storageName": "video-44751f86-5762-4aa4-8690-e3169d2f70dc.mp4",
+    "remainingTemp": [],
+    "name": "noise-disk"
+  },
+  {
+    "stats": {
+      "backend": "software",
+      "storage": "memory",
+      "frames": 360,
+      "encodedFrames": 360,
+      "maxPendingFrames": 60,
+      "softwareSegments": 6,
+      "largestSoftwareSegment": 4197257,
+      "bytes": 25189462
+    },
+    "playback": {
+      "duration": 6,
+      "currentTime": 5.9,
+      "readyState": 4,
+      "width": 256,
+      "height": 256
+    },
+    "storageName": null,
+    "remainingTemp": [],
+    "name": "noise-memory"
+  }
+]

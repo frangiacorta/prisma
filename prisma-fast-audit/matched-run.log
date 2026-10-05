@@ -1,0 +1,11 @@
+MATCHED before draw0
+MATCHED before draw1
+MATCHED before draw2
+MATCHED before draw3
+MATCHEDRESULT {"label":"before","size":96,"quality":"fast","coldMs":43308.89999999106,"warmMs":[683.5,640.3000000119209,896.9000000059605]}
+MATCHED after draw0
+MATCHED after draw1
+MATCHED after draw2
+MATCHED after draw3
+MATCHEDRESULT {"label":"after","size":96,"quality":"fast","coldMs":13691.800000011921,"warmMs":[29.799999997019768,25.299999997019768,25.100000008940697],"fieldResolution":112,"bakeUploads":1}
+MATCHED BEFORE/AFTER PREVIEW DONE

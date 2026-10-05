@@ -1,0 +1,33 @@
+{
+  "oldCrashMigration": true,
+  "liveMotion": {
+    "pending": 1,
+    "maxPending": 1,
+    "frames": 124,
+    "allocations": 1,
+    "seconds": 6.3420412550040055
+  },
+  "pauseScrub": true,
+  "offline": {
+    "paused": false,
+    "limit": 217.67823360000006,
+    "width": 218,
+    "height": 218,
+    "gpuMilliseconds": 10.426753,
+    "growthUploads": 122,
+    "bakeUploads": 122,
+    "bakeWarmups": 0,
+    "fieldResolution": 48,
+    "fieldAllocations": 0,
+    "completedFrames": 121,
+    "phase": 0.05152211951887686
+  },
+  "video": {
+    "width": 64,
+    "height": 64,
+    "r_frame_rate": "60/1",
+    "duration": "2.000000",
+    "nb_frames": "120"
+  },
+  "errors": []
+}

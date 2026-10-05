@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "codec_name": "h264",
+    "width": 64,
+    "height": 64,
+    "r_frame_rate": "60/1",
+    "avg_frame_rate": "60/1",
+    "duration": "1.000000",
+    "nb_read_frames": "60"
+  },
+  "decodedFrames": 60,
+  "uniqueDecodedFrames": 60,
+  "meanAdjacentPixelDifference": 3.6390484308792375,
+  "maxAdjacentPixelDifference": 4.591634114583333,
+  "lastToFirstDifference": 5.125406901041667,
+  "fileBytes": 55857
+}

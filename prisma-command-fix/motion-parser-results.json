@@ -1,0 +1,845 @@
+{
+  "count": 48,
+  "results": [
+    {
+      "text": "rendilo morbido nel movimento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.96×"
+      ]
+    },
+    {
+      "text": "movimento più morbido",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.96×"
+      ]
+    },
+    {
+      "text": "movimento più delicato",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.96×"
+      ]
+    },
+    {
+      "text": "movimento meno brusco",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.96×"
+      ]
+    },
+    {
+      "text": "rendi il moto più dolce",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.96×"
+      ]
+    },
+    {
+      "text": "movimento più fluido",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "smooth",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 27%",
+        "Velocità globale: 1.08×"
+      ]
+    },
+    {
+      "text": "movimento senza scatti",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "smooth",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 27%",
+        "Velocità globale: 1.08×"
+      ]
+    },
+    {
+      "text": "animazione senza strappi",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "smooth",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 27%",
+        "Velocità globale: 1.08×"
+      ]
+    },
+    {
+      "text": "movimento più smooth",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "smooth",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 27%",
+        "Velocità globale: 1.08×"
+      ]
+    },
+    {
+      "text": "rendilo morbido nel movimento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Rotazione delicata attivata",
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.8×"
+      ]
+    },
+    {
+      "text": "rendilo morbido nel movimento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Rotazione delicata attivata",
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.8×"
+      ]
+    },
+    {
+      "text": "rendilo morbido nel movimento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Rotazione delicata attivata",
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.8×"
+      ]
+    },
+    {
+      "text": "rendilo morbido nel movimento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Rotazione delicata attivata",
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.8×"
+      ]
+    },
+    {
+      "text": "rendilo morbido nel movimento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Rotazione delicata attivata",
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.8×"
+      ]
+    },
+    {
+      "text": "rendilo morbido nel movimento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Rotazione delicata attivata",
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.8×"
+      ]
+    },
+    {
+      "text": "rallenta il movimento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "slower",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Velocità globale: 0.9×"
+      ]
+    },
+    {
+      "text": "rendilo più lento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "slower",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Velocità globale: 0.9×"
+      ]
+    },
+    {
+      "text": "movimento meno veloce",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "slower",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Velocità globale: 0.9×"
+      ]
+    },
+    {
+      "text": "movimento più veloce",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "faster",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Velocità globale: 1.6×"
+      ]
+    },
+    {
+      "text": "accelera il movimento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "faster",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Velocità globale: 1.6×"
+      ]
+    },
+    {
+      "text": "movimento meno lento",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "faster",
+            "scope": "all"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Velocità globale: 1.6×"
+      ]
+    },
+    {
+      "text": "non rendere il movimento più morbido",
+      "plan": {
+        "operations": [],
+        "unrecognized": []
+      },
+      "changed": false,
+      "notes": []
+    },
+    {
+      "text": "non rendere più lento il movimento",
+      "plan": {
+        "operations": [],
+        "unrecognized": []
+      },
+      "changed": false,
+      "notes": []
+    },
+    {
+      "text": "movimento non più veloce",
+      "plan": {
+        "operations": [],
+        "unrecognized": []
+      },
+      "changed": false,
+      "notes": []
+    },
+    {
+      "text": "non cambiare il movimento",
+      "plan": {
+        "operations": [],
+        "unrecognized": []
+      },
+      "changed": false,
+      "notes": []
+    },
+    {
+      "text": "mantieni il movimento invariato",
+      "plan": {
+        "operations": [],
+        "unrecognized": []
+      },
+      "changed": false,
+      "notes": []
+    },
+    {
+      "text": "movimento meno morbido",
+      "plan": {
+        "operations": [],
+        "unrecognized": []
+      },
+      "changed": false,
+      "notes": []
+    },
+    {
+      "text": "rallenta solo la luce",
+      "plan": {
+        "operations": [],
+        "unrecognized": [
+          "rallenta solo"
+        ]
+      },
+      "changed": false,
+      "notes": []
+    },
+    {
+      "text": "movimento solo della luce più lento",
+      "plan": {
+        "operations": [],
+        "unrecognized": [
+          "movimento solo lento"
+        ]
+      },
+      "changed": false,
+      "notes": []
+    },
+    {
+      "text": "movimento morbido, velocità 0.5",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          },
+          {
+            "type": "set",
+            "key": "speed",
+            "value": 0.5
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.5×"
+      ]
+    },
+    {
+      "text": "movimento morbido a velocità 0.5",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          },
+          {
+            "type": "set",
+            "key": "speed",
+            "value": 0.5
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.5×"
+      ]
+    },
+    {
+      "text": "movimento fluido velocità 0,5",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "smooth",
+            "scope": "all"
+          },
+          {
+            "type": "set",
+            "key": "speed",
+            "value": 0.5
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 27%",
+        "Velocità globale: 0.5×"
+      ]
+    },
+    {
+      "text": "velocità 0.5 movimento morbido",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          },
+          {
+            "type": "set",
+            "key": "speed",
+            "value": 0.5
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.5×"
+      ]
+    },
+    {
+      "text": "movimento morbido intensità del movimento 20%",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          },
+          {
+            "type": "set",
+            "key": "motion",
+            "value": 0.2
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.96×"
+      ]
+    },
+    {
+      "text": "movimento morbido e palette blu e viola e sfondo nero",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          },
+          {
+            "type": "palette",
+            "colors": [
+              "#365eff",
+              "#ad75ff"
+            ]
+          },
+          {
+            "type": "background",
+            "mode": "solid",
+            "colors": [
+              "#000000"
+            ]
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.96×",
+        "Palette",
+        "Sfondo"
+      ]
+    },
+    {
+      "text": "rendi la texture più morbida",
+      "plan": {
+        "operations": [
+          {
+            "type": "set",
+            "key": "textureDepth",
+            "value": 0.19999999999999998
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Rilievo"
+      ]
+    },
+    {
+      "text": "movimento più morbido e texture più irregolare",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "all"
+          },
+          {
+            "type": "set",
+            "key": "textureOrganic",
+            "value": 0.8500000000000001
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide",
+        "Intensità delle oscillazioni: 20%",
+        "Velocità globale: 0.96×",
+        "Organicità"
+      ]
+    },
+    {
+      "text": "rendi più morbido il movimento delle luci",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "lights"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Curve del movimento fluide"
+      ]
+    },
+    {
+      "text": "rendi più morbida la rotazione",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "gentle",
+            "scope": "rotation"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": false,
+      "notes": []
+    },
+    {
+      "text": "senza movimento morbido",
+      "plan": {
+        "operations": [
+          {
+            "type": "stopMotion"
+          }
+        ],
+        "unrecognized": [
+          "morbido"
+        ]
+      },
+      "changed": true,
+      "notes": [
+        "Animazione ferma"
+      ]
+    },
+    {
+      "text": "ruota lentamente",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "slower",
+            "scope": "all"
+          },
+          {
+            "type": "motionTrack",
+            "key": "rotateY",
+            "values": {
+              "enabled": true,
+              "mode": "cycle",
+              "cycles": 1,
+              "direction": 1
+            }
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Velocità globale: 0.75×",
+        "Movimento: Rotazione orizzontale"
+      ]
+    },
+    {
+      "text": "fai ruotare lentamente",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "slower",
+            "scope": "all"
+          },
+          {
+            "type": "motionTrack",
+            "key": "rotateY",
+            "values": {
+              "enabled": true,
+              "mode": "cycle",
+              "cycles": 1,
+              "direction": 1
+            }
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Velocità globale: 0.75×",
+        "Movimento: Rotazione orizzontale"
+      ]
+    },
+    {
+      "text": "radici che entrano ed escono lentamente",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "slower",
+            "scope": "all"
+          },
+          {
+            "type": "shape",
+            "name": "radici"
+          },
+          {
+            "type": "set",
+            "key": "petalReentry",
+            "value": 0.8
+          },
+          {
+            "type": "motionPreset",
+            "name": "roots"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Velocità globale: 0.75×",
+        "Forma: radici",
+        "Rientro nella sfera",
+        "Movimento"
+      ]
+    },
+    {
+      "text": "bolla che respira lentamente",
+      "plan": {
+        "operations": [
+          {
+            "type": "motionStyle",
+            "style": "slower",
+            "scope": "all"
+          },
+          {
+            "type": "material",
+            "index": 0
+          },
+          {
+            "type": "motionPreset",
+            "name": "breathe"
+          }
+        ],
+        "unrecognized": []
+      },
+      "changed": true,
+      "notes": [
+        "Velocità globale: 0.75×",
+        "Materia: Bolla di sapone",
+        "Movimento"
+      ]
+    },
+    {
+      "text": "non ruotare lentamente",
+      "plan": {
+        "operations": [],
+        "unrecognized": []
+      },
+      "changed": false,
+      "notes": []
+    }
+  ]
+}

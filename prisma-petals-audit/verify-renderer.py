@@ -1,0 +1,27 @@
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+from PIL import Image,ImageDraw,ImageFont
+import base64,io,json
+out=Path('/workspace/prisma-petals-audit')
+with sync_playwright() as p:
+ b=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--use-angle=gl-egl','--ignore-gpu-blocklist','--disable-gpu-sandbox']);page=b.new_page();page.set_default_timeout(180000);page.on('console',lambda m:print(m.text,flush=True) if m.type=='log' else None);page.goto('http://127.0.0.1:4173/renderer.js')
+ data=page.evaluate('''async()=>{
+ const {Renderer,fieldAt,sampleFrame}=await import('./renderer.js'),{newCreation,sculpt,bloomExample,lightRig,motionPreset}=await import('./creative-model.js'),{MATERIAL_STYLES}=await import('./studio-model.js');const r=new Renderer(document.createElement('canvas')),images=[],metrics={loops:[],fields:[],benchmarks:[]};
+ const diff=(a,b)=>a.reduce((n,v,i)=>n+Math.abs(v-b[i]),0);const render=(s,phase=0,size=192)=>{r.draw(s,phase,size,size,{preview:true});const a=r.pixels();if(r.gl.getError())throw Error('GL');return a;};const capture=(name,s,phase=0)=>{const a=render(s,phase,256);let visible=0;for(let i=0;i<a.length;i+=4)if(a[i]+a[i+1]+a[i+2]>30)visible++;images.push({name,visible,url:r.canvas.toDataURL()});console.log(name+' '+visible);};
+ for(let i=0;i<4;i++){const s=sculpt(newCreation(),i);Object.assign(s,MATERIAL_STYLES[11].values,{scale:i===3?.76:.9,palette:['#d4c5e5','#83adce','#6c478a'],grounding:0});capture(['Rosetta','Riccio','Borchie','Aghi'][i],s);}
+ const bloom=bloomExample();for(const [name,phase] of [['Bloom · apertura',0],['Bloom · onde',Math.PI/2],['Bloom · raccolto',Math.PI*1.5]])capture(name,bloom,phase);
+ for(let i=0;i<3;i++){const s=lightRig(newCreation(),i);Object.assign(s,{scale:.8,transparency:.8,thinShell:0,hollow:0,fullness:1});capture(['Neon cyan e rosa','Anello alogeno','Doppio anello'][i],s);}
+ for(const [name,s] of [['Bloom',bloom],['Petali',motionPreset(sculpt(newCreation(),0),'bloom')],['Colori',motionPreset(sculpt(newCreation(),0),'chromatic')]]){metrics.loops.push({name,difference:diff(render(s,0,96),render(s,Math.PI*2,96)),moving:diff(render(s,0,96),render(s,Math.PI/2,96))});}
+ const q=sculpt(newCreation(),0);Object.assign(q,MATERIAL_STYLES[14].values,{palette:['#192dca','#f43358','#86d253'],colorWaveAmount:1,scale:.85});const first=render(q,0,96);q.colorWavePhase=.25;metrics.waveDifference=diff(first,render(q,0,96));q.colorWaveHeight=0;q.colorWaveRadius=1;metrics.radialDifference=diff(first,render(q,0,96));q.colorWaveSwirl=1;metrics.spiralDifference=diff(first,render(q,0,96));
+ const ground=Object.assign(newCreation(),MATERIAL_STYLES[0].values,{grounding:1,groundShadow:1,groundCaustic:1});let a=render(ground,0,128);ground.groundCaustic=0;let z=render(ground,0,128);metrics.causticDifference=diff(a,z);ground.background='#bbbbbb';a=render(ground,0,128);ground.groundShadow=0;z=render(ground,0,128);metrics.shadowDifference=diff(a,z);
+ for(const [name,s] of [['Bloom',bloom],['Aghi',Object.assign(sculpt(newCreation(),3),MATERIAL_STYLES[14].values)],['Vetro con petali',sculpt(newCreation(),0)]]){render(s,0,64);const times=[];for(let i=0;i<4;i++){const start=performance.now();render(s,i*.2,320);times.push(Math.round(performance.now()-start));}metrics.benchmarks.push({name,times});console.log('Benchmark '+name+' '+times);}
+ let source=await (await fetch('./renderer.js')).text();source=source.replace('const RESOLVE=',`MODERN_FRAG=shaderFunction(MODERN_FRAG,'main', 'void main(){vec2 uv=(gl_FragCoord.xy-.5*uResolution)/min(uResolution.x,uResolution.y)*3.4;float d=field(vec3(uv,uRuntime.z));fragColor=vec4(vec3(d<0.?1.:0.),1.);}');\nconst RESOLVE=`).replace('options.normalDiagnostic?2:+!!options.diagnostic','options.fieldPlane||0');const D=await import(URL.createObjectURL(new Blob([source],{type:'text/javascript'})));const dr=new D.Renderer(document.createElement('canvas'));
+ for(const index of [0,1,3]){const s=sculpt(newCreation(),index);Object.assign(s,{stemAmount:index===0?.6:0,stemBend:.3,asymmetry:.13,twist:.17,hole:index===0?.12:0,rotateZ:17,scale:.82});for(const plane of [0,.23]){dr.draw(s,0,64,64,{fieldPlane:plane});const p=dr.pixels();let mismatch=0,boundary=0;for(let y=0;y<64;y++)for(let x=0;x<64;x++){const d=fieldAt(s,[(x+.5-32)/64*3.4,(32-y-.5)/64*3.4,plane]),inside=p[(y*64+x)*4]>127;if(inside!==(d<0)){mismatch++;if(Math.abs(d)<.0005)boundary++;}}metrics.fields.push({index,plane,mismatch,boundary});}}
+ dr.dispose();r.dispose();return {images,metrics};}''')
+ print(json.dumps(data['metrics']),flush=True)
+ font=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',16);sheet=Image.new('RGB',(832,1200),'#181a20');d=ImageDraw.Draw(sheet)
+ for i,q in enumerate(data['images']):x=16+i%3*272;y=16+i//3*292;d.text((x,y),q['name'],font=font,fill='white');sheet.paste(Image.open(io.BytesIO(base64.b64decode(q['url'].split(',')[1]))).convert('RGB'),(x,y+26))
+ sheet.save(out/'nuove-forme-e-luci.png');(out/'renderer-metrics.json').write_text(json.dumps(data['metrics'],indent=2))
+ assert all(q['difference']==0 and q['moving']>5000 for q in data['metrics']['loops']),data['metrics']['loops']
+ assert all(q['mismatch']<=q['boundary']+3 for q in data['metrics']['fields']),data['metrics']['fields']
+ assert data['metrics']['waveDifference']>5000 and data['metrics']['causticDifference']>5000 and data['metrics']['shadowDifference']>5000,data['metrics'];b.close();print('NEW GEOMETRY, MATERIALS, WAVES, LIGHTS, CPU/GPU FIELDS AND LOOPS: PASS',flush=True)

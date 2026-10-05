@@ -1,0 +1,13 @@
+{"stage": "ready"}
+{"stage": "initial", "playing": false, "dirty": false, "refined": false, "refining": false, "idle": false, "generation": 1, "revision": 1, "hidden": true, "width": 300, "height": 150, "label": "192 × 108", "mainFrames": 0, "idleFrames": null, "lost": false, "idleLost": null}
+{"stage": "initial", "playing": false, "dirty": false, "refined": true, "refining": true, "idle": true, "generation": 1, "revision": 1, "hidden": true, "width": 300, "height": 150, "label": "300 × 169 · rifinisco…", "mainFrames": 2, "idleFrames": 0, "lost": false, "idleLost": false}
+{"stage": "initial", "playing": false, "dirty": false, "refined": true, "refining": true, "idle": true, "generation": 1, "revision": 1, "hidden": true, "width": 640, "height": 359, "label": "300 × 169 · rifinisco…", "mainFrames": 2, "idleFrames": 0, "lost": false, "idleLost": false}
+{"stage": "initial-complete", "playing": false, "dirty": false, "refined": true, "refining": false, "idle": false, "generation": 1, "revision": 1, "hidden": false, "width": 640, "height": 359, "label": "640 × 359", "mainFrames": 2, "idleFrames": 121, "lost": false, "idleLost": false}
+{"stage": "play-hides-overlay"}
+{"stage": "edit-hides-overlay"}
+{"stage": "edited-complete", "playing": false, "dirty": false, "refined": true, "refining": false, "idle": false, "generation": 5, "revision": 5, "hidden": false, "width": 640, "height": 359, "label": "640 × 359", "mainFrames": 8, "idleFrames": 247, "lost": false, "idleLost": false}
+{"stage": "preset-hides-overlay"}
+{"stage": "preset", "playing": false, "dirty": false, "refined": false, "refining": false, "idle": false, "generation": 6, "revision": 6, "hidden": true, "width": 640, "height": 359, "label": "204 × 115", "mainFrames": 8, "idleFrames": 247, "lost": false, "idleLost": false}
+{"stage": "preset", "playing": false, "dirty": false, "refined": true, "refining": true, "idle": true, "generation": 6, "revision": 6, "hidden": true, "width": 640, "height": 359, "label": "204 × 115 · rifinisco…", "mainFrames": 9, "idleFrames": 247, "lost": false, "idleLost": false}
+{"stage": "preset-complete", "playing": false, "dirty": false, "refined": true, "refining": false, "idle": false, "generation": 6, "revision": 6, "hidden": false, "width": 640, "height": 359, "label": "640 × 359", "mainFrames": 9, "idleFrames": 319, "lost": false, "idleLost": false}
+{"stage": "PASS", "errors": []}

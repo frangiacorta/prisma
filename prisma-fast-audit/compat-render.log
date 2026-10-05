@@ -1,0 +1,11 @@
+LEGACY PRESET 0 difference 0
+LEGACY PRESET 1 difference 0
+LEGACY PRESET 2 difference 0
+LEGACY PRESET 3 difference 0
+LEGACY PRESET 4 difference 0
+LEGACY PRESET 5 difference 0
+TILED solid
+TILED transparent
+PREVIEW ACCUMULATION [{"lit":1513,"glError":0,"lost":false,"drawFramebufferRestored":true,"readFramebufferRestored":true,"blendDisabled":true,"scissorDisabled":true,"bakes":1}]
+{"presets": [{"name": "Aurora liquida", "difference": 0}, {"name": "Vetro orbitale", "difference": 0}, {"name": "Mercurio", "difference": 0}, {"name": "Eclisse rosa", "difference": 0}, {"name": "Anello aurora", "difference": 0}, {"name": "Nebbia pastello", "difference": 0}], "tiling": [{"mode": "solid", "difference": 0}, {"mode": "solid", "accumulated": true, "difference": 0}, {"mode": "transparent", "difference": 0}, {"mode": "transparent", "accumulated": true, "difference": 0}], "previewAccumulation": [{"lit": 1513, "glError": 0, "lost": false, "drawFramebufferRestored": true, "readFramebufferRestored": true, "blendDisabled": true, "scissorDisabled": true, "bakes": 1}]}
+ALL SIX LEGACY PRESETS AND EXACT TILED EXPORT PASS

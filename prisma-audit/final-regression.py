@@ -1,0 +1,15 @@
+from playwright.sync_api import sync_playwright
+from PIL import Image,ImageDraw,ImageFont
+from pathlib import Path
+import json,base64,io,numpy as np
+out=Path('/workspace/prisma-audit')
+with sync_playwright() as p:
+ b=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--use-angle=gl-egl','--ignore-gpu-blocklist','--disable-gpu-sandbox']);page=b.new_page();page.goto('http://127.0.0.1:4173/renderer.js')
+ data=page.evaluate('''async()=>{
+ const {Renderer}=await import('./renderer.js'),{newCreation,motionPreset}=await import('./creative-model.js'),{MATERIAL_STYLES,newLight}=await import('./studio-model.js');const c=document.createElement('canvas'),r=new Renderer(c),metrics={};
+ const q=Object.assign(newCreation(),MATERIAL_STYLES[17].values,{translucency:1,subsurface:.8,transparency:0,thinShell:0,hollow:0,scattering:.5,dispersion:.2});q.lights=[{...newLight(1),type:'orb',x:.3,y:.2,z:0,size:.12,length:.12,power:3,color:'#ffd39a',visible:false}];r.draw(q,0,48,48);r.pixels();metrics.fullMixGL=r.gl.getError();metrics.fullMixVariant=Array.from(r.programs.keys()).at(-1);
+ const grain=Object.assign(newCreation(),{grain:.15,photoAll:false});await r.drawAccumulated(grain,0,96,96,{samples:4});const a=r.pixels();metrics.grainBackground=Array.from(a.slice(0,4));grain.photoAll=true;await r.drawAccumulated(grain,0,96,96,{samples:4});const z=r.pixels();let peak=0;for(let y=0;y<12;y++)for(let x=0;x<12;x++)peak=Math.max(peak,...z.slice((y*96+x)*4,(y*96+x)*4+3));metrics.grainOnBackground=peak;metrics.grainGL=r.gl.getError();
+ const mask=Object.assign(newCreation(),{transparency:1,thinFilm:0,iridescence:0,metal:0,coat:0,refraction:1,absorption:0,tintStrength:0,bgMode:'transparent'});mask.lights=[];r.draw(mask,0,96,96,{preview:true});await r.drawAccumulated(mask,0,96,96,{samples:4,preview:true});const smooth=r.pixels();mask.positionX=4;await r.drawAccumulated(mask,0,96,96,{samples:4,preview:true});const empty=r.pixels();metrics.previewCheckerCenterDifference=empty.slice((48*96+48)*4,(48*96+48)*4+3).reduce((n,v,i)=>n+Math.abs(v-smooth[(48*96+48)*4+i]),0);
+ const human=newCreation();r.draw(human,0,96,96);const high=r.pixels();human.iridescence=0;r.draw(human,0,96,96);const low=r.pixels();metrics.iridescenceControlDifference=high.reduce((n,v,i)=>n+Math.abs(v-low[i]),0);Object.assign(human,MATERIAL_STYLES[11].values);r.draw(human,0,96,96);const glossy=r.pixels();human.gloss=0;r.draw(human,0,96,96);const matte=r.pixels();metrics.glossControlDifference=glossy.reduce((n,v,i)=>n+Math.abs(v-matte[i]),0);r.dispose();return metrics;}''')
+ print(json.dumps(data),flush=True);assert data['iridescenceControlDifference']>10000 and data['glossControlDifference']>10000,data;assert data['fullMixGL']==0 and data['fullMixVariant']==47,data;assert data['grainBackground']==[0,0,0,255] and data['grainGL']==0 and data['grainOnBackground']>0,data;assert data['previewCheckerCenterDifference']<8,data;(out/'final-regression.json').write_text(json.dumps(data,indent=2));b.close()
+ print('Combined layers, volume, SSS, dispersion, grain mask, transparent preview accumulation: PASS',flush=True)

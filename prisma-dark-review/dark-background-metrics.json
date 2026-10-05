@@ -1,0 +1,158 @@
+[
+  {
+    "name": "Nero puro",
+    "top": [
+      0,
+      0,
+      0
+    ],
+    "bottom": [
+      0,
+      0,
+      0
+    ]
+  },
+  {
+    "name": "Nero carbone",
+    "top": [
+      7,
+      7,
+      8
+    ],
+    "bottom": [
+      7,
+      7,
+      8
+    ]
+  },
+  {
+    "name": "Grafite pieno",
+    "top": [
+      25,
+      26,
+      29
+    ],
+    "bottom": [
+      25,
+      26,
+      29
+    ]
+  },
+  {
+    "name": "Ardesia piena",
+    "top": [
+      48,
+      50,
+      55
+    ],
+    "bottom": [
+      48,
+      50,
+      55
+    ]
+  },
+  {
+    "name": "Grigio fumo",
+    "top": [
+      61,
+      63,
+      67
+    ],
+    "bottom": [
+      61,
+      63,
+      67
+    ]
+  },
+  {
+    "name": "Nero velluto",
+    "top": [
+      20,
+      21,
+      24
+    ],
+    "bottom": [
+      1,
+      1,
+      2
+    ]
+  },
+  {
+    "name": "Antracite",
+    "top": [
+      37,
+      39,
+      44
+    ],
+    "bottom": [
+      10,
+      11,
+      13
+    ]
+  },
+  {
+    "name": "Notte blu",
+    "top": [
+      11,
+      18,
+      31
+    ],
+    "bottom": [
+      1,
+      2,
+      4
+    ]
+  },
+  {
+    "name": "Petrolio profondo",
+    "top": [
+      11,
+      22,
+      23
+    ],
+    "bottom": [
+      1,
+      4,
+      5
+    ]
+  },
+  {
+    "name": "Prugna nera",
+    "top": [
+      25,
+      14,
+      25
+    ],
+    "bottom": [
+      4,
+      1,
+      4
+    ]
+  },
+  {
+    "name": "Bruno fum\u00e9",
+    "top": [
+      29,
+      22,
+      18
+    ],
+    "bottom": [
+      5,
+      4,
+      3
+    ]
+  },
+  {
+    "name": "Argento scuro",
+    "top": [
+      52,
+      54,
+      60
+    ],
+    "bottom": [
+      17,
+      18,
+      22
+    ]
+  }
+]

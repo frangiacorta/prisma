@@ -1,0 +1,9 @@
+import asyncio,json,pathlib
+from playwright.async_api import async_playwright
+R=pathlib.Path('/workspace/prisma-user-export');P=json.loads(pathlib.Path('/workspace/attachments/4e93de70-cd4f-4a85-a8cb-2756bb8eb15a/Pasted text.txt').read_text())
+async def main():
+ async with async_playwright() as p:
+  b=await p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--use-angle=gl-egl','--ignore-gpu-blocklist','--disable-gpu-sandbox']);page=await b.new_page();await page.route('**/bench',lambda r:r.fulfill(content_type='text/html',body='<canvas></canvas>'));await page.goto('http://127.0.0.1:4190/bench');await page.expose_function('report',lambda x:print(json.dumps(x),flush=True))
+  result=await page.evaluate('''async p=>{const {CachedRenderer}=await import('/cached-export.js');const r=new CachedRenderer(document.querySelector('canvas')),out=[];for(const [w,h] of [[256,144],[1920,1080]]){r.mode='baseline';let t=performance.now();await r.drawAccumulated(p.state,p.phase,w,h,{samples:2});const baseline=r.pixels();await report({kind:'baseline',w,ms:performance.now()-t});r.caches=[];t=performance.now();await r.bake(p.state,p.phase,w,h,2);await report({kind:'bake',w,ms:performance.now()-t});for(let k=0;k<3;k++){t=performance.now();await r.drawAccumulated(p.state,p.phase+k*.4,w,h,{samples:2});const actual=r.pixels(),ms=performance.now()-t;let sum=0,max=0,bad=0;if(k===0)for(let i=0;i<actual.length;i++){const d=Math.abs(actual[i]-baseline[i]);sum+=d;max=Math.max(max,d);if(d>1)bad++;}const item={w,h,k,ms,max,mean:sum/actual.length,bad};out.push(item);await report(item);}}window.r=r;return out;}''',P)
+  (R/'cache-benchmark.json').write_text(json.dumps(result,indent=2));await page.locator('canvas').screenshot(path=str(R/'cached1080.png'));await b.close()
+asyncio.run(main())

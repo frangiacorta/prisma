@@ -1,0 +1,10 @@
+{
+  "startup": true,
+  "contextRecovery": true,
+  "safeReload": true,
+  "projectDownload": true,
+  "favorites": true,
+  "variants": 8,
+  "offlineWallpaper": true,
+  "pageErrors": []
+}

@@ -1,0 +1,18 @@
+{"stage": "context", "hardware": {"name": "ANGLE (Mesa, llvmpipe (LLVM 19.1.7 256 bits), OpenGL ES 3.2)", "software": true, "powerPreference": "high-performance", "timingAvailable": true}, "roots": 21, "segments": 252, "nodes": 503, "unchangedNormalized": false}
+{"stage": "prepare-start", "label": "preview64"}
+{"stage": "prepare-done", "label": "preview64", "prepareMs": 2125.7999999821186, "programs": [14344, 16384]}
+{"stage": "draw-start", "label": "preview64"}
+{"label": "preview64", "width": 64, "height": 36, "prepareMs": 2125.7999999821186, "drawMs": 15759.5, "ok": true, "lost": false, "error": 0, "bakes": 1, "fieldResolution": 80, "lit": 1367, "png": null, "stage": "draw-done"}
+{"stage": "prepare-start", "label": "full64-cold"}
+{"stage": "prepare-done", "label": "full64-cold", "prepareMs": 3177, "programs": [14344, 16384, 34888]}
+{"stage": "draw-start", "label": "full64-cold"}
+{"label": "full64-cold", "width": 64, "height": 36, "prepareMs": 3177, "drawMs": 31042.100000023842, "ok": true, "lost": false, "error": 0, "bakes": 1, "fieldResolution": 80, "lit": 1317, "png": null, "stage": "draw-done"}
+{"stage": "prepare-start", "label": "full64-warm"}
+{"stage": "prepare-done", "label": "full64-warm", "prepareMs": 0, "programs": [14344, 16384, 34888]}
+{"stage": "draw-start", "label": "full64-warm"}
+{"label": "full64-warm", "width": 64, "height": 36, "prepareMs": 0, "drawMs": 430.7999999821186, "ok": true, "lost": false, "error": 0, "bakes": 1, "fieldResolution": 80, "lit": 1317, "png": null, "stage": "draw-done"}
+{"stage": "prepare-start", "label": "full128"}
+{"stage": "prepare-done", "label": "full128", "prepareMs": 0.20000001788139343, "programs": [14344, 16384, 34888]}
+{"stage": "draw-start", "label": "full128"}
+{"label": "full128", "width": 128, "height": 72, "prepareMs": 0.20000001788139343, "drawMs": 1068.699999988079, "ok": true, "lost": false, "error": 0, "bakes": 1, "fieldResolution": 80, "lit": 5299, "png": null, "stage": "draw-done"}
+BASELINE COMPLETE

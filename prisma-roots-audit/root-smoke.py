@@ -1,0 +1,6 @@
+from playwright.sync_api import sync_playwright
+import json
+with sync_playwright() as p:
+ b=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--use-angle=gl-egl','--ignore-gpu-blocklist','--disable-gpu-sandbox'])
+ pg=b.new_page();pg.set_default_timeout(180000);pg.on('console',lambda m:print(m.text,flush=True));pg.route('**/__smoke__',lambda r:r.fulfill(body='<html></html>',content_type='text/html'));pg.goto('http://127.0.0.1:4186/__smoke__')
+ r=pg.evaluate('''async()=>{const {Renderer}=await import('/renderer.js');const {newCreation,sculpt,material,motionPreset}=await import('/creative-model.js');const r=new Renderer(document.createElement('canvas'));const result=[];for(const index of [-1,4,5,6,7]){const s=newCreation();if(index>=0)sculpt(s,index);material(s,14);s.transparency=0;const times=[];for(let i=0;i<4;i++){const t=performance.now();await r.prepareAsync(s,0,{preview:true,quality:'fast'});r.draw(s,0,128,128,{preview:true,quality:'fast'});await r.waitForGpu();times.push(performance.now()-t);if(r.gl.getError())throw Error('GL error');}const out={index,times,field:r.fieldResolution,roots:r.rootStorage?.nodeCount};result.push(out);console.log(JSON.stringify(out));}r.dispose();return result;}''');print(json.dumps(r));b.close()

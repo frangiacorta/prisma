@@ -1,0 +1,20 @@
+PROGRAM REUSE [{"amount":0,"count":2},{"amount":0.05,"count":2,"ms":331.5},{"amount":0.15,"count":2,"ms":9.700000002980232},{"amount":0.35,"count":2,"ms":15.400000005960464},{"amount":0.7,"count":2,"ms":14.799999997019768},{"amount":1,"count":2,"ms":9.600000008940697}]
+CACHE [{"kind":"reuse","key":"rotateX","before":5,"after":5},{"kind":"reuse","key":"rotateY","before":5,"after":5},{"kind":"reuse","key":"rotateZ","before":5,"after":5},{"kind":"reuse","key":"scale","before":5,"after":5},{"kind":"reuse","key":"positionX","before":5,"after":5},{"kind":"reuse","key":"positionY","before":5,"after":5},{"kind":"reuse","key":"stretchX","before":5,"after":5},{"kind":"reuse","key":"stretchY","before":5,"after":5},{"kind":"reuse","key":"stretchZ","before":5,"after":5},{"kind":"reuse","key":"volume","before":5,"after":5},{"kind":"reuse","key":"roughness","before":5,"after":5},{"kind":"reuse","key":"metal","before":5,"after":5},{"kind":"reuse","key":"gloss","before":5,"after":5},{"kind":"reuse","key":"background","before":5,"after":5},{"kind":"reuse","key":"bgMode","before":5,"after":5},{"kind":"reuse","key":"light-position","before":5,"after":5},{"kind":"reuse","key":"light-color","before":5,"after":5},{"kind":"reuse","key":"palette","before":5,"after":5},{"kind":"reuse","key":"material","before":5,"after":5},{"kind":"rebuild","key":"petalAmount","before":5,"after":6},{"kind":"rebuild","key":"petalOpen","before":6,"after":7},{"kind":"rebuild","key":"petalCurl","before":7,"after":8},{"kind":"rebuild","key":"petalWidth","before":8,"after":9},{"kind":"rebuild","key":"petalCount","before":9,"after":10},{"kind":"rebuild","key":"deform","before":10,"after":11},{"kind":"rebuild","key":"twist","before":11,"after":12},{"kind":"rebuild","key":"hole","before":12,"after":13}]
+ANIMATION CACHE [{"frame":0,"ms":3423.5,"before":13,"after":14},{"frame":1,"ms":125.29999999701977,"before":14,"after":15},{"frame":2,"ms":148.6000000089407,"before":15,"after":16},{"frame":3,"ms":124.29999999701977,"before":16,"after":17},{"frame":4,"ms":132.8999999910593,"before":17,"after":18},{"frame":5,"ms":150.6000000089407,"before":18,"after":19},{"frame":6,"ms":129.29999999701977,"before":19,"after":20},{"frame":7,"ms":127.1000000089407,"before":20,"after":21}]
+REFERENCE partial petals 96 7689.1ms
+REFERENCE partial petals 256 28.3ms
+GEOMETRY {"name":"partial petals","size":96,"quality":"fast","ms":12.899999991059303,"iou":0.9949443882709808,"silhouetteMismatches":10,"meanNormalChannelDifference":2.2669376693766936}
+GEOMETRY {"name":"partial petals","size":256,"quality":"fast","ms":14.700000002980232,"iou":0.9917508178068554,"silhouetteMismatches":116,"meanNormalChannelDifference":2.309861848080692}
+GEOMETRY {"name":"partial petals","size":96,"quality":"balanced","ms":26.899999991059303,"iou":0.9969666329625885,"silhouetteMismatches":6,"meanNormalChannelDifference":0.9942528735632183}
+GEOMETRY {"name":"partial petals","size":256,"quality":"balanced","ms":21.30000001192093,"iou":0.9958042952638316,"silhouetteMismatches":59,"meanNormalChannelDifference":1.003975338617915}
+REFERENCE organic needles 96 11548.0ms
+REFERENCE organic needles 256 233.0ms
+GEOMETRY {"name":"organic needles","size":96,"quality":"fast","ms":146.79999999701977,"iou":0.9471788715486195,"silhouetteMismatches":176,"meanNormalChannelDifference":4.1215673848753696}
+GEOMETRY {"name":"organic needles","size":256,"quality":"fast","ms":27.5,"iou":0.9440020225003161,"silhouetteMismatches":1329,"meanNormalChannelDifference":4.168913289293578}
+GEOMETRY {"name":"organic needles","size":96,"quality":"balanced","ms":261.5,"iou":0.962484993997599,"silhouetteMismatches":125,"meanNormalChannelDifference":2.625922461282611}
+GEOMETRY {"name":"organic needles","size":256,"quality":"balanced","ms":28.200000002980232,"iou":0.9599224577521177,"silhouetteMismatches":951,"meanNormalChannelDifference":2.799616589106448}
+MATERIAL bubble 157.1ms
+MATERIAL water 61.6ms
+MATERIAL metal 25.8ms
+MATERIAL sss 3598.0ms
+CACHE, SHADER REUSE, GEOMETRY AND MATERIAL CHECKS PASS

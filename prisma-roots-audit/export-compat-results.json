@@ -1,0 +1,164 @@
+[
+  {
+    "ready": {
+      "backend": "native",
+      "storage": "disk",
+      "frames": 0,
+      "encodedFrames": 0,
+      "maxPendingFrames": 0,
+      "softwareSegments": 0,
+      "largestSoftwareSegment": 0
+    },
+    "stats": {
+      "backend": "native",
+      "storage": "disk",
+      "frames": 1500,
+      "encodedFrames": 1500,
+      "maxPendingFrames": 7,
+      "softwareSegments": 0,
+      "largestSoftwareSegment": 0,
+      "bytes": 1016729
+    },
+    "playback": {
+      "duration": 25,
+      "currentTime": 24.8,
+      "readyState": 4
+    },
+    "bytes": 1016729,
+    "bufferIsBlob": true,
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "r_frame_rate": "60/1",
+          "duration": "25.000000",
+          "nb_frames": "1500",
+          "nb_read_frames": "1500"
+        }
+      ]
+    },
+    "name": "legacy-25sec-native"
+  },
+  {
+    "ready": {
+      "backend": "software",
+      "storage": "disk",
+      "frames": 0,
+      "encodedFrames": 0,
+      "maxPendingFrames": 0,
+      "softwareSegments": 0,
+      "largestSoftwareSegment": 0
+    },
+    "stats": {
+      "backend": "software",
+      "storage": "disk",
+      "frames": 1500,
+      "encodedFrames": 1500,
+      "maxPendingFrames": 60,
+      "softwareSegments": 25,
+      "largestSoftwareSegment": 36136,
+      "bytes": 661357
+    },
+    "playback": {
+      "duration": 25,
+      "currentTime": 24.8,
+      "readyState": 4
+    },
+    "bytes": 661357,
+    "bufferIsBlob": true,
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "r_frame_rate": "60/1",
+          "duration": "25.000000",
+          "nb_frames": "1500",
+          "nb_read_frames": "1500"
+        }
+      ]
+    },
+    "name": "legacy-25sec-software"
+  },
+  {
+    "ready": {
+      "backend": "native",
+      "storage": "disk",
+      "frames": 0,
+      "encodedFrames": 0,
+      "maxPendingFrames": 0,
+      "softwareSegments": 0,
+      "largestSoftwareSegment": 0
+    },
+    "stats": {
+      "backend": "native",
+      "storage": "disk",
+      "frames": 1500,
+      "encodedFrames": 1500,
+      "maxPendingFrames": 3,
+      "softwareSegments": 0,
+      "largestSoftwareSegment": 0,
+      "bytes": 1057933
+    },
+    "playback": {
+      "duration": 25,
+      "currentTime": 24.8,
+      "readyState": 4
+    },
+    "bytes": 1057933,
+    "bufferIsBlob": false,
+    "probe": {
+      "programs": [],
+      "stream_groups": [],
+      "streams": [
+        {
+          "codec_name": "h264",
+          "r_frame_rate": "60/1",
+          "duration": "25.000000",
+          "nb_frames": "1500",
+          "nb_read_frames": "1500"
+        }
+      ]
+    },
+    "name": "modern-25sec-native"
+  },
+  {
+    "invalid": [
+      {
+        "name": "missing-modern",
+        "error": "Manca il numero di fotogrammi del video. Ricarica la pagina e riprova."
+      },
+      {
+        "name": "null",
+        "error": "Il numero di fotogrammi del video non \u00e8 valido. Ricarica la pagina e riprova."
+      },
+      {
+        "name": "nan",
+        "error": "Il numero di fotogrammi del video non \u00e8 valido. Ricarica la pagina e riprova."
+      },
+      {
+        "name": "infinity",
+        "error": "Il numero di fotogrammi del video non \u00e8 valido. Ricarica la pagina e riprova."
+      },
+      {
+        "name": "zero",
+        "error": "Il video deve contenere almeno un fotogramma."
+      },
+      {
+        "name": "fraction",
+        "error": "Il numero di fotogrammi del video non \u00e8 valido. Ricarica la pagina e riprova."
+      },
+      {
+        "name": "long-30fps",
+        "error": "Il video supera un\u2019ora. Riduci la durata del loop o aumenta la velocit\u00e0."
+      },
+      {
+        "name": "long-60fps",
+        "error": "Il video supera un\u2019ora. Riduci la durata del loop o aumenta la velocit\u00e0."
+      }
+    ]
+  }
+]

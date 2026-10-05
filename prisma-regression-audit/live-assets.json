@@ -1,0 +1,92 @@
+[
+  {
+    "file": "index.html",
+    "status": 200,
+    "type": "text/html",
+    "bytes": 12513,
+    "matchesCheckout": true,
+    "cache": "public, max-age=0, must-revalidate",
+    "sha256": "ab1c6c32b612c597459034a2de470a72081237ab261e46496a46422ebf2c6835"
+  },
+  {
+    "file": "app.js",
+    "status": 200,
+    "type": "text/javascript",
+    "bytes": 55008,
+    "matchesCheckout": true,
+    "cache": "public, max-age=0, must-revalidate",
+    "sha256": "3b105d500747486d5c7a29b9ac773f1ac1d21d0a022e674ebea548f3766bb076"
+  },
+  {
+    "file": "renderer.js",
+    "status": 200,
+    "type": "text/javascript",
+    "bytes": 75504,
+    "matchesCheckout": true,
+    "cache": "public, max-age=0, must-revalidate",
+    "sha256": "192eedd64f045acecf564484f0a92d1946232ebdc5232dfcce3ce6314b61a172"
+  },
+  {
+    "file": "studio-model.js",
+    "status": 200,
+    "type": "text/javascript",
+    "bytes": 17919,
+    "matchesCheckout": true,
+    "cache": "public, max-age=0, must-revalidate",
+    "sha256": "072e6c1d63411579b95cc05577623c2bb45635190c56bee0fda3e8cf8ecc4e68"
+  },
+  {
+    "file": "model.js",
+    "status": 200,
+    "type": "text/javascript",
+    "bytes": 8622,
+    "matchesCheckout": true,
+    "cache": "public, max-age=0, must-revalidate",
+    "sha256": "58cb7a191b2a388c1f37665bba6577c06b4758771742d1f47177cc8c6dbfbb62"
+  },
+  {
+    "file": "panels.js",
+    "status": 200,
+    "type": "text/javascript",
+    "bytes": 16975,
+    "matchesCheckout": true,
+    "cache": "public, max-age=0, must-revalidate",
+    "sha256": "feed6901399a8b58e85eff42943616e49850e981a90a7dc97e053a153e6cb390"
+  },
+  {
+    "file": "creative-model.js",
+    "status": 200,
+    "type": "text/javascript",
+    "bytes": 11644,
+    "matchesCheckout": true,
+    "cache": "public, max-age=0, must-revalidate",
+    "sha256": "336f276fb5a692ee10d448ea6eb06f06f991f040ebae8c9218561d689e4f1769"
+  },
+  {
+    "file": "description.js",
+    "status": 200,
+    "type": "text/javascript",
+    "bytes": 16548,
+    "matchesCheckout": true,
+    "cache": "public, max-age=0, must-revalidate",
+    "sha256": "556d2b715c3d028f88139a47eb0df6883f016528da3e8ae7e659b7ee59e33952"
+  },
+  {
+    "file": "preview-quality.js",
+    "status": 200,
+    "type": "text/javascript",
+    "bytes": 1557,
+    "matchesCheckout": true,
+    "cache": "public, max-age=0, must-revalidate",
+    "sha256": "e058b89966ccf53aa99f1d9ea735799acb928452e2e6e0a685dc7060286c2d2f"
+  },
+  {
+    "file": "style.css",
+    "status": 200,
+    "type": "text/css",
+    "bytes": 27859,
+    "matchesCheckout": true,
+    "cache": "public, max-age=0, must-revalidate",
+    "sha256": "b1b23fc180bfb79c7750bc44247674625c46ceda153220bf2e51e81d964c131d"
+  }
+]

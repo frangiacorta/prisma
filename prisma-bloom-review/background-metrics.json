@@ -1,0 +1,31 @@
+{
+  "compatibility": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "gradient": {
+    "top": [
+      255,
+      255,
+      255
+    ],
+    "bottom": [
+      0,
+      0,
+      0
+    ]
+  },
+  "heightChange": 2800224,
+  "softnessChange": 1420128,
+  "lightChange": 3259662,
+  "restored": true,
+  "clearAlphaMax": 0,
+  "glError": 0
+}

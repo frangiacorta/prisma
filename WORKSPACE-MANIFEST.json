@@ -1,0 +1,3408 @@
+{
+  "createdAt": "2026-10-05T19:35:53.900381+02:00",
+  "source": "/workspace",
+  "files": [
+    {
+      "path": "error.log",
+      "bytes": 104,
+      "sha256": "a9a14e3a4f13fc031c1359e4f181adb3b2eb4ed64911c7edcefef4def543e0d5"
+    },
+    {
+      "path": "attachments/492ed12a-996c-4a9e-99b5-92ad3c43aa42/Pasted text.txt",
+      "bytes": 12671,
+      "sha256": "79ee1ba84a82b9023ff2d0b79f0c6267d3e324bc092124b3c3f3af8c2a309de9"
+    },
+    {
+      "path": "attachments/4e93de70-cd4f-4a85-a8cb-2756bb8eb15a/Pasted text.txt",
+      "bytes": 14179,
+      "sha256": "fea877b9f20b1a8d668f925e54574b35ec9adc3756951c8f655ce434d58e770b"
+    },
+    {
+      "path": "attachments/cedc9f77-3cbc-4597-aecb-0c94ace2b5cf/Pasted text.txt",
+      "bytes": 12655,
+      "sha256": "e086cc3ed533ea2bbe6ddc14dc49631ad84165baff799086a1ec0f0aca394067"
+    },
+    {
+      "path": "prisma-audit/antialias-diagnosi.png",
+      "bytes": 13622,
+      "sha256": "25e44cdece2d817bb9b905e450ed7288fc48dfb35f44d3e5414e8e4cc25228e7"
+    },
+    {
+      "path": "prisma-audit/audit.py",
+      "bytes": 5563,
+      "sha256": "7fcd8381458e5830af2dca0bc6f502acef495d27c4cc00108710b0f375dd2984"
+    },
+    {
+      "path": "prisma-audit/baseline.json",
+      "bytes": 280622,
+      "sha256": "b7b2e7250dd8bffee9b2f6792c6601da3e973a90c0f8c575577b66df1880d802"
+    },
+    {
+      "path": "prisma-audit/before-00.png",
+      "bytes": 51635,
+      "sha256": "2b8263186d3c3b5c63295235c19bd0c537067dd1a1b5aeeb6872300414e51b16"
+    },
+    {
+      "path": "prisma-audit/before-01.png",
+      "bytes": 46649,
+      "sha256": "cfd85d35ac02cff4736f29f8646c0a436acb2fff074ae76783589e48a42dfc5b"
+    },
+    {
+      "path": "prisma-audit/before-02.png",
+      "bytes": 49227,
+      "sha256": "1700dd687331dcf5384e4f192a9a71e797347a93e836fff58106fc130a275a62"
+    },
+    {
+      "path": "prisma-audit/before-03.png",
+      "bytes": 70074,
+      "sha256": "20759715a81d2a9138780258f959b927a167bc5f18f7e458bce192ff16a21d89"
+    },
+    {
+      "path": "prisma-audit/before-04.png",
+      "bytes": 59465,
+      "sha256": "eefc85b958826c5f374a6044d2993cfedf0f2a939589fd4d4c2d5c98187b57b8"
+    },
+    {
+      "path": "prisma-audit/before-05.png",
+      "bytes": 66346,
+      "sha256": "69a26d6977a57a1e20dfaa430be76bc4e7b0506724a7e92ac43859f4a02fa930"
+    },
+    {
+      "path": "prisma-audit/before-06.png",
+      "bytes": 39571,
+      "sha256": "fdffd50efe00965bc57881c565bbf98c1e6d159b434af2902af022638f2dd57f"
+    },
+    {
+      "path": "prisma-audit/before-07.png",
+      "bytes": 47782,
+      "sha256": "0e98aebba5f1e8fd37f0751d55dabf3da11674441466f94a542d1ed034253ecb"
+    },
+    {
+      "path": "prisma-audit/before-08.png",
+      "bytes": 47641,
+      "sha256": "970ccf5c4c3f2383f1e44f2113afdcd03bcf5d0d6e5f3d6706f46decf450fd4a"
+    },
+    {
+      "path": "prisma-audit/before-09.png",
+      "bytes": 52152,
+      "sha256": "76f38f50c76d77e294f578f8adbb0315410d6e960ca23f28579ad52d33fba693"
+    },
+    {
+      "path": "prisma-audit/before-10.png",
+      "bytes": 54380,
+      "sha256": "86c3c5290bd3a33d6bbf042c4219dab4f26764ceb1954c600e5cd70dd267726d"
+    },
+    {
+      "path": "prisma-audit/before-11.png",
+      "bytes": 51525,
+      "sha256": "8f68c8b5d1cd08175ed3a1ac6dc700043ea8033dbbd3882b7e63cd78d327e9ca"
+    },
+    {
+      "path": "prisma-audit/before-12.png",
+      "bytes": 51548,
+      "sha256": "2ea2fb041124de1674958f357161021aa8167a7f2aa9daad8d1a9e7e48ae285b"
+    },
+    {
+      "path": "prisma-audit/before-13.png",
+      "bytes": 55191,
+      "sha256": "bbccc9b59227fafa2cc996d61cc62eaa6cf281544e07f92e5b71f1124b0c7c66"
+    },
+    {
+      "path": "prisma-audit/before-14.png",
+      "bytes": 29746,
+      "sha256": "5ff2c98a2c1a44259a9fcfc59301b75f93d61a3558c6f3f0d4c4ba7b4abae343"
+    },
+    {
+      "path": "prisma-audit/before-15.png",
+      "bytes": 42998,
+      "sha256": "b6d39249509011a226786015b0d436b15e1c9c2dbdb5869ee0538b4548242839"
+    },
+    {
+      "path": "prisma-audit/before-16.png",
+      "bytes": 48724,
+      "sha256": "ede6f8bc454465e91116ab38246ccdf56cb1ba4a593188edfe791d65096d54aa"
+    },
+    {
+      "path": "prisma-audit/before-17.png",
+      "bytes": 51309,
+      "sha256": "4390a027f75100e966271a833ce57728e0c19885117b1c40d3cbb18333147b67"
+    },
+    {
+      "path": "prisma-audit/before-18.png",
+      "bytes": 51363,
+      "sha256": "0d3e713233ac59a096411841534f3dfc68bbd98a26e19c5c433f63afb38efadd"
+    },
+    {
+      "path": "prisma-audit/before-19.png",
+      "bytes": 31451,
+      "sha256": "a3a424a29790545921fdd103e04b13a4de35be13736e83acc5880613f1535405"
+    },
+    {
+      "path": "prisma-audit/before-20.png",
+      "bytes": 30815,
+      "sha256": "a369a46448f78744ed7bfea300d518a68d88c3857c60237b56266bab9dcfeec3"
+    },
+    {
+      "path": "prisma-audit/before-21.png",
+      "bytes": 30443,
+      "sha256": "6825a79748398fa7804a23150434ffd0b5728d3e12339cae67e92516368828f9"
+    },
+    {
+      "path": "prisma-audit/before-22.png",
+      "bytes": 31513,
+      "sha256": "219991cdbf4357c46b7d02f9d99688775aa25b45993fdd6466ef742a4bae1288"
+    },
+    {
+      "path": "prisma-audit/before-23.png",
+      "bytes": 30620,
+      "sha256": "dcc22e62bf807029472d9ae0814daf5198eec04b5715d350262a98ad6f3e5643"
+    },
+    {
+      "path": "prisma-audit/before-24.png",
+      "bytes": 31451,
+      "sha256": "a3a424a29790545921fdd103e04b13a4de35be13736e83acc5880613f1535405"
+    },
+    {
+      "path": "prisma-audit/before-25.png",
+      "bytes": 8706,
+      "sha256": "cfa886e7f9c0002bce77b4365e64897112c27c2fc94546d318d71cc81ee71952"
+    },
+    {
+      "path": "prisma-audit/before-26.png",
+      "bytes": 11815,
+      "sha256": "1825b4805cea0e9b472bd8edc8c46ec342dcd963166bf46fc0a7fe8f839237b1"
+    },
+    {
+      "path": "prisma-audit/before-27.png",
+      "bytes": 11749,
+      "sha256": "9673df0b85803401b520a9bad241954dea3da2361eb75ec1d1239e4fa57ac299"
+    },
+    {
+      "path": "prisma-audit/before-28.png",
+      "bytes": 4565,
+      "sha256": "e0fcca3891c75471088adbfabfbe67a3985e68809322f1b88b4ee8af20c08784"
+    },
+    {
+      "path": "prisma-audit/before-29.png",
+      "bytes": 22516,
+      "sha256": "365aea743d190e6cd535d1441f3f8e4bc756fc011bfa0c32ecdf899587046055"
+    },
+    {
+      "path": "prisma-audit/before-30.png",
+      "bytes": 24073,
+      "sha256": "92f02616012eafb4dccc0dd1b17d0c8721068791bd7ce8cfa5102aecf1838846"
+    },
+    {
+      "path": "prisma-audit/before-31.png",
+      "bytes": 3198,
+      "sha256": "a129dcfde005a9e6b5b46f599d26ae37585357b6ef13d5ad814d64c2313cd7ca"
+    },
+    {
+      "path": "prisma-audit/before-32.png",
+      "bytes": 3581,
+      "sha256": "095513d51cf8fa6fe2529d59a2a2fbc1a6f590160efe90deff6de33d6f829740"
+    },
+    {
+      "path": "prisma-audit/confronto-material.png",
+      "bytes": 869937,
+      "sha256": "c9487e3cef98c6433e462385d0e5215e76a7fe9df36d9ef1d267792a7cff92ca"
+    },
+    {
+      "path": "prisma-audit/confronto-preset.png",
+      "bytes": 449378,
+      "sha256": "a80f1361b91e2f4ce1f58c31ac012229fec4af7f18b85101c92d6edbcb59b299"
+    },
+    {
+      "path": "prisma-audit/creative-ui.js",
+      "bytes": 8120,
+      "sha256": "1318851481d34fbe29aa690709f93d2c2c4060ffd310496a0860753823fa44a6"
+    },
+    {
+      "path": "prisma-audit/detail-00.png",
+      "bytes": 47833,
+      "sha256": "480a0def4313b25c7389633c76f27c228f5ceba26474ee2e82d43c1a64677399"
+    },
+    {
+      "path": "prisma-audit/detail-01.png",
+      "bytes": 46451,
+      "sha256": "d657a777eda314a4c2862d9642b9f394b9263e05bffd380d0f2013fe0d5c2724"
+    },
+    {
+      "path": "prisma-audit/detail-02.png",
+      "bytes": 42000,
+      "sha256": "f32dc3a7f47474906f2ae08f69c81aeef59ec67c1eafc3651c5f093625a60815"
+    },
+    {
+      "path": "prisma-audit/detail-03.png",
+      "bytes": 42895,
+      "sha256": "0575b35e0c7deb93be5fc42c411d5debba31f841cb3d73313eb322faa9f5ec77"
+    },
+    {
+      "path": "prisma-audit/detail-04.png",
+      "bytes": 47785,
+      "sha256": "348497e7755892c795b9f05e10282fc1d3e6046bdb7f9271da47b7aa1831c8ce"
+    },
+    {
+      "path": "prisma-audit/detail-05.png",
+      "bytes": 44279,
+      "sha256": "d8e795f8a7a44855c9118789d800f3bd532c319b6e32e07c4006a3f480eb4393"
+    },
+    {
+      "path": "prisma-audit/detail-06.png",
+      "bytes": 40563,
+      "sha256": "b4a42170e0082260a7513f41fea1050c3d430fe11c6848806ae75e62f6c0c1b0"
+    },
+    {
+      "path": "prisma-audit/detail-07.png",
+      "bytes": 40915,
+      "sha256": "ac5ea6dae18d184faeaac186081fe7aba8eeaa7c08f6d0e2ef91d9331b8091e3"
+    },
+    {
+      "path": "prisma-audit/detail-08.png",
+      "bytes": 5077,
+      "sha256": "43a08a499ffc69fda21353461bc2a24a8f5309cf2a5cc866020ee0ff9f599c11"
+    },
+    {
+      "path": "prisma-audit/details.json",
+      "bytes": 149,
+      "sha256": "0c344e86fedcaa93ca60287c017abfa32c682ca7eccd5cadff884d219947f825"
+    },
+    {
+      "path": "prisma-audit/details.py",
+      "bytes": 3761,
+      "sha256": "d7465eddfe46200847db0075eab36255725b57620d1ee1bb13b6e37650a287fd"
+    },
+    {
+      "path": "prisma-audit/export-final-4k.png",
+      "bytes": 1508412,
+      "sha256": "0c33a04cef10efc44ac2e2825a2632f41b55a19ec3ee53804165b7f19a26cf57"
+    },
+    {
+      "path": "prisma-audit/export-final.jpg",
+      "bytes": 6515,
+      "sha256": "30196efa07c15028229bb528bfae96386f085fe061fa443692e2109b54a29276"
+    },
+    {
+      "path": "prisma-audit/export-final.png",
+      "bytes": 39975,
+      "sha256": "f3c4cc65040438ed63168d631e3c89f3e89bf10b225ad9ea7785cf8119fad0a4"
+    },
+    {
+      "path": "prisma-audit/export-final.webp",
+      "bytes": 11094,
+      "sha256": "2dba260dd5c7eefd40278766b9fb33b5666e96946e7a591b11330fc3d9173b2c"
+    },
+    {
+      "path": "prisma-audit/final-aa.png",
+      "bytes": 59709,
+      "sha256": "51bba4c5d2fec58fdb2923a1bc54947fef2676ae83e8942c949bd5e7f38814ee"
+    },
+    {
+      "path": "prisma-audit/final-environment.png",
+      "bytes": 108865,
+      "sha256": "b174702128a686f70cc2778ea30b6dd550207fd9bf975da7c9a14875f781ef4f"
+    },
+    {
+      "path": "prisma-audit/final-physics.png",
+      "bytes": 67048,
+      "sha256": "f759d7a52899f2eba6b1e5851712ea90e5d3bd1d08c884eac71a98ef33178925"
+    },
+    {
+      "path": "prisma-audit/final-regression.json",
+      "bytes": 260,
+      "sha256": "d6158469dc1c78582bcaef0ef62843f399a1a9db1171788bef1bc23435b3a5d8"
+    },
+    {
+      "path": "prisma-audit/final-regression.py",
+      "bytes": 3131,
+      "sha256": "5e4866251cc8f4626da6b0826017465dddcc63fb09d61659dc6c4eead1d39e29"
+    },
+    {
+      "path": "prisma-audit/integrate-renderer.py",
+      "bytes": 7313,
+      "sha256": "f8a618edf876b38250351e25fe535c081420e6c8d9fe0562909c90e268439850"
+    },
+    {
+      "path": "prisma-audit/loop-final-60fps.mp4",
+      "bytes": 19545,
+      "sha256": "2ab92165903c46b0d039194a5254311c99927daef0420e48999b4e3f67dad135"
+    },
+    {
+      "path": "prisma-audit/modern-optics.glsl",
+      "bytes": 11532,
+      "sha256": "a5f19c60ac760489fdfa488b784e5db1b0a281b49faed567f80b3778569cfe3d"
+    },
+    {
+      "path": "prisma-audit/nuovo-internal.png",
+      "bytes": 42990,
+      "sha256": "1f8a8c6b7ed6422d8cfe1a27ca116f8d3862e992ee9d41f96a21d21e80105833"
+    },
+    {
+      "path": "prisma-audit/nuovo-material.png",
+      "bytes": 305591,
+      "sha256": "abf34bbb1e2157eee5a588c72e1b748bdaa34d5305a52e365b2570b51492eb75"
+    },
+    {
+      "path": "prisma-audit/nuovo-quality.png",
+      "bytes": 21898,
+      "sha256": "a54e353673799fd4a2b63e3cc78ae4591383b5319403e03501dcab7fac81c537"
+    },
+    {
+      "path": "prisma-audit/nuovo-skin.png",
+      "bytes": 27486,
+      "sha256": "f8613f1d4f86e6b8330cc8968ce70935d7f8922cc47e60a91e5cc8ac724a75b5"
+    },
+    {
+      "path": "prisma-audit/ottica-diagnosi.png",
+      "bytes": 53845,
+      "sha256": "22a2709fcd6df8d4787bf8942e4d091aebc4234c947eafa534e132c1c7c0398d"
+    },
+    {
+      "path": "prisma-audit/pelle-diagnosi.png",
+      "bytes": 104858,
+      "sha256": "3adea16a959a69f63cbc53e6879f164b1a0f38c112f7bcf28f72be6dc748ae56"
+    },
+    {
+      "path": "prisma-audit/pelle-nero-diagnosi.png",
+      "bytes": 223124,
+      "sha256": "c3608e35fe708c82939a0b3c361fbef3aebb6d04bf1833f429d72d195612f22a"
+    },
+    {
+      "path": "prisma-audit/prima-materiali.png",
+      "bytes": 343206,
+      "sha256": "a52ff59e756debb8ef75544550de2e95b172d7a4988131c042853ec9d6eef81e"
+    },
+    {
+      "path": "prisma-audit/prima-presets.png",
+      "bytes": 230692,
+      "sha256": "b02890a81f18f3ab4910a4aaa39e95f62cf78f7caeae8d85cda2818ab885ca6b"
+    },
+    {
+      "path": "prisma-audit/progetto-test.json",
+      "bytes": 7762,
+      "sha256": "e348113918c9a8fa43355d5088a4b34d6ac1453c817309a4b8a6f8e5e239ce32"
+    },
+    {
+      "path": "prisma-audit/renderer-legacy.js",
+      "bytes": 33706,
+      "sha256": "d1c632e20cb63245e45de51b540a9e5128ff4c2f58e16cd782d740cf42b8373d"
+    },
+    {
+      "path": "prisma-audit/ui-final-desktop.png",
+      "bytes": 306042,
+      "sha256": "26a1d1df9d3f9d143196a4c7a3ab1ddf351299fc04cd2ecd0376eb5d4c834be1"
+    },
+    {
+      "path": "prisma-audit/ui-final-mobile.png",
+      "bytes": 108337,
+      "sha256": "06573f574734c8c2a625ec7df33c3e670b16f77255d312605675fbdea78a39fd"
+    },
+    {
+      "path": "prisma-audit/ui-first-desktop.png",
+      "bytes": 311780,
+      "sha256": "ed48fc603518be34772a2c3e74f3259fb0fc6149b86fb52bd9d7c2b97bc6c65a"
+    },
+    {
+      "path": "prisma-audit/ui-first-mobile.png",
+      "bytes": 104281,
+      "sha256": "de9657387c6855a7b1027a1362361defa42f39b956d5c5027d874f42a65b4e67"
+    },
+    {
+      "path": "prisma-audit/ui-internal-light.png",
+      "bytes": 333274,
+      "sha256": "71ef680295ebb0fe2a1c89d79306c8c798463b354ca28b08a386bc25d9bdc433"
+    },
+    {
+      "path": "prisma-audit/ui-variants.png",
+      "bytes": 224872,
+      "sha256": "0486dc1e247154acb09979fb03ce375ab042bb185098fd7c50c84dd628236311"
+    },
+    {
+      "path": "prisma-audit/upgrade-qa.json",
+      "bytes": 254201,
+      "sha256": "38ac81911d9dd001fae1a9895bed9e345ed95581e360951ba31f7528203b1384"
+    },
+    {
+      "path": "prisma-audit/upgrade-qa.py",
+      "bytes": 3940,
+      "sha256": "443492100ab16ecfe2d1475566315cab0108579dfc9c5255a1949a7cba4560e3"
+    },
+    {
+      "path": "prisma-audit/validate-optics.json",
+      "bytes": 4729,
+      "sha256": "fb092f382dcd91af86baa74112082c746f8ec1b928afff0cf27a4b045544327a"
+    },
+    {
+      "path": "prisma-audit/validate-optics.py",
+      "bytes": 8334,
+      "sha256": "81288088a819801413b2bc705e5bf787f0d7b8496fa7f6d77df3e95bcb38c301"
+    },
+    {
+      "path": "prisma-audit/validate-ui.py",
+      "bytes": 9602,
+      "sha256": "3b0d159237ae6c0f8b3a923fa3066fd3cd88cbb27825f4e3d994971d1639ed8d"
+    },
+    {
+      "path": "prisma-audit/wallpaper-final.html",
+      "bytes": 62150,
+      "sha256": "9d716369e99077fa56e0d25ecb0426bc01c84366118cdc0a7b0526f74693077a"
+    },
+    {
+      "path": "prisma-bloom-review/background-metrics.json",
+      "bytes": 351,
+      "sha256": "1252a670ccd30389c95a4f15197b96bf0f172bd8f8831175c3f53a2f80abaa7a"
+    },
+    {
+      "path": "prisma-bloom-review/fondale-export.png",
+      "bytes": 13996,
+      "sha256": "60b0b86df8b4b716e81cf5cc994beef62c70b399941f330f32c8e21450f05b6d"
+    },
+    {
+      "path": "prisma-bloom-review/fondale-loop-60fps.mp4",
+      "bytes": 19896,
+      "sha256": "50336943cd1a2d9c4a4d03597f972a7042034827a6c250fc9ddd8bbf7595be3c"
+    },
+    {
+      "path": "prisma-bloom-review/fondale-wallpaper.html",
+      "bytes": 62669,
+      "sha256": "79d3893603645481fe4578f697c7d3068c69750e25ca356380bd2e5ae9db4732"
+    },
+    {
+      "path": "prisma-bloom-review/fondali-editor.png",
+      "bytes": 312456,
+      "sha256": "fc5ec0a0b422691bdf9991fa59da8f5e29b7d2fdb2f0c0420bc0c3a7a3da395e"
+    },
+    {
+      "path": "prisma-bloom-review/fondali-mobile.png",
+      "bytes": 107633,
+      "sha256": "2feeff46c12b0a303478a7dc666275758aab9668a058d994cad9db3a51e2b976"
+    },
+    {
+      "path": "prisma-bloom-review/fondali-morbidi.png",
+      "bytes": 177084,
+      "sha256": "a8904b07667ad878f0fd3ebbdcbe28ee9dc21d7a75dd33c305308538f2a39837"
+    },
+    {
+      "path": "prisma-bloom-review/renderer-before.js",
+      "bytes": 56592,
+      "sha256": "8d9403429c5a71b1c829b95201cf36d7f8ece026e9491b6ab44acce1c0f82cef"
+    },
+    {
+      "path": "prisma-bloom-review/validate-backgrounds.py",
+      "bytes": 8392,
+      "sha256": "cf7e13d33b5686f2bd18519b81525ac78825ab31188aa3ab43e7e1f858f7ee21"
+    },
+    {
+      "path": "prisma-bloom-review/video-contact.png",
+      "bytes": 1466678,
+      "sha256": "e8edd16a89175310192560a614729382d89f3bb1dcb288aa1e60cbca0835fa93"
+    },
+    {
+      "path": "prisma-command-fix/commands-after.json",
+      "bytes": 53040,
+      "sha256": "2e34238f2dce670387e7a2fbdf1e1d7fd199181078a9f5b607ed7089d2d40ba6"
+    },
+    {
+      "path": "prisma-command-fix/commands-after.log",
+      "bytes": 583,
+      "sha256": "2cb1e25bb2b96d497131e65be4244d4febdf9f2d85d24262fe643174bdb11369"
+    },
+    {
+      "path": "prisma-command-fix/commands-after.py",
+      "bytes": 6781,
+      "sha256": "086ea0aad9dc0290b8a524d350e2233b6557df51e6941f579e526ce842f9e68f"
+    },
+    {
+      "path": "prisma-command-fix/commands-before.json",
+      "bytes": 28573,
+      "sha256": "cad417171d213fd43ce91063ebfd32abe90337d1f7a9bf3d6423edc759b987a1"
+    },
+    {
+      "path": "prisma-command-fix/commands-before.log",
+      "bytes": 363,
+      "sha256": "eb4e0a19ba21cc089cef15c3f943727f15d1ced1d9249fa15ac5cb67f630c19a"
+    },
+    {
+      "path": "prisma-command-fix/commands-before.png",
+      "bytes": 378553,
+      "sha256": "7a2c1bea5b4832420ef153982de0d6b828ebc0872ca27a22e0cc969254f94144"
+    },
+    {
+      "path": "prisma-command-fix/commands-before.py",
+      "bytes": 1834,
+      "sha256": "9043eeba96e77439bd9513cdda99da05068a0b7db1ca23b1acb35abdd73fce69"
+    },
+    {
+      "path": "prisma-command-fix/commands-success.png",
+      "bytes": 380264,
+      "sha256": "554e1328dd0e231ae00369351064b1a58c986436b6125d38e0e0c293b605ae6c"
+    },
+    {
+      "path": "prisma-command-fix/description-before.js",
+      "bytes": 32306,
+      "sha256": "6abcb458fdf4e11e713cd94c065375c64b019f95418089015906ec8266c93cb3"
+    },
+    {
+      "path": "prisma-command-fix/legacy-commands-current-contract.mjs",
+      "bytes": 2849,
+      "sha256": "784ed529c97b4953bae7cfd47b105bfb376ac2df65c12791e248804735128be6"
+    },
+    {
+      "path": "prisma-command-fix/legacy-description-results.txt",
+      "bytes": 1489,
+      "sha256": "7a5004790f1599842253ce0d354d417f0baadf3450e99a3dab818477fc0212f5"
+    },
+    {
+      "path": "prisma-command-fix/motion-parser-results.json",
+      "bytes": 18378,
+      "sha256": "ca35e076901db1d1b4113a4419fb642ffadd310462d74eff443b04ef51d979df"
+    },
+    {
+      "path": "prisma-command-fix/motion-parser-tests.mjs",
+      "bytes": 7260,
+      "sha256": "0a3d66b0e90f4d7cc4cd07d3257a8e47b831abfe0ba0119c856ffc7f2301471b"
+    },
+    {
+      "path": "prisma-command-fix/parser-audit.json",
+      "bytes": 5444,
+      "sha256": "ec48582df764e5033e5d90c32bdc45eb06d6175f07aade2bff6c0207e33572ac"
+    },
+    {
+      "path": "prisma-command-fix/parser-audit.mjs",
+      "bytes": 1469,
+      "sha256": "db54128baba49585c7d031fbb249e43778129123ecb4e94b96800a99c7f29990"
+    },
+    {
+      "path": "prisma-command-fix/prisma-commands-final.tar",
+      "bytes": 2191360,
+      "sha256": "3370f31292ad82789bf39a518aabf88b18924812434cb600446ed6847d7c8b03"
+    },
+    {
+      "path": "prisma-command-fix/roots-description-results.txt",
+      "bytes": 4650,
+      "sha256": "8b2aef91eb54e789b627dfca45f003b371dd348e9f5c91636dbc8851c5578c58"
+    },
+    {
+      "path": "prisma-command-fix/source-sync.py",
+      "bytes": 1798,
+      "sha256": "92c1aed6526e9e158467daf09f33a2f66beb0565eb735e1428804ad240e70bf8"
+    },
+    {
+      "path": "prisma-command-fix/texture-description-results.txt",
+      "bytes": 4140,
+      "sha256": "aa7b57ebb3eb3f35cc95730f93c0e9dffc78b58ff11862f74f3d2c9635ce0bc4"
+    },
+    {
+      "path": "prisma-command-fix/vela-fixture.json",
+      "bytes": 7237,
+      "sha256": "f5249809f8f9daf3ae0ccea83acfa7f562cb1a3e55f24b6ea9d51b1b02837eb5"
+    },
+    {
+      "path": "prisma-command-fix/__pycache__/commands-after.cpython-312.pyc",
+      "bytes": 11268,
+      "sha256": "e584af4efd2724dac69b30e2d386ca77d56aaf4e8ef45d4a938dc51775f26446"
+    },
+    {
+      "path": "prisma-condivisione/prisma-studio-codice.zip",
+      "bytes": 567138,
+      "sha256": "b4a76ff5b8bd753ca43a6b340b4a406af82e8e2a0fccb6bd2c1baed9917f0463"
+    },
+    {
+      "path": "prisma-dark-review/dark-background-metrics.json",
+      "bytes": 1619,
+      "sha256": "a43ffde59ad8f6f4b59184a21f0e11b5ba6d4b6a80f39f71001a948467f1b2f5"
+    },
+    {
+      "path": "prisma-dark-review/fondali-scuri-editor.png",
+      "bytes": 307838,
+      "sha256": "24031154976ad78613bab6884b8f81920f04a528188bd7cd0977865f81001c9b"
+    },
+    {
+      "path": "prisma-dark-review/fondali-scuri-mobile.png",
+      "bytes": 104468,
+      "sha256": "d0d619710349e63dd9a31745585375cfdc5e623eaf2eaf5402e1cc9d9753748f"
+    },
+    {
+      "path": "prisma-dark-review/fondali-scuri.png",
+      "bytes": 191916,
+      "sha256": "b5d5e56ecdd80f8e97bdd019fef4fd17116eca1c15e04d178277b3cc69c7540b"
+    },
+    {
+      "path": "prisma-dark-review/nero-puro.png",
+      "bytes": 9110,
+      "sha256": "213d58bce1a7fea17d7dc7b3123d94003801b6044c1984ed83add94e21d20e8d"
+    },
+    {
+      "path": "prisma-dark-review/verify.py",
+      "bytes": 4630,
+      "sha256": "58e9c68a4ac6ca87570141a959d11f9d05ea1b064cb4b0b2b38c766c954dda61"
+    },
+    {
+      "path": "prisma-description-audit/barra-desktop.png",
+      "bytes": 308872,
+      "sha256": "465c6cfd4b34d4b16a6495f0aeb212426fcfa6e8521e2e99c69667468c3c48c3"
+    },
+    {
+      "path": "prisma-description-audit/barra-mobile.png",
+      "bytes": 112325,
+      "sha256": "3ee6a7612a5da2ebb3439b5490249c0a4059e011aa198c2b2a9dd8cae864e1dc"
+    },
+    {
+      "path": "prisma-description-audit/browser.py",
+      "bytes": 4428,
+      "sha256": "abbe77e83a20410b1c99014ece3d900cb11463efb68b059408f44192e7218776"
+    },
+    {
+      "path": "prisma-description-audit/commands.mjs",
+      "bytes": 2806,
+      "sha256": "06335471efac153a4e5c7f63a349d0c50e8cf66098b5ce3eb8eb8fc5f2731446"
+    },
+    {
+      "path": "prisma-export-fix-audit/app-25sec-analytic.log",
+      "bytes": 952,
+      "sha256": "83951361c9c12c0f121227ecd8e49e5a1e87eb3fc3050a15c8348e18b34232d7"
+    },
+    {
+      "path": "prisma-export-fix-audit/app-25sec-diagnosis.log",
+      "bytes": 952,
+      "sha256": "37782c32625154f0f2f8e43b9e3437f7cd230a8bcb825968e1e3349581038b0e"
+    },
+    {
+      "path": "prisma-export-fix-audit/app-25sec.log",
+      "bytes": 858,
+      "sha256": "c2ae18a5d04de9ac5403b07fbda2cd3b8c08b0db5623e11baf29d0ac6986e546"
+    },
+    {
+      "path": "prisma-export-fix-audit/app-25sec.py",
+      "bytes": 2334,
+      "sha256": "6d0cf86596490bf609aebfef575ec4dec3f293f8598716fa65773b9fea523fe8"
+    },
+    {
+      "path": "prisma-export-fix-audit/browser-b-reexport.json",
+      "bytes": 11864,
+      "sha256": "01751b4ed273db2f89e535a65600efba0362a191a564b631153c1aac7d998f11"
+    },
+    {
+      "path": "prisma-export-fix-audit/encoder-before.js",
+      "bytes": 11449,
+      "sha256": "aefd0f60d0e1e1834a05203695248b11b0e0cd6820c886f26278c992fdf08394"
+    },
+    {
+      "path": "prisma-export-fix-audit/export-timeout.png",
+      "bytes": 169289,
+      "sha256": "229e8cb5f137b888e1701a0b2b9a1a380d7fd5a644c3c4e184d45534b0ee57be"
+    },
+    {
+      "path": "prisma-export-fix-audit/gallery-card.json",
+      "bytes": 11833,
+      "sha256": "9127f0788c24747a125fbec93694197d8fa0ae48a6803fb9bfebd41b278647cb"
+    },
+    {
+      "path": "prisma-export-fix-audit/gallery-current-0.json",
+      "bytes": 11864,
+      "sha256": "7d511fe21d7a807f47dc4ffca27f9d2586ba02a343bcdb0ab802f76ddb186826"
+    },
+    {
+      "path": "prisma-export-fix-audit/gallery-current-1.json",
+      "bytes": 11864,
+      "sha256": "28c4ef044179a7572f5b05ba337ffdd11961889bdc60a4287b793b78e09f4cc4"
+    },
+    {
+      "path": "prisma-export-fix-audit/gallery-named.png",
+      "bytes": 178675,
+      "sha256": "3e1af8c96b241fa281b8fa65d6c9c76d5a41a293a6a53be69a32c90923e9ab66"
+    },
+    {
+      "path": "prisma-export-fix-audit/gallery-transfer-results.json",
+      "bytes": 667,
+      "sha256": "e157ed86edef0864216d3fb19a34fc00c8e7ba12933d8d734b748e251a3e83b3"
+    },
+    {
+      "path": "prisma-export-fix-audit/gallery-transfer.py",
+      "bytes": 5290,
+      "sha256": "d8beea1be776f2077becbc0bfd88c9ed88e175e9a1e80442a4b432555839000e"
+    },
+    {
+      "path": "prisma-export-fix-audit/preset-files-test.mjs",
+      "bytes": 2061,
+      "sha256": "b8c857c19d4000b0653566e244d99689e3d2b4d69bdbc4accb31b1a0959213ea"
+    },
+    {
+      "path": "prisma-export-fix-audit/prisma-export-fix.tar",
+      "bytes": 2170880,
+      "sha256": "0a7c660979d65fe5d3866cf5144167e6accf299b0ec746042ef2f742dd4ef765"
+    },
+    {
+      "path": "prisma-export-fix-audit/source-sync.py",
+      "bytes": 1791,
+      "sha256": "91fcb720c1872422ee90a2b34d95cd1a0d70aecdff68e807bd1394ee0f28b380"
+    },
+    {
+      "path": "prisma-export-fix-audit/test-creation.json",
+      "bytes": 8046,
+      "sha256": "15f421390b068f15b935f85ad595f416c804614dc0554e5b764b39ed3baaa4f7"
+    },
+    {
+      "path": "prisma-export-incident-audit/export-lifecycle.mjs",
+      "bytes": 7769,
+      "sha256": "5ee0ff94a8dff652ab46fe3450f9bf078a433567d67b53769f88fbba2c2d4f45"
+    },
+    {
+      "path": "prisma-export-incident-audit/export-preparation.mjs",
+      "bytes": 1292,
+      "sha256": "c36b3d56682c331fa84154b3ae41c36b470d0f9c9cb66c99fb0ef9d6cf7f7638"
+    },
+    {
+      "path": "prisma-export-incident-audit/preview-lifecycle.mjs",
+      "bytes": 2907,
+      "sha256": "ba13d305343474e6c5b9a6044a008023761791236e51ea0b35679d9b51ba6b7f"
+    },
+    {
+      "path": "prisma-export-incident-audit/preview-policy.mjs",
+      "bytes": 2138,
+      "sha256": "e4ac8f056d883ed80577d65ddd920ad0be1e0eed8f3d00956f1c96ddfade560c"
+    },
+    {
+      "path": "prisma-fast-audit/after-256-petals-0.05.png",
+      "bytes": 35661,
+      "sha256": "a15ce37af9971692959e90ee9d38267767b1ef26779c5f3be6525ee99fb031f9"
+    },
+    {
+      "path": "prisma-fast-audit/after-256-petals-0.15.png",
+      "bytes": 34121,
+      "sha256": "38eb57b46780adb8d0e5d2b9a1d1683e1818793b356bc411846e5005f7bd5f2c"
+    },
+    {
+      "path": "prisma-fast-audit/after-256-petals-0.35.png",
+      "bytes": 28968,
+      "sha256": "c491c4958e00e04267cc9c1ffde92afba8e975533056aee2d0fd2948536774ba"
+    },
+    {
+      "path": "prisma-fast-audit/after-256-petals-0.7.png",
+      "bytes": 22370,
+      "sha256": "919f91a00eca1acbdc1d7ec45aef2574c6b1fff034cc2523930b9699285efac1"
+    },
+    {
+      "path": "prisma-fast-audit/after-256-petals-0.png",
+      "bytes": 26320,
+      "sha256": "10c5235fc2452aa9536f6fef20ab5011273ff604731f8b6cfb2fd628f707d754"
+    },
+    {
+      "path": "prisma-fast-audit/after-256-petals-1.png",
+      "bytes": 23526,
+      "sha256": "ef6d14d22c00c6bfa161652cfaedaedebb7de940b41ec4d30bb4020d5ca1fee6"
+    },
+    {
+      "path": "prisma-fast-audit/after-96-petals-0.05.png",
+      "bytes": 6430,
+      "sha256": "3d8e2379dd2a191f8f0f67f5969d4ac14b066f1a96edbd8458e7aadb530a467a"
+    },
+    {
+      "path": "prisma-fast-audit/after-96-petals-0.15.png",
+      "bytes": 6150,
+      "sha256": "0a70e3bdff9d46f5b2f5fc8303c18f51038e127a7d3fe00265f5ea9911f92da9"
+    },
+    {
+      "path": "prisma-fast-audit/after-96-petals-0.35.png",
+      "bytes": 5388,
+      "sha256": "92fce153084565a31976a2a5df4490bb4542f29f12876701c2691fd2afcbe300"
+    },
+    {
+      "path": "prisma-fast-audit/after-96-petals-0.7.png",
+      "bytes": 4477,
+      "sha256": "b187666bb68f904a87a4f89b0b509463132e330bf04a7cc248342fef5f4176df"
+    },
+    {
+      "path": "prisma-fast-audit/after-96-petals-0.png",
+      "bytes": 5805,
+      "sha256": "da0ce5a1833b3c667f7318cfcca5c67a84bf025616a5219428c5aa594a69e807"
+    },
+    {
+      "path": "prisma-fast-audit/after-96-petals-1.png",
+      "bytes": 4420,
+      "sha256": "cf8e05c23003fd60e56ba2b4f54c52542f8796a0505cc12ecf08cfbd9869f9bd"
+    },
+    {
+      "path": "prisma-fast-audit/after-render-results.json",
+      "bytes": 23375,
+      "sha256": "2a2067a3a0ca70ed8fa712a15a700920e22d432077dd75fadb3bad704ee6df69"
+    },
+    {
+      "path": "prisma-fast-audit/after-run.log",
+      "bytes": 12448,
+      "sha256": "b0f17578ad5d174cd07272ccb27f85389422e9b1c9fbabd75adde202cd007a58"
+    },
+    {
+      "path": "prisma-fast-audit/after-ui-animation.png",
+      "bytes": 389781,
+      "sha256": "fe113a1458dacc653c3879304c2e510f8db141e766bf14ef17733aa699493b0a"
+    },
+    {
+      "path": "prisma-fast-audit/after-ui-petals-0.05.png",
+      "bytes": 407858,
+      "sha256": "14310e52383ffa9c7d6fa4c434b99eedc35fd0ce549270b4705c270eb4007f18"
+    },
+    {
+      "path": "prisma-fast-audit/after-ui-petals-0.15.png",
+      "bytes": 404623,
+      "sha256": "d03b38d07fb0369a36b8aed33257af6fda034a8ede5d5236a70335a04cdc2ad4"
+    },
+    {
+      "path": "prisma-fast-audit/after-ui-petals-0.35.png",
+      "bytes": 392548,
+      "sha256": "1dc587e99f4ab9dd27e95ea734449e29b614b47994918616dcabba665f5ca143"
+    },
+    {
+      "path": "prisma-fast-audit/after-ui-petals-0.7.png",
+      "bytes": 379417,
+      "sha256": "8fe5f0a1ffb4f3b1b331808d76120500c1296e538592e25ad5078305c7deddd7"
+    },
+    {
+      "path": "prisma-fast-audit/after-ui-petals-1.png",
+      "bytes": 381617,
+      "sha256": "aefef69f702140dc25bc50ad2cf82e72e67ab04e4a83785f0ac230f5dc083c74"
+    },
+    {
+      "path": "prisma-fast-audit/after-ui-results.json",
+      "bytes": 1515,
+      "sha256": "1150571bd525845db645ed9ccec3e0bf9d7d842ff5a2404fd290a2bfc605c89d"
+    },
+    {
+      "path": "prisma-fast-audit/after-ui-run.log",
+      "bytes": 2201,
+      "sha256": "c3ef14c99801b1a9b46d12ac1231e7a95fcfae790bafa3d0cb0cf7b3de2dd99e"
+    },
+    {
+      "path": "prisma-fast-audit/app-before.js",
+      "bytes": 60200,
+      "sha256": "a6d40ee9f6cd927d928cd4c06c3c7c0c344a16f94ecd111d9a46730bb090cee8"
+    },
+    {
+      "path": "prisma-fast-audit/atlas-check.py",
+      "bytes": 6708,
+      "sha256": "3b89aa949f439fd0cf407d7f77e61e607a25147fbe93e106a7efe7eb8ead2627"
+    },
+    {
+      "path": "prisma-fast-audit/atlas-final-run.log",
+      "bytes": 4035,
+      "sha256": "3701fa24b86d27fbb1de532e53542212304519bdad0315a38ccce3395f8053fb"
+    },
+    {
+      "path": "prisma-fast-audit/atlas-results.json",
+      "bytes": 6362,
+      "sha256": "c344f0862a3f497584769168365fd3c038a4d425d673172397e5b07aaf0bc88b"
+    },
+    {
+      "path": "prisma-fast-audit/atlas-run.log",
+      "bytes": 6362,
+      "sha256": "95a6150c8ae593b404bf2b6a8fe4aeb5fa287e33c4f858dbaf083e7ad6e7c322"
+    },
+    {
+      "path": "prisma-fast-audit/atlas-surface-comparison.png",
+      "bytes": 667412,
+      "sha256": "12110812b45d4a91743f2e5fa6944cb3ed36dd312332787e297883511e027bf0"
+    },
+    {
+      "path": "prisma-fast-audit/before-96-petals-0.05.png",
+      "bytes": 5685,
+      "sha256": "73e6cf551a7a00243f1649e08c5661a91ac63141a307501225dcfe4420e9f5fd"
+    },
+    {
+      "path": "prisma-fast-audit/before-96-petals-0.15.png",
+      "bytes": 5539,
+      "sha256": "d79d79bb9fa94b356de06901a85375dbbd89caeb73d288dba8ec7b7e8204d3f0"
+    },
+    {
+      "path": "prisma-fast-audit/before-96-petals-0.35.png",
+      "bytes": 5183,
+      "sha256": "caa9279f3e7d8a186023592c04a294659e3d6714e8a3d4eab0bce5a4eda5dc9c"
+    },
+    {
+      "path": "prisma-fast-audit/before-96-petals-0.7.png",
+      "bytes": 4478,
+      "sha256": "f35183cb3f7d96fdb42f807091e7bd024528eb7df79f885f7a22f059125cec7c"
+    },
+    {
+      "path": "prisma-fast-audit/before-96-petals-0.png",
+      "bytes": 5805,
+      "sha256": "da0ce5a1833b3c667f7318cfcca5c67a84bf025616a5219428c5aa594a69e807"
+    },
+    {
+      "path": "prisma-fast-audit/before-96-petals-1.png",
+      "bytes": 4427,
+      "sha256": "22c1a5735e5c0ced021d5de2d8cdb685af53509bf8a71d2573438c35d55c6f2b"
+    },
+    {
+      "path": "prisma-fast-audit/before-render-results.json",
+      "bytes": 13099,
+      "sha256": "d2f364687c269fdb1da5a0295028ea0269c32471020a1db4f022f19cd25faa88"
+    },
+    {
+      "path": "prisma-fast-audit/before-run.log",
+      "bytes": 5086,
+      "sha256": "e9e66ebb79a718d17f461d1850bb2b70a22dd4f28fb023da3b2fb5a72a72f8f4"
+    },
+    {
+      "path": "prisma-fast-audit/compat-browser-results.json",
+      "bytes": 226,
+      "sha256": "3cc29afdb0f191b1415a9687362d1d68b02ef54b3c03883fb5e94d4e96e6f391"
+    },
+    {
+      "path": "prisma-fast-audit/compat-browser.log",
+      "bytes": 420,
+      "sha256": "14c214f442f9292d803971659d82945954fe0dc6d9ad0475d7f8ff826a500945"
+    },
+    {
+      "path": "prisma-fast-audit/compat-browser.py",
+      "bytes": 7065,
+      "sha256": "e7f12208ddbe5f76dc5e8936593a0ef2de0b4457e112852062d1ae31887d0794"
+    },
+    {
+      "path": "prisma-fast-audit/compat-core.mjs",
+      "bytes": 3012,
+      "sha256": "babcf22f6898315a8073b2de53f56e7865beaa6826d57b4c8d2afc69411ccad3"
+    },
+    {
+      "path": "prisma-fast-audit/compat-crown-editor.png",
+      "bytes": 383441,
+      "sha256": "97b393d18e7811eac1c05a0ec85c36cce897bcf3a122f434a559206db2956c93"
+    },
+    {
+      "path": "prisma-fast-audit/compat-crown-wallpaper-offline.png",
+      "bytes": 40831,
+      "sha256": "1b0bd80ebaebb8ede92c3b7baf1b62c061543342ec3ae3a6699cd3fe1a0a33f0"
+    },
+    {
+      "path": "prisma-fast-audit/compat-crown-wallpaper.html",
+      "bytes": 117674,
+      "sha256": "3a6ee382c9f10703030b691bfbc83c1868e09ee85fe1b6eb3fed0fee1a655a63"
+    },
+    {
+      "path": "prisma-fast-audit/compat-export-results.json",
+      "bytes": 172,
+      "sha256": "448f3fb0cde5c44409b6335b72f75122e61078f8a3d5f43cca7620627960a155"
+    },
+    {
+      "path": "prisma-fast-audit/compat-export.log",
+      "bytes": 158,
+      "sha256": "478182e148d369894b810ea380f05ea774710b06354d3950069f2a1e13bcb44c"
+    },
+    {
+      "path": "prisma-fast-audit/compat-export.py",
+      "bytes": 2806,
+      "sha256": "3999a5cebcca95f6fbbae26231165af02fbe6d71c45c11546d4925624f46243b"
+    },
+    {
+      "path": "prisma-fast-audit/compat-legacy-comparison.png",
+      "bytes": 91544,
+      "sha256": "e4c8476b3e3264ead9968f54f81e2b8b5354a7846caf3e19f14dad730cfb8aad"
+    },
+    {
+      "path": "prisma-fast-audit/compat-loop-60fps.mp4",
+      "bytes": 9597,
+      "sha256": "f869318a7192c563e9f71fa576669815fd74859ceb8eb63ed561f482fc6beea4"
+    },
+    {
+      "path": "prisma-fast-audit/compat-render-results.json",
+      "bytes": 990,
+      "sha256": "8fca0c52e2d26123368a8c5b152b5445537e50a76a3c98f38f4dea77ba9788a1"
+    },
+    {
+      "path": "prisma-fast-audit/compat-render.log",
+      "bytes": 1113,
+      "sha256": "a07ac7aba51f1d77731d56a626cf24ca91400eebc432f1250988a706dd1932ab"
+    },
+    {
+      "path": "prisma-fast-audit/compat-render.py",
+      "bytes": 4563,
+      "sha256": "6607e466af79d302cc0083d827064ff335735dfbd693067987b22d18a91e74be"
+    },
+    {
+      "path": "prisma-fast-audit/compat-retained-project.json",
+      "bytes": 10199,
+      "sha256": "ac00d722ae46e3818d0599d2a3623e2ac5475515358817384f1a624eeb34e34e"
+    },
+    {
+      "path": "prisma-fast-audit/compat-transparent-export.png",
+      "bytes": 7458,
+      "sha256": "41515143e1002f27f2e92a121969d48d0eb765bd7442b1ee7f3a034469fb3567"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-256-petals-0.05.png",
+      "bytes": 35562,
+      "sha256": "c0911da12b8c0e0957a9010c96af592d4b851b4bfb845093af00b52042ec7e20"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-256-petals-0.15.png",
+      "bytes": 33857,
+      "sha256": "013965dc20de3a91ede06ba4207e173e7527931655b24d1538df91a3339eb250"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-256-petals-0.35.png",
+      "bytes": 28752,
+      "sha256": "b030ee678bc2024b776d086d2daf6662bde6361c165907a7002897ce0e010e1a"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-256-petals-0.7.png",
+      "bytes": 22234,
+      "sha256": "9c73bb1cacf36a5713ecb614c029e29b3349d33c7a85174ab35370be790e1dad"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-256-petals-0.png",
+      "bytes": 26320,
+      "sha256": "10c5235fc2452aa9536f6fef20ab5011273ff604731f8b6cfb2fd628f707d754"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-256-petals-1.png",
+      "bytes": 23280,
+      "sha256": "97b2e419e5d5c37cef6a62f769f5e4972875dcb69ce1ea6005d8d8762def7cba"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-96-petals-0.05.png",
+      "bytes": 6375,
+      "sha256": "74270fd5528ca2a835de602baff598107166173c75c3f73d32fb9cb99dbeba61"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-96-petals-0.15.png",
+      "bytes": 6085,
+      "sha256": "0878e0aa2f79e8a2f46a43917a6481f42e038c8a4fe74a33ebb4c8fdd37362d3"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-96-petals-0.35.png",
+      "bytes": 5342,
+      "sha256": "601242216afcc7128a88bc86f561a9642732e8d322c3b7f684e358587cef6658"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-96-petals-0.7.png",
+      "bytes": 4437,
+      "sha256": "662a3410034222c93ea9be744b6679cbe12dee9b98ad902d70e6726c39ce1792"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-96-petals-0.png",
+      "bytes": 5805,
+      "sha256": "da0ce5a1833b3c667f7318cfcca5c67a84bf025616a5219428c5aa594a69e807"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-96-petals-1.png",
+      "bytes": 4387,
+      "sha256": "cac0844a9fbc4f4a67023cc071ffe35a6bc2b1528d4a5d4bb5786b151397f9ef"
+    },
+    {
+      "path": "prisma-fast-audit/dynamic-render-results.json",
+      "bytes": 23509,
+      "sha256": "2a37c470a6c6cdd71cf56c2bff86571b7f9f224e104759207a1400483c0fc9cd"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-check.py",
+      "bytes": 3509,
+      "sha256": "c873827e451425654113c3a3ca4b727ab19ba340daf97f93d8f7d19b18226dd5"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-float-organic-needles-material.png",
+      "bytes": 71954,
+      "sha256": "0cb86ecf2415a562cd00743015eef6744994cbb7b772f6a117269bc674f074f9"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-float-organic-needles-normals.png",
+      "bytes": 83421,
+      "sha256": "4501b55a3ce0c1ed707bbea6c3a1fa7293e58004459a6f3c5ecaf5d62a89a32f"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-float-petals-.05-material.png",
+      "bytes": 25667,
+      "sha256": "9e6410fe6cacbb723f03384bfda4d4670cbca54776977cb9c13db08c2d10abbd"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-float-petals-.05-normals.png",
+      "bytes": 19799,
+      "sha256": "20b0e1a07c954f80b7961d206d35d4cb8b573579c5fa289fad5af6403a7b599c"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-float-petals-.35-material.png",
+      "bytes": 24876,
+      "sha256": "663a1366512dd7db4d0e197b5227507e0e8272fb0e14b44d0a045a5bd5b14fc3"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-float-petals-.35-normals.png",
+      "bytes": 22988,
+      "sha256": "f42d888ac85c1137c2189b42b82fef2459d98a54a8df73799dda980933592773"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-float-petals-.7-material.png",
+      "bytes": 21487,
+      "sha256": "26004a17894a6b719200773704914f03d2f07ecca5974f83b2cbbaf0fe73e5c0"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-float-petals-.7-normals.png",
+      "bytes": 21326,
+      "sha256": "a620eef0e44b12d95170974095a85c9528294358b7e2593d2ef9015cde3fa358"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-packed-organic-needles-material.png",
+      "bytes": 71958,
+      "sha256": "9d4409ec34aabfb8b15aedeb1dfb7f551f1802df84b19e6b0fd401883a41e189"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-packed-organic-needles-normals.png",
+      "bytes": 83378,
+      "sha256": "f5a5026f45705c37c0c2e2c2b07c8a2df86b7e0a5a87581a704dec4e9e0c1112"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-packed-petals-.05-material.png",
+      "bytes": 25667,
+      "sha256": "83ef2aaf02319d8954b6fdbe82fa75a8ad2b38eb89c74776ebee656d3ba4e31f"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-packed-petals-.05-normals.png",
+      "bytes": 19832,
+      "sha256": "70b9e1f628aea43982b009ad0884da34357d7201c9e5b6733db39236bb817400"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-packed-petals-.35-material.png",
+      "bytes": 24924,
+      "sha256": "d644772a42d5633b843b8c6556fa5e78a42c946e42c3d3fde61cada84c5d985b"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-packed-petals-.35-normals.png",
+      "bytes": 23034,
+      "sha256": "e507b7e82362095e27193cf493fa0ffa8228ed173abac085823fa25ee560abce"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-packed-petals-.7-material.png",
+      "bytes": 21461,
+      "sha256": "860754ed9e48294e52ea29bf23ffe1e2f9ad3f96de5de9a4172888f1f9c1bdfc"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-packed-petals-.7-normals.png",
+      "bytes": 21330,
+      "sha256": "42f3fe7eacee4a99b5174ea09bcd0c74e3f1835e1767bb6acac45d7bfa403a22"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-results.json",
+      "bytes": 4819,
+      "sha256": "bf4a4c89c3993424bbd2f60098c901deb4f3e8aeaa274e66752d007a4a2224a7"
+    },
+    {
+      "path": "prisma-fast-audit/fallback-run.log",
+      "bytes": 683,
+      "sha256": "f803b007374777fe808cc368f73cb360f5e822504457a4015d87a1d07a168ff3"
+    },
+    {
+      "path": "prisma-fast-audit/final-256-petals-0.05.png",
+      "bytes": 25667,
+      "sha256": "9e6410fe6cacbb723f03384bfda4d4670cbca54776977cb9c13db08c2d10abbd"
+    },
+    {
+      "path": "prisma-fast-audit/final-256-petals-0.15.png",
+      "bytes": 25170,
+      "sha256": "f1b837f08bb346406fad07be3633b37e8e60821cc3b312c2c03daa034cd3a4ff"
+    },
+    {
+      "path": "prisma-fast-audit/final-256-petals-0.35.png",
+      "bytes": 24876,
+      "sha256": "663a1366512dd7db4d0e197b5227507e0e8272fb0e14b44d0a045a5bd5b14fc3"
+    },
+    {
+      "path": "prisma-fast-audit/final-256-petals-0.7.png",
+      "bytes": 21487,
+      "sha256": "26004a17894a6b719200773704914f03d2f07ecca5974f83b2cbbaf0fe73e5c0"
+    },
+    {
+      "path": "prisma-fast-audit/final-256-petals-0.png",
+      "bytes": 26320,
+      "sha256": "10c5235fc2452aa9536f6fef20ab5011273ff604731f8b6cfb2fd628f707d754"
+    },
+    {
+      "path": "prisma-fast-audit/final-256-petals-1.png",
+      "bytes": 22243,
+      "sha256": "6371472d4aa4483e3714daaef0cd117ac194960fdc6d6e1619783a0aa77cba2b"
+    },
+    {
+      "path": "prisma-fast-audit/final-96-petals-0.05.png",
+      "bytes": 5631,
+      "sha256": "f75c5a8f1dd57b865844efb127cc2b5cb07d463c48fbe7884973c9327d8d9a3c"
+    },
+    {
+      "path": "prisma-fast-audit/final-96-petals-0.15.png",
+      "bytes": 5402,
+      "sha256": "8e7b64bf08e2a43494659c41c191792a85c61d549ecbf533e708d8b9dfaca953"
+    },
+    {
+      "path": "prisma-fast-audit/final-96-petals-0.35.png",
+      "bytes": 5064,
+      "sha256": "63874294dfb92b571fccaa0269c3d46681b2722b82b3f214c3fe6b050c417e6b"
+    },
+    {
+      "path": "prisma-fast-audit/final-96-petals-0.7.png",
+      "bytes": 4355,
+      "sha256": "a571a89ce3f1859e04a7e473abd8e999b3d4490451bdb055b2c48b4ba938cfaf"
+    },
+    {
+      "path": "prisma-fast-audit/final-96-petals-0.png",
+      "bytes": 5805,
+      "sha256": "da0ce5a1833b3c667f7318cfcca5c67a84bf025616a5219428c5aa594a69e807"
+    },
+    {
+      "path": "prisma-fast-audit/final-96-petals-1.png",
+      "bytes": 4372,
+      "sha256": "76989c8ddefd804c831aac290299b812ade23bf6285f05c829c9aa471cf6dcc4"
+    },
+    {
+      "path": "prisma-fast-audit/final-render-results.json",
+      "bytes": 23499,
+      "sha256": "cbf04a193e2e40d8bfee445bb11edc43080a833dff3cfb063bad6fd641518479"
+    },
+    {
+      "path": "prisma-fast-audit/final-run.log",
+      "bytes": 9229,
+      "sha256": "b09c1498b585b1087e527da8a29a7e375304714ab3af6e08a3214e83bf607498"
+    },
+    {
+      "path": "prisma-fast-audit/final-ui-animation.png",
+      "bytes": 387816,
+      "sha256": "828613bbf73aad7a8f67a4467ab9fb0a7945ad7ea84ec8a9d8d9efb5f31db821"
+    },
+    {
+      "path": "prisma-fast-audit/final-ui-petals-0.05.png",
+      "bytes": 376454,
+      "sha256": "dc4afa69218e56b340b5547c8fa57b2a7554e8c2430cb4b4e4c1871acf5d044b"
+    },
+    {
+      "path": "prisma-fast-audit/final-ui-petals-0.15.png",
+      "bytes": 376944,
+      "sha256": "402d9ac21d27370b75c9af6f3f2ec54d0dc2656f3adfa825e1545978df3b19d7"
+    },
+    {
+      "path": "prisma-fast-audit/final-ui-petals-0.35.png",
+      "bytes": 379630,
+      "sha256": "f1a486fce76c1c71da70c75b0153379f13a7f9c1886f13c5f4d8e42557f63654"
+    },
+    {
+      "path": "prisma-fast-audit/final-ui-petals-0.7.png",
+      "bytes": 373345,
+      "sha256": "cfa473ab08f116c7d583eac1bba65347d906a111a5c9023906b0724ba247312c"
+    },
+    {
+      "path": "prisma-fast-audit/final-ui-petals-1.png",
+      "bytes": 379221,
+      "sha256": "b7630a44e7ad104c0027c3aa342b73acfbbad706014636141352c8e5bf4d83ac"
+    },
+    {
+      "path": "prisma-fast-audit/final-ui-results.json",
+      "bytes": 1506,
+      "sha256": "e28a36f2412db8b32becfbe56fe42d162f556406568d41e7b78c03b4d34b076b"
+    },
+    {
+      "path": "prisma-fast-audit/final-ui-run.log",
+      "bytes": 2197,
+      "sha256": "8b9df7ec7ebf67abc05bc78e0ce1d7d3147733a269624d518c1bed017b110787"
+    },
+    {
+      "path": "prisma-fast-audit/float-256-petals-0.05.png",
+      "bytes": 25480,
+      "sha256": "b6067e6786e78fd3865b8dfcf4803f7fe411f0f9be87363a325c61b9fa826efd"
+    },
+    {
+      "path": "prisma-fast-audit/float-256-petals-0.15.png",
+      "bytes": 25016,
+      "sha256": "2245735e1338d544908d684925e907431dbe98a37e19b2eb9064f0955df452b3"
+    },
+    {
+      "path": "prisma-fast-audit/float-256-petals-0.35.png",
+      "bytes": 24271,
+      "sha256": "4c5159aba909c9b59ec6ab8dc4827ca4cf811f38257a02044f7f72c488f92bde"
+    },
+    {
+      "path": "prisma-fast-audit/float-256-petals-0.7.png",
+      "bytes": 20882,
+      "sha256": "e3c289974176a3839c015d886171859834566315f9bc38d73d546f2daa9dc975"
+    },
+    {
+      "path": "prisma-fast-audit/float-256-petals-0.png",
+      "bytes": 26320,
+      "sha256": "10c5235fc2452aa9536f6fef20ab5011273ff604731f8b6cfb2fd628f707d754"
+    },
+    {
+      "path": "prisma-fast-audit/float-256-petals-1.png",
+      "bytes": 22049,
+      "sha256": "c2990a758838754d5f22d5235821ffa846980488fc25c7ee878adab6f36eed5a"
+    },
+    {
+      "path": "prisma-fast-audit/float-96-petals-0.05.png",
+      "bytes": 5589,
+      "sha256": "bdf172db9ed6248790d9e5ef492647e69dbb948dc63e1af1e5d5f3983640cbac"
+    },
+    {
+      "path": "prisma-fast-audit/float-96-petals-0.15.png",
+      "bytes": 5366,
+      "sha256": "d35f31e3489d211ee64160e949f01597a5719bcae413c94d34e16f1115b8448f"
+    },
+    {
+      "path": "prisma-fast-audit/float-96-petals-0.35.png",
+      "bytes": 4989,
+      "sha256": "1ed24ecab4bf16029cb3814c3f51b98971b2743ee9b7701f17ff4dc0deae4cf6"
+    },
+    {
+      "path": "prisma-fast-audit/float-96-petals-0.7.png",
+      "bytes": 4327,
+      "sha256": "678e63a9626c6efc6b5816d486ce2a28e258dbb20ad82977fe9763434492ed0e"
+    },
+    {
+      "path": "prisma-fast-audit/float-96-petals-0.png",
+      "bytes": 5805,
+      "sha256": "da0ce5a1833b3c667f7318cfcca5c67a84bf025616a5219428c5aa594a69e807"
+    },
+    {
+      "path": "prisma-fast-audit/float-96-petals-1.png",
+      "bytes": 4403,
+      "sha256": "9af0d775a903c524241c01e564693ad8f8030e3c3318bb33b01cef35e269fe88"
+    },
+    {
+      "path": "prisma-fast-audit/float-render-results.json",
+      "bytes": 23569,
+      "sha256": "f8cbf26c2e0d052bd55a3dd3c1bc16963509668a7a2a9f632ec52c3590bd81cc"
+    },
+    {
+      "path": "prisma-fast-audit/glass-0.png",
+      "bytes": 10213,
+      "sha256": "78c08cda5b10554539e2dbb31dde330b599c8f6830acda026d1a065247e97689"
+    },
+    {
+      "path": "prisma-fast-audit/glass-1.png",
+      "bytes": 10416,
+      "sha256": "d0bc654fc8531cbff99706f915e5051d13310690a69c246e15e5d6829757a178"
+    },
+    {
+      "path": "prisma-fast-audit/glass-2.png",
+      "bytes": 10124,
+      "sha256": "8f92e2a4c0da5643f17d72843f7f1f292c16302c9974271a4c66ce1dd72b1616"
+    },
+    {
+      "path": "prisma-fast-audit/glass-3.png",
+      "bytes": 10271,
+      "sha256": "3f9b2357cdb9e672b321bf151dce595d5c1c6ddc90e7f549852d929ffb085c16"
+    },
+    {
+      "path": "prisma-fast-audit/glass-4.png",
+      "bytes": 10526,
+      "sha256": "dce80617525fd247e7aec32eb106c6b6a2814aff1de28e1fd26d5935b01d6c51"
+    },
+    {
+      "path": "prisma-fast-audit/glass-5.png",
+      "bytes": 10166,
+      "sha256": "534db1d80589df0ccfe3bb50d9474dd688c9fb8b151d0509dd9125bfd73d0bf3"
+    },
+    {
+      "path": "prisma-fast-audit/glass-compare.py",
+      "bytes": 3180,
+      "sha256": "fa3a0b8263279c294f8fcc90e81fafb14872d6fd2db3852a7932d63c3cecd573"
+    },
+    {
+      "path": "prisma-fast-audit/glass-quality-comparison.png",
+      "bytes": 376765,
+      "sha256": "7cc6e490400cc3fe5c6ace6317ebd487f0705906b4250d57f93f56da0ebf9f5d"
+    },
+    {
+      "path": "prisma-fast-audit/glass-results.json",
+      "bytes": 1532,
+      "sha256": "38ac406f9210036592d28361ebba4d60bc1bd22f309e231fcb8fddc9033d2802"
+    },
+    {
+      "path": "prisma-fast-audit/glass-run.log",
+      "bytes": 1412,
+      "sha256": "9fa80a22329c55f04e9fe3b9641b4b6275e24b7a6d0fe5bf8700b45f86f5301b"
+    },
+    {
+      "path": "prisma-fast-audit/matched-preview-after.png",
+      "bytes": 12658,
+      "sha256": "a9ace20a3582caf97b3f56e22fe3221b94fac4f8b4b2d42a26149e7dae7276cb"
+    },
+    {
+      "path": "prisma-fast-audit/matched-preview-before.png",
+      "bytes": 12664,
+      "sha256": "9011c540d3c76665569854ce726828e8fd8138e29b334e4a5aa800b0789ca250"
+    },
+    {
+      "path": "prisma-fast-audit/matched-preview-results.json",
+      "bytes": 11474,
+      "sha256": "ace02527f9c3b4b83dde448e71d9d917dcc1bc6ab7e4b40c967dfcc2a7d02aed"
+    },
+    {
+      "path": "prisma-fast-audit/matched-preview.py",
+      "bytes": 2206,
+      "sha256": "7a095830dc2ac98949a0413944a1b8a21791d26c6445aabdcd821a02f33ea3d0"
+    },
+    {
+      "path": "prisma-fast-audit/matched-run.log",
+      "bytes": 531,
+      "sha256": "c00f516b29e9d4cce2f59a01789d25084f4985e07f60336c28fe8e932e376949"
+    },
+    {
+      "path": "prisma-fast-audit/partial-petal-check.py",
+      "bytes": 9724,
+      "sha256": "9ad937c9c35b1927b167e08fccb7a773a4914cca978179dabc29fa4b556a4088"
+    },
+    {
+      "path": "prisma-fast-audit/prisma-cached-geometry.tar",
+      "bytes": 2027520,
+      "sha256": "b19218cc377cb92e226ad17331d85b4784f6dd3a114b63e27b8343a782654787"
+    },
+    {
+      "path": "prisma-fast-audit/realtexture-96-petals-0.05.png",
+      "bytes": 5631,
+      "sha256": "f75c5a8f1dd57b865844efb127cc2b5cb07d463c48fbe7884973c9327d8d9a3c"
+    },
+    {
+      "path": "prisma-fast-audit/realtexture-96-petals-0.15.png",
+      "bytes": 5402,
+      "sha256": "8e7b64bf08e2a43494659c41c191792a85c61d549ecbf533e708d8b9dfaca953"
+    },
+    {
+      "path": "prisma-fast-audit/realtexture-96-petals-0.35.png",
+      "bytes": 5064,
+      "sha256": "63874294dfb92b571fccaa0269c3d46681b2722b82b3f214c3fe6b050c417e6b"
+    },
+    {
+      "path": "prisma-fast-audit/realtexture-96-petals-0.7.png",
+      "bytes": 4355,
+      "sha256": "a571a89ce3f1859e04a7e473abd8e999b3d4490451bdb055b2c48b4ba938cfaf"
+    },
+    {
+      "path": "prisma-fast-audit/realtexture-96-petals-0.png",
+      "bytes": 5805,
+      "sha256": "da0ce5a1833b3c667f7318cfcca5c67a84bf025616a5219428c5aa594a69e807"
+    },
+    {
+      "path": "prisma-fast-audit/realtexture-96-petals-1.png",
+      "bytes": 4372,
+      "sha256": "76989c8ddefd804c831aac290299b812ade23bf6285f05c829c9aa471cf6dcc4"
+    },
+    {
+      "path": "prisma-fast-audit/realtexture-render-results.json",
+      "bytes": 13940,
+      "sha256": "81246e1f616049ef25570981f11927574c083c94f44676f55f4dec78ac14402d"
+    },
+    {
+      "path": "prisma-fast-audit/renderer-before.js",
+      "bytes": 93384,
+      "sha256": "d9c4d4353bb0a7eb613482183548006da24b3bde143773cced872cbe2d016313"
+    },
+    {
+      "path": "prisma-fast-audit/renderer-v12.js",
+      "bytes": 93384,
+      "sha256": "d9c4d4353bb0a7eb613482183548006da24b3bde143773cced872cbe2d016313"
+    },
+    {
+      "path": "prisma-fast-audit/source-sync.py",
+      "bytes": 1792,
+      "sha256": "4530bae6eaf7893157b196d5b5b8b05d3a52ec2f416cc68d9baf31cebf3fe527"
+    },
+    {
+      "path": "prisma-fast-audit/spectrum-96-petals-0.05.png",
+      "bytes": 5627,
+      "sha256": "5f981f0a9ec8a24341061d05585455011442df329a66ffee7ac458cdb12d649d"
+    },
+    {
+      "path": "prisma-fast-audit/spectrum-96-petals-0.15.png",
+      "bytes": 5402,
+      "sha256": "b801c4eb88f4f448cc6af4bbbedf51340ac685a13d9c09fcb459774a3aeb86e5"
+    },
+    {
+      "path": "prisma-fast-audit/spectrum-96-petals-0.35.png",
+      "bytes": 5063,
+      "sha256": "7bcf2451ad8ef0c1eb1b9a780530aa3c6f0b01f5901d2c883c2150a69910df8a"
+    },
+    {
+      "path": "prisma-fast-audit/spectrum-96-petals-0.7.png",
+      "bytes": 4377,
+      "sha256": "a375af8ebbe5e5aa9fd43df7126e5c4570520069f90b2170f965590c1cb91b4a"
+    },
+    {
+      "path": "prisma-fast-audit/spectrum-96-petals-0.png",
+      "bytes": 5805,
+      "sha256": "da0ce5a1833b3c667f7318cfcca5c67a84bf025616a5219428c5aa594a69e807"
+    },
+    {
+      "path": "prisma-fast-audit/spectrum-96-petals-1.png",
+      "bytes": 4391,
+      "sha256": "8ed25370a7b6ad8186bd449e1df2728554602d76812f7901f88f97b64bc40084"
+    },
+    {
+      "path": "prisma-fast-audit/spectrum-render-results.json",
+      "bytes": 14019,
+      "sha256": "21fbdfb12b5067be207bef16d5affe05cd8f33994318028d631c1a7cd31f397e"
+    },
+    {
+      "path": "prisma-fast-audit/__pycache__/atlas-check.cpython-312.pyc",
+      "bytes": 10535,
+      "sha256": "85e075c98eb95defa2b569fa7c6ffe72934caab9d5f510f31430d34e6e1b01c7"
+    },
+    {
+      "path": "prisma-fast-audit/__pycache__/compat-browser.cpython-312.pyc",
+      "bytes": 10621,
+      "sha256": "db8acf91ddc64c7dfef53c066451985f44daa43c0de74f6fa685d0cb4e5cd49a"
+    },
+    {
+      "path": "prisma-fast-audit/__pycache__/compat-export.cpython-312.pyc",
+      "bytes": 6365,
+      "sha256": "00f72a2deee7c332d285e68148ca445d29a5580dd5e6ccd1d81bdbf584a98421"
+    },
+    {
+      "path": "prisma-fast-audit/__pycache__/compat-render.cpython-312.pyc",
+      "bytes": 8151,
+      "sha256": "d31d8560776a3814d79f45c54dadef278bddcd38ae7fa06cbcc54af8c6ce1e81"
+    },
+    {
+      "path": "prisma-fast-audit/__pycache__/fallback-check.cpython-312.pyc",
+      "bytes": 5386,
+      "sha256": "4ed85f8ce6a718c4bdad664ce32c3883a2f2098307540fb1a556506c4a65d464"
+    },
+    {
+      "path": "prisma-fast-audit/__pycache__/glass-compare.cpython-312.pyc",
+      "bytes": 5822,
+      "sha256": "b5041c8b3b5a550d6290dff91074078b29e3a7f585ddc5d2f77d76f8fdb3f36c"
+    },
+    {
+      "path": "prisma-fast-audit/__pycache__/matched-preview.cpython-312.pyc",
+      "bytes": 4085,
+      "sha256": "5bc4eb889b73a92bdbfb88e82d1d252a1b9e38285c39eed7ec08acb2b50e5869"
+    },
+    {
+      "path": "prisma-fast-audit/__pycache__/partial-petal-check.cpython-312.pyc",
+      "bytes": 14206,
+      "sha256": "93ef4f53b13482859473ef4714c6aa62d1cc5e61b897a4dfcb6df2da929a96ff"
+    },
+    {
+      "path": "prisma-fast-audit/public/renderer-before.js",
+      "bytes": 93384,
+      "sha256": "d9c4d4353bb0a7eb613482183548006da24b3bde143773cced872cbe2d016313"
+    },
+    {
+      "path": "prisma-motion-audit/app-before.js",
+      "bytes": 60288,
+      "sha256": "857fbd8d171f2fa970db91f20f9204ddcbb07d77a1ae6f873dc4250c2775869e"
+    },
+    {
+      "path": "prisma-motion-audit/browser-motion.py",
+      "bytes": 5094,
+      "sha256": "157bae65b2e1abaa03040fcbce1e06e9c18847a8d212659655adc1364398431d"
+    },
+    {
+      "path": "prisma-motion-audit/detail-check.py",
+      "bytes": 6696,
+      "sha256": "9f84ecd2a358f9b3949f65efe1325c46f771c43951bef771f0407dcca5d91bec"
+    },
+    {
+      "path": "prisma-motion-audit/edit.py",
+      "bytes": 6827,
+      "sha256": "a1cf736ffe9efcaab7583ab2b435e00b20b18bf66b64abf56b8ee2e03675cd3a"
+    },
+    {
+      "path": "prisma-motion-audit/motion-after.json",
+      "bytes": 1268,
+      "sha256": "a9451d01e124f17d876bb8a6353f24e0035261b9b3ca48e2989358357852a600"
+    },
+    {
+      "path": "prisma-motion-audit/motion-baseline.json",
+      "bytes": 1288,
+      "sha256": "6b78a0e1ff1fc3c4ce13f16776b1933a1f08e0ac028cdc4f20a7b40482f71c85"
+    },
+    {
+      "path": "prisma-motion-audit/motion-browser.json",
+      "bytes": 670,
+      "sha256": "197c8d16c800b0e869a95344130f3a3d1709972f32109327864acfe407d032ad"
+    },
+    {
+      "path": "prisma-motion-audit/motion-check.py",
+      "bytes": 2839,
+      "sha256": "90b4f8ec8aa1da9396f009d50d3c57abdbac6de56f255aee9e8ef3abd7115558"
+    },
+    {
+      "path": "prisma-motion-audit/motion-core.mjs",
+      "bytes": 1677,
+      "sha256": "16fd4bf2d4c68140729c518c76067577f7832e3639518f6e41f0a2c8a89a4ce1"
+    },
+    {
+      "path": "prisma-motion-audit/motion-detail.json",
+      "bytes": 2530,
+      "sha256": "c992203f98cdce3e09b4c05e1f61c627935d7a13148eba777c4ddc3280421875"
+    },
+    {
+      "path": "prisma-motion-audit/motion-editor.png",
+      "bytes": 330305,
+      "sha256": "fa2389a7401b8e50d0e97625be6d13f137faccbe2605ce8c85b3c2f155817b92"
+    },
+    {
+      "path": "prisma-motion-audit/motion-final.json",
+      "bytes": 1314,
+      "sha256": "8175bae5bbefe0f1a2720a3556d751d8296c8504e3f3fd7e54834ee06b66f9ab"
+    },
+    {
+      "path": "prisma-motion-audit/motion-geometry.png",
+      "bytes": 250697,
+      "sha256": "d9de292e699136d2b82aaea1f802be6a8a4f4353599b7ef8853c496dac1cd63b"
+    },
+    {
+      "path": "prisma-motion-audit/motion-loop-60fps.mp4",
+      "bytes": 33774,
+      "sha256": "6e0b34dc9baa467801a738b454fc58ec60cbbd76f97f19df524a1691807d50b7"
+    },
+    {
+      "path": "prisma-motion-audit/motion-offline.png",
+      "bytes": 23799,
+      "sha256": "a210fdd166026d4d25f7e1155faddd578d74dd1a039e724bba9afb8b5cb96641"
+    },
+    {
+      "path": "prisma-motion-audit/motion-published.json",
+      "bytes": 1306,
+      "sha256": "dc1458e7853648850e2acc91cfa7f7d5c7d72501bd85c450f275f8afe2dae4ee"
+    },
+    {
+      "path": "prisma-motion-audit/motion-wallpaper.html",
+      "bytes": 121212,
+      "sha256": "acf8b9359f206890dec2178df606b6b5d9a131aad76e18899d771aa0d10a15ef"
+    },
+    {
+      "path": "prisma-motion-audit/prisma-motion-final.tar",
+      "bytes": 2037760,
+      "sha256": "fd8b608ece876a9cff86587da007f55b94fdaa2d404062c05d39e5f9a77234d3"
+    },
+    {
+      "path": "prisma-motion-audit/prisma-motion.tar",
+      "bytes": 2027520,
+      "sha256": "a1e3f5aea2705b44f56c5f5f73c56fdd8827a34c7ad8da5e326bd7244cb45258"
+    },
+    {
+      "path": "prisma-motion-audit/renderer-before.js",
+      "bytes": 111078,
+      "sha256": "d9ec136621107321a67cca788d7d2ab29fc0f55e16c56c5a9f7a183c33861c70"
+    },
+    {
+      "path": "prisma-motion-audit/soft-check.py",
+      "bytes": 1602,
+      "sha256": "04a1c6f582b5e583ecc280eff60c9c547c5444e938b8a60173923fd6e9906f80"
+    },
+    {
+      "path": "prisma-motion-audit/soft-results.json",
+      "bytes": 128,
+      "sha256": "0f4630248c86d173be504591e8f8ea53786db2b7a86a3da0bd3d4c9d103fccfc"
+    },
+    {
+      "path": "prisma-motion-audit/source-sync.py",
+      "bytes": 1782,
+      "sha256": "9438508af0a6c1031711e9d29deb73b532263fe4a3ba698c187ded08f9ab9a16"
+    },
+    {
+      "path": "prisma-organic-audit/check-fields.py",
+      "bytes": 1791,
+      "sha256": "eca04160534d4de98fb651631e8bb24df1fc997413d150bce94cf46dd736a43e"
+    },
+    {
+      "path": "prisma-organic-audit/check-ui.py",
+      "bytes": 5624,
+      "sha256": "f16258fb8e3b47cbf119cf19a080d2ee2c0bb09b72d535896af0ff445d030c64"
+    },
+    {
+      "path": "prisma-organic-audit/check.py",
+      "bytes": 5535,
+      "sha256": "56609bbb40c700d485e5b7bc706ff7d45397a8b5cbe4b32e02e2cb77f8109030"
+    },
+    {
+      "path": "prisma-organic-audit/confronto-radici.png",
+      "bytes": 146028,
+      "sha256": "37d131447c817a59ea9537eaf8eed0064384691b0df184f94e69c4b4b7cdf19a"
+    },
+    {
+      "path": "prisma-organic-audit/editor-organico.png",
+      "bytes": 283029,
+      "sha256": "f38f749f29f859223cb8c40c7181cca365b8bcbe92431bf0a29667a1f53a2821"
+    },
+    {
+      "path": "prisma-organic-audit/fields.json",
+      "bytes": 461,
+      "sha256": "32b0e465d4dd3af26bd9cc386cd3efe81a97f050f2165f29c4ba3fbec15b795e"
+    },
+    {
+      "path": "prisma-organic-audit/metrics.json",
+      "bytes": 1178,
+      "sha256": "b40900d3185f06c17323029a1bd3ceb5a788669cca0b6a2fe89db1147731209c"
+    },
+    {
+      "path": "prisma-organic-audit/radici-export.png",
+      "bytes": 31180,
+      "sha256": "696f25dc503a72293d474378b1adbb5591873db6973808aa759a26d262418421"
+    },
+    {
+      "path": "prisma-organic-audit/radici-progetto.json",
+      "bytes": 10161,
+      "sha256": "4fd88ba6473e0f2bafbb6b599de3bf5c6fd8965a43c4801c5ce6cae3937aa757"
+    },
+    {
+      "path": "prisma-organic-audit/radici-wallpaper.html",
+      "bytes": 81272,
+      "sha256": "2d604f987c261c12a6146de0dbe7bc6684226799346616fb1846bd0b528a605e"
+    },
+    {
+      "path": "prisma-organic-audit/renderer-before.js",
+      "bytes": 67859,
+      "sha256": "ed0619e710206d663fd673d08dc44e40dff5574693777194fa2d3870d1679011"
+    },
+    {
+      "path": "prisma-performance-audit/browser.py",
+      "bytes": 3263,
+      "sha256": "e02f99e153012097d976fde337c98b1fb4e0719eec5cd2255813b0a8554be0ee"
+    },
+    {
+      "path": "prisma-performance-audit/prestazioni-desktop.png",
+      "bytes": 159631,
+      "sha256": "212281bc67b6b339a421ccd5810bc30cea2a159f811bcd8dc26473055bbeccd6"
+    },
+    {
+      "path": "prisma-performance-audit/prestazioni-mobile.png",
+      "bytes": 60737,
+      "sha256": "90c81f8b50e83405f2831cd57607e2ad5d4b7b5b86067d5d9ff382f8026b4424"
+    },
+    {
+      "path": "prisma-performance-audit/quality.mjs",
+      "bytes": 1710,
+      "sha256": "dba36948d0c8caaa23d0408361c653c90f1195a1b0d3cbe20215145ce9d4de40"
+    },
+    {
+      "path": "prisma-performance-audit/render-metrics.json",
+      "bytes": 962,
+      "sha256": "0c1f5db3f011d6fcf15de2850df45388421a6c37282b80fc0a78e780077e87b5"
+    },
+    {
+      "path": "prisma-performance-audit/render.py",
+      "bytes": 2318,
+      "sha256": "0d24990fd9cc985e5f7bed23ec3269c0ce049d84aa3b288a049c3a26c7753421"
+    },
+    {
+      "path": "prisma-performance-audit/renderer-before.js",
+      "bytes": 73988,
+      "sha256": "7b697ac8bc532ad32587db3ac67f4d09064312ca1b4d3d7a875f8a56fd12b473"
+    },
+    {
+      "path": "prisma-performance-audit/timing.py",
+      "bytes": 1002,
+      "sha256": "9ccbd6cda1c1a94e7ac199307e12a87127c266b0ce81afb5a4158be538234784"
+    },
+    {
+      "path": "prisma-petals-audit/bloom-512.png",
+      "bytes": 148159,
+      "sha256": "88e9e71b7ffc4a4c787236826f2d09369415cb3fe56c6e76cf2740ff4bbfed9e"
+    },
+    {
+      "path": "prisma-petals-audit/bloom-editor.png",
+      "bytes": 288922,
+      "sha256": "e334590b5e6e870be7b2018cacf51bd19a8318292dc3e397aa7814eddf5b1ecb"
+    },
+    {
+      "path": "prisma-petals-audit/bloom-loop-60fps.mp4",
+      "bytes": 114343,
+      "sha256": "e72ca5296a5a249de16dde51b2f42af18a8c46af743cd65e5339e34cc24e1062"
+    },
+    {
+      "path": "prisma-petals-audit/bloom-onde-cromatiche.png",
+      "bytes": 101751,
+      "sha256": "933173c194f708fc3193c9688f8e0e8be6828db2a57210e86c9c687dca612c2a"
+    },
+    {
+      "path": "prisma-petals-audit/bloom-progetto.json",
+      "bytes": 9616,
+      "sha256": "91f4e6f8bfa2c251771353bac78a3bf41dc030922567b8c7d7910b2afe49243e"
+    },
+    {
+      "path": "prisma-petals-audit/bloom-wallpaper.html",
+      "bytes": 74703,
+      "sha256": "f9506c7b956296b7fe7ba1068639dd8475dd1712ee911b49b3826dc3b606874c"
+    },
+    {
+      "path": "prisma-petals-audit/intermediates.json",
+      "bytes": 249,
+      "sha256": "8bd27d5773d3e61d83605570471ecac5fb5b8e180dc61bd5a873b066f1bb4c4e"
+    },
+    {
+      "path": "prisma-petals-audit/luci-editor.png",
+      "bytes": 339343,
+      "sha256": "d970ea59360d3a12a7b17317042df64aa297fb566d1fb34707f7024cc3d17800"
+    },
+    {
+      "path": "prisma-petals-audit/mobile-editor.png",
+      "bytes": 109739,
+      "sha256": "6e62b962b1431062d57888ff898cae12a007c36c32cf117f779a62a0b8a5ce53"
+    },
+    {
+      "path": "prisma-petals-audit/neon-e-anelli.png",
+      "bytes": 68639,
+      "sha256": "3be4cf56e22f185e304f84ddbe8d013ee1a2bbc738532212b422f5b2e73ee419"
+    },
+    {
+      "path": "prisma-petals-audit/nuove-forme-e-luci.png",
+      "bytes": 314406,
+      "sha256": "1dee0cd12dfa3a362b076e12a3f0b9c23556075d2344d8ce5d484f948b1a1690"
+    },
+    {
+      "path": "prisma-petals-audit/petali-spine-borchie-aghi.png",
+      "bytes": 146334,
+      "sha256": "30cb5623a0b8120842dbf0159974b688d77f9f0fa3addbbe1b56307d78e81006"
+    },
+    {
+      "path": "prisma-petals-audit/renderer-before.js",
+      "bytes": 57044,
+      "sha256": "7d1cc0f9bf8123c72b0e0d8f09faf685dde6b959e7beabbf5bb5a6e2aa0d07b2"
+    },
+    {
+      "path": "prisma-petals-audit/renderer-metrics.json",
+      "bytes": 1349,
+      "sha256": "8be3aca4726a2d474c4156fb636d811a8127e25b4eca4715f5125067b5c98963"
+    },
+    {
+      "path": "prisma-petals-audit/smoke-shapes.png",
+      "bytes": 93451,
+      "sha256": "1f3ffa5535d74744a2403657f8aaa749aec6abc870ea309bc07e043dd632d98d"
+    },
+    {
+      "path": "prisma-petals-audit/smoke-states.json",
+      "bytes": 62048,
+      "sha256": "fee36788699de4112b3d6de9c383c74f5d2cd7264b481218cbd48e16d1108faf"
+    },
+    {
+      "path": "prisma-petals-audit/smoke.py",
+      "bytes": 2274,
+      "sha256": "148fbc218293d51ab4a336444a7e9c248c09921e2fad9815a014e15398ff3f8b"
+    },
+    {
+      "path": "prisma-petals-audit/varianti-editor.png",
+      "bytes": 332137,
+      "sha256": "b4449bef2af56ee8799d29e4dcc1b3de4d2e3682f63450b2c541614e709be2e7"
+    },
+    {
+      "path": "prisma-petals-audit/verify-intermediate.py",
+      "bytes": 1991,
+      "sha256": "dd2e16a2db1a61cbefca5c7514047a017e0c30f76ad733f43cf9c77f9ee150de"
+    },
+    {
+      "path": "prisma-petals-audit/verify-remaining-exports.py",
+      "bytes": 1956,
+      "sha256": "69837741ab30266eeb47d62defc90f2c79e67869ae77d23298139dcfa87242c0"
+    },
+    {
+      "path": "prisma-petals-audit/verify-renderer.py",
+      "bytes": 5548,
+      "sha256": "1cb839499820cc3c2e546dd97c8ad63f3c44f60ac8787c867bee21c48ebb2d8b"
+    },
+    {
+      "path": "prisma-petals-audit/verify-ui.py",
+      "bytes": 8375,
+      "sha256": "8fce6464a2bedc5089d3dabaf41a3fa69a22b1094c9dd1f60ba0327ee8bb521e"
+    },
+    {
+      "path": "prisma-petals-audit/video-metrics.json",
+      "bytes": 256,
+      "sha256": "22baf01b81e59d0700a7a19c2b72463da57ca4e15705b30191a173549a06eb60"
+    },
+    {
+      "path": "prisma-regression-audit/app-original.js",
+      "bytes": 55008,
+      "sha256": "3b105d500747486d5c7a29b9ac773f1ac1d21d0a022e674ebea548f3766bb076"
+    },
+    {
+      "path": "prisma-regression-audit/avvio-recuperabile.png",
+      "bytes": 357694,
+      "sha256": "265a0b44c5f2bd449f7fd7e481d4b7037fa63cedf3e6d59ff53b7b7efb534fac"
+    },
+    {
+      "path": "prisma-regression-audit/browser-checks.log",
+      "bytes": 360,
+      "sha256": "5c7ef95aab3456e8061f1c4ac72460314064ee73d293047418abf5c40c9dc8f7"
+    },
+    {
+      "path": "prisma-regression-audit/browser-checks.py",
+      "bytes": 4873,
+      "sha256": "d7d491c10ad7f61a0d1d62d85a1e75d6474e050134afb854c3c48545c3f1749a"
+    },
+    {
+      "path": "prisma-regression-audit/browser-results.json",
+      "bytes": 183,
+      "sha256": "4c8c6a94f87044dd12e4e26c54ee113615cde0f226c28284b786c510d94e00cb"
+    },
+    {
+      "path": "prisma-regression-audit/compile-check.log",
+      "bytes": 967,
+      "sha256": "0d8c62afd5690e380180225ee68754deb056cd56aea46e94026acfcdf3ff4eea"
+    },
+    {
+      "path": "prisma-regression-audit/compile-check.py",
+      "bytes": 1837,
+      "sha256": "d191ec030ac46112e1437733c6bf6bae98bd7c89f22ae0b3e00e53368632d85a"
+    },
+    {
+      "path": "prisma-regression-audit/compile-results.json",
+      "bytes": 674,
+      "sha256": "b3434f0abc5ee0d5894355ba5cada352fb1aebce0746e02b69242670e3626f9d"
+    },
+    {
+      "path": "prisma-regression-audit/confronto-renderer.png",
+      "bytes": 144621,
+      "sha256": "9279cab15f3ff0f7863d6af614b55c1f3dbb82399e9d5cf89b8d4f7a68a0139d"
+    },
+    {
+      "path": "prisma-regression-audit/core-checks.mjs",
+      "bytes": 2406,
+      "sha256": "ba70185d8a91ecbd1e33951014964d24905abf910a2d731a4e6a2f1d0835ac26"
+    },
+    {
+      "path": "prisma-regression-audit/corrected-wallpaper.html",
+      "bytes": 100258,
+      "sha256": "3f5e188de9896b451889c4395b6563713253c4507bde6e36a88819715e3841ca"
+    },
+    {
+      "path": "prisma-regression-audit/editor-corrected.png",
+      "bytes": 379125,
+      "sha256": "20bc8863d39ecc328823c0062b20eaa5fa900bdd49ae77def54572e262b6bdd8"
+    },
+    {
+      "path": "prisma-regression-audit/export-checks.log",
+      "bytes": 158,
+      "sha256": "478182e148d369894b810ea380f05ea774710b06354d3950069f2a1e13bcb44c"
+    },
+    {
+      "path": "prisma-regression-audit/export-checks.py",
+      "bytes": 2770,
+      "sha256": "8e75d6bbcb82c46757188f7c5b8e3fe41cdbcec7a2e5b2a95b101126d7ec139a"
+    },
+    {
+      "path": "prisma-regression-audit/export-results.json",
+      "bytes": 172,
+      "sha256": "448f3fb0cde5c44409b6335b72f75122e61078f8a3d5f43cca7620627960a155"
+    },
+    {
+      "path": "prisma-regression-audit/fetch-live.py",
+      "bytes": 1322,
+      "sha256": "39618c0a424cec47406ca4390cc18979c33c350d36c53437b8a38699181bc95f"
+    },
+    {
+      "path": "prisma-regression-audit/full-glass-check.log",
+      "bytes": 128,
+      "sha256": "9b001235983543f5cb5156570e5b29c5e30b0ed120a0968d0684279f01afb50b"
+    },
+    {
+      "path": "prisma-regression-audit/full-glass-check.py",
+      "bytes": 1392,
+      "sha256": "c7c94b1fd2e84bd496a460a2e9b83801952c62f748fa62410fdb0d042df91d3f"
+    },
+    {
+      "path": "prisma-regression-audit/full-glass-results.json",
+      "bytes": 79,
+      "sha256": "470fe354d0260eae62b10f822a414a2462bedf0b6d7082740db28b656a33e953"
+    },
+    {
+      "path": "prisma-regression-audit/live-assets.json",
+      "bytes": 2664,
+      "sha256": "50004794297e1e2fd6207984bcb06737eddaaf19d5972b5e80efe7c1c232903e"
+    },
+    {
+      "path": "prisma-regression-audit/loop-60fps.mp4",
+      "bytes": 9597,
+      "sha256": "e0872a47455a72f63a59ef4b9b8e10c9e3578fe396fe4808e4e156d8f3ace777"
+    },
+    {
+      "path": "prisma-regression-audit/prisma-corrected.tar",
+      "bytes": 2007040,
+      "sha256": "d6212016b61b0625bd844082a69d3e717bdc36227ea28387b5082d8253c79e71"
+    },
+    {
+      "path": "prisma-regression-audit/probe-before.log",
+      "bytes": 11743,
+      "sha256": "3f5e8d7d1c629c139bdac61fe246f15670351f41e0cd7d8bf9fcb1304d39989f"
+    },
+    {
+      "path": "prisma-regression-audit/probe-live.log",
+      "bytes": 11709,
+      "sha256": "e1c2b86ad1e65d6a63835cac5bea1c6beabb5adb855898f5bd7c1c360f5e50b0"
+    },
+    {
+      "path": "prisma-regression-audit/probe-startup.json",
+      "bytes": 12828,
+      "sha256": "215f86c2f412a41a86d62d9722031278c6f6803c127801677442da811ff90117"
+    },
+    {
+      "path": "prisma-regression-audit/probe-startup.log",
+      "bytes": 10416,
+      "sha256": "2ca02bc42efc134411737b905374a637e1e08e851147be6970ecc10af78d38b6"
+    },
+    {
+      "path": "prisma-regression-audit/probe.py",
+      "bytes": 3792,
+      "sha256": "511bc9f83010728e8fa617f5bd753d6e99cb58013d7ad69a4dadb68ca8e9c378"
+    },
+    {
+      "path": "prisma-regression-audit/render-checks-eval.js",
+      "bytes": 4400,
+      "sha256": "cf60251f9bf3cb23c4d8eb3a6011c59084afd237eb0b5906c9b019d4344f1ad1"
+    },
+    {
+      "path": "prisma-regression-audit/render-checks.log",
+      "bytes": 2392,
+      "sha256": "ed805655e84394bdd700d1ae93577cd38c21896733c9abd5526fb93a46c2e298"
+    },
+    {
+      "path": "prisma-regression-audit/render-checks.py",
+      "bytes": 6086,
+      "sha256": "82f8226afa6a714a2a43ce6c17cb05fd5f0a6ddf805c3d5fe7bf0941112cc0a4"
+    },
+    {
+      "path": "prisma-regression-audit/render-results.json",
+      "bytes": 2829,
+      "sha256": "0e8588e86b911e946a9f22720670e89ce94046811bbb5b8d78a3a5f1144c19b4"
+    },
+    {
+      "path": "prisma-regression-audit/renderer-original.js",
+      "bytes": 75504,
+      "sha256": "192eedd64f045acecf564484f0a92d1946232ebdc5232dfcce3ce6314b61a172"
+    },
+    {
+      "path": "prisma-regression-audit/retained-project.json",
+      "bytes": 10196,
+      "sha256": "1c2be60b047c263cf7a4955bebe13d380cbf1e45354cb2ab3fd447eff18dc868"
+    },
+    {
+      "path": "prisma-regression-audit/source-sync.py",
+      "bytes": 1822,
+      "sha256": "2c7f372d8b0b318ff5a3139e854018582b9b76d8d34ac219556776e3d4433feb"
+    },
+    {
+      "path": "prisma-regression-audit/transparent-export.png",
+      "bytes": 7458,
+      "sha256": "41515143e1002f27f2e92a121969d48d0eb765bd7442b1ee7f3a034469fb3567"
+    },
+    {
+      "path": "prisma-regression-audit/wallpaper-offline.png",
+      "bytes": 33171,
+      "sha256": "0b2b38b24fa170b6c1fccb262c08c55a9999f0221155236390d6ce74fb6e1ba2"
+    },
+    {
+      "path": "prisma-root-export-fix/baseline-events.json",
+      "bytes": 2577,
+      "sha256": "cecd093c0fef9fb1b3da3677aa311d0ce535e3758381f59f933a946c0a630e0b"
+    },
+    {
+      "path": "prisma-root-export-fix/baseline-results.json",
+      "bytes": 1116,
+      "sha256": "cc3644e15386d0498766af4c14e87a1a5ae7b6ed2b3cfb83d923afdfa8922a61"
+    },
+    {
+      "path": "prisma-root-export-fix/baseline.log",
+      "bytes": 1994,
+      "sha256": "36d52fbefc823265e21e88c39c180b0564e8c3e86a87eed246d159f97e6bba21"
+    },
+    {
+      "path": "prisma-root-export-fix/baseline.py",
+      "bytes": 3086,
+      "sha256": "79a49ebf02554d938470331d729edbc77173d9c6bd7462735aea2cac9e9ecfde"
+    },
+    {
+      "path": "prisma-root-export-fix/cancel-ui-events.json",
+      "bytes": 8291,
+      "sha256": "8bebe49bda8c544a5581d293f8f3e8ff5f8ef09f8dbf350ccb9321a2ee61a8ae"
+    },
+    {
+      "path": "prisma-root-export-fix/cancel-ui.log",
+      "bytes": 7081,
+      "sha256": "7b768508c5f0c9ef9ac7eda561614232c84bbdc886ea121d76769a9108c84c2c"
+    },
+    {
+      "path": "prisma-root-export-fix/cancel-ui.py",
+      "bytes": 4808,
+      "sha256": "6cd959cd77a941a782d4c5cf03162e69e2a03c65d89d62e1f96748e4cd2c4843"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate-events.json",
+      "bytes": 2601,
+      "sha256": "d2ded87036f4d6b227d8ec1b9e5e971dce512318a01dd0dd5ea5f2307ec93db3"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate-full128.png",
+      "bytes": 8271,
+      "sha256": "fde0ed24e6352585f31e74cadaaec1cbc25cf7f26eba134497e68ffddb235f02"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate-full64-cold.png",
+      "bytes": 2605,
+      "sha256": "ddbb7898ee1fab2d8b8048f78872cc1a00efb171b1fa3466d4fef4b4e881f8f1"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate-full64-warm.png",
+      "bytes": 2605,
+      "sha256": "ddbb7898ee1fab2d8b8048f78872cc1a00efb171b1fa3466d4fef4b4e881f8f1"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate-preview64.png",
+      "bytes": 2635,
+      "sha256": "e96e6f9946b9dc34772ba0d79ad23bb23e8b0788216b81f23d58f4b11402a8a6"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate-results.json",
+      "bytes": 1127,
+      "sha256": "c8da9080587053da1c6ea725e731b6548ae3892857cb5133e4b1ef5878c0cf2c"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate.log",
+      "bytes": 2019,
+      "sha256": "b04ec0245170f4f7f3a03a12f8a0b6eb5487c407a854a3a59703fb31aa046f0b"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate.py",
+      "bytes": 3111,
+      "sha256": "e23166d21930697f355758e4ea6a29749ce5f506b469603d9fe89fa8bdf01ecf"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate2-events.json",
+      "bytes": 2621,
+      "sha256": "4f9b16b85f352eab5e3e925be92541ad250f45d6649f7b2a2ec5d8af863e0633"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate2-full128.png",
+      "bytes": 8271,
+      "sha256": "fde0ed24e6352585f31e74cadaaec1cbc25cf7f26eba134497e68ffddb235f02"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate2-full64-cold.png",
+      "bytes": 2605,
+      "sha256": "ddbb7898ee1fab2d8b8048f78872cc1a00efb171b1fa3466d4fef4b4e881f8f1"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate2-full64-warm.png",
+      "bytes": 2605,
+      "sha256": "ddbb7898ee1fab2d8b8048f78872cc1a00efb171b1fa3466d4fef4b4e881f8f1"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate2-pixel-comparison.json",
+      "bytes": 404,
+      "sha256": "27916a75cea6df7b508b48ec4918ac299ec6dfbd671811754e588e62567ade13"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate2-preview64.png",
+      "bytes": 2635,
+      "sha256": "e96e6f9946b9dc34772ba0d79ad23bb23e8b0788216b81f23d58f4b11402a8a6"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate2-results.json",
+      "bytes": 1130,
+      "sha256": "e2386068437960457171283cc8ea6c6621093107359da5768bf2b6e9fd5d2902"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate2.log",
+      "bytes": 2040,
+      "sha256": "5da4662a21a7dcd45057cacd8911b9c52601bcdb40c37fd2066c5b4a1718f7d3"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate2.py",
+      "bytes": 3118,
+      "sha256": "e8a091dd6bdc0b10e1d1b39fbe407bf21e6b42129badfa8d42e47251d42003e4"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate3-events.json",
+      "bytes": 1974,
+      "sha256": "66fcec166cda5416f909c5422d6576cea23d38921427808eb004b3d298069276"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate3-full128.png",
+      "bytes": 8271,
+      "sha256": "fde0ed24e6352585f31e74cadaaec1cbc25cf7f26eba134497e68ffddb235f02"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate3-full64-cold.png",
+      "bytes": 2605,
+      "sha256": "ddbb7898ee1fab2d8b8048f78872cc1a00efb171b1fa3466d4fef4b4e881f8f1"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate3-full64-warm.png",
+      "bytes": 2605,
+      "sha256": "ddbb7898ee1fab2d8b8048f78872cc1a00efb171b1fa3466d4fef4b4e881f8f1"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate3-pixel-comparison.json",
+      "bytes": 304,
+      "sha256": "29ef37614e8e97f53aa205d14cddb027f7402ae0d781c6bffcfd7c9d0cf574fd"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate3-results.json",
+      "bytes": 865,
+      "sha256": "32bb27a1eacf5f172304071fdf3b7f939b1926caad92cfbbc4cd905d8358bbba"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate3.log",
+      "bytes": 1559,
+      "sha256": "f809464042d52b608ae1c13c5ea53c3abba161d3cdd4bc7dec134ae72bdf226b"
+    },
+    {
+      "path": "prisma-root-export-fix/candidate3.py",
+      "bytes": 3068,
+      "sha256": "5f5a22831a6b2e64d55dbf602c9700d6f1062b28ebe2ccf5005d22f320ac0357"
+    },
+    {
+      "path": "prisma-root-export-fix/compare.py",
+      "bytes": 664,
+      "sha256": "abdf21c3dc4ff4fbbebe41d783c6c54674d4e40d93bcf0d6b483db23ce4b1534"
+    },
+    {
+      "path": "prisma-root-export-fix/export-success.png",
+      "bytes": 179275,
+      "sha256": "e618c8eb05a2153ef3cdb5a4d2f143956abcb499aded14934e89481b68b159df"
+    },
+    {
+      "path": "prisma-root-export-fix/export-ui-events.json",
+      "bytes": 812,
+      "sha256": "adb14d85f81047f174f07e097f5d03002ac193d35653ffae4256c6c3547cb7da"
+    },
+    {
+      "path": "prisma-root-export-fix/export-ui.log",
+      "bytes": 2050,
+      "sha256": "901817852ad686ea7c95c2977d763223d6a5d58c29d8985413aa5c8a33ac424f"
+    },
+    {
+      "path": "prisma-root-export-fix/export-ui.py",
+      "bytes": 3869,
+      "sha256": "f3d449f4557e3d4a54870d4f02d37005000da393f0f42ae2bf2de9f9e348f66a"
+    },
+    {
+      "path": "prisma-root-export-fix/final-full128.png",
+      "bytes": 8271,
+      "sha256": "fde0ed24e6352585f31e74cadaaec1cbc25cf7f26eba134497e68ffddb235f02"
+    },
+    {
+      "path": "prisma-root-export-fix/final-full64-cold.png",
+      "bytes": 2605,
+      "sha256": "ddbb7898ee1fab2d8b8048f78872cc1a00efb171b1fa3466d4fef4b4e881f8f1"
+    },
+    {
+      "path": "prisma-root-export-fix/final-full64-warm.png",
+      "bytes": 2605,
+      "sha256": "ddbb7898ee1fab2d8b8048f78872cc1a00efb171b1fa3466d4fef4b4e881f8f1"
+    },
+    {
+      "path": "prisma-root-export-fix/final-pixel-comparison.json",
+      "bytes": 304,
+      "sha256": "29ef37614e8e97f53aa205d14cddb027f7402ae0d781c6bffcfd7c9d0cf574fd"
+    },
+    {
+      "path": "prisma-root-export-fix/full-final-events.json",
+      "bytes": 1259,
+      "sha256": "6ba4e479b7f602310d9a15e3ceddc74513cddd7bbc36e7c2e9940be127adc2f6"
+    },
+    {
+      "path": "prisma-root-export-fix/full-final-results.json",
+      "bytes": 612,
+      "sha256": "551f4c2038ee2c6f9eb69cf53d59f44f9d396ed29bdafe90846f6c859eeb0fc0"
+    },
+    {
+      "path": "prisma-root-export-fix/full-final.log",
+      "bytes": 931,
+      "sha256": "1406eae5c212fc587e75c3304db3f353a98bfb688e4942850b80f196a8fcf99b"
+    },
+    {
+      "path": "prisma-root-export-fix/full-final.py",
+      "bytes": 2286,
+      "sha256": "370a3747b95fc803298a31c1dc9c14816331256c4b8f80b673d83015cd6b66bd"
+    },
+    {
+      "path": "prisma-root-export-fix/full-new-pp.glsl",
+      "bytes": 36097,
+      "sha256": "e4942412af3a2abee29097b5d94fa6523a79c1b6ca2fe27f6d02bdb1e1cb1483"
+    },
+    {
+      "path": "prisma-root-export-fix/full-new.glsl",
+      "bytes": 47693,
+      "sha256": "12c7bfd7b8d33cc5011506463ac29dfd13c6c165fae24dc42b86a8b3ebb7efa4"
+    },
+    {
+      "path": "prisma-root-export-fix/full-old-pp.glsl",
+      "bytes": 35726,
+      "sha256": "a1c7513c059b0854ec86c1c6d786369d958265ae18a60802fab81b559714663e"
+    },
+    {
+      "path": "prisma-root-export-fix/full-old.glsl",
+      "bytes": 47322,
+      "sha256": "eba63864edbd7f63d9b4c7d2cbfe8aad5b7332eb89adbf73d31bd537f05b6bf1"
+    },
+    {
+      "path": "prisma-root-export-fix/full128.png",
+      "bytes": 8271,
+      "sha256": "fde0ed24e6352585f31e74cadaaec1cbc25cf7f26eba134497e68ffddb235f02"
+    },
+    {
+      "path": "prisma-root-export-fix/full64-cold.png",
+      "bytes": 2605,
+      "sha256": "ddbb7898ee1fab2d8b8048f78872cc1a00efb171b1fa3466d4fef4b4e881f8f1"
+    },
+    {
+      "path": "prisma-root-export-fix/full64-warm.png",
+      "bytes": 2605,
+      "sha256": "ddbb7898ee1fab2d8b8048f78872cc1a00efb171b1fa3466d4fef4b4e881f8f1"
+    },
+    {
+      "path": "prisma-root-export-fix/gpu-scheduling-test.mjs",
+      "bytes": 2845,
+      "sha256": "ec7a144743378fc64812974c2d45c69b448d30249fb70ae303868e376df10cc1"
+    },
+    {
+      "path": "prisma-root-export-fix/metric-new.mjs",
+      "bytes": 137026,
+      "sha256": "cd1009db04bee680d29a19015d19eab127811e5bb133fc21057f0e1984d95e43"
+    },
+    {
+      "path": "prisma-root-export-fix/metric-old.mjs",
+      "bytes": 131594,
+      "sha256": "73f4ed687cd2a02029a1eb1d08507da2c61f624925209824812caa099810e651"
+    },
+    {
+      "path": "prisma-root-export-fix/pixel-comparison.json",
+      "bytes": 404,
+      "sha256": "27916a75cea6df7b508b48ec4918ac299ec6dfbd671811754e588e62567ade13"
+    },
+    {
+      "path": "prisma-root-export-fix/preview-refined.png",
+      "bytes": 409038,
+      "sha256": "e7656b5596b3fca5ee80dccd3846368923e53593606e9dc705ab3a7d37fadac0"
+    },
+    {
+      "path": "prisma-root-export-fix/preview-ui-events.json",
+      "bytes": 3105,
+      "sha256": "5f72eec274a31188a16bae78631dc658e79da416ef223d29e7b24c77d377f915"
+    },
+    {
+      "path": "prisma-root-export-fix/preview-ui.log",
+      "bytes": 2423,
+      "sha256": "b694fccf85b1f7accfaa4ec080d611d9e4461670c251d592dafd66e12c2c5d42"
+    },
+    {
+      "path": "prisma-root-export-fix/preview-ui.py",
+      "bytes": 3816,
+      "sha256": "257cc2b3f7abd22c7945449735b64af0bcde098376a3d4dc1f974a5e57bad11f"
+    },
+    {
+      "path": "prisma-root-export-fix/preview64.png",
+      "bytes": 2635,
+      "sha256": "e96e6f9946b9dc34772ba0d79ad23bb23e8b0788216b81f23d58f4b11402a8a6"
+    },
+    {
+      "path": "prisma-root-export-fix/prisma-v19.tar",
+      "bytes": 2201600,
+      "sha256": "60b86266b1b62e94181cc0c14d8beb7f82566d9984ecf20220285378745686cd"
+    },
+    {
+      "path": "prisma-root-export-fix/renderer-before.js",
+      "bytes": 131569,
+      "sha256": "f61877be9e96601c61f424546383863d2c7a57466b1eba50e60d286552fb4930"
+    },
+    {
+      "path": "prisma-root-export-fix/renderer-candidate.js",
+      "bytes": 132635,
+      "sha256": "c32c6b6154e633021c740e74bd4cc28f1d8658f5661be0a7993f8f3f1db54f3d"
+    },
+    {
+      "path": "prisma-root-export-fix/renderer-candidate2.js",
+      "bytes": 134333,
+      "sha256": "fe2baaa442810e6c10cc68eadb0d26c1caaf275e73e24cacc82385327a8a48a3"
+    },
+    {
+      "path": "prisma-root-export-fix/renderer-candidate3.js",
+      "bytes": 135127,
+      "sha256": "d3ef54df9d892bfb1ba79ae75085b5cce4d33d8b3df4dbfe1e4084bb9cfe0ee0"
+    },
+    {
+      "path": "prisma-root-export-fix/source-sync.py",
+      "bytes": 1791,
+      "sha256": "619e5d8a30760315f74d3298fbd9e23635e6817823d06d1867d5e1ae7d2772d8"
+    },
+    {
+      "path": "prisma-root-export-fix/tile-partition-test.mjs",
+      "bytes": 1820,
+      "sha256": "c26d4821f25ee993e48a9ddcf74ef3edefc1e81bd514db911791d33b4c28d8a5"
+    },
+    {
+      "path": "prisma-root-export-fix/user-preset.json",
+      "bytes": 12671,
+      "sha256": "79ee1ba84a82b9023ff2d0b79f0c6267d3e324bc092124b3c3f3af8c2a309de9"
+    },
+    {
+      "path": "prisma-root-export-fix/user-roots-128-repeat.png",
+      "bytes": 7985,
+      "sha256": "a6dcbdf2f1a7d21823785faaeca8f3d1329ca418c7de1de798d3c34d5e980d57"
+    },
+    {
+      "path": "prisma-root-export-fix/user-roots-128.png",
+      "bytes": 7985,
+      "sha256": "a6dcbdf2f1a7d21823785faaeca8f3d1329ca418c7de1de798d3c34d5e980d57"
+    },
+    {
+      "path": "prisma-root-export-fix/user-roots-cancel-retry.png",
+      "bytes": 7985,
+      "sha256": "a6dcbdf2f1a7d21823785faaeca8f3d1329ca418c7de1de798d3c34d5e980d57"
+    },
+    {
+      "path": "prisma-root-export-fix/user-roots-gentle-64-60fps.mp4",
+      "bytes": 55857,
+      "sha256": "eb28ce339e6d63aaef257904a4751c9b6da013c560d3ea06b4531f8420848741"
+    },
+    {
+      "path": "prisma-root-export-fix/verify-video.py",
+      "bytes": 1537,
+      "sha256": "a9a7399d73216459fe55632099c91c9bee73c01e11a016b3eba745c59f42a7d9"
+    },
+    {
+      "path": "prisma-root-export-fix/video-frames.png",
+      "bytes": 29427,
+      "sha256": "837fa9c7d82b669055d653603fffebda214562f4cdcf8d3982250e3fe15b124e"
+    },
+    {
+      "path": "prisma-root-export-fix/video-loop.json",
+      "bytes": 375,
+      "sha256": "05ba975bd211eed2f31f491d3d52147c5d255f5bdf28f1ffbd5687a2de4b4fb2"
+    },
+    {
+      "path": "prisma-root-export-fix/video-verification.json",
+      "bytes": 421,
+      "sha256": "ea0504d421090612f6113e61b59d64d22d92bda374b42d74c1619c972cf71897"
+    },
+    {
+      "path": "prisma-root-export-fix/__pycache__/cancel-ui.cpython-312.pyc",
+      "bytes": 11079,
+      "sha256": "9bb9c587023235d22e56e482860633e7a1c0be92ebb418b57807d894169f36a3"
+    },
+    {
+      "path": "prisma-roots-audit/LICENSE",
+      "bytes": 1065,
+      "sha256": "75c54aae7ef6ad652f684f9dd3b71e4dcef86ccebd88cf441ceed7f5eec037c5"
+    },
+    {
+      "path": "prisma-roots-audit/README.md",
+      "bytes": 1145,
+      "sha256": "1c08a55ec15e0c8a5ef0e504b1cb8143da9cc43694ae5b56458bf2edec76de83"
+    },
+    {
+      "path": "prisma-roots-audit/description-before.js",
+      "bytes": 16548,
+      "sha256": "556d2b715c3d028f88139a47eb0df6883f016528da3e8ae7e659b7ee59e33952"
+    },
+    {
+      "path": "prisma-roots-audit/description-results.txt",
+      "bytes": 6138,
+      "sha256": "f7dd355c010565b53aca20c44d89ee0e24f89f9123ffc4421bb0fa20b92c850c"
+    },
+    {
+      "path": "prisma-roots-audit/description-tests.mjs",
+      "bytes": 6424,
+      "sha256": "dd32f190bed63b0741432d6e2f3fd54e691a6abbb2bff70b6276ecb256448bd6"
+    },
+    {
+      "path": "prisma-roots-audit/editor-60fps.mp4",
+      "bytes": 43809,
+      "sha256": "3ace9b4947012f2d16ee37895d1b877fa5a95f2dcb99d2593ec7ed24dcae6d58"
+    },
+    {
+      "path": "prisma-roots-audit/editor-check.json",
+      "bytes": 418,
+      "sha256": "b7a647ba49abac2161bf5d7d6db16f213fcd08c952b0012237c4aaaecda78b97"
+    },
+    {
+      "path": "prisma-roots-audit/editor-check.log",
+      "bytes": 377,
+      "sha256": "6ab6d5360274c520a3f2a1a300589dc8dc7abf42912ecadf9fe3977b80bd6977"
+    },
+    {
+      "path": "prisma-roots-audit/editor-check.py",
+      "bytes": 4213,
+      "sha256": "f578b55fd455015366aa6d4cc56f12f078bb37946e9b05df4a1c289cc28e5be5"
+    },
+    {
+      "path": "prisma-roots-audit/encoder-before.js",
+      "bytes": 733,
+      "sha256": "0e26213dfaee303f4e8ce961cce6ecc029ede36c43ee6b76ee4bb0dc4dcead70"
+    },
+    {
+      "path": "prisma-roots-audit/export-compat-results.json",
+      "bytes": 3940,
+      "sha256": "846d50a8717935333c2c949723304281a6d8e9df0a45ef61caf2788a7d16e3fc"
+    },
+    {
+      "path": "prisma-roots-audit/export-compat-test.py",
+      "bytes": 4872,
+      "sha256": "7d571452de7403dce0284bb1fd4954229c78e42307611382302e02cd6a172f55"
+    },
+    {
+      "path": "prisma-roots-audit/export-stream-results.json",
+      "bytes": 986,
+      "sha256": "6dc18f1cc56c625024cbc1b308e276738f12278eb12e61074881be3e59fe1468"
+    },
+    {
+      "path": "prisma-roots-audit/export-stream-test.py",
+      "bytes": 2831,
+      "sha256": "8d390d0d4a3f0274e87e3e52757270e5aa8925768dcb3d2679326098ac1b7624"
+    },
+    {
+      "path": "prisma-roots-audit/legacy-25sec-native.mp4",
+      "bytes": 1016729,
+      "sha256": "3cea28db678355e8d6c910a3ea869490ea1ad801fd6cb7274f345e7cb23dcdaa"
+    },
+    {
+      "path": "prisma-roots-audit/legacy-25sec-software.mp4",
+      "bytes": 661357,
+      "sha256": "b05d538741b6fd98b15281fe0ed25fe69b90e9968b329c0ac7a6c274c80e4010"
+    },
+    {
+      "path": "prisma-roots-audit/long-export-results.json",
+      "bytes": 2946,
+      "sha256": "5e60b2f10a908248f014766f905347d49bb9822d8519dd8843767fafa1a3b8e0"
+    },
+    {
+      "path": "prisma-roots-audit/long-export-test.py",
+      "bytes": 3671,
+      "sha256": "7037469d68fce65ac1eeb18cbda7ff17545c547a917f9c1beaf15321f55a31c7"
+    },
+    {
+      "path": "prisma-roots-audit/models-roots.mjs",
+      "bytes": 3482,
+      "sha256": "11e3926963f2db39f93db45c327d0022bc77dd6bebfc9517224e37039e23914c"
+    },
+    {
+      "path": "prisma-roots-audit/modern-25sec-native.mp4",
+      "bytes": 1057933,
+      "sha256": "aaa82e22ab19ca71ba1380181173ca311ec157436a0dd76755709040c5e33145"
+    },
+    {
+      "path": "prisma-roots-audit/mp4-muxer.d.ts",
+      "bytes": 9241,
+      "sha256": "0bb72cab12afa6d97ea6d20fc4899ca8596ae587c7eb801a2c3f0382d434c2ce"
+    },
+    {
+      "path": "prisma-roots-audit/mp4-muxer.js",
+      "bytes": 73921,
+      "sha256": "cc4d30bd20b9ffe0b15f59cf0de3e1930626ccd46a5146e36e4d619d7fecf63d"
+    },
+    {
+      "path": "prisma-roots-audit/mp4-muxer.mjs",
+      "bytes": 69011,
+      "sha256": "d2c4c782f180c86ed30b1f5d9487a34a0d370bf9b4535285734ea187d38f9bb5"
+    },
+    {
+      "path": "prisma-roots-audit/native-122sec.mp4",
+      "bytes": 808137,
+      "sha256": "193eef61e67aa2dcfa351227b8892609c21a2e5d75b77c89742aaafd47dc2083"
+    },
+    {
+      "path": "prisma-roots-audit/noise-disk.mp4",
+      "bytes": 25189462,
+      "sha256": "fa9b48e49570748ccb34b40af82d69bf422a2e4bd624bdc7670fe026b4cd5157"
+    },
+    {
+      "path": "prisma-roots-audit/noise-memory.mp4",
+      "bytes": 25189462,
+      "sha256": "7591e576306f64a6c0aa16884c89f2cb8045381dbf255d2efc8d939bb44e17e0"
+    },
+    {
+      "path": "prisma-roots-audit/old-panels.mjs",
+      "bytes": 17059,
+      "sha256": "857d7d69f2ac1ff89332734e6759281e465a9bb99aa8405833e939f639ecf186"
+    },
+    {
+      "path": "prisma-roots-audit/old-states.json",
+      "bytes": 133048,
+      "sha256": "b881c7e89d3c7a5c99b7b902473282a68ba921311411c3e5464acc1bdbc2de58"
+    },
+    {
+      "path": "prisma-roots-audit/panels-order.mjs",
+      "bytes": 2801,
+      "sha256": "eed1201c2a5fe445365d071c2fbf40a3800d294eb0c6e87fe1023bcfb7eedbe2"
+    },
+    {
+      "path": "prisma-roots-audit/prisma-roots-final.tar",
+      "bytes": 2160640,
+      "sha256": "ea82274cd0da3a4ae88e54a8a64a609c0f27518b5ae4f4d928d54baa9a0f14b7"
+    },
+    {
+      "path": "prisma-roots-audit/renderer-before.js",
+      "bytes": 114750,
+      "sha256": "461a4e27c46ddf3715aacbaf626dfa19396b076f029f27ec6b7d9d33b08b7999"
+    },
+    {
+      "path": "prisma-roots-audit/root-smoke.py",
+      "bytes": 1288,
+      "sha256": "1e6292c3398b61530cc8be252815abd40c770f178f1578853fa1c90128d7ae77"
+    },
+    {
+      "path": "prisma-roots-audit/roots-bvh-results.json",
+      "bytes": 974,
+      "sha256": "e9ad26b6ec8f3f534e4101bdad6c7e526e09f30fd229afaee9fa26148cc5ba4e"
+    },
+    {
+      "path": "prisma-roots-audit/roots-bvh.mjs",
+      "bytes": 2480,
+      "sha256": "02f1cdef2914ca3003320f4d83fe9f0046fdcea43509f243f97fe6706da43fa2"
+    },
+    {
+      "path": "prisma-roots-audit/roots-core-results.json",
+      "bytes": 1862,
+      "sha256": "5f55a65e33ba33e172d76290eeef1d521f5b9dadad3ae230a28f717bbba238da"
+    },
+    {
+      "path": "prisma-roots-audit/roots-core.mjs",
+      "bytes": 4623,
+      "sha256": "06a0c23f01ee6a456aa9fb03c7a5af1f3aecf88797d48d031d24a1b0676f7180"
+    },
+    {
+      "path": "prisma-roots-audit/roots-editor.png",
+      "bytes": 436211,
+      "sha256": "1b082aba3fa7899a1c679eadb5d5c450e01377469c9ea324e67a44ac883355d7"
+    },
+    {
+      "path": "prisma-roots-audit/roots-motion-final.json",
+      "bytes": 1990,
+      "sha256": "9f57a4a743b9b85b564837673430c4658921f870f43151609344be20ab5b44d5"
+    },
+    {
+      "path": "prisma-roots-audit/roots-motion-final.log",
+      "bytes": 3259,
+      "sha256": "b4911b2924154ac8bc35c13b520d8748c3a8256a3c3cb8008b62ca5d75b8412b"
+    },
+    {
+      "path": "prisma-roots-audit/roots-motion-final.py",
+      "bytes": 3262,
+      "sha256": "2013850a7dffcbb408877ddd0b9893169be7dc2a880270c2f058a25f3fce6228"
+    },
+    {
+      "path": "prisma-roots-audit/roots-offline.png",
+      "bytes": 8916,
+      "sha256": "ac3dd711b321a5cd57f398240a5c4fad8a2626eb678f97272a24ef04757e8903"
+    },
+    {
+      "path": "prisma-roots-audit/roots-render-results.json",
+      "bytes": 5924,
+      "sha256": "a25ad76cdd9ffffff7d99253fadce045a8d57363d94ca34165810d6fa60e0eeb"
+    },
+    {
+      "path": "prisma-roots-audit/roots-render.log",
+      "bytes": 8697,
+      "sha256": "4d833de9bdaa3173752b743ed5fc624f2b811a4856db2f9ec8530c5f07467402"
+    },
+    {
+      "path": "prisma-roots-audit/roots-render.py",
+      "bytes": 10092,
+      "sha256": "805e81bba52c434b0d07edcfc1191a404839837c6df8ef684b45737f43bd7dcb"
+    },
+    {
+      "path": "prisma-roots-audit/roots-visual-comparison.png",
+      "bytes": 376933,
+      "sha256": "dac02dd3ef19750bbacb38a91f74b23444f91d78f56c854ed25c3842d4ed402a"
+    },
+    {
+      "path": "prisma-roots-audit/roots-wallpaper.html",
+      "bytes": 135616,
+      "sha256": "44198b354f91c8b4e5bac9f4d1ec92e6ee5aa6476c1237a1a269278717b8ced9"
+    },
+    {
+      "path": "prisma-roots-audit/software-8000frames.mp4",
+      "bytes": 815774,
+      "sha256": "dbcc79568fa80b9c92a6908aa7704eabb2e25b515f58f62f78a3f5331903a060"
+    },
+    {
+      "path": "prisma-roots-audit/software-memory.mp4",
+      "bytes": 96236,
+      "sha256": "3b7e07d241cb85557f422e2e81a6f1067d62b6453e7d37c46fecb680f22198e1"
+    },
+    {
+      "path": "prisma-roots-audit/source-sync.py",
+      "bytes": 1815,
+      "sha256": "5a242e942a612ae3466840f9bc2f9b501478dd11e2e2dcba3fd2ee813b2c120d"
+    },
+    {
+      "path": "prisma-roots-audit/surprise-variety.mjs",
+      "bytes": 4171,
+      "sha256": "0e9519e8f35edf9db33a0686174c2fb3f1871414f75e943c11a9e49bef73c940"
+    },
+    {
+      "path": "prisma-roots-audit/__pycache__/roots-render.cpython-312.pyc",
+      "bytes": 15208,
+      "sha256": "52ed327da521ba32570ce16f6bbaca37bb338b6f185bf2b2fbaa7f32cf7094bb"
+    },
+    {
+      "path": "prisma-studio/.openai/hosting.json",
+      "bytes": 88,
+      "sha256": "a700d97d32e7650e9f558e89a6d918f387692850aea78751213dba60c41db676"
+    },
+    {
+      "path": "prisma-studio/dist/app.js",
+      "bytes": 70799,
+      "sha256": "319c57cc516a998a53fbc18f18cf1c230fafeed50336d63b8201011121b204f0"
+    },
+    {
+      "path": "prisma-studio/dist/creative-model.js",
+      "bytes": 20070,
+      "sha256": "65d987e82eadf4cb677a153e1c223478f5d8a88d192a59afbb94427540d157b9"
+    },
+    {
+      "path": "prisma-studio/dist/description.js",
+      "bytes": 36717,
+      "sha256": "b80bb0ed939c0612a5fca507db270b8f0359e7c414de38beeb55e1a1e5b8913c"
+    },
+    {
+      "path": "prisma-studio/dist/encoder-worker.js",
+      "bytes": 12831,
+      "sha256": "2e4c40cb2c0eeff446645b6ce10bac5d8f284cef27e691397d656222dc5c7c56"
+    },
+    {
+      "path": "prisma-studio/dist/index.html",
+      "bytes": 14912,
+      "sha256": "3e0b3d98963b0a0f7593edb873f0de961c471c2fa1ff87e84b4a7332b6ebca57"
+    },
+    {
+      "path": "prisma-studio/dist/model.js",
+      "bytes": 11396,
+      "sha256": "3c16df8002fb9bbb940f9319b1c16b0f125e7247bca95bc9e80d2d6f19f0888e"
+    },
+    {
+      "path": "prisma-studio/dist/panels.js",
+      "bytes": 19420,
+      "sha256": "393c992b5205703cbe3942da44d17ac1afa116ea73a184dda5e186cbd26cc592"
+    },
+    {
+      "path": "prisma-studio/dist/preset-files.js",
+      "bytes": 2623,
+      "sha256": "c5c723b0c0c5ce9d1757d5b32832c0015504b69e5858417d3d4d10fef4ae12b0"
+    },
+    {
+      "path": "prisma-studio/dist/preview-quality.js",
+      "bytes": 3189,
+      "sha256": "fb0f613189d3352ead43742361a19bb553fbc429abd5eec5f2d67d8c186dadf0"
+    },
+    {
+      "path": "prisma-studio/dist/render-session.js",
+      "bytes": 779,
+      "sha256": "b954b3ecc2d707e7bc4f5f38ea2103faf60aacb013b9117b2013c793d728e9c6"
+    },
+    {
+      "path": "prisma-studio/dist/renderer.js",
+      "bytes": 137448,
+      "sha256": "d01825d498d428a13e0fb0e215e434ad2f0902bbb422e5413aa38b2c43dcd349"
+    },
+    {
+      "path": "prisma-studio/dist/studio-model.js",
+      "bytes": 20024,
+      "sha256": "320c9ee42167da8d858ee04a60f2879e7b858ee3b8bc82d02e11aa4bba847761"
+    },
+    {
+      "path": "prisma-studio/dist/style.css",
+      "bytes": 29253,
+      "sha256": "5763ba5a04be1bda8d939a3e7170f5bebc7523cd335ade519228cabcdab41569"
+    },
+    {
+      "path": "prisma-studio/dist/video-export.js",
+      "bytes": 2440,
+      "sha256": "d12a11569707b4b0b4fab63833a0402c4dbc528d2b7c1d53b38ceb300fc0d84b"
+    },
+    {
+      "path": "prisma-studio/dist/presets/0.webp",
+      "bytes": 1888,
+      "sha256": "0df8924727d8262c30dad27f3cd1c4b35037bc2c039f52ceedc42231fd226020"
+    },
+    {
+      "path": "prisma-studio/dist/presets/1.webp",
+      "bytes": 1590,
+      "sha256": "da9ff8f4ef550c67c3261f1d8a11d43d5d99d58d9b81f0aba74bce8d956f31ac"
+    },
+    {
+      "path": "prisma-studio/dist/presets/2.webp",
+      "bytes": 1734,
+      "sha256": "de8f206dccbb5cb21b6277ffa5fc8f6f6aac5cdfef724942ae1086fcfbf11460"
+    },
+    {
+      "path": "prisma-studio/dist/presets/3.webp",
+      "bytes": 3378,
+      "sha256": "e45ff24e9747f9ce178890e8772bbd2fb7cc0cc625c54dac9bb5ba546a76ed9b"
+    },
+    {
+      "path": "prisma-studio/dist/presets/4.webp",
+      "bytes": 1768,
+      "sha256": "1df4f5c65c3a06cabc1524b855bf70852a80259a41291d6c2f2a58ebdbc6eb9e"
+    },
+    {
+      "path": "prisma-studio/dist/presets/5.webp",
+      "bytes": 1612,
+      "sha256": "605610396a0520782b59f61f76168d357f43c34c1e37da4a633c6e2a43a8d16f"
+    },
+    {
+      "path": "prisma-studio/dist/vendor/H264-LICENSE.md",
+      "bytes": 1072,
+      "sha256": "05f71440b962f294ffdced18c6e77437f59c7bd7cdf0bf69dc1ec0c918065cae"
+    },
+    {
+      "path": "prisma-studio/dist/vendor/MP4-MUXER-LICENSE.md",
+      "bytes": 1065,
+      "sha256": "75c54aae7ef6ad652f684f9dd3b71e4dcef86ccebd88cf441ceed7f5eec037c5"
+    },
+    {
+      "path": "prisma-studio/dist/vendor/NOTICE.txt",
+      "bytes": 367,
+      "sha256": "29c8abfe3ebc3464ef3c540009de63e6d8572e594810294907ecc48a5673f738"
+    },
+    {
+      "path": "prisma-studio/dist/vendor/h264-mp4-encoder.web.js",
+      "bytes": 1702288,
+      "sha256": "d42b9e86f03de43954f0a5c104c57f03825dee2108ba8c2f50e5e819f66eaf2d"
+    },
+    {
+      "path": "prisma-studio/dist/vendor/mp4-muxer.js",
+      "bytes": 73921,
+      "sha256": "cc4d30bd20b9ffe0b15f59cf0de3e1930626ccd46a5146e36e4d619d7fecf63d"
+    },
+    {
+      "path": "prisma-texture-audit/commands-regression.txt",
+      "bytes": 1488,
+      "sha256": "27d63d13d2c38db1cab85968048cca1f495f013b9c268462e6903914f31bd241"
+    },
+    {
+      "path": "prisma-texture-audit/description-results.txt",
+      "bytes": 4140,
+      "sha256": "aa7b57ebb3eb3f35cc95730f93c0e9dffc78b58ff11862f74f3d2c9635ce0bc4"
+    },
+    {
+      "path": "prisma-texture-audit/description-tests.mjs",
+      "bytes": 5336,
+      "sha256": "dbe95d12ddd52b8a2df2e3dad5d76887a770d330a444bc9cbcc85d9edbf168bc"
+    },
+    {
+      "path": "prisma-texture-audit/gradient-math.mjs",
+      "bytes": 2017,
+      "sha256": "99f0fcf47a27d3cc181374ac6a42cc212bd7531e4e9c337ce6ebf0a7357e17e1"
+    },
+    {
+      "path": "prisma-texture-audit/model-before.js",
+      "bytes": 8748,
+      "sha256": "8247b799d0d90b54d22276aca194ba44e7f306163fd544294e7cec24fdd1b5f6"
+    },
+    {
+      "path": "prisma-texture-audit/model-before.mjs",
+      "bytes": 8756,
+      "sha256": "dbd4428e045a5bca179b6e4d159472cffd33583e00cc97f0333f79e970133db9"
+    },
+    {
+      "path": "prisma-texture-audit/models-texture.mjs",
+      "bytes": 2919,
+      "sha256": "7735fc5854d552c3573609bc4a5d040e95dab9342f032db7fc384c47ebd18fe9"
+    },
+    {
+      "path": "prisma-texture-audit/old-states.json",
+      "bytes": 72712,
+      "sha256": "6676711b7faccf6a1dcc7406cdbbc91e79a2982c4e49da64acef393512a9781e"
+    },
+    {
+      "path": "prisma-texture-audit/preset-3.json",
+      "bytes": 11890,
+      "sha256": "6e1a66e764c1a8e0dcd021e3bdae140954344d1763f17049f44d988abd303bdc"
+    },
+    {
+      "path": "prisma-texture-audit/preset-3.png",
+      "bytes": 10940,
+      "sha256": "7224457bcf29b4eaf35067e117324b8482a52cc2b8b749b91f436b2f2bdb30df"
+    },
+    {
+      "path": "prisma-texture-audit/preset-3.webp",
+      "bytes": 3378,
+      "sha256": "e45ff24e9747f9ce178890e8772bbd2fb7cc0cc625c54dac9bb5ba546a76ed9b"
+    },
+    {
+      "path": "prisma-texture-audit/preset-4.json",
+      "bytes": 11888,
+      "sha256": "54748983ca600642a7e2c8ef256897d064457e6cb409206fda46ac1914fddc7a"
+    },
+    {
+      "path": "prisma-texture-audit/preset-4.png",
+      "bytes": 6748,
+      "sha256": "8da4da016ad00a49b6ff059b8bbec6748ae03aa4303f0e9e2afa876a0535dccc"
+    },
+    {
+      "path": "prisma-texture-audit/preset-4.webp",
+      "bytes": 1768,
+      "sha256": "1df4f5c65c3a06cabc1524b855bf70852a80259a41291d6c2f2a58ebdbc6eb9e"
+    },
+    {
+      "path": "prisma-texture-audit/preset-5.json",
+      "bytes": 11902,
+      "sha256": "e9976cee0714a443f747d343973d3c6d92e99bf77c13d60c5c6ee3a5da471644"
+    },
+    {
+      "path": "prisma-texture-audit/preset-5.png",
+      "bytes": 9947,
+      "sha256": "ac2ec07da661eb00529b5ad1b00d7a2a47db76d45a0003629b93fb260cb3dd0d"
+    },
+    {
+      "path": "prisma-texture-audit/preset-5.webp",
+      "bytes": 1612,
+      "sha256": "605610396a0520782b59f61f76168d357f43c34c1e37da4a633c6e2a43a8d16f"
+    },
+    {
+      "path": "prisma-texture-audit/prisma-texture-final.tar",
+      "bytes": 2191360,
+      "sha256": "f563ff38ea21b9fd7a3ade9bff61ddace033ccd994a9cb1df40610ce8adc8b8c"
+    },
+    {
+      "path": "prisma-texture-audit/renderer-before.js",
+      "bytes": 127372,
+      "sha256": "0155596160d3d8726ac88290aea08332bc09014188958ea48abec5bb37942c76"
+    },
+    {
+      "path": "prisma-texture-audit/roots-regression.txt",
+      "bytes": 4650,
+      "sha256": "8b2aef91eb54e789b627dfca45f003b371dd348e9f5c91636dbc8851c5578c58"
+    },
+    {
+      "path": "prisma-texture-audit/sidebar-presets.mjs",
+      "bytes": 1721,
+      "sha256": "bdf815e2c39a06b355789c78c4da0b42206d11740b09d0ee4543f268daa2da7d"
+    },
+    {
+      "path": "prisma-texture-audit/source-sync.py",
+      "bytes": 1793,
+      "sha256": "9847ce2bfcde72cf7c43c0852494e72efd29cf19a621995b3f224718ed2c8aed"
+    },
+    {
+      "path": "prisma-texture-audit/studio-model-before.mjs",
+      "bytes": 18757,
+      "sha256": "3a2b7fc4cad97c1104276296b25063b8e4963416c1dbcacdff64e0a8f853ecc1"
+    },
+    {
+      "path": "prisma-texture-audit/texture-anchor-results.json",
+      "bytes": 106,
+      "sha256": "5fcd8100f6c64a7eb66207321fa76e009a3669217ad312b7c99fe2b69ba3f955"
+    },
+    {
+      "path": "prisma-texture-audit/texture-anchor.log",
+      "bytes": 97,
+      "sha256": "404de4955389739040d446ee29a28c57325ec9f7601fafa6e674ac0ea1560cb3"
+    },
+    {
+      "path": "prisma-texture-audit/texture-anchor.py",
+      "bytes": 2441,
+      "sha256": "c842c451b93955a8378c59fd8b38656cc85c1883300eeddbdc3fc570b9b688b0"
+    },
+    {
+      "path": "prisma-texture-audit/texture-core-results.json",
+      "bytes": 372,
+      "sha256": "f5917f3dba941c0758084b26eb7952c665bbe229737bdb9304309c367726d7e2"
+    },
+    {
+      "path": "prisma-texture-audit/texture-core.mjs",
+      "bytes": 3915,
+      "sha256": "90c3b8eedfc8817383171adf9dacb73c7550a8691bdd7428c45e18fed9d6c54e"
+    },
+    {
+      "path": "prisma-texture-audit/texture-editor.png",
+      "bytes": 379895,
+      "sha256": "10245122196956d4f46702ed6d0bdc3271b7c68510a07081b19b74e09a1cd712"
+    },
+    {
+      "path": "prisma-texture-audit/texture-export-results.json",
+      "bytes": 118,
+      "sha256": "542fd8ebb4333f4a33f1f0e4732ecb0018cd2b5d776e9bfe18dd976a09fa32c9"
+    },
+    {
+      "path": "prisma-texture-audit/texture-export.log",
+      "bytes": 107,
+      "sha256": "8573ffa9002fdb06ff80c9ad862933066d39f88e5ab1e1615d0a2ef573e13d1c"
+    },
+    {
+      "path": "prisma-texture-audit/texture-export.py",
+      "bytes": 1710,
+      "sha256": "05328e7d3d11cae82b486c52a4e846836b119185fb886e56c8cffa8dbcd68976"
+    },
+    {
+      "path": "prisma-texture-audit/texture-full-export.png",
+      "bytes": 11289,
+      "sha256": "f2d1afbfb646bff7a05031659dea89cf484e8fb6242c8b42186dd76cac7af676"
+    },
+    {
+      "path": "prisma-texture-audit/texture-helper.txt",
+      "bytes": 3110,
+      "sha256": "87e776d0091d6faf17cba199cb7f7c1143b24852d615b6a64a80a23fd9e43a17"
+    },
+    {
+      "path": "prisma-texture-audit/texture-materials-comparison.png",
+      "bytes": 229155,
+      "sha256": "3c2fce6c306b7fc85a9b6b8eb01931d129d2fdafb36b199179f11aca9f95d518"
+    },
+    {
+      "path": "prisma-texture-audit/texture-offline.png",
+      "bytes": 13655,
+      "sha256": "5023d3b83f5fc3872ecd00d2ac94bf2d5040922dfd43c75f7bf4893774f7f534"
+    },
+    {
+      "path": "prisma-texture-audit/texture-render-results.json",
+      "bytes": 4196,
+      "sha256": "fa9aa0b7edbc6b3cc03dc6f003998785b50030e178ed07e3a5dcabca20f7823f"
+    },
+    {
+      "path": "prisma-texture-audit/texture-render.log",
+      "bytes": 6265,
+      "sha256": "b74d332a452241ee56895bffaf3f690430fb88a88aed798d70c989ee60e5f019"
+    },
+    {
+      "path": "prisma-texture-audit/texture-render.py",
+      "bytes": 6731,
+      "sha256": "fa263cf3f4c9f997d8395a533be01823d22a50512802238b622f3b8307b929a9"
+    },
+    {
+      "path": "prisma-texture-audit/texture-ui-results.json",
+      "bytes": 387,
+      "sha256": "767b1830e0483a015622103b8121b2c6aa1e3d5d5bad60b87fcee21239ebcb70"
+    },
+    {
+      "path": "prisma-texture-audit/texture-ui.log",
+      "bytes": 54,
+      "sha256": "ab364085b36b030e495bb8603c057e90af2e2299975744abf9564a0ae1635af9"
+    },
+    {
+      "path": "prisma-texture-audit/texture-ui.py",
+      "bytes": 2862,
+      "sha256": "d5be019bb4316f0015a9f5c3d99da5395773dadfbcee5f0d85b0f7b5c4a30ec0"
+    },
+    {
+      "path": "prisma-texture-audit/texture-wallpaper.html",
+      "bytes": 140019,
+      "sha256": "d9be7e79b80fb835f76353a8153ac0659271317709bf1ed2cd19ecef0f961e38"
+    },
+    {
+      "path": "prisma-texture-audit/__pycache__/texture-render.cpython-312.pyc",
+      "bytes": 11699,
+      "sha256": "d2a44abe20dba9a6398a63b26ac1b827256a7b41597eb326d3621ee1b258bf60"
+    },
+    {
+      "path": "prisma-texture-audit/__pycache__/texture-ui.cpython-312.pyc",
+      "bytes": 5942,
+      "sha256": "1f71012003ec7ea6dd68efec7acfe09f511df9db802e15e3667a7b87a71f7774"
+    },
+    {
+      "path": "prisma-user-export/Palloncino-metallizzato-1080p-60fps.mp4",
+      "bytes": 9606835,
+      "sha256": "68e3e4e54ae52c727f4988463b14605fbdf864118172caa1dcf6a5b255145bfc"
+    },
+    {
+      "path": "prisma-user-export/Prisma-Palloncino-metallizzato-1080p-60fps.mp4",
+      "bytes": 9646428,
+      "sha256": "961014fe4ce3b25dc8c95a9dc43abae6fa98ecfaa0c99807bbaaff50299f9dea"
+    },
+    {
+      "path": "prisma-user-export/benchmark.json",
+      "bytes": 122,
+      "sha256": "4187e4c678b98f6ba9edb867de28c089bd79fe2198d977808529187fbcf43006"
+    },
+    {
+      "path": "prisma-user-export/benchmark.py",
+      "bytes": 1446,
+      "sha256": "6c112deca413de31057fd6ab35202356b8eb2e9faba442a94408e300719b874a"
+    },
+    {
+      "path": "prisma-user-export/cache-benchmark.json",
+      "bytes": 720,
+      "sha256": "a67fc6568aeda89089970179ff654560d5b3113e99d95eae33c0b5895758b301"
+    },
+    {
+      "path": "prisma-user-export/cache-benchmark.py",
+      "bytes": 1821,
+      "sha256": "935960e356cc5f4add674bc4e7326e4e8588a61d8f3e28bed3263ad5b52352d4"
+    },
+    {
+      "path": "prisma-user-export/cached1080.png",
+      "bytes": 174156,
+      "sha256": "b5a84ef53332ce5bb31c24d4d10659fa992cdcbe4e4ef3225528a81315a3f77f"
+    },
+    {
+      "path": "prisma-user-export/contact-sheet.png",
+      "bytes": 115803,
+      "sha256": "037e1878d23a196cc187b2700a62b67f83082dc957db09b5977f22b6bfb98d19"
+    },
+    {
+      "path": "prisma-user-export/decoded-first-managed.png",
+      "bytes": 271676,
+      "sha256": "3e540ed678d734333f02a3fd94f10d6f16d5f4b023e25d6b359a32d8c29e562b"
+    },
+    {
+      "path": "prisma-user-export/decoded-first-matrix-only.png",
+      "bytes": 244357,
+      "sha256": "b420402fb84429d2b78ef9dd8b70796ffa8228966ced2d077aae3d96f8203766"
+    },
+    {
+      "path": "prisma-user-export/decoded-frame-hashes.txt",
+      "bytes": 115416,
+      "sha256": "a68329bd2fbd51ad81f220f587de6961512021ff23938974180642e01834bfce"
+    },
+    {
+      "path": "prisma-user-export/export-ffmpeg.py",
+      "bytes": 5750,
+      "sha256": "a379523d006a8d89850744df6f46f432592d73c2b43e2d4ca528df4c8b7a4571"
+    },
+    {
+      "path": "prisma-user-export/export-progress.json",
+      "bytes": 2538,
+      "sha256": "38af6f163c4e22987c8cbe1cde861e73ce245f4a93613047c6b2de6546d87b0a"
+    },
+    {
+      "path": "prisma-user-export/export-result.json",
+      "bytes": 2147,
+      "sha256": "01401b3999e170a1ad01ba6b2a7ef87cf203b9677beaa58376110822f43152dd"
+    },
+    {
+      "path": "prisma-user-export/export-video.py",
+      "bytes": 4421,
+      "sha256": "c43621f03f80ace7470d14b1d0a2fa9eeaab6a96825184999d3fc023f82e6d1c"
+    },
+    {
+      "path": "prisma-user-export/ffmpeg.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "prisma-user-export/final-first.png",
+      "bytes": 279558,
+      "sha256": "badfff175d6e2610302c90126730e505e69161f9bc5e37b363d859a4bf0e9dd2"
+    },
+    {
+      "path": "prisma-user-export/final-probe.json",
+      "bytes": 696,
+      "sha256": "84b61f2e0ee51e3ee8a5c1b45cc3d6d9b3bb18a7716f3c5c9a25c8dbb00e2f59"
+    },
+    {
+      "path": "prisma-user-export/final-validation.json",
+      "bytes": 3777,
+      "sha256": "da32beff7d9fb43387b2c1b9b3a0720be452eae798754fc3827d4f73903c8f6f"
+    },
+    {
+      "path": "prisma-user-export/last-frame.png",
+      "bytes": 172915,
+      "sha256": "870aafdb0661aeb6f49e840905735e5bf7c163c9fe6f0467a8fa481f4d08faf2"
+    },
+    {
+      "path": "prisma-user-export/preset.json",
+      "bytes": 14179,
+      "sha256": "fea877b9f20b1a8d668f925e54574b35ec9adc3756951c8f655ce434d58e770b"
+    },
+    {
+      "path": "prisma-user-export/raw-incomplete.mp4",
+      "bytes": 168911,
+      "sha256": "8cec195c551c457522737ddef637d122e704e97fe2ed11064d7750bf3109a342"
+    },
+    {
+      "path": "prisma-user-export/reference1080.png",
+      "bytes": 172793,
+      "sha256": "9aca353531c05710f90ca9a7f20dbf3f309b37d8d15d1e3cd2e5b7ff3f215135"
+    },
+    {
+      "path": "prisma-user-export/source-frame-0000.png",
+      "bytes": 172416,
+      "sha256": "3008e34ddeb4e3fd1a386f5b8db7fa6d799702cc0a40ed4970fc074df22eb02b"
+    },
+    {
+      "path": "prisma-user-export/site/app.js",
+      "bytes": 65937,
+      "sha256": "ca59025924070798d203956fdd6eae3a5e4ef5ebadd30f23885a733f83c7b7f0"
+    },
+    {
+      "path": "prisma-user-export/site/cached-export.js",
+      "bytes": 4587,
+      "sha256": "acb82f0a2bb5457ab6b2eb907c29f28473e46bb7664c1f52d674c117072a85ef"
+    },
+    {
+      "path": "prisma-user-export/site/creative-model.js",
+      "bytes": 19530,
+      "sha256": "9be9ddda595b8d7eee40147c8c0d7ce5a27c29925a7f1ebd367406ce38bcefc3"
+    },
+    {
+      "path": "prisma-user-export/site/description.js",
+      "bytes": 28413,
+      "sha256": "a6a07831c77a5ccfcee21031028929dd62abc03fa165109f6154642f7980beb9"
+    },
+    {
+      "path": "prisma-user-export/site/encoder-worker.js",
+      "bytes": 12831,
+      "sha256": "2e4c40cb2c0eeff446645b6ce10bac5d8f284cef27e691397d656222dc5c7c56"
+    },
+    {
+      "path": "prisma-user-export/site/index.html",
+      "bytes": 14803,
+      "sha256": "c03bfe7ba515c1bb7977d6480d0d9da16ce6d2439234134a1ea1cb08fc03ff1e"
+    },
+    {
+      "path": "prisma-user-export/site/model.js",
+      "bytes": 8748,
+      "sha256": "8247b799d0d90b54d22276aca194ba44e7f306163fd544294e7cec24fdd1b5f6"
+    },
+    {
+      "path": "prisma-user-export/site/panels.js",
+      "bytes": 18698,
+      "sha256": "8ca0430deea0c7efc0f5473e3e12e0a671cd1a76d82daded2afacf761d3a1df2"
+    },
+    {
+      "path": "prisma-user-export/site/preset-files.js",
+      "bytes": 2623,
+      "sha256": "c5c723b0c0c5ce9d1757d5b32832c0015504b69e5858417d3d4d10fef4ae12b0"
+    },
+    {
+      "path": "prisma-user-export/site/preview-quality.js",
+      "bytes": 2308,
+      "sha256": "9da15f6984ed727c1a7ed80f0d9582e9c5c4922d10ca6c2e57557b56e448f09b"
+    },
+    {
+      "path": "prisma-user-export/site/render-session.js",
+      "bytes": 779,
+      "sha256": "b954b3ecc2d707e7bc4f5f38ea2103faf60aacb013b9117b2013c793d728e9c6"
+    },
+    {
+      "path": "prisma-user-export/site/renderer-frozen.js",
+      "bytes": 127417,
+      "sha256": "a93b2f9c622166be5041530a199f493ea09fce436574d26a420b66cbef914180"
+    },
+    {
+      "path": "prisma-user-export/site/renderer.js",
+      "bytes": 127372,
+      "sha256": "0155596160d3d8726ac88290aea08332bc09014188958ea48abec5bb37942c76"
+    },
+    {
+      "path": "prisma-user-export/site/studio-model.js",
+      "bytes": 18757,
+      "sha256": "3a2b7fc4cad97c1104276296b25063b8e4963416c1dbcacdff64e0a8f853ecc1"
+    },
+    {
+      "path": "prisma-user-export/site/style.css",
+      "bytes": 29253,
+      "sha256": "5763ba5a04be1bda8d939a3e7170f5bebc7523cd335ade519228cabcdab41569"
+    },
+    {
+      "path": "prisma-user-export/site/video-export.js",
+      "bytes": 2440,
+      "sha256": "d12a11569707b4b0b4fab63833a0402c4dbc528d2b7c1d53b38ceb300fc0d84b"
+    },
+    {
+      "path": "prisma-user-export/site/presets/0.webp",
+      "bytes": 1888,
+      "sha256": "0df8924727d8262c30dad27f3cd1c4b35037bc2c039f52ceedc42231fd226020"
+    },
+    {
+      "path": "prisma-user-export/site/presets/1.webp",
+      "bytes": 1590,
+      "sha256": "da9ff8f4ef550c67c3261f1d8a11d43d5d99d58d9b81f0aba74bce8d956f31ac"
+    },
+    {
+      "path": "prisma-user-export/site/presets/2.webp",
+      "bytes": 1734,
+      "sha256": "de8f206dccbb5cb21b6277ffa5fc8f6f6aac5cdfef724942ae1086fcfbf11460"
+    },
+    {
+      "path": "prisma-user-export/site/presets/3.webp",
+      "bytes": 2410,
+      "sha256": "254037cf8362d4e161a3f12d4d157ce3cceb06066ebb51b2b5e57b3bc4276a19"
+    },
+    {
+      "path": "prisma-user-export/site/presets/4.webp",
+      "bytes": 1986,
+      "sha256": "143c5b4159ba9e2898dc1a28e24c70dc24a0a99aba58bce222ab025dece4fcc7"
+    },
+    {
+      "path": "prisma-user-export/site/presets/5.webp",
+      "bytes": 1594,
+      "sha256": "ee1b08bb066102698c13022df94a829030b0f258107b1f83930da486842c7806"
+    },
+    {
+      "path": "prisma-user-export/site/vendor/H264-LICENSE.md",
+      "bytes": 1072,
+      "sha256": "05f71440b962f294ffdced18c6e77437f59c7bd7cdf0bf69dc1ec0c918065cae"
+    },
+    {
+      "path": "prisma-user-export/site/vendor/MP4-MUXER-LICENSE.md",
+      "bytes": 1065,
+      "sha256": "75c54aae7ef6ad652f684f9dd3b71e4dcef86ccebd88cf441ceed7f5eec037c5"
+    },
+    {
+      "path": "prisma-user-export/site/vendor/NOTICE.txt",
+      "bytes": 367,
+      "sha256": "29c8abfe3ebc3464ef3c540009de63e6d8572e594810294907ecc48a5673f738"
+    },
+    {
+      "path": "prisma-user-export/site/vendor/h264-mp4-encoder.web.js",
+      "bytes": 1702288,
+      "sha256": "d42b9e86f03de43954f0a5c104c57f03825dee2108ba8c2f50e5e819f66eaf2d"
+    },
+    {
+      "path": "prisma-user-export/site/vendor/mp4-muxer.js",
+      "bytes": 73921,
+      "sha256": "cc4d30bd20b9ffe0b15f59cf0de3e1930626ccd46a5146e36e4d619d7fecf63d"
+    }
+  ],
+  "directories": [
+    ".",
+    ".agents",
+    ".aws",
+    ".codex",
+    "attachments",
+    "attachments/492ed12a-996c-4a9e-99b5-92ad3c43aa42",
+    "attachments/4e93de70-cd4f-4a85-a8cb-2756bb8eb15a",
+    "attachments/cedc9f77-3cbc-4597-aecb-0c94ace2b5cf",
+    "library-files",
+    "prisma-audit",
+    "prisma-bloom-review",
+    "prisma-command-fix",
+    "prisma-command-fix/__pycache__",
+    "prisma-condivisione",
+    "prisma-dark-review",
+    "prisma-description-audit",
+    "prisma-export-fix-audit",
+    "prisma-export-incident-audit",
+    "prisma-fast-audit",
+    "prisma-fast-audit/__pycache__",
+    "prisma-fast-audit/public",
+    "prisma-motion-audit",
+    "prisma-organic-audit",
+    "prisma-performance-audit",
+    "prisma-petals-audit",
+    "prisma-regression-audit",
+    "prisma-root-export-fix",
+    "prisma-root-export-fix/__pycache__",
+    "prisma-roots-audit",
+    "prisma-roots-audit/__pycache__",
+    "prisma-studio",
+    "prisma-studio/.openai",
+    "prisma-studio/dist",
+    "prisma-studio/dist/presets",
+    "prisma-studio/dist/vendor",
+    "prisma-texture-audit",
+    "prisma-texture-audit/__pycache__",
+    "prisma-user-export",
+    "prisma-user-export/site",
+    "prisma-user-export/site/presets",
+    "prisma-user-export/site/vendor",
+    "scratch",
+    "shared",
+    "shared/downloads"
+  ],
+  "gitMetadata": {
+    "directories": [
+      ".git",
+      "prisma-studio/.git"
+    ],
+    "sourceBundle": "history/prisma-studio.bundle",
+    "sourceBranch": "prisma-studio-history",
+    "sourceCommit": "eb6b45ca806ff3e9c55fdd08115634323d72945e",
+    "completeOriginalMetadata": "Included in the release ZIP"
+  },
+  "completeArchive": {
+    "releaseTag": "workspace-2026-10-05",
+    "assetName": "Prisma-workspace-completo.zip",
+    "bytes": 110068458,
+    "sha256": "beee9e7aa36b3450470a509e6897f0aa2c7d7811be402e26d113f8ee348f8019",
+    "generatedArchiveCopies": [
+      "prisma-workspace-completo-2026-10-05_19-23-29.zip",
+      "shared/downloads/Prisma-workspace-completo.zip"
+    ],
+    "url": "https://github.com/frangiacorta/prisma/releases/download/workspace-2026-10-05/Prisma-workspace-completo.zip"
+  }
+}
