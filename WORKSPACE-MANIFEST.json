@@ -3392,10 +3392,9 @@
     "sourceBundle": "history/prisma-studio.bundle",
     "sourceBranch": "prisma-studio-history",
     "sourceCommit": "eb6b45ca806ff3e9c55fdd08115634323d72945e",
-    "completeOriginalMetadata": "Included in the release ZIP"
+    "completeOriginalMetadata": "Included in the complete ZIP stored as backup parts"
   },
   "completeArchive": {
-    "releaseTag": "workspace-2026-10-05",
     "assetName": "Prisma-workspace-completo.zip",
     "bytes": 110068458,
     "sha256": "beee9e7aa36b3450470a509e6897f0aa2c7d7811be402e26d113f8ee348f8019",
@@ -3403,6 +3402,40 @@
       "prisma-workspace-completo-2026-10-05_19-23-29.zip",
       "shared/downloads/Prisma-workspace-completo.zip"
     ],
-    "url": "https://github.com/frangiacorta/prisma/releases/download/workspace-2026-10-05/Prisma-workspace-completo.zip"
+    "downloadUrl": "https://github.com/frangiacorta/prisma/archive/refs/heads/main.zip",
+    "parts": [
+      {
+        "path": "backup/Prisma-workspace-completo.zip.part001",
+        "bytes": 20971520,
+        "sha256": "1eb71c7a1ba11e58ca4bbe451568806456d922c25199f125de6ed32363620fa6"
+      },
+      {
+        "path": "backup/Prisma-workspace-completo.zip.part002",
+        "bytes": 20971520,
+        "sha256": "6016e08171b3ad16aeb32a7328c6a247c16ff1a23bd0a4119ba24e878a88dea9"
+      },
+      {
+        "path": "backup/Prisma-workspace-completo.zip.part003",
+        "bytes": 20971520,
+        "sha256": "1231a1ef7dd668853086a35b93834a210634f7d27f73501b681e89dfa9f4150f"
+      },
+      {
+        "path": "backup/Prisma-workspace-completo.zip.part004",
+        "bytes": 20971520,
+        "sha256": "2b7d9d0fc3c9124a8b8852f22cfe80d5baeaae7ab04cb232d55483a41c69ef19"
+      },
+      {
+        "path": "backup/Prisma-workspace-completo.zip.part005",
+        "bytes": 20971520,
+        "sha256": "40dbe3ad5759d0d0a1aaa19793af2055356cbfe724c02af4274995f1a4b7a188"
+      },
+      {
+        "path": "backup/Prisma-workspace-completo.zip.part006",
+        "bytes": 5210858,
+        "sha256": "b4092d1307c5e21ddf35b5de900eab63d5131a040f1e06563700d603e502c4b2"
+      }
+    ],
+    "windowsRebuildCommand": "backup/Ricrea-ZIP.cmd",
+    "pythonRebuildCommand": "python backup/ricrea_zip.py"
   }
 }

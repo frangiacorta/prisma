@@ -2,9 +2,9 @@
 
 Workspace completo di **Prisma Studio**, generatore di wallpaper statici e animati.
 
+- **Scarica tutto:** [ZIP del repository](https://github.com/frangiacorta/prisma/archive/refs/heads/main.zip), oppure **Code → Download ZIP**.
 - **Applicazione:** [`prisma-studio/dist`](prisma-studio/dist).
 - **Sito:** https://prisma-forme-studio.francesco-gioia.chatgpt.site/
-- **ZIP completo del workspace originale (110 MB):** [Scarica](https://github.com/frangiacorta/prisma/releases/download/workspace-2026-10-05/Prisma-workspace-completo.zip).
 - **Inventario e verifiche SHA-256:** [`WORKSPACE-MANIFEST.json`](WORKSPACE-MANIFEST.json).
 - **Cronologia originale:** ramo `prisma-studio-history` e [`history/prisma-studio.bundle`](history/prisma-studio.bundle).
 
@@ -22,11 +22,23 @@ python -m http.server 8080 --directory prisma-studio/dist
 
 Apri http://localhost:8080 in Chrome. L'applicazione usa WebGL2 nel browser.
 
-## Backup
+## ZIP originale completo
 
-La release contiene lo ZIP originale completo, comprese le directory nascoste
-e i metadati Git. Git non conserva directory vuote o directory `.git` annidate;
-lo ZIP le conserva e il bundle permette di recuperare la cronologia del progetto.
-Le due copie dello ZIP generate durante il download in chat sono rappresentate
-dallo stesso allegato della release, senza duplicare un file maggiore del limite
-di 100 MiB per i normali file GitHub.
+Il backup originale contiene **892 file**, comprese directory nascoste, directory
+vuote e metadati Git. È conservato in [`backup`](backup), in sei parti ordinate,
+per rispettare il limite di GitHub sui singoli file.
+
+Dopo aver scaricato ed estratto il repository, su **Windows** fai doppio clic su
+[`backup/Ricrea-ZIP.cmd`](backup/Ricrea-ZIP.cmd): ricrea
+`Prisma-workspace-completo.zip` nella cartella principale. Puoi estrarlo normalmente.
+
+Con Python, su qualsiasi sistema:
+
+```sh
+python backup/ricrea_zip.py
+```
+
+Git non conserva directory vuote o directory `.git` annidate; il backup originale
+le conserva. La cronologia del progetto rimane disponibile anche come ramo Git e
+come bundle. Le due copie dello ZIP generate durante il download in chat sono
+rappresentate dallo stesso backup, senza duplicare l'archivio.
