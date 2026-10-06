@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "units": "mm",
+  "axes": {
+    "x": "right",
+    "y": "up",
+    "z": "toward viewer",
+    "origin": "point on wall to be measured"
+  },
+  "measured": false,
+  "projection": {
+    "estimatedWidth": 1600,
+    "corners": null,
+    "pixelWidth": null,
+    "pixelHeight": null,
+    "projectorModel": null,
+    "keystoneConfiguration": null
+  },
+  "eye": {
+    "estimatedWallDistance": 1000,
+    "position": null
+  },
+  "tracking": false,
+  "homographyPixelToWall": null
+}

@@ -1,0 +1,115 @@
+{
+  "checkedAt": "2026-10-06T18:21:41.571Z",
+  "platform": "linux",
+  "node": "v24.19.0",
+  "scope": "browser and tooling checks on this execution host; Wallpaper Engine and Windows installation not tested here",
+  "explicitCloudSoftwareFlags": true,
+  "checks": {
+    "referenceHashes": true,
+    "server": true,
+    "webgl2": {
+      "schemaVersion": 1,
+      "at": "2026-10-06T18:21:42.391Z",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+      "viewport": {
+        "width": 1100,
+        "height": 800,
+        "devicePixelRatio": 1,
+        "screenWidth": 1100,
+        "screenHeight": 800
+      },
+      "hostProperties": {
+        "scale": 1,
+        "fps": null,
+        "userPropertyReceived": false,
+        "generalPropertyReceived": false
+      },
+      "webgl2": true,
+      "errors": [],
+      "renderer": "ANGLE (Mesa, llvmpipe (LLVM 19.1.7 256 bits), OpenGL ES 3.2)",
+      "softwareRenderer": true,
+      "extensions": {
+        "EXT_color_buffer_float": true,
+        "KHR_parallel_shader_compile": true,
+        "EXT_disjoint_timer_query_webgl2": true
+      },
+      "maxTextureSize": 16384,
+      "highFloatPrecision": 23,
+      "testPixel": [
+        64,
+        128,
+        191,
+        255
+      ],
+      "pixelTestPassed": true,
+      "prisma": {
+        "tested": false
+      },
+      "passed": true
+    },
+    "prisma": {
+      "schemaVersion": 1,
+      "at": "2026-10-06T18:21:44.236Z",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/151.0.0.0 Safari/537.36",
+      "viewport": {
+        "width": 1100,
+        "height": 800,
+        "devicePixelRatio": 1,
+        "screenWidth": 1100,
+        "screenHeight": 800
+      },
+      "hostProperties": {
+        "scale": 0.75,
+        "fps": 30,
+        "userPropertyReceived": true,
+        "generalPropertyReceived": true
+      },
+      "webgl2": true,
+      "errors": [],
+      "renderer": "ANGLE (Mesa, llvmpipe (LLVM 19.1.7 256 bits), OpenGL ES 3.2)",
+      "softwareRenderer": true,
+      "extensions": {
+        "EXT_color_buffer_float": true,
+        "KHR_parallel_shader_compile": true,
+        "EXT_disjoint_timer_query_webgl2": true
+      },
+      "maxTextureSize": 16384,
+      "highFloatPrecision": 23,
+      "testPixel": [
+        64,
+        128,
+        191,
+        255
+      ],
+      "pixelTestPassed": true,
+      "prisma": {
+        "tested": true,
+        "passed": true,
+        "width": 192,
+        "height": 108,
+        "elapsedMs": 6513,
+        "redChannelRange": 157,
+        "hardware": {
+          "name": "ANGLE (Mesa, llvmpipe (LLVM 19.1.7 256 bits), OpenGL ES 3.2)",
+          "software": true,
+          "powerPreference": "high-performance",
+          "timingAvailable": true
+        },
+        "mode": "diagnostic opaque sphere, fast preview; not a performance or visual-fidelity certification"
+      },
+      "passed": true
+    },
+    "wallpaperPropertyCallbacks": "passed via simulated callbacks; actual Wallpaper Engine host untested",
+    "fileProtocol": {
+      "status": "blocked",
+      "reason": "Browser administrator policy blocks file:// navigation; policy preserved"
+    },
+    "webgl2FailureReported": true
+  },
+  "limitations": [
+    "Local-file opening must be tested on Windows and in Wallpaper Engine."
+  ],
+  "pageErrors": [],
+  "coreChecksPassed": true,
+  "passed": false
+}

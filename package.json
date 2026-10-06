@@ -1,0 +1,19 @@
+{
+  "name": "prisma-4d-tooling",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node checks/verify.mjs",
+    "check:pc": "node checks/verify.mjs --headed",
+    "check:mcp": "node checks/mcp.mjs"
+  },
+  "dependencies": {
+    "@playwright/mcp": "0.0.83",
+    "playwright": "1.63.0"
+  }
+}

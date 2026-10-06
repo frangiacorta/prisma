@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prisma 4D · verifica browser</title>
+<style>
+body{margin:0;padding:32px;background:#10151d;color:#ecf1fa;font:16px/1.5 system-ui,sans-serif}main{max-width:950px;margin:auto}h1{font-size:28px}button{background:#aed8ff;color:#102033;border:0;border-radius:8px;padding:12px 18px;font:inherit;cursor:pointer;margin:8px 10px 8px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#1a2330;padding:18px;border-radius:10px}canvas{width:256px;height:144px;background:#05080d;border:1px solid #506070}small{color:#b9c7da}#status{font-weight:600}.canvases{display:flex;gap:16px;flex-wrap:wrap}
+</style>
+<main>
+<h1>Prisma 4D · verifica del browser</h1>
+<p>Controlliamo il browser prima di costruire la scena per il proiettore.</p>
+<p><small>Questa pagina verifica gli strumenti. Le misure della proiezione e l’effetto di profondità saranno controllati nella fase di calibrazione.</small></p>
+<button id="run">Controlla anche Prisma</button><button id="save">Salva il risultato</button>
+<p id="status" role="status">Controllo WebGL2…</p>
+<div class="canvases"><div><p>Test WebGL2</p><canvas id="basic" width="128" height="72"></canvas></div><div><p>Renderer originale Prisma</p><canvas id="prisma" width="128" height="72"></canvas></div></div>
+<p id="host-info"></p><pre id="result"></pre>
+</main>
+<script src="prisma-baseline.js"></script><script src="probe-state.js"></script><script src="probe.js"></script>
+</html>

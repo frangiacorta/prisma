@@ -1,0 +1,18 @@
+{
+  "title": "Prisma 4D - verifica browser",
+  "type": "web",
+  "file": "index.html",
+  "description": "Controllo WebGL2 e renderer Prisma. La calibrazione fisica e ancora da realizzare.",
+  "general": {
+    "properties": {
+      "probe_scale": {
+        "type": "slider",
+        "text": "Scala del test",
+        "value": 1,
+        "min": 0.5,
+        "max": 1,
+        "order": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+[
+  {
+    "url": "https://frangiacorta.github.io/prisma/",
+    "status": 200,
+    "finalUrl": "https://frangiacorta.github.io/prisma/",
+    "bytes": 14912,
+    "sha256": "3e0b3d98963b0a0f7593edb873f0de961c471c2fa1ff87e84b4a7332b6ebca57"
+  },
+  {
+    "url": "https://frangiacorta.github.io/prisma/reference-palettes.js",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "url": "https://prisma-forme-studio.francesco-gioia.chatgpt.site/",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "url": "https://help.wallpaperengine.io/en/functionality/cli.html",
+    "status": 200,
+    "finalUrl": "https://help.wallpaperengine.io/en/functionality/cli.html",
+    "bytes": 72969,
+    "sha256": "d3d63db462e34310cc7ece7e4e4a611fd4c7f2324587359bc28587769bd4b2aa"
+  }
+]
