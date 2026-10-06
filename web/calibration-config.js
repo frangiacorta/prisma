@@ -12,6 +12,7 @@ window.prismaCalibration = {
     // top-right, top-left. Fill only after measuring all four corners.
     corners: null
   },
-  eye: {x: null, y: null, estimatedWallDistance: 2000},
+  // User views from the image centre; distance remains approximate.
+  eye: {x: 0, y: 0, estimatedWallDistance: 2000},
   tracking: false
 };

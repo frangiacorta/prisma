@@ -24,7 +24,7 @@ Apri http://127.0.0.1:8240 . I risultati locali sono in `reports/`, esclusa da G
 & 'C:\Program Files (x86)\Steam\steamapps\common\wallpaper_engine\wallpaper64.exe' -control openWallpaper -file 'C:\PERCORSO\Prisma 4D\web\project.json' -playInWindow 'Prisma4DTest' -width 1280 -height 720 -activate
 ```
 
-Adatta soltanto i percorsi verificati sul tuo PC. L'immagine proiettata è stata misurata dall'utente: 1550 mm di larghezza e 900 mm di altezza. La distanza dell'occhio è approssimativa: circa 2000 mm (o poco meno), secondo l'utente. `web/calibration-config.js` conserva anche i quattro angoli e la posizione dell'occhio come valori ignoti, da compilare dopo la misura. La griglia serve a confrontare l'immagine con il muro; disattivala per giudicare la profondità. La sfera è un oggetto di controllo con ombra, non ancora il materiale Prisma originale.
+Adatta soltanto i percorsi verificati sul tuo PC. L'immagine proiettata è stata misurata dall'utente: 1550 mm di larghezza e 900 mm di altezza. L'utente guarda dal centro dell'immagine: coordinate dell'occhio x=0 e y=0. La distanza dell'occhio è approssimativa: circa 2000 mm (o poco meno). `web/calibration-config.js` conserva i quattro angoli e la risoluzione effettiva come valori ignoti, da compilare dopo la misura. La griglia serve a confrontare l'immagine con il muro; disattivala per giudicare la profondità. La sfera è un oggetto di controllo con ombra, non ancora il materiale Prisma originale.
 
 La diagnostica originale rimane in `web/index.html`: lì il pulsante **Controlla anche Prisma** verifica il renderer reale. Il risultato Windows e le limitazioni sono in [VERIFICHE.md](VERIFICHE.md).
 

@@ -89,7 +89,7 @@ void main(){
    if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
    const width=read('width')||config.projection.width,enteredHeight=read('height'),height=enteredHeight||width*h/w;
    document.querySelector('#estimate').textContent=enteredHeight?'Altezza misurata: '+enteredHeight+' mm':'Altezza provvisoria dai pixel: '+Math.round(height)+' mm. Inserisci quella misurata.';
-   document.querySelector('#measure').textContent='Immagine: '+width/10+' × '+Math.round(height)/10+' cm · occhi dalla parete: '+(read('distance')||config.eye.estimatedWallDistance)/10+' cm. Distanza approssimativa; posizione degli occhi da misurare.';
+   document.querySelector('#measure').textContent='Immagine: '+width/10+' × '+Math.round(height)/10+' cm · distanza approssimativa: '+(read('distance')||config.eye.estimatedWallDistance)/10+' cm · occhi rispetto al centro: '+(read('eyeX')||0)/10+' cm orizzontali, '+(read('eyeY')||0)/10+' cm verticali.';
    gl.viewport(0,0,w,h);gl.useProgram(program);gl.uniform2f(locations.res,w,h);gl.uniform2f(locations.size,width,height);
    gl.uniform2f(locations.eye,read('eyeX')||0,read('eyeY')||0);gl.uniform1f(locations.distance,read('distance')||config.eye.estimatedWallDistance);gl.uniform1f(locations.grid,document.getElementById('grid').checked?1:0);
    gl.drawArrays(gl.TRIANGLES,0,3);

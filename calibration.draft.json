@@ -5,7 +5,7 @@
     "x": "right",
     "y": "up",
     "z": "toward viewer",
-    "origin": "point on wall to be measured"
+    "origin": "centre of projected image on wall"
   },
   "measured": false,
   "projection": {
@@ -19,7 +19,7 @@
   },
   "eye": {
     "estimatedWallDistance": 2000,
-    "position": null
+    "position": {"x": 0, "y": 0}
   },
   "tracking": false,
   "homographyPixelToWall": null

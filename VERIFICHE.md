@@ -36,3 +36,4 @@ I report di questa cartella documentano soltanto la macchina di preparazione. I 
 - Configurazione e scena aggiornate a 1550 × 900 mm. La calibrazione complessiva resta incompleta: posizione dell'occhio, risoluzione effettiva e quattro angoli sono ignoti.
 - `npm run check:calibration` passato su Chrome con la RTX 5090: dimensioni fisiche e distanza corrette, altezza indipendente dal ridimensionamento della finestra, variazione della prospettiva al movimento virtuale dell'occhio, nessun errore JavaScript.
 - Ricaricata e osservata la finestra reale `Prisma4DTest` di Wallpaper Engine: controlli 1550, 900 e 2000 mm e stato WebGL2 attivo. Questa verifica in finestra non certifica ancora l'allineamento ottico sulla parete.
+- L'utente ha poi confermato la posizione degli occhi al centro dell'immagine: x=0 e y=0. Valori salvati; la distanza resta approssimativa, e la geometria degli angoli e la risoluzione effettiva restano da verificare.
