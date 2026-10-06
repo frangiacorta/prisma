@@ -20,6 +20,17 @@ try{
   assert.equal(initial.physicalWidthMm,1550);
   assert.equal(initial.physicalHeightMm,900);
   assert.equal(initial.eyeDistanceMm,2000);
+  assert.equal(initial.motion,true);
+  const movingBefore=await page.locator('#scene').screenshot();
+  const motionStart=await page.evaluate(()=>window.calibrationStatus.motionSeconds);
+  await page.waitForFunction(start=>window.calibrationStatus.motionSeconds>start+1,motionStart);
+  const movingAfter=await page.locator('#scene').screenshot();
+  assert.notDeepEqual(movingBefore,movingAfter,'Il movimento deve cambiare la scena');
+  await page.locator('#motion').uncheck();
+  const stoppedBefore=await page.locator('#scene').screenshot();
+  await page.waitForTimeout(200);
+  const stoppedAfter=await page.locator('#scene').screenshot();
+  assert.deepEqual(stoppedBefore,stoppedAfter,'La scena ferma non deve animarsi');
   await page.setViewportSize({width:1024,height:768});
   await page.waitForFunction(()=>window.calibrationStatus.pixelWidth===1024);
   const resized=await page.evaluate(()=>window.calibrationStatus);
@@ -42,7 +53,7 @@ try{
   assert.notDeepEqual(before,after,'La scena deve cambiare con il punto di vista');
   assert.deepEqual(errors,[]);
   await page.screenshot({path:path.join(root,'reports/calibration-chrome.png')});
-  console.log(JSON.stringify({passed:true,initial,frontAndRecessedDiffer:true,eyeShiftChangedImage:true,pageErrors:errors},null,2));
+  console.log(JSON.stringify({passed:true,initial,motionChangesImage:true,staticImageStable:true,frontAndRecessedDiffer:true,eyeShiftChangedImage:true,pageErrors:errors},null,2));
 }finally{
   await browser?.close();await new Promise(resolve=>server.close(resolve));
 }

@@ -45,3 +45,10 @@ I report di questa cartella documentano soltanto la macchina di preparazione. I 
 - Test Chrome passato sulla RTX 5090: WebGL2, variante davanti e arretrata producono immagini diverse, cambio virtuale del punto di vista, nessun errore JavaScript. Nuova variante osservata in Wallpaper Engine con WebGL2 attivo. La qualità dell'illusione sulla parete deve ancora essere valutata dall'utente.
 - L'utente ha chiesto di mantenere le barre della finestra e di Windows: nessuna modalità a schermo intero applicata. La mappatura fisica del solo contenuto rispetto all'intera proiezione resta approssimativa.
 - Su indicazione successiva dell'utente, l'apertura del vano è stata estesa fino ai quattro bordi del contenuto, eliminando fascia grigia e cornice esterne. Le barre di Windows restano. Test Chrome passato anche con questo assetto; percezione sulla parete ancora da valutare.
+
+## Confronto con movimento — 6 ottobre 2026
+
+- L'utente ha riferito che la seconda prova statica migliora poco. L'illusione desiderata resta quindi non dimostrata; una foto della proiezione dalla posizione di osservazione è stata richiesta per verificare il contesto reale.
+- Aggiunta una sfera a dimensione fisica costante che percorre avanti e indietro l'asse z in 12 secondi. Prospettiva e ombre sono ricalcolate dalla geometria; la camera non si muove e non usa tracciamento della testa. Un controllo permette di disattivare il movimento e confrontare le scene ferme.
+- Test Chrome passato: variazione dell'immagine durante il movimento, immagine stabile a scena ferma, confronto avanti/arretrato e punto di vista virtuale, nessun errore JavaScript. Non è una verifica dell'effetto percettivo né una misura degli FPS in Wallpaper Engine.
+- La variante è stata caricata nella finestra reale di Wallpaper Engine, che mostra **WebGL2 attivo · movimento in profondità**. Le barre restano visibili.

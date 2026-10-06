@@ -13,7 +13,7 @@ void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Posit
   const fragment=`#version 300 es
 precision highp float;
 uniform vec2 uResolution,uSize,uEyeXY;
-uniform float uEyeZ,uGrid,uFront;
+uniform float uEyeZ,uGrid,uFront,uMotion,uTime;
 out vec4 outColor;
 const float INF=1.e20;
 float sphereHit(vec3 ro,vec3 rd,vec3 c,float r){vec3 o=ro-c;float b=dot(o,rd),q=b*b-dot(o,o)+r*r;if(q<0.)return INF;float s=sqrt(q),a=-b-s;return a>.01?a:(-b+s>.01?-b+s:INF);}
@@ -32,6 +32,10 @@ void main(){
  float scale=min(uSize.x,uSize.y);
  vec3 sphere=mix(vec3(0.,-uSize.y*.045,-scale*.13),vec3(uSize.x*.265,-uSize.y*.12,scale*.25),uFront);
  float radius=scale*mix(.275,.24,uFront);
+ if(uMotion>.5){
+  sphere=vec3(uSize.x*.20,-uSize.y*.10,scale*(-.055-.422*cos(uTime*6.2831853/12.)));
+  radius=scale*.22;
+ }
  float best=INF;int kind=0;vec3 normal=vec3(0.,0.,1.),hit=vec3(0.);
  float ts=sphereHit(ro,rd,sphere,radius);
  if(ts<best){best=ts;kind=2;hit=ro+rd*ts;normal=normalize(hit-sphere);}
@@ -103,8 +107,9 @@ void main(){
   try{program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));}
   catch(error){status.textContent='Shader: '+error.message;window.calibrationStatus={passed:false,error:error.message};return;}
   const uniform=name=>gl.getUniformLocation(program,name);
-  const locations={res:uniform('uResolution'),size:uniform('uSize'),eye:uniform('uEyeXY'),distance:uniform('uEyeZ'),grid:uniform('uGrid'),front:uniform('uFront')};
+  const locations={res:uniform('uResolution'),size:uniform('uSize'),eye:uniform('uEyeXY'),distance:uniform('uEyeZ'),grid:uniform('uGrid'),front:uniform('uFront'),motion:uniform('uMotion'),time:uniform('uTime')};
   const read=id=>Number(document.getElementById(id).value);
+  let motionSeconds=0,lastTick=0,lastRender=0;
   function draw(){
    const dpr=Math.min(devicePixelRatio||1,1.5),w=Math.max(1,Math.floor(innerWidth*dpr)),h=Math.max(1,Math.floor(innerHeight*dpr));
    if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
@@ -114,11 +119,24 @@ void main(){
    gl.viewport(0,0,w,h);gl.useProgram(program);gl.uniform2f(locations.res,w,h);gl.uniform2f(locations.size,width,height);
    gl.uniform2f(locations.eye,read('eyeX')||0,read('eyeY')||0);gl.uniform1f(locations.distance,read('distance')||config.eye.estimatedWallDistance);gl.uniform1f(locations.grid,document.getElementById('grid').checked?1:0);
    gl.uniform1f(locations.front,document.getElementById('front').checked?1:0);
+   const motion=document.getElementById('motion').checked;
+   document.getElementById('front').disabled=motion;
+   gl.uniform1f(locations.motion,motion?1:0);gl.uniform1f(locations.time,motionSeconds);
    gl.drawArrays(gl.TRIANGLES,0,3);
    const error=gl.getError();window.calibrationStatus={passed:error===gl.NO_ERROR,webgl2:true,renderer:(()=>{const ext=gl.getExtension('WEBGL_debug_renderer_info');return gl.getParameter(ext?ext.UNMASKED_RENDERER_WEBGL:gl.RENDERER)})(),pixelWidth:w,pixelHeight:h,physicalWidthMm:width,physicalHeightMm:height,heightEstimated:!enteredHeight,eyeDistanceMm:read('distance')||config.eye.estimatedWallDistance,error:error||null};
-   status.textContent=error?'Errore WebGL: '+error:'WebGL2 attivo · scena di controllo';
+   window.calibrationStatus.motion=motion;
+   window.calibrationStatus.motionSeconds=motionSeconds;
+   status.textContent=error?'Errore WebGL: '+error:motion?'WebGL2 attivo · movimento in profondità':'WebGL2 attivo · scena ferma';
   }
   for(const input of document.querySelectorAll('input'))input.addEventListener('input',draw);
   document.querySelector('#toggle').onclick=()=>{document.querySelector('#panel').classList.toggle('compact');document.querySelector('#toggle').textContent=document.querySelector('#panel').classList.contains('compact')?'+':'−';};
   addEventListener('resize',draw);draw();
+  function tick(now){
+   const moving=document.getElementById('motion').checked&&!document.hidden;
+   if(lastTick&&moving)motionSeconds+=Math.min((now-lastTick)/1000,.1);
+   lastTick=now;
+   if(moving&&now-lastRender>=1000/30){draw();lastRender=now;}
+   requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 })();

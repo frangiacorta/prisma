@@ -28,6 +28,8 @@ Adatta soltanto i percorsi verificati sul tuo PC. L'immagine proiettata è stata
 
 Il vano occupa tutta l'area della scena, senza fascia grigia e cornice esterne. La prova parte con **Sfera in avanti** attiva: l'oggetto si trova davanti al piano dell'apertura e copre parte della parete laterale. Disattiva questa casella per confrontarla con la sfera arretrata. Le ombre usano una sorgente estesa con 64 campioni e la luce viene schermata dall'apertura. La griglia di calibrazione parte spenta. Questo è un confronto visivo da giudicare sulla parete: il rendering riuscito non dimostra che l'illusione sia convincente. Le barre della finestra e di Windows rimangono visibili per scelta dell'utente.
 
+È stata aggiunta una prova con **Movimento in profondità**: ciclo di 12 secondi, sfera di dimensione fisica costante che avanza e arretra lungo l'asse z, con camera ferma e ombre aggiornate. Il renderer è limitato a 30 disegni al secondo; non è un valore FPS misurato. Disattiva il movimento per confrontare le due posizioni statiche. Il test automatico verifica immagini diverse durante il movimento e identiche a scena ferma. Il risultato percettivo resta da giudicare sulla proiezione reale.
+
 La diagnostica originale rimane in `web/index.html`: lì il pulsante **Controlla anche Prisma** verifica il renderer reale. Il risultato Windows e le limitazioni sono in [VERIFICHE.md](VERIFICHE.md).
 
 `reference/` contiene copie mirate di renderer e preset, con hash in `reference/manifest.json`. Non occorre trasferire tutti gli audit, i backup o gli strumenti del cloud. Gli script Python conservati sono riferimenti storici con percorsi cloud: **non sono comandi di avvio pronti per Windows**.
