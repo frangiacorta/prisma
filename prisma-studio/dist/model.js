@@ -1,3 +1,4 @@
+import {REFERENCE_PALETTES} from './reference-palettes.js';
 import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js';
 export const BASE = {
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -52,7 +53,7 @@ export const MOODS = [
  {name:'Lava',colors:['#5a1542','#e62e51','#ff8b2b','#ffe298']},
  {name:'Notte',colors:['#171134','#3b258e','#5779de','#a792ef']}
 ];
-MOODS.push(...MORE_MOODS);
+MOODS.push(...MORE_MOODS,...REFERENCE_PALETTES);
 // label, minimum, maximum, step. All controls drive the same continuous field.
 export const META = {
  ...EXTRA_META,
