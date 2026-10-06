@@ -13,17 +13,24 @@ void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Posit
   const fragment=`#version 300 es
 precision highp float;
 uniform vec2 uResolution,uSize,uEyeXY;
-uniform float uEyeZ,uGrid;
+uniform float uEyeZ,uGrid,uFront;
 out vec4 outColor;
 const float INF=1.e20;
 float sphereHit(vec3 ro,vec3 rd,vec3 c,float r){vec3 o=ro-c;float b=dot(o,rd),q=b*b-dot(o,o)+r*r;if(q<0.)return INF;float s=sqrt(q),a=-b-s;return a>.01?a:(-b+s>.01?-b+s:INF);}
+float visibility(vec3 p,vec3 n,vec3 source,vec3 sphere,float radius,float ow,float oh){
+ vec3 origin=p+n*1.5,toLight=source-origin;float distance=length(toLight);vec3 direction=toLight/distance;
+ if(sphereHit(origin,direction,sphere,radius)<distance)return 0.;
+ if(origin.z<0.&&direction.z>0.){float t=-origin.z/direction.z;vec3 wall=origin+direction*t;if(t<distance&&(abs(wall.x)>ow||abs(wall.y)>oh))return 0.;}
+ return 1.;
+}
 void main(){
  vec2 uv=gl_FragCoord.xy/uResolution;
  vec2 wall=(uv-.5)*uSize;
  vec3 ro=vec3(uEyeXY,uEyeZ),rd=normalize(vec3(wall,0.)-ro);
  float ow=uSize.x*.36,oh=uSize.y*.34,depth=min(uSize.x,uSize.y)*.72;
- vec3 sphere=vec3(0.,-uSize.y*.045,-min(uSize.x,uSize.y)*.13);
- float radius=min(uSize.x,uSize.y)*.275;
+ float scale=min(uSize.x,uSize.y);
+ vec3 sphere=mix(vec3(0.,-uSize.y*.045,-scale*.13),vec3(uSize.x*.265,-uSize.y*.12,scale*.25),uFront);
+ float radius=scale*mix(.275,.24,uFront);
  float best=INF;int kind=0;vec3 normal=vec3(0.,0.,1.),hit=vec3(0.);
  float ts=sphereHit(ro,rd,sphere,radius);
  if(ts<best){best=ts;kind=2;hit=ro+rd*ts;normal=normalize(hit-sphere);}
@@ -44,26 +51,39 @@ void main(){
   }
  }
  vec3 color=vec3(.035,.045,.058);
- vec3 light=normalize(vec3(-.48,.72,.52));
+ vec3 lightPosition=vec3(-uSize.x*.48,uSize.y*.75,scale*1.1);
+ vec3 light=normalize(lightPosition-hit);
  if(kind>0){
-  float diffuse=max(0.,dot(normal,light));
+  float lighting=0.,shadow=0.;
+  for(int sampleIndex=0;sampleIndex<64;sampleIndex++){
+   float angle=float(sampleIndex)*2.39996323,spread=sqrt((float(sampleIndex)+.5)/64.)*scale*.13;
+   vec3 source=lightPosition+vec3(cos(angle)*spread,sin(angle)*spread,0.);
+   float visible=visibility(hit,normal,source,sphere,radius,ow,oh);
+   shadow+=visible/64.;lighting+=max(0.,dot(normal,normalize(source-hit)))*visible/64.;
+  }
   if(kind==1){
    float edge=min(abs(abs(hit.x)-ow),abs(abs(hit.y)-oh));
-   float frame=(abs(hit.x)<ow+24.&&abs(hit.y)<oh+24.&&edge<24.)?1.:0.;
-   color=mix(vec3(.19,.205,.21),vec3(.39,.31,.22),frame);
-   color*=.88+.12*diffuse;
+   float frame=(abs(hit.x)<ow+12.&&abs(hit.y)<oh+12.&&edge<12.)?1.:0.;
+   color=mix(vec3(.34,.325,.30),vec3(.22,.19,.15),frame);
+   color*=.16+.84*lighting;
   }else if(kind==2){
-   vec3 base=mix(vec3(.13,.42,.53),vec3(.65,.29,.33),clamp(hit.y/max(radius,1.)*.55+.5,0.,1.));
-   float spec=pow(max(0.,dot(reflect(-light,normal),-rd)),24.);
-   color=base*(.25+.75*diffuse)+vec3(.7,.85,.91)*spec*.55;
+   vec3 base=vec3(.055,.32,.39);
+   float spec=pow(max(0.,dot(normal,normalize(light-rd))),48.);
+   float fresnel=pow(1.-max(0.,dot(normal,-rd)),4.);
+   color=base*(.10+.90*lighting)+vec3(.95,.90,.78)*spec*shadow*.8;
+   color+=vec3(.10,.15,.18)*fresnel*(.3+.7*max(normal.y,0.));
   }else{
-   vec3 base=kind==3?vec3(.13,.18,.22):vec3(.16,.20,.23);
-   float shadow=sphereHit(hit+normal*2.,light,sphere,radius)<INF?.42:1.;
-   color=base*(.28+.72*diffuse*shadow);
+   vec3 base=kind==3?vec3(.20,.235,.25):vec3(.26,.28,.29);
+   float cornerDistance=min(ow-abs(hit.x),min(oh-abs(hit.y),hit.z+depth));
+   if(kind==3)cornerDistance=min(ow-abs(hit.x),oh-abs(hit.y));
+   else if(abs(normal.x)>.5)cornerDistance=min(oh-abs(hit.y),hit.z+depth);
+   else cornerDistance=min(ow-abs(hit.x),hit.z+depth);
+   float ambient=mix(.055,.14,smoothstep(0.,scale*.12,max(cornerDistance,0.)));
+   color=base*(ambient+.86*lighting);
    if(kind==3){
     vec2 q=hit.xy/100.;vec2 line=abs(fract(q)-.5);
     float grid=smoothstep(.46,.495,max(line.x,line.y));
-    color+=vec3(.025,.045,.055)*grid;
+    color+=vec3(.012,.018,.02)*grid;
    }
   }
  }
@@ -82,7 +102,7 @@ void main(){
   try{program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));}
   catch(error){status.textContent='Shader: '+error.message;window.calibrationStatus={passed:false,error:error.message};return;}
   const uniform=name=>gl.getUniformLocation(program,name);
-  const locations={res:uniform('uResolution'),size:uniform('uSize'),eye:uniform('uEyeXY'),distance:uniform('uEyeZ'),grid:uniform('uGrid')};
+  const locations={res:uniform('uResolution'),size:uniform('uSize'),eye:uniform('uEyeXY'),distance:uniform('uEyeZ'),grid:uniform('uGrid'),front:uniform('uFront')};
   const read=id=>Number(document.getElementById(id).value);
   function draw(){
    const dpr=Math.min(devicePixelRatio||1,1.5),w=Math.max(1,Math.floor(innerWidth*dpr)),h=Math.max(1,Math.floor(innerHeight*dpr));
@@ -92,6 +112,7 @@ void main(){
    document.querySelector('#measure').textContent='Immagine: '+width/10+' × '+Math.round(height)/10+' cm · distanza approssimativa: '+(read('distance')||config.eye.estimatedWallDistance)/10+' cm · occhi rispetto al centro: '+(read('eyeX')||0)/10+' cm orizzontali, '+(read('eyeY')||0)/10+' cm verticali.';
    gl.viewport(0,0,w,h);gl.useProgram(program);gl.uniform2f(locations.res,w,h);gl.uniform2f(locations.size,width,height);
    gl.uniform2f(locations.eye,read('eyeX')||0,read('eyeY')||0);gl.uniform1f(locations.distance,read('distance')||config.eye.estimatedWallDistance);gl.uniform1f(locations.grid,document.getElementById('grid').checked?1:0);
+   gl.uniform1f(locations.front,document.getElementById('front').checked?1:0);
    gl.drawArrays(gl.TRIANGLES,0,3);
    const error=gl.getError();window.calibrationStatus={passed:error===gl.NO_ERROR,webgl2:true,renderer:(()=>{const ext=gl.getExtension('WEBGL_debug_renderer_info');return gl.getParameter(ext?ext.UNMASKED_RENDERER_WEBGL:gl.RENDERER)})(),pixelWidth:w,pixelHeight:h,physicalWidthMm:width,physicalHeightMm:height,heightEstimated:!enteredHeight,eyeDistanceMm:read('distance')||config.eye.estimatedWallDistance,error:error||null};
    status.textContent=error?'Errore WebGL: '+error:'WebGL2 attivo · scena di controllo';

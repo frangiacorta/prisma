@@ -37,3 +37,10 @@ I report di questa cartella documentano soltanto la macchina di preparazione. I 
 - `npm run check:calibration` passato su Chrome con la RTX 5090: dimensioni fisiche e distanza corrette, altezza indipendente dal ridimensionamento della finestra, variazione della prospettiva al movimento virtuale dell'occhio, nessun errore JavaScript.
 - Ricaricata e osservata la finestra reale `Prisma4DTest` di Wallpaper Engine: controlli 1550, 900 e 2000 mm e stato WebGL2 attivo. Questa verifica in finestra non certifica ancora l'allineamento ottico sulla parete.
 - L'utente ha poi confermato la posizione degli occhi al centro dell'immagine: x=0 e y=0. Valori salvati; la distanza resta approssimativa, e la geometria degli angoli e la risoluzione effettiva restano da verificare.
+
+## Seconda prova visiva — 6 ottobre 2026
+
+- L'utente ha visto la prima scena sulla parete e l'ha giudicata piatta, simile a uno sfondo normale con un vano 3D. L'effetto percettivo della prima prova non è riuscito.
+- La nuova variante porta la sfera davanti al piano della parete, in posizione decentrata, con sovrapposizione al bordo destro e inferiore. Sono state aggiunte ombre della sfera sulla parete frontale, ombre dell'apertura, sorgente estesa con 64 campioni e attenuazione negli angoli. La casella **Sfera davanti al bordo** permette il confronto con la sfera arretrata.
+- Test Chrome passato sulla RTX 5090: WebGL2, variante davanti e arretrata producono immagini diverse, cambio virtuale del punto di vista, nessun errore JavaScript. Nuova variante osservata in Wallpaper Engine con WebGL2 attivo. La qualità dell'illusione sulla parete deve ancora essere valutata dall'utente.
+- L'utente ha chiesto di mantenere le barre della finestra e di Windows: nessuna modalità a schermo intero applicata. La mappatura fisica del solo contenuto rispetto all'intera proiezione resta approssimativa.

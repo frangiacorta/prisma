@@ -33,12 +33,16 @@ try{
   await page.screenshot({path:path.join(root,'reports/calibration-preview.png')});
   const before=await page.locator('#scene').screenshot();
   await page.locator('#toggle').click();
+  await page.locator('#front').uncheck();
+  const recessed=await page.locator('#scene').screenshot();
+  assert.notDeepEqual(before,recessed,'La variante davanti al bordo deve differire da quella nel vano');
+  await page.locator('#front').check();
   await page.locator('#eyeX').fill('250');
   const after=await page.locator('#scene').screenshot();
   assert.notDeepEqual(before,after,'La scena deve cambiare con il punto di vista');
   assert.deepEqual(errors,[]);
   await page.screenshot({path:path.join(root,'reports/calibration-chrome.png')});
-  console.log(JSON.stringify({passed:true,initial,eyeShiftChangedImage:true,pageErrors:errors},null,2));
+  console.log(JSON.stringify({passed:true,initial,frontAndRecessedDiffer:true,eyeShiftChangedImage:true,pageErrors:errors},null,2));
 }finally{
   await browser?.close();await new Promise(resolve=>server.close(resolve));
 }
