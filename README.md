@@ -1,4 +1,4 @@
-# Prisma 4D — kit per ripartire in Codex locale
+# Prisma 4D — kit e prima calibrazione locale
 
 Ricerca e diagnostica preparate il 6 ottobre 2026. **Questo kit non è ancora l'effetto 4D**: verifica gli strumenti prima della calibrazione fisica.
 
@@ -10,13 +10,22 @@ Ricerca e diagnostica preparate il 6 ottobre 2026. **Questo kit non è ancora l'
 npm ci --ignore-scripts --no-audit --no-fund
 npm run check:pc
 npm run check:mcp
+npm run check:calibration
 npm start
 ```
 
 Apri http://127.0.0.1:8240 . I risultati locali sono in `reports/`, esclusa da Git. Per MCP, se è disponibile solo Edge: `$env:PRISMA_MCP_BROWSER = "msedge"` prima del controllo. Per un browser in posizione particolare usa `PRISMA_BROWSER_EXECUTABLE` con il suo percorso assoluto.
 
-`check:pc` apre un browser di prova e poi lo chiude; `npm start` mantiene aperto il server. Nessuna installazione sul PC è stata eseguita dal cloud. Non usare su Windows le variabili o le opzioni Linux elencate nelle prove cloud.
+`check:pc` apre un browser di prova e poi lo chiude; `npm start` mantiene aperto il server. In Chrome il prototipo è su http://127.0.0.1:8240/calibration.html; la diagnostica originale resta su http://127.0.0.1:8240/. Non usare su Windows le variabili o le opzioni Linux elencate nelle prove cloud.
 
-La cartella `web/` comprende un progetto Web per la prova in Wallpaper Engine; la compatibilità effettiva con il programma va ancora verificata. I callback delle proprietà sono verificati solo simulandoli nel browser. Il rendering Prisma si avvia con il pulsante dedicato e può richiedere alcuni secondi.
+`web/project.json` apre la prima scena di calibrazione in Wallpaper Engine. Per una finestra separata, con Wallpaper Engine già avviato:
+
+```powershell
+& 'C:\Program Files (x86)\Steam\steamapps\common\wallpaper_engine\wallpaper64.exe' -control openWallpaper -file 'C:\PERCORSO\Prisma 4D\web\project.json' -playInWindow 'Prisma4DTest' -width 1280 -height 720 -activate
+```
+
+Adatta soltanto i percorsi verificati sul tuo PC. La scena usa stime iniziali di 1600 mm per la larghezza e 1000 mm per la distanza dell'occhio. L'altezza mostrata è provvisoria finché non viene misurata. `web/calibration-config.js` conserva anche i quattro angoli e la posizione dell'occhio come valori ignoti, da compilare dopo la misura. La griglia serve a confrontare l'immagine con il muro; disattivala per giudicare la profondità. La sfera è un oggetto di controllo con ombra, non ancora il materiale Prisma originale.
+
+La diagnostica originale rimane in `web/index.html`: lì il pulsante **Controlla anche Prisma** verifica il renderer reale. Il risultato Windows e le limitazioni sono in [VERIFICHE.md](VERIFICHE.md).
 
 `reference/` contiene copie mirate di renderer e preset, con hash in `reference/manifest.json`. Non occorre trasferire tutti gli audit, i backup o gli strumenti del cloud. Gli script Python conservati sono riferimenti storici con percorsi cloud: **non sono comandi di avvio pronti per Windows**.

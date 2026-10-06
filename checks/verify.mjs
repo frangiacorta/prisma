@@ -11,11 +11,15 @@ await mkdir(path.join(root,'reports'),{recursive:true});
 const {server,url}=await startServer(0);
 let browser;
 const report={checkedAt:new Date().toISOString(),platform:process.platform,node:process.version,
-  scope:'browser and tooling checks on this execution host; Wallpaper Engine and Windows installation not tested here',
+  scope:'browser and tooling checks on this execution host; Wallpaper Engine requires a separate host test',
   explicitCloudSoftwareFlags:process.env.PRISMA_CLOUD_SOFTWARE_GL==='1',checks:{},limitations:[]};
 try {
   const manifest=JSON.parse(await readFile(path.join(root,'reference/manifest.json'),'utf8'));
-  for(const item of manifest.files)assert.equal(createHash('sha256').update(await readFile(path.join(root,item.file))).digest('hex'),item.sha256);
+  // Git may check out text files with CRLF on Windows; the manifest hashes the LF source.
+  for(const item of manifest.files){
+    const source=await readFile(path.join(root,item.file),'utf8');
+    assert.equal(createHash('sha256').update(source.replace(/\r\n/g,'\n')).digest('hex'),item.sha256);
+  }
   report.checks.referenceHashes=true;
   const response=await fetch(url);assert.equal(response.status,200);assert.match(await response.text(),/Prisma 4D/);
   assert.equal((await fetch(url+'%2e%2e%2fpackage.json')).status,403);report.checks.server=true;

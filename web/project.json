@@ -1,8 +1,8 @@
 {
-  "title": "Prisma 4D - verifica browser",
+  "title": "Prisma 4D - calibrazione profondita",
   "type": "web",
-  "file": "index.html",
-  "description": "Controllo WebGL2 e renderer Prisma. La calibrazione fisica e ancora da realizzare.",
+  "file": "calibration.html",
+  "description": "Prototipo di calibrazione: vano, bordo e sfera da un punto di vista fisso.",
   "general": {
     "properties": {
       "probe_scale": {

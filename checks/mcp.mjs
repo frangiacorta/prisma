@@ -33,7 +33,7 @@ function call(method,params={}) {
     pending.set(requestId,{resolve,reject,timer});child.stdin.write(JSON.stringify({jsonrpc:'2.0',id:requestId,method,params})+'\n');
   });
 }
-const report={scope:'MCP and controlled browser on this host; no Windows or authenticated website access implied',version:pkg.version};
+const report={scope:'MCP and controlled browser on this host; authenticated website access is separate',version:pkg.version};
 let server;
 try {
   const init=await call('initialize',{protocolVersion:'2024-11-05',capabilities:{},clientInfo:{name:'prisma-tooling-check',version:'0.1.0'}});

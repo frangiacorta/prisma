@@ -10,7 +10,8 @@
     "start": "node server.mjs",
     "test": "node checks/verify.mjs",
     "check:pc": "node checks/verify.mjs --headed",
-    "check:mcp": "node checks/mcp.mjs"
+    "check:mcp": "node checks/mcp.mjs",
+    "check:calibration": "node checks/calibration.mjs"
   },
   "dependencies": {
     "@playwright/mcp": "0.0.83",

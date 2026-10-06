@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prisma 4D · calibrazione profondità</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#11141a;color:#eef3f6;font:14px/1.35 system-ui,sans-serif}canvas{display:block;width:100vw;height:100vh}aside{position:fixed;top:16px;left:16px;width:min(335px,calc(100vw - 32px));padding:16px;background:#121b27e8;border:1px solid #5b7890;border-radius:12px;box-shadow:0 8px 35px #0008}h1{font-size:18px;margin:0 0 4px}p{margin:6px 0 12px;color:#c6d3de}label{display:flex;justify-content:space-between;align-items:center;margin:7px 0;gap:12px}input[type=number]{width:105px;background:#071018;color:#eef3f6;border:1px solid #718597;border-radius:5px;padding:5px;font:inherit}input[type=checkbox]{accent-color:#9bd7fa}small{display:block;color:#c6d3de;margin-top:10px}button,a{color:#9bd7fa}button{background:#213e55;border:1px solid #78a7c5;padding:6px 10px;border-radius:5px;cursor:pointer}#status{color:#bcf4bf;font-weight:bold}#toggle{float:right}.compact #controls{display:none}.compact{width:auto;max-width:335px}#measure{position:fixed;bottom:16px;right:16px;max-width:560px;padding:8px 12px;background:#111b26db;border-radius:6px;color:#e8eef5}
+</style>
+<canvas id="scene" aria-label="Prototipo WebGL di vano e sfera in prospettiva"></canvas>
+<aside id="panel"><button id="toggle" aria-label="Nascondi o mostra controlli">−</button><h1>Prisma 4D · calibrazione</h1><p>Vano, bordo e sfera. Punto di vista fisso, senza tracciamento.</p>
+ <div id="controls">
+  <label>Larghezza immagine · mm <input id="width" type="number" min="200" max="10000" step="10" value="1600"></label>
+  <label>Altezza immagine · mm <input id="height" type="number" min="100" max="10000" step="10" placeholder="da misurare"></label>
+  <label>Occhio dalla parete · mm <input id="distance" type="number" min="100" max="10000" step="10" value="1000"></label>
+  <label>Occhio destra/sinistra · mm <input id="eyeX" type="number" step="10" value="0"></label>
+  <label>Occhio sopra/sotto · mm <input id="eyeY" type="number" step="10" value="0"></label>
+  <label>Griglia 100 mm <input id="grid" type="checkbox" checked></label>
+  <p id="estimate">Altezza visiva provvisoria: calcolata dai pixel della finestra. Inserisci l’altezza misurata.</p>
+  <small>Questa è una scena di controllo. La sfera Prisma originale, Sfera cava e Gelatina verranno collegate dopo la misura della proiezione.</small>
+  <small><a href="index.html">Test tecnico WebGL e renderer Prisma</a></small>
+ </div><p id="status" role="status">Avvio WebGL2…</p>
+</aside><div id="measure">Stime iniziali: larghezza 160 cm · distanza 100 cm. Altezza e posizione dell’occhio da misurare.</div>
+<script src="calibration-config.js"></script><script src="calibration.js"></script>
+</html>
