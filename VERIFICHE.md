@@ -52,3 +52,9 @@ I report di questa cartella documentano soltanto la macchina di preparazione. I 
 - Aggiunta una sfera a dimensione fisica costante che percorre avanti e indietro l'asse z in 12 secondi. Prospettiva e ombre sono ricalcolate dalla geometria; la camera non si muove e non usa tracciamento della testa. Un controllo permette di disattivare il movimento e confrontare le scene ferme.
 - Test Chrome passato: variazione dell'immagine durante il movimento, immagine stabile a scena ferma, confronto avanti/arretrato e punto di vista virtuale, nessun errore JavaScript. Non è una verifica dell'effetto percettivo né una misura degli FPS in Wallpaper Engine.
 - La variante è stata caricata nella finestra reale di Wallpaper Engine, che mostra **WebGL2 attivo · movimento in profondità**. Le barre restano visibili.
+
+## Prova di sovrapposizione geometrica — 6 ottobre 2026
+
+- L'utente ha precisato che il problema è la sensazione di profondità, non il colore. Le foto non certificano un'illusione riuscita; nessuna compensazione di tinta è stata applicata.
+- Aggiunti un cubo orientato con tre facce visibili e due montanti sottili nel piano della parete. La traiettoria aggira il montante e passa da dietro a davanti. Gli stessi solidi sono usati per visibilità e ombre. Vano fino ai bordi e barre di Windows conservati.
+- Chrome sulla RTX 5090 ha superato il test: al pixel del montante destro l'oggetto arretrato è coperto dal montante (RGBA 96,82,66,255); in posizione avanzata l'oggetto copre il montante (24,53,58,255). Verificati anche movimento, stabilità della scena ferma, variante sfera, spostamento virtuale del punto di vista e assenza di errori JavaScript. L'effetto percepito sulla parete resta da valutare.

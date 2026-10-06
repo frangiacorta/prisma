@@ -21,6 +21,7 @@ try{
   assert.equal(initial.physicalHeightMm,900);
   assert.equal(initial.eyeDistanceMm,2000);
   assert.equal(initial.motion,true);
+  assert.equal(initial.object,'cube');
   const movingBefore=await page.locator('#scene').screenshot();
   const motionStart=await page.evaluate(()=>window.calibrationStatus.motionSeconds);
   await page.waitForFunction(start=>window.calibrationStatus.motionSeconds>start+1,motionStart);
@@ -31,6 +32,10 @@ try{
   await page.waitForTimeout(200);
   const stoppedAfter=await page.locator('#scene').screenshot();
   assert.deepEqual(stoppedBefore,stoppedAfter,'La scena ferma non deve animarsi');
+  await page.locator('#cube').uncheck();
+  const sphere=await page.locator('#scene').screenshot();
+  assert.notDeepEqual(sphere,stoppedAfter,'Il cubo e la sfera devono dare immagini diverse');
+  await page.locator('#cube').check();
   await page.setViewportSize({width:1024,height:768});
   await page.waitForFunction(()=>window.calibrationStatus.pixelWidth===1024);
   const resized=await page.evaluate(()=>window.calibrationStatus);
@@ -45,15 +50,29 @@ try{
   const before=await page.locator('#scene').screenshot();
   await page.locator('#toggle').click();
   await page.locator('#front').uncheck();
+  const behindPixel=await page.evaluate(()=>{
+    document.querySelector('#front').dispatchEvent(new Event('input',{bubbles:true}));
+    const canvas=document.querySelector('#scene'),gl=canvas.getContext('webgl2'),pixel=new Uint8Array(4);
+    gl.readPixels(Math.floor(canvas.width*.74),Math.floor(canvas.height*.4),1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+    return [...pixel];
+  });
+  assert.ok(behindPixel[0]>behindPixel[1],'Il montante color legno deve coprire il cubo arretrato');
   const recessed=await page.locator('#scene').screenshot();
   assert.notDeepEqual(before,recessed,'La variante davanti al bordo deve differire da quella nel vano');
   await page.locator('#front').check();
+  const frontPixel=await page.evaluate(()=>{
+    document.querySelector('#front').dispatchEvent(new Event('input',{bubbles:true}));
+    const canvas=document.querySelector('#scene'),gl=canvas.getContext('webgl2'),pixel=new Uint8Array(4);
+    gl.readPixels(Math.floor(canvas.width*.74),Math.floor(canvas.height*.4),1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
+    return [...pixel];
+  });
+  assert.ok(frontPixel[1]>frontPixel[0],'Il cubo turchese avanzato deve coprire il montante');
   await page.locator('#eyeX').fill('250');
   const after=await page.locator('#scene').screenshot();
   assert.notDeepEqual(before,after,'La scena deve cambiare con il punto di vista');
   assert.deepEqual(errors,[]);
   await page.screenshot({path:path.join(root,'reports/calibration-chrome.png')});
-  console.log(JSON.stringify({passed:true,initial,motionChangesImage:true,staticImageStable:true,frontAndRecessedDiffer:true,eyeShiftChangedImage:true,pageErrors:errors},null,2));
+  console.log(JSON.stringify({passed:true,initial,motionChangesImage:true,staticImageStable:true,frontAndRecessedDiffer:true,occlusionPixels:{behind:behindPixel,front:frontPixel},eyeShiftChangedImage:true,pageErrors:errors},null,2));
 }finally{
   await browser?.close();await new Promise(resolve=>server.close(resolve));
 }

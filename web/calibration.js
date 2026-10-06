@@ -13,13 +13,37 @@ void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Posit
   const fragment=`#version 300 es
 precision highp float;
 uniform vec2 uResolution,uSize,uEyeXY;
-uniform float uEyeZ,uGrid,uFront,uMotion,uTime;
+uniform float uEyeZ,uGrid,uFront,uMotion,uTime,uCube;
 out vec4 outColor;
 const float INF=1.e20;
 float sphereHit(vec3 ro,vec3 rd,vec3 c,float r){vec3 o=ro-c;float b=dot(o,rd),q=b*b-dot(o,o)+r*r;if(q<0.)return INF;float s=sqrt(q),a=-b-s;return a>.01?a:(-b+s>.01?-b+s:INF);}
+float boxHit(vec3 ro,vec3 rd,vec3 centre,vec3 halfSize,float angle,out vec3 normal){
+ float c=cos(angle),s=sin(angle);vec3 o=ro-centre;
+ o=vec3(c*o.x-s*o.z,o.y,s*o.x+c*o.z);
+ vec3 d=vec3(c*rd.x-s*rd.z,rd.y,s*rd.x+c*rd.z);
+ float pitch=angle==0.?0.:.25,cp=cos(pitch),sp=sin(pitch);
+ o=vec3(o.x,cp*o.y+sp*o.z,-sp*o.y+cp*o.z);
+ d=vec3(d.x,cp*d.y+sp*d.z,-sp*d.y+cp*d.z);
+ vec3 safeDir=mix(vec3(.000001),d,greaterThan(abs(d),vec3(.000001)));
+ vec3 a=(-halfSize-o)/safeDir,b=(halfSize-o)/safeDir;
+ vec3 nearT=min(a,b),farT=max(a,b);
+ float enter=max(nearT.x,max(nearT.y,nearT.z)),leave=min(farT.x,min(farT.y,farT.z));
+ if(enter>leave||leave<=.01){normal=vec3(0.);return INF;}
+ float t=enter>.01?enter:leave;vec3 p=(o+d*t)/halfSize,q=abs(p),n;
+ if(q.x>q.y&&q.x>q.z)n=vec3(sign(p.x),0.,0.);
+ else if(q.y>q.z)n=vec3(0.,sign(p.y),0.);
+ else n=vec3(0.,0.,sign(p.z));
+ n=vec3(n.x,cp*n.y-sp*n.z,sp*n.y+cp*n.z);
+ normal=vec3(c*n.x+s*n.z,n.y,-s*n.x+c*n.z);return t;
+}
 float visibility(vec3 p,vec3 n,vec3 source,vec3 sphere,float radius,float ow,float oh){
  vec3 origin=p+n*1.5,toLight=source-origin;float distance=length(toLight);vec3 direction=toLight/distance;
- if(sphereHit(origin,direction,sphere,radius)<distance)return 0.;
+ vec3 unused;float objectHit=uCube>.5?boxHit(origin,direction,sphere,vec3(radius),.35,unused):sphereHit(origin,direction,sphere,radius);
+ if(objectHit<distance)return 0.;
+ if(uCube>.5)for(int side=0;side<2;side++){
+  vec3 post=vec3(uSize.x*.24*(side==0?-1.:1.),0.,0.);
+  if(boxHit(origin,direction,post,vec3(8.,uSize.y*.5,16.),0.,unused)<distance)return 0.;
+ }
  if(origin.z<0.&&direction.z>0.){float t=-origin.z/direction.z;vec3 wall=origin+direction*t;if(t<distance&&(abs(wall.x)>ow||abs(wall.y)>oh))return 0.;}
  return 1.;
 }
@@ -36,9 +60,21 @@ void main(){
   sphere=vec3(uSize.x*.20,-uSize.y*.10,scale*(-.055-.422*cos(uTime*6.2831853/12.)));
   radius=scale*.22;
  }
+ if(uCube>.5){
+  radius=scale*.14;
+  if(uMotion<.5)sphere.z=scale*mix(-.477,.367,uFront);
+  // Go around the right post rather than passing through solid geometry.
+  float approach=sphere.z/(scale*.37);
+  sphere.x=uSize.x*(.24-.17*exp(-approach*approach));sphere.y=-uSize.y*.10;
+ }
  float best=INF;int kind=0;vec3 normal=vec3(0.,0.,1.),hit=vec3(0.);
- float ts=sphereHit(ro,rd,sphere,radius);
- if(ts<best){best=ts;kind=2;hit=ro+rd*ts;normal=normalize(hit-sphere);}
+ vec3 objectNormal;float ts=uCube>.5?boxHit(ro,rd,sphere,vec3(radius),.35,objectNormal):sphereHit(ro,rd,sphere,radius);
+ if(ts<best){best=ts;kind=2;hit=ro+rd*ts;normal=uCube>.5?objectNormal:normalize(hit-sphere);}
+ if(uCube>.5)for(int side=0;side<2;side++){
+  vec3 post=vec3(uSize.x*.24*(side==0?-1.:1.),0.,0.);
+  ts=boxHit(ro,rd,post,vec3(8.,uSize.y*.5,16.),0.,objectNormal);
+  if(ts<best){best=ts;kind=5;hit=ro+rd*ts;normal=objectNormal;}
+ }
  float tp=-ro.z/rd.z;vec3 plane=ro+rd*tp;
  bool inside=abs(plane.x)<ow&&abs(plane.y)<oh;
  if(tp>0.&&tp<best&&!inside){best=tp;kind=1;hit=plane;normal=vec3(0.,0.,1.);}
@@ -77,6 +113,8 @@ void main(){
    float fresnel=pow(1.-max(0.,dot(normal,-rd)),4.);
    color=base*(.10+.90*lighting)+vec3(.95,.90,.78)*spec*shadow*.8;
    color+=vec3(.10,.15,.18)*fresnel*(.3+.7*max(normal.y,0.));
+  }else if(kind==5){
+   color=vec3(.18,.13,.08)*(.14+.86*lighting);
   }else{
    vec3 base=kind==3?vec3(.20,.235,.25):vec3(.26,.28,.29);
    float cornerDistance=min(ow-abs(hit.x),min(oh-abs(hit.y),hit.z+depth));
@@ -107,7 +145,7 @@ void main(){
   try{program=gl.createProgram();gl.attachShader(program,compile(gl.VERTEX_SHADER,vertex));gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fragment));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));}
   catch(error){status.textContent='Shader: '+error.message;window.calibrationStatus={passed:false,error:error.message};return;}
   const uniform=name=>gl.getUniformLocation(program,name);
-  const locations={res:uniform('uResolution'),size:uniform('uSize'),eye:uniform('uEyeXY'),distance:uniform('uEyeZ'),grid:uniform('uGrid'),front:uniform('uFront'),motion:uniform('uMotion'),time:uniform('uTime')};
+  const locations={res:uniform('uResolution'),size:uniform('uSize'),eye:uniform('uEyeXY'),distance:uniform('uEyeZ'),grid:uniform('uGrid'),front:uniform('uFront'),motion:uniform('uMotion'),time:uniform('uTime'),cube:uniform('uCube')};
   const read=id=>Number(document.getElementById(id).value);
   let motionSeconds=0,lastTick=0,lastRender=0;
   function draw(){
@@ -122,11 +160,13 @@ void main(){
    const motion=document.getElementById('motion').checked;
    document.getElementById('front').disabled=motion;
    gl.uniform1f(locations.motion,motion?1:0);gl.uniform1f(locations.time,motionSeconds);
+   gl.uniform1f(locations.cube,document.getElementById('cube').checked?1:0);
    gl.drawArrays(gl.TRIANGLES,0,3);
    const error=gl.getError();window.calibrationStatus={passed:error===gl.NO_ERROR,webgl2:true,renderer:(()=>{const ext=gl.getExtension('WEBGL_debug_renderer_info');return gl.getParameter(ext?ext.UNMASKED_RENDERER_WEBGL:gl.RENDERER)})(),pixelWidth:w,pixelHeight:h,physicalWidthMm:width,physicalHeightMm:height,heightEstimated:!enteredHeight,eyeDistanceMm:read('distance')||config.eye.estimatedWallDistance,error:error||null};
    window.calibrationStatus.motion=motion;
    window.calibrationStatus.motionSeconds=motionSeconds;
-   status.textContent=error?'Errore WebGL: '+error:motion?'WebGL2 attivo · movimento in profondità':'WebGL2 attivo · scena ferma';
+   window.calibrationStatus.object=document.getElementById('cube').checked?'cube':'sphere';
+   status.textContent=error?'Errore WebGL: '+error:(window.calibrationStatus.object==='cube'?'Cubo e montanti':'Sfera')+(motion?' · avanti/indietro':' · scena ferma')+' · WebGL2';
   }
   for(const input of document.querySelectorAll('input'))input.addEventListener('input',draw);
   document.querySelector('#toggle').onclick=()=>{document.querySelector('#panel').classList.toggle('compact');document.querySelector('#toggle').textContent=document.querySelector('#panel').classList.contains('compact')?'+':'−';};
