@@ -1,7 +1,7 @@
 (() => {
   const canvas=document.querySelector('#scene'),status=document.querySelector('#status');
   const config=window.prismaCalibration;
-  document.querySelector('#width').value=config.projection.estimatedWidth;
+  document.querySelector('#width').value=config.projection.width;
   if(config.projection.height!==null)document.querySelector('#height').value=config.projection.height;
   document.querySelector('#distance').value=config.eye.estimatedWallDistance;
   document.querySelector('#eyeX').value=config.eye.x??0;
@@ -87,12 +87,13 @@ void main(){
   function draw(){
    const dpr=Math.min(devicePixelRatio||1,1.5),w=Math.max(1,Math.floor(innerWidth*dpr)),h=Math.max(1,Math.floor(innerHeight*dpr));
    if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
-   const width=read('width')||config.projection.estimatedWidth,enteredHeight=read('height'),height=enteredHeight||width*h/w;
+   const width=read('width')||config.projection.width,enteredHeight=read('height'),height=enteredHeight||width*h/w;
    document.querySelector('#estimate').textContent=enteredHeight?'Altezza misurata: '+enteredHeight+' mm':'Altezza provvisoria dai pixel: '+Math.round(height)+' mm. Inserisci quella misurata.';
+   document.querySelector('#measure').textContent='Immagine: '+width/10+' × '+Math.round(height)/10+' cm · occhi dalla parete: '+(read('distance')||config.eye.estimatedWallDistance)/10+' cm. Distanza approssimativa; posizione degli occhi da misurare.';
    gl.viewport(0,0,w,h);gl.useProgram(program);gl.uniform2f(locations.res,w,h);gl.uniform2f(locations.size,width,height);
-   gl.uniform2f(locations.eye,read('eyeX')||0,read('eyeY')||0);gl.uniform1f(locations.distance,read('distance')||1000);gl.uniform1f(locations.grid,document.getElementById('grid').checked?1:0);
+   gl.uniform2f(locations.eye,read('eyeX')||0,read('eyeY')||0);gl.uniform1f(locations.distance,read('distance')||config.eye.estimatedWallDistance);gl.uniform1f(locations.grid,document.getElementById('grid').checked?1:0);
    gl.drawArrays(gl.TRIANGLES,0,3);
-   const error=gl.getError();window.calibrationStatus={passed:error===gl.NO_ERROR,webgl2:true,renderer:(()=>{const ext=gl.getExtension('WEBGL_debug_renderer_info');return gl.getParameter(ext?ext.UNMASKED_RENDERER_WEBGL:gl.RENDERER)})(),pixelWidth:w,pixelHeight:h,physicalWidthMm:width,physicalHeightMm:height,heightEstimated:!enteredHeight,eyeDistanceMm:read('distance')||1000,error:error||null};
+   const error=gl.getError();window.calibrationStatus={passed:error===gl.NO_ERROR,webgl2:true,renderer:(()=>{const ext=gl.getExtension('WEBGL_debug_renderer_info');return gl.getParameter(ext?ext.UNMASKED_RENDERER_WEBGL:gl.RENDERER)})(),pixelWidth:w,pixelHeight:h,physicalWidthMm:width,physicalHeightMm:height,heightEstimated:!enteredHeight,eyeDistanceMm:read('distance')||config.eye.estimatedWallDistance,error:error||null};
    status.textContent=error?'Errore WebGL: '+error:'WebGL2 attivo · scena di controllo';
   }
   for(const input of document.querySelectorAll('input'))input.addEventListener('input',draw);

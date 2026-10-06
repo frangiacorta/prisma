@@ -8,9 +8,9 @@
 <canvas id="scene" aria-label="Prototipo WebGL di vano e sfera in prospettiva"></canvas>
 <aside id="panel"><button id="toggle" aria-label="Nascondi o mostra controlli">−</button><h1>Prisma 4D · calibrazione</h1><p>Vano, bordo e sfera. Punto di vista fisso, senza tracciamento.</p>
  <div id="controls">
-  <label>Larghezza immagine · mm <input id="width" type="number" min="200" max="10000" step="10" value="1600"></label>
-  <label>Altezza immagine · mm <input id="height" type="number" min="100" max="10000" step="10" placeholder="da misurare"></label>
-  <label>Occhio dalla parete · mm <input id="distance" type="number" min="100" max="10000" step="10" value="1000"></label>
+  <label>Larghezza immagine · mm <input id="width" type="number" min="200" max="10000" step="10" value="1550"></label>
+  <label>Altezza immagine · mm <input id="height" type="number" min="100" max="10000" step="10" value="900" placeholder="da misurare"></label>
+  <label>Occhio dalla parete · mm <input id="distance" type="number" min="100" max="10000" step="10" value="2000"></label>
   <label>Occhio destra/sinistra · mm <input id="eyeX" type="number" step="10" value="0"></label>
   <label>Occhio sopra/sotto · mm <input id="eyeY" type="number" step="10" value="0"></label>
   <label>Griglia 100 mm <input id="grid" type="checkbox" checked></label>
@@ -18,6 +18,6 @@
   <small>Questa è una scena di controllo. La sfera Prisma originale, Sfera cava e Gelatina verranno collegate dopo la misura della proiezione.</small>
   <small><a href="index.html">Test tecnico WebGL e renderer Prisma</a></small>
  </div><p id="status" role="status">Avvio WebGL2…</p>
-</aside><div id="measure">Stime iniziali: larghezza 160 cm · distanza 100 cm. Altezza e posizione dell’occhio da misurare.</div>
+</aside><div id="measure">Immagine misurata: 155 × 90 cm · distanza degli occhi approssimativa: 200 cm.</div>
 <script src="calibration-config.js"></script><script src="calibration.js"></script>
 </html>

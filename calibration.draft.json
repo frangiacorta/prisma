@@ -9,7 +9,8 @@
   },
   "measured": false,
   "projection": {
-    "estimatedWidth": 1600,
+    "width": 1550,
+    "height": 900,
     "corners": null,
     "pixelWidth": null,
     "pixelHeight": null,
@@ -17,7 +18,7 @@
     "keystoneConfiguration": null
   },
   "eye": {
-    "estimatedWallDistance": 1000,
+    "estimatedWallDistance": 2000,
     "position": null
   },
   "tracking": false,

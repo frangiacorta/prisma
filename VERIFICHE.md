@@ -29,3 +29,10 @@ I report di questa cartella documentano soltanto la macchina di preparazione. I 
 - Git nel terminale locale non ha ancora credenziali di push: Git Credential Manager ha aperto una finestra di login durante la prova, e il push simulato senza interazione ha confermato che mancano le credenziali. Il connettore GitHub funziona senza questo login aggiuntivo; la pubblicazione Pages non dipende più da esso.
 - Il sito originale si apre nel browser. Il connettore Sites elenca il progetto `Prisma Studio` con ruolo owner e una versione 19 pubblicata con successo. Questo verifica l'accesso al progetto e alla cronologia di pubblicazione tramite connettore, non equivale a modificare il codice del sito pubblico. Sites rimane riserva secondo la richiesta dell'utente.
 - La precedente chat cloud è leggibile come cronologia tramite gli strumenti Codex, ma il suo filesystem `/workspace` non è montato sul PC. I file mirati del kit e i connettori GitHub/Sites sono i collegamenti operativi disponibili.
+
+## Prime misure della proiezione — 6 ottobre 2026
+
+- L'utente ha misurato l'immagine: 155 × 90 cm. La distanza di osservazione riferita è circa 2 metri o poco meno; è impostata a 2000 mm come stima, ancora da precisare.
+- Configurazione e scena aggiornate a 1550 × 900 mm. La calibrazione complessiva resta incompleta: posizione dell'occhio, risoluzione effettiva e quattro angoli sono ignoti.
+- `npm run check:calibration` passato su Chrome con la RTX 5090: dimensioni fisiche e distanza corrette, altezza indipendente dal ridimensionamento della finestra, variazione della prospettiva al movimento virtuale dell'occhio, nessun errore JavaScript.
+- Ricaricata e osservata la finestra reale `Prisma4DTest` di Wallpaper Engine: controlli 1550, 900 e 2000 mm e stato WebGL2 attivo. Questa verifica in finestra non certifica ancora l'allineamento ottico sulla parete.

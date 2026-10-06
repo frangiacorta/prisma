@@ -3,14 +3,15 @@ window.prismaCalibration = {
   units: 'mm',
   measured: false,
   projection: {
-    estimatedWidth: 1600,
-    height: null,
+    // Image measured by the user: 155 × 90 cm.
+    width: 1550,
+    height: 900,
     pixelWidth: null,
     pixelHeight: null,
     // Wall coordinates (x right, y up), ordered bottom-left, bottom-right,
     // top-right, top-left. Fill only after measuring all four corners.
     corners: null
   },
-  eye: {x: null, y: null, estimatedWallDistance: 1000},
+  eye: {x: null, y: null, estimatedWallDistance: 2000},
   tracking: false
 };

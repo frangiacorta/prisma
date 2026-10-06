@@ -16,7 +16,17 @@ try{
   await page.waitForFunction(()=>window.calibrationStatus);
   const initial=await page.evaluate(()=>window.calibrationStatus);
   assert.equal(initial.passed,true,JSON.stringify(initial));
-  assert.equal(initial.heightEstimated,true);
+  assert.equal(initial.heightEstimated,false);
+  assert.equal(initial.physicalWidthMm,1550);
+  assert.equal(initial.physicalHeightMm,900);
+  assert.equal(initial.eyeDistanceMm,2000);
+  await page.setViewportSize({width:1024,height:768});
+  await page.waitForFunction(()=>window.calibrationStatus.pixelWidth===1024);
+  const resized=await page.evaluate(()=>window.calibrationStatus);
+  assert.equal(resized.physicalWidthMm,1550);
+  assert.equal(resized.physicalHeightMm,900);
+  await page.setViewportSize({width:1280,height:720});
+  await page.waitForFunction(()=>window.calibrationStatus.pixelWidth===1280);
   await page.locator('#grid').uncheck();
   await page.locator('#toggle').click();
   await mkdir(path.join(root,'reports'),{recursive:true});
