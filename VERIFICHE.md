@@ -1,5 +1,17 @@
 # Verifiche effettive — 6 ottobre 2026
 
+## Stato aggiornato dopo il riscontro dell'utente
+
+- Le prove locali sotto dimostrano funzionamento tecnico, **non un effetto di profondità accettato**. L'utente ha rifiutato il risultato e richiesto un cambio di percorso. Sospese le variazioni della demo WebGL.
+- Recuperata la cronologia pertinente di «Set up prisma», con riferimenti a TouchDesigner, camera off-axis, ombre virtuali e modelli Sketchfab animati. Le foto originali non sono state riviste: la descrizione proviene dalla cronologia.
+- Nuovo requisito: vero sfondo desktop mentre l'utente lavora; ora accetta anche webcam PC e tracking dopo una prima scena valida a punto fisso. Camera non attivata. Nessun collegamento TouchDesigner → desktop confermato.
+- Scaricato l'installer ufficiale `TouchDesignerWebInstaller.2025.33230.exe`, 815927448 byte, in `reports/downloads/`. Firma Authenticode valida, firmatario Derivative Inc. Il primo comando di avvio/estrazione è stato respinto prima dell'esecuzione dalla revisione automatica per il divieto iniziale. L'utente ha poi risposto esplicitamente «Sì, installa TouchDesigner e TDMCP».
+- Installazione successiva riuscita: uscita installer 0, registro Windows `TouchDesigner 2025.33230`, eseguibile `C:\Program Files\Derivative\TouchDesigner\bin\TouchDesigner.exe` versione `0.99.2025.33230`. Nessun riavvio richiesto dal comando. Il primo avvio ha richiesto tempo; successivamente osservati editor e Key Manager, con stato «No key installed». Richiesto all'utente login personale Derivative e attivazione Non-Commercial; licenza ancora da confermare. Nessuna credenziale acquisita o inserita dall'agente.
+- TDMCP 1.1.55 scaricato dal repository ufficiale in `reports/downloads/TDMCP-1.1.55.tox`, SHA256 `12e1c270171cd35f3b91377ee9c4e833ff42d4e6fa298b9269ed24d5f321c9d4` coincidente con il digest pubblicato. Non ancora caricato, eseguito o collegato. Blender non installato. Nessun acquisto.
+- Calibrazione ancora incompleta: angoli e mappatura pixel→parete ignoti; 155 × 90 cm non è ancora attribuito con misura separata al solo canvas, viste le barre Windows. La camera matematica già presente è corretta per un rettangolo ideale, ma non certifica la corrispondenza fisica.
+
+## Preparazione cloud (storica)
+
 Il lavoro è avvenuto su Linux in cloud, non sul PC dell'utente. Non sono stati installati programmi Windows né configurato Wallpaper Engine.
 
 - Installate nel kit le dipendenze npm bloccate, con lifecycle scripts disabilitati.

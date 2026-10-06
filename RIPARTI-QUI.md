@@ -1,5 +1,19 @@
 # Mandato per Codex locale — riprendere da qui
 
+## Aggiornamento prioritario dopo le prove locali — 6 ottobre 2026
+
+I paragrafi successivi conservano il mandato iniziale. I controlli Windows, GPU, Playwright MCP, Wallpaper Engine, accesso GitHub e ripubblicazione delle palette sono già stati eseguiti: leggere VERIFICHE.md, non ripeterli da zero.
+
+- Le prove sfera/cubo/vano sono tecnicamente funzionanti ma **bocciate dall'utente per la sensazione di profondità**. Non continuare con cambi di colore o varianti dello stesso oggetto presentandoli come soluzione.
+- È stata recuperata la cronologia della chat «Set up prisma»: i riferimenti descrivevano un personaggio che sembra attraversare una barriera, TouchDesigner, off-axis projection, virtual shadow e modelli Sketchfab animati. Le due foto originali non sono state riviste: distinguere la cronologia dai pixel effettivamente osservati.
+- Direzione da verificare: TouchDesigner + TDMCP per scena, camera e mapping; Blender se serve costruire asset e riferimenti. Nessun acquisto. Non convertire automaticamente Prisma in mesh: movimenti, luci e materiali originali restano requisiti.
+- **Risultato finale: vero sfondo desktop mentre l'utente lavora.** Una finestra a tutto schermo non soddisfa questo requisito. Il collegamento live di TouchDesigner al desktop/Wallpaper Engine non è ancora provato e va verificato presto.
+- Nuova indicazione dell'utente: webcam del PC e head tracking sono accettati **dopo** una prima scena convincente a punto fisso. Questa indicazione sostituisce il precedente no tracking. Non è stata attivata alcuna camera; la sua copertura dal punto di osservazione resta da verificare.
+- Misure attuali: 1550 × 900 mm, distanza circa 2000 mm o poco meno, occhio al centro. Barre della finestra e di Windows mantenute su richiesta. L'area fisica del canvas rispetto all'intera proiezione, gli angoli e la mappatura restano da misurare.
+- L'utente ha esplicitamente risposto «Sì, installa TouchDesigner e TDMCP», superando il divieto iniziale e il primo blocco della revisione automatica. TouchDesigner 2025.33230 è ora installato in `C:\Program Files\Derivative\TouchDesigner\`; installer uscito con codice 0, firma e versione verificate. Editor e Key Manager osservati: attende accesso personale e attivazione Non-Commercial da parte dell'utente. TDMCP 1.1.55 scaricato con hash verificato in `reports/downloads/`, non ancora caricato o collegato. Non richiedere di nuovo l'autorizzazione all'installazione.
+
+Il ramo del kit resta autonomo e non deve essere unito a main. La nuova direzione e i limiti documentati sono in RICERCA-STRUMENTI.md; leggere questo aggiornamento prima delle istruzioni storiche sotto.
+
 ## Obiettivo e autorizzazione dell'utente
 
 L'utente vuole lavorare nell'app Codex locale sul suo PC Windows come punto centrale per Prisma, GitHub/Pages e un prototipo per Wallpaper Engine. Ha autorizzato ricerca e installazione degli strumenti necessari; procedi con inventario e installa solo ciò che manca. Non chiedere nuovamente il permesso per ogni controllo o installazione ordinaria già richiesta. Se una policy blocca un'azione, riferisci l'azione e il motivo concreto.

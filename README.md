@@ -2,6 +2,18 @@
 
 Ricerca e diagnostica preparate il 6 ottobre 2026. **Questo kit non è ancora l'effetto 4D**: verifica gli strumenti prima della calibrazione fisica.
 
+## Stato corrente dopo le prove sulla parete
+
+**L'utente ha rifiutato l'effetto delle prove WebGL.** I test tecnici passati non validano la profondità percepita. Sospese le variazioni di sfera, cubo e colore; i comandi sotto conservano le prove diagnostiche precedenti.
+
+La prossima prova deve usare una scena progettata rispetto al riferimento originale, con prospettiva dello spettatore, bordo attraversato e ombre coerenti. TouchDesigner + TDMCP è il percorso da provare; l'integrazione come vero sfondo dietro icone e finestre va verificata prima di investirci ulteriormente. Blender può servire per costruire la scena; Prisma deve conservare i propri movimenti e materiali.
+
+Il requisito finale è **sfondo desktop durante il normale lavoro**, anche con webcam. L'utente ha ora accettato il tracciamento della testa come fase successiva alla prima scena convincente da punto fisso: sostituisce il precedente vincolo «senza tracciamento». La webcam non è stata attivata. Misure riferite: 155 × 90 cm, circa 2 m, occhio centrale; resta da distinguere l'area del contenuto da quella comprensiva delle barre Windows, che l'utente vuole mantenere.
+
+TouchDesigner 2025.33230 è installato dopo l'autorizzazione esplicita aggiornata dell'utente: installer ufficiale con firma valida, uscita 0 e programma verificato sul disco. L'editor si apre e mostra il Key Manager: serve l'accesso personale dell'utente per attivare la licenza gratuita Non-Commercial. TDMCP 1.1.55 è scaricato con hash verificato, **non ancora caricato o collegato**. Vedi gli aggiornamenti in [RICERCA-STRUMENTI.md](RICERCA-STRUMENTI.md) e [VERIFICHE.md](VERIFICHE.md).
+
+## Comandi delle prove precedenti
+
 1. Leggi [RIPARTI-QUI.md](RIPARTI-QUI.md): contiene il mandato per Codex locale e lo stato del progetto.
 2. Consulta [RICERCA-STRUMENTI.md](RICERCA-STRUMENTI.md) e [VERIFICHE.md](VERIFICHE.md).
 3. Su Windows, usa Node compatibile (preferibilmente 24 LTS) e Chrome oppure Edge già installato. Nella cartella del kit:

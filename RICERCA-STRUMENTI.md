@@ -1,5 +1,34 @@
 # Ricerca strumenti e decisioni — 6 ottobre 2026
 
+## Revisione dopo le prove visive locali
+
+La prima scelta WebGL sotto è storica. L'utente ha giudicato le prove piatte e ha chiesto di riprendere gli strumenti del percorso originale. Un cambio di motore non garantisce l'illusione: il confronto deve riguardare il risultato sulla parete, non soltanto shader e pixel corretti.
+
+**Requisiti aggiornati:** scena convincente da punto fisso; in seguito webcam PC per aggiornare la posizione dell'occhio; esecuzione come sfondo desktop durante il lavoro. Il tracking è ora accettato, ma non è ancora implementato o verificato. Dimensioni riferite 155 × 90 cm, distanza circa 2 m, occhio centrale, barre Windows mantenute.
+
+### Prova TouchDesigner e continuità Prisma
+
+1. Verificare licenza gratuita di TouchDesigner 2025.33230, quindi round trip reale di [TDMCP](https://github.com/TouchDesigner/TDMCP) 1.1.55 su localhost. L'utente ha autorizzato esplicitamente l'installazione dopo il primo blocco della revisione automatica: TouchDesigner installato con uscita 0, versione verificata, editor e Key Manager osservati. Attende login e attivazione Non-Commercial da parte dell'utente. TDMCP scaricato con hash verificato; caricamento e collegamento ancora da confermare.
+2. Provare subito la destinazione desktop: [Wallpaper Engine mantiene le app locali](https://store.steampowered.com/news/posts/?appids=431960&feed=steam_community_announcements), ma catturare TouchPlayer/TouchDesigner non è una compatibilità certificata. [TouchPlayer](https://derivative.ca/UserGuide/TouchPlayer) esegue i progetti in Perform Mode; la versione gratuita ha ulteriori controlli e richieste per camera/rete. Verificare icone, focus, monitor scelto e applicazioni di lavoro aperte. Alternativa da valutare: [SpoutWallpaper](https://github.com/leadedge/SpoutWallpaper), che nel codice attuale copia pixel e limita a 30 fps; non è una funzione nativa di Wallpaper Engine e non è ancora compilata/provata qui.
+3. Costruire la scena rispetto al riferimento visivo recuperato. La [camera dello spettatore](https://derivative.ca/UserGuide/Camera_COMP) e la [mappatura dell'uscita](https://derivative.ca/UserGuide/Palette:kantanMapper) sono problemi distinti. Quattro angoli su parete piana possono bastare per una trasformazione proiettiva; controllare anche punti intermedi. Non applicare automaticamente 155 × 90 cm al canvas se le misure includono le barre.
+4. Per conservare Prisma, [Web Render TOP](https://derivative.ca/UserGuide/Web_Render_TOP) può ospitare la pagina originale; WebGL2, GPU e prestazioni reali restano da provare. Un'immagine RGB sovrapposta non dà ombre, rifrazione o occlusioni reciproche. Per quelle interazioni serve la stessa scena o passaggi espliciti di profondità/materiale; un port in [GLSL TOP](https://docs.derivative.ca/Write_a_GLSL_TOP) richiede adattamenti e confronti agli stessi istanti. Blender può costruire vano, asset e riferimenti; l'esportazione mesh rimane opzionale.
+
+[TouchDesigner Non-Commercial](https://derivative.ca/product/touchdesigner-non-commercial/77) è gratuito per uso personale non commerciale ma limitato a 1280 × 1280: adatto alla fattibilità, non a validare la nitidezza nativa 1080p/4K. MadMapper e Resolume Arena sono alternative per mapping/uscita, non componenti da installare tutti insieme. MCP automatizza il programma; non produce da solo un effetto convincente.
+
+### Webcam, in una fase successiva
+
+Percorso Windows documentato: [Video Device In TOP](https://derivative.ca/UserGuide/Video_Device_In_TOP) → [Face Track CHOP](https://derivative.ca/UserGuide/Face_Track_CHOP), con NVIDIA RTX e modelli AR SDK aggiuntivi. Alternativa: [MediaPipe TouchDesigner](https://github.com/torinmb/mediapipe-touchdesigner). Non installati né provati. Nessuna necessità dimostrata di iPhone/ARKit per la webcam PC.
+
+Occorre stimare la posizione del punto fra gli occhi rispetto alla parete, con scala e posizione della webcam calibrate; orientamento del volto e landmark normalizzati non equivalgono a coordinate in millimetri. Verificare che la camera veda l'utente anche dal letto. A tracking perso, ritornare gradualmente al punto fisso; misurare jitter, latenza e carico insieme alle applicazioni di lavoro. Un video preregistrato non può aggiornare la prospettiva al movimento della testa.
+
+### Riferimenti originali recuperati e limiti
+
+La chat «Set up prisma» descriveva due foto («Rosso scenografico» e «Mecha: acciaio e rosso»), un personaggio che sembra attraversare una barriera, TouchDesigner, off-axis projection, virtual shadow, Animated FBX, Sketchfab e autori solodovnykov/Just8. Sono dati della cronologia: le due immagini originali non sono state nuovamente visualizzate. VTK era lo strumento proposto per estrarre mesh da Prisma; non è un requisito per il rendering procedurale.
+
+La ricerca ha trovato il post pubblico [Virtual Shadow Projection di ojrgb](https://www.patreon.com/ojrgb/posts/virtual-shadow-167668304): descrive un progetto TouchDesigner con componente appletd, solo Mac nella distribuzione proposta, dichiarato adattabile a Windows dall'autore. **Non è confermato che sia lo stesso riferimento dell'utente.** Nessun template acquistato o scaricato, né compatibilità Windows provata.
+
+## Ricerca iniziale conservata
+
 ## Scelta per il primo prototipo
 
 Usare il renderer WebGL2 di Prisma, una pagina di calibrazione e Wallpaper Engine già posseduto dall'utente. Automatizzare il browser con Playwright. Aggiungere la camera fisica e il vano nello stesso ambiente di rendering dopo aver validato un oggetto semplice. L'esportazione mesh non è un prerequisito.
