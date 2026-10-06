@@ -27,7 +27,8 @@ void main(){
  vec2 uv=gl_FragCoord.xy/uResolution;
  vec2 wall=(uv-.5)*uSize;
  vec3 ro=vec3(uEyeXY,uEyeZ),rd=normalize(vec3(wall,0.)-ro);
- float ow=uSize.x*.36,oh=uSize.y*.34,depth=min(uSize.x,uSize.y)*.72;
+ // The opening fills the projected canvas; retain the Windows bars outside it.
+ float ow=uSize.x*.5,oh=uSize.y*.5,depth=min(uSize.x,uSize.y)*.72;
  float scale=min(uSize.x,uSize.y);
  vec3 sphere=mix(vec3(0.,-uSize.y*.045,-scale*.13),vec3(uSize.x*.265,-uSize.y*.12,scale*.25),uFront);
  float radius=scale*mix(.275,.24,uFront);
