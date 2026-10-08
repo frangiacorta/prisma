@@ -8,6 +8,7 @@ uniform vec4 uForm,uWarp,uFrame,uRotation;
 uniform vec4 uLife,uNetwork;uniform float uSymmetry;
 uniform vec4 uOrbit,uDrift,uWander,uTentacle,uTentacleMotion,uSpaceWarp;
 uniform vec2 uMotionQuality;uniform float uMotionSeed;
+uniform int uForceCount;uniform vec4 uForcePoints[8];uniform vec2 uForceOptions[8];
 mat2 rot(float a){return mat2(cos(a),-sin(a),sin(a),cos(a));}
 float clockAt(float q){
  q=clamp((fract(q)-uClock.z*.5)/(1.-uClock.z),0.,1.);
@@ -94,7 +95,16 @@ vec3 position(vec4 r,float phase){
  p+=uWarp.x*.4*vec3(sin(p.y*2.6+global),cos(p.z*3.+global),sin(p.x*3.4-global));
  p+=uWarp.z*.3*sin(p.yzx*uWarp.w+vec3(global,-global,global));
  p.xy=rot(uRotation.z)*p.xy;p.yz=rot(uRotation.x)*p.yz;p.xz=rot(uRotation.y)*p.xz;
- p*=uFrame.x;p.xy+=uFrame.yz;return p;
+ p*=uFrame.x;p.xy+=uFrame.yz;
+ // Static scene-space fields preserve periodicity and work equally on points and tails.
+ vec3 pull=vec3(0.);float influence=0.;
+ for(int i=0;i<8;i++){if(i>=uForceCount)break;vec3 d=uForcePoints[i].xyz-p;
+  float radius=uForceOptions[i].x,weight=exp(-dot(d,d)/(2.*radius*radius));
+  float strength=uForcePoints[i].w,gain=1.-exp(-abs(strength));
+  pull+=(sign(strength)*d*gain+cross(vec3(0.,0.,1.),d)*uForceOptions[i].y*.5)*weight;
+  influence+=gain*weight;
+ }
+ p+=pull/max(1.,influence);return p;
 }
 vec4 project(vec3 p){float depth=max(2.,7.5-p.z);return vec4(p.xy*vec2(uResolution.y/uResolution.x,1.)*2.6/depth,(depth-3.)/12.,1.);}
 vec3 particleColor(vec4 r,vec3 p){

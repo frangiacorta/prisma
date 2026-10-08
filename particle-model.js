@@ -1,5 +1,5 @@
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
-export const PARTICLE_VERSION=4;
+export const PARTICLE_VERSION=5;
 export const FAMILIES=['Nucleo Pathfinder'];
 export const SPRITES=['Granello','Disco','Anello','Scintilla'];
 export const COLOR_MODES=['Solidale alla forma iniziale','Identità della particella','Fasci e filamenti','Campo nello spazio'];
@@ -18,7 +18,8 @@ export const PARTICLE_META={
  pAttract:['Attrazione',0,2,.01],pRepel:['Repulsione',0,2,.01],pMagnet:['Avvolgimento magnetico',-2,2,.01],pPoles:['Numero di poli',1,6,1],pRadius:['Raggio dei poli',.1,2.5,.01],pField:['Influenza dei poli',.1,3,.01],
  pOuter:['Fasci esterni',0,1,.01],pReach:['Estensione fasci',0,4,.01],pBranches:['Numero di fasci',1,12,1],
  pCycles:['Cicli nel loop',1,12,1],pDirection:['Direzione del moto',-1,1,2],pRhythm:['Accelerazioni e rallentamenti',0,1,.01],pPause:['Pausa nel ciclo',0,.45,.01],pSpeedSpread:['Diversità delle cadenze',0,1,.01],
- pTrailCount:['Numero di scie',0,4000,10],pTrailLength:['Lunghezza scie',0,.5,.005],pTrailWidth:['Spessore scie · px',.08,8,.01],pTrailOpacity:['Opacità scie',0,1,.01],pTrailFade:['Sfumatura della coda',.1,5,.01],pTrailTaper:['Assottigliamento della coda',0,1,.01],pTrailScatter:['Dispersione delle scie',0,1,.01],
+ pTrailCount:['Numero di fibre / scie',0,60000,10],pTrailLength:['Coda · frazione del loop',0,1,.005],pTrailWidth:['Spessore fibre · px',.015,8,.005],pTrailOpacity:['Opacità scie',0,1,.01],pTrailFade:['Sfumatura della coda',.1,5,.01],pTrailTaper:['Assottigliamento della coda',0,1,.01],pTrailScatter:['Dispersione delle scie',0,1,.01],
+ pTrailPersistence:['Persistenza della coda',0,1,.01],pTrailSoftness:['Morbidezza delle fibre',0,1,.01],pTrailCoherence:['Coesione in tessuto',0,1,.01],pTrailDensity:['Compensazione luminosità',0,1,.01],pTrailQuality:['Definizione delle curve',24,192,8],
  pColorMode:['Colore sulle particelle',0,3,1],pColorScatter:['Variazione cromatica individuale',0,1,.01],pLumaVar:['Variazione luminosità individuale',0,1,.01],pDepthFade:['Attenuazione in profondità',0,1,.01],pLighting:['Risposta alle luci',0,1,.01],
 };
 export const PARTICLE_DEFAULTS={
@@ -33,11 +34,12 @@ export const PARTICLE_DEFAULTS={
  pAttract:.2,pRepel:.08,pMagnet:.18,pPoles:3,pRadius:1.2,pField:.9,
  pOuter:0,pReach:1.4,pBranches:5,pCycles:1,pDirection:1,pRhythm:.6,pPause:0,pSpeedSpread:.3,
  pTrailCount:700,pTrailLength:.085,pTrailWidth:.55,pTrailOpacity:.3,pTrailFade:1.7,pTrailTaper:.8,pTrailScatter:0,
+ pTrailPersistence:0,pTrailSoftness:.35,pTrailCoherence:0,pTrailDensity:.75,pTrailQuality:64,
  pColorMode:0,pColorScatter:.06,pLumaVar:.25,pDepthFade:.25,pLighting:.65,
 };
 export const PARTICLE_GROUPS={
  shape:['pCount','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pOrganic','pFrequency','pDetail','pRough','pWarp','pOuter','pReach','pBranches','pNeural','pNodes','pConnect','pSymmetry','pTentacle','pTentacleCount','pTentacleLength','pTentacleTaper','pTentacleCurl'],
- material:['pSize','pSizeVar','pSprite','pOpacity','pSoftness','pTrailCount','pTrailLength','pTrailWidth','pTrailOpacity','pTrailFade','pTrailTaper','pTrailScatter'],
+ material:['pSize','pSizeVar','pSprite','pOpacity','pSoftness','pTrailCount','pTrailLength','pTrailWidth','pTrailOpacity','pTrailFade','pTrailTaper','pTrailScatter','pTrailPersistence','pTrailSoftness','pTrailCoherence','pTrailDensity','pTrailQuality'],
  color:['pColorMode','pColorScatter','pLumaVar'],light:['pLighting','pDepthFade'],
  motion:['pCohesion','pRandom','pJitter','pVortex','pReentry','pBreath','pTravel','pAttract','pRepel','pMagnet','pPoles','pRadius','pField','pCycles','pDirection','pRhythm','pPause','pSpeedSpread','pLife','pPulse','pSignal','pPropagation','pMotionSoftness','pFollow','pOrbitOval','pOrbitTilt','pOrbitPrecession','pOrbitSpread','pOrbitDrift','pWander','pWanderScale','pWanderCycles','pFlowBalance','pMotionSeed','pTentacleWave','pTentacleCycles','pSpaceWarp','pWarpScale','pWarpCycles','pWarpTwist'],
 };
@@ -50,7 +52,7 @@ export const PARTICLE_STUDIES=[
  {name:'Pulsante',label:'Pathfinder · vitalità',values:{pLife:.8,pPulse:3,pSignal:.7,pPropagation:.7,pNeural:.65,pNodes:32,pConnect:.7,pOrganic:.3,pSize:.9,palette:['#1d3667','#43898c','#b6d89b','#e7d6a0']}},
 ];
 export function particleCreation(base,index=0,seed=417){
- const s=structuredClone(base);Object.assign(s,PARTICLE_DEFAULTS,{engine:'particles',particleVersion:PARTICLE_VERSION,seed:seed>>>0,
+ const s=structuredClone(base);Object.assign(s,PARTICLE_DEFAULTS,{engine:'particles',particleVersion:PARTICLE_VERSION,seed:seed>>>0,forcePoints:[],
  volume:1,stretchX:1,stretchY:1,stretchZ:1,deform:0,twist:0,waves:0,waveScale:3,scale:1.25,positionX:0,positionY:0,rotateX:20,rotateY:-18,rotateZ:0,
  duration:10,speed:1,perfectLoop:true,transparency:0,metal:.18,roughness:.38,gloss:.7,iridescence:.1,emission:.6,glow:.22,
  environment:'studio',environmentPower:.35,environmentAngle:0,environmentRotate:false,filmFlow:0,filmSwirl:0,
@@ -90,3 +92,9 @@ export function varyParticleMotion(source,seed,amount=.45){
  const s=varyParticles(source,seed,amount,'motion');s.seed=source.seed;s.pMotionSeed=seed%10000;
  return s;
 }
+// Material recipes on the current nucleus: never replace colors, geometry or choreography.
+export const FIBER_STYLES={
+ fibres:{pTrailCount:7000,pTrailLength:.28,pTrailWidth:.07,pTrailOpacity:.6,pTrailPersistence:.28,pTrailSoftness:.75,pTrailCoherence:.2,pTrailDensity:.6,pTrailQuality:96,pTrailTaper:.6,pOpacity:.16},
+ threads:{pTrailCount:18000,pTrailLength:.6,pTrailWidth:.13,pTrailOpacity:.55,pTrailPersistence:.62,pTrailSoftness:.7,pTrailCoherence:.68,pTrailDensity:.8,pTrailQuality:128,pTrailTaper:.25,pOpacity:.07},
+ fabric:{pTrailCount:42000,pTrailLength:.85,pTrailWidth:.21,pTrailOpacity:.5,pTrailPersistence:.9,pTrailSoftness:.8,pTrailCoherence:.95,pTrailDensity:1,pTrailQuality:160,pTrailTaper:.08,pOpacity:0}
+};

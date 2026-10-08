@@ -1,7 +1,7 @@
-import {META} from './model.js?v=94ae8e7aefbb';
-import {PARTICLE_META} from './particle-model.js?v=94ae8e7aefbb';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=94ae8e7aefbb';
-import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=94ae8e7aefbb';
+import {META} from './model.js?v=16c153490221';
+import {PARTICLE_META} from './particle-model.js?v=16c153490221';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=16c153490221';
+import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=16c153490221';
 
 // Shared by the local assistant and browser. Generated text can only propose these controls.
 const sharedParticleKeys='volume stretchX stretchY stretchZ deform twist waves waveScale scale positionX positionY rotateX rotateY rotateZ duration speed motion metal roughness gloss iridescence transparency emission glow environmentPower environmentAngle environmentCycles gradientAngle gradientScale gradientOffset colorSoftness colorWaveAmount colorWaveBands colorWavePhase colorWaveHeight colorWaveRadius colorWaveSwirl colorWaveWarp bgAngle bgHeight bgSoftness bgWash exposure brightness contrast saturation grain temperature photoTint gamma blacks highlights vignette lensDistortion'.split(' ');
@@ -23,6 +23,8 @@ export function assistantCatalog(s){
    'pNeural raggruppa fibre, pLife pulsa, pSignal illumina impulsi: metafore artistiche, non simulazioni biologiche.',
    'pSize e pTrailWidth sono pixel a 1080p: .08-.6 finissimi, 1 normale. Colore pColorMode=0 resta assegnato alla stessa particella. 3 è colore nello spazio.',
    'pOuter=0 spegne fasci esterni. Nessuna luce visibile o ombra fisica sui granelli; gestisci x/y/z, power, size, color, enabled delle luci.',
+   'Scie/fibre: pTrailCount fino a 60000, pTrailWidth .015-8 px, pTrailLength 0-1 (frazione di loop), pTrailPersistence 1 mantiene la coda intera. pTrailCoherence avvicina i percorsi per creare tessuto; pTrailSoftness ammorbidisce i bordi, pTrailQuality 24-192 segmenti. pTrailDensity attenua la sovraesposizione delle trame dense. Per fibre prova 7000/.07 px/.28 lunghezza; tessuto 42000/.21 px/.85 lunghezza/coherence .95/persistence .9 e pOpacity 0. Preserva forma e colori.',
+   'forcePoints contiene i punti manuali di attrazione/repulsione sulla scena. Conserva questi punti: questa versione del traduttore non li modifica; l’utente può trascinarli e regolarli in Moto → Punti sulla scena.',
    'Cicli interi e campi periodici chiudono il loop. Cambia solo ciò che serve; per richieste soggettive scegli valori moderati e spiegali in linguaggio naturale.'
   ]:[]};
 }

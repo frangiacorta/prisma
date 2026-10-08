@@ -1,10 +1,10 @@
-import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=94ae8e7aefbb';
-import {MOODS} from './model.js?v=94ae8e7aefbb';
-import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=94ae8e7aefbb';
+import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=16c153490221';
+import {MOODS} from './model.js?v=16c153490221';
+import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=16c153490221';
 export function pathValue(s,path){const parts=path.split('.');let value=s;for(let i=0;i<parts.length;i++){if(i===1&&parts[0]==='lights')value=value.find(l=>l.id===Number(parts[i]));else value=value?.[parts[i]];}return value}
 export function pathMeta(path,state){const parts=path.split('.'),last=parts.at(-1);if(last==='cycles')return state?.perfectLoop===false?['Ripetizioni nel ciclo',.1,8,.1]:['Ripetizioni nel loop',1,8,1];if(last==='phase')return['Fase di partenza',0,360,1];if(last==='amplitude'){if(parts[0]==='motions'){const m=TRACK_META[parts[1]];return ['Ampiezza',m[1],m[2],m[3]]}return parts[2]==='orbit'?['Ampiezza orbita',0,180,1]:['Ampiezza pulsazione',0,1,.01]}return LIGHT_META[last]}
 export function writePath(s,path,value){const parts=path.split('.');let object=s;for(let i=0;i<parts.length-1;i++){if(i===1&&parts[0]==='lights')object=object.find(l=>l.id===Number(parts[i]));else object=object[parts[i]];}if(object)object[parts.at(-1)]=value}
-import {particlePanel} from './particle-panel.js?v=94ae8e7aefbb';
+import {particlePanel} from './particle-panel.js?v=16c153490221';
 export function buildPanel(tab,s,h,selectedLight){return s.engine==='particles'?particlePanel(tab,s,h,sharedPanel,selectedLight):sharedPanel(tab,s,h,selectedLight);}
 function sharedPanel(tab,s,h,selectedLight){
  const {slider,section,details,colorField,check,icon}=h;
