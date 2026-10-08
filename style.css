@@ -42,3 +42,9 @@
 .force-handle.repel{border-color:var(--force-repel);color:var(--force-repel);background:#2c1824e6}.force-handle.selected{outline:2px solid #ffffff90;outline-offset:3px}.force-handle.disabled{opacity:.5;border-style:dashed}
 .force-radius{position:absolute;transform:translate(-50%,-50%);border:1px dashed #bcf3a64d;border-radius:50%;background:#bcf3a604;pointer-events:none}.force-radius.repel{border-color:#efa2c74d;background:#efa2c704}
 .artboard canvas.placing-force{cursor:crosshair}.force-actions,.fiber-styles,.force-list{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:15px}.fiber-styles button{flex:1}.force-chip{border:1px solid #373c40;padding:7px 11px;border-radius:6px}.force-chip.selected{border-color:var(--accent);color:var(--accent)}
+
+/* Drawn particle guides; editor overlays never enter the render canvas. */
+#guide-handles{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4;overflow:visible;touch-action:none}
+#guide-handles[hidden]{display:none}.drawing-guide{cursor:crosshair!important}.guide-tool{font-size:19px;font-weight:500;letter-spacing:-3px;padding-right:8px}
+.guide-shape{color:#c9ee9a}.guide-shape.avoid,.guide-draft.avoid{color:#ffa6b8}.guide-shape.disabled{opacity:.3}.guide-line{stroke:currentColor;stroke-width:1.5;fill:none;pointer-events:none;stroke-dasharray:5 5;filter:drop-shadow(0 0 2px #000)}.guide-shape.selected .guide-line{stroke-width:2;stroke-dasharray:none}
+.guide-hit{stroke:transparent;stroke-width:18;fill:none;pointer-events:stroke;cursor:move;touch-action:none}.guide-knot{fill:#11161f;stroke:currentColor;stroke-width:1.5;pointer-events:all;cursor:grab;touch-action:none}.guide-knot:hover,.guide-knot:focus{fill:currentColor;stroke:white}.guide-draft{stroke:#c9ee9a;stroke-width:2;stroke-dasharray:4 4;fill:none;pointer-events:none}.guide-draft.avoid{stroke:#ffa6b8}#guide-controls .force-actions{margin-bottom:14px}#guide-controls .selected{border-color:#7e995c;color:var(--accent)}

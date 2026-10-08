@@ -1,7 +1,8 @@
-import {sampleFrame} from './solid-renderer.js?v=16c153490221';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=16c153490221';
-import {fieldGLSL} from './particle-field.js?v=16c153490221';
-import {prismaShadingGLSL} from './particle-shading.js?v=16c153490221';
+import {sampleFrame} from './solid-renderer.js?v=e3a7e09f7af0';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=e3a7e09f7af0';
+import {GuideField} from './particle-path-field.js?v=e3a7e09f7af0';
+import {fieldGLSL} from './particle-field.js?v=e3a7e09f7af0';
+import {prismaShadingGLSL} from './particle-shading.js?v=e3a7e09f7af0';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -96,7 +97,7 @@ export class ParticleRenderer{
   this.canvas=canvas;const gl=this.gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});
   if(!gl)throw Error('WebGL 2 non disponibile.');this.float=!!gl.getExtension('EXT_color_buffer_float');
   this.points=this.program(pointVert,pointFrag);this.lines=this.program(trailVert,trailFrag);this.pathProgram=this.float?this.program(screenVert,pathFrag):null;this.blur=this.program(screenVert,blurFrag);this.compose=this.program(screenVert,composeFrag);
-  this.empty=gl.createVertexArray();this.targets=[];this.width=0;this.height=0;this.seed=null;this.completedFrames=0;this.gpuSample=0;this.gpuMilliseconds=null;
+  this.empty=gl.createVertexArray();this.guides=new GuideField(this);this.targets=[];this.width=0;this.height=0;this.seed=null;this.completedFrames=0;this.gpuSample=0;this.gpuMilliseconds=null;
   this.maxSize=Math.min(4096,gl.getParameter(gl.MAX_TEXTURE_SIZE),gl.getParameter(gl.MAX_RENDERBUFFER_SIZE));this.recoveryExtension=gl.getExtension('WEBGL_lose_context');
   this.timerExtension=gl.getExtension('EXT_disjoint_timer_query_webgl2');this.queries=[];
  }
@@ -120,7 +121,7 @@ export class ParticleRenderer{
  resize(w,h){if(this.width===w&&this.height===h)return;this.releaseSurface();this.width=w;this.height=h;this.canvas.width=w;this.canvas.height=h;this.targets=[this.target(w,h),this.target(Math.ceil(w/4),Math.ceil(h/4)),this.target(Math.ceil(w/4),Math.ceil(h/4))];}
  bind(t){const gl=this.gl;gl.bindFramebuffer(gl.FRAMEBUFFER,t?.fbo||null);gl.viewport(0,0,t?.w||this.width,t?.h||this.height);}
  tex(p,key,texture,unit){const gl=this.gl;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(this.loc(p,key),unit);}
- settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);
+ settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);this.guides.bind(p);
   this.u(p,'uPhase',phase);this.u(p,'uSeed',(s.seed%997)*.013);this.u(p,'uResolution',this.width,this.height);
   this.u(p,'uShape',s.pFamily,s.pTarget,s.pOpening,s.pThickness);this.u(p,'uStructure',s.pFill,s.pLobes,s.pLobeDepth,s.pClumps);
   this.u(p,'uNoise',s.pOrganic,s.pFrequency,s.pDetail,s.pWarp);this.u(p,'uFlow',s.pCohesion,s.pRandom,s.pJitter,s.pRough);
@@ -150,7 +151,7 @@ export class ParticleRenderer{
  draw(source,phase=0,w=this.canvas.width,h=this.canvas.height,options={}){
   const gl=this.gl;if(gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');
   phase=((phase/(Math.PI*2))%1+1)%1;const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase*Math.PI*2)};
-  if(this.seed!==s.seed)this.geometry(s.seed);this.resize(w,h);this.pollGpuTime();const query=this.timerExtension&&this.queries.length<3?gl.createQuery():null;
+  if(this.seed!==s.seed)this.geometry(s.seed);this.resize(w,h);this.guides.update(s);this.pollGpuTime();const query=this.timerExtension&&this.queries.length<3?gl.createQuery():null;
   if(query)gl.beginQuery(this.timerExtension.TIME_ELAPSED_EXT,query);
   const [scene,a,b]=this.targets;this.bind(scene);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.disable(gl.SCISSOR_TEST);gl.enable(gl.BLEND);gl.blendEquation(gl.FUNC_ADD);gl.blendFunc(gl.ONE,gl.ONE);
   if(s.pTrailCount>0&&s.pTrailLength>0&&s.pTrailOpacity>0){
@@ -182,5 +183,5 @@ export class ParticleRenderer{
  pollGpuTime(){const gl=this.gl,e=this.timerExtension;if(!e)return;const disjoint=gl.getParameter(e.GPU_DISJOINT_EXT);while(this.queries.length&&(disjoint||gl.getQueryParameter(this.queries[0],gl.QUERY_RESULT_AVAILABLE))){const q=this.queries.shift();if(!disjoint){this.gpuMilliseconds=gl.getQueryParameter(q,gl.QUERY_RESULT)/1e6;this.gpuSample++;}gl.deleteQuery(q);}}
  hardwareInfo(){const gl=this.gl,e=gl.getExtension('WEBGL_debug_renderer_info'),name=gl.getParameter(e?e.UNMASKED_RENDERER_WEBGL:gl.RENDERER);return {name,software:/swiftshader|llvmpipe/i.test(name),timingAvailable:!!this.timerExtension};}
  pixels(){const gl=this.gl,a=new Uint8Array(this.width*this.height*4),out=new Uint8Array(a.length),stride=this.width*4;gl.readPixels(0,0,this.width,this.height,gl.RGBA,gl.UNSIGNED_BYTE,a);for(let y=0;y<this.height;y++)out.set(a.subarray(y*stride,(y+1)*stride),(this.height-y-1)*stride);return out;}
- dispose({loseContext=false}={}){const gl=this.gl;if(this.completionSync)gl.deleteSync(this.completionSync);for(const q of this.queries)gl.deleteQuery(q);this.releaseSurface();if(this.buffer)gl.deleteBuffer(this.buffer);if(this.lineIndices)gl.deleteBuffer(this.lineIndices);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pathTarget){gl.deleteTexture(this.pathTarget.texture);gl.deleteFramebuffer(this.pathTarget.fbo);}for(const p of [this.points,this.lines,this.pathProgram,this.blur,this.compose])if(p)gl.deleteProgram(p.program);for(const v of [this.pointVAO,this.lineVAO,this.empty])if(v)gl.deleteVertexArray(v);gl.bindVertexArray(null);if(loseContext)this.recoveryExtension?.loseContext();}
+ dispose({loseContext=false}={}){const gl=this.gl;if(this.completionSync)gl.deleteSync(this.completionSync);for(const q of this.queries)gl.deleteQuery(q);this.guides.dispose();this.releaseSurface();if(this.buffer)gl.deleteBuffer(this.buffer);if(this.lineIndices)gl.deleteBuffer(this.lineIndices);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pathTarget){gl.deleteTexture(this.pathTarget.texture);gl.deleteFramebuffer(this.pathTarget.fbo);}for(const p of [this.points,this.lines,this.pathProgram,this.blur,this.compose])if(p)gl.deleteProgram(p.program);for(const v of [this.pointVAO,this.lineVAO,this.empty])if(v)gl.deleteVertexArray(v);gl.bindVertexArray(null);if(loseContext)this.recoveryExtension?.loseContext();}
 }

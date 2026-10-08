@@ -1,5 +1,5 @@
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
-export const PARTICLE_VERSION=5;
+export const PARTICLE_VERSION=6;
 export const FAMILIES=['Nucleo Pathfinder'];
 export const SPRITES=['Granello','Disco','Anello','Scintilla'];
 export const COLOR_MODES=['Solidale alla forma iniziale','Identità della particella','Fasci e filamenti','Campo nello spazio'];
@@ -52,7 +52,7 @@ export const PARTICLE_STUDIES=[
  {name:'Pulsante',label:'Pathfinder · vitalità',values:{pLife:.8,pPulse:3,pSignal:.7,pPropagation:.7,pNeural:.65,pNodes:32,pConnect:.7,pOrganic:.3,pSize:.9,palette:['#1d3667','#43898c','#b6d89b','#e7d6a0']}},
 ];
 export function particleCreation(base,index=0,seed=417){
- const s=structuredClone(base);Object.assign(s,PARTICLE_DEFAULTS,{engine:'particles',particleVersion:PARTICLE_VERSION,seed:seed>>>0,forcePoints:[],
+ const s=structuredClone(base);Object.assign(s,PARTICLE_DEFAULTS,{engine:'particles',particleVersion:PARTICLE_VERSION,seed:seed>>>0,forcePoints:[],forcePaths:[],
  volume:1,stretchX:1,stretchY:1,stretchZ:1,deform:0,twist:0,waves:0,waveScale:3,scale:1.25,positionX:0,positionY:0,rotateX:20,rotateY:-18,rotateZ:0,
  duration:10,speed:1,perfectLoop:true,transparency:0,metal:.18,roughness:.38,gloss:.7,iridescence:.1,emission:.6,glow:.22,
  environment:'studio',environmentPower:.35,environmentAngle:0,environmentRotate:false,filmFlow:0,filmSwirl:0,

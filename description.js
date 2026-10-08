@@ -1,6 +1,7 @@
-import {META,MOODS,GROUPS} from './model.js?v=16c153490221';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=16c153490221';
-import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=16c153490221';
+import {META,MOODS,GROUPS} from './model.js?v=e3a7e09f7af0';
+import {PATH_META} from './particle-paths.js?v=e3a7e09f7af0';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=e3a7e09f7af0';
+import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=e3a7e09f7af0';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
@@ -28,6 +29,16 @@ export function applyDescriptionPlan(current,plan){
   else if(o.type==='background'){if(!['solid','gradient','transparent','studio'].includes(o.mode))throw Error('Sfondo non valido');if(o.colors&&(!Array.isArray(o.colors)||!o.colors.length||!o.colors.every(isColor)))throw Error('Colori dello sfondo non validi');s.bgMode=o.mode;if(o.colors){s.background=o.colors[0];s.background2=o.colors[1]||o.colors[0];}notes.push('Sfondo');}
   else if(o.type==='environment'){if(!['studio','sky','sunset','neon','aurora','aquarium','city'].includes(o.name))throw Error('Ambiente non valido');upgrade(s);s.environment=o.name;notes.push('Ambiente riflesso');}
   else if(o.type==='light'){upgrade(s);if(o.action==='remove'){const i=s.lights.findIndex(l=>l.id===o.id);if(i<0)throw Error('Luce non trovata');s.lights.splice(i,1);notes.push('Luce rimossa');continue;}let l;if(o.action==='add'){if(s.lights.length>=MAX_LIGHTS)throw Error('Puoi usare fino a 8 luci');l=newLight(Math.max(0,...s.lights.map(q=>q.id))+1);}else if(o.action==='edit'){l=s.lights.find(q=>q.id===o.id);if(!l)throw Error('Luce non trovata');}else throw Error('Azione luce non valida');for(const [k,v] of Object.entries(o.values||{})){if(Object.hasOwn(LIGHT_META,k)){const m=LIGHT_META[k];if(!Number.isFinite(v)||v<m[1]||v>m[2])throw Error('Valore luce non valido');l[k]=m[3]>=1?Math.round(v):v;}else if(k==='color'&&isColor(v))l.color=v;else if(k==='type'&&LIGHT_TYPES.some(q=>q[0]===v))l.type=v;else if(['visible','enabled'].includes(k)&&typeof v==='boolean')l[k]=v;else throw Error('Proprietà luce non valida');}if(o.action==='add')s.lights.push(l);notes.push(o.action==='add'?'Luce aggiunta':'Luce spostata / modificata');}
+  else if(o.type==='path'){
+   const p=s.engine==='particles'&&(s.forcePaths||[]).find(p=>p.id===o.id);if(!p||!o.values||typeof o.values!=='object'||Array.isArray(o.values))throw Error('Percorso non disponibile');
+   for(const [key,value] of Object.entries(o.values)){
+    if(Object.hasOwn(PATH_META,key)){const m=PATH_META[key];if(!Number.isFinite(value)||value<m[1]||value>m[2]||m[3]===1&&!Number.isInteger(value))throw Error('Valore percorso non valido');p[key]=value;}
+    else if(key==='mode'&&['follow','avoid'].includes(value))p.mode=value;
+    else if(['enabled','closed'].includes(key)&&typeof value==='boolean'){if(key==='closed'&&value&&p.points.length<3)throw Error('Servono almeno tre nodi per chiudere il percorso');p[key]=value;}
+    else if(key==='direction'&&[1,-1].includes(value))p.direction=value;
+    else throw Error('Proprietà del percorso non valida');
+   }notes.push('Percorso '+p.id);
+  }
   else if(o.type==='motionPreset'){if(!MOTION_PRESETS.some(q=>q[0]===o.name))throw Error('Movimento non disponibile');motionPreset(s,o.name);notes.push('Movimento');}
   else if(o.type==='loop'){if(typeof o.perfect!=='boolean')throw Error('Modalità loop non valida');s.perfectLoop=o.perfect;if(o.perfect){for(const t of Object.values(s.motions||{}))t.cycles=Math.max(1,Math.round(t.cycles||1));for(const l of s.lights||[])for(const t of [l.orbit,l.pulse])if(t)t.cycles=Math.max(1,Math.round(t.cycles||1));for(const key of ['environmentCycles','filmCycles'])if(Number.isFinite(s[key]))s[key]=Math.max(1,Math.round(s[key]));}notes.push(o.perfect?'Loop perfetto attivo':'Movimento libero');}
   else if(o.type==='motionTrack'){

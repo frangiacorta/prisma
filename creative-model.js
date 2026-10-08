@@ -1,7 +1,8 @@
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=16c153490221';
-import {normalizeForcePoints} from './particle-forces.js?v=16c153490221';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=16c153490221';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=16c153490221';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=e3a7e09f7af0';
+import {normalizeForcePaths} from './particle-paths.js?v=e3a7e09f7af0';
+import {normalizeForcePoints} from './particle-forces.js?v=e3a7e09f7af0';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=e3a7e09f7af0';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=e3a7e09f7af0';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -113,7 +114,7 @@ export function surprise(seed){
 }
 export function normalizeCreation(raw){
  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw Error('Il file non contiene una creazione Prisma.');
- const s=preset(0);s.forcePoints=normalizeForcePoints(raw.forcePoints);s.perfectLoop=raw.perfectLoop!==false;for(const [k,meta] of Object.entries(META)){if(Number.isFinite(raw[k]))s[k]=clamp(k,raw[k]);}
+ const s=preset(0);s.forcePoints=normalizeForcePoints(raw.forcePoints);s.forcePaths=normalizeForcePaths(raw.forcePaths);s.perfectLoop=raw.perfectLoop!==false;for(const [k,meta] of Object.entries(META)){if(Number.isFinite(raw[k]))s[k]=clamp(k,raw[k]);}
  for(const k of ['background','background2','internalColor','sssColor'])if(/^#[0-9a-f]{6}$/i.test(raw[k]||''))s[k]=raw[k];
  if(Array.isArray(raw.palette)&&raw.palette.length&&raw.palette.every(c=>/^#[0-9a-f]{6}$/i.test(c)))s.palette=raw.palette.slice(0,12);
  if(['solid','gradient','transparent','studio'].includes(raw.bgMode))s.bgMode=raw.bgMode;

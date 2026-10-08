@@ -1,7 +1,8 @@
-import {META} from './model.js?v=16c153490221';
-import {PARTICLE_META} from './particle-model.js?v=16c153490221';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=16c153490221';
-import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=16c153490221';
+import {META} from './model.js?v=e3a7e09f7af0';
+import {PARTICLE_META} from './particle-model.js?v=e3a7e09f7af0';
+import {PATH_META} from './particle-paths.js?v=e3a7e09f7af0';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=e3a7e09f7af0';
+import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=e3a7e09f7af0';
 
 // Shared by the local assistant and browser. Generated text can only propose these controls.
 const sharedParticleKeys='volume stretchX stretchY stretchZ deform twist waves waveScale scale positionX positionY rotateX rotateY rotateZ duration speed motion metal roughness gloss iridescence transparency emission glow environmentPower environmentAngle environmentCycles gradientAngle gradientScale gradientOffset colorSoftness colorWaveAmount colorWaveBands colorWavePhase colorWaveHeight colorWaveRadius colorWaveSwirl colorWaveWarp bgAngle bgHeight bgSoftness bgWash exposure brightness contrast saturation grain temperature photoTint gamma blacks highlights vignette lensDistortion'.split(' ');
@@ -12,6 +13,7 @@ export function assistantCatalog(s){
  return {...all,engine:s.engine,parameters:Object.fromEntries(allowed.filter(k=>META[k]).map(k=>[k,{...all.parameters[k],value:s[k]}])),
   motionTracks:Object.fromEntries(Object.entries(all.motionTracks).filter(([k])=>!particles||particleTracks.includes(k))),
   shapes:particles?[]:all.shapes,materials:particles?[]:all.materials,textureStyles:particles?[]:all.textureStyles,
+  pathParameters:particles?PATH_META:{},paths:particles?(s.forcePaths||[]).map(({points,...p})=>({...p,knotCount:points.length})):[],
   lightParameters:particles?Object.fromEntries(Object.entries(LIGHT_META).filter(([k])=>['x','y','z','power','size'].includes(k))):LIGHT_META,
   notes:particles?[
    'Unico nucleo Pathfinder: deforma la stessa materia, non sostituire con altri effetti. La posa corrente e i colori vanno conservati salvo richiesta.',
@@ -25,6 +27,7 @@ export function assistantCatalog(s){
    'pOuter=0 spegne fasci esterni. Nessuna luce visibile o ombra fisica sui granelli; gestisci x/y/z, power, size, color, enabled delle luci.',
    'Scie/fibre: pTrailCount fino a 60000, pTrailWidth .015-8 px, pTrailLength 0-1 (frazione di loop), pTrailPersistence 1 mantiene la coda intera. pTrailCoherence avvicina i percorsi per creare tessuto; pTrailSoftness ammorbidisce i bordi, pTrailQuality 24-192 segmenti. pTrailDensity attenua la sovraesposizione delle trame dense. Per fibre prova 7000/.07 px/.28 lunghezza; tessuto 42000/.21 px/.85 lunghezza/coherence .95/persistence .9 e pOpacity 0. Preserva forma e colori.',
    'forcePoints contiene i punti manuali di attrazione/repulsione sulla scena. Conserva questi punti: questa versione del traduttore non li modifica; l’utente può trascinarli e regolarli in Moto → Punti sulla scena.',
+   'paths modifica i percorsi già disegnati con il loro id. Non inventare percorsi o coordinate: se non ce ne sono, chiedi di disegnarli con Segui/Evita in Moto. coverage è la percentuale stabile di particelle potenzialmente coinvolte; radius è la zona di influenza 3D; strength la forza; adherence la compattezza sul percorso. orbitRadius=0 percorre la linea, maggiore di 0 satellita; orbitTurns e cycles sono interi per loop. release è il tempo percentuale libero per ogni particella, non la percentuale di particelle libere (quella è 100-coverage). softness ammorbidisce ingresso e uscita. mode=avoid respinge dalla linea e ignora i satelliti; follow segue. Non modificare points. Mantieni tutte le altre impostazioni.',
    'Cicli interi e campi periodici chiudono il loop. Cambia solo ciò che serve; per richieste soggettive scegli valori moderati e spiegali in linguaggio naturale.'
   ]:[]};
 }
@@ -37,13 +40,16 @@ export function assistantSchema(s){
   background:nullable(object({mode:{enum:['solid','gradient','transparent','studio']},colors:arr(str)})),environment:nullable({enum:['studio','sky','sunset','neon','aurora','aquarium','city']}),
   lights:arr(object({action:{enum:['add','edit','remove']},id:nullable({type:'integer'}),changes:arr(object({key:{enum:[...Object.keys(c.lightParameters),'color','enabled',...(s.engine==='particles'?[]:['type','visible'])]},value:{anyOf:[num,str,bool]}}))})),
   tracks:arr(object({key:{enum:Object.keys(c.motionTracks)},enabled:bool,amplitude:num,cycles:num,phase:num,direction:{enum:[-1,1]},curve:{enum:['sine','soft','triangle']},mode:{enum:['wave','cycle']}})),
+  paths:arr(object({id:{type:'integer'},changes:arr(object({key:{enum:[...Object.keys(PATH_META),'mode','enabled','closed','direction']},value:{anyOf:[num,str,bool]}}))})),
   perfectLoop:nullable(bool),play:nullable(bool),shape:nullable(str),materialIndex:nullable({type:'integer'}),textureIndex:nullable({type:'integer'})});
 }
 export function assistantPlan(current,reply){
  if(!reply||typeof reply.message!=='string'||reply.message.length>1800||!(reply.clarification===null||typeof reply.clarification==='string'&&reply.clarification.length<=1000))throw Error('Risposta dell’assistente non valida.');
  const catalog=assistantCatalog(current),operations=[];
  if(reply.perfectLoop!==null)operations.push({type:'loop',perfect:reply.perfectLoop});
- if(!Array.isArray(reply.changes)||!Array.isArray(reply.lights)||!Array.isArray(reply.tracks)||reply.changes.length+reply.lights.length+reply.tracks.length>90)throw Error('Troppe modifiche proposte.');
+ const pathEdits=reply.paths??[];
+ if(!Array.isArray(reply.changes)||!Array.isArray(reply.lights)||!Array.isArray(reply.tracks)||!Array.isArray(pathEdits)||pathEdits.length>4||reply.changes.length+reply.lights.length+reply.tracks.length+pathEdits.length>90)throw Error('Troppe modifiche proposte.');
+ for(const p of pathEdits){if(current.engine!=='particles'||!Number.isInteger(p.id)||!Array.isArray(p.changes)||p.changes.length>16)throw Error('Percorso non valido');operations.push({type:'path',id:p.id,values:Object.fromEntries(p.changes.map(({key,value})=>[key,value]))});}
  for(const {key,value}of reply.changes){if(!Object.hasOwn(catalog.parameters,key))throw Error('Controllo non disponibile: '+key);operations.push({type:'set',key,value});}
  if(reply.palette!==null)operations.push({type:'palette',colors:reply.palette});
  if(reply.background!==null)operations.push({type:'background',...reply.background});
