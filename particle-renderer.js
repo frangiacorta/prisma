@@ -1,7 +1,7 @@
-import {sampleFrame} from './solid-renderer.js?v=a1656d1c85dc';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=a1656d1c85dc';
-import {fieldGLSL} from './particle-field.js?v=a1656d1c85dc';
-import {prismaShadingGLSL} from './particle-shading.js?v=a1656d1c85dc';
+import {sampleFrame} from './solid-renderer.js?v=94ae8e7aefbb';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=94ae8e7aefbb';
+import {fieldGLSL} from './particle-field.js?v=94ae8e7aefbb';
+import {prismaShadingGLSL} from './particle-shading.js?v=94ae8e7aefbb';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const pointVert=`#version 300 es
 precision highp float;
@@ -108,6 +108,11 @@ export class ParticleRenderer{
   this.u(p,'uTrails',s.pTrailLength*s.pDirection,s.pTrailWidth,s.pTrailOpacity,0);this.u(p,'uTail',s.pTrailFade,s.pTrailTaper,0,s.pTrailScatter);
   this.u(p,'uColor',s.pColorMode,s.pColorScatter,s.pLumaVar,s.pDepthFade);
   this.u(p,'uLife',s.pLife,s.pPulse,s.pSignal,s.pPropagation);this.u(p,'uNetwork',s.pNeural,s.pNodes,s.pConnect,0);this.u(p,'uSymmetry',s.pSymmetry);
+  this.u(p,'uMotionQuality',s.pMotionSoftness,s.pFollow);this.u(p,'uMotionSeed',s.pMotionSeed);
+  this.u(p,'uOrbit',s.pOrbitOval,s.pOrbitTilt*rad,s.pOrbitPrecession,s.pOrbitSpread);this.u(p,'uDrift',s.pOrbitDrift,0,0,0);
+  this.u(p,'uWander',s.pWander,s.pWanderScale,s.pWanderCycles,s.pFlowBalance);
+  this.u(p,'uTentacle',s.pTentacle,s.pTentacleCount,s.pTentacleLength,s.pTentacleTaper);this.u(p,'uTentacleMotion',s.pTentacleCurl,s.pTentacleWave,s.pTentacleCycles,0);
+  this.u(p,'uSpaceWarp',s.pSpaceWarp,s.pWarpScale,s.pWarpCycles,s.pWarpTwist);
   this.u(p,'uForm',s.stretchX,s.stretchY,s.stretchZ,s.volume);this.u(p,'uWarp',s.deform,s.twist,s.waves,s.waveScale);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uRotation',s.rotateX*rad,s.rotateY*rad,s.rotateZ*rad,0);
   this.u(p,'uMaterial',s.metal,s.roughness,s.gloss,s.iridescence);this.u(p,'uFinish',s.emission,s.pLighting,1-s.transparency,1);
   this.u(p,'uEnvironment',environments.indexOf(s.environment),s.environmentAngle*rad,s.environmentPower,0);

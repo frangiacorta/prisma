@@ -5,7 +5,7 @@
  <meta name="theme-color" content="#101114"><meta name="description" content="Modella forme e materia procedurale, guida particelle, luci e movimento. Crea immagini e video in loop con Prisma Studio.">
  <title>Prisma Studio — Forme in movimento</title>
  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23101114'/%3E%3Cpath d='M20 6 34 30H6Z' fill='none' stroke='%23ccf497' stroke-width='3'/%3E%3Cpath d='m20 6 4 24M6 30l18-10 10 10' fill='none' stroke='%23ccf497'/%3E%3C/svg%3E">
- <link rel="stylesheet" href="style.css?v=a1656d1c85dc">
+ <link rel="stylesheet" href="style.css?v=94ae8e7aefbb">
 </head>
 <body>
  <header class="topbar">
@@ -23,10 +23,13 @@
    <div class="random-bar"><button id="randomize" class="random-button"><span data-icon="shuffle"></span>Sorprendimi</button><button id="similar" class="quiet" title="Crea otto varianti vicine">Rifalla simile</button><button id="favorite" class="icon-button" title="Salva tra i preferiti" aria-label="Salva tra i preferiti">♡</button><button id="gallery-open" class="quiet" title="Apri i preferiti">Galleria</button><label class="seed">SEED <input id="seed" type="number" min="0" max="4294967295" value="2408" aria-label="Seed casuale"></label><button id="random-settings" class="icon-button" title="Opzioni di randomizzazione" aria-label="Opzioni di randomizzazione"><span data-icon="sliders"></span></button></div>
    <section class="description-bar" aria-labelledby="description-label">
     <div class="description-heading"><label id="description-label" for="creation-description">Descrivi la tua idea</label><span id="description-mode">Forma · materia · movimento</span></div>
-    <form id="description-form" class="description-form"><textarea id="creation-description" rows="2" maxlength="1600" placeholder="Es. Radici nodose che entrano ed escono dalla sfera, blu e viola, sfondo nero" aria-describedby="description-help description-status"></textarea><button id="description-apply" class="primary" type="submit">Applica</button></form>
+    <div class="assistant-toolbar"><label for="description-engine">Interpreta con</label><select id="description-engine"><option value="codex">Assistente Codex · testo libero</option><option value="quick">Comandi rapidi · offline</option></select><button id="assistant-retry" type="button" class="quiet" hidden>Ricollega</button><button id="assistant-open-pc" type="button" class="quiet" hidden>Continua sul PC</button></div>
+    <form id="description-form" class="description-form"><textarea id="creation-description" rows="2" maxlength="4000" placeholder="Es. Vorrei che sembrasse sospeso nell’acqua, morbido, con radici che si cercano" aria-describedby="description-help description-status"></textarea><button id="description-apply" class="primary" type="submit">Interpreta e applica</button></form>
     <div class="description-examples" aria-label="Esempi di richieste"><button type="button" data-description="Rendilo morbido nel movimento">Movimento morbido</button><button type="button" data-description="Radici nodose che entrano ed escono dalla sfera">Radici nodose</button><button type="button" data-description="Piccoli rigonfiamenti della sfera">Rigonfiamenti</button><button type="button" data-description="Corde che si attorcigliano attorno alla sfera in movimento">Corde in movimento</button></div>
-    <p id="description-help" class="description-help">Descrivi forma, materia, colori, luci o movimento. Puoi combinare più modifiche e indicare valori precisi. Le parti non riconosciute vengono segnalate; puoi sempre annullare.</p>
+    <p id="description-help" class="description-help">Descrivi liberamente quello che vuoi, anche per immagini e sensazioni. Codex legge questa scena e le ultime richieste scritte qui. Ogni modifica si può annullare.</p>
+    <button id="assistant-cancel" type="button" class="quiet" hidden>Interrompi richiesta</button>
     <div class="description-result"><p id="description-status" role="status" aria-live="polite"></p><button id="description-undo" class="quiet" type="button" hidden>Annulla</button></div>
+    <details id="assistant-changes" class="assistant-changes" hidden><summary>Controlli modificati</summary><ul id="assistant-change-list"></ul></details>
    </section>
   </main>
   <aside class="inspector" aria-label="Parametri della creazione"><div class="inspector-head"><span>Modella la tua idea</span><span class="inspector-glyph">✳</span></div><nav id="tabs" class="tabs" aria-label="Gruppi di parametri"></nav><div id="controls" class="controls"></div><div class="inspector-footer"><span class="live-icon">↝</span> Ogni modifica, in tempo reale</div></aside>
@@ -40,5 +43,5 @@
  <script>
  (()=>{function failed(){if(window.prismaReady)return;const box=document.getElementById('render-error');box.hidden=false;box.textContent='Il caricamento dell’editor si è interrotto. ';const button=document.createElement('button');button.className='primary';button.textContent='Ricarica editor';button.onclick=()=>location.reload();box.append(button);}window.addEventListener('error',e=>{if(e.target?.tagName==='SCRIPT')failed();},true);setTimeout(failed,15000);})();
  </script>
- <script type="module" src="app.js?v=a1656d1c85dc"></script>
+ <script type="module" src="app.js?v=94ae8e7aefbb"></script>
 </body></html>

@@ -1,6 +1,6 @@
-import {PARTICLE_META} from './particle-model.js?v=a1656d1c85dc';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=a1656d1c85dc';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=a1656d1c85dc';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=94ae8e7aefbb';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=94ae8e7aefbb';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=94ae8e7aefbb';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -120,7 +120,7 @@ export function normalizeCreation(raw){
  for(const k of Object.keys(MODERN_BASE))if(typeof raw[k]===typeof MODERN_BASE[k]&&k!=='renderVersion')s[k]=typeof raw[k]==='number'&&META[k]?clamp(k,raw[k]):raw[k];
  if(!['studio','sunset','neon','sky','aquarium','aurora','city'].includes(s.environment))s.environment='studio';
  if(MATERIAL_STYLES.some(m=>m.name===raw.materialName))s.materialName=raw.materialName;
- s.renderVersion=raw.renderVersion>=2?2:1;s.thinShell=Math.max(0,Math.min(1,Number(raw.thinShell)||0));s.seed=Number(raw.seed)>>>0;s.engine=raw.engine==='particles'?'particles':'solid';s.particleVersion=3;for(const [key,meta]of Object.entries(PARTICLE_META))if(meta[3]>=1)s[key]=Math.round(s[key]);if(s.pDirection!==-1)s.pDirection=1;
+ s.renderVersion=raw.renderVersion>=2?2:1;s.thinShell=Math.max(0,Math.min(1,Number(raw.thinShell)||0));s.seed=Number(raw.seed)>>>0;s.engine=raw.engine==='particles'?'particles':'solid';s.particleVersion=PARTICLE_VERSION;for(const [key,meta]of Object.entries(PARTICLE_META))if(meta[3]>=1)s[key]=Math.round(s[key]);if(s.pDirection!==-1)s.pDirection=1;
  if(Array.isArray(raw.lights))s.lights=raw.lights.slice(0,8).map((l,i)=>{const v=newLight(i+1);for(const k of ['x','y','z'])if(Number.isFinite(l[k]))v[k]=Math.max(-5,Math.min(5,l[k]));for(const k of ['power','size','length','roll','softness','cone','grid'])if(Number.isFinite(l[k]))v[k]=Math.max(k==='roll'?-180:0,Math.min(k==='power'?6:k==='roll'?180:k==='cone'?85:k==='grid'?12:3,l[k]));if(/^#[0-9a-f]{6}$/i.test(l.color))v.color=l.color;if(['circle','bar','spot','diffuser','grid','ring','orb'].includes(l.type))v.type=l.type;v.enabled=l.enabled!==false;v.visible=l.visible===true;for(const key of ['orbit','pulse'])if(l[key])v[key]=safeTrack(v[key],l[key],s.perfectLoop);return v;});
  for(const k of Object.keys(s.motions))if(raw.motions?.[k])s.motions[k]=safeTrack(s.motions[k],raw.motions[k],s.perfectLoop);
  for(const k of ['internalColor','sssColor'])if(!/^#[0-9a-f]{6}$/i.test(s[k]||''))s[k]=k==='internalColor'?'#e6f5ff':'#ffc49b';

@@ -6,13 +6,15 @@ uniform vec2 uResolution;
 uniform vec4 uShape,uStructure,uNoise,uFlow,uDynamics,uPoles,uOuter,uClock,uPoints,uTrails,uTail,uColor;
 uniform vec4 uForm,uWarp,uFrame,uRotation;
 uniform vec4 uLife,uNetwork;uniform float uSymmetry;
+uniform vec4 uOrbit,uDrift,uWander,uTentacle,uTentacleMotion,uSpaceWarp;
+uniform vec2 uMotionQuality;uniform float uMotionSeed;
 mat2 rot(float a){return mat2(cos(a),-sin(a),sin(a),cos(a));}
 float clockAt(float q){
  q=clamp((fract(q)-uClock.z*.5)/(1.-uClock.z),0.,1.);
  float r=.14,y=min(q,1.-q)/r,ramp=r*y*y*y*(1.-.5*y);
  float area=q<r?ramp:q>1.-r?1.-r-ramp:q-r*.5;
  float e=uClock.z>0.?area/(1.-r):q;
- return TAU*e-.92*uClock.y*sin(TAU*e);
+ return TAU*e-.92*uClock.y*(1.-.55*uMotionQuality.x)*sin(TAU*e);
 }
 vec3 curl(vec3 p,float t){return vec3(cos(p.y+t)-sin(p.z-t),cos(p.z+t)-sin(p.x-t),cos(p.x+t)-sin(p.y-t));}
 vec3 shape(vec4 r,float t,float family){
@@ -32,19 +34,43 @@ vec3 shape(vec4 r,float t,float family){
 vec3 restPoint(vec4 r){return mix(shape(r,0.,uShape.x),shape(r,0.,uShape.y),uDynamics.w);}
 vec3 position(vec4 r,float phase){
  float global=clockAt(phase*uClock.x),c=1.+floor(r.z*3.)*step(1.-uClock.w,r.w);
- float t=global*c+(r.w-.5)*uFlow.y*TAU;
+ float seedPhase=(uMotionSeed-417.)*.013;
+ float t=global*c+(r.w-.5)*uFlow.y*TAU+seedPhase+uOrbit.w*r.z*TAU-uMotionQuality.y*r.x*2.;
  vec3 rest=restPoint(r),p=mix(shape(r,t,uShape.x),shape(r,t,uShape.y),uDynamics.w);
  p=mix(rest,p,uDynamics.z);
+ // Ellipses and rotating orbital planes affect the existing trajectories.
+ p.xz*=vec2(1.+uOrbit.x*.45,1.-uOrbit.x*.65);
+ p.yz=rot(uOrbit.y+uOrbit.z*.9*sin(global+r.x*TAU+seedPhase))*p.yz;
+ vec3 drift=vec3(cos(global+r.y*TAU+seedPhase),.5*sin(global*2.+r.x*TAU),sin(global+r.y*TAU+seedPhase));
+ p+=uDrift.x*.4*drift;
  float gain=1.,freq=uNoise.y;
  for(int i=0;i<5;i++){if(float(i)>=uNoise.z)break;
   vec3 q=p*freq+uSeed+float(i)*13.7;
   q+=uNoise.w*.8*curl(q*.8,global);
   vec3 flow=mix(curl(q,global),curl(rest*freq*.35+uSeed,global),uFlow.x*.75);
   p+=flow*uNoise.x*.13*gain;
-  gain*=uFlow.w;freq*=1.93;
+  gain*=uFlow.w*(1.-uMotionQuality.x*.7);freq*=1.93;
  }
- p+=uFlow.y*.25*vec3(sin(t+r.z*TAU),cos(t*2.+r.x*TAU),sin(t*3.+r.y*TAU));
- p+=uFlow.z*.04*vec3(sin(global*13.+r.x*91.),sin(global*17.+r.y*97.),cos(global*19.+r.z*83.));
+ vec3 wandering=vec3(sin(t+r.z*TAU),cos(t*2.+r.x*TAU),sin(t*3.+r.y*TAU));
+ vec3 softWandering=vec3(sin(t+r.z*TAU),cos(t+r.x*TAU),sin(t+r.y*TAU));
+ p+=uFlow.y*.25*mix(wandering,softWandering,uMotionQuality.x);
+ p+=uFlow.z*.04*mix(vec3(sin(global*13.+r.x*91.),sin(global*17.+r.y*97.),cos(global*19.+r.z*83.)),softWandering,uMotionQuality.x);
+ // Seeded periodic harmonics, with a blend from shared currents to individual drift.
+ vec3 q=mix(rest*uWander.y,r.xyz*TAU,uWander.w)+seedPhase;
+ float wt=global*uWander.z;
+ p+=uWander.x*.32*(curl(q,wt)+mix(.38,.08,uMotionQuality.x)*curl(q*1.93+7.1,wt*2.));
+ // The torus itself elongates into soft arms; no separate particles or emitter.
+ float ta=atan(p.z,p.x),ridge=pow(max(0.,.5+.5*cos(ta*uTentacle.y+seedPhase)),uTentacle.w);
+ float extension=uTentacle.x*uTentacle.z*ridge;
+ float tentaclePhase=global*uTentacleMotion.z-ridge*3.+seedPhase;
+ vec3 radial=normalize(vec3(p.x,0.,p.z)+vec3(.00001,0.,0.));
+ p+=radial*extension;
+ p.y+=extension*(uTentacleMotion.y*sin(tentaclePhase)+.35*sin(ta*uTentacle.y+seedPhase));
+ p.xz=rot(extension*uTentacleMotion.x+uTentacle.x*uTentacleMotion.y*ridge*.35*cos(tentaclePhase))*p.xz;
+ // Periodic space deformation, independent of the fine organic noise domain warp.
+ float st=global*uSpaceWarp.z;
+ p+=uSpaceWarp.x*.38*curl(p*uSpaceWarp.y+seedPhase,st);
+ p.xz=rot(uSpaceWarp.x*uSpaceWarp.w*sin(p.y*uSpaceWarp.y+st))*p.xz;
  p.xz=rot(uDynamics.x*p.y+uDynamics.x*sin(global)*.3)*p.xz;
  p*=1.-uDynamics.y*(.5+.5*sin(t+r.y*TAU))*.78;
  p*=1.+uBreath*.35*sin(global+uSeed);

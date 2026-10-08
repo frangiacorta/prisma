@@ -1,5 +1,5 @@
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
-export const PARTICLE_VERSION=3;
+export const PARTICLE_VERSION=4;
 export const FAMILIES=['Nucleo Pathfinder'];
 export const SPRITES=['Granello','Disco','Anello','Scintilla'];
 export const COLOR_MODES=['Solidale alla forma iniziale','Identità della particella','Fasci e filamenti','Campo nello spazio'];
@@ -10,6 +10,11 @@ export const PARTICLE_META={
  pOpening:['Apertura nucleo',0,1,.01],pThickness:['Spessore della forma',.02,1,.01],pFill:['Riempimento del volume',0,1,.01],pClumps:['Addensamenti',0,1,.01],pLobes:['Lobi / ramificazioni',1,12,1],pLobeDepth:['Profondità lobi',0,1,.01],
  pOrganic:['Organicità',0,2,.01],pFrequency:['Scala del campo organico',.3,8,.01],pDetail:['Ottave del dettaglio',1,5,1],pRough:['Peso del dettaglio fine',0,1,.01],pWarp:['Distorsione del campo',0,1,.01],
  pCohesion:['Coesione del movimento',0,1,.01],pRandom:['Irregolarità del moto',0,1,.01],pJitter:['Microfluttuazioni',0,1,.01],pVortex:['Vorticità',-2,2,.01],pReentry:['Rientro verso il nucleo',0,1,.01],pBreath:['Respiro',0,1,.01],pTravel:['Ampiezza delle orbite',0,1,.01],
+ pMotionSoftness:['Morbidezza del movimento',0,1,.01],pFollow:['Ritardo tra le fibre',0,1,.01],
+ pOrbitOval:['Ellitticità delle orbite',0,1,.01],pOrbitTilt:['Inclinazione orbite · °',-90,90,1],pOrbitPrecession:['Precessione delle orbite',0,1,.01],pOrbitSpread:['Sfasamento delle orbite',0,1,.01],pOrbitDrift:['Deriva orbitale',0,1,.01],
+ pWander:['Esplorazione casuale',0,1,.01],pWanderScale:['Dimensione delle correnti',.2,5,.01],pWanderCycles:['Evoluzioni casuali nel loop',1,8,1],pFlowBalance:['Movimento corale / individuale',0,1,.01],pMotionSeed:['Seed del movimento',0,9999,1],
+ pTentacle:['Tentacolarità',0,1,.01],pTentacleCount:['Numero di tentacoli',1,16,1],pTentacleLength:['Allungamento tentacoli',0,3,.01],pTentacleTaper:['Concentrazione dei tentacoli',.2,6,.01],pTentacleCurl:['Arricciamento tentacoli',-2,2,.01],pTentacleWave:['Ondulazione tentacoli',0,1,.01],pTentacleCycles:['Onde dei tentacoli nel loop',1,8,1],
+ pSpaceWarp:['Warp dello spazio',0,1,.01],pWarpScale:['Scala del warp',.2,5,.01],pWarpCycles:['Cicli del warp',1,8,1],pWarpTwist:['Torsione del warp',-2,2,.01],
  pAttract:['Attrazione',0,2,.01],pRepel:['Repulsione',0,2,.01],pMagnet:['Avvolgimento magnetico',-2,2,.01],pPoles:['Numero di poli',1,6,1],pRadius:['Raggio dei poli',.1,2.5,.01],pField:['Influenza dei poli',.1,3,.01],
  pOuter:['Fasci esterni',0,1,.01],pReach:['Estensione fasci',0,4,.01],pBranches:['Numero di fasci',1,12,1],
  pCycles:['Cicli nel loop',1,12,1],pDirection:['Direzione del moto',-1,1,2],pRhythm:['Accelerazioni e rallentamenti',0,1,.01],pPause:['Pausa nel ciclo',0,.45,.01],pSpeedSpread:['Diversità delle cadenze',0,1,.01],
@@ -21,16 +26,20 @@ export const PARTICLE_DEFAULTS={
  pFamily:0,pMorph:0,pTarget:0,pCount:85000,pSize:1.1,pSizeVar:.6,pSprite:0,pOpacity:.5,pSoftness:.6,
  pOpening:.55,pThickness:.45,pFill:.25,pClumps:.2,pLobes:3,pLobeDepth:.18,
  pOrganic:.6,pFrequency:2.1,pDetail:3,pRough:.42,pWarp:.25,pCohesion:.72,pRandom:.3,pJitter:.06,pVortex:.5,pReentry:.2,pBreath:.1,pTravel:1,
+ pMotionSoftness:0,pFollow:0,pOrbitOval:0,pOrbitTilt:0,pOrbitPrecession:0,pOrbitSpread:0,pOrbitDrift:0,
+ pWander:0,pWanderScale:1.2,pWanderCycles:2,pFlowBalance:.65,pMotionSeed:417,
+ pTentacle:0,pTentacleCount:5,pTentacleLength:1.2,pTentacleTaper:2,pTentacleCurl:.5,pTentacleWave:.3,pTentacleCycles:2,
+ pSpaceWarp:0,pWarpScale:1,pWarpCycles:1,pWarpTwist:.2,
  pAttract:.2,pRepel:.08,pMagnet:.18,pPoles:3,pRadius:1.2,pField:.9,
  pOuter:0,pReach:1.4,pBranches:5,pCycles:1,pDirection:1,pRhythm:.6,pPause:0,pSpeedSpread:.3,
  pTrailCount:700,pTrailLength:.085,pTrailWidth:.55,pTrailOpacity:.3,pTrailFade:1.7,pTrailTaper:.8,pTrailScatter:0,
  pColorMode:0,pColorScatter:.06,pLumaVar:.25,pDepthFade:.25,pLighting:.65,
 };
 export const PARTICLE_GROUPS={
- shape:['pCount','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pOrganic','pFrequency','pDetail','pRough','pWarp','pOuter','pReach','pBranches','pNeural','pNodes','pConnect','pSymmetry'],
+ shape:['pCount','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pOrganic','pFrequency','pDetail','pRough','pWarp','pOuter','pReach','pBranches','pNeural','pNodes','pConnect','pSymmetry','pTentacle','pTentacleCount','pTentacleLength','pTentacleTaper','pTentacleCurl'],
  material:['pSize','pSizeVar','pSprite','pOpacity','pSoftness','pTrailCount','pTrailLength','pTrailWidth','pTrailOpacity','pTrailFade','pTrailTaper','pTrailScatter'],
  color:['pColorMode','pColorScatter','pLumaVar'],light:['pLighting','pDepthFade'],
- motion:['pCohesion','pRandom','pJitter','pVortex','pReentry','pBreath','pTravel','pAttract','pRepel','pMagnet','pPoles','pRadius','pField','pCycles','pDirection','pRhythm','pPause','pSpeedSpread','pLife','pPulse','pSignal','pPropagation'],
+ motion:['pCohesion','pRandom','pJitter','pVortex','pReentry','pBreath','pTravel','pAttract','pRepel','pMagnet','pPoles','pRadius','pField','pCycles','pDirection','pRhythm','pPause','pSpeedSpread','pLife','pPulse','pSignal','pPropagation','pMotionSoftness','pFollow','pOrbitOval','pOrbitTilt','pOrbitPrecession','pOrbitSpread','pOrbitDrift','pWander','pWanderScale','pWanderCycles','pFlowBalance','pMotionSeed','pTentacleWave','pTentacleCycles','pSpaceWarp','pWarpScale','pWarpCycles','pWarpTwist'],
 };
 export const PARTICLE_STUDIES=[
  {name:'Nucleo vivo',label:'Pathfinder · equilibrio',values:{}},
@@ -64,7 +73,7 @@ export function migratePathfinder(doc,base){
  return s;
 }
 export function varyParticles(source,seed,amount=.45,scope='all',surprise=false){
- const r=rng(seed),s=surprise?particleCreation(source,Math.floor(r()*PARTICLE_STUDIES.length),seed):structuredClone(source);s.seed=seed>>>0;
+ const r=rng(seed),s=surprise?particleCreation(source,Math.floor(r()*PARTICLE_STUDIES.length),seed):structuredClone(source);if(scope==='all'||scope==='shape')s.seed=seed>>>0;
  for(const [group,keys] of Object.entries(PARTICLE_GROUPS))if(scope==='all'||scope===group)for(const key of keys){
   const [,lo,hi,step]=PARTICLE_META[key];
   if(['pColorMode','pSprite','pDirection'].includes(key)){if(surprise||r()<amount*.3)s[key]=key==='pDirection'?(r()<.5?-1:1):Math.floor(lo+r()*(hi-lo+1));continue;}
@@ -74,5 +83,10 @@ export function varyParticles(source,seed,amount=.45,scope='all',surprise=false)
  }
  // A random study should still contain visible matter and retain its time scale.
  if(surprise){s.pSize=.25+r()*1.3;s.pOpacity=.3+r()*.4;s.pTrailOpacity=.12+r()*.35;s.pCount=Math.round(40000+r()*120000);s.pOuter=r()<.2?r()*.5:0;s.duration=source.duration;s.speed=source.speed;}
+ return s;
+}
+// A fresh choreography keeps the sampled matter, palette, lights and loop duration intact.
+export function varyParticleMotion(source,seed,amount=.45){
+ const s=varyParticles(source,seed,amount,'motion');s.seed=source.seed;s.pMotionSeed=seed%10000;
  return s;
 }
