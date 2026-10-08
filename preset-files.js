@@ -1,4 +1,6 @@
-import {normalizeCreation} from './creative-model.js';
+import {migratePathfinder} from './particle-model.js?v=a1656d1c85dc';
+import {newCreation} from './creative-model.js?v=a1656d1c85dc';
+import {normalizeCreation} from './creative-model.js?v=a1656d1c85dc';
 
 let downloadSerial=0;
 export function cleanPresetName(value,fallback='La tua creazione'){
@@ -26,7 +28,7 @@ export function presetDocument(snapshot,now=new Date()){
 export function readPreset(text,fallbackName='Preset importato'){
  const document=JSON.parse(text);
  if(!document||typeof document!=='object'||Array.isArray(document))throw Error('Il file non contiene un preset Prisma.');
- const raw=document.state||document;
+ const raw=document.format==='prisma/pathfinder'?migratePathfinder(document,newCreation()):document.state||document;
  if(!raw||typeof raw!=='object'||Array.isArray(raw)||!['volume','deform','scale','transparency'].some(k=>Number.isFinite(raw[k])))throw Error('Il file non contiene i parametri di una creazione Prisma.');
  const state=normalizeCreation(raw),ratio=Number.isFinite(document.ratio)&&document.ratio>=.1&&document.ratio<=10?document.ratio:1;
  const phase=Number.isFinite(document.phase)?document.phase>=0&&document.phase<Math.PI*2?document.phase:((document.phase%(Math.PI*2))+(Math.PI*2))%(Math.PI*2):0;

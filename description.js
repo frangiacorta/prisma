@@ -1,6 +1,6 @@
-import {META,MOODS,GROUPS} from './model.js';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js';
-import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js';
+import {META,MOODS,GROUPS} from './model.js?v=a1656d1c85dc';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=a1656d1c85dc';
+import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=a1656d1c85dc';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
@@ -121,7 +121,22 @@ export function interpretDescription(text,current){
   // All independent numeric assignments in one sentence are applied, not just the first.
   const motionNumbers=[];
   const scopedAliases=texture?[['irregolarita','textureOrganic'],['regolarita','textureOrganic',true],['scala','textureScale'],['densita','textureScale'],['rilievo','textureDepth'],['direzione','textureAngle']]:[];
-  if(!lightTarget&&!backgroundTarget){for(const [label,key,inverse] of [...scopedAliases,...aliases]){if(!META[key]||label==='increspature'&&(key==='textureRipples'&&!texture||key==='waves'&&texture))continue;claim(new RegExp('(?:^|\\b)'+escapeRe(label)+'\\s*(?:[:=]|(?:a|al|di|del|circa)\\s+)?\\s*(-?\\d+(?:[.,]\\d+)?)\\s*(%|percento|per cento)?(?:\\s*(?:secondi|secondo|sec|gradi|nm|x)\\b)?(?=\\s|$|[.!?])'),m=>{let value=Number(m[1].replace(',','.'));if(m[2])value=META[key][1]+(META[key][2]-META[key][1])*value/100;if(inverse)value=META[key][1]+META[key][2]-value;const op=setting(key,value);if(key==='speed'||key==='motion')motionNumbers.push(op);else push(op);});}}
+  if(!lightTarget&&!backgroundTarget){for(const [label,key,inverse] of [...scopedAliases,...aliases]){if(!META[key]||label==='increspature'&&(key==='textureRipples'&&!texture||key==='waves'&&texture))continue;claim(new RegExp('(?:^|\\b)'+escapeRe(label)+'\\s*(?:[:=]|(?:a|al|di|del|circa)\\s+)?\\s*(-?\\d+(?:[.,]\\d+)?)\\s*(%|percento|per cento)?(?:\\s*(?:secondi|secondo|sec|gradi|nm|px|x)\\b)?(?=\\s|$|[.!?])'),m=>{let value=Number(m[1].replace(',','.'));if(m[2])value=META[key][1]+(META[key][2]-META[key][1])*value/100;if(inverse)value=META[key][1]+META[key][2]-value;const op=setting(key,value);if(key==='speed'||key==='motion')motionNumbers.push(op);else push(op);});}}
+
+  if(current.engine==='particles'){
+   // Particle clauses are consumed before the solid-shape vocabulary.
+   for(const [label,key] of [['diametro particelle','pSize'],['dimensione particelle','pSize'],['densita','pCount'],['scie','pTrailCount'],['rientro','pReentry'],['magnetismo','pMagnet'],['repulsione','pRepel'],['attrazione','pAttract'],['vitalita','pLife'],['connettivita','pConnect'],['neuronale','pNeural']]){
+    claim(new RegExp('\\b'+label+'\\s*(?:[:=]|a|al)?\\s*(-?\\d+(?:[.,]\\d+)?)\\s*(%|percento)?(?:\\s*px)?(?=\\s|$|[.!?])'),m=>{const n=Number(m[1].replace(',','.'));push(setting(key,m[2]?META[key][1]+n/100*(META[key][2]-META[key][1]):n));});
+   }
+   claim(/\bparticelle\s+(finissime|microscopiche|piccolissime|piccole|grandi)\b/,m=>push(setting('pSize',m[1]==='grandi'?4:m[1]==='piccole'?.7:.25)));
+   claim(/\b(?:piu|meno)\s+(vivo|viva|vivente|neuronale|neurale|organico|organica|denso|densa|compatto|compatta|frattale)\b/,m=>{const less=m[0].startsWith('meno'),word=m[1];let key=/neuron|neural/.test(word)?'pNeural':/viv/.test(word)?'pLife':/organic/.test(word)?'pOrganic':/dens/.test(word)?'pCount':/compatt/.test(word)?'pCohesion':'pDetail';const delta=key==='pCount'?30000:key==='pDetail'?1:.25;push(setting(key,working[key]+(less?-1:1)*delta));});
+   for(const [word,key,delta]of [['repulsione','pRepel',.4],['attrazione','pAttract',.4],['magnetismo','pMagnet',.5],['rientro','pReentry',.25],['segnali','pSignal',.25],['connettivita','pConnect',.25],['organicita','pOrganic',.3],['coesione','pCohesion',.25],['casualita','pRandom',.25],['scie','pTrailCount',500]])claim(new RegExp('\\b(piu|meno)\\s+'+word+'\\b'),m=>push(setting(key,working[key]+(m[1]==='meno'?-1:1)*delta)));
+   claim(/\b(?:senza|togli|elimina)\s+(?:le\s+|i\s+)?(scie|fasci esterni|particelle)\b/,m=>push(setting(m[1]==='scie'?'pTrailCount':m[1]==='particelle'?'pCount':'pOuter',0)));
+   claim(/\bscie\s+(sottili|finissime|spesse|lunghe|corte)\b/,m=>push(setting(/lunghe|corte/.test(m[1])?'pTrailLength':'pTrailWidth',m[1]==='lunghe'?.22:m[1]==='corte'?.03:m[1]==='spesse'?3:.2)));
+   claim(/\b(?:rete neuronale|rete neurale|sinapsi|neuronale|neurale)\b/,()=>push(setting('pNeural',Math.min(1,working.pNeural+.3)),setting('pSignal',Math.max(.4,working.pSignal))));
+   claim(/\b(?:colore|colori|gradiente)\s+(?:solidale|solidali|sulle particelle|alle particelle)\b/,()=>push(setting('pColorMode',0)));
+  }
+
   // Interpret how a motion should feel before interpreting isolated words such
   // as 'rotazione' or 'morbido' as a new rotation or a surface edit.
   const explicitMotion=/\b(?:movimento|movimenti|moto|animazione|animazioni|rotazione|rotazioni|ruot\w*|anima\w*)\b/.test(clause);

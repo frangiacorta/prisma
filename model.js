@@ -1,6 +1,8 @@
-import {REFERENCE_PALETTES} from './reference-palettes.js';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=a1656d1c85dc';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=a1656d1c85dc';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=a1656d1c85dc';
 export const BASE = {
+ ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
   hole:0, holeX:0, holeY:0, holeShape:0, cut:0, cutX:.7, cutY:.1, edge:.015,
   transparency:.58, refraction:1.38, thickness:.7, metal:.38, roughness:.12, gloss:.9, iridescence:.7, emission:.02,
@@ -56,6 +58,7 @@ export const MOODS = [
 MOODS.push(...MORE_MOODS,...REFERENCE_PALETTES);
 // label, minimum, maximum, step. All controls drive the same continuous field.
 export const META = {
+ ...PARTICLE_META,
  ...EXTRA_META,
  volume:['Volume',.08,1.5,.01],stretchX:['Larghezza',.45,1.7,.01],stretchY:['Altezza',.45,1.7,.01],stretchZ:['Profondità',.45,1.7,.01],deform:['Deformazione',0,.75,.01],asymmetry:['Asimmetria',-.6,.6,.01],twist:['Torsione',-2.5,2.5,.01],waves:['Increspature',0,.4,.01],waveScale:['Frequenza onde',1,9,.1],hole:['Apertura del vuoto',0,.95,.01],holeX:['Vuoto · orizzontale',-.8,.8,.01],holeY:['Vuoto · verticale',-.8,.8,.01],holeShape:['Vuoto · rotondo / quadrato',0,1,.01],cut:['Dimensione del ritaglio',0,1.6,.01],cutX:['Ritaglio · orizzontale',-1.4,1.4,.01],cutY:['Ritaglio · verticale',-1.4,1.4,.01],edge:['Contorno sfumato',0,.45,.005],
  transparency:['Trasparenza',0,1,.01],refraction:['Rifrazione',1,2.4,.01],thickness:['Spessore ottico',0,2,.01],metal:['Metallicità',0,1,.01],roughness:['Rugosità',0,1,.01],gloss:['Lucentezza',0,1,.01],iridescence:['Iridescenza',0,1,.01],emission:['Luce propria',0,1,.01],gradientAngle:['Direzione gradiente',-180,180,1],gradientScale:['Distribuzione colori',.2,3,.01],gradientOffset:['Posizione colori',0,1,.01],colorSoftness:['Transizioni sfumate',0,1,.01],glow:['Diffusione alone',0,1,.01],grain:['Grana',0,.2,.005],
@@ -74,6 +77,7 @@ GROUPS.shape.push('petalAmount','petalCount','petalOpen','petalCurl','petalLengt
 GROUPS.shape.push('rotateX','rotateY','rotateZ');
 GROUPS.color.push('colorWaveAmount','colorWaveHeight','colorWaveRadius','colorWaveSwirl','colorWaveBands','colorWaveWarp','colorWavePhase');
 GROUPS.background.push('grounding','groundShadow','groundCaustic');
+for(const [g,keys]of Object.entries(PARTICLE_GROUPS)){GROUPS[g]??=[];GROUPS[g].push(...keys);}
 export function preset(i){const s={...structuredClone(BASE),...structuredClone(EXTRA_BASE),...structuredClone(PRESETS[i].values)};s.lights=PRESETS[i].values.lights?structuredClone(PRESETS[i].values.lights):legacyLights(s);if(i===1){s.animateShape=false;s.motions.volume.enabled=false;s.motions.deform.enabled=false;}return s}
 export function random(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let a=Math.imul(t^t>>>15,1|t);a^=a+Math.imul(a^a>>>7,61|a);return((a^a>>>14)>>>0)/4294967296}}
 function mixColor(a,b,t){return '#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-t)+parseInt(b.slice(i,i+2),16)*t).toString(16).padStart(2,'0')).join('')}
