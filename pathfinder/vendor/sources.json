@@ -1,0 +1,16 @@
+{
+  "mediabunny": {
+    "version": "1.61.3",
+    "license": "MPL-2.0",
+    "registry": "https://registry.npmjs.org/mediabunny/-/mediabunny-1.61.3.tgz",
+    "repository": "https://github.com/Vanilagy/mediabunny",
+    "bundle": "mediabunny-1.61.3.mjs",
+    "sha256": "d7b3a90e82158a7022729cbd4f861daf73cbb4f69d23349d2aefc9c8281cf70c",
+    "source": "mediabunny-1.61.3-source.tgz",
+    "modifications": "None. Upstream minified browser bundle and full npm source archive are distributed unchanged."
+  },
+  "renderer": {
+    "authoring": "Original Prisma code; not copied from the reference artwork, a TouchDesigner patch, or Three.js examples.",
+    "inspiration": "Pathfinder particles by incrprl.dsgn, supplied video s03-04."
+  }
+}
