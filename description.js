@@ -1,7 +1,8 @@
-import {META,MOODS,GROUPS} from './model.js?v=e3a7e09f7af0';
-import {PATH_META} from './particle-paths.js?v=e3a7e09f7af0';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=e3a7e09f7af0';
-import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=e3a7e09f7af0';
+import {META,MOODS,GROUPS} from './model.js?v=162c0081651c';
+import {particleSphere} from './particle-model.js?v=162c0081651c';
+import {PATH_META} from './particle-paths.js?v=162c0081651c';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=162c0081651c';
+import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=162c0081651c';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
@@ -10,7 +11,7 @@ for(const [forms,base] of [['neri nere','nero'],['bianchi bianche','bianco'],['r
 function colorsIn(text){const result=[];const re=new RegExp('#(?:[0-9a-f]{6}|[0-9a-f]{3})\\b|\\b(?:'+Object.keys(namedColors).join('|')+')\\b','gi');for(const m of text.matchAll(re)){let c=m[0][0]==='#'?m[0].toLowerCase():namedColors[m[0].toLowerCase()];if(c.length===4)c='#'+c.slice(1).split('').map(q=>q+q).join('');result.push(c);}return result;}
 function scalar(key,value){const m=Object.hasOwn(META,key)?META[key]:null;if(!m||!Number.isFinite(value)||value<m[1]||value>m[2])throw Error('Valore non valido per '+(m?.[0]||key));return m[3]>=1?Math.round(value):value;}
 const shapeNames=[...new Set(['sfera','goccia','blob','macchia','disco','anello','semiluna',...SCULPT_EXAMPLES.map(q=>normalize(q.name))])];
-function shape(s,name){if(!shapeNames.includes(name))throw Error('Forma non disponibile');for(const k of ['deform','asymmetry','twist','waves','hole','cut','edge','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','petalBlend','petalRoot','petalRandom','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemAmount'])s[k]=0;s.petalGrowth=1;for(const k of ['volume','stretchX','stretchY','stretchZ','holeAspect','cutAspect'])s[k]=1;for(const k of SHAPE_TRACKS)if(s.motions[k])s.motions[k].enabled=false;
+function shape(s,name){if(s.engine==='particles'&&name==='sfera')return particleSphere(s);if(!shapeNames.includes(name))throw Error('Forma non disponibile');for(const k of ['deform','asymmetry','twist','waves','hole','cut','edge','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','petalBlend','petalRoot','petalRandom','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemAmount'])s[k]=0;s.petalGrowth=1;for(const k of ['volume','stretchX','stretchY','stretchZ','holeAspect','cutAspect'])s[k]=1;for(const k of SHAPE_TRACKS)if(s.motions[k])s.motions[k].enabled=false;
  if(name==='goccia')Object.assign(s,{taper:.38,stretchY:1.18,stretchX:.9});if(name==='blob')Object.assign(s,{deform:.3,asymmetry:.13,twist:.3});if(name==='macchia')Object.assign(s,{volume:.08,stretchX:1.2,deform:.34,edge:.22});if(name==='disco')s.volume=.1;if(name==='anello')Object.assign(s,{hole:.55,volume:.45});if(name==='semiluna')Object.assign(s,{cut:.9,cutX:.4,cutY:.1,volume:.5});const i=SCULPT_EXAMPLES.findIndex(q=>normalize(q.name)===name);if(i>=0)sculpt(s,i);return s;}
 
 // Atomic, allowlisted operations shared by text commands and browser agents.

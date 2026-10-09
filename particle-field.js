@@ -1,5 +1,5 @@
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=e3a7e09f7af0';
+import {guideGLSL} from './particle-path-field.js?v=162c0081651c';
 export const fieldGLSL=`
 ${guideGLSL}
 const float TAU=6.28318530718;
@@ -22,13 +22,19 @@ float clockAt(float q){
 vec3 curl(vec3 p,float t){return vec3(cos(p.y+t)-sin(p.z-t),cos(p.z+t)-sin(p.x-t),cos(p.x+t)-sin(p.y-t));}
 vec3 shape(vec4 r,float t,float family){
  float cell=floor(r.x*uNetwork.y),local=fract(r.x*uNetwork.y);
- // Neuronal quality groups trajectories into communicating fibres on this same torus.
+ // A continuous sphere-to-ring nucleus. Zero opening has no hidden major radius.
  float a=(cell+local*mix(1.,.12,uNetwork.x))/uNetwork.y*TAU+t;
  float b=r.y*TAU+t+uNetwork.x*uNetwork.z*sin(a*3.+t)*2.;
  float th=uShape.w*mix(1.,sqrt(r.z),uStructure.x);
  float lobe=uStructure.z*(.5+.5*sin(a*uStructure.y+t))*.4;
  float radius=.36+uShape.z*.8+th*cos(b)+lobe;
- vec3 p=vec3(radius*cos(a),th*sin(b),radius*sin(a));
+ vec3 ring=vec3(radius*cos(a),th*sin(b),radius*sin(a));
+ // Equal-area sphere sampling; cube-root radius gives uniform volume at Fill = 1.
+ float latitude=1.-2.*r.y,parallel=sqrt(max(0.,1.-latitude*latitude));
+ float shell=mix(1.,pow(r.z,1./3.),uStructure.x);
+ vec3 sphere=vec3(parallel*cos(a),latitude,parallel*sin(a))*(uShape.w*2.+lobe)*shell;
+ sphere.yz=rot(t+uNetwork.x*uNetwork.z*sin(a*3.+t))*sphere.yz;
+ vec3 p=mix(sphere,ring,smoothstep(0.,.45,uShape.z));
  // Density concentrates around lobes without changing the kernel into a different effect.
  float cluster=.6+.4*cos(a*uStructure.y+t)*cos(b*2.-t);
  p*=mix(1.,cluster,uStructure.w*.6);
@@ -62,7 +68,7 @@ vec3 position(vec4 r,float phase){
  vec3 q=mix(rest*uWander.y,r.xyz*TAU,uWander.w)+seedPhase;
  float wt=global*uWander.z;
  p+=uWander.x*.32*(curl(q,wt)+mix(.38,.08,uMotionQuality.x)*curl(q*1.93+7.1,wt*2.));
- // The torus itself elongates into soft arms; no separate particles or emitter.
+ // The same nucleus elongates into soft arms; no separate particles or emitter.
  float ta=atan(p.z,p.x),ridge=pow(max(0.,.5+.5*cos(ta*uTentacle.y+seedPhase)),uTentacle.w);
  float extension=uTentacle.x*uTentacle.z*ridge;
  float tentaclePhase=global*uTentacleMotion.z-ridge*3.+seedPhase;

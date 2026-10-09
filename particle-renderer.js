@@ -1,8 +1,8 @@
-import {sampleFrame} from './solid-renderer.js?v=e3a7e09f7af0';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=e3a7e09f7af0';
-import {GuideField} from './particle-path-field.js?v=e3a7e09f7af0';
-import {fieldGLSL} from './particle-field.js?v=e3a7e09f7af0';
-import {prismaShadingGLSL} from './particle-shading.js?v=e3a7e09f7af0';
+import {sampleFrame} from './solid-renderer.js?v=162c0081651c';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=162c0081651c';
+import {GuideField} from './particle-path-field.js?v=162c0081651c';
+import {fieldGLSL} from './particle-field.js?v=162c0081651c';
+import {prismaShadingGLSL} from './particle-shading.js?v=162c0081651c';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -24,14 +24,15 @@ const pointFrag=`#version 300 es
 precision highp float;
 in vec3 vColor,vPosition;in float vOpacity;out vec4 color;
 ${prismaShadingGLSL}
-uniform vec4 uPoints;uniform float uSprite;
+uniform vec4 uPoints;uniform float uSprite;uniform vec3 uShadeOrigin;
 void main(){vec2 xy=gl_PointCoord*2.-1.;float d=length(xy),aa=max(fwidth(d),.04);
  float coverage=1.-smoothstep(1.-aa,1.,d);
  if(uSprite>1.5&&uSprite<2.5)coverage*=smoothstep(.35,.55,d);
  if(uSprite>2.5)coverage*=exp(-min(abs(xy.x),abs(xy.y))*12.);
  float profile=uSprite<.5?exp(-d*d*mix(.2,3.,uPoints.w)):mix(1.,exp(-d*d*3.),uPoints.w);
  float a=coverage*profile*vOpacity;
- vec3 n=normalize(vec3(xy.x,-xy.y,sqrt(max(.01,1.-d*d))));
+ vec3 micro=vec3(xy.x,-xy.y,sqrt(max(.01,1.-d*d)));
+ vec3 n=normalize(normalize(vPosition-uShadeOrigin+vec3(0.,0.,.0001))+micro*.28);
  color=vec4(shadeParticle(vColor,vPosition,n)*a,a);
 }`;
 const trailVert=`#version 300 es
@@ -39,7 +40,7 @@ precision highp float;
 precision highp sampler2D;
 ${common}
 ${trailSampling}
-uniform sampler2D uPaths;uniform bool uBaked;
+uniform sampler2D uPaths;uniform bool uBaked;uniform vec3 uShadeOrigin;
 out vec3 vColor;out float vOpacity,vSide;
 vec3 pathAt(int j,vec4 r){return uBaked?texelFetch(uPaths,ivec2(j+1,gl_InstanceID),0).xyz:position(r,uPhase-float(j)/float(uSegments)*uTrails.x);}
 void main(){
@@ -51,7 +52,7 @@ void main(){
  float width=uTrails.y*mix(1.,pow(max(.001,1.-age),.7),uTail.y)*uResolution.y/1080.;
  clip.xy+=normal*side*max(1.,width)/uResolution;
  gl_Position=clip;vSide=side;
- vColor=shadeParticle(particleColor(original,p),p,normalize(p+vec3(0.,0.,1.5)));
+ vColor=shadeParticle(particleColor(original,p),p,normalize(p-uShadeOrigin+vec3(0.,0.,.0001)));
  vOpacity=uTrails.z*mix(pow(max(0.,1.-age),uTail.x),1.,uFiber.x)*min(1.,width)*uFiber.w;
 }`;
 const trailFrag=`#version 300 es
@@ -74,7 +75,11 @@ precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage,uBloom;
 uniform vec4 uGrade,uPhoto,uTone,uLens,uBg;uniform vec3 uBackground,uBackground2;
 vec3 grade(vec3 c){c=(c*exp2(uGrade.x)+uGrade.y-.5)*uGrade.z+.5;float grey=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(grey),c,uGrade.w);c*=vec3(1.+uPhoto.x*.25,1.+uPhoto.y*.2,1.-uPhoto.x*.25);c+=uTone.x*pow(1.-clamp(c,0.,1.),vec3(2.))+uTone.y*pow(clamp(c,0.,1.),vec3(2.));return pow(max(c,0.),vec3(1./max(.1,uPhoto.z)));}
 void main(){vec2 p=uv-.5,q=.5+p*(1.+uLens.x*dot(p,p));vec4 src=texture(uImage,q),bloom=texture(uBloom,q);
- vec3 c=1.-exp(-(src.rgb+bloom.rgb*uGlow*2.2)*1.7);
+ // Compress accumulated light with a shared scale: channel-by-channel clipping
+ // used to wash different palettes into the same pink/white highlights.
+ vec3 radiance=max(vec3(0.),src.rgb+bloom.rgb*uGlow*2.2)*1.7;
+ vec3 linear=radiance/(1.+max(radiance.r,max(radiance.g,radiance.b)));
+ vec3 c=mix(linear*12.92,1.055*pow(linear,vec3(1./2.4))-.055,step(vec3(.0031308),linear));
  float bgT=dot(uv-.5,vec2(cos(uBg.x),sin(uBg.x)))+.5;
  if(uBgMode>1.5)bgT=smoothstep(-uBg.z,uBg.z,(uv.y-.5)*2.+uBg.y);
  vec3 bg=uBgMode<.5?uBackground:mix(uBackground,uBackground2,clamp(bgT,0.,1.));
@@ -88,6 +93,7 @@ void main(){vec2 p=uv-.5,q=.5+p*(1.+uLens.x*dot(p,p));vec4 src=texture(uImage,q)
  color=vec4(clamp(c,0.,1.),uBgMode>2.5?alpha:1.);
 }`;
 const rad=Math.PI/180,rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
+const linearRgb=hex=>rgb(hex).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));
 const environments=['studio','sunset','neon','sky','aquarium','aurora','city'];
 // A long persistent tail deposits much more light than a short fading trail.
 // Normalize coverage, including length and persistence, without changing thin raster widths.
@@ -140,12 +146,13 @@ export class ParticleRenderer{
   this.u(p,'uSpaceWarp',s.pSpaceWarp,s.pWarpScale,s.pWarpCycles,s.pWarpTwist);
   this.u(p,'uForm',s.stretchX,s.stretchY,s.stretchZ,s.volume);this.u(p,'uWarp',s.deform,s.twist,s.waves,s.waveScale);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uRotation',s.rotateX*rad,s.rotateY*rad,s.rotateZ*rad,0);
   this.u(p,'uMaterial',s.metal,s.roughness,s.gloss,s.iridescence);this.u(p,'uFinish',s.emission,s.pLighting,1-s.transparency,1);
+  this.u(p,'uPearl',s.iridShift??0,s.filmThickness??420);this.u(p,'uShadeOrigin',s.positionX,s.positionY,0);
   this.u(p,'uEnvironment',environments.indexOf(s.environment),s.environmentAngle*rad,s.environmentPower,0);
   this.u(p,'uGradient',s.gradientAngle*rad,s.gradientScale,s.gradientOffset,1);this.u(p,'uColorSoftness',s.colorSoftness);
   this.u(p,'uColorWave',s.colorWaveAmount,s.colorWaveBands,s.colorWavePhase*Math.PI*2,0);this.u(p,'uColorWave2',s.colorWaveHeight,s.colorWaveRadius,s.colorWaveSwirl,s.colorWaveWarp);
-  gl.uniform1i(this.loc(p,'uPaletteCount'),s.palette.length);gl.uniform3fv(this.loc(p,'uPalette'),s.palette.flatMap(rgb));
+  gl.uniform1i(this.loc(p,'uPaletteCount'),s.palette.length);gl.uniform3fv(this.loc(p,'uPalette'),s.palette.flatMap(linearRgb));
   const lights=s.lights.filter(l=>l.enabled).slice(0,8);gl.uniform1i(this.loc(p,'uLightCount'),lights.length);
-  if(lights.length){gl.uniform4fv(this.loc(p,'uLights'),lights.flatMap(l=>[l.x,l.y,l.z,l.power]));gl.uniform3fv(this.loc(p,'uLightColors'),lights.flatMap(l=>rgb(l.color)));gl.uniform1fv(this.loc(p,'uLightSizes'),lights.map(l=>l.size));}
+  if(lights.length){gl.uniform4fv(this.loc(p,'uLights'),lights.flatMap(l=>[l.x,l.y,l.z,l.power]));gl.uniform3fv(this.loc(p,'uLightColors'),lights.flatMap(l=>linearRgb(l.color)));gl.uniform1fv(this.loc(p,'uLightSizes'),lights.map(l=>l.size));}
  }
  prepare(){return true;}async prepareAsync(s,p,o={}){return !o.cancelled?.();}
  draw(source,phase=0,w=this.canvas.width,h=this.canvas.height,options={}){

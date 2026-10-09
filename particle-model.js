@@ -1,5 +1,5 @@
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
-export const PARTICLE_VERSION=6;
+export const PARTICLE_VERSION=7;
 export const FAMILIES=['Nucleo Pathfinder'];
 export const SPRITES=['Granello','Disco','Anello','Scintilla'];
 export const COLOR_MODES=['Solidale alla forma iniziale','Identità della particella','Fasci e filamenti','Campo nello spazio'];
@@ -7,7 +7,7 @@ export const COLOR_MODES=['Solidale alla forma iniziale','Identità della partic
 export const PARTICLE_META={
  pLife:['Vitalità',0,1,.01],pPulse:['Pulsazioni nel loop',1,12,1],pSignal:['Intensità dei segnali',0,1,.01],pPropagation:['Propagazione tra le zone',0,1,.01],pNeural:['Struttura neuronale',0,1,.01],pNodes:['Nodi della rete',4,64,1],pConnect:['Connettività',0,1,.01],pSymmetry:['Simmetria radiale',1,12,1],
  pCount:['Numero di particelle',0,300000,100],pSize:['Diametro particelle · px',.08,16,.01],pSizeVar:['Variazione dimensioni',0,1,.01],pSprite:['Sagoma del granello',0,3,1],pOpacity:['Opacità particelle',0,1,.01],pSoftness:['Morbidezza granello',0,1,.01],
- pOpening:['Apertura nucleo',0,1,.01],pThickness:['Spessore della forma',.02,1,.01],pFill:['Riempimento del volume',0,1,.01],pClumps:['Addensamenti',0,1,.01],pLobes:['Lobi / ramificazioni',1,12,1],pLobeDepth:['Profondità lobi',0,1,.01],
+ pOpening:['Vuoto centrale · sfera / anello',0,1,.01],pThickness:['Spessore / raggio del nucleo',.02,1,.01],pFill:['Riempimento del volume',0,1,.01],pClumps:['Addensamenti',0,1,.01],pLobes:['Lobi / ramificazioni',1,12,1],pLobeDepth:['Profondità lobi',0,1,.01],
  pOrganic:['Organicità',0,2,.01],pFrequency:['Scala del campo organico',.3,8,.01],pDetail:['Ottave del dettaglio',1,5,1],pRough:['Peso del dettaglio fine',0,1,.01],pWarp:['Distorsione del campo',0,1,.01],
  pCohesion:['Coesione del movimento',0,1,.01],pRandom:['Irregolarità del moto',0,1,.01],pJitter:['Microfluttuazioni',0,1,.01],pVortex:['Vorticità',-2,2,.01],pReentry:['Rientro verso il nucleo',0,1,.01],pBreath:['Respiro',0,1,.01],pTravel:['Ampiezza delle orbite',0,1,.01],
  pMotionSoftness:['Morbidezza del movimento',0,1,.01],pFollow:['Ritardo tra le fibre',0,1,.01],
@@ -25,7 +25,7 @@ export const PARTICLE_META={
 export const PARTICLE_DEFAULTS={
  pLife:.2,pPulse:2,pSignal:.1,pPropagation:.4,pNeural:0,pNodes:24,pConnect:.4,pSymmetry:1,
  pFamily:0,pMorph:0,pTarget:0,pCount:85000,pSize:1.1,pSizeVar:.6,pSprite:0,pOpacity:.5,pSoftness:.6,
- pOpening:.55,pThickness:.45,pFill:.25,pClumps:.2,pLobes:3,pLobeDepth:.18,
+ pOpening:.15,pThickness:.45,pFill:.45,pClumps:.2,pLobes:3,pLobeDepth:.18,
  pOrganic:.6,pFrequency:2.1,pDetail:3,pRough:.42,pWarp:.25,pCohesion:.72,pRandom:.3,pJitter:.06,pVortex:.5,pReentry:.2,pBreath:.1,pTravel:1,
  pMotionSoftness:0,pFollow:0,pOrbitOval:0,pOrbitTilt:0,pOrbitPrecession:0,pOrbitSpread:0,pOrbitDrift:0,
  pWander:0,pWanderScale:1.2,pWanderCycles:2,pFlowBalance:.65,pMotionSeed:417,
@@ -43,13 +43,21 @@ export const PARTICLE_GROUPS={
  color:['pColorMode','pColorScatter','pLumaVar'],light:['pLighting','pDepthFade'],
  motion:['pCohesion','pRandom','pJitter','pVortex','pReentry','pBreath','pTravel','pAttract','pRepel','pMagnet','pPoles','pRadius','pField','pCycles','pDirection','pRhythm','pPause','pSpeedSpread','pLife','pPulse','pSignal','pPropagation','pMotionSoftness','pFollow','pOrbitOval','pOrbitTilt','pOrbitPrecession','pOrbitSpread','pOrbitDrift','pWander','pWanderScale','pWanderCycles','pFlowBalance','pMotionSeed','pTentacleWave','pTentacleCycles','pSpaceWarp','pWarpScale','pWarpCycles','pWarpTwist'],
 };
+// Geometry-only reset: material, palette, seed and loop duration are preserved.
+export const SPHERE_FORM={pOpening:0,pThickness:.6,pFill:1,pClumps:0,pLobeDepth:0,pOrganic:0,pWarp:0,pNeural:0,pSymmetry:1,pTentacle:0,pOuter:0,pRandom:0,pJitter:0,pVortex:0,pReentry:0,pBreath:0,pLife:0,pAttract:0,pRepel:0,pMagnet:0,pOrbitOval:0,pOrbitTilt:0,pOrbitPrecession:0,pOrbitDrift:0,pWander:0,pSpaceWarp:0,deform:0,twist:0,waves:0,volume:1,stretchX:1,stretchY:1,stretchZ:1,pTravel:1};
+export function particleSphere(s){
+ Object.assign(s,SPHERE_FORM);
+ for(const k of ['volume','deform','twist','waves'])if(s.motions?.[k])s.motions[k].enabled=false;
+ for(const p of [...s.forcePoints||[],...s.forcePaths||[]])p.enabled=false;
+ return s;
+}
 export const PARTICLE_STUDIES=[
  {name:'Nucleo vivo',label:'Pathfinder · equilibrio',values:{}},
- {name:'Polvere fine',label:'Pathfinder · micrograni',values:{pCount:180000,pSize:.55,pOpacity:.7,pFill:.65,pOrganic:.4,pTrailCount:0,palette:['#31456d','#6398b0','#b4e4ce','#f5e9b8']}},
- {name:'Filamenti',label:'Pathfinder · scie sottili',values:{pCount:55000,pSize:.7,pNeural:.4,pTrailCount:1500,pTrailWidth:.3,pTrailLength:.2,pTrailOpacity:.3,pOrganic:.35,palette:['#413568','#948cbb','#e2bebb','#e1e8df']}},
- {name:'Raccolto',label:'Pathfinder · coesione',values:{pOpening:.2,pThickness:.35,pCohesion:.95,pRandom:.08,pReentry:.7,pOrganic:.4,pAttract:.6,pRepel:0,pSize:.9}},
+ {name:'Polvere fine',label:'Volume · micrograni',values:{pOpening:0,pCount:180000,pSize:.55,pOpacity:.7,pFill:1,pOrganic:.4,pTrailCount:0,palette:['#31456d','#6398b0','#b4e4ce','#f5e9b8']}},
+ {name:'Filamenti',label:'Anello · scie sottili',values:{pOpening:.65,pCount:55000,pSize:.7,pNeural:.4,pTrailCount:1500,pTrailWidth:.3,pTrailLength:.2,pTrailOpacity:.3,pOrganic:.35,palette:['#413568','#948cbb','#e2bebb','#e1e8df']}},
+ {name:'Sfera piena',label:'Volume · senza vuoto',values:{...SPHERE_FORM,pSize:.75,pCount:110000,pTrailCount:0,pSizeVar:.35,palette:['#efe5d5','#b9e6e0','#d1c9e4','#faf6ea']}},
  {name:'Espanso',label:'Pathfinder · repulsione',values:{pOpening:.8,pThickness:.3,pRepel:1,pAttract:0,pCohesion:.4,pVortex:.9,pOrganic:.7,pOuter:.2,pReach:1.2,pSize:.85}},
- {name:'Pulsante',label:'Pathfinder · vitalità',values:{pLife:.8,pPulse:3,pSignal:.7,pPropagation:.7,pNeural:.65,pNodes:32,pConnect:.7,pOrganic:.3,pSize:.9,palette:['#1d3667','#43898c','#b6d89b','#e7d6a0']}},
+ {name:'Pulsante',label:'Nucleo · vitalità',values:{pOpening:0,pLobeDepth:.3,pLife:.8,pPulse:3,pSignal:.7,pPropagation:.7,pNeural:.65,pNodes:32,pConnect:.7,pOrganic:.3,pSize:.9,palette:['#1d3667','#43898c','#b6d89b','#e7d6a0']}},
 ];
 export function particleCreation(base,index=0,seed=417){
  const s=structuredClone(base);Object.assign(s,PARTICLE_DEFAULTS,{engine:'particles',particleVersion:PARTICLE_VERSION,seed:seed>>>0,forcePoints:[],forcePaths:[],

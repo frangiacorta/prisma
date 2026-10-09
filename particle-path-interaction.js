@@ -1,5 +1,5 @@
-import {MAX_FORCE_PATHS,PATH_META,pathValue,newForcePath,samplePath,ellipseKnots} from './particle-paths.js?v=e3a7e09f7af0';
-import {screenToForce,forceToScreen} from './particle-forces.js?v=e3a7e09f7af0';
+import {MAX_FORCE_PATHS,PATH_META,pathValue,newForcePath,samplePath,ellipseKnots} from './particle-paths.js?v=162c0081651c';
+import {screenToForce,forceToScreen} from './particle-forces.js?v=162c0081651c';
 
 export function mountParticlePaths({canvas,board,getState,getMode,setMode,remember,mark,renderControls,showTab,toast}){
  const overlay=document.querySelector('#guide-handles'),controls=document.querySelector('#controls');
@@ -77,7 +77,7 @@ export function mountParticlePaths({canvas,board,getState,getMode,setMode,rememb
   if(b.hasAttribute('data-guide-redraw')){redraw=true;setMode(current().mode==='avoid'?'avoid':'guide');toast('Disegna sulla scena per sostituire il percorso selezionato.');return;}
   if(b.hasAttribute('data-guide-remove')||b.hasAttribute('data-guide-clear')){remember();getState().forcePaths=b.hasAttribute('data-guide-clear')?[]:paths().filter(p=>p.id!==selected);redraw=false;mark();renderControls();}
  });
- function activate(mode){redraw=false;setMode(mode);showTab('motion');controls.scrollTop=0;}
+ function activate(mode){redraw=false;setMode(mode);showTab('motion');const group=document.getElementById('guide-controls');if(group){group.open=true;group.scrollIntoView({block:'nearest'});}}
  function panel(){
   const p=current()||paths()[0];
   const slider=key=>{const [label,min,max,step]=PATH_META[key],v=p[key];return `<div class="param"><div class="param-line"><label for="guide-${key}">${label}</label><input type="number" class="number" data-guide-number="${key}" aria-label="${label}: valore" min="${min}" max="${max}" step="${step}" value="${Number(v.toFixed(3))}"></div><input id="guide-${key}" type="range" data-guide-param="${key}" min="${min}" max="${max}" step="${step}" value="${v}" style="--fill:${(v-min)/(max-min)*100}%"></div>`;};
