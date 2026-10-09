@@ -1,8 +1,8 @@
-import {META,MOODS,GROUPS} from './model.js?v=285a9866eee5';
-import {particleSphere} from './particle-model.js?v=285a9866eee5';
-import {PATH_META} from './particle-paths.js?v=285a9866eee5';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=285a9866eee5';
-import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=285a9866eee5';
+import {META,MOODS,GROUPS} from './model.js?v=706803f7e946';
+import {particleSphere} from './particle-model.js?v=706803f7e946';
+import {PATH_META} from './particle-paths.js?v=706803f7e946';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=706803f7e946';
+import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=706803f7e946';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
@@ -137,6 +137,9 @@ export function interpretDescription(text,current){
 
   if(current.engine==='particles'){
    // Particle clauses are consumed before the solid-shape vocabulary.
+   claim(/\b(?:senza|togli|elimina)\s+(?:il\s+|i\s+)?rifless[oi]\s+setos[oi]\b/,()=>push(setting('pFiberSheen',0)));
+   claim(/\b(?:fibre|fili|riflessi)\s+(piu\s+|meno\s+)?setos[ei]\b/,m=>push(setting('pFiberSheen',m[1]?working.pFiberSheen+(m[1].startsWith('meno')?-.25:.25):.75)));
+   claim(/\brifless[oi]\s+(piu\s+)?(strett[oi]|diffus[oi])\b/,m=>push(setting('pFiberSpread',m[2].startsWith('strett')?.1:.8)));
    for(const [label,key] of [['diametro particelle','pSize'],['dimensione particelle','pSize'],['densita','pCount'],['scie','pTrailCount'],['rientro','pReentry'],['magnetismo','pMagnet'],['repulsione','pRepel'],['attrazione','pAttract'],['vitalita','pLife'],['connettivita','pConnect'],['neuronale','pNeural']]){
     claim(new RegExp('\\b'+label+'\\s*(?:[:=]|a|al)?\\s*(-?\\d+(?:[.,]\\d+)?)\\s*(%|percento)?(?:\\s*px)?(?=\\s|$|[.!?])'),m=>{const n=Number(m[1].replace(',','.'));push(setting(key,m[2]?META[key][1]+n/100*(META[key][2]-META[key][1]):n));});
    }

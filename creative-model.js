@@ -1,9 +1,9 @@
-import {normalizeBodyTracking} from './body-tracking-model.js?v=285a9866eee5';
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=285a9866eee5';
-import {normalizeForcePaths} from './particle-paths.js?v=285a9866eee5';
-import {normalizeForcePoints} from './particle-forces.js?v=285a9866eee5';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=285a9866eee5';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=285a9866eee5';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=706803f7e946';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=706803f7e946';
+import {normalizeForcePaths} from './particle-paths.js?v=706803f7e946';
+import {normalizeForcePoints} from './particle-forces.js?v=706803f7e946';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=706803f7e946';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=706803f7e946';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}

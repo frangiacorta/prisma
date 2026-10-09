@@ -1,7 +1,7 @@
 // Particle shading uses Prisma's parameter names. It does not trace solid glass.
 export const prismaShadingGLSL=`
 uniform vec4 uMaterial,uFinish,uEnvironment,uGradient;
-uniform vec2 uPearl;
+uniform vec2 uPearl,uFiberLight;
 uniform vec4 uColorWave;uniform vec4 uColorWave2;uniform float uColorSoftness;
 uniform vec3 uPalette[12];uniform highp int uPaletteCount,uLightCount;
 uniform vec4 uLights[8];uniform vec3 uLightColors[8];uniform float uLightSizes[8];
@@ -40,13 +40,24 @@ vec3 pearlFresnel(vec3 f0,float cosine,float irid,float rough){
  vec3 tint=mix(vec3(1.),.45+1.05*spectrum,irid*(1.-rough*.5));
  return clamp(fresnel*tint,0.,1.);
 }
-vec3 shadeParticle(vec3 base,vec3 p,vec3 n){
+vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
  float metal=uMaterial.x,rough=max(.04,uMaterial.y),gloss=uMaterial.z,irid=uMaterial.w;
  vec3 view=normalize(vec3(0.,0.,7.5)-p);if(dot(n,view)<0.)n=-n;
  float facing=clamp(dot(n,view),.001,1.);
  vec3 f0=mix(vec3(.04),clamp(base,0.,1.),metal);
  vec3 reflection=reflectedEnvironment(reflect(-view,n),rough);
  vec3 fresnel=pearlFresnel(f0,facing,irid,rough);
+ // Artistic strand reflection: the local 3D tangent determines the cylinder
+ // normal and the elongated highlight. This changes reflected light only.
+ if(silk>0.){
+   vec3 radial=view-tangent*dot(view,tangent);float radialLength=length(radial);
+   vec3 strandNormal=radialLength>.0001?radial/radialLength:n;
+   float strandRough=mix(rough,1.,uFiberLight.y*.65);
+   vec3 strandReflection=reflectedEnvironment(reflect(-view,strandNormal),strandRough);
+   vec3 strandFresnel=pearlFresnel(f0,clamp(dot(strandNormal,view),.001,1.),irid,rough);
+   reflection=mix(reflection*fresnel,strandReflection*strandFresnel,silk);
+   fresnel=vec3(1.);
+ }
  vec3 lit=base*(uFinish.x+(1.-metal)*uEnvironment.z*.22)*uFinish.z+reflection*fresnel*gloss;
  float shininess=mix(180.,2.,rough*rough);
  for(int i=0;i<8;i++){
@@ -56,11 +67,23 @@ vec3 shadeParticle(vec3 base,vec3 p,vec3 n){
    float diffuse=clamp((dot(n,l)+spread)/(1.+spread),0.,1.);
    vec3 halfVector=normalize(l+view);
    float spec=pow(max(0.,dot(n,halfVector)),max(2.,shininess/(1.+spread*4.)));
+   if(silk>0.){
+     float along=clamp(dot(tangent,halfVector),-1.,1.);
+     float exponent=exp2(mix(8.,1.5,uFiberLight.y))*(1.-rough*rough*.85);
+     float strandSpec=pow(sqrt(max(0.,1.-along*along)),max(2.,exponent/(1.+spread*4.)));
+     spec=mix(spec,strandSpec,silk);
+   }
    vec3 power=uLightColors[i]*uLights[i].w/(1.+distance2*.045);
    vec3 specular=pearlFresnel(f0,max(0.,dot(view,halfVector)),irid,rough);
    lit+=power*(base*diffuse*(1.-metal)*.7*uFinish.z+specular*spec*gloss*2.);
  }
  // Unlit is a usable palette view even with emission at zero.
  return mix(base*uFinish.z,lit,uFinish.y);
+}
+vec3 shadeParticle(vec3 base,vec3 p,vec3 n){return shadeMatter(base,p,n,vec3(0.),0.);}
+vec3 shadeFibre(vec3 base,vec3 p,vec3 n,vec3 direction){
+ float distance=length(direction);
+ if(uFiberLight.x<=0.||distance<.000001)return shadeParticle(base,p,n);
+ return shadeMatter(base,p,n,direction/distance,uFiberLight.x);
 }
 `;

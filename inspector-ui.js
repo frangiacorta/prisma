@@ -1,4 +1,4 @@
-import {controlHelp} from './control-help.js?v=285a9866eee5';
+import {controlHelp} from './control-help.js?v=706803f7e946';
 const STORE='prisma-interface-v1';
 let preferences={};try{preferences=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(preferences));}catch{}};
