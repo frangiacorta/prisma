@@ -94,3 +94,8 @@ body.preview-expanded{overflow:hidden}
  .description-bar{padding:9px 0}.controls{padding:4px 18px 14px}.control-details>summary{min-height:48px}.parameter-info{width:23px;height:23px;min-width:23px}.control-with-help>.parameter-info{top:0}
  .preview-expanded .studio{padding:0 10px}.preview-expanded .stage-toolbar{min-height:68px;height:auto}.preview-expanded .stage-options #wallpaper-guide{display:none}.preview-expanded .viewport{min-height:0;height:auto}.preview-expanded .canvas-tools{max-width:calc(100% - 8px)}
 }
+/* Live body points are editor guides; render/export surfaces contain only matter. */
+#body-tracking-overlay{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4}
+.body-tracking-point{position:absolute;transform:translate(-50%,-50%);min-width:42px;height:42px;border:1px solid #cbed9c;border-radius:50%;display:grid;place-items:center;color:#e8ffd1;font:10px sans-serif;background:#18261066;box-shadow:0 0 0 5px #b9f29218}
+.body-tracking-point.lost{border-style:dashed;color:#f6d59a;border-color:#f6d59a}
+#body-tracking-controls .force-actions{flex-wrap:wrap}#body-tracking-controls a{color:var(--accent,#c9ed96)}

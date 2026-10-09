@@ -1,6 +1,6 @@
-import {Renderer as SolidRenderer} from './solid-renderer.js?v=162c0081651c';
-import {ParticleRenderer} from './particle-renderer.js?v=162c0081651c';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=162c0081651c';
+import {Renderer as SolidRenderer} from './solid-renderer.js?v=285a9866eee5';
+import {ParticleRenderer} from './particle-renderer.js?v=285a9866eee5';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=285a9866eee5';
 // One editor and export contract; the saved creation chooses its renderer.
 export class Renderer{
  constructor(canvas){this.canvas=canvas;this.context=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!this.context)throw Error('WebGL 2 non disponibile.');}

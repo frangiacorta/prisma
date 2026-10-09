@@ -1,8 +1,8 @@
-import {sampleFrame} from './solid-renderer.js?v=162c0081651c';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=162c0081651c';
-import {GuideField} from './particle-path-field.js?v=162c0081651c';
-import {fieldGLSL} from './particle-field.js?v=162c0081651c';
-import {prismaShadingGLSL} from './particle-shading.js?v=162c0081651c';
+import {sampleFrame} from './solid-renderer.js?v=285a9866eee5';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=285a9866eee5';
+import {GuideField} from './particle-path-field.js?v=285a9866eee5';
+import {fieldGLSL} from './particle-field.js?v=285a9866eee5';
+import {prismaShadingGLSL} from './particle-shading.js?v=285a9866eee5';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -136,7 +136,7 @@ export class ParticleRenderer{
   this.u(p,'uPoints',s.pSize,s.pSizeVar,s.pOpacity,s.pSoftness);this.u(p,'uSprite',s.pSprite);
   this.u(p,'uTrails',s.pTrailLength*s.pDirection,s.pTrailWidth,s.pTrailOpacity,0);this.u(p,'uTail',s.pTrailFade,s.pTrailTaper,0,s.pTrailScatter);
   this.u(p,'uFiber',s.pTrailPersistence,s.pTrailSoftness,s.pTrailCoherence,fiberGain(s));
-  const forces=(s.forcePoints||[]).filter(f=>f.enabled).slice(0,8);gl.uniform1i(this.loc(p,'uForceCount'),forces.length);if(forces.length){gl.uniform4fv(this.loc(p,'uForcePoints'),forces.flatMap(f=>[f.x,f.y,f.z,f.strength]));gl.uniform2fv(this.loc(p,'uForceOptions'),forces.flatMap(f=>[f.radius,f.swirl]));}
+  const forces=[...(s.forcePoints||[]).filter(f=>f.enabled).slice(0,8),...(s.bodyForces||[]).filter(f=>f.enabled).slice(0,3)];gl.uniform1i(this.loc(p,'uForceCount'),forces.length);if(forces.length){gl.uniform4fv(this.loc(p,'uForcePoints'),forces.flatMap(f=>[f.x,f.y,f.z,f.strength]));gl.uniform2fv(this.loc(p,'uForceOptions'),forces.flatMap(f=>[f.radius,f.swirl]));}
   this.u(p,'uColor',s.pColorMode,s.pColorScatter,s.pLumaVar,s.pDepthFade);
   this.u(p,'uLife',s.pLife,s.pPulse,s.pSignal,s.pPropagation);this.u(p,'uNetwork',s.pNeural,s.pNodes,s.pConnect,0);this.u(p,'uSymmetry',s.pSymmetry);
   this.u(p,'uMotionQuality',s.pMotionSoftness,s.pFollow);this.u(p,'uMotionSeed',s.pMotionSeed);

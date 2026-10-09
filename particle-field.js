@@ -1,5 +1,5 @@
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=162c0081651c';
+import {guideGLSL} from './particle-path-field.js?v=285a9866eee5';
 export const fieldGLSL=`
 ${guideGLSL}
 const float TAU=6.28318530718;
@@ -10,7 +10,7 @@ uniform vec4 uForm,uWarp,uFrame,uRotation;
 uniform vec4 uLife,uNetwork;uniform float uSymmetry;
 uniform vec4 uOrbit,uDrift,uWander,uTentacle,uTentacleMotion,uSpaceWarp;
 uniform vec2 uMotionQuality;uniform float uMotionSeed;
-uniform int uForceCount;uniform vec4 uForcePoints[8];uniform vec2 uForceOptions[8];
+uniform int uForceCount;uniform vec4 uForcePoints[11];uniform vec2 uForceOptions[11];
 mat2 rot(float a){return mat2(cos(a),-sin(a),sin(a),cos(a));}
 float clockAt(float q){
  q=clamp((fract(q)-uClock.z*.5)/(1.-uClock.z),0.,1.);
@@ -106,7 +106,7 @@ vec3 position(vec4 r,float phase){
  p*=uFrame.x;p.xy+=uFrame.yz;
  // Static scene-space fields preserve periodicity and work equally on points and tails.
  vec3 pull=vec3(0.);float influence=0.;
- for(int i=0;i<8;i++){if(i>=uForceCount)break;vec3 d=uForcePoints[i].xyz-p;
+ for(int i=0;i<11;i++){if(i>=uForceCount)break;vec3 d=uForcePoints[i].xyz-p;
   float radius=uForceOptions[i].x,weight=exp(-dot(d,d)/(2.*radius*radius));
   float strength=uForcePoints[i].w,gain=1.-exp(-abs(strength));
   pull+=(sign(strength)*d*gain+cross(vec3(0.,0.,1.),d)*uForceOptions[i].y*.5)*weight;
