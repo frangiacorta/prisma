@@ -1,5 +1,5 @@
-import {organizeSections} from './inspector-navigation.js?v=336f6e73d149';
-import {controlHelp} from './control-help.js?v=336f6e73d149';
+import {organizeSections} from './inspector-navigation.js?v=b18a20e380e3';
+import {controlHelp} from './control-help.js?v=b18a20e380e3';
 const STORE='prisma-interface-v2';
 let preferences={};try{preferences=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(preferences));}catch{}};

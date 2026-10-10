@@ -1,5 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=336f6e73d149';
-import {excludeForcePositions} from './particle-forces.js?v=336f6e73d149';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=b18a20e380e3';
+import {excludeForcePositions} from './particle-forces.js?v=b18a20e380e3';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;uniform vec3 uLivingMotion;`;
 export class LivingStructures{

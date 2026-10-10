@@ -9036,7 +9036,10 @@
       "name": "Planet X · intrecci multicolore",
       "kind": "video",
       "related": [
-        "roadmap-filament-planets"
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
       ],
       "state": "reference",
       "priority": false,
@@ -9175,7 +9178,10 @@
       "name": "Planet 225 · globo di fibre",
       "kind": "video",
       "related": [
-        "roadmap-filament-planets"
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
       ],
       "state": "reference",
       "priority": false,
@@ -9314,7 +9320,10 @@
       "name": "Planets · oro, ciuffi e viste macro",
       "kind": "video",
       "related": [
-        "roadmap-filament-planets"
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
       ],
       "state": "reference",
       "priority": false,
@@ -9470,6 +9479,979 @@
       ],
       "duration": 26.38,
       "clip": "media/s13-03-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s14-01",
+      "name": "Planet 200 · ciuffi bianchi",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Un globo bianco-ciano con ciuffi simili a piume: fasci morbidi, punte sottili e cavità ombreggiate.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://docs.blender.org/manual/en/4.4/modeling/geometry_nodes/hair/guides/clump_hair_curves.html",
+        "https://docs.blender.org/manual/id/4.5/modeling/geometry_nodes/hair/guides/curl_hair_curves.html"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "I fili sono riuniti in ciuffi voluminosi, orientati in direzioni diverse; la sagoma è lobata e sfrangiata.",
+                "colourLight": "Bianco freddo e ciano tenue; le punte e il lato destro sono più luminosi, gli incavi separano i ciuffi. Non si vede una prova di iridescenza o di pellicola trasparente.",
+                "motion": "Nei circa quattro secondi registrati cambiano scala apparente e orientamento dei ciuffi. Il corpo conserva coesione; non è possibile separare con certezza rotazione, deformazione e camera.",
+                "organicQuality": "Fibre persistenti, distribuzioni non uniformi e orientamenti condivisi danno coesione. Nessuna crescita biologica o ramificazione fisica verificata."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta Prisma: radici ancorate al nucleo, curve con identità stabile, lunghezza e direzione per fibra. Separare ciuffi, riccioli, deformazione, camera e colore; conservare i controlli condivisi."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Stessa serie e stesso autore delle reference s13. Processo Cinema 4D/Adobe documentato; nessuna repo originale identificata nella ricerca precedente. Per ciuffi e riccioli consultati i nodi Blender Clump e Curl Hair Curves: alternativa desktop, non plugin Pages, non ancora provata."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Dimensione dei ciuffi",
+                "Coesione lungo il filo",
+                "Apertura delle punte",
+                "Orientamento condiviso",
+                "Ombre tra ciuffi"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.17,
+                  0.51,
+                  0.85,
+                  1.1900000000000002,
+                  1.53,
+                  1.87,
+                  2.21,
+                  2.5500000000000003,
+                  2.89,
+                  3.23,
+                  3.5700000000000003,
+                  3.91
+                ],
+                "contactSheet": "reports/reference-series-14/1-contact.jpg",
+                "limits": "Analizzati 12 fotogrammi distribuiti per video e le didascalie. Audio non analizzato; continuità del loop e traiettorie fisiche non verificate."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da progettare: deformazioni periodiche, identità dei fili e raccordo di posizione/velocità. Gli estratti di riferimento non certificano un loop."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Un globo bianco-ciano con ciuffi simili a piume: fasci morbidi, punte sottili e cavità ombreggiate.",
+      "avoid": "Foro obbligatorio, scintillio dei fili sottili e casualità fotogramma per fotogramma. Separare i salti di montaggio dalla deformazione della forma.",
+      "detailsSource": [
+        "reference\\video-series-14.json"
+      ],
+      "media": [
+        {
+          "src": "media/52c53733691299f7.webp",
+          "width": 296,
+          "height": 396
+        },
+        {
+          "src": "media/7dc0552b658fba2e.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/9099eb6338d39ed3.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/4083e3d0005f038e.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/6c2833e833523a2b.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "1b0dee0c60333fe1",
+          "name": "1-ScreenRecording_10-10-2026-14-45-57_1.mov",
+          "bytes": 1282533,
+          "available": true
+        }
+      ],
+      "duration": 4.08,
+      "clip": "media/s14-01-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s14-02",
+      "name": "Planets · atlante di densità e colori",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Una sequenza di post mostra globi rosa, corallo, blu e arancio, dal pelo lungo alla superficie corta e compatta.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://docs.blender.org/manual/en/4.4/modeling/geometry_nodes/hair/guides/clump_hair_curves.html",
+        "https://docs.blender.org/manual/id/4.5/modeling/geometry_nodes/hair/guides/curl_hair_curves.html"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "La registrazione scorre tra più opere. Didascalie leggibili: Planet #92, #93, #37, #49 e #107; compaiono anche un’animazione con centro a ciuffi e la preparazione di stampe.",
+                "colourLight": "Nucleo luminoso rosa-ciano, peli corallo con punte chiare, globo blu molto compatto, ciuffi arancio e fili verde-blu. Contrasto e lunghezza cambiano separatamente.",
+                "motion": "Tagli, scorrimento di Instagram, zoom e transizioni a blocchi. La sequenza non è un unico organismo che cambia stato e non dimostra interpolazione fra tutti i preset.",
+                "organicQuality": "Fibre persistenti, distribuzioni non uniformi e orientamenti condivisi danno coesione. Nessuna crescita biologica o ramificazione fisica verificata."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta Prisma: radici ancorate al nucleo, curve con identità stabile, lunghezza e direzione per fibra. Separare ciuffi, riccioli, deformazione, camera e colore; conservare i controlli condivisi."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Stessa serie e stesso autore delle reference s13. Processo Cinema 4D/Adobe documentato; nessuna repo originale identificata nella ricerca precedente. Per ciuffi e riccioli consultati i nodi Blender Clump e Curl Hair Curves: alternativa desktop, non plugin Pages, non ancora provata."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Rapporto pelo corto/lungo",
+                "Densità indipendente dallo spessore",
+                "Luminosità del nucleo",
+                "Contrasto radice/punta",
+                "Orientamento pettinato"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  1.3266666666666667,
+                  3.98,
+                  6.633333333333333,
+                  9.286666666666667,
+                  11.94,
+                  14.593333333333334,
+                  17.246666666666666,
+                  19.900000000000002,
+                  22.55333333333333,
+                  25.206666666666667,
+                  27.86,
+                  30.513333333333335
+                ],
+                "contactSheet": "reports/reference-series-14/2-contact.jpg",
+                "limits": "Analizzati 12 fotogrammi distribuiti per video e le didascalie. Audio non analizzato; continuità del loop e traiettorie fisiche non verificate."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da progettare: deformazioni periodiche, identità dei fili e raccordo di posizione/velocità. Gli estratti di riferimento non certificano un loop."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Una sequenza di post mostra globi rosa, corallo, blu e arancio, dal pelo lungo alla superficie corta e compatta.",
+      "avoid": "Foro obbligatorio, scintillio dei fili sottili e casualità fotogramma per fotogramma. Separare i salti di montaggio dalla deformazione della forma.",
+      "detailsSource": [
+        "reference\\video-series-14.json"
+      ],
+      "media": [
+        {
+          "src": "media/03f529cf8f8406a2.webp",
+          "width": 296,
+          "height": 396
+        },
+        {
+          "src": "media/8b5980a67490cb6f.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/db8c751747fe48cc.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/158e0aa117f11371.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/1156a608dfc76f0c.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/5018749f46e80602.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/62f70d9d62894f92.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/feaad3ca8cc118bc.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/fc9aaf3417b783ab.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/800bc6f95b018112.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "457df73537677398",
+          "name": "2-ScreenRecording_10-10-2026-14-52-23_1.mov",
+          "bytes": 12825467,
+          "available": true
+        }
+      ],
+      "duration": 31.84,
+      "clip": "media/s14-02-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s14-03",
+      "name": "Planet X1–X9 · fasce cromatiche",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Un breve estratto mostra un globo con centro scuro e fasce verdi, rosse, viola e gialle.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://docs.blender.org/manual/en/4.4/modeling/geometry_nodes/hair/guides/clump_hair_curves.html",
+        "https://docs.blender.org/manual/id/4.5/modeling/geometry_nodes/hair/guides/curl_hair_curves.html"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Filamenti fini distribuiti radialmente su una massa arrotondata. La didascalia indica una serie da X1 a X9; non identifica con certezza la variante singola.",
+                "colourLight": "Fasce di colore dal centro all’esterno, con passaggio rapido da viola/verde a rosso/verde e oro/ciano. Il centro scuro può dipendere dalla luce e dalla densità: non prova un foro.",
+                "motion": "Estratto inferiore a due secondi: si osservano cambi cromatici e una variazione di scala. Durata insufficiente per caratterizzare il ciclo o promettere un movimento lento.",
+                "organicQuality": "Fibre persistenti, distribuzioni non uniformi e orientamenti condivisi danno coesione. Nessuna crescita biologica o ramificazione fisica verificata."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta Prisma: radici ancorate al nucleo, curve con identità stabile, lunghezza e direzione per fibra. Separare ciuffi, riccioli, deformazione, camera e colore; conservare i controlli condivisi."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Stessa serie e stesso autore delle reference s13. Processo Cinema 4D/Adobe documentato; nessuna repo originale identificata nella ricerca precedente. Per ciuffi e riccioli consultati i nodi Blender Clump e Curl Hair Curves: alternativa desktop, non plugin Pages, non ancora provata."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Posizioni delle fasce colore",
+                "Morbidezza delle transizioni",
+                "Centro/bordo indipendenti",
+                "Velocità cromatica separata dal moto"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.07833333333333332,
+                  0.235,
+                  0.3916666666666666,
+                  0.5483333333333333,
+                  0.705,
+                  0.8616666666666667,
+                  1.0183333333333333,
+                  1.175,
+                  1.3316666666666666,
+                  1.4883333333333333,
+                  1.6449999999999998,
+                  1.8016666666666665
+                ],
+                "contactSheet": "reports/reference-series-14/3-contact.jpg",
+                "limits": "Analizzati 12 fotogrammi distribuiti per video e le didascalie. Audio non analizzato; continuità del loop e traiettorie fisiche non verificate."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da progettare: deformazioni periodiche, identità dei fili e raccordo di posizione/velocità. Gli estratti di riferimento non certificano un loop."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Un breve estratto mostra un globo con centro scuro e fasce verdi, rosse, viola e gialle.",
+      "avoid": "Foro obbligatorio, scintillio dei fili sottili e casualità fotogramma per fotogramma. Separare i salti di montaggio dalla deformazione della forma.",
+      "detailsSource": [
+        "reference\\video-series-14.json"
+      ],
+      "media": [
+        {
+          "src": "media/8c3d5ef48035b6b3.webp",
+          "width": 296,
+          "height": 396
+        },
+        {
+          "src": "media/a94a4541383bea8b.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/e63fb70a184bbc33.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/8f74510217faf234.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/41322b0a8620aa45.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "a84327d80df457be",
+          "name": "3-ScreenRecording_10-10-2026-14-48-12_1.mov",
+          "bytes": 264461,
+          "available": true
+        }
+      ],
+      "duration": 1.88,
+      "clip": "media/s14-03-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s14-04",
+      "name": "Planet 227 · dal filo al globo",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Un viaggio da un intreccio blu ravvicinato a una sfera soffice con bordo ciano.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://docs.blender.org/manual/en/4.4/modeling/geometry_nodes/hair/guides/clump_hair_curves.html",
+        "https://docs.blender.org/manual/id/4.5/modeling/geometry_nodes/hair/guides/curl_hair_curves.html"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Nel dettaglio si distinguono fili sottili obliqui, interstizi scuri e curve sovrapposte; da lontano emerge il globo.",
+                "colourLight": "Blu profondo nel corpo, ciano verso il bordo e sul lato destro. La densità deve conservare il dettaglio anche in piena luce.",
+                "motion": "La prima parte attraversa l’intreccio, poi la vista arretra fino alla figura intera. La rotazione apparente e la flessione restano da distinguere dal movimento della camera.",
+                "organicQuality": "Fibre persistenti, distribuzioni non uniformi e orientamenti condivisi danno coesione. Nessuna crescita biologica o ramificazione fisica verificata."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta Prisma: radici ancorate al nucleo, curve con identità stabile, lunghezza e direzione per fibra. Separare ciuffi, riccioli, deformazione, camera e colore; conservare i controlli condivisi."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Stessa serie e stesso autore delle reference s13. Processo Cinema 4D/Adobe documentato; nessuna repo originale identificata nella ricerca precedente. Per ciuffi e riccioli consultati i nodi Blender Clump e Curl Hair Curves: alternativa desktop, non plugin Pages, non ancora provata."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Distanza e traiettoria camera",
+                "Scala macro",
+                "Luce radente",
+                "Densità visiva",
+                "Spessore minimo stabile"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.5266666666666667,
+                  1.58,
+                  2.6333333333333333,
+                  3.686666666666667,
+                  4.74,
+                  5.793333333333334,
+                  6.846666666666667,
+                  7.900000000000001,
+                  8.953333333333333,
+                  10.006666666666668,
+                  11.06,
+                  12.113333333333335
+                ],
+                "contactSheet": "reports/reference-series-14/4-contact.jpg",
+                "limits": "Analizzati 12 fotogrammi distribuiti per video e le didascalie. Audio non analizzato; continuità del loop e traiettorie fisiche non verificate."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da progettare: deformazioni periodiche, identità dei fili e raccordo di posizione/velocità. Gli estratti di riferimento non certificano un loop."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Un viaggio da un intreccio blu ravvicinato a una sfera soffice con bordo ciano.",
+      "avoid": "Foro obbligatorio, scintillio dei fili sottili e casualità fotogramma per fotogramma. Separare i salti di montaggio dalla deformazione della forma.",
+      "detailsSource": [
+        "reference\\video-series-14.json"
+      ],
+      "media": [
+        {
+          "src": "media/347b2b4fc7eb46bb.webp",
+          "width": 296,
+          "height": 396
+        },
+        {
+          "src": "media/23da0389423b4b87.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/48eb28b7b2b8ecb6.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/cdf936ab5bef0548.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/f8c97678eac43e82.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/cef1405b3ef28d99.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "d21dd7e44f8dbf47",
+          "name": "4-ScreenRecording_10-10-2026-14-36-37_1.mov",
+          "bytes": 5371938,
+          "available": true
+        }
+      ],
+      "duration": 12.64,
+      "clip": "media/s14-04-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s14-05",
+      "name": "Planet 229 · filamenti lunghi",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Un nucleo denso emette fili molto lunghi, ondulati e distanziati, mentre il colore varia.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://docs.blender.org/manual/en/4.4/modeling/geometry_nodes/hair/guides/clump_hair_curves.html",
+        "https://docs.blender.org/manual/id/4.5/modeling/geometry_nodes/hair/guides/curl_hair_curves.html"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Due scale convivono: massa compatta centrale e appendici sottili che arrivano fuori dal quadro. I fili hanno lunghezze molto diverse e piccole curvature irregolari.",
+                "colourLight": "Colori caldi, magenta e infine ciano/verde; alcuni fili lunghi restano cromaticamente distinti dal nucleo.",
+                "motion": "Il nucleo si riduce in scala apparente, le appendici cambiano disposizione e sembrano accorciarsi. Un arretramento della camera spiega parte della variazione: la contrazione fisica non è dimostrata. A fine registrazione compare il replay del reel.",
+                "organicQuality": "Fibre persistenti, distribuzioni non uniformi e orientamenti condivisi danno coesione. Nessuna crescita biologica o ramificazione fisica verificata."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta Prisma: radici ancorate al nucleo, curve con identità stabile, lunghezza e direzione per fibra. Separare ciuffi, riccioli, deformazione, camera e colore; conservare i controlli condivisi."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Stessa serie e stesso autore delle reference s13. Processo Cinema 4D/Adobe documentato; nessuna repo originale identificata nella ricerca precedente. Per ciuffi e riccioli consultati i nodi Blender Clump e Curl Hair Curves: alternativa desktop, non plugin Pages, non ancora provata."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Percentuale di filamenti lunghi",
+                "Lunghezza massima e distribuzione",
+                "Rapporto nucleo/appendici",
+                "Ondulazione lungo il filo",
+                "Colore distinto delle appendici"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.7304166666666667,
+                  2.19125,
+                  3.6520833333333336,
+                  5.112916666666667,
+                  6.57375,
+                  8.034583333333334,
+                  9.495416666666667,
+                  10.956250000000002,
+                  12.417083333333332,
+                  13.87791666666667,
+                  15.33875,
+                  16.799583333333334
+                ],
+                "contactSheet": "reports/reference-series-14/5-contact.jpg",
+                "limits": "Analizzati 12 fotogrammi distribuiti per video e le didascalie. Audio non analizzato; continuità del loop e traiettorie fisiche non verificate."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da progettare: deformazioni periodiche, identità dei fili e raccordo di posizione/velocità. Gli estratti di riferimento non certificano un loop."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Un nucleo denso emette fili molto lunghi, ondulati e distanziati, mentre il colore varia.",
+      "avoid": "Foro obbligatorio, scintillio dei fili sottili e casualità fotogramma per fotogramma. Separare i salti di montaggio dalla deformazione della forma.",
+      "detailsSource": [
+        "reference\\video-series-14.json"
+      ],
+      "media": [
+        {
+          "src": "media/f630e6b0b5e7bc34.webp",
+          "width": 296,
+          "height": 396
+        },
+        {
+          "src": "media/4a012b810962d3f3.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/0ce15fd000956829.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/34d03a57c84fe088.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/62e74e882af0b7d8.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/975a63f85820e717.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/d71c90b5a0a482cf.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "9f51dbbc7447b787",
+          "name": "5-ScreenRecording_10-10-2026-14-37-28_1.mov",
+          "bytes": 7642316,
+          "available": true
+        }
+      ],
+      "duration": 17.53,
+      "clip": "media/s14-05-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s14-06",
+      "name": "Planet X14 · riccioli e cappi",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Fibre verde-ciano formano un globo soffice con lunghi riccioli esterni e intrecci ravvicinati.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://docs.blender.org/manual/en/4.4/modeling/geometry_nodes/hair/guides/clump_hair_curves.html",
+        "https://docs.blender.org/manual/id/4.5/modeling/geometry_nodes/hair/guides/curl_hair_curves.html"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "La sagoma esterna contiene curve a cappio. Nei dettagli i fili si sovrappongono in più direzioni; gli incroci visivi non dimostrano connessioni fisiche tra fibre.",
+                "colourLight": "Ciano luminoso sui fili, verde nel volume e nero negli interstizi. La leggibilità viene dalla profondità e dalle differenze di luminosità.",
+                "motion": "Alternanza di macro e globo con transizioni a blocchi e bande. Non attribuire gli scatti del montaggio a una simulazione naturale dei riccioli.",
+                "organicQuality": "Fibre persistenti, distribuzioni non uniformi e orientamenti condivisi danno coesione. Nessuna crescita biologica o ramificazione fisica verificata."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta Prisma: radici ancorate al nucleo, curve con identità stabile, lunghezza e direzione per fibra. Separare ciuffi, riccioli, deformazione, camera e colore; conservare i controlli condivisi."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Stessa serie e stesso autore delle reference s13. Processo Cinema 4D/Adobe documentato; nessuna repo originale identificata nella ricerca precedente. Per ciuffi e riccioli consultati i nodi Blender Clump e Curl Hair Curves: alternativa desktop, non plugin Pages, non ancora provata."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Raggio del ricciolo",
+                "Frequenza della curvatura",
+                "Punto di inizio del ricciolo",
+                "Percentuale di fili ricurvi",
+                "Dispersione delle punte"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.5195833333333334,
+                  1.55875,
+                  2.597916666666667,
+                  3.6370833333333334,
+                  4.6762500000000005,
+                  5.715416666666667,
+                  6.754583333333334,
+                  7.79375,
+                  8.832916666666668,
+                  9.872083333333334,
+                  10.91125,
+                  11.950416666666667
+                ],
+                "contactSheet": "reports/reference-series-14/6-contact.jpg",
+                "limits": "Analizzati 12 fotogrammi distribuiti per video e le didascalie. Audio non analizzato; continuità del loop e traiettorie fisiche non verificate."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da progettare: deformazioni periodiche, identità dei fili e raccordo di posizione/velocità. Gli estratti di riferimento non certificano un loop."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Fibre verde-ciano formano un globo soffice con lunghi riccioli esterni e intrecci ravvicinati.",
+      "avoid": "Foro obbligatorio, scintillio dei fili sottili e casualità fotogramma per fotogramma. Separare i salti di montaggio dalla deformazione della forma.",
+      "detailsSource": [
+        "reference\\video-series-14.json"
+      ],
+      "media": [
+        {
+          "src": "media/637ac857fab82056.webp",
+          "width": 296,
+          "height": 396
+        },
+        {
+          "src": "media/404afbd325ee8f91.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/4b946d5cf677f5f3.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/db2379140be9f280.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/55ab79c28d4dfa31.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/f89f33091443e88d.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/f15f8959b754c183.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "a1be2d3a41d791e9",
+          "name": "6-ScreenRecording_10-10-2026-14-51-08_1.mov",
+          "bytes": 5484060,
+          "available": true
+        }
+      ],
+      "duration": 12.47,
+      "clip": "media/s14-06-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": []
     },
@@ -11270,6 +12252,15 @@
         "project-fibre-setose",
         "reuse-xpbd",
         "reuse-three-filament-lines",
+        "s14-01",
+        "s14-02",
+        "s14-03",
+        "s14-04",
+        "s14-05",
+        "s14-06",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10",
         "s05-02"
       ],
       "state": "proposed",
@@ -11280,7 +12271,9 @@
         "https://www.pauschenwein.ch/kreationsprozessplaneten",
         "https://www.pauschenwein.ch/the-apanage-days-cyprus",
         "https://docs.blender.org/manual/id/4.4/modeling/geometry_nodes/hair/generation/generate_hair_curves.html",
-        "https://docs.blender.org/manual/en/latest/render/shader_nodes/shader/hair_principled.html"
+        "https://docs.blender.org/manual/en/latest/render/shader_nodes/shader/hair_principled.html",
+        "https://docs.blender.org/manual/en/4.4/modeling/geometry_nodes/hair/guides/clump_hair_curves.html",
+        "https://docs.blender.org/manual/id/4.5/modeling/geometry_nodes/hair/guides/curl_hair_curves.html"
       ],
       "sections": [
         {
@@ -11301,7 +12294,8 @@
                 "originale": "Cinema 4D e Adobe dichiarati dall’autore. Nessuna repo originale o scena scaricabile identificata; il modulo preciso usato per il pelo non è confermato.",
                 "prisma": "Riutilizzare la gestione delle fibre e i riflessi setosi. I vincoli XPBD già presenti possono contribuire al controllo delle lunghezze; non forniscono da soli grooming, torsione o auto-collisione del pelo.",
                 "web": "Ispezionato three.js r180 LineSegments2 e licenza MIT: linee a spessore regolabile e colori ai vertici. Richiede Three WebGLRenderer, quindi non è un plugin diretto del motore custom di Prisma. Utile come confronto; nessuna nuova dipendenza installata.",
-                "offline": "Alternativa Blender: Generate Hair Curves per curve su superficie, densità, lunghezza, seed e punti di controllo; Principled Hair BSDF in Cycles per il materiale. Da usare come banco visivo o render esportato, non da eseguire direttamente in Pages. Documentazione consultata, nessuna scena provata."
+                "offline": "Alternativa Blender: Generate Hair Curves per curve su superficie, densità, lunghezza, seed e punti di controllo; Principled Hair BSDF in Cycles per il materiale. Da usare come banco visivo o render esportato, non da eseguire direttamente in Pages. Documentazione consultata, nessuna scena provata.",
+                "blenderGuides": "Documentazione ufficiale Clump Hair Curves: curve guida, influenza lungo il filo, dispersione punte e mantenimento lunghezza. Curl Hair Curves: raggio, frequenza, inizio della curvatura e variazione con seed. Componenti da riusare in una prova Blender, non sorgente originale delle opere; nessuna scena eseguita."
               }
             }
           ]
@@ -11318,7 +12312,12 @@
                   "Lunghezza media e variazione",
                   "Spessore radice/punta e assottigliamento",
                   "Curvatura, ricciolo e orientamento",
-                  "Dimensione dei ciuffi e coesione"
+                  "Dimensione dei ciuffi e coesione",
+                  "Quota di filamenti molto lunghi distinta dal pelo corto",
+                  "Rapporto nucleo/appendici",
+                  "Raggio, frequenza e inizio dei riccioli",
+                  "Apertura e dispersione delle punte dei ciuffi",
+                  "Profondità delle depressioni, senza foro obbligatorio"
                 ],
                 "Movimento": [
                   "Respiro del nucleo",
@@ -11335,7 +12334,11 @@
                   "Variazione cromatica controllata",
                   "Luce radente e controluce",
                   "Rugosità e riflesso lungo la tangente",
-                  "Profondità delle ombre tra ciuffi"
+                  "Profondità delle ombre tra ciuffi",
+                  "Modalità colore: raggio del nucleo / lunghezza del filo / casualità per filo",
+                  "Posizione e larghezza delle fasce cromatiche",
+                  "Colori distinti per nucleo, corpo e punte",
+                  "Luminosità del nucleo indipendente dal riflesso"
                 ]
               }
             },
@@ -11356,7 +12359,10 @@
                 "Zero salti delle radici o scatti nelle pieghe",
                 "Palette leggibile sui fili e dettaglio conservato in luce",
                 "Verificare raccordo e velocità del loop",
-                "Misurare prestazioni su PC e telefono con qualità adattiva"
+                "Misurare prestazioni su PC e telefono con qualità adattiva",
+                "Confrontare ciuffi bianchi (Planet 200), appendici lunghe (Planet 229) e riccioli (Planet X14)",
+                "Ottenere le tre palette degli screenshot senza cambiare la geometria",
+                "Mantenere continuità e lunghezza dei fili durante clumping e curl"
               ]
             }
           ]
@@ -11367,6 +12373,18 @@
             {
               "label": "remaining",
               "value": "Distribuzione radiale ancorata e grooming da costruire; ombre dense e stabilità dei fili sottili da verificare. Non ancora implementato."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "evidence",
+              "value": {
+                "batch14": "Sei video e quattro screenshot analizzati; foto 8 e 9 raggruppate nello stesso carosello. Originali tutti mappati.",
+                "status": "Estensione della specifica, non implementazione del renderer."
+              }
             }
           ]
         }
@@ -12101,6 +13119,348 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-filament-planets",
+      "completedProjects": []
+    },
+    {
+      "id": "img-s14-07",
+      "name": "Planet 48 · rosa e ciano",
+      "kind": "image",
+      "related": [
+        "roadmap-filament-planets",
+        "s13-01",
+        "s13-02",
+        "s13-03",
+        "s14-01",
+        "s14-02",
+        "s14-03",
+        "s14-04",
+        "s14-05",
+        "s14-06",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein",
+      "summary": "Globo composto da fili quasi rettilinei: centro rosa, fascia chiara e bordo ciano. Molte punte sporgono dalla sagoma.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": "Globo composto da fili quasi rettilinei: centro rosa, fascia chiara e bordo ciano. Molte punte sporgono dalla sagoma."
+            },
+            {
+              "label": "captionEvidence",
+              "value": "Didascalia: Planet #48, 2021 Digitaldruck, LED-Lichtbox dimmbar. Post datato 2 gennaio 2024. La dicitura lightbox descrive il supporto espositivo, non dimostra emissione luminosa del materiale 3D."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Palette associata alla geometria: distinguere distanza dal centro, coordinata lungo ciascun filo e variazione tra fili. La stessa immagine può derivare da combinazioni diverse di luce e colore: implementazione proposta, non ricostruzione certificata."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Gradiente radiale a più colori",
+                "Posizione e larghezza della fascia chiara",
+                "Rigidità delle fibre",
+                "Dispersione delle lunghezze"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": "Immagini complete e dettagli visivi ispezionati. Fonte statica: nessuna inferenza sul movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Colori distribuiti sulla struttura e filamenti distinguibili contro il nero.",
+      "avoid": "Confondere il magenta desiderato di questa opera con un materiale che forza sempre il fucsia; ogni colore deve restare una scelta modificabile.",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/e7efa64396d9ed95.webp",
+          "width": 588,
+          "height": 590
+        },
+        {
+          "src": "media/51b4609a74a96fee.webp",
+          "width": 588,
+          "height": 1280
+        }
+      ],
+      "assets": [
+        {
+          "id": "51b4609a74a96fee",
+          "name": "7-Foto-7.jpg",
+          "bytes": 166835,
+          "available": true
+        }
+      ],
+      "completedProjects": []
+    },
+    {
+      "id": "img-s14-08-09",
+      "name": "Apanage · due palette radiali",
+      "kind": "image",
+      "related": [
+        "roadmap-filament-planets",
+        "s13-01",
+        "s13-02",
+        "s13-03",
+        "s14-01",
+        "s14-02",
+        "s14-03",
+        "s14-04",
+        "s14-05",
+        "s14-06",
+        "img-s14-07",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · con Apanage",
+      "summary": "Due immagini dello stesso carosello: una sfera blu-ciano con punte dorate e una con centro arancio, fascia magenta/viola e bordo turchese.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": "Due immagini dello stesso carosello: una sfera blu-ciano con punte dorate e una con centro arancio, fascia magenta/viola e bordo turchese."
+            },
+            {
+              "label": "captionEvidence",
+              "value": "Screenshot 8: diapositiva 6/8, nucleo blu, bordo ciano e punte ocra. Screenshot 9: diapositiva 1/8, centro arancio-magenta e periferia turchese; logo Apanage Month Larnaka 2026. L’autore e la galleria sono visibili; numero dell’opera non leggibile. I due allegati sono conservati nella stessa scheda."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Palette associata alla geometria: distinguere distanza dal centro, coordinata lungo ciascun filo e variazione tra fili. La stessa immagine può derivare da combinazioni diverse di luce e colore: implementazione proposta, non ricostruzione certificata."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Palette nucleo/corpo/punte",
+                "Raggio delle fasce",
+                "Larghezza del bordo luminoso",
+                "Quantità di punte calde",
+                "Variazione per filo"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": "Immagini complete e dettagli visivi ispezionati. Fonte statica: nessuna inferenza sul movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Colori distribuiti sulla struttura e filamenti distinguibili contro il nero.",
+      "avoid": "Confondere il magenta desiderato di questa opera con un materiale che forza sempre il fucsia; ogni colore deve restare una scelta modificabile.",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/df4f002070fb1029.webp",
+          "width": 588,
+          "height": 753
+        },
+        {
+          "src": "media/ca57bb632524989c.webp",
+          "width": 588,
+          "height": 1280
+        },
+        {
+          "src": "media/c6ef0fa842775c26.webp",
+          "width": 588,
+          "height": 753
+        },
+        {
+          "src": "media/aea3c485cdb90bd6.webp",
+          "width": 588,
+          "height": 1280
+        }
+      ],
+      "assets": [
+        {
+          "id": "ca57bb632524989c",
+          "name": "8-Foto-8.jpg",
+          "bytes": 150431,
+          "available": true
+        },
+        {
+          "id": "aea3c485cdb90bd6",
+          "name": "9-Foto-9.jpg",
+          "bytes": 140647,
+          "available": true
+        }
+      ],
+      "completedProjects": []
+    },
+    {
+      "id": "img-s14-10",
+      "name": "Planet 11 · velluto magenta",
+      "kind": "image",
+      "related": [
+        "roadmap-filament-planets",
+        "s13-01",
+        "s13-02",
+        "s13-03",
+        "s14-01",
+        "s14-02",
+        "s14-03",
+        "s14-04",
+        "s14-05",
+        "s14-06",
+        "img-s14-07",
+        "img-s14-08-09"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein",
+      "summary": "Sfera compatta di fibre magenta con una depressione centrale e una luce più intensa sul lato destro.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": "Sfera compatta di fibre magenta con una depressione centrale e una luce più intensa sul lato destro."
+            },
+            {
+              "label": "captionEvidence",
+              "value": "Didascalia visibile: Planet #11, post del 25 novembre 2025. Screenshot statico: non prova il moto indicato dal testo del post. La concavità scura non dimostra un foro passante."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Palette associata alla geometria: distinguere distanza dal centro, coordinata lungo ciascun filo e variazione tra fili. La stessa immagine può derivare da combinazioni diverse di luce e colore: implementazione proposta, non ricostruzione certificata."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Densità e lunghezza corta",
+                "Profondità della depressione",
+                "Direzione dei ciuffi",
+                "Rugosità",
+                "Luce laterale"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": "Immagini complete e dettagli visivi ispezionati. Fonte statica: nessuna inferenza sul movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Colori distribuiti sulla struttura e filamenti distinguibili contro il nero.",
+      "avoid": "Confondere il magenta desiderato di questa opera con un materiale che forza sempre il fucsia; ogni colore deve restare una scelta modificabile.",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/b421587d48af2c10.webp",
+          "width": 588,
+          "height": 734
+        },
+        {
+          "src": "media/88313fbdcb4211f1.webp",
+          "width": 588,
+          "height": 1280
+        }
+      ],
+      "assets": [
+        {
+          "id": "88313fbdcb4211f1",
+          "name": "10-Foto-10.jpg",
+          "bytes": 100214,
+          "available": true
+        }
+      ],
       "completedProjects": []
     },
     {
@@ -15118,13 +16478,13 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 146,
-    "videos": 42,
-    "images": 15,
+    "records": 155,
+    "videos": 48,
+    "images": 18,
     "tools": 64,
     "projects": 22,
-    "attachments": 101,
-    "clips": 42,
+    "attachments": 111,
+    "clips": 48,
     "missing": 10
   }
 }
