@@ -1,5 +1,5 @@
-import {MAX_FORCE_PATHS,PATH_META,pathValue,newForcePath,samplePath,ellipseKnots} from './particle-paths.js?v=bd6df16a7ed3';
-import {screenToForce,forceToScreen} from './particle-forces.js?v=bd6df16a7ed3';
+import {MAX_FORCE_PATHS,PATH_META,pathValue,newForcePath,samplePath,ellipseKnots} from './particle-paths.js?v=ec7fea738e02';
+import {screenToForce,forceToScreen} from './particle-forces.js?v=ec7fea738e02';
 
 export function mountParticlePaths({canvas,board,getState,getMode,setMode,remember,mark,renderControls,showTab,toast}){
  const overlay=document.querySelector('#guide-handles'),controls=document.querySelector('#controls');

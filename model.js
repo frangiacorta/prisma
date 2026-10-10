@@ -1,6 +1,6 @@
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=bd6df16a7ed3';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=bd6df16a7ed3';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=bd6df16a7ed3';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=ec7fea738e02';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=ec7fea738e02';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=ec7fea738e02';
 export const BASE = {
  ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -67,7 +67,7 @@ export const META = {
 };
 export const GROUPS={
  shape:['volume','stretchX','stretchY','stretchZ','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','cut','cutX','cutY','edge','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','holeAspect','cutAspect'],
- material:['transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture','textureDepth','textureScale','textureOrganic','textureAngle','textureWrinkles','textureFolds','textureWear','textureRipples','hollow','wallThickness','translucency','scattering','scatterDirection','thinFilm','filmThickness','subsurface','sssRadius','sssColor','fullness','internalColor','thinShell','renderVersion'],
+ material:['filmPattern','filmPatternScale','filmPatternWarp','filmPatternDetail','filmChroma','filmDuo','transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture','textureDepth','textureScale','textureOrganic','textureAngle','textureWrinkles','textureFolds','textureWear','textureRipples','hollow','wallThickness','translucency','scattering','scatterDirection','thinFilm','filmThickness','subsurface','sssRadius','sssColor','fullness','internalColor','thinShell','renderVersion'],
  color:['palette','gradientAngle','gradientScale','gradientOffset','colorSoftness','glow'],
  light:['lights','environment','environmentAngle','environmentPower','environmentRefraction','environmentRotate','environmentCycles'],
  background:['background','background2','bgAngle','bgMode','bgHeight','bgSoftness','bgWash','bgShade'],

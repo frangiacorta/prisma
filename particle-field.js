@@ -1,5 +1,5 @@
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=bd6df16a7ed3';
+import {guideGLSL} from './particle-path-field.js?v=ec7fea738e02';
 export const fieldGLSL=`
 ${guideGLSL}
 const float TAU=6.28318530718;

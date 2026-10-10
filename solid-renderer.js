@@ -1,4 +1,41 @@
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
+// Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
+// Periodic 3D domain warp changes optical thickness, never screen-space pigment.
+export const FILM_PATTERN_GLSL=`
+uniform vec4 uFilmPattern;
+uniform vec2 uFilmAccent;
+float coatingField(vec3 q,float phase,float flow,float swirl){
+ q*=uFilmPattern.y;
+ vec3 t=flow*vec3(sin(phase),cos(phase),sin(phase+.9));
+ vec3 w=sin(q.yzx*1.7+t+vec3(.3,2.1,4.2));
+ q+=uFilmPattern.z*(w+.4*sin(q.zxy*3.1-w*1.3+swirl*sin(phase)));
+ float broad=sin(q.x*1.8+sin(q.y*1.7+t.x)+q.z*.8);
+ float fine=sin(q.y*4.6+sin(q.z*3.8+t.y)+q.x*2.3);
+ float micro=sin(q.z*9.1+q.y*6.7+sin(q.x*5.3-t.z));
+ return (broad+.45*uFilmPattern.w*fine+.16*uFilmPattern.w*micro)/(1.+.61*uFilmPattern.w);
+}
+float coatingThickness(vec3 local,float phase,float flow,float swirl,float base,float original){
+ if(uFilmPattern.x<=0.)return original;
+ float field=coatingField(local,phase,flow,swirl);
+ return mix(original,max(20.,base*(1.+.78*field)),uFilmPattern.x);
+}
+vec3 coatingContrast(vec3 film){
+ float peak=max(max(film.r,film.g),film.b);
+ if(uFilmAccent.x>0.){
+  vec3 separated=pow(clamp(film/max(.0001,peak),0.,1.),vec3(1.+uFilmAccent.x*1.8));
+  film=mix(film,separated*min(.98,peak*(1.+uFilmAccent.x*3.)),uFilmAccent.x);
+ }
+ if(uFilmAccent.y>0.){
+  // Optional art direction of reflected colour only; not spectral accuracy.
+  float balance=film.r/max(.0001,film.r+film.b);
+  vec3 blue=vec3(.004,.035,1.),gold=vec3(1.,.38,.009),cyan=vec3(.005,.8,1.);
+  vec3 duo=mix(blue,gold,smoothstep(.42,.64,balance));
+  duo=mix(duo,cyan,exp(-pow((balance-.38)/.09,2.))*.85);
+  film=mix(film,duo*max(max(film.r,film.g),film.b),uFilmAccent.y);
+ }
+ return film;
+}
+`;
 const TAU=Math.PI*2;
 const MOTION_LIMITS={volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
 function motionCycles(value,source){const n=Math.max(.1,Number(value)||1);return source?.perfectLoop===false?n:Math.max(1,Math.round(n));}
@@ -469,6 +506,7 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'fresnel',`vec3 fresnel(float cosine,floa
  float rs=(n1*ci-n2*ct)/max(.000001,n1*ci+n2*ct),rp=(n1*ct-n2*ci)/max(.000001,n1*ct+n2*ci);
  return vec3(clamp((rs*rs+rp*rp)*.5*uCoat.z,0.,1.));
 }
+${FILM_PATTERN_GLSL}
 float gaussian(float x,float center,float left,float right){float v=(x-center)*(x<center?left:right);return exp(-.5*v*v);}
 vec3 cie(float wavelength){
  float x=1.056*gaussian(wavelength,599.8,.0264,.0323)+.362*gaussian(wavelength,442.,.0624,.0374)-.065*gaussian(wavelength,501.1,.049,.0382);
@@ -484,6 +522,7 @@ vec3 soapFilm(vec3 local,float facing){
    +flow*.22*sin(local.y*4.8+phase+swirl*sin(angle*3.-phase)*1.2)
    +swirl*.17*sin(angle*3.-phase+local.y*2.)
    +uColorWave.x*.25*sin(colorCoordinate(local)*2.*PI));
+ thickness=coatingThickness(local,phase,flow,swirl,uScatter.w,thickness);
  float n1=1.333,n2=mix(mix(max(1.001,uMat.y),2.2,uMat.z*.55),1.,clamp(uModern.x,0.,1.));
  float ci=max(.001,facing),c1=sqrt(max(.001,1.-(1.-ci*ci)/(n1*n1))),c2=sqrt(max(.001,1.-(1.-ci*ci)/(n2*n2)));
  vec2 r01=vec2((ci-n1*c1)/(ci+n1*c1),(n1*ci-c1)/(n1*ci+c1));
@@ -494,7 +533,7 @@ vec3 soapFilm(vec3 local,float facing){
   vec2 product=r01*r12,reflection=(r01*r01+r12*r12+2.*product*interference)/(vec2(1.)+product*product+2.*product*interference);
   vec3 response=cie(wavelength);xyz+=response*dot(reflection,vec2(.5));white+=response;
  }
- return clamp(xyzRGB(xyz)/max(vec3(.001),xyzRGB(white)),0.,1.);
+ return coatingContrast(clamp(xyzRGB(xyz)/max(vec3(.001),xyzRGB(white)),0.,1.));
 }`);
 MODERN_FRAG=shaderFunction(MODERN_FRAG,'absorptionCoefficient',`vec3 absorptionCoefficient(vec3 tint){
  vec3 interiorTint=mix(uInternalColor,tint,uColorWave.x);
@@ -1329,7 +1368,7 @@ export class Renderer{
  async waitForGpu(options={}){const start=Date.now();let polls=0;while(this.completionSync){this.assertAvailable();if(this.pollCompletion())break;if(options.cancelled?.())return false;if(Date.now()-start>120000)throw new Error('Il calcolo richiede troppo tempo. La creazione è conservata.');if(polls++<4&&globalThis.scheduler?.yield)await globalThis.scheduler.yield();else await new Promise(r=>setTimeout(r,4));}return !options.cancelled?.();}
  draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options,source),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);let analytic=!!(key&32)||analyticShape(s);const timer=options.preview&&options.trackTiming!==false?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW){this.ensurePreviewField(s,options,source);analytic=this.cachedShapeAnalytic;}this.useVariant(key);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(key&512)this.uploadGrowth(s);if(key&32768)this.uploadRoots(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
  if(s.renderVersion>=2){u('uBudget',key&ATLAS_PREVIEW?(options.quality==='fast'?[this.fieldResolution>=96?128:96,3,4,1]:[128,4,8,2]):key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
- if(s.renderVersion>=2){u('uMaterialDetail',[s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad]);u('uMaterialLayers',[s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0]);u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);f('uNormalSamples',6);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,24]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
+ if(s.renderVersion>=2){u('uFilmPattern',[s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5]);u('uFilmAccent',[s.filmChroma||0,s.filmDuo||0]);u('uMaterialDetail',[s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad]);u('uMaterialLayers',[s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0]);u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);f('uNormalSamples',6);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,24]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
  u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);
 

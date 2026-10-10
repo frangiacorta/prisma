@@ -1,5 +1,7 @@
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=ec7fea738e02';
 // Particle shading uses Prisma's parameter names. It does not trace solid glass.
 export const prismaShadingGLSL=`
+${FILM_PATTERN_GLSL}
 uniform vec4 uMaterial,uFinish,uEnvironment,uGradient;
 uniform vec2 uPearl,uFiberLight;
 uniform vec4 uFilmLayer,uParticleFilmMotion,uFilmObject;
@@ -51,6 +53,7 @@ vec3 livingFilm(vec3 world,float facing,float rough){
  local.xz=filmRotate(-uFilmRotation.y)*local.xz;
  local.yz=filmRotate(-uFilmRotation.x)*local.yz;
  local.xy=filmRotate(-uFilmRotation.z)*local.xy;
+ vec3 coatingLocal=local;
  local*=uFilmLayer.y;
  float phase=uParticleFilmMotion.x,flow=uParticleFilmMotion.y,swirl=uParticleFilmMotion.z;
  float angle=atan(local.y,local.x+.000001);
@@ -58,6 +61,7 @@ vec3 livingFilm(vec3 world,float facing,float rough){
    +flow*.45*sin(local.y*4.8+phase+swirl*sin(angle*3.-phase)*1.2)
    +swirl*.3*sin(angle*3.-phase+local.y*2.);
  float thickness=max(20.,uPearl.y*(1.+uFilmLayer.z*variation)+uPearl.x*100.);
+ thickness=coatingThickness(coatingLocal,phase,flow,swirl,uPearl.y,thickness);
  float ci=clamp(facing,.001,1.),n1=1.333,c1=sqrt(max(.001,1.-(1.-ci*ci)/(n1*n1)));
  vec2 r01=vec2((ci-n1*c1)/(ci+n1*c1),(n1*ci-c1)/(n1*ci+c1)),r12=-r01,product=r01*r12;
  vec3 xyz=vec3(0.);
@@ -68,6 +72,7 @@ vec3 livingFilm(vec3 world,float facing,float rough){
  }
  vec3 film=clamp(filmRGB(xyz)/max(vec3(.001),filmRGB(uFilmWhite)),0.,1.);
  // Rough surfaces soften the hue contrast while preserving reflected energy.
+ film=coatingContrast(film);
  return mix(film,vec3(dot(film,vec3(.2126,.7152,.0722))),rough*rough*.7);
 }
 vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){

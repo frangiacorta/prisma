@@ -134,3 +134,12 @@ export const MATERIAL_STYLES=[
 Object.assign(EXTRA_META,{fullness:['Spessore',0,1,.001],environmentAngle:['Rotazione ambiente',-180,180,1],environmentPower:['Intensità ambiente',0,3,.01],environmentRefraction:['Ambiente nelle rifrazioni',0,.5,.01],environmentCycles:['Giri dell’ambiente',.1,4,.1],filmFlow:['Colori che colano',0,1,.01],filmSwirl:['Vortici della pellicola',0,1,.01],filmCycles:['Giri dei colori',.1,4,.1],grounding:['Ombra e caustica',0,1,.01]});
 
 Object.assign(EXTRA_BASE,{...MODERN_BASE,renderVersion:1});
+
+export const INTERFERENCE_BASE={filmPattern:0,filmPatternScale:1.5,filmPatternWarp:.8,filmPatternDetail:.5,filmChroma:0,filmDuo:0};
+Object.assign(EXTRA_BASE,INTERFERENCE_BASE);
+Object.assign(EXTRA_META,{
+ filmPattern:['Venature di interferenza',0,1,.01],filmPatternScale:['Densità delle venature',.2,6,.01],
+ filmPatternWarp:['Distorsione delle venature',0,2,.01],filmPatternDetail:['Dettaglio delle venature',0,1,.01],
+ filmChroma:['Contrasto dell’interferenza',0,1,.01],filmDuo:['Accento cobalto e oro',0,1,.01]
+});
+export const INTERFERENCE_STYLE={filmPattern:1,filmPatternScale:1.5,filmPatternWarp:.95,filmPatternDetail:.65,filmChroma:.85,filmDuo:1,filmThickness:440,filmFlow:.45,filmSwirl:.65,filmCycles:1,iridescence:1,thinFilm:1,metal:.05,roughness:.16,gloss:1,emission:.02,coat:0};

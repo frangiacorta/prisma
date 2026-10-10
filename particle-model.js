@@ -112,6 +112,6 @@ export const FIBER_STYLES={
 };
 
 export const FILM_STYLES={
- living:{pFilm:1,pFilmScale:1.1,pFilmVariation:.8,filmThickness:520,filmFlow:.75,filmSwirl:.45,filmCycles:1,pFiberSheen:.8,pFiberSpread:.3,pLighting:1,emission:.04,metal:.12,roughness:.18,gloss:1,iridescence:.15},
- satin:{pFilm:.6,pFilmScale:.6,pFilmVariation:.35,filmThickness:380,filmFlow:.3,filmSwirl:.18,filmCycles:1,pFiberSheen:.8,pFiberSpread:.65,pLighting:1,emission:.08,metal:.08,roughness:.4,gloss:.85,iridescence:.1}
+ living:{filmPattern:0,filmChroma:0,filmDuo:0,pFilm:1,pFilmScale:1.1,pFilmVariation:.8,filmThickness:520,filmFlow:.75,filmSwirl:.45,filmCycles:1,pFiberSheen:.8,pFiberSpread:.3,pLighting:1,emission:.04,metal:.12,roughness:.18,gloss:1,iridescence:.15},
+ satin:{filmPattern:0,filmChroma:0,filmDuo:0,pFilm:.6,pFilmScale:.6,pFilmVariation:.35,filmThickness:380,filmFlow:.3,filmSwirl:.18,filmCycles:1,pFiberSheen:.8,pFiberSpread:.65,pLighting:1,emission:.08,metal:.08,roughness:.4,gloss:.85,iridescence:.1}
 };

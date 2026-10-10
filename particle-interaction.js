@@ -1,4 +1,4 @@
-import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=bd6df16a7ed3';
+import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=ec7fea738e02';
 
 export function mountParticleForces({canvas,board,getState,getMode,setMode,remember,mark,renderControls,showTab,toast}){
  const overlay=document.querySelector('#force-handles'),controls=document.querySelector('#controls');
