@@ -11409,6 +11409,480 @@
       "completedProjects": []
     },
     {
+      "id": "s17-01",
+      "name": "Infinite Mantra · petali di velo viola",
+      "kind": "video",
+      "related": [
+        "roadmap-layered-veils"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Lindsay Kokoska · @infinite_mantra",
+      "summary": "Lamine trasparenti viola si aprono e ripiegano attorno a un nucleo scuro, su fondo avorio.",
+      "sources": [
+        "https://www.infinitemantra.ca/",
+        "https://www.fooh.com/blog/lindsay-kokoska-interview"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Petali asimmetrici e sovrapposti, bordi sottili ondulati; il gruppo cambia silhouette conservando un centro comune.",
+                "light": "Trasparenza lilla, bordi più saturi e oscuramento dove si sovrappongono gli strati. Presso il nucleo compaiono ciano e ocra. Nessuna ombra portata netta o sorgente speculare riconoscibile.",
+                "motion": "Tra i campioni 0,63–14,44 s le lamine si avvolgono, si allargano e si riorganizzano, con pieghe ampie e differenze di fase.",
+                "organicQuality": "Superfici continue e sottili, pieghe morbide; nessuna ramificazione o crescita biologica dimostrata."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta: estendere le membrane esistenti con più lamine persistenti attorno a una radice comune. Moto periodico di apertura e torsione con ritardi per strato, dettaglio delle ondulazioni separato dal respiro. Colore e opacità dipendenti dalla posizione sulla lamina e dalla sovrapposizione; verificare composizione alpha e ordine in profondità."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Ricerca del 10 ottobre 2026: sito dell’artista e intervista diretta consultati. Lindsay Kokoska descrive un processo misto con compositing, animazione e AI; cita Procreate, Runway, After Effects e altri strumenti. Non identifica il procedimento di questi tre video. Nessuna repo o plugin originale per questi effetti individuato nelle ricerche per nome/handle; non equivale a provarne l’assenza. Le ricette Prisma sotto sono proposte autonome, non attribuzioni della tecnica originale."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Numero e ampiezza dei petali",
+                "Apertura/chiusura",
+                "Torsione e ritardo fra strati",
+                "Ondulazione del bordo",
+                "Trasparenza e assorbimento apparente",
+                "Palette radice/bordo",
+                "Oscurità e dimensione del nucleo indipendenti",
+                "Durata loop e irregolarità periodica"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.6279166666666667,
+                  1.88375,
+                  3.139583333333333,
+                  4.395416666666667,
+                  5.65125,
+                  6.9070833333333335,
+                  8.162916666666666,
+                  9.418750000000001,
+                  10.674583333333333,
+                  11.930416666666666,
+                  13.186250000000001,
+                  14.442083333333334
+                ],
+                "contactSheet": "reports/reference-series-17/1-contact.jpg",
+                "limits": "Analisi visiva di 12 fotogrammi in sequenza per video, a 296×640 px. Audio non analizzato. Software originale, simulazione fisica e raccordo del loop non verificati."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da ricostruire con fase periodica e confrontare in movimento: queste registrazioni non certificano un loop continuo."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "motion"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "La trasparenza deve mostrare la sovrapposizione dei petali; bordi sottili e movimento continuo anche nella chiusura.",
+      "avoid": "Foro centrale obbligatorio, pieghe che scattano, viola uniforme o materiale metallico imposto.",
+      "detailsSource": [
+        "reference\\video-series-17.json"
+      ],
+      "media": [
+        {
+          "src": "media/d70d08d7f1b50cdc.webp",
+          "width": 296,
+          "height": 473
+        },
+        {
+          "src": "media/809145fe4b3c000d.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/d5b7661018866d49.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/63e2203e7d447ddc.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/754a52b1c163f692.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/bed50f9f875e0a87.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "bb619b0434cc2247",
+          "name": "1-ScreenRecording_10-10-2026-19-06-29_1.mov",
+          "bytes": 6175543,
+          "available": true
+        }
+      ],
+      "duration": 15.07,
+      "clip": "media/s17-01-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s17-02",
+      "name": "Infinite Mantra · nube di luce pulsante",
+      "kind": "video",
+      "related": [
+        "roadmap-particle-volume",
+        "roadmap-layered-veils"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Lindsay Kokoska · @infinite_mantra",
+      "summary": "Granuli luminosi finissimi formano un volume con centro bianco e alone azzurro, che cambia densità ed estensione.",
+      "sources": [
+        "https://www.infinitemantra.ca/",
+        "https://www.fooh.com/blog/lindsay-kokoska-interview"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Nube approssimativamente sferica/ellittica, nucleo più denso e luminoso; margine diffuso con punti sparsi.",
+                "light": "Bianco caldo centrale, periferia fredda blu-verde su fondo scuro bruno. La luminosità cresce con la densità apparente; non si distinguono riflessi di superficie o ombre portate.",
+                "motion": "Nei campioni la nube si espande e si raccoglie; quantità apparente di granuli e luminosità cambiano insieme. Non si può seguire l’identità di ogni particella alla risoluzione disponibile.",
+                "organicQuality": "Coesione del volume e dispersione periferica. Non sono visibili collegamenti fra punti o fibre persistenti."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta: riusare il nucleo Particelle con distribuzione volumetrica piena, gradiente di densità dal centro, campo radiale di respiro e turbolenza lenta. Separare movimento, opacità, dimensione dei punti e luce centrale, così la pulsazione non dipende solo dal bloom."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Ricerca del 10 ottobre 2026: sito dell’artista e intervista diretta consultati. Lindsay Kokoska descrive un processo misto con compositing, animazione e AI; cita Procreate, Runway, After Effects e altri strumenti. Non identifica il procedimento di questi tre video. Nessuna repo o plugin originale per questi effetti individuato nelle ricerche per nome/handle; non equivale a provarne l’assenza. Le ricette Prisma sotto sono proposte autonome, non attribuzioni della tecnica originale."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Raggio e compattezza del volume",
+                "Densità centro/periferia",
+                "Diametro minimo e variabilità dei punti",
+                "Ampiezza e fase del respiro",
+                "Turbolenza lenta e coesione",
+                "Dispersione periferica",
+                "Luce del nucleo e alone indipendenti",
+                "Palette radiale",
+                "Durata loop"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.6687500000000001,
+                  2.00625,
+                  3.34375,
+                  4.68125,
+                  6.018750000000001,
+                  7.35625,
+                  8.69375,
+                  10.03125,
+                  11.36875,
+                  12.706249999999999,
+                  14.043750000000001,
+                  15.381250000000001
+                ],
+                "contactSheet": "reports/reference-series-17/2-contact.jpg",
+                "limits": "Analisi visiva di 12 fotogrammi in sequenza per video, a 296×640 px. Audio non analizzato. Software originale, simulazione fisica e raccordo del loop non verificati. Il campione finale mostra l’uscita alla schermata del telefono: escluso dalle anteprime editoriali e dal clip di studio."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da ricostruire con fase periodica e confrontare in movimento: queste registrazioni non certificano un loop continuo."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "cloud",
+        "motion"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Granuli minuti ancora leggibili, centro pieno, dispersione graduale e respiro dell’intero volume.",
+      "avoid": "Anello o foro centrale automatico, punti grandi come coriandoli, bloom che cancella la struttura.",
+      "detailsSource": [
+        "reference\\video-series-17.json"
+      ],
+      "media": [
+        {
+          "src": "media/c3acfec666f79b42.webp",
+          "width": 296,
+          "height": 473
+        },
+        {
+          "src": "media/f07d7a1317ed4146.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/0204283f9bcd982a.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/925d152448172c8d.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/e2ce091aadee1147.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/eaeef05fc99f99e0.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "799138c7ea08d6a1",
+          "name": "2-ScreenRecording_10-10-2026-19-07-19_1.mov",
+          "bytes": 6199125,
+          "available": true
+        }
+      ],
+      "duration": 16.05,
+      "clip": "media/s17-02-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s17-03",
+      "name": "Infinite Mantra · aureola a strati",
+      "kind": "video",
+      "related": [
+        "roadmap-layered-veils"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Lindsay Kokoska · @infinite_mantra",
+      "summary": "Un alone di strati blu e arancio si deforma lentamente attorno a una zona scura e si apre lateralmente.",
+      "sources": [
+        "https://www.infinitemantra.ca/",
+        "https://www.fooh.com/blog/lindsay-kokoska-interview"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Contorni multipli sottili e semitrasparenti attorno a una forma ovale; nel finale la composizione si apre in due lobi. Testo sovrapposto nel reel.",
+                "light": "Bordo esterno azzurro, fascia crema/arancio e accento rosa caldo laterale. Luce diffusa e colore stratificato; nessuna prova di metallicità o iridescenza fisica.",
+                "motion": "Tra 0,35 e 8,10 s cambia l’inclinazione apparente e l’apertura dei lobi; contorni sfalsati suggeriscono sovrapposizione spaziale o persistenza temporale, non distinguibili con certezza.",
+                "organicQuality": "Continuità del contorno e deformazione morbida, con livelli che seguono una forma comune."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta: stessa famiglia Veli, con copie di superficie o contorni a distanza/scala/fase leggermente diverse. Prima provare strati geometrici deterministici per avere controllo e loop; confrontare un feedback d’immagine solo se serve persistenza visiva aggiuntiva. Il feedback da solo resta 2D e non aggiunge volume per il 4D."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Ricerca del 10 ottobre 2026: sito dell’artista e intervista diretta consultati. Lindsay Kokoska descrive un processo misto con compositing, animazione e AI; cita Procreate, Runway, After Effects e altri strumenti. Non identifica il procedimento di questi tre video. Nessuna repo o plugin originale per questi effetti individuato nelle ricerche per nome/handle; non equivale a provarne l’assenza. Le ricette Prisma sotto sono proposte autonome, non attribuzioni della tecnica originale."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Numero di strati",
+                "Distanza e variazione di scala",
+                "Ritardo di fase fra strati",
+                "Spessore e sfumatura del contorno",
+                "Apertura laterale e asimmetria",
+                "Palette radiale blu/crema/corallo",
+                "Opacità per strato",
+                "Nucleo scuro regolabile fino a zero"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.3520833333333333,
+                  1.05625,
+                  1.7604166666666667,
+                  2.464583333333333,
+                  3.1687499999999997,
+                  3.8729166666666663,
+                  4.577083333333333,
+                  5.281249999999999,
+                  5.985416666666666,
+                  6.689583333333332,
+                  7.39375,
+                  8.097916666666666
+                ],
+                "contactSheet": "reports/reference-series-17/3-contact.jpg",
+                "limits": "Analisi visiva di 12 fotogrammi in sequenza per video, a 296×640 px. Audio non analizzato. Software originale, simulazione fisica e raccordo del loop non verificati."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da ricostruire con fase periodica e confrontare in movimento: queste registrazioni non certificano un loop continuo."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "motion",
+        "graphic"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Transizioni cromatiche larghe, strati leggibili e trasformazione lenta della stessa forma.",
+      "avoid": "Interpretare il nero centrale come un foro obbligatorio; copiare le scritte del reel come parte dell’effetto.",
+      "detailsSource": [
+        "reference\\video-series-17.json"
+      ],
+      "media": [
+        {
+          "src": "media/ae2db15780338f4f.webp",
+          "width": 296,
+          "height": 473
+        },
+        {
+          "src": "media/8563646870ceb412.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/8de27801582ae24d.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/5251f20b13525ff8.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/483cb700e47d9f84.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/83d8a0dbf7861fa4.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "ea9fef841753d12f",
+          "name": "3-ScreenRecording_10-10-2026-19-06-09_1.mov",
+          "bytes": 2544547,
+          "available": true
+        }
+      ],
+      "duration": 8.45,
+      "clip": "media/s17-03-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
       "id": "roadmap-fractals",
       "name": "Frattali 3D",
       "kind": "project",
@@ -12070,6 +12544,7 @@
         "s09-05",
         "s09-03",
         "img-20261010-02",
+        "s17-02",
         "reuse-pcr",
         "reuse-three-attractors",
         "dense-cloud"
@@ -12087,7 +12562,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Prima provare il componente PCR già usato dallo stesso autore in un altro lavoro, se accessibile, e valutare come riceva i punti di Prisma o comunichi tramite il servizio PC. Verificare separatamente le ombre volumetriche personalizzate: PCR non le dimostra. Sviluppare composizione/profondità o attenuazione nuove solo per le lacune accertate e per l'eventuale percorso web autonomo."
+              "value": "Prima provare il componente PCR già usato dallo stesso autore in un altro lavoro, se accessibile, e valutare come riceva i punti di Prisma o comunichi tramite il servizio PC. Verificare separatamente le ombre volumetriche personalizzate: PCR non le dimostra. Sviluppare composizione/profondità o attenuazione nuove solo per le lacune accertate e per l'eventuale percorso web autonomo. Per la nuova reference s17-02 di Infinite Mantra, provare prima la distribuzione e il moto radiale di Prisma; non abbiamo evidenza che questa artista usi PCR o lo stesso procedimento delle reference precedenti."
             }
           ]
         },
@@ -12177,6 +12652,12 @@
               ]
             },
             {
+              "label": "remaining",
+              "value": [
+                "Studio nube luminosa s17-02: respiro radiale, centro pieno, densità e luce separate, granuli minuti e alone controllato"
+              ]
+            },
+            {
               "label": "currentLimitation",
               "value": "Il passaggio attuale in particle-renderer.js usa fusione additiva ONE/ONE senza test di profondità. Più punti o più luce non producono auto-ombreggiatura fra strati. Un buffer di profondità da solo non equivale a ombre volumetriche."
             }
@@ -12190,7 +12671,7 @@
       "result": "",
       "where": "",
       "platform": "",
-      "next": "",
+      "next": "Studio nube luminosa s17-02: respiro radiale, centro pieno, densità e luce separate, granuli minuti e alone controllato",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -12229,6 +12710,7 @@
         "s11-01",
         "reuse-xpbd",
         "project-living-extensions",
+        "roadmap-layered-veils",
         "project-cobalto-oro",
         "project-pellicola-viva"
       ],
@@ -13647,6 +14129,130 @@
       ]
     },
     {
+      "id": "roadmap-layered-veils",
+      "name": "Veli trasparenti e aureole",
+      "kind": "project",
+      "related": [
+        "s17-01",
+        "s17-03",
+        "roadmap-membrane",
+        "project-pellicola-viva",
+        "s17-02"
+      ],
+      "state": "proposed",
+      "priority": false,
+      "author": "",
+      "summary": "Estensione delle membrane: petali semitrasparenti e aureole sovrapposte con apertura lenta, ritardi e colore per strato.",
+      "sources": [
+        "https://www.infinitemantra.ca/",
+        "https://www.fooh.com/blog/lindsay-kokoska-interview"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Riutilizzare le superfici e il moto connesso già presenti in Particelle. Aggiungere lamine persistenti e una variante di contorni stratificati, con fase periodica esplicita. Confrontare trasparenza geometrica e feedback solo dopo un primo studio visivo."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Base Prisma: living-structures.js, living-topology.js e particle-shading.js; codice XPBD già integrato. Nessuna repo originale dell’artista identificata per questi video."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Numero e ampiezza dei petali",
+                "Apertura/chiusura",
+                "Torsione e ritardo fra strati",
+                "Ondulazione del bordo",
+                "Trasparenza e assorbimento apparente",
+                "Palette radice/bordo",
+                "Oscurità e dimensione del nucleo indipendenti",
+                "Durata loop e irregolarità periodica",
+                "Numero di strati",
+                "Distanza e variazione di scala",
+                "Ritardo di fase fra strati",
+                "Spessore e sfumatura del contorno",
+                "Apertura laterale e asimmetria",
+                "Palette radiale blu/crema/corallo",
+                "Opacità per strato",
+                "Nucleo scuro regolabile fino a zero"
+              ]
+            },
+            {
+              "label": "acceptance",
+              "value": [
+                "Bordi sottili riconoscibili attraverso gli strati",
+                "Colore sulla superficie, evitando una tinta uniforme",
+                "Deformazione continua anche nella chiusura",
+                "Raccordo del loop controllato per posa, colore e velocità"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "remaining",
+              "value": [
+                "Studio trasparenza e sovrapposizione delle lamine",
+                "Due preset di confronto: petali su avorio e aureola su scuro",
+                "Controllo indipendente del nucleo scuro, incluso zero",
+                "Verifica chiusura naturale senza scatti e loop senza salto",
+                "Prova prestazioni e sorting degli strati sovrapposti"
+              ]
+            },
+            {
+              "label": "limits",
+              "value": [
+                "Le membrane v1 già completate non dimostrano ancora la qualità di queste nuove reference",
+                "Le ricette sono ipotesi di implementazione Prisma; non descrivono il codice originale"
+              ]
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "motion"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "Studio trasparenza e sovrapposizione delle lamine · Due preset di confronto: petali su avorio e aureola su scuro · Controllo indipendente del nucleo scuro, incluso zero · Verifica chiusura naturale senza scatti e loop senza salto · Prova prestazioni e sorting degli strati sovrapposti",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/creative-roadmap.json"
+      ],
+      "media": [
+        {
+          "src": "media/d70d08d7f1b50cdc.webp",
+          "width": 296,
+          "height": 473
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "s17-01",
+      "completedProjects": [
+        "roadmap-membrane",
+        "project-pellicola-viva"
+      ]
+    },
+    {
       "id": "method-living-moodboard",
       "name": "Un moodboard che diventa progetto",
       "kind": "image",
@@ -14025,7 +14631,8 @@
       "related": [
         "roadmap-membrane",
         "s07-03",
-        "s04-01"
+        "s04-01",
+        "roadmap-layered-veils"
       ],
       "state": "implemented",
       "priority": false,
@@ -18890,13 +19497,13 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 174,
-    "videos": 53,
+    "records": 178,
+    "videos": 56,
     "images": 22,
     "tools": 71,
-    "projects": 25,
-    "attachments": 123,
-    "clips": 53,
+    "projects": 26,
+    "attachments": 126,
+    "clips": 56,
     "missing": 10
   }
 }

@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=c8567bd14506';
+import {AUDIO_HELP} from './audio-model.js?v=c2b52e9c14b3';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishRegionsEnabled:'Limita mosaico e/o RGB ai riquadri disegnati. Disattivalo per trattare di nuovo tutta l’immagine, conservando le aree.',
