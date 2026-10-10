@@ -1,4 +1,4 @@
-import {screenToForce} from './particle-forces.js?v=b18a20e380e3';
+import {screenToForce} from './particle-forces.js?v=e948e90c6d73';
 export const BODY_LABELS={head:'Testa','hand-a':'Mano A','hand-b':'Mano B'};
 export const BODY_META={gainX:['Sensibilità orizzontale',.1,4,.01],gainY:['Sensibilità verticale',.1,4,.01],offsetX:['Sposta il campo X',-.75,.75,.01],offsetY:['Sposta il campo Y',-.75,.75,.01],rotation:['Correzione camera obliqua',-90,90,1],smoothing:['Morbidezza · secondi',0,1.5,.01],deadzone:['Filtro micro-movimenti',0,.05,.001],hold:['Attesa in perdita · secondi',0,3,.05],fade:['Dissolvenza · secondi',.1,3,.05],strength:['Forza',0,3,.01],radius:['Raggio',.1,5,.01],swirl:['Avvolgimento',-2,2,.01],z:['Profondità del campo',-4,4,.01]};
 const defaults={gainX:1,gainY:1,offsetX:0,offsetY:0,rotation:0,smoothing:.18,deadzone:.003,hold:.6,fade:.9,mirrorX:false,mirrorY:false,loss:'fade',show:true,target:'fields'};

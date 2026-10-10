@@ -10456,6 +10456,373 @@
       "completedProjects": []
     },
     {
+      "id": "s15-01",
+      "name": "Planets · nuclei freddi e fibre calde",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Globi con nucleo turchese/verde e una corona di fibre rosse, arancio e oro; ciuffi luminosi e riccioli isolati.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://docs.blender.org/manual/en/4.2/modeling/geometry_nodes/hair/deformation/roll_hair_curves.html",
+        "https://docs.blender.org/manual/en/4.0/modeling/geometry_nodes/hair/write/set_hair_curve_profile.html"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Masse sferiche irregolari, pelo corto mescolato a riccioli lunghi, addensamenti e cavità locali. Nel finale ciuffi verdi e una sfera giallo-arancio. Compare anche un post Monster: è contesto della raccolta, non una nuova richiesta di personaggi.",
+                "colourLight": "Zone fredde nel corpo e fibre calde sul bordo; la luce enfatizza il lato destro e lascia ombre negli incavi. Piccoli gruppi verde-ciano sembrano luminosi. Il video non permette di separare emissione, luce diretta e postproduzione.",
+                "motion": "Scorrimento fra diversi post, con variazioni di sagoma e orientamento nelle singole opere. Il movimento mantiene una massa compatta. Non è dimostrato che il passaggio fra colori/opere sia un morph continuo della stessa geometria.",
+                "organicQuality": "Disordine locale, ciuffi di dimensioni diverse e orientamento condiviso danno un aspetto vivo senza richiedere ramificazione biologica."
+              }
+            },
+            {
+              "label": "captionEvidence",
+              "value": "Sono leggibili Planet #110, Planet #160 e Planet #155. Durante lo scorrimento compare anche una didascalia #133 senza attribuzione sicura ai fotogrammi vicini. Non usata per identificare la geometria."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta da provare in Prisma: campo di direzioni sulla superficie per pettinare le curve, variazione coerente per ciuffo, profilo del filo e torsione. Prima verificare se i fasci di fibre esistenti bastano per il look a petali; eventuali nastri appiattiti richiedono una prova separata."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Stesso autore e processo Cinema 4D/Adobe già verificati nella serie 13. Nessuna nuova repo originale individuata. Aggiunta lettura dei nodi Blender Roll Hair Curves e Set Hair Curve Profile: componenti desktop per arrotolare le punte e variare il raggio, non plugin del renderer web. Nessun codice installato o scena eseguita."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Maschera colore nucleo/corona",
+                "Ampiezza e transizione delle zone calde/fredde",
+                "Colore e luminosità per ciuffo",
+                "Quota di riccioli isolati",
+                "Contrasto fra cavità e punte"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  1.1375,
+                  3.4125,
+                  5.6875,
+                  7.9624999999999995,
+                  10.2375,
+                  12.512500000000001,
+                  14.787500000000001,
+                  17.0625,
+                  19.337500000000002,
+                  21.6125,
+                  23.887500000000003,
+                  26.162499999999998
+                ],
+                "contactSheet": "reports/reference-series-15/1-contact.jpg",
+                "limits": "24 campioni in totale, didascalie e confronto delle due sequenze. Durate diverse (27,30 e 25,20 s) e hash diversi, contenuto visivo distinto: due reference, non duplicati. Audio non analizzato; raccordi dei loop non certificati."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da progettare con radici persistenti, direzioni continue e controllo separato di camera, deformazione e colore. Le sequenze sono raccolte di post, non prove di loop unico."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Coesione della massa, differenze tra ciuffi e fibre, palette sulla materia e direzioni locali leggibili.",
+      "avoid": "Dichiarare una simulazione fisica dai soli fotogrammi, confondere scorrimento e moto, imporre un foro o un solo colore. Non trasformare ogni variante in un nuovo renderer.",
+      "detailsSource": [
+        "reference\\video-series-15.json"
+      ],
+      "media": [
+        {
+          "src": "media/c910b1e14ef22aa4.webp",
+          "width": 296,
+          "height": 262
+        },
+        {
+          "src": "media/78dc0cf102f9ed11.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/30387179ea4cbc9f.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/5d3038d92a3c1f0e.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/8bf71bdeeaea9472.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/b0deb8202e107eb4.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/baf64c7658511ba6.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/d246fccfa8ef136f.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/5102e73c7db0edbc.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/c3ad6734011715e7.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "c06d6334cf8625c0",
+          "name": "1-ScreenRecording_10-10-2026-14-53-24_1.mov",
+          "bytes": 11092149,
+          "available": true
+        }
+      ],
+      "duration": 27.3,
+      "clip": "media/s15-01-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s15-02",
+      "name": "Planets · ciuffi pettinati e petali",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Fibre ciano piegate in una direzione comune, gruppi multicolore più grumosi e fasci arancio larghi come petali.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://docs.blender.org/manual/en/4.2/modeling/geometry_nodes/hair/deformation/roll_hair_curves.html",
+        "https://docs.blender.org/manual/en/4.0/modeling/geometry_nodes/hair/write/set_hair_curve_profile.html"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "In apertura una sfera con lunghe ciocche ciano; seguono ciuffi multicolore compatti, pelo blu-verde, un dettaglio di fasci arancio e verdi a punta, un vortice verde e altri volumi soffici.",
+                "colourLight": "Riflessi ciano sul corpo scuro, colori distribuiti per gruppo e punte calde su fasci arancio. Gli incavi ombreggiati danno volume; non si vede una prova di pellicola madreperlacea.",
+                "motion": "Nelle prime viste cambia l’orientamento del volume e delle ciocche. Le fibre hanno una direzione condivisa simile a una pettinatura; non è possibile attribuirla con certezza alla gravità o a una simulazione. La registrazione contiene scorrimenti, gallerie e caricamenti bianchi: non sono effetti da ricreare.",
+                "organicQuality": "La direzione delle ciocche segue la superficie e produce vortici, ricadute e una gerarchia fra nucleo, ciuffo e punta. Alcuni fasci sembrano larghi o piatti, ma potrebbero essere molti peli ravvicinati."
+              }
+            },
+            {
+              "label": "captionEvidence",
+              "value": "Didascalie leggibili: Planet #114 (ciocche ciano), #115 (gruppi multicolore), #125 (blu-verde), #166 presso il passaggio ai fasci arancio, #127 (verde), #113 (ultimo volume blu). Le scene espositive restano documentazione del supporto."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta da provare in Prisma: campo di direzioni sulla superficie per pettinare le curve, variazione coerente per ciuffo, profilo del filo e torsione. Prima verificare se i fasci di fibre esistenti bastano per il look a petali; eventuali nastri appiattiti richiedono una prova separata."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Stesso autore e processo Cinema 4D/Adobe già verificati nella serie 13. Nessuna nuova repo originale individuata. Aggiunta lettura dei nodi Blender Roll Hair Curves e Set Hair Curve Profile: componenti desktop per arrotolare le punte e variare il raggio, non plugin del renderer web. Nessun codice installato o scena eseguita."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Direzione di pettinatura sulla superficie",
+                "Inclinazione delle fibre e vortice locale",
+                "Profilo di spessore lungo il filo",
+                "Larghezza e appiattimento del fascio",
+                "Torsione e orientamento delle punte",
+                "Ritardo progressivo tra radice e punta"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  1.05,
+                  3.15,
+                  5.25,
+                  7.3500000000000005,
+                  9.45,
+                  11.549999999999999,
+                  13.649999999999999,
+                  15.75,
+                  17.849999999999998,
+                  19.95,
+                  22.049999999999997,
+                  24.150000000000002
+                ],
+                "contactSheet": "reports/reference-series-15/2-contact.jpg",
+                "limits": "24 campioni in totale, didascalie e confronto delle due sequenze. Durate diverse (27,30 e 25,20 s) e hash diversi, contenuto visivo distinto: due reference, non duplicati. Audio non analizzato; raccordi dei loop non certificati."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Da progettare con radici persistenti, direzioni continue e controllo separato di camera, deformazione e colore. Le sequenze sono raccolte di post, non prove di loop unico."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Coesione della massa, differenze tra ciuffi e fibre, palette sulla materia e direzioni locali leggibili.",
+      "avoid": "Dichiarare una simulazione fisica dai soli fotogrammi, confondere scorrimento e moto, imporre un foro o un solo colore. Non trasformare ogni variante in un nuovo renderer.",
+      "detailsSource": [
+        "reference\\video-series-15.json"
+      ],
+      "media": [
+        {
+          "src": "media/132532625c8ea27f.webp",
+          "width": 296,
+          "height": 378
+        },
+        {
+          "src": "media/16ee116ca653cf5a.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/1a6044be0565b64e.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/4c68e210618e361c.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/761c1635883ee4f9.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/4e1187d8513fe821.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/742566746537b875.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/e5cb441c850d601f.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/3f0c84edd47f68fb.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/3a2447021ba97124.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "bfc5886cf7241abf",
+          "name": "2-ScreenRecording_10-10-2026-14-53-24_1.mov",
+          "bytes": 10495257,
+          "available": true
+        }
+      ],
+      "duration": 25.2,
+      "clip": "media/s15-02-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
       "id": "roadmap-fractals",
       "name": "Frattali 3D",
       "kind": "project",
@@ -12261,6 +12628,8 @@
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10",
+        "s15-01",
+        "s15-02",
         "s05-02"
       ],
       "state": "proposed",
@@ -12273,7 +12642,9 @@
         "https://docs.blender.org/manual/id/4.4/modeling/geometry_nodes/hair/generation/generate_hair_curves.html",
         "https://docs.blender.org/manual/en/latest/render/shader_nodes/shader/hair_principled.html",
         "https://docs.blender.org/manual/en/4.4/modeling/geometry_nodes/hair/guides/clump_hair_curves.html",
-        "https://docs.blender.org/manual/id/4.5/modeling/geometry_nodes/hair/guides/curl_hair_curves.html"
+        "https://docs.blender.org/manual/id/4.5/modeling/geometry_nodes/hair/guides/curl_hair_curves.html",
+        "https://docs.blender.org/manual/en/4.2/modeling/geometry_nodes/hair/deformation/roll_hair_curves.html",
+        "https://docs.blender.org/manual/en/4.0/modeling/geometry_nodes/hair/write/set_hair_curve_profile.html"
       ],
       "sections": [
         {
@@ -12295,7 +12666,8 @@
                 "prisma": "Riutilizzare la gestione delle fibre e i riflessi setosi. I vincoli XPBD già presenti possono contribuire al controllo delle lunghezze; non forniscono da soli grooming, torsione o auto-collisione del pelo.",
                 "web": "Ispezionato three.js r180 LineSegments2 e licenza MIT: linee a spessore regolabile e colori ai vertici. Richiede Three WebGLRenderer, quindi non è un plugin diretto del motore custom di Prisma. Utile come confronto; nessuna nuova dipendenza installata.",
                 "offline": "Alternativa Blender: Generate Hair Curves per curve su superficie, densità, lunghezza, seed e punti di controllo; Principled Hair BSDF in Cycles per il materiale. Da usare come banco visivo o render esportato, non da eseguire direttamente in Pages. Documentazione consultata, nessuna scena provata.",
-                "blenderGuides": "Documentazione ufficiale Clump Hair Curves: curve guida, influenza lungo il filo, dispersione punte e mantenimento lunghezza. Curl Hair Curves: raggio, frequenza, inizio della curvatura e variazione con seed. Componenti da riusare in una prova Blender, non sorgente originale delle opere; nessuna scena eseguita."
+                "blenderGuides": "Documentazione ufficiale Clump Hair Curves: curve guida, influenza lungo il filo, dispersione punte e mantenimento lunghezza. Curl Hair Curves: raggio, frequenza, inizio della curvatura e variazione con seed. Componenti da riusare in una prova Blender, non sorgente originale delle opere; nessuna scena eseguita.",
+                "blenderRollProfile": "Roll Hair Curves (manuale 4.2): lunghezza/raggio della porzione arrotolata, asse e mantenimento lunghezza. Set Hair Curve Profile (manuale 4.0): raggio variabile lungo una curva. Documentazione verificata; non genera da solo un petalo piatto o una simulazione fisica. Alternative desktop, non integrate."
               }
             }
           ]
@@ -12317,7 +12689,11 @@
                   "Rapporto nucleo/appendici",
                   "Raggio, frequenza e inizio dei riccioli",
                   "Apertura e dispersione delle punte dei ciuffi",
-                  "Profondità delle depressioni, senza foro obbligatorio"
+                  "Profondità delle depressioni, senza foro obbligatorio",
+                  "Direzione di pettinatura sulla superficie",
+                  "Inclinazione e vortice locale",
+                  "Profilo di spessore lungo il filo",
+                  "Larghezza, appiattimento e torsione dei fasci: prova da valutare"
                 ],
                 "Movimento": [
                   "Respiro del nucleo",
@@ -12326,7 +12702,8 @@
                   "Turbolenza lenta coerente",
                   "Rotazione indipendente",
                   "Viaggio camera globo/macro",
-                  "Durata del loop"
+                  "Durata del loop",
+                  "Ritardo progressivo radice/punta per ciuffi pettinati"
                 ],
                 "Colore e luce": [
                   "Palette per filo",
@@ -12338,7 +12715,9 @@
                   "Modalità colore: raggio del nucleo / lunghezza del filo / casualità per filo",
                   "Posizione e larghezza delle fasce cromatiche",
                   "Colori distinti per nucleo, corpo e punte",
-                  "Luminosità del nucleo indipendente dal riflesso"
+                  "Luminosità del nucleo indipendente dal riflesso",
+                  "Maschere separate nucleo/corona e variazione per ciuffo",
+                  "Contrasto caldo/freddo distinto dalla direzione della luce"
                 ]
               }
             },
@@ -12362,7 +12741,10 @@
                 "Misurare prestazioni su PC e telefono con qualità adattiva",
                 "Confrontare ciuffi bianchi (Planet 200), appendici lunghe (Planet 229) e riccioli (Planet X14)",
                 "Ottenere le tre palette degli screenshot senza cambiare la geometria",
-                "Mantenere continuità e lunghezza dei fili durante clumping e curl"
+                "Mantenere continuità e lunghezza dei fili durante clumping e curl",
+                "Confrontare pettinatura ciano, nucleo freddo/corona calda e fasci a petalo",
+                "Verificare se bastano ciuffi di fili prima di introdurre nastri",
+                "Separare moto del corpo, flessione delle ciocche e camera"
               ]
             }
           ]
@@ -12383,7 +12765,8 @@
               "label": "evidence",
               "value": {
                 "batch14": "Sei video e quattro screenshot analizzati; foto 8 e 9 raggruppate nello stesso carosello. Originali tutti mappati.",
-                "status": "Estensione della specifica, non implementazione del renderer."
+                "status": "Estensione della specifica, non implementazione del renderer.",
+                "batch15": "Due video distinti con lo stesso nome originale, entrambi conservati e analizzati; 24 campioni. Progetto sempre da sviluppare."
               }
             }
           ]
@@ -13136,6 +13519,8 @@
         "s14-04",
         "s14-05",
         "s14-06",
+        "s15-01",
+        "s15-02",
         "img-s14-08-09",
         "img-s14-10"
       ],
@@ -13244,6 +13629,8 @@
         "s14-04",
         "s14-05",
         "s14-06",
+        "s15-01",
+        "s15-02",
         "img-s14-07",
         "img-s14-10"
       ],
@@ -13369,6 +13756,8 @@
         "s14-04",
         "s14-05",
         "s14-06",
+        "s15-01",
+        "s15-02",
         "img-s14-07",
         "img-s14-08-09"
       ],
@@ -16478,13 +16867,13 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 155,
-    "videos": 48,
+    "records": 157,
+    "videos": 50,
     "images": 18,
     "tools": 64,
     "projects": 22,
-    "attachments": 111,
-    "clips": 48,
+    "attachments": 113,
+    "clips": 50,
     "missing": 10
   }
 }
