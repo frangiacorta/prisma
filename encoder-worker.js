@@ -1,7 +1,7 @@
 /* Streaming MP4 export. Raw frames never accumulate; encoded media is written
  * to OPFS when available. The software fallback restarts every second so its
  * WASM filesystem never contains the entire movie. */
-importScripts('./vendor/mp4-muxer.js?v=643cf87c5a69');
+importScripts('./vendor/mp4-muxer.js?v=336f6e73d149');
 const BLOCK=1024*1024, MEMORY_LIMIT=512*1024*1024;
 let encoder=null,muxer=null,sink=null,config=null,frameNumber=0,segmentFrames=0,segmentStart=0,encoderError=null,nativePending=0;
 let stats={};
@@ -32,7 +32,7 @@ class OutputSink{
 function closeEncoder(){if(!encoder)return;if(stats.backend==='native'){try{encoder.close()}catch{}}else{const fs=encoder.FS,name=encoder.outputFilename;try{encoder.delete()}catch{}try{fs.unlink(name)}catch{}}encoder=null;}
 function check(){if(encoderError)throw encoderError;}
 async function softwareEncoder(){
- if(!self.HME)importScripts('./vendor/h264-mp4-encoder.web.js?v=643cf87c5a69');
+ if(!self.HME)importScripts('./vendor/h264-mp4-encoder.web.js?v=336f6e73d149');
  encoder=await HME.createH264MP4Encoder();encoder.width=config.width;encoder.height=config.height;encoder.frameRate=config.fps;encoder.speed=8;encoder.quantizationParameter=20;encoder.groupOfPictures=config.fps;encoder.initialize();segmentFrames=0;segmentStart=frameNumber;
 }
 async function nativeEncoder(){

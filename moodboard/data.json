@@ -3026,6 +3026,7 @@
       "name": "Fibre di seta",
       "kind": "video",
       "related": [
+        "roadmap-filament-planets",
         "roadmap-fibre-motion",
         "roadmap-tissue",
         "project-living-extensions",
@@ -9031,6 +9032,448 @@
       "completedProjects": []
     },
     {
+      "id": "s13-01",
+      "name": "Planet X · intrecci multicolore",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Fili verdi, gialli, ciano e rossi si incrociano su fondo scuro; la vista ravvicinata rivela le singole curve.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://www.pauschenwein.ch/the-apanage-days-cyprus"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Fili sottili sovrapposti, alcuni quasi rettilinei, altri curvi o irregolari. Vista macro e campo più fitto con organizzazione radiale.",
+                "colourLight": "Colori distinti lungo fili diversi; fondo scuro tra gli interstizi. Il dettaglio dipende da contrasto e sovrapposizione, senza evidenza di pellicola madreperlacea.",
+                "motion": "Cambi di scala e inquadratura, alternati a transizioni digitali a blocchi. I campioni non dimostrano una simulazione fisica continua dei fili.",
+                "organicQuality": "Diversità delle curve, densità e sovrapposizione danno una materia simile a un intreccio vegetale."
+              }
+            },
+            {
+              "label": "sourceClaims",
+              "value": "Il sito dell’autore indica schizzi e studi cromatici, poi Cinema 4D e strumenti Adobe. Non specifica il setup Hair o i parametri di queste tre opere. Una diversa opera della serie, Planet 209, è descritta come loop con viaggio della camera dal globo al dettaglio."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Ipotesi per Prisma: curve con radici distribuite su un nucleo sferico deformabile, lunghezza e orientamento variabili, ciuffi coerenti, colore per filo. Moto del nucleo, flessione delle punte e viaggio della camera separati."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Nessuna repo, scena sorgente o plugin pubblico dell’autore identificato nelle fonti consultate. Il processo è documentato, il codice delle opere non è disponibile nelle pagine trovate. Vedi il progetto collegato per le alternative."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.9179166666666667,
+                  2.75375,
+                  4.589583333333334,
+                  6.425416666666667,
+                  8.26125,
+                  10.097083333333334,
+                  11.932916666666666,
+                  13.768750000000002,
+                  15.604583333333332,
+                  17.440416666666668,
+                  19.27625,
+                  21.112083333333334
+                ],
+                "contactSheet": "reports/reference-series-13/1-contact.jpg",
+                "limits": "12 fotogrammi distribuiti lungo ciascun video, lettura delle didascalie e confronto cronologico. Audio non analizzato; raccordo del loop non verificato. Nessuna misura fisica del moto ricavata da questa registrazione."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Futuro risultato: durata selezionabile e deformazioni periodiche; verificare posizione e velocità al raccordo. Le registrazioni non sono prove di loop continui."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Fili distinguibili anche da vicino, coesione del globo, colore applicato alla materia e forte contrasto tra fondo e bordo.",
+      "avoid": "Foro centrale obbligatorio, bagliore che cancella i fili, cambi casuali a scatti. Trattare glitch e montaggio come effetti separati.",
+      "detailsSource": [
+        "reference\\video-series-13.json"
+      ],
+      "media": [
+        {
+          "src": "media/c63e127aa8848f95.webp",
+          "width": 296,
+          "height": 396
+        },
+        {
+          "src": "media/624a3b61eb4a2ffe.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/fe43b2f2b6362252.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/2e2a5208e69f0497.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/0d1ee4b03a43647e.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "74f78f9d13edc7a2",
+          "name": "1-ScreenRecording_10-10-2026-14-49-44_1.mov",
+          "bytes": 9477782,
+          "available": true
+        }
+      ],
+      "duration": 22.03,
+      "clip": "media/s13-01-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s13-02",
+      "name": "Planet 225 · globo di fibre",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Un globo soffice di filamenti passa dal turchese al blu e al viola, con bordo luminoso e centro più scuro.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://www.pauschenwein.ch/the-apanage-days-cyprus"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Massa arrotondata composta da moltissimi filamenti prevalentemente radiali; ciuffi e depressioni locali interrompono la regolarità.",
+                "colourLight": "Turchese → blu → viola → turchese. Luce più forte sul lato destro, ombra sul lato sinistro e tra i filamenti. Il centro scuro non prova un foro nella geometria.",
+                "motion": "Variazione graduale della sagoma e della scala apparente con cambio cromatico; possibile rotazione/deformazione. Separazione fra moto camera e moto dei singoli fili non determinabile dai soli campioni.",
+                "organicQuality": "Fibre sottili che condividono una forma compatta; la morbidezza viene dalla silhouette sfrangiata e dal passaggio fra luce e ombra."
+              }
+            },
+            {
+              "label": "sourceClaims",
+              "value": "Il sito dell’autore indica schizzi e studi cromatici, poi Cinema 4D e strumenti Adobe. Non specifica il setup Hair o i parametri di queste tre opere. Una diversa opera della serie, Planet 209, è descritta come loop con viaggio della camera dal globo al dettaglio."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Ipotesi per Prisma: curve con radici distribuite su un nucleo sferico deformabile, lunghezza e orientamento variabili, ciuffi coerenti, colore per filo. Moto del nucleo, flessione delle punte e viaggio della camera separati."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Nessuna repo, scena sorgente o plugin pubblico dell’autore identificato nelle fonti consultate. Il processo è documentato, il codice delle opere non è disponibile nelle pagine trovate. Vedi il progetto collegato per le alternative."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.6887500000000001,
+                  2.06625,
+                  3.44375,
+                  4.82125,
+                  6.19875,
+                  7.576250000000001,
+                  8.953750000000001,
+                  10.33125,
+                  11.70875,
+                  13.086250000000001,
+                  14.46375,
+                  15.841250000000002
+                ],
+                "contactSheet": "reports/reference-series-13/2-contact.jpg",
+                "limits": "12 fotogrammi distribuiti lungo ciascun video, lettura delle didascalie e confronto cronologico. Audio non analizzato; raccordo del loop non verificato. Nessuna misura fisica del moto ricavata da questa registrazione."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Futuro risultato: durata selezionabile e deformazioni periodiche; verificare posizione e velocità al raccordo. Le registrazioni non sono prove di loop continui."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Fili distinguibili anche da vicino, coesione del globo, colore applicato alla materia e forte contrasto tra fondo e bordo.",
+      "avoid": "Foro centrale obbligatorio, bagliore che cancella i fili, cambi casuali a scatti. Trattare glitch e montaggio come effetti separati.",
+      "detailsSource": [
+        "reference\\video-series-13.json"
+      ],
+      "media": [
+        {
+          "src": "media/edb90d9faab56acb.webp",
+          "width": 296,
+          "height": 358
+        },
+        {
+          "src": "media/6b68ab719f0207b5.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/284ec59aba2ee96f.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/d80b45f9bcb77e12.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/c35d6d7c1a641567.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "6492f26df1f4112f",
+          "name": "2-ScreenRecording_10-10-2026-14-38-13_1.mov",
+          "bytes": 7058130,
+          "available": true
+        }
+      ],
+      "duration": 16.53,
+      "clip": "media/s13-02-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s13-03",
+      "name": "Planets · oro, ciuffi e viste macro",
+      "kind": "video",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein · @christoph.pauschenwein",
+      "summary": "Più opere della stessa serie: globi dorati, intrecci lime e magenta, dettagli radiali e transizioni a bande.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://www.pauschenwein.ch/the-apanage-days-cyprus"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Globi e dettagli filamentosi: Planet #60, Planet #x 10 e Planet #X04 sono leggibili nelle didascalie. Segue una vista di tre opere incorniciate e un dettaglio ciano/verde.",
+                "colourLight": "Giallo e lime su ocra, accenti magenta; poi ciano e verde su fondo viola scuro. Le variazioni di densità e occlusione danno profondità.",
+                "motion": "È una registrazione che scorre fra più post. Zoom forti, tagli e slittamenti orizzontali a bande non vanno confusi con crescita o collasso del volume.",
+                "organicQuality": "Fasci divergenti da un nucleo e grovigli a più scale: l’organicità può convivere con fili localmente angolosi."
+              }
+            },
+            {
+              "label": "sourceClaims",
+              "value": "Il sito dell’autore indica schizzi e studi cromatici, poi Cinema 4D e strumenti Adobe. Non specifica il setup Hair o i parametri di queste tre opere. Una diversa opera della serie, Planet 209, è descritta come loop con viaggio della camera dal globo al dettaglio."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Ipotesi per Prisma: curve con radici distribuite su un nucleo sferico deformabile, lunghezza e orientamento variabili, ciuffi coerenti, colore per filo. Moto del nucleo, flessione delle punte e viaggio della camera separati."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Nessuna repo, scena sorgente o plugin pubblico dell’autore identificato nelle fonti consultate. Il processo è documentato, il codice delle opere non è disponibile nelle pagine trovate. Vedi il progetto collegato per le alternative."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  1.0991666666666666,
+                  3.2975,
+                  5.495833333333334,
+                  7.694166666666667,
+                  9.8925,
+                  12.090833333333334,
+                  14.289166666666667,
+                  16.4875,
+                  18.68583333333333,
+                  20.884166666666665,
+                  23.0825,
+                  25.280833333333334
+                ],
+                "contactSheet": "reports/reference-series-13/3-contact.jpg",
+                "limits": "12 fotogrammi distribuiti lungo ciascun video, lettura delle didascalie e confronto cronologico. Audio non analizzato; raccordo del loop non verificato. Nessuna misura fisica del moto ricavata da questa registrazione."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Futuro risultato: durata selezionabile e deformazioni periodiche; verificare posizione e velocità al raccordo. Le registrazioni non sono prove di loop continui."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Fili distinguibili anche da vicino, coesione del globo, colore applicato alla materia e forte contrasto tra fondo e bordo.",
+      "avoid": "Foro centrale obbligatorio, bagliore che cancella i fili, cambi casuali a scatti. Trattare glitch e montaggio come effetti separati.",
+      "detailsSource": [
+        "reference\\video-series-13.json"
+      ],
+      "media": [
+        {
+          "src": "media/c5c664f799183bdb.webp",
+          "width": 296,
+          "height": 390
+        },
+        {
+          "src": "media/9417b8260c836712.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/88d7a513c4c33293.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/54c6b89fc31bc1cd.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/8fbbeaf148762fb8.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/8ab13a3081836055.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/683b9a4f22dcbb80.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/24303e180aab62d2.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/445295ddc6b28207.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/a4f169669ce7f116.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "8cbc6430bfb9ad84",
+          "name": "3-ScreenRecording_10-10-2026-14-50-23_1.mov",
+          "bytes": 11227709,
+          "available": true
+        }
+      ],
+      "duration": 26.38,
+      "clip": "media/s13-03-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
       "id": "roadmap-fractals",
       "name": "Frattali 3D",
       "kind": "project",
@@ -9979,6 +10422,7 @@
         "reuse-xpbd",
         "reuse-pcr",
         "project-living-extensions",
+        "roadmap-filament-planets",
         "project-trama-viva",
         "project-fibre-setose",
         "soleil"
@@ -10815,6 +11259,147 @@
       ]
     },
     {
+      "id": "roadmap-filament-planets",
+      "name": "Pianeti di filamenti",
+      "kind": "project",
+      "related": [
+        "s13-01",
+        "s13-02",
+        "s13-03",
+        "roadmap-fibre-motion",
+        "project-fibre-setose",
+        "reuse-xpbd",
+        "reuse-three-filament-lines",
+        "s05-02"
+      ],
+      "state": "proposed",
+      "priority": false,
+      "author": "Reference: Christoph Pauschenwein; futura interpretazione Prisma",
+      "summary": "Globi di fili finissimi, ciuffi morbidi e colori individuali: estensione delle fibre di Prisma ispirata alla serie Planets.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten",
+        "https://www.pauschenwein.ch/the-apanage-days-cyprus",
+        "https://docs.blender.org/manual/id/4.4/modeling/geometry_nodes/hair/generation/generate_hair_curves.html",
+        "https://docs.blender.org/manual/en/latest/render/shader_nodes/shader/hair_principled.html"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Estendere il nucleo Particelle con radici stabili su una sfera o superficie deformata. Curve segmentate con tangente e lunghezza proprie; flessione continua e raggruppamento in ciuffi. Riutilizzare materiali, luci, preset, durata del loop e campi magnetici esistenti."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": {
+                "originale": "Cinema 4D e Adobe dichiarati dall’autore. Nessuna repo originale o scena scaricabile identificata; il modulo preciso usato per il pelo non è confermato.",
+                "prisma": "Riutilizzare la gestione delle fibre e i riflessi setosi. I vincoli XPBD già presenti possono contribuire al controllo delle lunghezze; non forniscono da soli grooming, torsione o auto-collisione del pelo.",
+                "web": "Ispezionato three.js r180 LineSegments2 e licenza MIT: linee a spessore regolabile e colori ai vertici. Richiede Three WebGLRenderer, quindi non è un plugin diretto del motore custom di Prisma. Utile come confronto; nessuna nuova dipendenza installata.",
+                "offline": "Alternativa Blender: Generate Hair Curves per curve su superficie, densità, lunghezza, seed e punti di controllo; Principled Hair BSDF in Cycles per il materiale. Da usare come banco visivo o render esportato, non da eseguire direttamente in Pages. Documentazione consultata, nessuna scena provata."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": {
+                "Forma e fibre": [
+                  "Raggio e deformazione del nucleo",
+                  "Densità e distribuzione delle radici",
+                  "Lunghezza media e variazione",
+                  "Spessore radice/punta e assottigliamento",
+                  "Curvatura, ricciolo e orientamento",
+                  "Dimensione dei ciuffi e coesione"
+                ],
+                "Movimento": [
+                  "Respiro del nucleo",
+                  "Flessione delle punte",
+                  "Ritardo lungo il filo",
+                  "Turbolenza lenta coerente",
+                  "Rotazione indipendente",
+                  "Viaggio camera globo/macro",
+                  "Durata del loop"
+                ],
+                "Colore e luce": [
+                  "Palette per filo",
+                  "Gradiente radice/punta",
+                  "Variazione cromatica controllata",
+                  "Luce radente e controluce",
+                  "Rugosità e riflesso lungo la tangente",
+                  "Profondità delle ombre tra ciuffi"
+                ]
+              }
+            },
+            {
+              "label": "existingControlsToReuse",
+              "value": [
+                "Preset e randomizzazione con seed",
+                "Palette, luci e riflessi setosi",
+                "Campi di punti e percorsi",
+                "Esportazione e durata del loop"
+              ]
+            },
+            {
+              "label": "acceptance",
+              "value": [
+                "Confrontare tre prove: globo ciano, intreccio multicolore e macro dorata",
+                "Dimostrare sfera senza foro e densità distinta dallo spessore",
+                "Zero salti delle radici o scatti nelle pieghe",
+                "Palette leggibile sui fili e dettaglio conservato in luce",
+                "Verificare raccordo e velocità del loop",
+                "Misurare prestazioni su PC e telefono con qualità adattiva"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "remaining",
+              "value": "Distribuzione radiale ancorata e grooming da costruire; ombre dense e stabilità dei fili sottili da verificare. Non ancora implementato."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "Percorso proposto: Particelle → Forma e fibre; moto e materiale nei gruppi esistenti.",
+      "platform": "",
+      "next": "Prima prova comparativa con radici stabili e ciuffi, usando il materiale setoso già disponibile. Nessun nuovo renderer dedicato finché non emerge un limite concreto.",
+      "keep": "Volume pieno e controllabile, passaggio dal globo al dettaglio, filamenti persistenti e palette sulla singola fibra.",
+      "avoid": "Anello fisso al centro, scie dipendenti dagli FPS usate come finto pelo, migliaia di tubi pesanti, colore sovrapposto allo schermo.",
+      "detailsSource": [
+        "reference/creative-roadmap.json"
+      ],
+      "media": [
+        {
+          "src": "media/284ec59aba2ee96f.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [],
+      "completedProjects": [
+        "roadmap-fibre-motion",
+        "project-fibre-setose"
+      ]
+    },
+    {
       "id": "method-living-moodboard",
       "name": "Un moodboard che diventa progetto",
       "kind": "image",
@@ -11119,7 +11704,8 @@
       "related": [
         "roadmap-fibre-motion",
         "s06-01",
-        "s05-02"
+        "s05-02",
+        "roadmap-filament-planets"
       ],
       "state": "implemented",
       "priority": false,
@@ -11440,6 +12026,81 @@
         }
       ],
       "illustrationFrom": "roadmap-4d",
+      "completedProjects": []
+    },
+    {
+      "id": "reuse-three-filament-lines",
+      "name": "Curve 3D · three.js LineSegments2",
+      "kind": "tool",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "",
+      "summary": "Componente MIT per linee 3D a spessore regolabile e colori ai vertici; candidato di confronto per i filamenti.",
+      "sources": [
+        "https://github.com/mrdoob/three.js/blob/r180/examples/jsm/lines/LineSegments2.js",
+        "https://github.com/mrdoob/three.js/blob/r180/LICENSE"
+      ],
+      "sections": [
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "verified",
+              "value": "Supporta segmenti a spessore arbitrario, coordinate mondo e colori ai vertici. Line2 estende il componente a polilinee."
+            },
+            {
+              "label": "decision",
+              "value": "Non importato: dipende da Three WebGLRenderer, mentre il nucleo Particelle ha un renderer proprio. Prima riusare geometria e shading esistenti; valutare adattamento solo se necessario."
+            },
+            {
+              "label": "license",
+              "value": "MIT, verificata sul tag r180; preservare attribuzione e licenza in caso di riuso."
+            },
+            {
+              "label": "inspected",
+              "value": [
+                "r180 · examples/jsm/lines/LineSegments2.js: API, worldUnits, instanceStart/End, colori, raycast e aggiornamento viewport",
+                "r180 · LICENSE"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Non genera da solo radici, ciuffi, illuminazione del pelo, collisioni o animazione. Lettura del codice e della licenza; nessun benchmark o test runtime eseguito."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "workflow"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/284ec59aba2ee96f.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "roadmap-filament-planets",
       "completedProjects": []
     },
     {
@@ -11803,6 +12464,7 @@
         "roadmap-membrane",
         "roadmap-fibre-motion",
         "roadmap-tissue",
+        "roadmap-filament-planets",
         "s06-02",
         "s07-05"
       ],
@@ -14456,13 +15118,13 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 141,
-    "videos": 39,
+    "records": 146,
+    "videos": 42,
     "images": 15,
-    "tools": 63,
-    "projects": 21,
-    "attachments": 98,
-    "clips": 39,
+    "tools": 64,
+    "projects": 22,
+    "attachments": 101,
+    "clips": 42,
     "missing": 10
   }
 }

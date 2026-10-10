@@ -1,6 +1,6 @@
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=643cf87c5a69';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=643cf87c5a69';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=643cf87c5a69';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=336f6e73d149';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=336f6e73d149';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=336f6e73d149';
 export const BASE = {
  ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,

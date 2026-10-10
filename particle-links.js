@@ -1,6 +1,6 @@
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=643cf87c5a69';
-import {guideGLSL} from './particle-path-field.js?v=643cf87c5a69';
-import {forceBarrierGLSL} from './particle-forces.js?v=643cf87c5a69';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=336f6e73d149';
+import {guideGLSL} from './particle-path-field.js?v=336f6e73d149';
+import {forceBarrierGLSL} from './particle-forces.js?v=336f6e73d149';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.
