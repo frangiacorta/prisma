@@ -5180,6 +5180,7 @@
       "name": "Ladybug — volto a punti",
       "kind": "image",
       "related": [
+        "roadmap-image-treatments",
         "prisma-image-particles"
       ],
       "state": "reference",
@@ -5187,7 +5188,9 @@
       "author": "",
       "summary": "Volto ricostruito con celle/punti multicolore, bagliori e distorsione.",
       "sources": [
-        "https://www.theladybug.app/about/"
+        "https://www.theladybug.app/about/",
+        "https://theladybug.app/terms/",
+        "https://app.theladybug.app/home/"
       ],
       "sections": [
         {
@@ -5205,6 +5208,10 @@
             {
               "label": "law",
               "value": "Campionamento di immagine su griglia e resa puntiforme: ricetta nostra, non codice verificato dell’app."
+            },
+            {
+              "label": "method",
+              "value": "Campionare immagine/video in una griglia di punti, usare luminanza per dimensione e visibilità, aggiungere colore, split RGB e bagliore dosato. Segmentazione facoltativa dopo la prova statica."
             }
           ]
         },
@@ -5212,14 +5219,40 @@
           "title": "Repo, plugin e riuso",
           "fields": [
             {
+              "label": "reuse",
+              "value": "Sito ufficiale e condizioni verificati: app separata, piano gratuito personale e piano a pagamento per uso commerciale. Nessuna repo o SDK pubblico individuato. Non confondere con Ladybug Tools per analisi ambientale."
+            },
+            {
               "label": "use",
               "value": "Modulo Prisma per trasformare foto e video in particelle; repo aperto dell’app non identificato."
             }
           ]
         },
         {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Passo griglia",
+                "Dimensione punti",
+                "Soglia luminanza",
+                "Colore dalla sorgente o palette",
+                "Profondità da luminanza",
+                "Bagliore",
+                "Separazione RGB",
+                "Mix"
+              ]
+            }
+          ]
+        },
+        {
           "title": "Prove e provenienza",
           "fields": [
+            {
+              "label": "inspection",
+              "value": "Nuovo invio dello stesso screenshot: identità verificata tramite SHA-256. Originali conservati nella stessa scheda."
+            },
             {
               "label": "loop",
               "value": "La sorgente deve essere ciclica; dispersione e ricomposizione guidate da fase."
@@ -5238,7 +5271,8 @@
       "keep": "",
       "avoid": "",
       "detailsSource": [
-        "catalogo/initialScreenshots"
+        "catalogo/initialScreenshots",
+        "reference/moodboard-additions.json"
       ],
       "media": [
         {
@@ -5251,6 +5285,12 @@
         {
           "id": "d31f45000877a266",
           "name": "1-Foto-1.jpg",
+          "bytes": 210768,
+          "available": true
+        },
+        {
+          "id": "69727c4ebb7b64d0",
+          "name": "9-Foto-9.jpg",
           "bytes": 210768,
           "available": true
         },
@@ -5352,6 +5392,8 @@
       "name": "MediaPipe GPU per TouchDesigner — Torin Blankensmith",
       "kind": "image",
       "related": [
+        "roadmap-body-interaction",
+        "roadmap-image-treatments",
         "prisma-window-depth"
       ],
       "state": "reference",
@@ -5385,6 +5427,15 @@
           "title": "Repo, plugin e riuso",
           "fields": [
             {
+              "label": "reuse",
+              "value": {
+                "license": "MIT, copyright Torin Blankensmith; conservare licenza e attribuzione per riuso del codice. Modelli e dipendenze richiedono la propria verifica.",
+                "inspected": "README, LICENSE, configurazione GestureRecognizer GPU e modelli di segmentazione. Repo letta, non eseguita o installata.",
+                "prisma": "Prisma usa già HandLandmarker nel worker locale, attualmente con delegate CPU e recupero delle mani ruotate. La repo usa JavaScript/MediaPipe in un browser integrato in TouchDesigner e scambia dati con TD. Riutilizzare i moduli web pertinenti, non importare .tox nel sito.",
+                "next": "Confronto CPU/GPU misurato sul PC; segmentazione opzionale per maschere e ritratto a particelle. Il plugin non garantisce di riconoscere mani occluse o di taglio."
+              }
+            },
+            {
               "label": "use",
               "value": "Repository MIT verificato. Utile per futuri ingressi interattivi; non dimostra affidabilità del tracking della nuca nel nostro allestimento."
             }
@@ -5393,6 +5444,18 @@
         {
           "title": "Prove e provenienza",
           "fields": [
+            {
+              "label": "inspection",
+              "value": "Nuovo invio dello stesso screenshot: identità verificata tramite SHA-256. Originali conservati nella stessa scheda."
+            },
+            {
+              "label": "evidence",
+              "value": "Audit locale e hash dei file conservati in reports/reference-series-16/repo/audit.json."
+            },
+            {
+              "label": "pinnedCommit",
+              "value": "bb01606926edeec828cc123e86a4a300bdc96c9b"
+            },
             {
               "label": "loop",
               "value": "Registrare e rendere ciclici i segnali di controllo quando si esporta."
@@ -5411,7 +5474,8 @@
       "keep": "",
       "avoid": "",
       "detailsSource": [
-        "catalogo/initialScreenshots"
+        "catalogo/initialScreenshots",
+        "reference/moodboard-additions.json"
       ],
       "media": [
         {
@@ -5424,6 +5488,12 @@
         {
           "id": "211a130d53c495b6",
           "name": "4-Foto-4.jpg",
+          "bytes": 251513,
+          "available": true
+        },
+        {
+          "id": "51f94e284f8c943c",
+          "name": "10-Foto-10.jpg",
           "bytes": 251513,
           "available": true
         }
@@ -6195,6 +6265,10 @@
           "title": "Prove e provenienza",
           "fields": [
             {
+              "label": "inspection",
+              "value": "Nuovo invio dello stesso screenshot: identità verificata tramite SHA-256. Originali conservati nella stessa scheda."
+            },
+            {
               "label": "loop",
               "value": "Feedback e pittura richiedono uno stato periodico o una transizione verificata."
             }
@@ -6214,7 +6288,8 @@
       "avoid": "",
       "detailsSource": [
         "catalogo/initialScreenshots",
-        "reference/screenshot-series-10.json"
+        "reference/screenshot-series-10.json",
+        "reference/moodboard-additions.json"
       ],
       "media": [
         {
@@ -6227,6 +6302,12 @@
         {
           "id": "5d531ee3d85e0293",
           "name": "3-Foto-3.jpg",
+          "bytes": 107661,
+          "available": true
+        },
+        {
+          "id": "213041ebc5c1024f",
+          "name": "8-Foto-8.jpg",
           "bytes": 107661,
           "available": true
         }
@@ -9037,6 +9118,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -9179,6 +9261,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -9321,6 +9404,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -9488,6 +9572,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -9642,6 +9727,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -9821,6 +9907,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -9974,6 +10061,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -10133,6 +10221,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -10297,6 +10386,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -10461,6 +10551,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -10644,6 +10735,7 @@
       "kind": "video",
       "related": [
         "roadmap-filament-planets",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09",
         "img-s14-10"
@@ -10823,6 +10915,500 @@
       "completedProjects": []
     },
     {
+      "id": "s16-01",
+      "name": "Gromari · cromo e prismi al tocco",
+      "kind": "video",
+      "related": [
+        "roadmap-preset-morphing",
+        "roadmap-body-interaction"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Gromer · @gromer.png",
+      "summary": "Galleria su iPhone: volto cromato, fasci prismatici radiali e forme riflettenti che cambiano mentre il dito interagisce.",
+      "sources": [
+        "https://apps.apple.com/us/app/gromari/id6749023025"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Alternanza fra maschera/volto, composizione di elementi rettangolari e corona radiale. La registrazione include la navigazione fra opere.",
+                "light": "Riflessi bianchi molto netti su nero, bande arcobaleno sui prismi e superfici simili a cromo liquido. Non è possibile stabilire da questi fotogrammi se siano rifrazione, texture o video renderizzati.",
+                "motion": "Il dito scorre e tiene premuto. Nei campioni finali i raggi si allungano verso i bordi; il volto centrale cambia aspetto. Non è provato che si tratti di geometria 3D calcolata dal telefono anziché una sequenza interattiva.",
+                "organicQuality": "Fluidità visiva delle superfici metalliche, ma composizione radiale regolare e costruita."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Prova proposta nello Studio: ripetizione radiale di elementi, materiale riflettente e dispersione controllata. Collegare un gesto a estensione, apertura o fase; distinguere cambio opera e deformazione interna."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "App iPhone identificata nello store, di Christoph Gromer. Nessuna repo o SDK pubblico individuato nella ricerca; non è un plugin web. Studiare il comportamento e usare geometrie proprie."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Numero e lunghezza raggi",
+                "Apertura radiale",
+                "Dispersione cromatica",
+                "Rugosità e riflessi",
+                "Intensità del gesto",
+                "Ritorno morbido dopo il rilascio"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.8020833333333334,
+                  2.40625,
+                  4.010416666666667,
+                  5.614583333333333,
+                  7.21875,
+                  8.822916666666666,
+                  10.427083333333334,
+                  12.03125,
+                  13.635416666666666,
+                  15.239583333333334,
+                  16.84375,
+                  18.447916666666668
+                ],
+                "contactSheet": "reports/reference-series-16/1-contact.jpg",
+                "limits": "Analisi di 12 campioni distribuiti per video; audio non analizzato. Tecnica originale e continuità fra ultimo e primo fotogramma non certificate. Nel terzo video il materiale pubblico inizia dopo la notifica iniziale."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Reference acquisita; il loop Prisma deve ancora essere costruito e confrontato in movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "interaction"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Identità della forma nel movimento, dettagli leggibili e colore distinto dalla luce.",
+      "avoid": "Confondere una rotazione con una simulazione, una tinta animata con iridescenza o la navigazione fra opere con un morph.",
+      "detailsSource": [
+        "reference\\video-series-16.json"
+      ],
+      "media": [
+        {
+          "src": "media/2c2012a0c3c6cb0b.webp",
+          "width": 296,
+          "height": 410
+        },
+        {
+          "src": "media/34f13aa23e28817a.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/625a6d0ab775ffe9.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/b7ad3aa875f98b94.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/832ab72bf2e587c1.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/173e0cc47dab40ea.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/86f0265b39e6a38b.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/7a49b7e1cdeb19c5.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "3236eefeb1ceef8e",
+          "name": "1-ScreenRecording_10-10-2026-12-51-56_1.mov",
+          "bytes": 8155974,
+          "available": true
+        }
+      ],
+      "duration": 19.25,
+      "clip": "media/s16-01-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s16-02",
+      "name": "Cube 07 · nodo a bande colorate",
+      "kind": "video",
+      "related": [
+        "roadmap-soft-knots",
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein",
+      "summary": "Un nodo volumetrico si ripiega e ruota: bande arcobaleno seguono la superficie, su fondo blu che diventa viola.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Fasce arrotondate si intrecciano formando una massa compatta con cavità. La didascalia leggibile dice Cube 07; non basta per dedurne la topologia.",
+                "light": "Colore saturo organizzato in strisce lungo la materia, bordi scuri e ombre nei passaggi interni; leggibile la distinzione tra bande e volume.",
+                "motion": "Tra i campioni cambiano orientamento, sovrapposizioni e sagoma. Rotazione e possibile deformazione non sono separabili con certezza. Non è una nube di particelle.",
+                "organicQuality": "Continuità delle superfici e curve morbide, pur con un disegno geometrico molto preciso."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta: curve chiuse con sezione arrotondata o nastri spessi, coordinate colore ancorate alla curva e deformazione periodica continua. Prima testare un nodo parametrico, poi collisioni e morph fra configurazioni."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Processo Cinema 4D/Adobe documentato dall’autore per Planets: non prova il procedimento specifico di Cube 07. Nessuna scena o repo originale di questo nodo individuata. Riutilizzare il renderer solido e i controlli materiale di Prisma; geometria del nodo da sviluppare."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Numero lobi",
+                "Spessore e sezione",
+                "Apertura cavità",
+                "Torsione",
+                "Curvatura minima",
+                "Frequenza e larghezza bande",
+                "Fase della palette",
+                "Rotazione separata dalla deformazione"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.2725,
+                  0.8175,
+                  1.3625,
+                  1.9075,
+                  2.4525,
+                  2.9975,
+                  3.5425,
+                  4.0874999999999995,
+                  4.6325,
+                  5.1775,
+                  5.7225,
+                  6.267499999999999
+                ],
+                "contactSheet": "reports/reference-series-16/2-contact.jpg",
+                "limits": "Analisi di 12 campioni distribuiti per video; audio non analizzato. Tecnica originale e continuità fra ultimo e primo fotogramma non certificate. Nel terzo video il materiale pubblico inizia dopo la notifica iniziale."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Reference acquisita; il loop Prisma deve ancora essere costruito e confrontato in movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "motion",
+        "graphic"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Identità della forma nel movimento, dettagli leggibili e colore distinto dalla luce.",
+      "avoid": "Confondere una rotazione con una simulazione, una tinta animata con iridescenza o la navigazione fra opere con un morph.",
+      "detailsSource": [
+        "reference\\video-series-16.json"
+      ],
+      "media": [
+        {
+          "src": "media/01252cf2a0cbf64c.webp",
+          "width": 296,
+          "height": 409
+        },
+        {
+          "src": "media/00f723f696ffff67.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/9e2997d14ded8505.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/eded571f86b57cd0.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/9315f5ed35967804.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/3d7e7ccd8a33451a.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/ddf06d974c6324bd.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "41e4633af3fb9456",
+          "name": "2-ScreenRecording_10-10-2026-14-44-38_1.mov",
+          "bytes": 2881989,
+          "available": true
+        }
+      ],
+      "duration": 6.54,
+      "clip": "media/s16-02-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s16-03",
+      "name": "Nodo laccato · luce bianca e colore in ciclo",
+      "kind": "video",
+      "related": [
+        "roadmap-soft-knots",
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Christoph Pauschenwein",
+      "summary": "Massa annodata lucida su nero: viola, rosso, giallo, verde e ciano, con riflessi bianchi ampi e incavi scuri.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Lobi gonfi e raccordati in un nodo compatto; alcune sovrapposizioni sembrano nastri tubolari. Non si vede una trama di fibre.",
+                "light": "Macchie bianche speculari e riflessi allungati restano distinti dal colore del corpo. L’aspetto è compatibile con lacca o plastica lucida; non dimostra metallicità né iridescenza fisica.",
+                "motion": "Il corpo cambia orientamento e sagoma mentre il colore attraversa lo spettro. Il cambio globale di tinta è osservabile, la sua causa tecnica no.",
+                "organicQuality": "Continuità dei lobi e ombre interne producono una sensazione morbida e compatta, senza bisogno di rumore molto rapido."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Usare lo stesso progetto dei nodi: materiale dielettrico con rivestimento lucido, illuminazione ampia, tinta animata separata da riflessi e geometria. Loop di tinta, rotazione e deformazione con periodi compatibili."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Nessun file originale identificato. Prova nel renderer solido esistente: conservare luce bianca e palette sulla materia. Non imitare questo risultato alzando insieme iridescenza e metallicità."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Colore del corpo",
+                "Velocità del ciclo colore",
+                "Rugosità",
+                "Rivestimento lucido",
+                "Dimensione e posizione luci",
+                "Contrasto nelle cavità",
+                "Ampiezza della deformazione"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.6216666666666667,
+                  1.865,
+                  3.108333333333333,
+                  4.351666666666667,
+                  5.595,
+                  6.838333333333334,
+                  8.081666666666667,
+                  9.325000000000001,
+                  10.568333333333333,
+                  11.811666666666667,
+                  13.055,
+                  14.298333333333334
+                ],
+                "contactSheet": "reports/reference-series-16/3-contact.jpg",
+                "limits": "Analisi di 12 campioni distribuiti per video; audio non analizzato. Tecnica originale e continuità fra ultimo e primo fotogramma non certificate. Nel terzo video il materiale pubblico inizia dopo la notifica iniziale."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Reference acquisita; il loop Prisma deve ancora essere costruito e confrontato in movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "motion"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Identità della forma nel movimento, dettagli leggibili e colore distinto dalla luce.",
+      "avoid": "Confondere una rotazione con una simulazione, una tinta animata con iridescenza o la navigazione fra opere con un morph.",
+      "detailsSource": [
+        "reference\\video-series-16.json"
+      ],
+      "media": [
+        {
+          "src": "media/92258006e252018b.webp",
+          "width": 296,
+          "height": 397
+        },
+        {
+          "src": "media/18ea337c481cc74c.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/fbc2345baab1faf3.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/fe938e91bedefa86.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/fa39fd639c815856.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/ffcf5a18f9bdc625.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/6f61825150c6b4c7.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "ed06ed84b7e8ac8d",
+          "name": "3-ScreenRecording_10-10-2026-14-40-00_1.mov",
+          "bytes": 3616991,
+          "available": true
+        }
+      ],
+      "duration": 14.92,
+      "clip": "media/s16-03-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
       "id": "roadmap-fractals",
       "name": "Frattali 3D",
       "kind": "project",
@@ -10912,6 +11498,7 @@
       "name": "Particelle e percorsi",
       "kind": "project",
       "related": [
+        "img-s16-rootstock",
         "reuse-three-attractors",
         "s03-04",
         "roadmap-body-interaction"
@@ -10978,13 +11565,13 @@
       ],
       "media": [
         {
-          "src": "media/c7b3f7572e256ed2.webp",
-          "width": 296,
-          "height": 473
+          "src": "media/d9ad5036f12e7cc4.webp",
+          "width": 588,
+          "height": 1280
         }
       ],
       "assets": [],
-      "illustrationFrom": "s03-04",
+      "illustrationFrom": "img-s16-rootstock",
       "completedProjects": []
     },
     {
@@ -10992,6 +11579,8 @@
       "name": "Testa e mani muovono la materia",
       "kind": "project",
       "related": [
+        "img-04",
+        "s16-01",
         "s03-04",
         "roadmap-particles",
         "archive-calibration-20261009"
@@ -11078,13 +11667,13 @@
       ],
       "media": [
         {
-          "src": "media/c7b3f7572e256ed2.webp",
-          "width": 296,
-          "height": 473
+          "src": "media/355a858b5c2f6231.webp",
+          "width": 322,
+          "height": 700
         }
       ],
       "assets": [],
-      "illustrationFrom": "s03-04",
+      "illustrationFrom": "img-04",
       "completedProjects": [
         "roadmap-particles"
       ]
@@ -11340,6 +11929,8 @@
       "kind": "project",
       "related": [
         "s09-05",
+        "img-s16-rootstock",
+        "s16-01",
         "reuse-tdxmorph",
         "img-tdxmorph"
       ],
@@ -12165,6 +12756,7 @@
       "kind": "project",
       "related": [
         "img-20261010-03",
+        "img-s16-displace",
         "recursive-displace"
       ],
       "state": "proposed",
@@ -12638,7 +13230,10 @@
         "reuse-hairtool-groom",
         "research-hair-alternatives",
         "soleil",
-        "s05-02"
+        "s05-02",
+        "s16-02",
+        "s16-03",
+        "roadmap-soft-knots"
       ],
       "state": "proposed",
       "priority": false,
@@ -12808,6 +13403,195 @@
         "roadmap-fibre-motion",
         "project-fibre-setose"
       ]
+    },
+    {
+      "id": "roadmap-soft-knots",
+      "name": "Nodi morbidi · bande e lacca",
+      "kind": "project",
+      "related": [
+        "s16-02",
+        "s16-03",
+        "s13-01",
+        "s13-02",
+        "s13-03",
+        "s14-01",
+        "s14-02",
+        "s14-03",
+        "s14-04",
+        "s14-05",
+        "s14-06",
+        "s15-01",
+        "s15-02",
+        "roadmap-filament-planets",
+        "img-s14-07",
+        "img-s14-08-09",
+        "img-s14-10"
+      ],
+      "state": "proposed",
+      "priority": false,
+      "author": "",
+      "summary": "Superfici annodate continue con due materiali confrontabili: strisce ancorate alla forma e lacca colorata con riflessi bianchi.",
+      "sources": [
+        "https://www.pauschenwein.ch/kreationsprozessplaneten"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Estendere le geometrie del renderer solido esistente con curve chiuse e sezioni morbide; UV stabili e deformazione periodica. Blender può servire come confronto di qualità, senza rendere Prisma dipendente da un’app esterna."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Lobi e torsione",
+                "Spessore",
+                "Apertura",
+                "Ampiezza e lentezza",
+                "Bande per curva",
+                "Palette e ciclo tinta",
+                "Rugosità",
+                "Rivestimento lucido",
+                "Luci"
+              ]
+            },
+            {
+              "label": "acceptance",
+              "value": [
+                "Nessuna piega che scatta o cambio di topologia involontario",
+                "Le bande restano attaccate alla superficie",
+                "Luce bianca separata dal colore del corpo",
+                "Colore, moto e rotazione regolabili separatamente",
+                "Loop verificato al raccordo e preset ripetibile"
+              ]
+            }
+          ]
+        }
+      ],
+      "families": [
+        "motion",
+        "film"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "Prototipo di una sola geometria annodata nei due materiali e confronto affiancato con le reference.",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/creative-roadmap.json"
+      ],
+      "media": [
+        {
+          "src": "media/01252cf2a0cbf64c.webp",
+          "width": 296,
+          "height": 409
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "s16-02",
+      "completedProjects": []
+    },
+    {
+      "id": "roadmap-image-treatments",
+      "name": "Immagine in punti · pixel e RGB",
+      "kind": "project",
+      "related": [
+        "img-01",
+        "img-04",
+        "img-s16-mosaic",
+        "img-s16-rgb",
+        "prisma-window-depth",
+        "prisma-image-particles"
+      ],
+      "state": "proposed",
+      "priority": false,
+      "author": "",
+      "summary": "Una sezione di trattamenti per trasformare immagini, video o l’uscita della scena in punti, celle e contorni cromatici.",
+      "sources": [
+        "https://www.theladybug.app/about/",
+        "https://derivative.ca/UserGuide/Resolution_TOP",
+        "https://github.com/torinmb/mediapipe-touchdesigner"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Ingresso condiviso, campionamento in griglia, mosaico nearest e split RGB componibili. Aggiungere maschera persona dopo la prima prova statica; collegare il warp al progetto esistente."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Ladybug come riferimento di risultato. MediaPipe MIT per eventuale segmentazione; operatori TouchDesigner come ricette. Nessuna dipendenza dal servizio Ladybug."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Sorgente immagine/video/scena",
+                "Densità e dimensione punti",
+                "Mosaico X/Y",
+                "Soglia e contrasto",
+                "Offset RGB",
+                "Mix",
+                "Ordine dei trattamenti",
+                "Maschera opzionale"
+              ]
+            },
+            {
+              "label": "acceptance",
+              "value": [
+                "Mix zero restituisce la sorgente",
+                "Sorgente riconoscibile a densità intermedia",
+                "Niente aloni RGB imposti sul materiale 3D",
+                "Celle nette senza stiramenti involontari",
+                "Preset e ordine dei trattamenti salvati"
+              ]
+            }
+          ]
+        }
+      ],
+      "families": [
+        "graphic",
+        "film"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "Prima una prova su immagine con punti, pixel e RGB indipendenti; poi video e maschere.",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/creative-roadmap.json"
+      ],
+      "media": [
+        {
+          "src": "media/5aa57a36bf30504c.webp",
+          "width": 322,
+          "height": 700
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "img-01",
+      "completedProjects": []
     },
     {
       "id": "method-living-moodboard",
@@ -13530,6 +14314,9 @@
         "s14-06",
         "s15-01",
         "s15-02",
+        "s16-02",
+        "s16-03",
+        "roadmap-soft-knots",
         "img-s14-08-09",
         "img-s14-10"
       ],
@@ -13640,6 +14427,9 @@
         "s14-06",
         "s15-01",
         "s15-02",
+        "s16-02",
+        "s16-03",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-10"
       ],
@@ -13767,6 +14557,9 @@
         "s14-06",
         "s15-01",
         "s15-02",
+        "s16-02",
+        "s16-03",
+        "roadmap-soft-knots",
         "img-s14-07",
         "img-s14-08-09"
       ],
@@ -14492,6 +15285,410 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-filament-planets",
+      "completedProjects": []
+    },
+    {
+      "id": "img-s16-rootstock",
+      "name": "Rootstock · disperdere e ricomporre segni",
+      "kind": "image",
+      "related": [
+        "roadmap-particles",
+        "roadmap-preset-morphing"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "@skuchaka · repost TouchDesigner",
+      "summary": "La didascalia descrive lettere costruite da diamanti che si disperdono e tornano a formare la parola.",
+      "sources": [],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": "Screenshot quasi interamente testuale; in alto è visibile solo una parte di una mano metallica. L’animazione del logo è dichiarata nella didascalia, non dimostrata dall’immagine."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta: campionare una maschera di testo o forma, assegnare posizioni bersaglio persistenti ai segni e interpolare fra dispersione e ricomposizione."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "La fonte dichiara TouchDesigner. Ricerca per autore e titolo senza individuare una repo o un progetto scaricabile verificabile; non attribuire una tecnica specifica all’autore."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Testo o forma bersaglio",
+                "Dimensione e densità segni",
+                "Dispersione",
+                "Richiamo",
+                "Tempo e curva di ritorno",
+                "Ritardo per gruppi",
+                "Seed"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Ricostruzione di testo e corrispondenza dei punti ancora da implementare; il tracking non è richiesto per questo effetto."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": "Screenshot letto integralmente; osservazione del fotogramma separata dalle dichiarazioni della didascalia."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "graphic",
+        "motion"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/d9ad5036f12e7cc4.webp",
+          "width": 588,
+          "height": 1280
+        }
+      ],
+      "assets": [
+        {
+          "id": "d9ad5036f12e7cc4",
+          "name": "4-Foto-4.jpg",
+          "bytes": 175713,
+          "available": true
+        }
+      ],
+      "completedProjects": [
+        "roadmap-particles"
+      ]
+    },
+    {
+      "id": "img-s16-displace",
+      "name": "Displacement · deformare con una mappa",
+      "kind": "image",
+      "related": [
+        "roadmap-recursive-warp"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "@okamirufu.vizualizer",
+      "summary": "Una seconda immagine guida la deformazione della prima: onde, vibrazioni e distorsioni controllabili.",
+      "sources": [
+        "https://derivative.ca/UserGuide/Displace_TOP"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": "Tutorial grafico con curva e selezione del canale rosso; nessuna dimostrazione della deformazione di una mesh 3D."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Applicare un campo allo spostamento delle coordinate dell’immagine. Il grigio al valore neutro non deforma; canali e intensità separati sugli assi. Collegare al warp già previsto."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Displace TOP è un operatore integrato in TouchDesigner. Documento ufficiale verificato; in Prisma serve un passaggio di shader equivalente, non installare il TOP."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Intensità X/Y",
+                "Scala e velocità mappa",
+                "Valore neutro",
+                "Canali sorgente",
+                "Ripeti/specchia/blocca bordi",
+                "Mix originale/effetto"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": "Screenshot letto integralmente; osservazione del fotogramma separata dalle dichiarazioni della didascalia."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "graphic"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/c4c8d913d91e85c5.webp",
+          "width": 588,
+          "height": 1280
+        }
+      ],
+      "assets": [
+        {
+          "id": "c4c8d913d91e85c5",
+          "name": "5-Foto-5.jpg",
+          "bytes": 98040,
+          "available": true
+        }
+      ],
+      "completedProjects": []
+    },
+    {
+      "id": "img-s16-mosaic",
+      "name": "Mosaico · pixel netti e bande",
+      "kind": "image",
+      "related": [
+        "roadmap-image-treatments"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "@okamirufu.vizualizer",
+      "summary": "Riduzione della risoluzione e ingrandimento senza sfocatura per ottenere celle nette.",
+      "sources": [
+        "https://derivative.ca/UserGuide/Resolution_TOP"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": "La didascalia propone pixel grandi; il fotogramma mostra anche strisciate orizzontali. Il semplice ridimensionamento non basta a spiegare tutte le bande visibili."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Quantizzare le coordinate di campionamento; ridurre la risoluzione e ingrandire con nearest. Tenere lo stiramento orizzontale come controllo distinto, da verificare."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Resolution TOP integrato, documentazione ufficiale verificata. Equivalente browser: texture a bassa risoluzione o quantizzazione UV in un passaggio."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Dimensione celle X/Y",
+                "Forma celle",
+                "Origine griglia",
+                "Mix",
+                "Stiramento per righe separato"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": "Screenshot letto integralmente; osservazione del fotogramma separata dalle dichiarazioni della didascalia."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "graphic"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/513ec5a88bad1636.webp",
+          "width": 588,
+          "height": 1280
+        }
+      ],
+      "assets": [
+        {
+          "id": "513ec5a88bad1636",
+          "name": "6-Foto-6.jpg",
+          "bytes": 116718,
+          "available": true
+        }
+      ],
+      "completedProjects": []
+    },
+    {
+      "id": "img-s16-rgb",
+      "name": "RGB split · separazione dei canali",
+      "kind": "image",
+      "related": [
+        "roadmap-image-treatments"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "@okamirufu.vizualizer",
+      "summary": "Spostamenti diversi di rosso, verde e blu creano contorni sdoppiati e aberrazione cromatica.",
+      "sources": [
+        "https://derivative.ca/UserGuide/TOP"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": "Si vedono nodi Transform e la ricetta in didascalia; non un confronto prima/dopo del risultato finale."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Tre campionamenti della stessa immagine con offset indipendenti, ricomposti prendendo un canale per campione. È un trattamento dell’immagine, distinto dalla dispersione ottica 3D."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "La didascalia suggerisce Reorder e Composite Over. In una ricostruzione web riunire esplicitamente RGB: sovrapporre tre immagini opache con Over nasconderebbe quelle sotto. Kit citato accessibile tramite contatto social, nessun download/licenza pubblica verificati."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Offset R/G/B",
+                "Direzione",
+                "Intensità",
+                "Maschera centro/bordo",
+                "Velocità",
+                "Mix"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": "Screenshot letto integralmente; osservazione del fotogramma separata dalle dichiarazioni della didascalia."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "graphic",
+        "film"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/6a0f98eb175fe28e.webp",
+          "width": 588,
+          "height": 1280
+        }
+      ],
+      "assets": [
+        {
+          "id": "6a0f98eb175fe28e",
+          "name": "7-Foto-7.jpg",
+          "bytes": 111309,
+          "available": true
+        }
+      ],
       "completedProjects": []
     },
     {
@@ -16947,7 +18144,8 @@
       "related": [
         "img-03",
         "img-04",
-        "img-06"
+        "img-06",
+        "roadmap-image-treatments"
       ],
       "state": "reference",
       "priority": false,
@@ -17133,7 +18331,8 @@
       "name": "prisma-image-particles",
       "kind": "tool",
       "related": [
-        "img-01"
+        "img-01",
+        "roadmap-image-treatments"
       ],
       "state": "reference",
       "priority": false,
@@ -17510,13 +18709,13 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 164,
-    "videos": 50,
-    "images": 18,
+    "records": 173,
+    "videos": 53,
+    "images": 22,
     "tools": 71,
-    "projects": 22,
-    "attachments": 113,
-    "clips": 50,
+    "projects": 24,
+    "attachments": 123,
+    "clips": 53,
     "missing": 10
   }
 }
