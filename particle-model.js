@@ -5,6 +5,7 @@ export const SPRITES=['Granello','Disco','Anello','Scintilla'];
 export const COLOR_MODES=['Solidale alla forma iniziale','Identità della particella','Fasci e filamenti','Campo nello spazio'];
 // label, min, max, step; grouped independently from the solid renderer.
 export const PARTICLE_META={
+ pFilm:['Pellicola viva',0,1,.01],pFilmScale:['Scala delle venature',.2,5,.01],pFilmVariation:['Variazione dello spessore',0,1,.01],
  pFiberSheen:['Riflesso setoso',0,1,.01],pFiberSpread:['Larghezza del riflesso',0,1,.01],
  pLife:['Vitalità',0,1,.01],pPulse:['Pulsazioni nel loop',1,12,1],pSignal:['Intensità dei segnali',0,1,.01],pPropagation:['Propagazione tra le zone',0,1,.01],pNeural:['Struttura neuronale',0,1,.01],pNodes:['Nodi della rete',4,64,1],pConnect:['Connettività',0,1,.01],pSymmetry:['Simmetria radiale',1,12,1],
  pCount:['Numero di particelle',0,300000,100],pSize:['Diametro particelle · px',.08,16,.01],pSizeVar:['Variazione dimensioni',0,1,.01],pSprite:['Sagoma del granello',0,3,1],pOpacity:['Opacità particelle',0,1,.01],pSoftness:['Morbidezza granello',0,1,.01],
@@ -24,6 +25,7 @@ export const PARTICLE_META={
  pColorMode:['Colore sulle particelle',0,3,1],pColorScatter:['Variazione cromatica individuale',0,1,.01],pLumaVar:['Variazione luminosità individuale',0,1,.01],pDepthFade:['Attenuazione in profondità',0,1,.01],pLighting:['Risposta alle luci',0,1,.01],
 };
 export const PARTICLE_DEFAULTS={
+ pFilm:0,pFilmScale:1,pFilmVariation:.5,
  pFiberSheen:0,pFiberSpread:.35,
  pLife:.2,pPulse:2,pSignal:.1,pPropagation:.4,pNeural:0,pNodes:24,pConnect:.4,pSymmetry:1,
  pFamily:0,pMorph:0,pTarget:0,pCount:85000,pSize:1.1,pSizeVar:.6,pSprite:0,pOpacity:.5,pSoftness:.6,
@@ -40,8 +42,8 @@ export const PARTICLE_DEFAULTS={
  pColorMode:0,pColorScatter:.06,pLumaVar:.25,pDepthFade:.25,pLighting:.65,
 };
 export const PARTICLE_GROUPS={
- shape:['pCount','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pOrganic','pFrequency','pDetail','pRough','pWarp','pOuter','pReach','pBranches','pNeural','pNodes','pConnect','pSymmetry','pTentacle','pTentacleCount','pTentacleLength','pTentacleTaper','pTentacleCurl'],
- material:['pSize','pSizeVar','pSprite','pOpacity','pSoftness','pTrailCount','pTrailLength','pTrailWidth','pTrailOpacity','pTrailFade','pTrailTaper','pTrailScatter','pTrailPersistence','pTrailSoftness','pTrailCoherence','pTrailDensity','pTrailQuality','pFiberSheen','pFiberSpread'],
+ shape:['pCount','pSize','pSizeVar','pSprite','pOpacity','pSoftness','pTrailCount','pTrailLength','pTrailWidth','pTrailOpacity','pTrailFade','pTrailTaper','pTrailScatter','pTrailPersistence','pTrailSoftness','pTrailCoherence','pTrailDensity','pTrailQuality','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pOrganic','pFrequency','pDetail','pRough','pWarp','pOuter','pReach','pBranches','pNeural','pNodes','pConnect','pSymmetry','pTentacle','pTentacleCount','pTentacleLength','pTentacleTaper','pTentacleCurl'],
+ material:['pFilm','pFilmScale','pFilmVariation','pFiberSheen','pFiberSpread'],
  color:['pColorMode','pColorScatter','pLumaVar'],light:['pLighting','pDepthFade'],
  motion:['pCohesion','pRandom','pJitter','pVortex','pReentry','pBreath','pTravel','pAttract','pRepel','pMagnet','pPoles','pRadius','pField','pCycles','pDirection','pRhythm','pPause','pSpeedSpread','pLife','pPulse','pSignal','pPropagation','pMotionSoftness','pFollow','pOrbitOval','pOrbitTilt','pOrbitPrecession','pOrbitSpread','pOrbitDrift','pWander','pWanderScale','pWanderCycles','pFlowBalance','pMotionSeed','pTentacleWave','pTentacleCycles','pSpaceWarp','pWarpScale','pWarpCycles','pWarpTwist'],
 };
@@ -107,4 +109,9 @@ export const FIBER_STYLES={
  fibres:{pTrailCount:7000,pTrailLength:.28,pTrailWidth:.07,pTrailOpacity:.6,pTrailPersistence:.28,pTrailSoftness:.75,pTrailCoherence:.2,pTrailDensity:.6,pTrailQuality:96,pTrailTaper:.6,pOpacity:.16},
  threads:{pTrailCount:18000,pTrailLength:.6,pTrailWidth:.13,pTrailOpacity:.55,pTrailPersistence:.62,pTrailSoftness:.7,pTrailCoherence:.68,pTrailDensity:.8,pTrailQuality:128,pTrailTaper:.25,pOpacity:.07},
  fabric:{pTrailCount:42000,pTrailLength:.85,pTrailWidth:.21,pTrailOpacity:.5,pTrailPersistence:.9,pTrailSoftness:.8,pTrailCoherence:.95,pTrailDensity:1,pTrailQuality:160,pTrailTaper:.08,pOpacity:0}
+};
+
+export const FILM_STYLES={
+ living:{pFilm:1,pFilmScale:1.1,pFilmVariation:.8,filmThickness:520,filmFlow:.75,filmSwirl:.45,filmCycles:1,pFiberSheen:.8,pFiberSpread:.3,pLighting:1,emission:.04,metal:.12,roughness:.18,gloss:1,iridescence:.15},
+ satin:{pFilm:.6,pFilmScale:.6,pFilmVariation:.35,filmThickness:380,filmFlow:.3,filmSwirl:.18,filmCycles:1,pFiberSheen:.8,pFiberSpread:.65,pLighting:1,emission:.08,metal:.08,roughness:.4,gloss:.85,iridescence:.1}
 };

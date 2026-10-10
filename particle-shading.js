@@ -2,6 +2,8 @@
 export const prismaShadingGLSL=`
 uniform vec4 uMaterial,uFinish,uEnvironment,uGradient;
 uniform vec2 uPearl,uFiberLight;
+uniform vec4 uFilmLayer,uParticleFilmMotion,uFilmObject;
+uniform vec3 uFilmRotation,uFilmResponse[24],uFilmWhite;
 uniform vec4 uColorWave;uniform vec4 uColorWave2;uniform float uColorSoftness;
 uniform vec3 uPalette[12];uniform highp int uPaletteCount,uLightCount;
 uniform vec4 uLights[8];uniform vec3 uLightColors[8];uniform float uLightSizes[8];
@@ -40,6 +42,34 @@ vec3 pearlFresnel(vec3 f0,float cosine,float irid,float rough){
  vec3 tint=mix(vec3(1.),.45+1.05*spectrum,irid*(1.-rough*.5));
  return clamp(fresnel*tint,0.,1.);
 }
+// Reuses Prisma Forme's soapFilm air/water/air interference and its 24 CIE
+// samples. This is a coating on the existing particles, not a refracting mesh.
+mat2 filmRotate(float a){return mat2(cos(a),-sin(a),sin(a),cos(a));}
+vec3 filmRGB(vec3 xyz){return mat3(3.2406,-.9689,.0557,-1.5372,1.8758,-.204,-.4986,.0415,1.057)*xyz;}
+vec3 livingFilm(vec3 world,float facing,float rough){
+ vec3 local=(world-vec3(uFilmObject.yz,0.))/max(.001,uFilmObject.x);
+ local.xz=filmRotate(-uFilmRotation.y)*local.xz;
+ local.yz=filmRotate(-uFilmRotation.x)*local.yz;
+ local.xy=filmRotate(-uFilmRotation.z)*local.xy;
+ local*=uFilmLayer.y;
+ float phase=uParticleFilmMotion.x,flow=uParticleFilmMotion.y,swirl=uParticleFilmMotion.z;
+ float angle=atan(local.y,local.x+.000001);
+ float variation=.35*sin(local.x*1.7+local.y*2.6)-.12*local.y
+   +flow*.45*sin(local.y*4.8+phase+swirl*sin(angle*3.-phase)*1.2)
+   +swirl*.3*sin(angle*3.-phase+local.y*2.);
+ float thickness=max(20.,uPearl.y*(1.+uFilmLayer.z*variation)+uPearl.x*100.);
+ float ci=clamp(facing,.001,1.),n1=1.333,c1=sqrt(max(.001,1.-(1.-ci*ci)/(n1*n1)));
+ vec2 r01=vec2((ci-n1*c1)/(ci+n1*c1),(n1*ci-c1)/(n1*ci+c1)),r12=-r01,product=r01*r12;
+ vec3 xyz=vec3(0.);
+ for(int j=0;j<24;j++){
+   float wavelength=390.+float(j)*15.,interference=cos(12.5663706144*n1*thickness*c1/wavelength);
+   vec2 reflection=(r01*r01+r12*r12+2.*product*interference)/(vec2(1.)+product*product+2.*product*interference);
+   xyz+=uFilmResponse[j]*dot(reflection,vec2(.5));
+ }
+ vec3 film=clamp(filmRGB(xyz)/max(vec3(.001),filmRGB(uFilmWhite)),0.,1.);
+ // Rough surfaces soften the hue contrast while preserving reflected energy.
+ return mix(film,vec3(dot(film,vec3(.2126,.7152,.0722))),rough*rough*.7);
+}
 vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
  float metal=uMaterial.x,rough=max(.04,uMaterial.y),gloss=uMaterial.z,irid=uMaterial.w;
  vec3 view=normalize(vec3(0.,0.,7.5)-p);if(dot(n,view)<0.)n=-n;
@@ -47,6 +77,9 @@ vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
  vec3 f0=mix(vec3(.04),clamp(base,0.,1.),metal);
  vec3 reflection=reflectedEnvironment(reflect(-view,n),rough);
  vec3 fresnel=pearlFresnel(f0,facing,irid,rough);
+ vec3 film=vec3(0.);float coating=uFilmLayer.x;
+ if(coating>0.)film=livingFilm(p,facing,rough);
+ fresnel=mix(fresnel,film,coating);
  // Artistic strand reflection: the local 3D tangent determines the cylinder
  // normal and the elongated highlight. This changes reflected light only.
  if(silk>0.){
@@ -55,6 +88,7 @@ vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
    float strandRough=mix(rough,1.,uFiberLight.y*.65);
    vec3 strandReflection=reflectedEnvironment(reflect(-view,strandNormal),strandRough);
    vec3 strandFresnel=pearlFresnel(f0,clamp(dot(strandNormal,view),.001,1.),irid,rough);
+   strandFresnel=mix(strandFresnel,film,coating);
    reflection=mix(reflection*fresnel,strandReflection*strandFresnel,silk);
    fresnel=vec3(1.);
  }
@@ -75,6 +109,7 @@ vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
    }
    vec3 power=uLightColors[i]*uLights[i].w/(1.+distance2*.045);
    vec3 specular=pearlFresnel(f0,max(0.,dot(view,halfVector)),irid,rough);
+   specular=mix(specular,film,coating);
    lit+=power*(base*diffuse*(1.-metal)*.7*uFinish.z+specular*spec*gloss*2.);
  }
  // Unlit is a usable palette view even with emission at zero.

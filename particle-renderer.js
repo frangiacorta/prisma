@@ -1,8 +1,8 @@
-import {sampleFrame} from './solid-renderer.js?v=706803f7e946';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=706803f7e946';
-import {GuideField} from './particle-path-field.js?v=706803f7e946';
-import {fieldGLSL} from './particle-field.js?v=706803f7e946';
-import {prismaShadingGLSL} from './particle-shading.js?v=706803f7e946';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=bd6df16a7ed3';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=bd6df16a7ed3';
+import {GuideField} from './particle-path-field.js?v=bd6df16a7ed3';
+import {fieldGLSL} from './particle-field.js?v=bd6df16a7ed3';
+import {prismaShadingGLSL} from './particle-shading.js?v=bd6df16a7ed3';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -148,6 +148,11 @@ export class ParticleRenderer{
   this.u(p,'uSpaceWarp',s.pSpaceWarp,s.pWarpScale,s.pWarpCycles,s.pWarpTwist);
   this.u(p,'uForm',s.stretchX,s.stretchY,s.stretchZ,s.volume);this.u(p,'uWarp',s.deform,s.twist,s.waves,s.waveScale);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uRotation',s.rotateX*rad,s.rotateY*rad,s.rotateZ*rad,0);
   this.u(p,'uMaterial',s.metal,s.roughness,s.gloss,s.iridescence);this.u(p,'uFinish',s.emission,s.pLighting,1-s.transparency,1);
+  this.u(p,'uFilmLayer',s.pFilm,s.pFilmScale,s.pFilmVariation,0);
+  const filmCycles=s.perfectLoop!==false?Math.max(1,Math.round(s.filmCycles||1)):(s.filmCycles||1);
+  this.u(p,'uParticleFilmMotion',phase*Math.PI*2*filmCycles,s.filmFlow||0,s.filmSwirl||0,0);
+  this.u(p,'uFilmObject',s.scale,s.positionX,s.positionY,0);this.u(p,'uFilmRotation',s.rotateX*rad,s.rotateY*rad,s.rotateZ*rad);
+  gl.uniform3fv(this.loc(p,'uFilmResponse'),FILM_SPECTRUM.data);gl.uniform3fv(this.loc(p,'uFilmWhite'),FILM_SPECTRUM.white);
   this.u(p,'uPearl',s.iridShift??0,s.filmThickness??420);this.u(p,'uShadeOrigin',s.positionX,s.positionY,0);
   this.u(p,'uEnvironment',environments.indexOf(s.environment),s.environmentAngle*rad,s.environmentPower,0);
   this.u(p,'uGradient',s.gradientAngle*rad,s.gradientScale,s.gradientOffset,1);this.u(p,'uColorSoftness',s.colorSoftness);

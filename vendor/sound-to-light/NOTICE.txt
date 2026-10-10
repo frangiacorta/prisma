@@ -1,0 +1,10 @@
+SpectralFluxDetector is a JavaScript adaptation of SpectralFluxBeatDetector
+and the refractory interval in scheb/sound-to-light-osc (MIT).
+Upstream commit: 1fda932608f501a2f7256849416e354a539c3cb3
+https://github.com/scheb/sound-to-light-osc/blob/1fda932608f501a2f7256849416e354a539c3cb3/src/analyzer.py
+Original source: analyzer.upstream.py, unmodified. Full license: LICENSE.txt.
+Prisma modifications, 2026-10-09: Python/Qt to standalone JS; uses native
+Web Audio spectra; 3-second timestamped history instead of 30 seconds;
+no 5-second startup wait; threshold scaled for linear browser magnitudes;
+configurable sensitivity and minimum interval; edge trigger avoids sustained
+threshold retriggers. Outputs onsets, not a promise of accurate musical BPM.

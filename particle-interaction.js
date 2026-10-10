@@ -1,4 +1,4 @@
-import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=706803f7e946';
+import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=bd6df16a7ed3';
 
 export function mountParticleForces({canvas,board,getState,getMode,setMode,remember,mark,renderControls,showTab,toast}){
  const overlay=document.querySelector('#force-handles'),controls=document.querySelector('#controls');
@@ -51,5 +51,5 @@ export function mountParticleForces({canvas,board,getState,getMode,setMode,remem
   if(b.dataset.forceSelect){selected=+b.dataset.forceSelect;setMode(current().strength<0?'repel':'attract');renderControls();sync();return;}
   if(b.hasAttribute('data-force-remove')||b.hasAttribute('data-force-clear')||b.hasAttribute('data-force-invert')){remember();if(b.hasAttribute('data-force-invert'))current().strength=-current().strength;else getState().forcePoints=b.hasAttribute('data-force-clear')?[]:getState().forcePoints.filter(p=>p.id!==selected);mark();renderControls();}
  });
- return {sync,panel:()=>forcePanel(getState(),selected),get dragging(){return !!drag;},activate(kind){setMode(kind);showTab('motion');const group=document.getElementById('force-controls');if(group){group.open=true;group.scrollIntoView({block:'nearest'});}},dispose(){clearTimeout(wheelTimer);}};
+ return {sync,panel:()=>forcePanel(getState(),selected),get dragging(){return !!drag;},activate(kind){setMode(kind);showTab('fields');const group=document.getElementById('force-controls');if(group){group.open=true;group.scrollIntoView({block:'nearest'});}},dispose(){clearTimeout(wheelTimer);}};
 }

@@ -6,3 +6,12 @@ Corresponding upstream source: https://github.com/sergiomb2/libmp4v2
 mp4-muxer 5.2.2 — MIT, unmodified browser distribution.
 https://github.com/Vanilagy/mp4-muxer
 License: MP4-MUXER-LICENSE.md
+
+OrbAudioInput — MIT, adapted JavaScript runtime for Prisma audio modulation.
+Copyright (c) 2026 LerSent001.
+Pinned source, modifications and license: orb/NOTICE.txt and orb/LICENSE.txt.
+https://github.com/LerSent001/orb
+sound-to-light-osc (MIT, Christian Scheb): adapted spectral-flux detector.
+See sound-to-light/LICENSE.txt and NOTICE.txt for source version and changes.
+Meyda (MIT): spectral centroid and flatness extractors adapted for timbre.
+Originals, fixed commit and license: meyda/NOTICE.txt and meyda/LICENSE.md.

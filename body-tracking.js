@@ -1,4 +1,4 @@
-import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=706803f7e946';
+import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=bd6df16a7ed3';
 export function mountBodyTracking({board,getState,remember,mark,renderControls,showTab,toast,invalidate}){
  const local=/^(localhost|127\.0\.0\.1)$/.test(location.hostname),runtime=new BodyTrackingState();
  const overlay=document.createElement('div');overlay.id='body-tracking-overlay';overlay.setAttribute('aria-hidden','true');board.append(overlay);
@@ -24,7 +24,7 @@ export function mountBodyTracking({board,getState,remember,mark,renderControls,s
    }else{remember();const moved=bodyPreviewState(s,fields);s.positionX=moved.positionX;s.positionY=moved.positionY;}stop();mark();toast('Influenza congelata · ora fa parte del preset e degli export.');
   }renderControls();if(mode!=='off')document.querySelector('#body-tracking-controls').open=true;
  });
- const button=document.createElement('button');button.id='body-tracking-tool';button.className='tool';button.textContent='◉';button.title='Tracking testa e mani';button.setAttribute('aria-label','Tracking testa e mani');document.querySelector('.canvas-tools .tool-separator').before(button);button.onclick=()=>{showTab('motion');const panel=document.querySelector('#body-tracking-controls');panel.open=true;panel.scrollIntoView({block:'nearest'});};
+ const button=document.createElement('button');button.id='body-tracking-tool';button.className='tool';button.innerHTML='◉<span class="tool-label">Tracking</span>';button.title='Tracking testa e mani';button.setAttribute('aria-label','Tracking testa e mani');document.querySelector('.canvas-tools .tool-separator').before(button);button.onclick=()=>{showTab('body');const panel=document.querySelector('#body-tracking-controls');panel.open=true;panel.scrollIntoView({block:'nearest'});};
  addEventListener('pagehide',stop);
  return {panel,get active(){return mode!=='off';},preview:s=>bodyPreviewState(s,fields),tick(now){
   if(mode==='off')return false;

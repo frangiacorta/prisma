@@ -1,0 +1,17 @@
+Meyda spectral centroid and spectral flatness, MIT.
+Copyright (c) 2014 Hugh A. Rawlinson, Nevo Segal, Jakub Fiala.
+Commit: ecf256616d43292c82cbf96e60a91b19ca10eb64
+https://github.com/meyda/meyda/tree/ecf256616d43292c82cbf96e60a91b19ca10eb64/src/extractors
+License: LICENSE.md. Original files, downloaded without alterations:
+spectralCentroid.upstream.ts, spectralFlatness.upstream.ts,
+extractorUtilities.upstream.ts.
+
+Prisma adaptation, 2026-10-09: removed TypeScript and object wrappers;
+specialized mu(1) for the centroid; added guards for empty/silent spectra
+and bounded numerical rounding. The input uses Orb's existing native
+Web Audio FFT (Blackman window), not Meyda's default Hanning FFT pipeline.
+Values are therefore not asserted identical to a full Meyda analysis.
+Prisma wrapper limits the band to 30–16000 Hz, converts centroid bins to Hz
+and maps 80–8000 Hz logarithmically into a 0–1 brightness control.
+Flatness describes noise-like versus tonal spectra, not sound recognition
+or pitch tracking. No additional AudioContext, FFT, callback or network call.

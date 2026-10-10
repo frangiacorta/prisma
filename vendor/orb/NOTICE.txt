@@ -1,0 +1,19 @@
+OrbAudioInput — adapted from LerSent001/orb, MIT.
+Upstream commit: 8d1736e1fc5b41a5037b524403f35b7952b038f0
+https://github.com/LerSent001/orb/blob/8d1736e1fc5b41a5037b524403f35b7952b038f0/src/orb-audio.ts
+Original source: orb-audio.upstream.ts (unaltered download).
+Source SHA256: 7fc6c3ccb336f768c468077af0a1ee386161f8006eebf55fddf1e00279c4cfa4
+License: LICENSE.txt, copyright (c) 2026 LerSent001.
+
+Prisma adaptation, 2026-10-09: JavaScript module, independent of Orb presets;
+configurable threshold, attack/release and frequency bands; device selection;
+noise calibration RMS; hysteresis; release after stop; resource cleanup on
+failure/cancellation; audio player reattachment after inspector rendering.
+The input, FFT/RMS analysis, band averaging and exponential smoothing are
+derived from OrbAudioInput. Prisma parameter mappings and UI are separate.
+
+Second adaptation, 2026-10-09: interactive audio context; 1024-sample FFT
+without duplicate smoothing; band power replaces mean log-magnitude bins;
+adaptive reference levels, gain before envelope and response curve;
+peak signal and spectral-flux input from the separately credited MIT module
+in ../sound-to-light/. Microphone requests unprocessed audio where supported.

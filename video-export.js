@@ -8,7 +8,7 @@ export async function removeVideoTemporaryFile(name){
 }
 export class VideoExportSession{
  constructor(){
-  this.worker=new Worker(new URL('./encoder-worker.js?v=706803f7e946',import.meta.url));this.pending=new Map();this.nextId=0;this.storageName=`video-${crypto.randomUUID()}.mp4`;this.finished=false;
+  this.worker=new Worker(new URL('./encoder-worker.js?v=bd6df16a7ed3',import.meta.url));this.pending=new Map();this.nextId=0;this.storageName=`video-${crypto.randomUUID()}.mp4`;this.finished=false;
   this.worker.onmessage=({data})=>{const entry=this.pending.get(data.id);if(!entry)return;clearTimeout(entry.timer);this.pending.delete(data.id);if(data.error)entry.reject(new Error(data.error));else entry.resolve(data);};
   this.worker.onerror=e=>this.fail(new Error(e.message||'La codifica del video si è interrotta.'));
   this.worker.onmessageerror=()=>this.fail(new Error('Il browser non riesce a trasferire il video.'));

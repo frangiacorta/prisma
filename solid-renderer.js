@@ -906,7 +906,7 @@ PREVIEW_FRAG=PREVIEW_FRAG.replace('for(int k=0;k<SCATTER_SAMPLES;k++){if(k>=int(
 // Integrate the same 24 spectral wavelengths as the exact renderer, with
 // CIE weights computed once on the CPU. Dynamic shader loops then stay compact
 // without evaluating seven wavelength-only Gaussian functions per sample.
-const FILM_SPECTRUM=(()=>{
+export const FILM_SPECTRUM=(()=>{
  const data=new Float32Array(72),white=new Float32Array(3),gaussian=(x,c,l,r)=>Math.exp(-.5*((x-c)*(x<c?l:r))**2);
  for(let j=0;j<24;j++){
   const w=390+j*15,response=[1.056*gaussian(w,599.8,.0264,.0323)+.362*gaussian(w,442.,.0624,.0374)-.065*gaussian(w,501.1,.049,.0382),.821*gaussian(w,568.8,.0213,.0247)+.286*gaussian(w,530.9,.0613,.0322),1.217*gaussian(w,437.,.0845,.0278)+.681*gaussian(w,459.,.0385,.0725)];
