@@ -1,11 +1,11 @@
-import {Renderer as SolidRenderer} from './solid-renderer.js?v=c2b52e9c14b3';
-import {ParticleRenderer} from './particle-renderer.js?v=c2b52e9c14b3';
-import {FinishingPass,FINISH_DEFAULTS,finishingOff,finishingSource} from './finishing.js?v=c2b52e9c14b3';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=c2b52e9c14b3';
+import {Renderer as SolidRenderer} from './solid-renderer.js?v=87dc341942b4';
+import {ParticleRenderer} from './particle-renderer.js?v=87dc341942b4';
+import {FinishingPass,FINISH_DEFAULTS,finishingOff,finishingSource} from './finishing.js?v=87dc341942b4';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=87dc341942b4';
 // One editor and export contract; the saved creation chooses its renderer.
 export class Renderer{
  constructor(canvas){this.canvas=canvas;this.context=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!this.context)throw Error('WebGL 2 non disponibile.');}
- select(s){const kind=s?.engine==='particles'?'particles':'solid';if(this.kind!==kind){this.impl?.dispose({loseContext:false});this.context.bindVertexArray(null);this.context.bindFramebuffer(this.context.FRAMEBUFFER,null);this.context.disable(this.context.BLEND);this.impl=kind==='particles'?new ParticleRenderer(this.canvas):new SolidRenderer(this.canvas);this.kind=kind;}return this.impl;}
+ select(s){const kind=(s?.engine==='particles'||s?.pLiving>0)?'particles':'solid';if(this.kind!==kind){this.impl?.dispose({loseContext:false});this.context.bindVertexArray(null);this.context.bindFramebuffer(this.context.FRAMEBUFFER,null);this.context.disable(this.context.BLEND);this.impl=kind==='particles'?new ParticleRenderer(this.canvas):new SolidRenderer(this.canvas);this.kind=kind;}return this.impl;}
  get gl(){return this.context;}get maxSize(){return Math.min(4096,this.context.getParameter(this.context.MAX_TEXTURE_SIZE));}
  get recoveryExtension(){return this.context.getExtension('WEBGL_lose_context');}
  get completionSync(){return this.impl?.completionSync;}get completedFrames(){return this.impl?.completedFrames||0;}

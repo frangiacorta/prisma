@@ -1,16 +1,17 @@
-import {MAX_FORCE_PATHS,PATH_META,pathValue,newForcePath,samplePath,ellipseKnots} from './particle-paths.js?v=c2b52e9c14b3';
-import {screenToForce,forceToScreen} from './particle-forces.js?v=c2b52e9c14b3';
+import {usesParticleSurface} from './living-composition.js?v=87dc341942b4';
+import {MAX_FORCE_PATHS,PATH_META,pathValue,newForcePath,samplePath,ellipseKnots} from './particle-paths.js?v=87dc341942b4';
+import {screenToForce,forceToScreen} from './particle-forces.js?v=87dc341942b4';
 
 export function mountParticlePaths({canvas,board,getState,getMode,setMode,remember,mark,renderControls,showTab,toast}){
  const overlay=document.querySelector('#guide-handles'),controls=document.querySelector('#controls');
  let selected=null,kind='free',drag=null,redraw=false,before=null,recorded=false,paintKey='';
- const active=()=>getState().engine==='particles'&&['guide','avoid'].includes(getMode());
+ const active=()=>usesParticleSurface(getState())&&['guide','avoid'].includes(getMode());
  const paths=()=>getState().forcePaths||[];
  const current=()=>paths().find(p=>p.id===selected);
  const pointer=(e,z=0)=>{const r=canvas.getBoundingClientRect();return screenToForce((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height,r.width/r.height,z);};
  function draftPoints(){if(!drag?.drawing)return [];const a=drag.points[0],b=drag.points.at(-1);return kind==='ellipse'?ellipseKnots(a,b):kind==='line'?[a,b]:drag.points;}
  function sync(){
-  for(const k of ['guide','avoid'])document.querySelector('#'+k+'-tool').hidden=getState().engine!=='particles';
+  for(const k of ['guide','avoid'])document.querySelector('#'+k+'-tool').hidden=!usesParticleSurface(getState());
   overlay.toggleAttribute('hidden',!active());canvas.classList.toggle('drawing-guide',active());
   if(!paths().some(p=>p.id===selected))selected=paths()[0]?.id??null;
   if(!active())return;

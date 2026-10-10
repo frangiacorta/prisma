@@ -1,6 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=c2b52e9c14b3';
+import {AUDIO_HELP} from './audio-model.js?v=87dc341942b4';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ pLivingBlend:'Passaggio continuo: 0 mostra solo particelle, scie e connessioni; 0,5 le mescola con la struttura; 1 mostra solo fibre e pelle. Non cancella i parametri delle componenti.',
+ pSurfaceBind:'Porta granelli e nodi dei legami sulla superficie realmente deformata. A 1 seguono esattamente la sua apertura e le sue pieghe. Le scie restano percorsi indipendenti.',
+ pLivingOcclusion:'Attenua la materia dietro la pelle, rispettando pori, continuità e trasparenza. A 0 il nucleo resta visibile attraverso la struttura.',
  finishRegionsEnabled:'Limita mosaico e/o RGB ai riquadri disegnati. Disattivalo per trattare di nuovo tutta l’immagine, conservando le aree.',
  finishRegionMosaic:'Il mosaico appare solo nelle aree selezionate. Gli altri trattamenti conservano le proprie impostazioni.',
  finishRegionRgb:'La separazione RGB appare solo nelle aree selezionate.',

@@ -12729,6 +12729,10 @@
             {
               "label": "method",
               "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo. Correzione collasso: trazione unilaterale e compressione libera, verificata su 240 fasi per ogni preset e sulle contrazioni profonde."
+            },
+            {
+              "label": "integration",
+              "value": "Passaggio continuo particelle / struttura, adesione di granelli e nodi alla superficie deformata, schermatura progressiva del nucleo. Il cambio Forme / Particelle conserva la stessa creazione."
             }
           ]
         },
@@ -12776,7 +12780,7 @@
             },
             {
               "label": "limits",
-              "value": "Versione 1 di deformazione elastica guidata, senza collisioni e inerzia libera. La resistenza alla piega usa vincoli tra secondi vicini. La pelle traslucida mostra la superficie più vicina: niente rifrazione o trasparenza fisica multistrato. Pori ritagliati nel materiale, non nuove maglie del solver. I granelli liberi mantengono il campo precedente; la struttura connessa ha nodi propri."
+              "value": "Deformazione elastica guidata e periodica, senza collisioni o inerzia libera. La pelle mostra lo strato più vicino; la schermatura dei granelli rispetta pori e opacità, senza rifrazione fisica multistrato. Adesione per granelli e nodi; le scie mantengono percorsi indipendenti. Immagini e video disponibili; wallpaper HTML interattivo riservato ai volumi scolpiti."
             }
           ]
         },
@@ -12790,7 +12794,8 @@
                 "reports/living-structures/exports.json",
                 "reports/living-motion/before.json",
                 "reports/living-motion/after.json",
-                "reports/living-motion/stress.json"
+                "reports/living-motion/stress.json",
+                "reports/living-integration/source.json"
               ]
             }
           ]
@@ -12801,7 +12806,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "membrana-viva",
-      "where": "Particelle → Punti di partenza → Membrana viva. Controlli: Forma e moto → Fibre e scie.",
+      "where": "Forme oppure Particelle → Forma → Fibre, tessuto e membrane. I tre esempi sono nei Punti di partenza di entrambi gli spazi.",
       "platform": "",
       "next": "",
       "keep": "",
@@ -12863,6 +12868,10 @@
             {
               "label": "method",
               "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo. Correzione collasso: trazione unilaterale e compressione libera, verificata su 240 fasi per ogni preset e sulle contrazioni profonde."
+            },
+            {
+              "label": "integration",
+              "value": "Passaggio continuo particelle / struttura, adesione di granelli e nodi alla superficie deformata, schermatura progressiva del nucleo. Il cambio Forme / Particelle conserva la stessa creazione."
             }
           ]
         },
@@ -12910,7 +12919,7 @@
             },
             {
               "label": "limits",
-              "value": "Versione 1 di deformazione elastica guidata, senza collisioni e inerzia libera. La resistenza alla piega usa vincoli tra secondi vicini. La pelle traslucida mostra la superficie più vicina: niente rifrazione o trasparenza fisica multistrato. Pori ritagliati nel materiale, non nuove maglie del solver. I granelli liberi mantengono il campo precedente; la struttura connessa ha nodi propri."
+              "value": "Deformazione elastica guidata e periodica, senza collisioni o inerzia libera. La pelle mostra lo strato più vicino; la schermatura dei granelli rispetta pori e opacità, senza rifrazione fisica multistrato. Adesione per granelli e nodi; le scie mantengono percorsi indipendenti. Immagini e video disponibili; wallpaper HTML interattivo riservato ai volumi scolpiti."
             }
           ]
         },
@@ -12924,7 +12933,8 @@
                 "reports/living-structures/exports.json",
                 "reports/living-motion/before.json",
                 "reports/living-motion/after.json",
-                "reports/living-motion/stress.json"
+                "reports/living-motion/stress.json",
+                "reports/living-integration/source.json"
               ]
             }
           ]
@@ -12936,7 +12946,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "fibre-vive",
-      "where": "Particelle → Punti di partenza → Fibre che respirano. Controlli: Forma e moto → Fibre e scie.",
+      "where": "Forme oppure Particelle → Forma → Fibre, tessuto e membrane. I tre esempi sono nei Punti di partenza di entrambi gli spazi.",
       "platform": "",
       "next": "",
       "keep": "",
@@ -12990,6 +13000,10 @@
             {
               "label": "method",
               "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo. Correzione collasso: trazione unilaterale e compressione libera, verificata su 240 fasi per ogni preset e sulle contrazioni profonde."
+            },
+            {
+              "label": "integration",
+              "value": "Passaggio continuo particelle / struttura, adesione di granelli e nodi alla superficie deformata, schermatura progressiva del nucleo. Il cambio Forme / Particelle conserva la stessa creazione."
             }
           ]
         },
@@ -13037,7 +13051,7 @@
             },
             {
               "label": "limits",
-              "value": "Versione 1 di deformazione elastica guidata, senza collisioni e inerzia libera. La resistenza alla piega usa vincoli tra secondi vicini. La pelle traslucida mostra la superficie più vicina: niente rifrazione o trasparenza fisica multistrato. Pori ritagliati nel materiale, non nuove maglie del solver. I granelli liberi mantengono il campo precedente; la struttura connessa ha nodi propri."
+              "value": "Deformazione elastica guidata e periodica, senza collisioni o inerzia libera. La pelle mostra lo strato più vicino; la schermatura dei granelli rispetta pori e opacità, senza rifrazione fisica multistrato. Adesione per granelli e nodi; le scie mantengono percorsi indipendenti. Immagini e video disponibili; wallpaper HTML interattivo riservato ai volumi scolpiti."
             }
           ]
         },
@@ -13051,7 +13065,8 @@
                 "reports/living-structures/exports.json",
                 "reports/living-motion/before.json",
                 "reports/living-motion/after.json",
-                "reports/living-motion/stress.json"
+                "reports/living-motion/stress.json",
+                "reports/living-integration/source.json"
               ]
             }
           ]
@@ -13062,7 +13077,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "tessuto-connesso",
-      "where": "Particelle → Punti di partenza → Tessuto connesso. Controlli: Forma e moto → Fibre e scie.",
+      "where": "Forme oppure Particelle → Forma → Fibre, tessuto e membrane. I tre esempi sono nei Punti di partenza di entrambi gli spazi.",
       "platform": "",
       "next": "",
       "keep": "",

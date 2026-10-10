@@ -1,8 +1,8 @@
-import {META,MOODS,GROUPS} from './model.js?v=c2b52e9c14b3';
-import {particleSphere} from './particle-model.js?v=c2b52e9c14b3';
-import {PATH_META} from './particle-paths.js?v=c2b52e9c14b3';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=c2b52e9c14b3';
-import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=c2b52e9c14b3';
+import {META,MOODS,GROUPS} from './model.js?v=87dc341942b4';
+import {particleSphere} from './particle-model.js?v=87dc341942b4';
+import {PATH_META} from './particle-paths.js?v=87dc341942b4';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=87dc341942b4';
+import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=87dc341942b4';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
@@ -11,7 +11,7 @@ for(const [forms,base] of [['neri nere','nero'],['bianchi bianche','bianco'],['r
 function colorsIn(text){const result=[];const re=new RegExp('#(?:[0-9a-f]{6}|[0-9a-f]{3})\\b|\\b(?:'+Object.keys(namedColors).join('|')+')\\b','gi');for(const m of text.matchAll(re)){let c=m[0][0]==='#'?m[0].toLowerCase():namedColors[m[0].toLowerCase()];if(c.length===4)c='#'+c.slice(1).split('').map(q=>q+q).join('');result.push(c);}return result;}
 function scalar(key,value){const m=Object.hasOwn(META,key)?META[key]:null;if(!m||!Number.isFinite(value)||value<m[1]||value>m[2])throw Error('Valore non valido per '+(m?.[0]||key));return m[3]>=1?Math.round(value):value;}
 const shapeNames=[...new Set(['sfera','goccia','blob','macchia','disco','anello','semiluna',...SCULPT_EXAMPLES.map(q=>normalize(q.name))])];
-function shape(s,name){if(s.engine==='particles'&&name==='sfera')return particleSphere(s);if(!shapeNames.includes(name))throw Error('Forma non disponibile');for(const k of ['deform','asymmetry','twist','waves','hole','cut','edge','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','petalBlend','petalRoot','petalRandom','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemAmount'])s[k]=0;s.petalGrowth=1;for(const k of ['volume','stretchX','stretchY','stretchZ','holeAspect','cutAspect'])s[k]=1;for(const k of SHAPE_TRACKS)if(s.motions[k])s.motions[k].enabled=false;
+function shape(s,name){if((s.engine==='particles'||s.pLiving>0)&&name==='sfera')return particleSphere(s);if(!shapeNames.includes(name))throw Error('Forma non disponibile');for(const k of ['deform','asymmetry','twist','waves','hole','cut','edge','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','petalBlend','petalRoot','petalRandom','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemAmount'])s[k]=0;s.petalGrowth=1;for(const k of ['volume','stretchX','stretchY','stretchZ','holeAspect','cutAspect'])s[k]=1;for(const k of SHAPE_TRACKS)if(s.motions[k])s.motions[k].enabled=false;
  if(name==='goccia')Object.assign(s,{taper:.38,stretchY:1.18,stretchX:.9});if(name==='blob')Object.assign(s,{deform:.3,asymmetry:.13,twist:.3});if(name==='macchia')Object.assign(s,{volume:.08,stretchX:1.2,deform:.34,edge:.22});if(name==='disco')s.volume=.1;if(name==='anello')Object.assign(s,{hole:.55,volume:.45});if(name==='semiluna')Object.assign(s,{cut:.9,cutX:.4,cutY:.1,volume:.5});const i=SCULPT_EXAMPLES.findIndex(q=>normalize(q.name)===name);if(i>=0)sculpt(s,i);return s;}
 
 // Atomic, allowlisted operations shared by text commands and browser agents.
@@ -31,7 +31,7 @@ export function applyDescriptionPlan(current,plan){
   else if(o.type==='environment'){if(!['studio','sky','sunset','neon','aurora','aquarium','city'].includes(o.name))throw Error('Ambiente non valido');upgrade(s);s.environment=o.name;notes.push('Ambiente riflesso');}
   else if(o.type==='light'){upgrade(s);if(o.action==='remove'){const i=s.lights.findIndex(l=>l.id===o.id);if(i<0)throw Error('Luce non trovata');s.lights.splice(i,1);notes.push('Luce rimossa');continue;}let l;if(o.action==='add'){if(s.lights.length>=MAX_LIGHTS)throw Error('Puoi usare fino a 8 luci');l=newLight(Math.max(0,...s.lights.map(q=>q.id))+1);}else if(o.action==='edit'){l=s.lights.find(q=>q.id===o.id);if(!l)throw Error('Luce non trovata');}else throw Error('Azione luce non valida');for(const [k,v] of Object.entries(o.values||{})){if(Object.hasOwn(LIGHT_META,k)){const m=LIGHT_META[k];if(!Number.isFinite(v)||v<m[1]||v>m[2])throw Error('Valore luce non valido');l[k]=m[3]>=1?Math.round(v):v;}else if(k==='color'&&isColor(v))l.color=v;else if(k==='type'&&LIGHT_TYPES.some(q=>q[0]===v))l.type=v;else if(['visible','enabled'].includes(k)&&typeof v==='boolean')l[k]=v;else throw Error('Proprietà luce non valida');}if(o.action==='add')s.lights.push(l);notes.push(o.action==='add'?'Luce aggiunta':'Luce spostata / modificata');}
   else if(o.type==='path'){
-   const p=s.engine==='particles'&&(s.forcePaths||[]).find(p=>p.id===o.id);if(!p||!o.values||typeof o.values!=='object'||Array.isArray(o.values))throw Error('Percorso non disponibile');
+   const p=(s.engine==='particles'||s.pLiving>0)&&(s.forcePaths||[]).find(p=>p.id===o.id);if(!p||!o.values||typeof o.values!=='object'||Array.isArray(o.values))throw Error('Percorso non disponibile');
    for(const [key,value] of Object.entries(o.values)){
     if(Object.hasOwn(PATH_META,key)){const m=PATH_META[key];if(!Number.isFinite(value)||value<m[1]||value>m[2]||m[3]===1&&!Number.isInteger(value))throw Error('Valore percorso non valido');p[key]=value;}
     else if(key==='mode'&&['follow','avoid'].includes(value))p.mode=value;
@@ -135,7 +135,7 @@ export function interpretDescription(text,current){
   const scopedAliases=texture?[['irregolarita','textureOrganic'],['regolarita','textureOrganic',true],['scala','textureScale'],['densita','textureScale'],['rilievo','textureDepth'],['direzione','textureAngle']]:[];
   if(!lightTarget&&!backgroundTarget){for(const [label,key,inverse] of [...scopedAliases,...aliases]){if(!META[key]||label==='increspature'&&(key==='textureRipples'&&!texture||key==='waves'&&texture))continue;claim(new RegExp('(?:^|\\b)'+escapeRe(label)+'\\s*(?:[:=]|(?:a|al|di|del|circa)\\s+)?\\s*(-?\\d+(?:[.,]\\d+)?)\\s*(%|percento|per cento)?(?:\\s*(?:secondi|secondo|sec|gradi|nm|px|x)\\b)?(?=\\s|$|[.!?])'),m=>{let value=Number(m[1].replace(',','.'));if(m[2])value=META[key][1]+(META[key][2]-META[key][1])*value/100;if(inverse)value=META[key][1]+META[key][2]-value;const op=setting(key,value);if(key==='speed'||key==='motion')motionNumbers.push(op);else push(op);});}}
 
-  if(current.engine==='particles'){
+  if(current.engine==='particles'||current.pLiving>0){
    // Particle clauses are consumed before the solid-shape vocabulary.
    claim(/\b(?:senza|togli|elimina)\s+(?:il\s+|i\s+)?rifless[oi]\s+setos[oi]\b/,()=>push(setting('pFiberSheen',0)));
    claim(/\b(?:fibre|fili|riflessi)\s+(piu\s+|meno\s+)?setos[ei]\b/,m=>push(setting('pFiberSheen',m[1]?working.pFiberSheen+(m[1].startsWith('meno')?-.25:.25):.75)));

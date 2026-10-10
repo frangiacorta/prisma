@@ -1,4 +1,4 @@
-import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=c2b52e9c14b3';
+import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=87dc341942b4';
 export function mountBodyTracking({board,getState,remember,mark,renderControls,showTab,toast,invalidate}){
  const local=/^(localhost|127\.0\.0\.1)$/.test(location.hostname),runtime=new BodyTrackingState();
  const overlay=document.createElement('div');overlay.id='body-tracking-overlay';overlay.setAttribute('aria-hidden','true');board.append(overlay);

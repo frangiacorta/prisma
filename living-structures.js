@@ -1,5 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=c2b52e9c14b3';
-import {excludeForcePositions} from './particle-forces.js?v=c2b52e9c14b3';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=87dc341942b4';
+import {excludeForcePositions} from './particle-forces.js?v=87dc341942b4';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;uniform vec3 uLivingMotion;`;
 export class LivingStructures{
@@ -72,7 +72,7 @@ void main(){
  if(coverage<.05)discard;
  vec3 n=normalize(vNormal);if(!gl_FrontFacing)n=-n;
  vec3 base=particleColor(vec4(vUV,.5,.5),vPosition);
- float a=uLivingSurface.x*coverage;
+ float a=uLivingSurface.x*coverage*uFinish.z;
  vec3 lit=shadeParticle(base,vPosition,n);
  color=vec4(lit*a,a);
 }`);
