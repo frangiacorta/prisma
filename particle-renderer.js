@@ -1,11 +1,11 @@
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=e948e90c6d73';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=e948e90c6d73';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=e948e90c6d73';
-import {ParticleLinks} from './particle-links.js?v=e948e90c6d73';
-import {LivingStructures} from './living-structures.js?v=e948e90c6d73';
-import {fieldGLSL} from './particle-field.js?v=e948e90c6d73';
-import {forceBarrierGLSL} from './particle-forces.js?v=e948e90c6d73';
-import {prismaShadingGLSL} from './particle-shading.js?v=e948e90c6d73';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=a9f986a8d913';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=a9f986a8d913';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=a9f986a8d913';
+import {ParticleLinks} from './particle-links.js?v=a9f986a8d913';
+import {LivingStructures} from './living-structures.js?v=a9f986a8d913';
+import {fieldGLSL} from './particle-field.js?v=a9f986a8d913';
+import {forceBarrierGLSL} from './particle-forces.js?v=a9f986a8d913';
+import {prismaShadingGLSL} from './particle-shading.js?v=a9f986a8d913';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;

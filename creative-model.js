@@ -1,11 +1,11 @@
-import {normalizeAudioClip} from './audio-recording.js?v=e948e90c6d73';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=e948e90c6d73';
-import {normalizeAudio} from './audio-model.js?v=e948e90c6d73';
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=e948e90c6d73';
-import {normalizeForcePaths} from './particle-paths.js?v=e948e90c6d73';
-import {normalizeForcePoints} from './particle-forces.js?v=e948e90c6d73';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=e948e90c6d73';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=e948e90c6d73';
+import {normalizeAudioClip} from './audio-recording.js?v=a9f986a8d913';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=a9f986a8d913';
+import {normalizeAudio} from './audio-model.js?v=a9f986a8d913';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=a9f986a8d913';
+import {normalizeForcePaths} from './particle-paths.js?v=a9f986a8d913';
+import {normalizeForcePoints} from './particle-forces.js?v=a9f986a8d913';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=a9f986a8d913';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=a9f986a8d913';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}

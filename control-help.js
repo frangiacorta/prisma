@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=e948e90c6d73';
+import {AUDIO_HELP} from './audio-model.js?v=a9f986a8d913';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pVolumeHold:'Mantiene il volume di riferimento mentre la struttura si deforma. Per misurarlo considera chiusa l’apertura della pelle; valori alti contrastano il respiro.',

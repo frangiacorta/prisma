@@ -12630,6 +12630,14 @@
         "img-s14-10",
         "s15-01",
         "s15-02",
+        "reuse-blender-procedural-groom",
+        "reuse-td-organic-fur",
+        "reuse-td-hairy-banana",
+        "reuse-frostbitten-hair",
+        "reuse-tressfx-strands",
+        "reuse-hairtool-groom",
+        "research-hair-alternatives",
+        "soleil",
         "s05-02"
       ],
       "state": "proposed",
@@ -12644,7 +12652,8 @@
         "https://docs.blender.org/manual/en/4.4/modeling/geometry_nodes/hair/guides/clump_hair_curves.html",
         "https://docs.blender.org/manual/id/4.5/modeling/geometry_nodes/hair/guides/curl_hair_curves.html",
         "https://docs.blender.org/manual/en/4.2/modeling/geometry_nodes/hair/deformation/roll_hair_curves.html",
-        "https://docs.blender.org/manual/en/4.0/modeling/geometry_nodes/hair/write/set_hair_curve_profile.html"
+        "https://docs.blender.org/manual/en/4.0/modeling/geometry_nodes/hair/write/set_hair_curve_profile.html",
+        "https://frangiacorta.github.io/prisma/moodboard/research-filaments.html"
       ],
       "sections": [
         {
@@ -12652,7 +12661,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Estendere il nucleo Particelle con radici stabili su una sfera o superficie deformata. Curve segmentate con tangente e lunghezza proprie; flessione continua e raggruppamento in ciuffi. Riutilizzare materiali, luci, preset, durata del loop e campi magnetici esistenti."
+              "value": "Curve con radici stabili su un globo, guide e fili figli, ciuffi gerarchici, curl/frizz e colore per attributi. Integrare nel nucleo Particelle con compositing e ombre adatti ai fili densi. Le scie temporali attuali da sole non producono questo tipo di pelo. Ricerca e piano completi nel dossier collegato."
             }
           ]
         },
@@ -12669,6 +12678,10 @@
                 "blenderGuides": "Documentazione ufficiale Clump Hair Curves: curve guida, influenza lungo il filo, dispersione punte e mantenimento lunghezza. Curl Hair Curves: raggio, frequenza, inizio della curvatura e variazione con seed. Componenti da riusare in una prova Blender, non sorgente originale delle opere; nessuna scena eseguita.",
                 "blenderRollProfile": "Roll Hair Curves (manuale 4.2): lunghezza/raggio della porzione arrotolata, asse e mantenimento lunghezza. Set Hair Curve Profile (manuale 4.0): raggio variabile lungo una curva. Documentazione verificata; non genera da solo un petalo piatto o una simulazione fisica. Alternative desktop, non integrate."
               }
+            },
+            {
+              "label": "reuseAudit",
+              "value": "Ricerca 10/10: nodi Hair Blender per campione visivo; tutorial POPs Organic Fur e Hairy Banana per grooming live; Frostbitten Hair WebGPU e TressFX MIT letti nel codice. Demo Frostbitten avviata; equivalenza con i pianeti non ancora provata. Unity Companion e WebHairSim senza licenza individuata esclusi dal porting diretto. Soleil rimane opzionale e desktop."
             }
           ]
         },
@@ -12754,7 +12767,7 @@
           "fields": [
             {
               "label": "remaining",
-              "value": "Distribuzione radiale ancorata e grooming da costruire; ombre dense e stabilità dei fili sottili da verificare. Non ancora implementato."
+              "value": "Ricerca strumenti e codice completata; campione Blender, groom Prisma, compositing/ombre e confronto in movimento ancora da realizzare. Nessun risultato visivo equivalente dichiarato."
             }
           ]
         },
@@ -12763,11 +12776,7 @@
           "fields": [
             {
               "label": "evidence",
-              "value": {
-                "batch14": "Sei video e quattro screenshot analizzati; foto 8 e 9 raggruppate nello stesso carosello. Originali tutti mappati.",
-                "status": "Estensione della specifica, non implementazione del renderer.",
-                "batch15": "Due video distinti con lo stesso nome originale, entrambi conservati e analizzati; 24 campioni. Progetto sempre da sviluppare."
-              }
+              "value": "Ricerca e audit, demo web pubblica avviata. Nessun plugin installato, acquisto effettuato, scena Blender/TD aperta o nuovo renderer implementato. Audit locale: reference/filament-planets-research-2026-10-10.json."
             }
           ]
         }
@@ -12781,7 +12790,7 @@
       "result": "",
       "where": "Percorso proposto: Particelle → Forma e fibre; moto e materiale nei gruppi esistenti.",
       "platform": "",
-      "next": "Prima prova comparativa con radici stabili e ciuffi, usando il materiale setoso già disponibile. Nessun nuovo renderer dedicato finché non emerge un limite concreto.",
+      "next": "1. Costruire una scena campione Blender con tre varianti: globo radiale rosa/ciano, ciuffi bianchi e pelo pettinato. Stesse inquadrature delle reference; salvare parametri e render di confronto. Poi prova WebGL2 nello stesso editor; WebGPU solo se il confronto evidenzia un limite concreto.",
       "keep": "Volume pieno e controllabile, passaggio dal globo al dettaglio, filamenti persistenti e palette sulla singola fibra.",
       "avoid": "Anello fisso al centro, scie dipendenti dagli FPS usate come finto pelo, migliaia di tubi pesanti, colore sovrapposto allo schermo.",
       "detailsSource": [
@@ -13850,6 +13859,639 @@
           "available": true
         }
       ],
+      "completedProjects": []
+    },
+    {
+      "id": "reuse-blender-procedural-groom",
+      "name": "Blender · guide, ciuffi e materiale del pelo",
+      "kind": "tool",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Blender Studio · Simon Thommes e Daniel Bystedt",
+      "summary": "Prima scelta per costruire un modello visivo di confronto, usando nodi già inclusi.",
+      "sources": [
+        "https://studio.blender.org/blog/procedural-hair-nodes/",
+        "https://www.youtube.com/watch?v=gCQN5vNgHiI",
+        "https://docs.blender.org/manual/en/5.1/modeling/geometry_nodes/hair/generation/interpolate_hair_curves.html",
+        "https://docs.blender.org/manual/en/4.4/render/shader_nodes/shader/hair_principled.html"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Sfera deformata → guide ancorate → interpolazione dei fili → ciuffi, curl e frizz → profilo del raggio → materiale del pelo in Cycles. Conservare attributi radice/punta e ID del ciuffo per il colore."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Usare i gruppi di nodi Hair di Blender: non occorre riscrivere il grooming per la prova desktop. Per Prisma trasferire guide e attributi o ricreare solo gli operatori necessari; il grafo Blender e il materiale Cycles non vengono eseguiti nel browser."
+            },
+            {
+              "label": "inspected",
+              "value": "Blog ufficiale sul workflow guide/figli; descrizione e capitoli del tutorial ufficiale; documentazione Interpolate Hair Curves e Principled Hair BSDF. Nessuna scena Blender eseguita in questa ricerca."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Densità indipendente dal diametro",
+                "Guide e ciuffi",
+                "Curl/frizz",
+                "Raggio radice/punta",
+                "Colore diretto, rugosità e variazione per filo"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Principled Hair BSDF è per Cycles. Esportare solo una mesh finale perderebbe controlli procedurali. Serve uno scambio di guide/attributi, non assumere che glTF trasporti il groom completo."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "access",
+              "value": "Nodi inclusi in Blender. Tutorial pubblico. Demo citata dal tutorial, ma file e relativa licenza non acquisiti in questa sessione."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "workflow"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/284ec59aba2ee96f.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "roadmap-filament-planets",
+      "completedProjects": []
+    },
+    {
+      "id": "reuse-td-organic-fur",
+      "name": "TouchDesigner · Organic Fur con POPs",
+      "kind": "tool",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Okamirufu Vizualizer",
+      "summary": "Tutorial molto vicino alla costruzione di un globo di fibre modulabili; la demo parte da un volume rettangolare.",
+      "sources": [
+        "https://www.youtube.com/watch?v=Qaw_5O0Q2s8",
+        "https://www.patreon.com/posts/project-file-fur-155055152",
+        "https://derivative.ca/UserGuide/Line_MAT"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Distribuire radici sulla sfera, copiare linee orientate, variare lunghezza e direzione con attributi; applicare noise con una maschera nulla alla radice e crescente alla punta."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Studiare la rete Point Generator / Random / Noise / Copy / Math Mix / Skin. Per i ciuffi grossi Skin e PBR sono una prova utile; per migliaia di fili finissimi serve misurare costo e resa."
+            },
+            {
+              "label": "inspected",
+              "value": "Descrizione e capitoli pubblici: 01:50 attributi, 03:32 linee e rastremazione, 04:24 deformazione, 05:28 Skin, 06:22 materiali. Non visionato integralmente e .toe non aperto."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Lunghezza per radice",
+                "Direzione locale",
+                "Taper",
+                "Peso della deformazione",
+                "Frequenza e ampiezza del moto"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Non è il progetto di Pauschenwein. Non basta applicare metallicità al massimo. Line MAT standard è privo di risposta alle luci della scena; per riflessi servono altro materiale/geometria o shader."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "access",
+              "value": "Video pubblico; progetto SF60 - Fur Box.zip su Patreon a pagamento (pagina mostrava 25 USD il 10/10/2026). Nessun acquisto."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "workflow"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/284ec59aba2ee96f.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "roadmap-filament-planets",
+      "completedProjects": []
+    },
+    {
+      "id": "reuse-td-hairy-banana",
+      "name": "TouchDesigner · Hairy Banana / GLSL Copy",
+      "kind": "tool",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Lake Heckaman",
+      "summary": "Lezione mirata al controllo GPU di ciascun filo: orientamento, piega, ricciolo e vento.",
+      "sources": [
+        "https://www.patreon.com/water__shed/posts/glsl-for-pops-in-142588800",
+        "https://derivative.ca/UserGuide/Noise_POP"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Una curva campione viene copiata sulle radici di una mesh; normale e tangente definiscono il sistema locale. Applicare lunghezza, bend, curl e vento con attributi stabili per radice."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Ottimo riferimento progettuale per portare un piccolo insieme di deformatori negli shader Prisma. Il file .toe non si installa su Pages."
+            },
+            {
+              "label": "inspected",
+              "value": "Pagina pubblica della lezione 5 e programma degli esercizi; file lesson5.toe e lesson5-live.toe indicati ma bloccati da abbonamento. Codice interno non letto."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Lunghezza",
+                "Piega",
+                "Ricciolo",
+                "Vento",
+                "Colore per indice o curvatura"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Il clumping è proposto anche come esercizio: non dichiarato un sistema completo già pronto per tutti i pianeti."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "access",
+              "value": "Lezione/file su Patreon con accesso a pagamento; condizioni di riuso del codice da verificare prima di copiarlo."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "workflow"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/284ec59aba2ee96f.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "roadmap-filament-planets",
+      "completedProjects": []
+    },
+    {
+      "id": "reuse-frostbitten-hair",
+      "name": "Frostbitten Hair · rendering WebGPU",
+      "kind": "tool",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Scthe / Marcin Matuszczyk",
+      "summary": "Candidato web più utile: antialiasing dei fili, trasparenze ordinate per profondità, ombre e simulazione.",
+      "sources": [
+        "https://github.com/Scthe/frostbitten-hair-webgpu",
+        "https://scthe.github.io/frostbitten-hair-webgpu/",
+        "https://www.sctheblog.com/blog/hair-software-rasterize/"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Separare generatore dei pianeti, simulazione delle guide e disegno dei fili. Questa repo offre soprattutto il secondo e il terzo livello; il groom sferico deve essere costruito."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Adattare singoli algoritmi di shading e stabilità; valutare il renderer WebGPU solo se la prova WebGL2 non raggiunge la qualità. WGSL, compute e buffer non sono compatibili direttamente con il renderer GLSL di Prisma."
+            },
+            {
+              "label": "license",
+              "value": "MIT verificata nel file LICENSE; mantenere copyright e licenza per codice adattato. Gli asset dimostrativi richiedono verifica separata."
+            },
+            {
+              "label": "inspected",
+              "value": "Letti pipeline dei pass, configurazione, shader Marschner, vincoli di lunghezza/forma, rasterizzazione e compositing delle slice. Copie e hash dei file nel rapporto locale."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Diametro",
+                "Colore radice/punta",
+                "Rugosità e riflessi",
+                "Attenuazione/ombre",
+                "Rigidità locale e globale",
+                "Conservazione volume"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Shading e scattering approssimati, LOD manuale. Configurazione contiene timestep fisso e TODO sul refresh rate: da correggere per timeline/export Prisma. Vincoli hanno divisioni da proteggere nei segmenti degeneri. Il dato FPS della demo non dimostra prestazioni del futuro effetto."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "evidence",
+              "value": "Demo pubblica avviata e screenshot ispezionato in Chrome 155 headless, 1280×800, adapter NVIDIA. Mostra circa 11.4k fili / 171k segmenti; HUD circa 60 fps. Una sola vista, nessun benchmark su telefono o prova con pianeti. Zero pageerror."
+            },
+            {
+              "label": "commit",
+              "value": "4478dd129525ff7db92978178b55f760716cbd72"
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "workflow"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/284ec59aba2ee96f.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "roadmap-filament-planets",
+      "completedProjects": []
+    },
+    {
+      "id": "reuse-tressfx-strands",
+      "name": "AMD TressFX · guide e vincoli dei fili",
+      "kind": "tool",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "AMD GPUOpen",
+      "summary": "Riferimento MIT per simulazione, conservazione della forma e fili secondari che seguono le guide.",
+      "sources": [
+        "https://github.com/GPUOpen-Effects/TressFX",
+        "https://github.com/GPUOpen-Effects/TressFX/blob/ba0bdacdfb964e38522fda812bf23169bc5fa603/src/Shaders/TressFXSimulation.hlsl"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Simulare un numero contenuto di guide e ricostruire i figli con offset stabili; preservare la forma iniziale per evitare collassi e mantenere i ciuffi."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Riutilizzo selettivo delle formule e della struttura guide/figli. La libreria è C++/HLSL per DirectX/Vulkan: porting richiesto, non plugin JavaScript."
+            },
+            {
+              "label": "license",
+              "value": "MIT verificata in license.txt; preservare avvisi nel codice eventualmente adattato."
+            },
+            {
+              "label": "inspected",
+              "value": "README, licenza e parti di src/Shaders/TressFXSimulation.hlsl: guide/follow hairs, vincoli locali, rigidità limitata e propagazione del movimento."
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Nessuna compilazione o benchmark eseguito. Non sostituire il nucleo Prisma con tutta la libreria; verificare casi di lunghezza zero, radici bloccate e attrattori estremi."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "commit",
+              "value": "ba0bdacdfb964e38522fda812bf23169bc5fa603"
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "workflow"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/284ec59aba2ee96f.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "roadmap-filament-planets",
+      "completedProjects": []
+    },
+    {
+      "id": "reuse-hairtool-groom",
+      "name": "Hair Tool · pettinatura e fasci in Blender",
+      "kind": "tool",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Bartosz Styperek / joseconseco",
+      "summary": "Add-on opzionale per disegnare guide, impilare deformatori e produrre hair cards o profili.",
+      "sources": [
+        "https://joseconseco.github.io/HairTool_3_Documentation/",
+        "https://joseconseco.github.io/HairTool_3_Documentation/hair_library.html"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Usarlo se il grooming manuale e i fasci a petalo risultano scomodi con gli strumenti inclusi. Le hair cards possono essere un livello di dettaglio economico, da confrontare in macro."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Strumento desktop di authoring, non componente da incorporare in Prisma. Prima provare i nodi Hair gratuiti di Blender."
+            },
+            {
+              "label": "inspected",
+              "value": "Documentazione principale, workflow generatori/deformatori, guide, profili, conversione e baking. La licenza della libreria preset non va confusa con quella del codice add-on."
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Una hair card può appiattire la silhouette e ridurre la libertà del movimento; non è equivalente ai singoli fili delle macro."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "access",
+              "value": "Prodotto commerciale; documentazione pubblica Hair Tool 4 per Blender 4.2+. Non acquistato né installato."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "workflow"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/284ec59aba2ee96f.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "roadmap-filament-planets",
+      "completedProjects": []
+    },
+    {
+      "id": "research-hair-alternatives",
+      "name": "Altre repo hair · confronto e limiti",
+      "kind": "tool",
+      "related": [
+        "roadmap-filament-planets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Unity Technologies; SiTronXD",
+      "summary": "Due implementazioni interessanti per confronto, escluse dal riuso diretto in Prisma per ragioni concrete.",
+      "sources": [
+        "https://github.com/Unity-Technologies/com.unity.demoteam.hair",
+        "https://github.com/SiTronXD/WebHairSim"
+      ],
+      "sections": [
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Unity mostra un workflow di guide, volume e LOD, ma il file LICENSE specifica Unity Companion License per progetti dipendenti da Unity. WebHairSim usa Verlet, radici su mesh e nastri, ma non è stata individuata una licenza del progetto."
+            },
+            {
+              "label": "inspected",
+              "value": "Unity: README, LICENSE.md e configurazione solver, commit 75a7f446209896bc1bce0da2682cfdbdf30ce447. WebHairSim: README, shader vincoli e inventario file, commit e65e5738654841e829bad4e65802c058694c8a06."
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Nessun codice copiato in Prisma. WebHairSim elenca antialiasing e shading Marschner tra le cose ancora da migliorare; gli shader letti usano vecchia sintassi WGSL. Non lo scelgo come base di produzione."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "workflow"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/284ec59aba2ee96f.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "roadmap-filament-planets",
       "completedProjects": []
     },
     {
@@ -15640,6 +16282,7 @@
       "kind": "tool",
       "related": [
         "roadmap-fibre-motion",
+        "roadmap-filament-planets",
         "img-20261010-04"
       ],
       "state": "reference",
@@ -16867,10 +17510,10 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 157,
+    "records": 164,
     "videos": 50,
     "images": 18,
-    "tools": 64,
+    "tools": 71,
     "projects": 22,
     "attachments": 113,
     "clips": 50,
