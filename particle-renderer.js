@@ -1,9 +1,9 @@
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=170c6bdce53c';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=170c6bdce53c';
-import {GuideField} from './particle-path-field.js?v=170c6bdce53c';
-import {ParticleLinks} from './particle-links.js?v=170c6bdce53c';
-import {fieldGLSL} from './particle-field.js?v=170c6bdce53c';
-import {prismaShadingGLSL} from './particle-shading.js?v=170c6bdce53c';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=48a3739bbae9';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=48a3739bbae9';
+import {GuideField} from './particle-path-field.js?v=48a3739bbae9';
+import {ParticleLinks} from './particle-links.js?v=48a3739bbae9';
+import {fieldGLSL} from './particle-field.js?v=48a3739bbae9';
+import {prismaShadingGLSL} from './particle-shading.js?v=48a3739bbae9';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;

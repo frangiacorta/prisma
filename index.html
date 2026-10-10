@@ -5,13 +5,13 @@
  <meta name="theme-color" content="#101114"><meta name="description" content="Modella forme e materia procedurale, guida particelle, luci e movimento. Crea immagini e video in loop con Prisma Studio.">
  <title>Prisma Studio — Forme in movimento</title>
  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23101114'/%3E%3Cpath d='M20 6 34 30H6Z' fill='none' stroke='%23ccf497' stroke-width='3'/%3E%3Cpath d='m20 6 4 24M6 30l18-10 10 10' fill='none' stroke='%23ccf497'/%3E%3C/svg%3E">
- <link rel="stylesheet" href="style.css?v=170c6bdce53c">
+ <link rel="stylesheet" href="style.css?v=48a3739bbae9">
 </head>
 <body>
  <header class="topbar">
   <a class="brand" href="./" aria-label="Prisma Studio, inizio"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="m18 4 15 26H3Z M18 4l4 26M3 30l19-11 11 11"/></svg><span>prisma<span class="brand-small">STUDIO</span></span></a>
   <div class="top-caption"><label for="engine-picker">Crea con</label> <select id="engine-picker" aria-label="Tipo di creazione"><option value="solid">Forme</option><option value="particles">Particelle</option></select></div>
-  <div class="header-actions"><button id="undo" class="icon-button" title="Annulla (Ctrl+Z)" aria-label="Annulla"></button><button id="redo" class="icon-button" title="Ripristina (Ctrl+Shift+Z)" aria-label="Ripristina"></button><span class="divider"></span><button id="export-open" class="primary"><span data-icon="download"></span>Esporta<span class="desktop-only"> creazione</span></button></div>
+  <div class="header-actions"><a class="moodboard-link" href="moodboard/" title="Reference, roadmap e risultati">Moodboard ↗</a><button id="undo" class="icon-button" title="Annulla (Ctrl+Z)" aria-label="Annulla"></button><button id="redo" class="icon-button" title="Ripristina (Ctrl+Shift+Z)" aria-label="Ripristina"></button><span class="divider"></span><button id="export-open" class="primary"><span data-icon="download"></span>Esporta<span class="desktop-only"> creazione</span></button></div>
  </header>
  <div class="workspace">
   <aside class="preset-rail" aria-label="Esempi pronti"><details id="examples-section"><summary class="rail-heading"><span>Punti di partenza</span><span class="count">06</span></summary><div id="presets" class="preset-list"></div><p class="rail-note">Ogni forma è solo<br>l’inizio di un’altra.</p></details><button id="reset" class="quiet reset-button"><span data-icon="reset"></span>Ricomincia</button></aside>
@@ -45,5 +45,5 @@
  <script>
  (()=>{function failed(){if(window.prismaReady)return;const box=document.getElementById('render-error');box.hidden=false;box.textContent='Il caricamento dell’editor si è interrotto. ';const button=document.createElement('button');button.className='primary';button.textContent='Ricarica editor';button.onclick=()=>location.reload();box.append(button);}window.addEventListener('error',e=>{if(e.target?.tagName==='SCRIPT')failed();},true);setTimeout(failed,15000);})();
  </script>
- <script type="module" src="app.js?v=170c6bdce53c"></script>
+ <script type="module" src="app.js?v=48a3739bbae9"></script>
 </body></html>
