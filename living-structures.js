@@ -1,4 +1,4 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=6c293ce983a2';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=02f845f3303f';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;uniform vec3 uLivingMotion;`;
 export class LivingStructures{
@@ -48,7 +48,7 @@ uniform vec4 uLivingSurface;
 void main(){
  vec2 vUV=vec2(fract(atan(vCoord.y,vCoord.x)/TAU),vCoord.z);
  float hole=length((fract(vUV*vec2(uLivingSurface.z,uLivingSurface.z*.65))-.5)*2.);
- float coverage=1.-smoothstep(hole-fwidth(hole),hole+fwidth(hole),uLivingSurface.y);
+ float coverage=uLivingSurface.y<=0.?1.:1.-smoothstep(hole-fwidth(hole),hole+fwidth(hole),uLivingSurface.y);
  if(coverage<.05)discard;
  vec3 n=normalize(vNormal);if(!gl_FrontFacing)n=-n;
  vec3 base=particleColor(vec4(vUV,.5,.5),vPosition);
