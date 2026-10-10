@@ -1,4 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=8613ad610791';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=b2fa487885ad';
+import {excludeForcePositions} from './particle-forces.js?v=b2fa487885ad';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;uniform vec3 uLivingMotion;`;
 export class LivingStructures{
@@ -36,7 +37,7 @@ precision highp float;precision highp int;out vec4 color;void main(){color=vec4(
 vec3 at(ivec2 q){q.x=(q.x+uLivingSize.x)%uLivingSize.x;q.y=clamp(q.y,0,uLivingSize.y-1);return texelFetch(uLivingPositions,q,0).xyz;}
 vec3 curve(vec3 a,vec3 b,vec3 c,vec3 d,float t){return .5*((2.*b)+(-a+c)*t+(2.*a-5.*b+4.*c-d)*t*t+(-a+3.*b-3.*c+d)*t*t*t);}
 vec3 column(ivec2 i,float t){return curve(at(i-ivec2(0,1)),at(i),at(i+ivec2(0,1)),at(i+ivec2(0,2)),t);}
-vec3 surface(vec2 uv){vec2 q=uv*vec2(uLivingSize-ivec2(0,1));ivec2 i=ivec2(floor(q));vec2 t=fract(q);return mix(column(i,t.y),column(i+ivec2(1,0),t.y),t.x);}
+vec3 surface(vec2 uv){vec2 q=uv*vec2(uLivingSize-ivec2(0,1));ivec2 i=ivec2(floor(q));vec2 t=fract(q);return excludeForceCores(mix(column(i,t.y),column(i+ivec2(1,0),t.y),t.x));}
 vec3 surfaceNormal(vec2 uv){vec2 e=1./vec2(uLivingSize);return normalize(cross(surface(uv+vec2(e.x,0))-surface(uv-vec2(e.x,0)),surface(uv+vec2(0,e.y))-surface(uv-vec2(0,e.y)))+vec3(.000001));}`;
   this.skin=owner.program(`#version 300 es
 precision highp float;precision highp int;precision highp sampler2D;
@@ -51,6 +52,7 @@ ${common}
 in vec3 vPosition,vNormal,vCoord;out vec4 color;
 uniform vec4 uLivingSurface;
 void main(){
+ if(insideForceCore(vPosition))discard;
  vec2 vUV=vec2(fract(atan(vCoord.y,vCoord.x)/TAU),vCoord.z);
  float hole=length((fract(vUV*vec2(uLivingSurface.z,uLivingSurface.z*.65))-.5)*2.);
  float coverage=uLivingSurface.y<=0.?1.:1.-smoothstep(hole-fwidth(hole),hole+fwidth(hole),uLivingSurface.y);
@@ -84,7 +86,7 @@ void main(){
 precision highp float;precision highp int;
 ${common}
 in vec3 vPosition,vNormal,vTangent;in vec2 vUV;in float vSide,vAlpha;out vec4 color;
-void main(){float a=vAlpha*(1.-smoothstep(.25,1.,abs(vSide)));if(a<.003)discard;
+void main(){if(insideForceCore(vPosition))discard;float a=vAlpha*(1.-smoothstep(.25,1.,abs(vSide)));if(a<.003)discard;
  vec3 lit=shadeFibre(particleColor(vec4(vUV,.5,.5),vPosition),vPosition,normalize(vNormal),vTangent);
  color=vec4(lit*a,a);}`);
   this.feedback=gl.createTransformFeedback();this.captureBuffer=gl.createBuffer();this.seedBuffer=gl.createBuffer();this.indices=gl.createBuffer();this.vao=gl.createVertexArray();this.texture=gl.createTexture();
@@ -118,6 +120,7 @@ void main(){float a=vAlpha*(1.-smoothstep(.25,1.,abs(vSide)));if(a<.003)discard;
   // Weld the polar vertices after relaxation: a closed end must stay closed.
   for(const row of (s.pSkinOpening===0?[0,t.rows-1]:[t.rows-1])){const mean=[0,0,0];for(let x=0;x<t.columns;x++)for(let k=0;k<3;k++)mean[k]+=this.positions[(row*t.columns+x)*3+k]/t.columns;for(let x=0;x<t.columns;x++)this.positions.set(mean,(row*t.columns+x)*3);}
   preserveLivingVolume(t,this.positions,s.pVolumeHold);
+  excludeForcePositions(this.positions,[...(s.forcePoints||[]).filter(f=>f.enabled).slice(0,8),...(s.bodyForces||[]).filter(f=>f.enabled).slice(0,3)]);
   for(let i=0;i<this.positions.length/3;i++)this.pixels.set(this.positions.subarray(i*3,i*3+3),i*4);
   gl.activeTexture(gl.TEXTURE4);gl.bindTexture(gl.TEXTURE_2D,this.texture);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,t.columns,t.rows,gl.RGBA,gl.FLOAT,this.pixels);
   const setup=p=>{o.settings(p,s,phase);o.tex(p,'uLivingPositions',this.texture,4);gl.uniform2i(o.loc(p,'uLivingSize'),t.columns,t.rows);};

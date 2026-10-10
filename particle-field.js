@@ -1,7 +1,9 @@
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=8613ad610791';
+import {guideGLSL} from './particle-path-field.js?v=b2fa487885ad';
+import {forceBarrierGLSL} from './particle-forces.js?v=b2fa487885ad';
 export const fieldGLSL=`
 ${guideGLSL}
+${forceBarrierGLSL}
 const float TAU=6.28318530718;
 uniform float uPhase,uSeed,uBreath,uPoleRadius,uPoleField;
 uniform vec2 uResolution;
@@ -10,7 +12,6 @@ uniform vec4 uForm,uWarp,uFrame,uRotation;
 uniform vec4 uLife,uNetwork;uniform float uSymmetry;
 uniform vec4 uOrbit,uDrift,uWander,uTentacle,uTentacleMotion,uSpaceWarp;
 uniform vec2 uMotionQuality;uniform float uMotionSeed;
-uniform int uForceCount;uniform vec4 uForcePoints[11];uniform vec2 uForceOptions[11];
 mat2 rot(float a){return mat2(cos(a),-sin(a),sin(a),cos(a));}
 float clockAt(float q){
  q=clamp((fract(q)-uClock.z*.5)/(1.-uClock.z),0.,1.);
@@ -112,7 +113,7 @@ vec3 position(vec4 r,float phase){
   pull+=(sign(strength)*d*gain+cross(vec3(0.,0.,1.),d)*uForceOptions[i].y*.5)*weight;
   influence+=gain*weight;
  }
- p+=pull/max(1.,influence);return guidePosition(p,r,phase);
+ p+=pull/max(1.,influence);return excludeForceCores(guidePosition(p,r,phase));
 }
 vec4 project(vec3 p){float depth=max(2.,7.5-p.z);return vec4(p.xy*vec2(uResolution.y/uResolution.x,1.)*2.6/depth,(depth-3.)/12.,1.);}
 vec3 particleColor(vec4 r,vec3 p){
