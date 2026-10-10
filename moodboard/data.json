@@ -1158,7 +1158,8 @@
       "kind": "video",
       "related": [
         "roadmap-membrane",
-        "roadmap-tissue"
+        "roadmap-tissue",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -1334,7 +1335,10 @@
       "duration": 18.2,
       "clip": "media/s02-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane",
+        "roadmap-tissue"
+      ]
     },
     {
       "id": "s02-02",
@@ -1828,7 +1832,8 @@
         "tool-incrprl-dsgn-primary-fear-e-lumen-chamber",
         "tool-github-com-mrdoob-three-js-blob-dev-examples-webgpu-tsl-compute-attractors-particles-",
         "roadmap-fibre-motion",
-        "roadmap-tissue"
+        "roadmap-tissue",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -1965,7 +1970,10 @@
       "duration": 11.87,
       "clip": "media/s03-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-fibre-motion",
+        "roadmap-tissue"
+      ]
     },
     {
       "id": "s03-02",
@@ -2263,7 +2271,8 @@
         "tool-github-com-mrdoob-three-js-blob-dev-examples-webgpu-tsl-compute-attractors-particles-",
         "roadmap-particles",
         "roadmap-body-interaction",
-        "roadmap-fibre-motion"
+        "roadmap-fibre-motion",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -2402,7 +2411,8 @@
       "clip": "media/s03-04-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
-        "roadmap-particles"
+        "roadmap-particles",
+        "roadmap-fibre-motion"
       ]
     },
     {
@@ -2412,6 +2422,7 @@
       "related": [
         "roadmap-membrane",
         "roadmap-fibre-motion",
+        "project-living-extensions",
         "project-pellicola-viva"
       ],
       "state": "reference",
@@ -2556,6 +2567,8 @@
       "clip": "media/s04-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
+        "roadmap-membrane",
+        "roadmap-fibre-motion",
         "project-pellicola-viva"
       ]
     },
@@ -2565,7 +2578,8 @@
       "kind": "video",
       "related": [
         "roadmap-membrane",
-        "roadmap-fibre-motion"
+        "roadmap-fibre-motion",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -2705,14 +2719,18 @@
       "duration": 38.59,
       "clip": "media/s04-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane",
+        "roadmap-fibre-motion"
+      ]
     },
     {
       "id": "s04-03",
       "name": "Tessuto vegetale",
       "kind": "video",
       "related": [
-        "roadmap-tissue"
+        "roadmap-tissue",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -2849,14 +2867,17 @@
       "duration": 5.4,
       "clip": "media/s04-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-tissue"
+      ]
     },
     {
       "id": "s05-01",
       "name": "Corallo nella membrana",
       "kind": "video",
       "related": [
-        "roadmap-membrane"
+        "roadmap-membrane",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -2996,7 +3017,9 @@
       "duration": 8.92,
       "clip": "media/s05-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane"
+      ]
     },
     {
       "id": "s05-02",
@@ -3005,6 +3028,7 @@
       "related": [
         "roadmap-fibre-motion",
         "roadmap-tissue",
+        "project-living-extensions",
         "project-fibre-setose"
       ],
       "state": "reference",
@@ -3146,6 +3170,8 @@
       "clip": "media/s05-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
+        "roadmap-fibre-motion",
+        "roadmap-tissue",
         "project-fibre-setose"
       ]
     },
@@ -3156,7 +3182,8 @@
       "related": [
         "roadmap-membrane",
         "roadmap-fibre-motion",
-        "roadmap-tissue"
+        "roadmap-tissue",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -3302,7 +3329,11 @@
       "duration": 44.93,
       "clip": "media/s05-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane",
+        "roadmap-fibre-motion",
+        "roadmap-tissue"
+      ]
     },
     {
       "id": "s06-01",
@@ -3310,6 +3341,7 @@
       "kind": "video",
       "related": [
         "roadmap-fibre-motion",
+        "project-living-extensions",
         "project-fibre-setose"
       ],
       "state": "reference",
@@ -3452,6 +3484,7 @@
       "clip": "media/s06-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
+        "roadmap-fibre-motion",
         "project-fibre-setose"
       ]
     },
@@ -3461,7 +3494,8 @@
       "kind": "video",
       "related": [
         "reuse-xpbd",
-        "roadmap-tissue"
+        "roadmap-tissue",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -3601,14 +3635,17 @@
       "duration": 13.89,
       "clip": "media/s06-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-tissue"
+      ]
     },
     {
       "id": "s06-03",
       "name": "Fioriture opalescenti",
       "kind": "video",
       "related": [
-        "roadmap-membrane"
+        "roadmap-membrane",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -3748,14 +3785,17 @@
       "duration": 31.32,
       "clip": "media/s06-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane"
+      ]
     },
     {
       "id": "s07-01",
       "name": "Rosetta a imbuto",
       "kind": "video",
       "related": [
-        "roadmap-membrane"
+        "roadmap-membrane",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -3889,14 +3929,17 @@
       "duration": 24.0,
       "clip": "media/s07-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane"
+      ]
     },
     {
       "id": "s07-02",
       "name": "Diaframma stratificato",
       "kind": "video",
       "related": [
-        "roadmap-membrane"
+        "roadmap-membrane",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -4032,7 +4075,9 @@
       "duration": 53.34,
       "clip": "media/s07-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane"
+      ]
     },
     {
       "id": "s07-03",
@@ -4040,6 +4085,7 @@
       "kind": "video",
       "related": [
         "roadmap-membrane",
+        "project-living-extensions",
         "project-pellicola-viva"
       ],
       "state": "reference",
@@ -4182,6 +4228,7 @@
       "clip": "media/s07-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
+        "roadmap-membrane",
         "project-pellicola-viva"
       ]
     },
@@ -4190,7 +4237,8 @@
       "name": "Rosetta a impulsi",
       "kind": "video",
       "related": [
-        "roadmap-membrane"
+        "roadmap-membrane",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -4325,7 +4373,9 @@
       "duration": 10.75,
       "clip": "media/s07-04-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane"
+      ]
     },
     {
       "id": "s07-05",
@@ -4333,7 +4383,8 @@
       "kind": "video",
       "related": [
         "reuse-xpbd",
-        "roadmap-tissue"
+        "roadmap-tissue",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -4477,14 +4528,17 @@
       "duration": 25.67,
       "clip": "media/s07-05-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-tissue"
+      ]
     },
     {
       "id": "s07-06",
       "name": "Cuori di fibre",
       "kind": "video",
       "related": [
-        "roadmap-fibre-motion"
+        "roadmap-fibre-motion",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -4622,14 +4676,17 @@
       "duration": 20.5,
       "clip": "media/s07-06-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-fibre-motion"
+      ]
     },
     {
       "id": "s08-01",
       "name": "Colonia traslucida",
       "kind": "video",
       "related": [
-        "roadmap-membrane"
+        "roadmap-membrane",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -4775,7 +4832,9 @@
       "duration": 20.85,
       "clip": "media/s08-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane"
+      ]
     },
     {
       "id": "s11-01",
@@ -4783,7 +4842,8 @@
       "kind": "video",
       "related": [
         "project-cobalto-oro",
-        "roadmap-membrane"
+        "roadmap-membrane",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -4938,7 +4998,8 @@
       "resultVideo": "../previews/cobalto-oro-10s.mp4",
       "resultUrl": "../previews/cobalto-oro.html",
       "completedProjects": [
-        "project-cobalto-oro"
+        "project-cobalto-oro",
+        "roadmap-membrane"
       ]
     },
     {
@@ -5953,7 +6014,8 @@
         "project-trama-viva",
         "dense-cloud",
         "roadmap-particle-volume",
-        "roadmap-fibre-motion"
+        "roadmap-fibre-motion",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -6051,7 +6113,8 @@
       "resultVideo": "../previews/trama-viva-10s.mp4",
       "resultUrl": "../previews/trama-viva.html",
       "completedProjects": [
-        "project-trama-viva"
+        "project-trama-viva",
+        "roadmap-fibre-motion"
       ]
     },
     {
@@ -6176,7 +6239,8 @@
       "related": [
         "soleil",
         "roadmap-membrane",
-        "roadmap-fibre-motion"
+        "roadmap-fibre-motion",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -6270,7 +6334,10 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane",
+        "roadmap-fibre-motion"
+      ]
     },
     {
       "id": "tool-01",
@@ -8525,7 +8592,8 @@
       "related": [
         "reuse-pcr",
         "roadmap-audio-interaction",
-        "roadmap-fibre-motion"
+        "roadmap-fibre-motion",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -8623,7 +8691,9 @@
       "duration": 2.75,
       "clip": "media/s09-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-fibre-motion"
+      ]
     },
     {
       "id": "s09-03",
@@ -8634,7 +8704,8 @@
         "reuse-three-attractors",
         "roadmap-audio-interaction",
         "roadmap-particle-volume",
-        "roadmap-membrane"
+        "roadmap-membrane",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -8736,14 +8807,17 @@
       "duration": 1.93,
       "clip": "media/s09-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane"
+      ]
     },
     {
       "id": "s09-04",
       "name": "Luminar sphere · bordi iridescenti",
       "kind": "video",
       "related": [
-        "roadmap-membrane"
+        "roadmap-membrane",
+        "project-living-extensions"
       ],
       "state": "reference",
       "priority": false,
@@ -8841,7 +8915,9 @@
       "duration": 4.48,
       "clip": "media/s09-04-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane"
+      ]
     },
     {
       "id": "s09-05",
@@ -9046,8 +9122,7 @@
       "related": [
         "reuse-three-attractors",
         "s03-04",
-        "roadmap-body-interaction",
-        "roadmap-fibre-motion"
+        "roadmap-body-interaction"
       ],
       "state": "implemented",
       "priority": false,
@@ -9121,7 +9196,6 @@
       "related": [
         "s03-04",
         "roadmap-particles",
-        "roadmap-fibre-motion",
         "archive-calibration-20261009"
       ],
       "state": "partial",
@@ -9746,7 +9820,7 @@
     },
     {
       "id": "roadmap-membrane",
-      "name": "Membrane vive · pellicola pronta",
+      "name": "Membrane vive",
       "kind": "project",
       "related": [
         "s09-04",
@@ -9764,15 +9838,17 @@
         "s02-01",
         "img-20261010-04",
         "s11-01",
+        "reuse-xpbd",
+        "project-living-extensions",
         "project-cobalto-oro",
         "project-pellicola-viva"
       ],
-      "state": "partial",
+      "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Primo passo sul PC: pellicola madreperlacea animata su particelle e fibre. Pieghe e membrane connesse da sviluppare.",
+      "summary": "Pelle continua, apertura a coppa, pieghe, respiro e involuzione.",
       "sources": [
-        "https://frangiacorta.github.io/prisma/previews/pellicola-viva.html",
+        "https://frangiacorta.github.io/prisma/previews/membrana-viva.html",
         "https://github.com/paper-design/shaders/blob/main/packages/shaders/src/shaders/liquid-metal.ts"
       ],
       "sections": [
@@ -9781,7 +9857,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Riusata la risposta spettrale della pellicola Forme (24 campioni) nel materiale Particelle. Venature nello spazio della forma, luci e tangenti dei fili; palette conservata. Paper Liquid Metal esaminato: shader a maschera/immagine, non materiale volumetrico equivalente; nessun codice esterno copiato in questa modifica."
+              "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo."
             }
           ]
         },
@@ -9790,7 +9866,7 @@
           "fields": [
             {
               "label": "feasible",
-              "value": "Primo passo sul PC: pellicola madreperlacea animata su particelle e fibre. Pieghe e membrane connesse da sviluppare."
+              "value": "Disponibile nello stesso renderer Particelle, sul PC e su Pages."
             }
           ]
         },
@@ -9800,19 +9876,10 @@
             {
               "label": "acceptance",
               "value": [
-                "Pelle esterna e nucleo distinguibili con controlli indipendenti",
-                "Riflessi legati alla superficie e alla luce",
-                "Luminar sphere: intensità/larghezza dei riflessi di bordo, microstriature e luci orbitanti; centro scuro distinto da un foro geometrico",
-                "Ferrofluido: nucleo, punte e alone restano coesi, con ampiezza e lentezza separate; comportamento magnetico artistico, senza dichiarare una simulazione fisica verificata",
-                "Apertura e involuzione con attacchi comuni e coesione visibile",
-                "Foro, profondità della cavità e concavità regolabili separatamente",
-                "Granuli con identità stabile, aderenza alle pieghe e quota di distacco controllabili",
-                "Impulso radiale con ampiezza geometrica distinta dalla luminosità",
-                "Ritmo con sospensioni, accelerazioni, fasi attive e ritardi regolabili",
-                "Nella variante di crescita: steli ancorati al nucleo e tempi separati dalla corolla",
-                "Nella variante colonia: identità dei corpi, respiro individuale e coesione collettiva distinti",
-                "Nella variante colonia: trasparenze sovrapposte leggibili, veli ancorati e scie coordinate",
-                "Durata selezionabile, preset e verifica della chiusura di forma e velocità del loop"
+                "Mesh connessa distinta dal nucleo di particelle",
+                "Apertura, distanza dal nucleo, pieghe e contrazione regolabili",
+                "Pellicola madreperlacea e riflessi sulla normale della superficie",
+                "Variazioni visibili dei controlli, palette e luci; campi di attrazione; preset e chiusura del loop verificati"
               ]
             }
           ]
@@ -9823,20 +9890,18 @@
             {
               "label": "implemented",
               "value": [
-                "Materia → Pellicola madreperlacea viva: intensità, spessore, variazione, scala delle venature, scorrimento, vortici e cicli",
-                "Varianti Pellicola viva e Perla satinata; preset, Annulla e randomizzazione della materia",
-                "Loop nei due versi verificato, esempio MP4 di 10 secondi e preset scaricabile",
-                "Effetto spento identico al renderer precedente; palette e luci restano operative",
-                "Interferenza cobalto e oro dal video liquid_tapestry: venature 3D, densità, warp, dettaglio, contrasto e accento cromatico nei materiali Forme e Particelle. Schema luci neutre separato; preset e loop."
+                "Mesh connessa distinta dal nucleo di particelle",
+                "Apertura, distanza dal nucleo, pieghe e contrazione regolabili",
+                "Pellicola madreperlacea e riflessi sulla normale della superficie",
+                "Struttura persistente da 3136 nodi con vincoli di distanza XPBD MIT adattati in JavaScript; stessa deformazione, campi e materiali di Particelle",
+                "Elasticità, resistenza alla piega e conservazione del volume con chiusura virtuale delle aperture",
+                "Preset, Annulla, randomizzazione, assistente testuale, durata e verso condivisi",
+                "Loop deterministico: ogni fase si può riprodurre e cercare senza dipendere dai fotogrammi precedenti; MP4 di esempio da 20 secondi"
               ]
             },
             {
-              "label": "remaining",
-              "value": [
-                "Pelle esterna e nucleo indipendenti; membrane geometriche connesse",
-                "Pieghe, cavità, apertura e involuzione della superficie",
-                "Granuli aderenti alla superficie e varianti ferrofluido/colonia"
-              ]
+              "label": "limits",
+              "value": "Versione 1 di deformazione elastica guidata, senza collisioni e inerzia libera. La resistenza alla piega usa vincoli tra secondi vicini. La pelle traslucida mostra la superficie più vicina: niente rifrazione o trasparenza fisica multistrato. Pori ritagliati nel materiale, non nuove maglie del solver. I granelli liberi mantengono il campo precedente; la struttura connessa ha nodi propri."
             }
           ]
         },
@@ -9846,26 +9911,21 @@
             {
               "label": "evidence",
               "value": [
-                "reports/particle-film/check.json",
-                "web/studio/previews/pellicola-viva-10s.mp4",
-                "reports/publish-2026-10-10/live-check.json",
-                "reports/colour-reference-11/check.json",
-                "web/studio/previews/cobalto-oro.html"
+                "reports/living-structures/check.json",
+                "reports/living-structures/exports.json"
               ]
             }
           ]
         }
       ],
       "families": [
-        "film",
-        "fibre",
-        "cloud"
+        "motion"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "pellicola-viva",
-      "where": "",
+      "result": "membrana-viva",
+      "where": "Particelle → Punti di partenza → Membrana viva. Controlli: Forma e moto → Fibre e scie.",
       "platform": "",
-      "next": "Pelle esterna e nucleo indipendenti; membrane geometriche connesse · Pieghe, cavità, apertura e involuzione della superficie · Granuli aderenti alla superficie e varianti ferrofluido/colonia",
+      "next": "",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -9873,15 +9933,15 @@
       ],
       "media": [
         {
-          "src": "media/1dd2c0af9c7c3a38.webp",
-          "width": 480,
-          "height": 480
+          "src": "media/e5b7848f69a9e85c.webp",
+          "width": 640,
+          "height": 640
         }
       ],
       "assets": [],
-      "resultImage": "media/1dd2c0af9c7c3a38.webp",
-      "resultVideo": "../previews/pellicola-viva-10s.mp4",
-      "resultUrl": "../previews/pellicola-viva.html",
+      "resultImage": "media/e5b7848f69a9e85c.webp",
+      "resultVideo": "../previews/membrana-viva-20s.mp4",
+      "resultUrl": "../previews/membrana-viva.html",
       "completedProjects": [
         "project-cobalto-oro",
         "project-pellicola-viva"
@@ -9905,18 +9965,17 @@
         "img-20261010-04",
         "reuse-xpbd",
         "reuse-pcr",
-        "roadmap-particles",
-        "roadmap-body-interaction",
+        "project-living-extensions",
         "project-trama-viva",
         "project-fibre-setose",
         "soleil"
       ],
-      "state": "partial",
+      "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Primo passo pronto: riflessi setosi regolabili sulla direzione 3D delle fibre. Fasci e veli strutturati ancora da sviluppare.",
+      "summary": "Fasci persistenti con pieghe condivise, ritardi, sfrangiatura e passaggio a velo.",
       "sources": [
-        "https://frangiacorta.github.io/prisma/?engine=particles"
+        "https://frangiacorta.github.io/prisma/previews/fibre-vive.html"
       ],
       "sections": [
         {
@@ -9924,7 +9983,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Conservare i riflessi setosi implementati. Valutare XPBD per fasci con vincoli persistenti, PCR per la sola resa di nuvole nel percorso PC e OrbAudioInput per il respiro sonoro. Collegare la libreria utile al nucleo esistente; distinguere fili connessi da nuvole di punti."
+              "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo."
             }
           ]
         },
@@ -9933,7 +9992,7 @@
           "fields": [
             {
               "label": "feasible",
-              "value": "Primo passo pronto: riflessi setosi regolabili sulla direzione 3D delle fibre. Fasci e veli strutturati ancora da sviluppare."
+              "value": "Disponibile nello stesso renderer Particelle, sul PC e su Pages."
             }
           ]
         },
@@ -9943,14 +10002,10 @@
             {
               "label": "acceptance",
               "value": [
-                "Un fascio resta riconoscibile durante una deformazione",
-                "Passaggio controllabile da fascio a velo, con pieghe condivise e sfrangiatura",
-                "Fibre orientate su un volume guida astratto o figurativo, con contrazione comune",
-                "Diametro, densità, conservazione del volume e ritardi fra fasci indipendenti",
-                "Riflessi orientati lungo il filo e sovrapposizioni con profondità",
-                "Velo pulsante: inviluppo di luce indipendente dalla deformazione, con livello minimo e rilascio morbido; l'aspetto del video non costituisce prova di una mesh connessa",
-                "Velocità non uniforme senza scatti o rumore temporale",
-                "Densità e scala minima delle fibre restano leggibili durante l'export"
+                "Numero e apertura dei fasci, quantità e spessore dei fili fino a 0,015 px",
+                "Ritardo tra fasci, sfrangiatura, pieghe e respiro condivisi",
+                "Riflessi orientati sui fili e visibilità con profondità",
+                "Variazioni visibili dei controlli, palette e luci; campi di attrazione; preset e chiusura del loop verificati"
               ]
             }
           ]
@@ -9961,19 +10016,18 @@
             {
               "label": "implemented",
               "value": [
-                "Materia → Riflessi setosi delle fibre: intensità e larghezza del riflesso",
-                "Riflessi orientati dalla tangente 3D di ogni filo; luci, ambiente, rugosità, metallo e iridescenza condivisi",
-                "Controlli nei preset, randomizzazione della materia e assistente testuale",
-                "Compatibilità dei preset precedenti con effetto spento; loop verificati e MP4 di prova da 10 secondi"
+                "Numero e apertura dei fasci, quantità e spessore dei fili fino a 0,015 px",
+                "Ritardo tra fasci, sfrangiatura, pieghe e respiro condivisi",
+                "Riflessi orientati sui fili e visibilità con profondità",
+                "Struttura persistente da 3136 nodi con vincoli di distanza XPBD MIT adattati in JavaScript; stessa deformazione, campi e materiali di Particelle",
+                "Elasticità, resistenza alla piega e conservazione del volume con chiusura virtuale delle aperture",
+                "Preset, Annulla, randomizzazione, assistente testuale, durata e verso condivisi",
+                "Loop deterministico: ogni fase si può riprodurre e cercare senza dipendere dai fotogrammi precedenti; MP4 di esempio da 20 secondi"
               ]
             },
             {
-              "label": "remaining",
-              "value": [
-                "Fasci persistenti con pieghe comuni, conservazione del volume e ritardi indipendenti",
-                "Passaggio fascio/velo e aderenza a un volume guida",
-                "Occlusione e sovrapposizioni con profondità: il renderer attuale accumula luce, non simula un tessuto connesso"
-              ]
+              "label": "limits",
+              "value": "Versione 1 di deformazione elastica guidata, senza collisioni e inerzia libera. La resistenza alla piega usa vincoli tra secondi vicini. La pelle traslucida mostra la superficie più vicina: niente rifrazione o trasparenza fisica multistrato. Pori ritagliati nel materiale, non nuove maglie del solver. I granelli liberi mantengono il campo precedente; la struttura connessa ha nodi propri."
             }
           ]
         },
@@ -9983,23 +10037,22 @@
             {
               "label": "evidence",
               "value": [
-                "reports/pathfinder/studio-v9-silk-gpu.json",
-                "reports/pathfinder/studio-v9-silk-loop.mp4"
+                "reports/living-structures/check.json",
+                "reports/living-structures/exports.json"
               ]
             }
           ]
         }
       ],
       "families": [
-        "film",
         "fibre",
         "motion"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "fibre-setose",
-      "where": "",
+      "result": "fibre-vive",
+      "where": "Particelle → Punti di partenza → Fibre che respirano. Controlli: Forma e moto → Fibre e scie.",
       "platform": "",
-      "next": "Fasci persistenti con pieghe comuni, conservazione del volume e ritardi indipendenti · Passaggio fascio/velo e aderenza a un volume guida · Occlusione e sovrapposizioni con profondità: il renderer attuale accumula luce, non simula un tessuto connesso",
+      "next": "",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -10007,17 +10060,16 @@
       ],
       "media": [
         {
-          "src": "media/f1deb95b4c9c8800.webp",
-          "width": 480,
-          "height": 480
+          "src": "media/50f929a64198bfba.webp",
+          "width": 640,
+          "height": 640
         }
       ],
       "assets": [],
-      "resultImage": "media/f1deb95b4c9c8800.webp",
-      "resultVideo": "../previews/fibre-setose-10s.mp4",
-      "resultUrl": "../previews/fibre-setose.html",
+      "resultImage": "media/50f929a64198bfba.webp",
+      "resultVideo": "../previews/fibre-vive-20s.mp4",
+      "resultUrl": "../previews/fibre-vive.html",
       "completedProjects": [
-        "roadmap-particles",
         "project-trama-viva",
         "project-fibre-setose"
       ]
@@ -10035,20 +10087,23 @@
         "s02-01",
         "s03-01",
         "reuse-xpbd",
+        "project-living-extensions",
         "project-trama-viva"
       ],
-      "state": "partial",
+      "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Estensione strutturale: legami persistenti e membrane tra le fibre.",
-      "sources": [],
+      "summary": "Trama elastica persistente con intreccio, pori e membrana collegata.",
+      "sources": [
+        "https://frangiacorta.github.io/prisma/previews/tessuto-connesso.html"
+      ],
       "sections": [
         {
           "title": "Come lo portiamo in Prisma",
           "fields": [
             {
               "label": "method",
-              "value": "Riusare DLAF per generare punti e legami ramificati sul PC, importando il CSV. Provare il solver XPBD già individuato per distanza/flessione/volume, offline o con adattatore WASM. Aggiungere membrane, resa e loop solo dove i due componenti non coprono il risultato."
+              "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo."
             }
           ]
         },
@@ -10057,7 +10112,7 @@
           "fields": [
             {
               "label": "feasible",
-              "value": "Estensione strutturale: legami persistenti e membrane tra le fibre."
+              "value": "Disponibile nello stesso renderer Particelle, sul PC e su Pages."
             }
           ]
         },
@@ -10067,12 +10122,10 @@
             {
               "label": "acceptance",
               "value": [
-                "Legami e pori persistono durante l'animazione",
-                "Ponti ancorati a rami distinti, con elasticità e flessione leggibili",
-                "Rami principali e trama minuta controllabili separatamente",
-                "Noduli ancorati alle giunzioni e crescita localizzata con identità stabile",
-                "Resa scura o traslucida con profondità, luce e fuoco regolabili",
-                "Loop periodico della rete completa prima di aggiungere crescita e involuzione"
+                "Fili longitudinali e trasversali sullo stesso reticolo deformabile",
+                "Elasticità e resistenza alle pieghe: i legami correggono realmente le posizioni",
+                "Pori stabili, pelle regolabile e risposta alle luci",
+                "Variazioni visibili dei controlli, palette e luci; campi di attrazione; preset e chiusura del loop verificati"
               ]
             }
           ]
@@ -10083,15 +10136,18 @@
             {
               "label": "implemented",
               "value": [
-                "Connessioni visive curve fra nodi della materia: port 3D MIT da Particle Hero, preset Trama viva, fino a 4000 nodi. Prima trama connessa; non mesh o simulazione elastica."
+                "Fili longitudinali e trasversali sullo stesso reticolo deformabile",
+                "Elasticità e resistenza alle pieghe: i legami correggono realmente le posizioni",
+                "Pori stabili, pelle regolabile e risposta alle luci",
+                "Struttura persistente da 3136 nodi con vincoli di distanza XPBD MIT adattati in JavaScript; stessa deformazione, campi e materiali di Particelle",
+                "Elasticità, resistenza alla piega e conservazione del volume con chiusura virtuale delle aperture",
+                "Preset, Annulla, randomizzazione, assistente testuale, durata e verso condivisi",
+                "Loop deterministico: ogni fase si può riprodurre e cercare senza dipendere dai fotogrammi precedenti; MP4 di esempio da 20 secondi"
               ]
             },
             {
-              "label": "remaining",
-              "value": [
-                "Simulazione elastica coesa e resistenza alla deformazione",
-                "Membrana connessa fra fili e risposta materiale della superficie"
-              ]
+              "label": "limits",
+              "value": "Versione 1 di deformazione elastica guidata, senza collisioni e inerzia libera. La resistenza alla piega usa vincoli tra secondi vicini. La pelle traslucida mostra la superficie più vicina: niente rifrazione o trasparenza fisica multistrato. Pori ritagliati nel materiale, non nuove maglie del solver. I granelli liberi mantengono il campo precedente; la struttura connessa ha nodi propri."
             }
           ]
         },
@@ -10101,7 +10157,8 @@
             {
               "label": "evidence",
               "value": [
-                "reports/danny-trial/check.json"
+                "reports/living-structures/check.json",
+                "reports/living-structures/exports.json"
               ]
             }
           ]
@@ -10111,10 +10168,10 @@
         "fibre"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "trama-viva",
-      "where": "",
+      "result": "tessuto-connesso",
+      "where": "Particelle → Punti di partenza → Tessuto connesso. Controlli: Forma e moto → Fibre e scie.",
       "platform": "",
-      "next": "Simulazione elastica coesa e resistenza alla deformazione · Membrana connessa fra fili e risposta materiale della superficie",
+      "next": "",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -10122,15 +10179,15 @@
       ],
       "media": [
         {
-          "src": "media/5427b6b4ff7a91df.webp",
+          "src": "media/8d0aed554d52b933.webp",
           "width": 640,
           "height": 640
         }
       ],
       "assets": [],
-      "resultImage": "media/5427b6b4ff7a91df.webp",
-      "resultVideo": "../previews/trama-viva-10s.mp4",
-      "resultUrl": "../previews/trama-viva.html",
+      "resultImage": "media/8d0aed554d52b933.webp",
+      "resultVideo": "../previews/tessuto-connesso-20s.mp4",
+      "resultUrl": "../previews/tessuto-connesso.html",
       "completedProjects": [
         "project-trama-viva"
       ]
@@ -10637,6 +10694,100 @@
       "completedProjects": []
     },
     {
+      "id": "project-living-extensions",
+      "name": "Strutture vive · crescita e simulazione avanzata",
+      "kind": "project",
+      "related": [
+        "s09-02",
+        "s06-01",
+        "s07-06",
+        "s05-02",
+        "s05-03",
+        "s04-01",
+        "s04-02",
+        "s03-01",
+        "s03-04",
+        "img-20261010-02",
+        "img-20261010-04",
+        "s07-05",
+        "s06-02",
+        "s04-03",
+        "s02-01",
+        "s09-04",
+        "s09-03",
+        "s07-03",
+        "s07-02",
+        "s08-01",
+        "s07-01",
+        "s07-04",
+        "s06-03",
+        "s05-01",
+        "s11-01",
+        "roadmap-fibre-motion",
+        "roadmap-tissue",
+        "roadmap-membrane"
+      ],
+      "state": "proposed",
+      "priority": false,
+      "author": "",
+      "summary": "Estensioni successive alle tre strutture guidate completate: crescita, collisioni, colonie e materiali multistrato.",
+      "sources": [],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Conservare le reference e i criteri originali nei progetti. Queste estensioni non sono dichiarate realizzate dalla versione guidata."
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "remaining",
+              "value": [
+                "Collisioni e inerzia della stoffa; solver dinamico e metodo di raccordo del loop",
+                "Aderenza a modelli figurativi importati, ramificazione DLAF, noduli alle giunzioni e crescita localizzata",
+                "Granuli ancorati alla pelle con distacco controllato; varianti ferrofluido, steli/corolle e colonie indipendenti",
+                "Trasparenza e rifrazione multistrato, ombre reciproche e fuoco fisico"
+              ]
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "motion",
+        "film"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "Collisioni e inerzia della stoffa; solver dinamico e metodo di raccordo del loop · Aderenza a modelli figurativi importati, ramificazione DLAF, noduli alle giunzioni e crescita localizzata · Granuli ancorati alla pelle con distacco controllato; varianti ferrofluido, steli/corolle e colonie indipendenti · Trasparenza e rifrazione multistrato, ombre reciproche e fuoco fisico",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/creative-roadmap.json"
+      ],
+      "media": [
+        {
+          "src": "media/946116c47a8db1b0.webp",
+          "width": 296,
+          "height": 390
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "s09-02",
+      "completedProjects": [
+        "roadmap-fibre-motion",
+        "roadmap-tissue",
+        "roadmap-membrane"
+      ]
+    },
+    {
       "id": "method-living-moodboard",
       "name": "Un moodboard che diventa progetto",
       "kind": "image",
@@ -10840,7 +10991,7 @@
       "result": "trama-viva",
       "where": "Particelle → Punti di partenza → Trama viva. Controlli: Forma e moto → Fibre e scie → Connessioni.",
       "platform": "",
-      "next": "Sviluppare elasticità e membrane nel progetto Tessuto e connessioni.",
+      "next": "Elasticità e membrane disponibili nel progetto Tessuto e connessioni. Questa ricetta conserva i legami visivi originali di Particle Hero.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -10857,7 +11008,10 @@
       "resultImage": "media/5427b6b4ff7a91df.webp",
       "resultVideo": "../previews/trama-viva-10s.mp4",
       "resultUrl": "../previews/trama-viva.html",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-tissue",
+        "roadmap-fibre-motion"
+      ]
     },
     {
       "id": "project-cobalto-oro",
@@ -10927,7 +11081,9 @@
       "resultImage": "media/76023939a460a447.webp",
       "resultVideo": "../previews/cobalto-oro-10s.mp4",
       "resultUrl": "../previews/cobalto-oro.html",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane"
+      ]
     },
     {
       "id": "project-fibre-setose",
@@ -10957,7 +11113,7 @@
             },
             {
               "label": "limits",
-              "value": "I riflessi sono pronti; la dinamica dei fasci e dei veli resta nel progetto Fibre che respirano."
+              "value": "Questa funzione modifica i riflessi. Fasci e veli connessi sono disponibili nel progetto Fibre che respirano."
             }
           ]
         },
@@ -10998,7 +11154,9 @@
       "resultImage": "media/f1deb95b4c9c8800.webp",
       "resultVideo": "../previews/fibre-setose-10s.mp4",
       "resultUrl": "../previews/fibre-setose.html",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-fibre-motion"
+      ]
     },
     {
       "id": "project-pellicola-viva",
@@ -11068,7 +11226,9 @@
       "resultImage": "media/1dd2c0af9c7c3a38.webp",
       "resultVideo": "../previews/pellicola-viva-10s.mp4",
       "resultUrl": "../previews/pellicola-viva.html",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-membrane"
+      ]
     },
     {
       "id": "project-moodboard",
@@ -11446,7 +11606,9 @@
       ],
       "assets": [],
       "illustrationFrom": "s09-01",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-fibre-motion"
+      ]
     },
     {
       "id": "reuse-inkfield",
@@ -11611,6 +11773,7 @@
       "name": "PositionBasedDynamics · XPBD",
       "kind": "tool",
       "related": [
+        "roadmap-membrane",
         "roadmap-fibre-motion",
         "roadmap-tissue",
         "s06-02",
@@ -11693,14 +11856,18 @@
       ],
       "media": [
         {
-          "src": "media/f1deb95b4c9c8800.webp",
-          "width": 480,
-          "height": 480
+          "src": "media/e5b7848f69a9e85c.webp",
+          "width": 640,
+          "height": 640
         }
       ],
       "assets": [],
-      "illustrationFrom": "roadmap-fibre-motion",
-      "completedProjects": []
+      "illustrationFrom": "roadmap-membrane",
+      "completedProjects": [
+        "roadmap-membrane",
+        "roadmap-fibre-motion",
+        "roadmap-tissue"
+      ]
     },
     {
       "id": "reuse-three-attractors",
@@ -13119,14 +13286,16 @@
       ],
       "media": [
         {
-          "src": "media/f1deb95b4c9c8800.webp",
-          "width": 480,
-          "height": 480
+          "src": "media/50f929a64198bfba.webp",
+          "width": 640,
+          "height": 640
         }
       ],
       "assets": [],
       "illustrationFrom": "roadmap-fibre-motion",
-      "completedProjects": []
+      "completedProjects": [
+        "roadmap-fibre-motion"
+      ]
     },
     {
       "id": "tool-github-com-dannystuart-3d-shape-generator",
@@ -14260,11 +14429,11 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 140,
+    "records": 141,
     "videos": 39,
     "images": 15,
     "tools": 63,
-    "projects": 20,
+    "projects": 21,
     "attachments": 98,
     "clips": 39,
     "missing": 10

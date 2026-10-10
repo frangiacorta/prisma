@@ -1,4 +1,4 @@
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=abe1513fc265';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=6c293ce983a2';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.

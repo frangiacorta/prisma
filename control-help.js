@@ -1,6 +1,27 @@
-import {AUDIO_HELP} from './audio-model.js?v=abe1513fc265';
+import {AUDIO_HELP} from './audio-model.js?v=6c293ce983a2';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ pVolumeHold:'Mantiene il volume di riferimento mentre la struttura si deforma. Per misurarlo considera chiusa l’apertura della pelle; valori alti contrastano il respiro.',
+ pBundleDelay:'Sfasa progressivamente il movimento delle zone della struttura, mantenendo pieghe collegate e un loop chiuso.',
+ pFray:'Aggiunge piccole ondulazioni ai fasci conservando l’identità dei fili. A zero i bordi sono più regolari.',
+ pLiving:'Aggiunge fasci, tessuto o una pelle alla stessa materia. A Spenta il rendering precedente resta identico.',
+ pBundles:'Divide le fibre in gruppi che piegano insieme. Agisce in modalità Fasci di fibre.',
+ pBundleSpread:'Allarga ogni fascio fino a formare un velo. Agisce in modalità Fasci di fibre.',
+ pStrands:'Numero di fili collegati sulla struttura: più fili rendono il tessuto fitto. Indipendente dal numero di particelle.',
+ pThreadWidth:'Spessore dei fili connessi a 1080p, con controllo anche sotto un pixel.',
+ pThreadOpacity:'Visibilità dei fili connessi. A zero puoi vedere solo la membrana.',
+ pWeft:'Aggiunge la trama trasversale ai fili longitudinali, sulla stessa superficie deformata.',
+ pElastic:'Resiste ai cambiamenti di lunghezza dei legami. A zero il campo muove liberamente i punti; alto conserva meglio la trama.',
+ pBend:'Collega anche punti più lontani sullo stesso filo: alto resiste alle pieghe strette.',
+ pSkin:'Rende visibile la superficie continua tra i fili. A zero rimangono solo i filamenti.',
+ pSkinOffset:'Scosta la pelle dal nucleo di granelli senza spostare questi ultimi.',
+ pSkinOpening:'Apre la superficie a un polo e la trasforma progressivamente in una coppa.',
+ pFoldCount:'Numero delle pieghe ampie della pelle, visibili con Profondità delle pieghe sopra zero.',
+ pFoldDepth:'Intensità delle pieghe condivise da pelle e fibre. Il ritmo segue il loop.',
+ pInflate:'Ampiezza del respiro che si propaga lungo la pelle in un ciclo completo.',
+ pContract:'Quanto la parte centrale si richiude e rientra durante il loop.',
+ pPores:'Ritaglia aperture nella membrana lasciando collegati i bordi. A zero la superficie è continua.',
+ pPoreCount:'Quanti pori distribuire sulla superficie; agisce con Apertura dei pori sopra zero.',
  pLinks:'Visibilità dei fili che collegano particelle vicine. A zero le connessioni sono spente.',
  pLinkNodes:'Da 50 a 4000 punti usati per la trama, indipendenti dai granelli visibili. Più nodi creano una rete più fitta.',
  pLinkReach:'Distanza massima fra i punti nel nucleo iniziale, prima del movimento. Cambiarla ricostruisce i legami.',

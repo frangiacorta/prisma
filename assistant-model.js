@@ -1,8 +1,8 @@
-import {META} from './model.js?v=abe1513fc265';
-import {PARTICLE_META} from './particle-model.js?v=abe1513fc265';
-import {PATH_META} from './particle-paths.js?v=abe1513fc265';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=abe1513fc265';
-import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=abe1513fc265';
+import {META} from './model.js?v=6c293ce983a2';
+import {PARTICLE_META} from './particle-model.js?v=6c293ce983a2';
+import {PATH_META} from './particle-paths.js?v=6c293ce983a2';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=6c293ce983a2';
+import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=6c293ce983a2';
 
 // Shared by the local assistant and browser. Generated text can only propose these controls.
 const sharedParticleKeys='volume stretchX stretchY stretchZ deform twist waves waveScale scale positionX positionY rotateX rotateY rotateZ duration speed motion metal roughness gloss iridescence transparency emission glow environmentPower environmentAngle environmentCycles gradientAngle gradientScale gradientOffset colorSoftness colorWaveAmount colorWaveBands colorWavePhase colorWaveHeight colorWaveRadius colorWaveSwirl colorWaveWarp bgAngle bgHeight bgSoftness bgWash exposure brightness contrast saturation grain temperature photoTint gamma blacks highlights vignette lensDistortion'.split(' ');
@@ -26,6 +26,7 @@ export function assistantCatalog(s){
    'pSize e pTrailWidth sono pixel a 1080p: .08-.6 finissimi, 1 normale. Colore pColorMode=0 resta assegnato alla stessa particella. 3 è colore nello spazio.',
    'pOuter=0 spegne fasci esterni. Nessuna luce visibile o ombra fisica sui granelli; gestisci x/y/z, power, size, color, enabled delle luci.',
    'Riflessi setosi: pFiberSheen 0-1 orienta la luce sulla tangente 3D delle fibre; pFiberSpread 0-1 va da stretto a diffuso. Richiede fibre visibili, gloss e pLighting sopra 0. Per seta prova .75/.35; per madreperla regola anche iridescence e filmThickness. Conserva palette e forma; non cambia i granelli né crea una mesh tessuta.',
+   'Strutture connesse: pLiving 0=spento, 1=fasci, 2=tessuto, 3=membrana. pBundles/pBundleSpread regolano fasci; pStrands/pThreadWidth/pThreadOpacity i fili; pWeft intreccia; pSkin mostra la superficie; pPores/pPoreCount aprono pori. pElastic/pBend resistono alle deformazioni, pVolumeHold conserva il volume con apertura chiusa virtualmente. pSkinOpening apre una coppa; pSkinOffset separa pelle e nucleo; pFoldCount/pFoldDepth danno pieghe; pInflate/pContract respirano e richiudono; pBundleDelay sfalsa zone, pFray sfrangia. Geometria guidata periodica con vincoli XPBD, senza collisioni o inerzia libera. Preservare forma, palette e durata quando si applica una struttura.',
    'Connessioni 3D persistenti fra particelle: pLinks 0-1 visibilità, pLinkNodes 50-4000, pLinkReach .03-1.5 distanza nel nucleo iniziale, pLinkNeighbors 1-5, pLinkWidth .02-4 px, pLinkCurve 0-.8, pLinkStretch 1-12 limite prima della sfumatura. Per ragnatela prova 1800 nodi, .23 distanza, 3 vicini, .6 px. Palette e moto restano quelli di Particelle; non è simulazione di tessuto elastico.',
    'Scie/fibre: pTrailCount fino a 60000, pTrailWidth .015-8 px, pTrailLength 0-1 (frazione di loop), pTrailPersistence 1 mantiene la coda intera. pTrailCoherence avvicina i percorsi per creare tessuto; pTrailSoftness ammorbidisce i bordi, pTrailQuality 24-192 segmenti. pTrailDensity attenua la sovraesposizione delle trame dense. Per fibre prova 7000/.07 px/.28 lunghezza; tessuto 42000/.21 px/.85 lunghezza/coherence .95/persistence .9 e pOpacity 0. Preserva forma e colori.',
    'forcePoints contiene i punti manuali di attrazione/repulsione sulla scena. Conserva questi punti: questa versione del traduttore non li modifica; l’utente può trascinarli e regolarli in Moto → Punti sulla scena.',
