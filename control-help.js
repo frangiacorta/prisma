@@ -1,6 +1,11 @@
-import {AUDIO_HELP} from './audio-model.js?v=849adf675d98';
+import {AUDIO_HELP} from './audio-model.js?v=c8567bd14506';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ finishRegionsEnabled:'Limita mosaico e/o RGB ai riquadri disegnati. Disattivalo per trattare di nuovo tutta l’immagine, conservando le aree.',
+ finishRegionMosaic:'Il mosaico appare solo nelle aree selezionate. Gli altri trattamenti conservano le proprie impostazioni.',
+ finishRegionRgb:'La separazione RGB appare solo nelle aree selezionate.',
+ finishRegionInvert:'Tratta l’esterno dell’unione dei riquadri. Serve almeno un riquadro.',
+ finishFeather:'Sfuma il bordo verso l’interno delle aree, in percentuale del lato corto. Zero crea un bordo netto.',
  finishEnabled:'Attiva o esclude tutta la finitura senza perdere i valori scelti. Vale anche per l’export.',
  finishTone:'Attiva esposizione, contrasto, saturazione e bilanciamento mantenendo i valori memorizzati.',
  finishRgb:'Sposta i tre canali di colore sull’immagine finale. Funziona su Forme, Particelle e sfondo.',

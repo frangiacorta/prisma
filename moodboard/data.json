@@ -12615,14 +12615,19 @@
       "priority": false,
       "author": "",
       "summary": "Tracking testa ai bordi confermato. Regolazione visiva X/Y approvata dall’utente; calibrazione metrica e accuratezza della prospettiva ancora da verificare.",
-      "sources": [],
+      "sources": [
+        "https://github.com/sparkjsdev/spark",
+        "https://github.com/V4C38/sensai-off-axis",
+        "https://github.com/icurtis1/off-axis-sneaker",
+        "https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/"
+      ],
       "sections": [
         {
           "title": "Come lo portiamo in Prisma",
           "fields": [
             {
               "label": "method",
-              "value": "Scena 3D grande con controlli manuali. Guadagni visivi X/Y salvati a 0,4/0,3; distanza fissa. Riprendere la prova sulla parete dopo le mani."
+              "value": "Scena 3D grande con controlli manuali. Guadagni visivi X/Y salvati a 0,4/0,3; distanza fissa. Riprendere la prova sulla parete dopo le mani. Estensione pianificata: importare un ambiente Gaussian Splatting con Spark (Three.js), riusando il tracking esistente e la prospettiva off-axis. Controlli di scala, orientamento, posizione e profondità; misurare fluidità, latenza e qualità ai margini sulla parete."
             }
           ]
         },
@@ -12630,8 +12635,31 @@
           "title": "Repo, plugin e riuso",
           "fields": [
             {
+              "label": "reuse",
+              "value": "Spark: renderer per Three.js con licenza MIT. Sensai off-axis: esempio browser di combinazione splat/head tracking, utile come riferimento; verificare la licenza prima di riusarne codice. Il nostro tracking da dietro va conservato: il Face Mesh frontale dell’esempio non lo sostituisce."
+            },
+            {
               "label": "feasible",
               "value": "Tracking testa ai bordi confermato. Regolazione visiva X/Y approvata dall’utente; calibrazione metrica e accuratezza della prospettiva ancora da verificare."
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "remaining",
+              "value": [
+                "Calibrazione metrica e verifica della prospettiva sulla parete",
+                "Prototipo Gaussian Splatting: import locale di un ambiente, confronto con la scena geometrica e prova di prestazioni; non ancora implementato"
+              ]
+            },
+            {
+              "label": "limits",
+              "value": [
+                "Lo splatting fornisce il contenuto 3D: calibrazione, head tracking e camera off-axis rimangono necessari",
+                "Qualità fuori dalle viste acquisite e costo GPU da misurare sul PC di destinazione"
+              ]
             }
           ]
         }
@@ -12643,7 +12671,7 @@
       "result": "",
       "where": "",
       "platform": "PC · calibrazione locale",
-      "next": "",
+      "next": "Calibrazione metrica e verifica della prospettiva sulla parete · Prototipo Gaussian Splatting: import locale di un ambiente, confronto con la scena geometrica e prova di prestazioni; non ancora implementato",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -13576,7 +13604,8 @@
               "value": [
                 "Mosaico a celle X/Y sull’uscita della scena, mix e bypass",
                 "Separazione RGB con offset indipendenti, direzione e mix",
-                "Anteprima, preset, immagini, MP4 e wallpaper web"
+                "Anteprima, preset, immagini, MP4 e wallpaper web",
+                "Maschere rettangolari per mosaico e RGB: fino a otto aree, spostamento, dimensioni, sfumatura e inversione"
               ]
             },
             {
@@ -15733,7 +15762,7 @@
       "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Trattamenti finali condivisi da Forme e Particelle: colore ed esposizione, mosaico e separazione dei canali.",
+      "summary": "Finitura comune a Forme e Particelle: colore, mosaico e RGB, con riquadri disegnabili per trattamenti locali.",
       "sources": [
         "https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexSubImage2D"
       ],
@@ -15759,7 +15788,11 @@
                 "Esposizione, contrasto, saturazione e bilanciamento",
                 "Attiva mosaico, dimensione celle X/Y e mix",
                 "Attiva RGB, offset R/G/B, angolo e mix",
-                "Reset per gruppo e generale"
+                "Reset per gruppo e generale",
+                "Fino a otto riquadri disegnabili, spostabili e ridimensionabili",
+                "Posizione e dimensioni in percentuale",
+                "Scelta indipendente: mosaico e/o RGB nelle aree",
+                "Bordi sfumati, inversione dentro/fuori, nascondi maniglie"
               ]
             }
           ]
@@ -15774,7 +15807,9 @@
                 "Valori e attivazioni inclusi nei preset, confronto Prima escluso",
                 "Stesse proporzioni a risoluzioni diverse: dimensioni riferite al lato corto di 1080 px",
                 "Pixel finali inviati all’esportatore MP4; immagini e wallpaper HTML offline",
-                "Trasparenza conservata con composizione dei canali in alfa premoltiplicato"
+                "Trasparenza conservata con composizione dei canali in alfa premoltiplicato",
+                "Maschera come unione di riquadri fermi nello spazio dell’immagine, salvata nel preset",
+                "Disegno mouse/touch, dimensioni numeriche, annulla/ripristina; maniglie escluse dai file esportati"
               ]
             },
             {
@@ -15782,7 +15817,9 @@
               "value": [
                 "Il grading colore conserva la scelta esistente di applicazione anche allo sfondo",
                 "Ordine fisso colore/lente → mosaico → RGB",
-                "Displacement, ingresso video/immagine e conversione in punti sono ancora da sviluppare"
+                "Displacement, ingresso video/immagine e conversione in punti sono ancora da sviluppare",
+                "Riquadri applicabili a mosaico e RGB. Colore/esposizione/lente/grana conservano il loro ambito globale o soggetto",
+                "Nessun inseguimento automatico del soggetto, poligoni o maschere dipinte in questa versione"
               ]
             }
           ]
@@ -15792,7 +15829,7 @@
           "fields": [
             {
               "label": "evidence",
-              "value": "reports/finishing/local-check.json; immagini di prova e wallpaper offline in reports/finishing/"
+              "value": "reports/finishing/local-check.json; immagini di prova e wallpaper offline in reports/finishing/; reports/finishing-areas/local-check.json"
             },
             {
               "label": "checks",
@@ -15802,7 +15839,9 @@
                 "Trasparenza parziale e angoli trasparenti",
                 "MP4 di prova 128×128, 30 fps, un secondo: codifica e decodifica",
                 "Wallpaper scaricato e aperto offline",
-                "Preset, slider, shortcut da export e larghezza mobile 390 px"
+                "Preset, slider, shortcut da export e larghezza mobile 390 px",
+                "Maschere: pixel esterni invariati, due aree, inversione, maschera vuota e sfumatura",
+                "Preset con riquadri, input invalidi, manipolazione UI e persistenza dopo ricarica"
               ]
             }
           ]
