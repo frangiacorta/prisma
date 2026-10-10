@@ -1,4 +1,4 @@
-import {SPRITES,COLOR_MODES} from './particle-model.js?v=48a3739bbae9';
+import {SPRITES,COLOR_MODES} from './particle-model.js?v=abe1513fc265';
 export function particlePanel(tab,s,h,shared,selectedLight){
  const {slider,section,details,colorField,check}=h;
  const sliders=keys=>keys.map(k=>slider(k)).join('');

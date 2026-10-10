@@ -9121,7 +9121,8 @@
       "related": [
         "s03-04",
         "roadmap-particles",
-        "roadmap-fibre-motion"
+        "roadmap-fibre-motion",
+        "archive-calibration-20261009"
       ],
       "state": "partial",
       "priority": false,
@@ -10139,7 +10140,8 @@
       "name": "Da completare · Prisma 4D",
       "kind": "project",
       "related": [
-        "img-03"
+        "img-03",
+        "archive-calibration-20261009"
       ],
       "state": "partial",
       "priority": false,
@@ -11133,6 +11135,124 @@
       ],
       "assets": [],
       "illustrationFrom": "method-living-moodboard",
+      "completedProjects": []
+    },
+    {
+      "id": "archive-calibration-20261009",
+      "name": "Calibrazione · screenshot delle prove",
+      "kind": "archive",
+      "related": [
+        "roadmap-4d",
+        "roadmap-body-interaction"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "",
+      "summary": "Dieci screenshot tecnici inviati durante le prove di tracking e schermo intero. I file non sono più presenti nei percorsi Desktop indicati.",
+      "sources": [],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": "Le immagini nella conversazione documentavano perdita della testa al bordo basso e basso-sinistra, recupero e individuazione dei controlli della scena grande."
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Riferimenti conservati per nome e provenienza; nessuna anteprima ricostruita o dichiarata disponibile. Le immagini della webcam non sono pubblicate."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "interaction"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "Se servirà riesaminare questi screenshot originali, ricollegare i file o allegarli di nuovo.",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/ca52b76828a0f137.webp",
+          "width": 322,
+          "height": 700
+        }
+      ],
+      "assets": [
+        {
+          "id": "a2ea14e8559dded5",
+          "name": "Screen Shot 2026-10-09 at 12.24.55.536 PM.png",
+          "bytes": null,
+          "available": false
+        },
+        {
+          "id": "16f6e7cf7d9fa53b",
+          "name": "Screen Shot 2026-10-09 at 12.24.26.703 PM.png",
+          "bytes": null,
+          "available": false
+        },
+        {
+          "id": "2f033848e8d61620",
+          "name": "Screen Shot 2026-10-09 at 12.24.37.886 PM.png",
+          "bytes": null,
+          "available": false
+        },
+        {
+          "id": "946bbf91fae42cb3",
+          "name": "Screen Shot 2026-10-09 at 12.24.42.791 PM.png",
+          "bytes": null,
+          "available": false
+        },
+        {
+          "id": "4bd561726e8ea82c",
+          "name": "Screen Shot 2026-10-09 at 12.24.47.552 PM.png",
+          "bytes": null,
+          "available": false
+        },
+        {
+          "id": "f8d3560c3c271123",
+          "name": "Screen Shot 2026-10-09 at 12.24.52.18 PM.png",
+          "bytes": null,
+          "available": false
+        },
+        {
+          "id": "8752b59ba674a27c",
+          "name": "Screen Shot 2026-10-09 at 12.41.21.442 PM.png",
+          "bytes": null,
+          "available": false
+        },
+        {
+          "id": "c4f34f7bcf76c989",
+          "name": "Screen Shot 2026-10-09 at 12.41.33.190 PM.png",
+          "bytes": null,
+          "available": false
+        },
+        {
+          "id": "b70027b8d3cb6cc0",
+          "name": "Screen Shot 2026-10-09 at 03.48.23.933 PM.png",
+          "bytes": null,
+          "available": false
+        },
+        {
+          "id": "93decf79fa6b79cf",
+          "name": "Screen Shot 2026-10-09 at 03.48.32.179 PM.png",
+          "bytes": null,
+          "available": false
+        }
+      ],
+      "illustrationFrom": "roadmap-4d",
       "completedProjects": []
     },
     {
@@ -14140,13 +14260,13 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 139,
+    "records": 140,
     "videos": 39,
     "images": 15,
     "tools": 63,
     "projects": 20,
-    "attachments": 88,
+    "attachments": 98,
     "clips": 39,
-    "missing": 0
+    "missing": 10
   }
 }
