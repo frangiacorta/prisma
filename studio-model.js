@@ -1,3 +1,4 @@
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=849adf675d98';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
@@ -9,6 +10,7 @@ export const TRACK_META={
  rotateY:['Rotazione orizzontale',0,360,1],rotateX:['Rotazione verticale',0,180,1],rotateZ:['Rotazione sul piano',0,360,1],volume:['Volume',0,.6,.01],deform:['Deformazione',0,.4,.01],twist:['Torsione',0,2,.01],waves:['Increspature',0,.3,.01],hole:['Apertura del vuoto',0,.6,.01],cut:['Ritaglio',0,.8,.01],scale:['Dimensione',0,.7,.01],positionX:['Posizione orizzontale',0,1.2,.01],positionY:['Posizione verticale',0,1.2,.01],gradientOffset:['Scorrimento colori',0,1,.01],iridescence:['Iridescenza',0,.7,.01],roughness:['Rugosità',0,.6,.01],transparency:['Trasparenza',0,.7,.01]
 };
 export const EXTRA_BASE={
+ ...FINISH_DEFAULTS,
  textureDepth:.35,textureScale:1,textureOrganic:.65,textureAngle:0,textureWrinkles:0,textureFolds:0,textureWear:0,textureRipples:0,
  petalGrowth:1,petalWander:0,petalCoil:0,petalReentry:0,petalKnots:0,petalRidges:0,petalDisorder:0,
  petalAmount:0,petalCount:12,petalOpen:.65,petalCurl:0,petalLength:1.05,petalWidth:.24,petalInflate:.6,petalSharp:0,petalCoverage:0,petalRows:5,petalPhase:0,petalBlend:0,petalRoot:0,petalRandom:0,stemAmount:0,stemRadius:.09,stemBend:0,
@@ -37,6 +39,7 @@ export const LIGHT_RIGS=[
 ];
 export function legacyLights(s){const build=(id,p)=>{const angle=s[p+'Angle']*Math.PI/180,height=s[p+'Height']*Math.PI/180;return{...newLight(id),visible:true,type:'bar',x:3.2*Math.sin(angle)*Math.cos(height),y:3.2*Math.sin(height),z:3.2*Math.cos(angle)*Math.cos(height),color:s[p+'Color'],power:s[p+'Power'],size:1.7,length:s[p+'Size']*.6,softness:s[p+'Size'],enabled:id===1||s.light2}};return[build(1,'light'),build(2,'light2')]}
 export const EXTRA_META={
+ ...FINISH_META,
  textureDepth:['Rilievo',0,1,.01],textureScale:['Densità della texture',.25,8,.05],textureOrganic:['Organicità',0,1,.01],textureAngle:['Direzione della texture',-180,180,1],textureWrinkles:['Grinze',0,1,.01],textureFolds:['Pieghe',0,1,.01],textureWear:['Abrasioni',0,1,.01],textureRipples:['Increspature',0,1,.01],
  petalGrowth:['Emersione',0,1,.01],petalWander:['Sinuosità',0,1,.01],petalCoil:['Avvolgimento',-1,1,.01],petalReentry:['Rientro nella sfera',0,1,.01],petalKnots:['Nodosità',0,1,.01],petalRidges:['Nervature',0,1,.01],petalDisorder:['Disordine',0,1,.01],
  petalAmount:['Petali e punte',0,1,.01],petalCount:['Numero di petali / punte',3,24,1],petalOpen:['Apertura',0,1,.01],petalCurl:['Arricciatura',-1,1,.01],petalLength:['Lunghezza',.15,1.8,.01],petalWidth:['Larghezza dei petali',.025,.45,.005],petalInflate:['Gonfiore',0,1,.01],petalSharp:['Acutezza delle punte',0,1,.01],petalCoverage:['Corona / superficie sferica',0,1,.01],petalRows:['File sulla sfera',2,8,1],petalPhase:['Rotazione della corona',0,360,1],petalBlend:['Fusione con la sfera',0,1,.01],petalRoot:['Ampiezza delle radici',0,1,.01],petalRandom:['Irregolarità delle punte',0,1,.01],stemAmount:['Lunghezza del gambo',0,1,.01],stemRadius:['Spessore del gambo',.015,.2,.005],stemBend:['Curvatura del gambo',-1,1,.01],

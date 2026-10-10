@@ -13508,10 +13508,11 @@
         "img-04",
         "img-s16-mosaic",
         "img-s16-rgb",
+        "project-finishing",
         "prisma-window-depth",
         "prisma-image-particles"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
       "summary": "Una sezione di trattamenti per trasformare immagini, video o l’uscita della scena in punti, celle e contorni cromatici.",
@@ -13566,6 +13567,27 @@
               ]
             }
           ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Mosaico a celle X/Y sull’uscita della scena, mix e bypass",
+                "Separazione RGB con offset indipendenti, direzione e mix",
+                "Anteprima, preset, immagini, MP4 e wallpaper web"
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Ingresso immagine/video esterno e trasformazione in punti",
+                "Segmentazione opzionale",
+                "Ordine arbitrario dei trattamenti: attualmente colore/lente → mosaico → RGB"
+              ]
+            }
+          ]
         }
       ],
       "families": [
@@ -13574,9 +13596,9 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Scena → Finitura; accessibile anche dal pannello Export.",
       "platform": "",
-      "next": "Prima una prova su immagine con punti, pixel e RGB indipendenti; poi video e maschere.",
+      "next": "Prossima estensione di questo progetto: ingresso immagine/video e campionamento a punti. Il displacement resta nel Warp ricorsivo.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -13591,7 +13613,9 @@
       ],
       "assets": [],
       "illustrationFrom": "img-01",
-      "completedProjects": []
+      "completedProjects": [
+        "project-finishing"
+      ]
     },
     {
       "id": "method-living-moodboard",
@@ -15500,7 +15524,8 @@
       "name": "Mosaico · pixel netti e bande",
       "kind": "image",
       "related": [
-        "roadmap-image-treatments"
+        "roadmap-image-treatments",
+        "project-finishing"
       ],
       "state": "reference",
       "priority": false,
@@ -15590,14 +15615,17 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [
+        "project-finishing"
+      ]
     },
     {
       "id": "img-s16-rgb",
       "name": "RGB split · separazione dei canali",
       "kind": "image",
       "related": [
-        "roadmap-image-treatments"
+        "roadmap-image-treatments",
+        "project-finishing"
       ],
       "state": "reference",
       "priority": false,
@@ -15689,6 +15717,120 @@
           "available": true
         }
       ],
+      "completedProjects": [
+        "project-finishing"
+      ]
+    },
+    {
+      "id": "project-finishing",
+      "name": "Finitura · colore, mosaico e RGB",
+      "kind": "project",
+      "related": [
+        "img-s16-mosaic",
+        "img-s16-rgb",
+        "roadmap-image-treatments"
+      ],
+      "state": "implemented",
+      "priority": false,
+      "author": "",
+      "summary": "Trattamenti finali condivisi da Forme e Particelle: colore ed esposizione, mosaico e separazione dei canali.",
+      "sources": [
+        "https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexSubImage2D"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Riutilizzate le regolazioni fotografiche esistenti. Un passaggio GPU sull’immagine completa aggiunge mosaico e RGB dopo il rendering, una sola volta dopo accumulazione o tasselli."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Attiva finitura",
+                "Prima/Dopo solo in anteprima",
+                "Attiva colore",
+                "Esposizione, contrasto, saturazione e bilanciamento",
+                "Attiva mosaico, dimensione celle X/Y e mix",
+                "Attiva RGB, offset R/G/B, angolo e mix",
+                "Reset per gruppo e generale"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Controlli collassabili, ricerca e spiegazioni",
+                "Valori e attivazioni inclusi nei preset, confronto Prima escluso",
+                "Stesse proporzioni a risoluzioni diverse: dimensioni riferite al lato corto di 1080 px",
+                "Pixel finali inviati all’esportatore MP4; immagini e wallpaper HTML offline",
+                "Trasparenza conservata con composizione dei canali in alfa premoltiplicato"
+              ]
+            },
+            {
+              "label": "limits",
+              "value": [
+                "Il grading colore conserva la scelta esistente di applicazione anche allo sfondo",
+                "Ordine fisso colore/lente → mosaico → RGB",
+                "Displacement, ingresso video/immagine e conversione in punti sono ancora da sviluppare"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "evidence",
+              "value": "reports/finishing/local-check.json; immagini di prova e wallpaper offline in reports/finishing/"
+            },
+            {
+              "label": "checks",
+              "value": [
+                "Due motori: differenza pixel, bypass esatto a intensità zero, confronto e export",
+                "Accumulo, cambio risoluzione, cambio motore e rilascio GPU",
+                "Trasparenza parziale e angoli trasparenti",
+                "MP4 di prova 128×128, 30 fps, un secondo: codifica e decodifica",
+                "Wallpaper scaricato e aperto offline",
+                "Preset, slider, shortcut da export e larghezza mobile 390 px"
+              ]
+            }
+          ]
+        }
+      ],
+      "families": [
+        "graphic",
+        "film"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "Scena → Finitura, oppure Esporta creazione → Regola finitura prima dell’export.",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/513ec5a88bad1636.webp",
+          "width": 588,
+          "height": 1280
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "img-s16-mosaic",
       "completedProjects": []
     },
     {
@@ -18709,11 +18851,11 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 173,
+    "records": 174,
     "videos": 53,
     "images": 22,
     "tools": 71,
-    "projects": 24,
+    "projects": 25,
     "attachments": 123,
     "clips": 53,
     "missing": 10

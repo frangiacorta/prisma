@@ -1,11 +1,11 @@
-import {normalizeAudioClip} from './audio-recording.js?v=0d110cb2c465';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=0d110cb2c465';
-import {normalizeAudio} from './audio-model.js?v=0d110cb2c465';
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=0d110cb2c465';
-import {normalizeForcePaths} from './particle-paths.js?v=0d110cb2c465';
-import {normalizeForcePoints} from './particle-forces.js?v=0d110cb2c465';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=0d110cb2c465';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=0d110cb2c465';
+import {normalizeAudioClip} from './audio-recording.js?v=849adf675d98';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=849adf675d98';
+import {normalizeAudio} from './audio-model.js?v=849adf675d98';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=849adf675d98';
+import {normalizeForcePaths} from './particle-paths.js?v=849adf675d98';
+import {normalizeForcePoints} from './particle-forces.js?v=849adf675d98';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=849adf675d98';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=849adf675d98';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -130,6 +130,9 @@ export function normalizeCreation(raw){
  for(const k of Object.keys(s.motions))if(raw.motions?.[k])s.motions[k]=safeTrack(s.motions[k],raw.motions[k],s.perfectLoop);
  for(const k of ['internalColor','sssColor'])if(!/^#[0-9a-f]{6}$/i.test(s[k]||''))s[k]=k==='internalColor'?'#e6f5ff':'#ffc49b';
  for(const k of ['photoAll','environmentRotate'])s[k]=raw[k]===true;
+ for(const k of ['finishEnabled','finishTone'])s[k]=raw[k]!==false;
+ for(const k of ['finishRgb','finishMosaic'])s[k]=raw[k]===true;
+ s.finishCompare=false;
  if(s.perfectLoop)for(const k of ['environmentCycles','filmCycles'])s[k]=Math.max(1,Math.round(s[k]||1));
  s.animateRotation=['rotateX','rotateY','rotateZ'].some(k=>s.motions[k].enabled);
  s.animateShape=SHAPE_TRACKS.some(k=>s.motions[k].enabled);

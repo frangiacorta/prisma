@@ -1,6 +1,6 @@
-import {migratePathfinder} from './particle-model.js?v=0d110cb2c465';
-import {newCreation} from './creative-model.js?v=0d110cb2c465';
-import {normalizeCreation} from './creative-model.js?v=0d110cb2c465';
+import {migratePathfinder} from './particle-model.js?v=849adf675d98';
+import {newCreation} from './creative-model.js?v=849adf675d98';
+import {normalizeCreation} from './creative-model.js?v=849adf675d98';
 
 let downloadSerial=0;
 export function cleanPresetName(value,fallback='La tua creazione'){
@@ -23,7 +23,7 @@ export function uniqueDownloadName(stem,extension,date=new Date()){
  return `${slug}-${stamp}-${serial}.${String(extension).replace(/[^a-z0-9]/gi,'').toLowerCase()||'json'}`;
 }
 export function presetDocument(snapshot,now=new Date()){
- return {prismaProject:2,name:cleanPresetName(snapshot.name),createdAt:snapshot.date||now.toISOString(),exportedAt:now.toISOString(),state:structuredClone(snapshot.state),ratio:Number.isFinite(snapshot.ratio)?snapshot.ratio:1,phase:Number.isFinite(snapshot.phase)?snapshot.phase:0};
+ return {prismaProject:2,name:cleanPresetName(snapshot.name),createdAt:snapshot.date||now.toISOString(),exportedAt:now.toISOString(),state:{...structuredClone(snapshot.state),finishCompare:false},ratio:Number.isFinite(snapshot.ratio)?snapshot.ratio:1,phase:Number.isFinite(snapshot.phase)?snapshot.phase:0};
 }
 export function readPreset(text,fallbackName='Preset importato'){
  const document=JSON.parse(text);

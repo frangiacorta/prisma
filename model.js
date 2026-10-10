@@ -1,6 +1,6 @@
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=0d110cb2c465';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=0d110cb2c465';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=0d110cb2c465';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=849adf675d98';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=849adf675d98';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=849adf675d98';
 export const BASE = {
  ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -77,6 +77,7 @@ GROUPS.shape.push('petalAmount','petalCount','petalOpen','petalCurl','petalLengt
 GROUPS.shape.push('rotateX','rotateY','rotateZ');
 GROUPS.color.push('colorWaveAmount','colorWaveHeight','colorWaveRadius','colorWaveSwirl','colorWaveBands','colorWaveWarp','colorWavePhase');
 GROUPS.background.push('grounding','groundShadow','groundCaustic');
+GROUPS.photo.push('photoAll','finishEnabled','finishTone','finishRgb','finishMosaic','finishRgbR','finishRgbG','finishRgbB','finishRgbAngle','finishRgbMix','finishCellX','finishCellY','finishMosaicMix');
 for(const [g,keys]of Object.entries(PARTICLE_GROUPS)){GROUPS[g]??=[];GROUPS[g].push(...keys);}
 export function preset(i){const s={...structuredClone(BASE),...structuredClone(EXTRA_BASE),...structuredClone(PRESETS[i].values)};s.lights=PRESETS[i].values.lights?structuredClone(PRESETS[i].values.lights):legacyLights(s);if(i===1){s.animateShape=false;s.motions.volume.enabled=false;s.motions.deform.enabled=false;}return s}
 export function random(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let a=Math.imul(t^t>>>15,1|t);a^=a+Math.imul(a^a>>>7,61|a);return((a^a>>>14)>>>0)/4294967296}}

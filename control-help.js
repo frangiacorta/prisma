@@ -1,6 +1,18 @@
-import {AUDIO_HELP} from './audio-model.js?v=0d110cb2c465';
+import {AUDIO_HELP} from './audio-model.js?v=849adf675d98';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ finishEnabled:'Attiva o esclude tutta la finitura senza perdere i valori scelti. Vale anche per l’export.',
+ finishTone:'Attiva esposizione, contrasto, saturazione e bilanciamento mantenendo i valori memorizzati.',
+ finishRgb:'Sposta i tre canali di colore sull’immagine finale. Funziona su Forme, Particelle e sfondo.',
+ finishMosaic:'Ricampiona il fotogramma in celle nette. Non cambia il numero o la dimensione delle particelle nella scena.',
+ finishCellX:'Larghezza delle celle, in pixel riferiti al lato corto di 1080 px. Scala con la risoluzione di export.',
+ finishCellY:'Altezza delle celle. Usa lo stesso valore della larghezza per celle quadrate.',
+ finishMosaicMix:'Mescola il mosaico con l’immagine originale: zero esclude il trattamento, uno lo applica completamente.',
+ finishRgbR:'Sposta il canale rosso lungo la direzione RGB, in pixel riferiti a 1080 px. Accetta valori positivi e negativi.',
+ finishRgbG:'Sposta il canale verde indipendentemente da rosso e blu.',
+ finishRgbB:'Sposta il canale blu indipendentemente da rosso e verde.',
+ finishRgbAngle:'Ruota la direzione dello spostamento dei tre canali; zero è orizzontale.',
+ finishRgbMix:'Mescola la separazione RGB con l’immagine precedente; zero conserva i colori allineati.',
  pVolumeHold:'Mantiene il volume di riferimento mentre la struttura si deforma. Per misurarlo considera chiusa l’apertura della pelle; valori alti contrastano il respiro.',
  pBundleDelay:'Sfasa progressivamente il movimento delle zone della struttura, mantenendo pieghe collegate e un loop chiuso.',
  pFray:'Aggiunge piccole ondulazioni ai fasci conservando l’identità dei fili. A zero i bordi sono più regolari.',
