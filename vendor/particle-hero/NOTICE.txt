@@ -1,0 +1,14 @@
+Particle Hero — Danny Stuart
+https://github.com/dannystuart/particle-hero
+Upstream commit: d671163c3bdb81e3c2906d74a5955b7722e1c9c4
+License: MIT (full text in LICENSE).
+
+links.upstream.ts is the original app/engine/links.ts.
+links-3d.js adapts its counting-sort spatial grid, nearest-neighbour insertion
+and undirected-pair deduplication to three dimensions (27 adjacent cells).
+Prisma changes: JavaScript port, third coordinate, grid axis cap 64, finite input
+validation. This is not the author's unidentified two-million-particle demo.
+
+Prisma builds the graph in the nucleus's rest configuration, then moves its
+endpoints with existing particle trajectories. It is a persistent visual graph,
+not a cloth simulation or a dynamic all-particle neighbour solver.

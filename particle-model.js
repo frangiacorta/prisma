@@ -5,6 +5,7 @@ export const SPRITES=['Granello','Disco','Anello','Scintilla'];
 export const COLOR_MODES=['Solidale alla forma iniziale','Identità della particella','Fasci e filamenti','Campo nello spazio'];
 // label, min, max, step; grouped independently from the solid renderer.
 export const PARTICLE_META={
+ pLinks:['Visibilità connessioni',0,1,.01],pLinkNodes:['Nodi della trama',50,4000,10],pLinkReach:['Distanza di collegamento',.03,1.5,.01],pLinkNeighbors:['Vicini scelti per nodo',1,5,1],pLinkWidth:['Spessore connessioni · px',.02,4,.01],pLinkCurve:['Curvatura dei fili',0,.8,.01],pLinkStretch:['Allungamento consentito',1,12,.1],
  pFilm:['Pellicola viva',0,1,.01],pFilmScale:['Scala delle venature',.2,5,.01],pFilmVariation:['Variazione dello spessore',0,1,.01],
  pFiberSheen:['Riflesso setoso',0,1,.01],pFiberSpread:['Larghezza del riflesso',0,1,.01],
  pLife:['Vitalità',0,1,.01],pPulse:['Pulsazioni nel loop',1,12,1],pSignal:['Intensità dei segnali',0,1,.01],pPropagation:['Propagazione tra le zone',0,1,.01],pNeural:['Struttura neuronale',0,1,.01],pNodes:['Nodi della rete',4,64,1],pConnect:['Connettività',0,1,.01],pSymmetry:['Simmetria radiale',1,12,1],
@@ -25,6 +26,7 @@ export const PARTICLE_META={
  pColorMode:['Colore sulle particelle',0,3,1],pColorScatter:['Variazione cromatica individuale',0,1,.01],pLumaVar:['Variazione luminosità individuale',0,1,.01],pDepthFade:['Attenuazione in profondità',0,1,.01],pLighting:['Risposta alle luci',0,1,.01],
 };
 export const PARTICLE_DEFAULTS={
+ pLinks:0,pLinkNodes:1500,pLinkReach:.2,pLinkNeighbors:3,pLinkWidth:.45,pLinkCurve:.12,pLinkStretch:4,
  pFilm:0,pFilmScale:1,pFilmVariation:.5,
  pFiberSheen:0,pFiberSpread:.35,
  pLife:.2,pPulse:2,pSignal:.1,pPropagation:.4,pNeural:0,pNodes:24,pConnect:.4,pSymmetry:1,
@@ -42,7 +44,7 @@ export const PARTICLE_DEFAULTS={
  pColorMode:0,pColorScatter:.06,pLumaVar:.25,pDepthFade:.25,pLighting:.65,
 };
 export const PARTICLE_GROUPS={
- shape:['pCount','pSize','pSizeVar','pSprite','pOpacity','pSoftness','pTrailCount','pTrailLength','pTrailWidth','pTrailOpacity','pTrailFade','pTrailTaper','pTrailScatter','pTrailPersistence','pTrailSoftness','pTrailCoherence','pTrailDensity','pTrailQuality','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pOrganic','pFrequency','pDetail','pRough','pWarp','pOuter','pReach','pBranches','pNeural','pNodes','pConnect','pSymmetry','pTentacle','pTentacleCount','pTentacleLength','pTentacleTaper','pTentacleCurl'],
+ shape:['pLinks','pLinkNodes','pLinkReach','pLinkNeighbors','pLinkWidth','pLinkCurve','pLinkStretch','pCount','pSize','pSizeVar','pSprite','pOpacity','pSoftness','pTrailCount','pTrailLength','pTrailWidth','pTrailOpacity','pTrailFade','pTrailTaper','pTrailScatter','pTrailPersistence','pTrailSoftness','pTrailCoherence','pTrailDensity','pTrailQuality','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pOrganic','pFrequency','pDetail','pRough','pWarp','pOuter','pReach','pBranches','pNeural','pNodes','pConnect','pSymmetry','pTentacle','pTentacleCount','pTentacleLength','pTentacleTaper','pTentacleCurl'],
  material:['pFilm','pFilmScale','pFilmVariation','pFiberSheen','pFiberSpread'],
  color:['pColorMode','pColorScatter','pLumaVar'],light:['pLighting','pDepthFade'],
  motion:['pCohesion','pRandom','pJitter','pVortex','pReentry','pBreath','pTravel','pAttract','pRepel','pMagnet','pPoles','pRadius','pField','pCycles','pDirection','pRhythm','pPause','pSpeedSpread','pLife','pPulse','pSignal','pPropagation','pMotionSoftness','pFollow','pOrbitOval','pOrbitTilt','pOrbitPrecession','pOrbitSpread','pOrbitDrift','pWander','pWanderScale','pWanderCycles','pFlowBalance','pMotionSeed','pTentacleWave','pTentacleCycles','pSpaceWarp','pWarpScale','pWarpCycles','pWarpTwist'],
@@ -62,6 +64,7 @@ export const PARTICLE_STUDIES=[
  {name:'Sfera piena',label:'Volume · senza vuoto',values:{...SPHERE_FORM,pSize:.75,pCount:110000,pTrailCount:0,pSizeVar:.35,palette:['#efe5d5','#b9e6e0','#d1c9e4','#faf6ea']}},
  {name:'Espanso',label:'Pathfinder · repulsione',values:{pOpening:.8,pThickness:.3,pRepel:1,pAttract:0,pCohesion:.4,pVortex:.9,pOrganic:.7,pOuter:.2,pReach:1.2,pSize:.85}},
  {name:'Pulsante',label:'Nucleo · vitalità',values:{pOpening:0,pLobeDepth:.3,pLife:.8,pPulse:3,pSignal:.7,pPropagation:.7,pNeural:.65,pNodes:32,pConnect:.7,pOrganic:.3,pSize:.9,palette:['#1d3667','#43898c','#b6d89b','#e7d6a0']}},
+ {name:'Trama viva',label:'Ragnatela · connessioni 3D',values:{"pLinks":0.75,"pLinkNodes":1800,"pLinkReach":0.23,"pLinkWidth":0.75,"pLinkCurve":0.14,"pLinkStretch":7,"pFiberSheen":0.5,"pFiberSpread":0.5,"pLife":0.13,"pSignal":0,"pCount":42000,"pSize":0.7,"pOpacity":0.22,"pOpening":0.06,"pThickness":0.57,"pFill":0.22,"pLobes":5,"pLobeDepth":0.28,"pOrganic":0.48,"pWarp":0.18,"pRandom":0,"pJitter":0,"pVortex":0.18,"pBreath":0.08,"pTravel":0.28,"pMotionSoftness":0.8,"pAttract":0,"pRepel":0,"pMagnet":0,"pRhythm":0.15,"pSpeedSpread":0,"pTrailCount":0,"pLighting":0.7,"metal":0.2,"gloss":0.75,"iridescence":0.12,"emission":0.4,"palette":["#505476","#99c4cd","#ece6cf"],"glow":0.12,"background":"#05080e","scale":1.65,"rotateX":22,"rotateY":-20}},
 ];
 export function particleCreation(base,index=0,seed=417){
  const s=structuredClone(base);Object.assign(s,PARTICLE_DEFAULTS,{engine:'particles',particleVersion:PARTICLE_VERSION,seed:seed>>>0,forcePoints:[],forcePaths:[],
@@ -105,6 +108,11 @@ export function varyParticleMotion(source,seed,amount=.45){
  return s;
 }
 // Material recipes on the current nucleus: never replace colors, geometry or choreography.
+export const LINK_STYLES={
+ web:{pLinks:.48,pLinkNodes:1800,pLinkReach:.23,pLinkNeighbors:3,pLinkWidth:.6,pLinkCurve:.12,pLinkStretch:5},
+ veil:{pLinks:.6,pLinkNodes:3200,pLinkReach:.17,pLinkNeighbors:4,pLinkWidth:.32,pLinkCurve:.2,pLinkStretch:7},
+ off:{pLinks:0},
+};
 export const FIBER_STYLES={
  fibres:{pTrailCount:7000,pTrailLength:.28,pTrailWidth:.07,pTrailOpacity:.6,pTrailPersistence:.28,pTrailSoftness:.75,pTrailCoherence:.2,pTrailDensity:.6,pTrailQuality:96,pTrailTaper:.6,pOpacity:.16},
  threads:{pTrailCount:18000,pTrailLength:.6,pTrailWidth:.13,pTrailOpacity:.55,pTrailPersistence:.62,pTrailSoftness:.7,pTrailCoherence:.68,pTrailDensity:.8,pTrailQuality:128,pTrailTaper:.25,pOpacity:.07},

@@ -1,6 +1,13 @@
-import {AUDIO_HELP} from './audio-model.js?v=ec7fea738e02';
+import {AUDIO_HELP} from './audio-model.js?v=170c6bdce53c';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ pLinks:'Visibilità dei fili che collegano particelle vicine. A zero le connessioni sono spente.',
+ pLinkNodes:'Da 50 a 4000 punti usati per la trama, indipendenti dai granelli visibili. Più nodi creano una rete più fitta.',
+ pLinkReach:'Distanza massima fra i punti nel nucleo iniziale, prima del movimento. Cambiarla ricostruisce i legami.',
+ pLinkNeighbors:'Ogni nodo sceglie da 1 a 5 vicini. Può ricevere altri legami dai nodi che lo scelgono.',
+ pLinkWidth:'Spessore dei fili a 1080p. Valori sotto 1 producono connessioni sottili; scala precisa sulle piccole dimensioni.',
+ pLinkCurve:'Incurva i fili mantenendo le estremità attaccate alle particelle. A zero i collegamenti sono rettilinei.',
+ pLinkStretch:'Allungamento rispetto alla distanza iniziale: i fili sfumano avvicinandosi a questo limite e riappaiono quando si accorciano.',
  pFilm:'Aggiunge una pellicola ottica ai riflessi di particelle e fili. Non tinge la palette e non crea una membrana tra i fili. A zero è spenta.',
  pFilmScale:'Frequenza delle venature di spessore sulla materia: basso per campiture ampie, alto per bande più fitte.',
  pFilmVariation:'Quanto cambia lo spessore da una zona all’altra. A zero la pellicola è uniforme e scorrimento/vortici non cambiano il suo spessore.',
