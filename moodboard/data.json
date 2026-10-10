@@ -9127,7 +9127,7 @@
       "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Particelle, fibre, punti, percorsi, sfera senza foro e interfaccia condivisa. Repulsione con barriera sferica al massimo della forza.",
+      "summary": "Particelle, fibre, punti e percorsi condivisi. Barriere al massimo per punti, linee, orbite e disegni liberi; aggancio forte alle guide positive.",
       "sources": [
         "https://frangiacorta.github.io/prisma/?engine=particles"
       ],
@@ -9137,7 +9137,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Campi nello spazio della scena: da −1,2 a −3 cresce un nucleo protetto; a −3 copre tutto il raggio. Il vincolo finale prevale su attrazione e percorsi, anche con campi sovrapposti. Scie e connessioni non disegnano segmenti dentro il nucleo. Fibre, tessuto e membrane applicano il vincolo dopo la deformazione e il rilassamento."
+              "value": "Campi nello spazio della scena: da −1,2 a −3 cresce un nucleo protetto; a −3 copre tutto il raggio. Il vincolo finale prevale su attrazione e percorsi, anche con campi sovrapposti. Scie e connessioni non disegnano segmenti dentro il nucleo. Fibre, tessuto e membrane applicano il vincolo dopo la deformazione e il rilassamento. Percorsi: Segui a forza 3 aggancia il gruppo selezionato alla curva o al satellite; Evita a forza 3 protegge il tubo lungo il tracciato. Percentuale e Tempo libero restano espliciti; le barriere prevalgono sugli agganci e il primo aggancio massimo ha priorità sugli altri. La mappa delle distanze usa un margine conservativo di una cella per evitare attraversamenti agli incroci."
             }
           ]
         },
@@ -9146,7 +9146,7 @@
           "fields": [
             {
               "label": "feasible",
-              "value": "Particelle, fibre, punti, percorsi, sfera senza foro e interfaccia condivisa. Repulsione con barriera sferica al massimo della forza."
+              "value": "Particelle, fibre, punti e percorsi condivisi. Barriere al massimo per punti, linee, orbite e disegni liberi; aggancio forte alle guide positive."
             }
           ]
         },
@@ -9160,7 +9160,9 @@
                 "reports/pathfinder/studio-v6-export.json",
                 "reports/pathfinder/studio-v6-delivery.json",
                 "reports/force-barrier/check.json",
-                "reports/force-barrier/live-check.json"
+                "reports/force-barrier/live-check.json",
+                "reports/path-magnets/check.json",
+                "reports/path-magnets/live-check.json"
               ]
             }
           ]
@@ -9169,7 +9171,8 @@
       "families": [
         "fibre",
         "motion",
-        "cloud"
+        "cloud",
+        "graphic"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",

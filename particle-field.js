@@ -1,6 +1,6 @@
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=b2fa487885ad';
-import {forceBarrierGLSL} from './particle-forces.js?v=b2fa487885ad';
+import {guideGLSL} from './particle-path-field.js?v=643cf87c5a69';
+import {forceBarrierGLSL} from './particle-forces.js?v=643cf87c5a69';
 export const fieldGLSL=`
 ${guideGLSL}
 ${forceBarrierGLSL}
@@ -42,6 +42,20 @@ vec3 shape(vec4 r,float t,float family){
  return p;
 }
 vec3 restPoint(vec4 r){return mix(shape(r,0.,uShape.x),shape(r,0.,uShape.y),uDynamics.w);}
+// Repulsive volumes have priority over positive routes. Final depth escape
+// resolves intersections between point spheres and path tubes without undoing either.
+vec3 sceneBarriers(vec3 p,vec4 r,float phase){
+ p=excludeForceCores(excludeGuideCores(p,r,phase));
+ if(insideGuideCore(p,r,phase)){
+  float upper=p.z,lower=p.z;
+  for(int i=0;i<4;i++){if(i>=uGuideCount)break;float core=guideCore(i,r,phase),xy=guideClearance(i,p.xy);if(core<=0.||xy>=core)continue;
+   float dz=sqrt(max(0.,core*core-xy*xy))+.00002;upper=max(upper,uGuideA[i].w+dz);lower=min(lower,uGuideA[i].w-dz);
+  }
+  for(int i=0;i<11;i++){if(i>=uForceCount)break;float core=forceCore(i),xy=distance(p.xy,uForcePoints[i].xy);if(core<=0.||xy>=core)continue;
+   float dz=sqrt(max(0.,core*core-xy*xy))+.00002;upper=max(upper,uForcePoints[i].z+dz);lower=min(lower,uForcePoints[i].z-dz);
+  }p.z=upper-p.z<=p.z-lower?upper:lower;
+ }return p;
+}
 vec3 position(vec4 r,float phase){
  float global=clockAt(phase*uClock.x),c=1.+floor(r.z*3.)*step(1.-uClock.w,r.w);
  float seedPhase=(uMotionSeed-417.)*.013;
@@ -113,7 +127,7 @@ vec3 position(vec4 r,float phase){
   pull+=(sign(strength)*d*gain+cross(vec3(0.,0.,1.),d)*uForceOptions[i].y*.5)*weight;
   influence+=gain*weight;
  }
- p+=pull/max(1.,influence);return excludeForceCores(guidePosition(p,r,phase));
+ p+=pull/max(1.,influence);return sceneBarriers(guidePosition(p,r,phase),r,phase);
 }
 vec4 project(vec3 p){float depth=max(2.,7.5-p.z);return vec4(p.xy*vec2(uResolution.y/uResolution.x,1.)*2.6/depth,(depth-3.)/12.,1.);}
 vec3 particleColor(vec4 r,vec3 p){

@@ -1,8 +1,8 @@
-import {packPathCurves,PATH_SAMPLES} from './particle-paths.js?v=b2fa487885ad';
+import {packPathCurves,PATH_SAMPLES} from './particle-paths.js?v=643cf87c5a69';
 
 export const guideGLSL=`
 uniform highp sampler2D uGuideCurves,uGuideMap;
-uniform int uGuideCount;uniform bool uGuideBaked;
+uniform highp int uGuideCount;uniform bool uGuideBaked;
 uniform vec4 uGuideBounds[4],uGuideA[4],uGuideB[4],uGuideC[4],uGuideD[4];
 vec4 guideCurve(int row,float progress){
  bool closed=uGuideC[row].w>.5;float f=(closed?fract(progress):clamp(progress,0.,1.))*(closed?128.:127.);
@@ -26,6 +26,61 @@ vec4 nearestGuide(int row,vec2 p){
  }return best;
 }
 float guideHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float guideParticipation(int i,vec4 r,float phase){
+ vec4 a=uGuideA[i],b=uGuideB[i],c=uGuideC[i],d=uGuideD[i];
+ if(a.y<=0.||guideHash(r.xy+vec2(d.w*.017,4.13))>=a.x||c.y>=.99999)return 0.;
+ if(c.y<=0.)return 1.;float h=guideHash(r.xy+vec2(d.w*.031,8.71));
+ float edge=c.y*.5,feather=max(.00001,min(min(edge,(1.-c.y)*.5),.005+.12*c.z));
+ return smoothstep(edge-feather,edge+feather,abs(fract(phase*b.w+h+d.y)-.5));
+}
+vec3 guideDestination(int i,vec4 r,float phase){
+ vec4 a=uGuideA[i],b=uGuideB[i],c=uGuideC[i],d=uGuideD[i];
+ float h=guideHash(r.xy+vec2(d.w*.031,8.71)),progress=phase*b.w*d.x+h+d.y;
+ float u=c.w>.5?fract(progress):.5-.5*cos(6.28318530718*progress);
+ vec4 curve=guideCurve(i,u);vec3 normal=vec3(-curve.w,curve.z,0.);
+ float angle=6.28318530718*(phase*c.x+h+d.y);
+ vec3 satellite=(normal*cos(angle)+vec3(0.,0.,sin(angle)))*b.z;
+ vec3 freedom=(normal*sin(6.28318530718*(phase*b.w+h*3.))+vec3(0.,0.,cos(6.28318530718*(phase+h*7.))))*(1.-b.x)*min(a.z*.45,.8);
+ return vec3(curve.xy,a.w)+satellite+freedom;
+}
+vec3 lockGuidePosition(vec3 p,vec4 r,float phase){
+ // First eligible maximum-strength guide owns the particle; competing routes
+ // are not averaged into a position that belongs to neither of them.
+ for(int i=0;i<4;i++){if(i>=uGuideCount)break;if(uGuideD[i].z>.5||uGuideA[i].y<2.99999)continue;
+  float participation=guideParticipation(i,r,phase);if(participation>0.)return mix(p,guideDestination(i,r,phase),participation);
+ }return p;
+}
+float guideCore(int i,vec4 r,float phase){return uGuideD[i].z>.5?uGuideA[i].z*smoothstep(1.2,3.,uGuideA[i].y)*guideParticipation(i,r,phase):0.;}
+float guideClearance(int i,vec2 p){
+ vec4 box=uGuideBounds[i];vec2 uv=(p-box.xy)/box.zw;
+ if(any(lessThan(uv,vec2(0.)))||any(greaterThan(uv,vec2(1.))))return 1e10;
+ // Distance is 1-Lipschitz. Subtract one atlas cell diagonal to obtain a
+ // conservative lower bound even around intersections and sharp bends.
+ return max(0.,nearestGuide(i,p).w-(uGuideBaked?length(box.zw)/256.:0.));
+}
+bool insideGuideCore(vec3 p,vec4 r,float phase){
+ for(int i=0;i<4;i++){if(i>=uGuideCount)break;float core=guideCore(i,r,phase);if(core<=0.)continue;
+  if(length(vec2(guideClearance(i,p.xy),p.z-uGuideA[i].w))<core*.99999)return true;
+ }return false;
+}
+vec3 excludeGuideCores(vec3 p,vec4 r,float phase){
+ for(int pass=0;pass<2;pass++)for(int i=0;i<4;i++){
+  if(i>=uGuideCount)break;float core=guideCore(i,r,phase);if(core<=0.)continue;
+  float xy=guideClearance(i,p.xy);if(length(vec2(xy,p.z-uGuideA[i].w))>=core)continue;
+  vec4 near=nearestGuide(i,p.xy);vec3 center=vec3(near.xy,uGuideA[i].w),away=p-center;
+  float len=length(away),padding=uGuideBaked?length(uGuideBounds[i].zw)/256.:0.;
+  vec3 normal=len>.00001?away/len:vec3(0.,0.,1.);
+  p=center+normal*(core+padding+.00002);
+ }
+ // Curves lie in editable parallel depth planes. Exiting along depth preserves
+ // longitudinal motion and cannot be trapped between overlapping path tubes.
+ float upper=p.z,lower=p.z;bool inside=false;
+ for(int i=0;i<4;i++){if(i>=uGuideCount)break;float core=guideCore(i,r,phase);if(core<=0.)continue;
+  float xy=guideClearance(i,p.xy);if(xy>=core)continue;float dz=sqrt(max(0.,core*core-xy*xy))+.00002;
+  float z=uGuideA[i].w;upper=max(upper,z+dz);lower=min(lower,z-dz);if(abs(p.z-z)<dz)inside=true;
+ }
+ if(inside)p.z=(upper-p.z<=p.z-lower)?upper:lower;return p;
+}
 vec3 guidePosition(vec3 base,vec4 r,float phase){
  vec3 change=vec3(0.);float total=0.;
  for(int i=0;i<4;i++){if(i>=uGuideCount)break;
@@ -51,7 +106,12 @@ vec3 guidePosition(vec3 base,vec4 r,float phase){
    delta=vec3(curve.xy,a.w)+satellite+freedom-base;
   }
   change+=delta*gain;total+=gain;
- }return base+change/max(1.,total);
+ }
+ vec3 p=base+change/max(1.,total);
+ for(int i=0;i<4;i++){if(i>=uGuideCount)break;if(uGuideD[i].z>.5)continue;
+  float lock=smoothstep(2.4,3.,uGuideA[i].y)*guideParticipation(i,r,phase);
+  if(lock>0.)return mix(p,guideDestination(i,r,phase),lock);
+ }return p;
 }
 `;
 const vertex=`#version 300 es

@@ -1,5 +1,6 @@
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=b2fa487885ad';
-import {forceBarrierGLSL} from './particle-forces.js?v=b2fa487885ad';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=643cf87c5a69';
+import {guideGLSL} from './particle-path-field.js?v=643cf87c5a69';
+import {forceBarrierGLSL} from './particle-forces.js?v=643cf87c5a69';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.
@@ -19,7 +20,7 @@ precision highp float;precision highp sampler2D;
 layout(location=0) in vec3 aPair;
 ${common}
 uniform sampler2D uSeeds;uniform vec4 uLinks;uniform vec3 uShadeOrigin;
-out vec3 vColor,vPosition;out float vOpacity,vSide;
+out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity,vSide;
 vec4 seedAt(int i){return texelFetch(uSeeds,ivec2(i%1024,i/1024),0);}
 void main(){
  // Eight short ribbons per connection, with endpoints exactly on the particles.
@@ -33,7 +34,7 @@ void main(){
  vec3 outward=(a+b)*.5-uShadeOrigin;
  vec3 bend=outward-delta*dot(outward,delta)/max(.000001,dot(delta,delta));
  bend=normalize(bend+vec3(.00001))*len*uLinks.z;
- vec3 p=excludeForceCores(mix(a,b,t)+bend*(4.*t*(1.-t)));vPosition=p;
+ vec3 p=sceneBarriers(mix(a,b,t)+bend*(4.*t*(1.-t)),ra,uPhase);vPosition=p;vForceSeed=ra;
  vec3 tangent=delta+bend*(4.-8.*t);
  vec4 clip=project(p);vec2 line=(project(p+tangent*.01).xy-project(p-tangent*.01).xy)*uResolution;
  vec2 normal=vec2(-line.y,line.x)/max(.00001,length(line));
@@ -44,9 +45,11 @@ void main(){
  float tension=1.-smoothstep(uLinks.w*.7,uLinks.w,len/reference);
  vOpacity=uLinks.x*min(1.,width)*tension;
 }`,`#version 300 es
-precision highp float;in vec3 vColor,vPosition;in float vOpacity,vSide;out vec4 color;
+precision highp float;in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vOpacity,vSide;out vec4 color;
 ${forceBarrierGLSL}
-void main(){if(insideForceCore(vPosition))discard;float a=vOpacity*(1.-smoothstep(.1,1.,abs(vSide)));color=vec4(vColor*a,a);}`);
+${guideGLSL}
+uniform float uPhase;
+void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vForceSeed,uPhase))discard;float a=vOpacity*(1.-smoothstep(.1,1.,abs(vSide)));color=vec4(vColor*a,a);}`);
   this.feedback=gl.createTransformFeedback();this.captureBuffer=gl.createBuffer();
   this.buffer=gl.createBuffer();this.vao=gl.createVertexArray();
   gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);

@@ -68,7 +68,7 @@ $('#import').onchange=async e=>{try{const file=e.target.files[0];if(!file)return
 window.addEventListener('popstate',()=>{const id=decodeURIComponent(location.hash.slice(1));if(byId?.has(id))openDetail(id,false);else if($('#detail').open){stopVideos();$('#detail').close();document.body.classList.remove('modal-open');current=null;}});
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!$('#detail').open){e.preventDefault();$('#search').focus();}});
 try{
- const response=await fetch('data.json?v=b2fa487885ad');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();byId=new Map(data.items.map(r=>[r.id,r]));
+ const response=await fetch('data.json?v=643cf87c5a69');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();byId=new Map(data.items.map(r=>[r.id,r]));
  $('#archive-count').textContent=`${data.stats.videos} video · ${data.stats.images} immagini · ${data.stats.tools} strumenti · ${data.stats.projects} progetti`;
  $('#family').innerHTML+='<option disabled>──────────</option>'+data.families.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('');
  $('#workflow').innerHTML=data.workflow.map(s=>`<li>${esc(s)}</li>`).join('');$('#principles').innerHTML=data.principles.map(([name,text])=>`<details><summary>${esc(name)}</summary><p>${esc(text)}</p></details>`).join('');

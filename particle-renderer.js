@@ -1,11 +1,11 @@
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=b2fa487885ad';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=b2fa487885ad';
-import {GuideField} from './particle-path-field.js?v=b2fa487885ad';
-import {ParticleLinks} from './particle-links.js?v=b2fa487885ad';
-import {LivingStructures} from './living-structures.js?v=b2fa487885ad';
-import {fieldGLSL} from './particle-field.js?v=b2fa487885ad';
-import {forceBarrierGLSL} from './particle-forces.js?v=b2fa487885ad';
-import {prismaShadingGLSL} from './particle-shading.js?v=b2fa487885ad';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=643cf87c5a69';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=643cf87c5a69';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=643cf87c5a69';
+import {ParticleLinks} from './particle-links.js?v=643cf87c5a69';
+import {LivingStructures} from './living-structures.js?v=643cf87c5a69';
+import {fieldGLSL} from './particle-field.js?v=643cf87c5a69';
+import {forceBarrierGLSL} from './particle-forces.js?v=643cf87c5a69';
+import {prismaShadingGLSL} from './particle-shading.js?v=643cf87c5a69';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -17,19 +17,21 @@ const pointVert=`#version 300 es
 precision highp float;
 layout(location=0) in vec4 aRandom;
 ${common}
-out vec3 vColor,vPosition;out float vOpacity;
+out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity;
 void main(){vec3 p=position(aRandom,uPhase);gl_Position=project(p);
  float px=uPoints.x*mix(1.,.15+aRandom.z*1.7,uPoints.y)*uResolution.y/1080.;
  gl_PointSize=clamp(px,2.,64.);
- vOpacity=uPoints.z*3.*min(1.,px*px/4.);vPosition=p;vColor=particleColor(aRandom,p);
+ vForceSeed=aRandom;vOpacity=uPoints.z*3.*min(1.,px*px/4.);vPosition=p;vColor=particleColor(aRandom,p);
 }`;
 const pointFrag=`#version 300 es
 precision highp float;
-in vec3 vColor,vPosition;in float vOpacity;out vec4 color;
+in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vOpacity;out vec4 color;
 ${prismaShadingGLSL}
 ${forceBarrierGLSL}
+${guideGLSL}
+uniform float uPhase;
 uniform vec4 uPoints;uniform float uSprite;uniform vec3 uShadeOrigin;
-void main(){if(insideForceCore(vPosition))discard;vec2 xy=gl_PointCoord*2.-1.;float d=length(xy),aa=max(fwidth(d),.04);
+void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vForceSeed,uPhase))discard;vec2 xy=gl_PointCoord*2.-1.;float d=length(xy),aa=max(fwidth(d),.04);
  float coverage=1.-smoothstep(1.-aa,1.,d);
  if(uSprite>1.5&&uSprite<2.5)coverage*=smoothstep(.35,.55,d);
  if(uSprite>2.5)coverage*=exp(-min(abs(xy.x),abs(xy.y))*12.);
@@ -45,7 +47,7 @@ precision highp sampler2D;
 ${common}
 ${trailSampling}
 uniform sampler2D uPaths;uniform bool uBaked;uniform vec3 uShadeOrigin;
-out vec3 vColor,vPosition;out float vOpacity,vSide;
+out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vForcePhase;out float vOpacity,vSide;
 vec3 pathAt(int j,vec4 r){return uBaked?texelFetch(uPaths,ivec2(j+1,gl_InstanceID),0).xyz:position(r,uPhase-float(j)/float(uSegments)*uTrails.x);}
 void main(){
  int j=gl_VertexID/2;float side=gl_VertexID%2==0?-1.:1.,age=float(j)/float(uSegments);
@@ -55,15 +57,16 @@ void main(){
  vec2 normal=vec2(-tangent.y,tangent.x)/max(.00001,length(tangent));
  float width=uTrails.y*mix(1.,pow(max(.001,1.-age),.7),uTail.y)*uResolution.y/1080.;
  clip.xy+=normal*side*max(1.,width)/uResolution;
- gl_Position=clip;vSide=side;vPosition=p;
+ gl_Position=clip;vSide=side;vPosition=p;vForceSeed=r;vForcePhase=uPhase-age*uTrails.x;
  vec3 strand=next-prev;if(dot(strand,strand)<1e-12)strand=next-p;
  vColor=shadeFibre(particleColor(original,p),p,normalize(p-uShadeOrigin+vec3(0.,0.,.0001)),strand);
  vOpacity=uTrails.z*mix(pow(max(0.,1.-age),uTail.x),1.,uFiber.x)*min(1.,width)*uFiber.w;
 }`;
 const trailFrag=`#version 300 es
-precision highp float;in vec3 vColor,vPosition;in float vOpacity,vSide;out vec4 color;uniform vec4 uFiber;
+precision highp float;in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vForcePhase;in float vOpacity,vSide;out vec4 color;uniform vec4 uFiber;
 ${forceBarrierGLSL}
-void main(){if(insideForceCore(vPosition))discard;float a=vOpacity*(1.-smoothstep(mix(.85,.05,uFiber.y),1.,abs(vSide)));color=vec4(vColor*a,a);}`;
+${guideGLSL}
+void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vForceSeed,vForcePhase))discard;float a=vOpacity*(1.-smoothstep(mix(.85,.05,uFiber.y),1.,abs(vSide)));color=vec4(vColor*a,a);}`;
 const screenVert=`#version 300 es
 precision highp float;out vec2 uv;void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);uv=p;gl_Position=vec4(p*2.-1.,0.,1.);}`;
 // Bake each trajectory sample once, in bounded batches. Triangle vertices reuse the samples.
