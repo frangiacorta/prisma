@@ -9857,7 +9857,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo."
+              "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo. Correzione collasso: trazione unilaterale e compressione libera, verificata su 240 fasi per ogni preset e sulle contrazioni profonde."
             }
           ]
         },
@@ -9893,11 +9893,15 @@
                 "Mesh connessa distinta dal nucleo di particelle",
                 "Apertura, distanza dal nucleo, pieghe e contrazione regolabili",
                 "Pellicola madreperlacea e riflessi sulla normale della superficie",
-                "Struttura persistente da 3136 nodi con vincoli di distanza XPBD MIT adattati in JavaScript; stessa deformazione, campi e materiali di Particelle",
+                "Struttura persistente da 3136 nodi con vincoli XPBD MIT adattati alla sola trazione in JavaScript; stessa deformazione, campi e materiali di Particelle",
                 "Elasticità, resistenza alla piega e conservazione del volume con chiusura virtuale delle aperture",
                 "Preset, Annulla, randomizzazione, assistente testuale, durata e verso condivisi",
                 "Loop deterministico: ogni fase si può riprodurre e cercare senza dipendere dai fotogrammi precedenti; MP4 di esempio da 20 secondi"
               ]
+            },
+            {
+              "label": "motionCorrection",
+              "value": "Corretti gli scatti nel collasso: vincoli unilaterali di trazione, compressione libera e attivazione morbida. Le pieghe interne non oltrepassano bruscamente il centro. Durata e ampiezze del preset conservate; nessun filtro temporale che nasconda gli scatti."
             },
             {
               "label": "limits",
@@ -9912,7 +9916,10 @@
               "label": "evidence",
               "value": [
                 "reports/living-structures/check.json",
-                "reports/living-structures/exports.json"
+                "reports/living-structures/exports.json",
+                "reports/living-motion/before.json",
+                "reports/living-motion/after.json",
+                "reports/living-motion/stress.json"
               ]
             }
           ]
@@ -9940,8 +9947,8 @@
       ],
       "assets": [],
       "resultImage": "media/e5b7848f69a9e85c.webp",
-      "resultVideo": "../previews/membrana-viva-20s.mp4",
-      "resultUrl": "../previews/membrana-viva.html",
+      "resultVideo": "../previews/membrana-viva-20s.mp4?v=motion2",
+      "resultUrl": "../previews/membrana-viva.html?v=motion2",
       "completedProjects": [
         "project-cobalto-oro",
         "project-pellicola-viva"
@@ -9983,7 +9990,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo."
+              "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo. Correzione collasso: trazione unilaterale e compressione libera, verificata su 240 fasi per ogni preset e sulle contrazioni profonde."
             }
           ]
         },
@@ -10019,11 +10026,15 @@
                 "Numero e apertura dei fasci, quantità e spessore dei fili fino a 0,015 px",
                 "Ritardo tra fasci, sfrangiatura, pieghe e respiro condivisi",
                 "Riflessi orientati sui fili e visibilità con profondità",
-                "Struttura persistente da 3136 nodi con vincoli di distanza XPBD MIT adattati in JavaScript; stessa deformazione, campi e materiali di Particelle",
+                "Struttura persistente da 3136 nodi con vincoli XPBD MIT adattati alla sola trazione in JavaScript; stessa deformazione, campi e materiali di Particelle",
                 "Elasticità, resistenza alla piega e conservazione del volume con chiusura virtuale delle aperture",
                 "Preset, Annulla, randomizzazione, assistente testuale, durata e verso condivisi",
                 "Loop deterministico: ogni fase si può riprodurre e cercare senza dipendere dai fotogrammi precedenti; MP4 di esempio da 20 secondi"
               ]
+            },
+            {
+              "label": "motionCorrection",
+              "value": "Corretti gli scatti nel collasso: vincoli unilaterali di trazione, compressione libera e attivazione morbida. Le pieghe interne non oltrepassano bruscamente il centro. Durata e ampiezze del preset conservate; nessun filtro temporale che nasconda gli scatti."
             },
             {
               "label": "limits",
@@ -10038,7 +10049,10 @@
               "label": "evidence",
               "value": [
                 "reports/living-structures/check.json",
-                "reports/living-structures/exports.json"
+                "reports/living-structures/exports.json",
+                "reports/living-motion/before.json",
+                "reports/living-motion/after.json",
+                "reports/living-motion/stress.json"
               ]
             }
           ]
@@ -10067,8 +10081,8 @@
       ],
       "assets": [],
       "resultImage": "media/50f929a64198bfba.webp",
-      "resultVideo": "../previews/fibre-vive-20s.mp4",
-      "resultUrl": "../previews/fibre-vive.html",
+      "resultVideo": "../previews/fibre-vive-20s.mp4?v=motion2",
+      "resultUrl": "../previews/fibre-vive.html?v=motion2",
       "completedProjects": [
         "project-trama-viva",
         "project-fibre-setose"
@@ -10103,7 +10117,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo."
+              "value": "Port del vincolo di distanza XPBD da PositionBasedDynamics (MIT), commit 10a70bc146a97873dc3c8fef372f5217e010542e. Reticolo e mesh persistenti; rilassamento deterministico per fase, curve interpolate e occlusione in profondità. Nessun renderer aggiuntivo. Correzione collasso: trazione unilaterale e compressione libera, verificata su 240 fasi per ogni preset e sulle contrazioni profonde."
             }
           ]
         },
@@ -10139,11 +10153,15 @@
                 "Fili longitudinali e trasversali sullo stesso reticolo deformabile",
                 "Elasticità e resistenza alle pieghe: i legami correggono realmente le posizioni",
                 "Pori stabili, pelle regolabile e risposta alle luci",
-                "Struttura persistente da 3136 nodi con vincoli di distanza XPBD MIT adattati in JavaScript; stessa deformazione, campi e materiali di Particelle",
+                "Struttura persistente da 3136 nodi con vincoli XPBD MIT adattati alla sola trazione in JavaScript; stessa deformazione, campi e materiali di Particelle",
                 "Elasticità, resistenza alla piega e conservazione del volume con chiusura virtuale delle aperture",
                 "Preset, Annulla, randomizzazione, assistente testuale, durata e verso condivisi",
                 "Loop deterministico: ogni fase si può riprodurre e cercare senza dipendere dai fotogrammi precedenti; MP4 di esempio da 20 secondi"
               ]
+            },
+            {
+              "label": "motionCorrection",
+              "value": "Corretti gli scatti nel collasso: vincoli unilaterali di trazione, compressione libera e attivazione morbida. Le pieghe interne non oltrepassano bruscamente il centro. Durata e ampiezze del preset conservate; nessun filtro temporale che nasconda gli scatti."
             },
             {
               "label": "limits",
@@ -10158,7 +10176,10 @@
               "label": "evidence",
               "value": [
                 "reports/living-structures/check.json",
-                "reports/living-structures/exports.json"
+                "reports/living-structures/exports.json",
+                "reports/living-motion/before.json",
+                "reports/living-motion/after.json",
+                "reports/living-motion/stress.json"
               ]
             }
           ]
@@ -10186,8 +10207,8 @@
       ],
       "assets": [],
       "resultImage": "media/8d0aed554d52b933.webp",
-      "resultVideo": "../previews/tessuto-connesso-20s.mp4",
-      "resultUrl": "../previews/tessuto-connesso.html",
+      "resultVideo": "../previews/tessuto-connesso-20s.mp4?v=motion2",
+      "resultUrl": "../previews/tessuto-connesso.html?v=motion2",
       "completedProjects": [
         "project-trama-viva"
       ]

@@ -1,4 +1,4 @@
-import {sameAssistantSource} from './assistant-model.js?v=02f845f3303f';
+import {sameAssistantSource} from './assistant-model.js?v=8613ad610791';
 const local=()=>['127.0.0.1','localhost','[::1]'].includes(location.hostname);
 export function mountCreativeAssistant({getState,applyPlan,quickCommand,setPlaying,importCreation,getSnapshot}){
  const $=id=>document.getElementById(id),status=$('description-status'),mode=$('description-engine'),submit=$('description-apply'),cancel=$('assistant-cancel'),connect=$('assistant-retry'),pc=$('assistant-open-pc');

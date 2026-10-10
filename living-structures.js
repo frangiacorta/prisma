@@ -1,4 +1,4 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=02f845f3303f';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=8613ad610791';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;uniform vec3 uLivingMotion;`;
 export class LivingStructures{
@@ -22,8 +22,13 @@ void main(){
  float fold=sin(r.x*TAU*uLivingFold.x+sin(aRandom.y*TAU+clock)*1.2+clock)*envelope;
  float contraction=1.-uLivingFold.w*(.5+.5*sin(clock))*envelope;
  p=origin+(p-origin)*contraction;
- p+=radial*(uLivingShape.w+fold*uLivingFold.y+uLivingFold.z*sin(clock+aRandom.y*TAU)*envelope)*uFrame.x;
- p+=radial*uLivingMotion.y*.04*sin(r.x*TAU*31.+clock)*sin(aRandom.y*TAU*3.+clock)*envelope*uFrame.x;
+ float offset=(uLivingShape.w+fold*uLivingFold.y+uLivingFold.z*sin(clock+aRandom.y*TAU)*envelope
+  +uLivingMotion.y*.04*sin(r.x*TAU*31.+clock)*sin(aRandom.y*TAU*3.+clock)*envelope)*uFrame.x;
+ // Deep inward folds approach the centre smoothly instead of crossing it and
+ // reversing their orientation. Outward expansion retains its original range.
+ float inwardRoom=max(.0001,length(p-origin)*.7);
+ if(offset<0.)offset=inwardRoom*tanh(offset/inwardRoom);
+ p+=radial*offset;
  targetPosition=p;gl_Position=vec4(0.,0.,0.,1.);
 }`,`#version 300 es
 precision highp float;precision highp int;out vec4 color;void main(){color=vec4(0.);}`,['targetPosition']);

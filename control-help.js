@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=02f845f3303f';
+import {AUDIO_HELP} from './audio-model.js?v=8613ad610791';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pVolumeHold:'Mantiene il volume di riferimento mentre la struttura si deforma. Per misurarlo considera chiusa l’apertura della pelle; valori alti contrastano il respiro.',
@@ -11,8 +11,8 @@ const HELP={
  pThreadWidth:'Spessore dei fili connessi a 1080p, con controllo anche sotto un pixel.',
  pThreadOpacity:'Visibilità dei fili connessi. A zero puoi vedere solo la membrana.',
  pWeft:'Aggiunge la trama trasversale ai fili longitudinali, sulla stessa superficie deformata.',
- pElastic:'Resiste ai cambiamenti di lunghezza dei legami. A zero il campo muove liberamente i punti; alto conserva meglio la trama.',
- pBend:'Collega anche punti più lontani sullo stesso filo: alto resiste alle pieghe strette.',
+ pElastic:'Resiste allo stiramento dei legami. In compressione lascia richiudere la trama senza spingere le pieghe verso l’esterno.',
+ pBend:'Distribuisce la trazione anche tra punti più lontani del filo. Riduce gli stiramenti localizzati e lascia libere le pieghe in compressione.',
  pSkin:'Rende visibile la superficie continua tra i fili. A zero rimangono solo i filamenti.',
  pSkinOffset:'Scosta la pelle dal nucleo di granelli senza spostare questi ultimi.',
  pSkinOpening:'Apre la superficie a un polo e la trasforma progressivamente in una coppa.',
