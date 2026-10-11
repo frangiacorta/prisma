@@ -1,8 +1,8 @@
-import {META,MOODS,GROUPS} from './model.js?v=87dc341942b4';
-import {particleSphere} from './particle-model.js?v=87dc341942b4';
-import {PATH_META} from './particle-paths.js?v=87dc341942b4';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=87dc341942b4';
-import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=87dc341942b4';
+import {META,MOODS,GROUPS} from './model.js?v=8dbd9e6db53f';
+import {particleSphere} from './particle-model.js?v=8dbd9e6db53f';
+import {PATH_META} from './particle-paths.js?v=8dbd9e6db53f';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=8dbd9e6db53f';
+import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=8dbd9e6db53f';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
@@ -11,7 +11,7 @@ for(const [forms,base] of [['neri nere','nero'],['bianchi bianche','bianco'],['r
 function colorsIn(text){const result=[];const re=new RegExp('#(?:[0-9a-f]{6}|[0-9a-f]{3})\\b|\\b(?:'+Object.keys(namedColors).join('|')+')\\b','gi');for(const m of text.matchAll(re)){let c=m[0][0]==='#'?m[0].toLowerCase():namedColors[m[0].toLowerCase()];if(c.length===4)c='#'+c.slice(1).split('').map(q=>q+q).join('');result.push(c);}return result;}
 function scalar(key,value){const m=Object.hasOwn(META,key)?META[key]:null;if(!m||!Number.isFinite(value)||value<m[1]||value>m[2])throw Error('Valore non valido per '+(m?.[0]||key));return m[3]>=1?Math.round(value):value;}
 const shapeNames=[...new Set(['sfera','goccia','blob','macchia','disco','anello','semiluna',...SCULPT_EXAMPLES.map(q=>normalize(q.name))])];
-function shape(s,name){if((s.engine==='particles'||s.pLiving>0)&&name==='sfera')return particleSphere(s);if(!shapeNames.includes(name))throw Error('Forma non disponibile');for(const k of ['deform','asymmetry','twist','waves','hole','cut','edge','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','petalBlend','petalRoot','petalRandom','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemAmount'])s[k]=0;s.petalGrowth=1;for(const k of ['volume','stretchX','stretchY','stretchZ','holeAspect','cutAspect'])s[k]=1;for(const k of SHAPE_TRACKS)if(s.motions[k])s.motions[k].enabled=false;
+function shape(s,name){if((s.engine==='particles'||s.pLiving>0)&&name==='sfera')return particleSphere(s);if(!shapeNames.includes(name))throw Error('Forma non disponibile');for(const k of ['deform','asymmetry','twist','waves','hole','cut','edge','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','petalBlend','petalRoot','petalRandom','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','petalDirectionSpread','petalWeave','petalFlow','petalFlowPhase','petalOrbitPhase','stemAmount'])s[k]=0;s.petalGrowth=1;for(const k of ['volume','stretchX','stretchY','stretchZ','holeAspect','cutAspect'])s[k]=1;for(const k of SHAPE_TRACKS)if(s.motions[k])s.motions[k].enabled=false;
  if(name==='goccia')Object.assign(s,{taper:.38,stretchY:1.18,stretchX:.9});if(name==='blob')Object.assign(s,{deform:.3,asymmetry:.13,twist:.3});if(name==='macchia')Object.assign(s,{volume:.08,stretchX:1.2,deform:.34,edge:.22});if(name==='disco')s.volume=.1;if(name==='anello')Object.assign(s,{hole:.55,volume:.45});if(name==='semiluna')Object.assign(s,{cut:.9,cutX:.4,cutY:.1,volume:.5});const i=SCULPT_EXAMPLES.findIndex(q=>normalize(q.name)===name);if(i>=0)sculpt(s,i);return s;}
 
 // Atomic, allowlisted operations shared by text commands and browser agents.
@@ -48,10 +48,11 @@ export function applyDescriptionPlan(current,plan){
     if(key==='enabled'&&typeof value==='boolean')values[key]=value;
     else if(key==='amplitude'&&Number.isFinite(value)&&value>=TRACK_META[o.key][1]&&value<=TRACK_META[o.key][2])values[key]=value;
     else if(key==='cycles'&&Number.isFinite(value)&&value>=(s.perfectLoop===false?.1:1)&&value<=8&&(s.perfectLoop===false||Number.isInteger(value)))values[key]=value;
+    else if(['pace','pacePhase','hold'].includes(key)&&Number.isFinite(value)&&value>=0&&value<=(key==='pace'?.95:key==='hold'?.8:360))values[key]=value;
     else if(key==='phase'&&Number.isFinite(value)&&value>=0&&value<=360)values[key]=value;
     else if(key==='direction'&&(value===1||value===-1))values[key]=value;
     else if(key==='curve'&&['sine','soft','triangle'].includes(value))values[key]=value;
-    else if(key==='mode'&&(['wave'].includes(value)||(value==='cycle'&&/^(rotate[XYZ]|gradientOffset|colorWavePhase|petalPhase)$/.test(o.key))))values[key]=value;
+    else if(key==='mode'&&(['wave'].includes(value)||(value==='cycle'&&/^(rotate[XYZ]|gradientOffset|colorWavePhase|petalPhase|petalFlowPhase|petalOrbitPhase)$/.test(o.key))))values[key]=value;
     else throw Error('Proprietà del movimento non valida');
    }upgrade(s);s.motions[o.key]={...(s.motions[o.key]||track()),...values};notes.push('Movimento: '+TRACK_META[o.key][0]);
   }
@@ -273,4 +274,4 @@ export function interpretDescription(text,current){
  return {operations,unrecognized:[...new Set(unrecognized)]};
 }
 
-export function descriptionCatalog(){return {parameters:Object.fromEntries(Object.entries(META).map(([k,m])=>[k,{label:m[0],min:m[1],max:m[2],step:m[3]}])),materials:MATERIAL_STYLES.map((m,index)=>({index,name:m.name})),textureStyles:TEXTURE_STYLES.map((m,index)=>({index,name:m.name})),textureStyleOperation:{type:'textureStyle',index:0},shapes:shapeNames,lightTypes:LIGHT_TYPES,lightParameters:LIGHT_META,maxLights:MAX_LIGHTS,maxColors:MAX_COLORS,motionPresets:MOTION_PRESETS.map(([id,name])=>({id,name})),motionTracks:Object.fromEntries(Object.entries(TRACK_META).map(([key,m])=>[key,{label:m[0],minAmplitude:m[1],maxAmplitude:m[2],step:m[3]}])),motionTrackOperation:{type:'motionTrack',key:'petalGrowth',values:{enabled:true,amplitude:.5,cycles:1,phase:270,direction:1,curve:'sine',mode:'wave'}},loopOperation:{type:'loop',perfect:true},motionStyleOperation:{type:'motionStyle',style:'gentle',scope:'all'},motionStyles:['gentle','smooth','slower','faster']};}
+export function descriptionCatalog(){return {parameters:Object.fromEntries(Object.entries(META).map(([k,m])=>[k,{label:m[0],min:m[1],max:m[2],step:m[3]}])),materials:MATERIAL_STYLES.map((m,index)=>({index,name:m.name})),textureStyles:TEXTURE_STYLES.map((m,index)=>({index,name:m.name})),textureStyleOperation:{type:'textureStyle',index:0},shapes:shapeNames,lightTypes:LIGHT_TYPES,lightParameters:LIGHT_META,maxLights:MAX_LIGHTS,maxColors:MAX_COLORS,motionPresets:MOTION_PRESETS.map(([id,name])=>({id,name})),motionTracks:Object.fromEntries(Object.entries(TRACK_META).map(([key,m])=>[key,{label:m[0],minAmplitude:m[1],maxAmplitude:m[2],step:m[3]}])),motionTrackOperation:{type:'motionTrack',key:'petalGrowth',values:{enabled:true,amplitude:.5,cycles:1,phase:270,direction:1,curve:'sine',mode:'wave',pace:.6,pacePhase:180,hold:.15}},motionTiming:{pace:[0,.95],pacePhase:[0,360],hold:[0,.8],note:'Variazioni di velocità e pause in ogni ciclo. petalFlowPhase e petalOrbitPhase accettano cycle per avanzare senza inversione.'},loopOperation:{type:'loop',perfect:true},motionStyleOperation:{type:'motionStyle',style:'gentle',scope:'all'},motionStyles:['gentle','smooth','slower','faster']};}

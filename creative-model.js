@@ -1,12 +1,12 @@
-import {normalizeFinishRegions} from './finishing.js?v=87dc341942b4';
-import {normalizeAudioClip} from './audio-recording.js?v=87dc341942b4';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=87dc341942b4';
-import {normalizeAudio} from './audio-model.js?v=87dc341942b4';
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=87dc341942b4';
-import {normalizeForcePaths} from './particle-paths.js?v=87dc341942b4';
-import {normalizeForcePoints} from './particle-forces.js?v=87dc341942b4';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=87dc341942b4';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=87dc341942b4';
+import {normalizeFinishRegions} from './finishing.js?v=8dbd9e6db53f';
+import {normalizeAudioClip} from './audio-recording.js?v=8dbd9e6db53f';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=8dbd9e6db53f';
+import {normalizeAudio} from './audio-model.js?v=8dbd9e6db53f';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=8dbd9e6db53f';
+import {normalizeForcePaths} from './particle-paths.js?v=8dbd9e6db53f';
+import {normalizeForcePoints} from './particle-forces.js?v=8dbd9e6db53f';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=8dbd9e6db53f';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=8dbd9e6db53f';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -14,7 +14,7 @@ export function material(s,index){Object.assign(s,MATERIAL_STYLES[index].values)
 export function textureStyle(s,index){if(!TEXTURE_STYLES[index])throw Error('Scegli una texture disponibile.');upgrade(s);Object.assign(s,TEXTURE_STYLES[index].values);return s;}
 export function newCreation(){const s=preset(1);material(s,0);Object.assign(s,{background:'#000000',background2:'#152535',palette:['#7ccfff','#d9aeff','#ffb8d2','#a9f1e5'],grain:0,glow:0,edge:0,rotateX:0,rotateY:0,scale:.92,duration:12});for(const t of Object.values(s.motions))t.enabled=false;s.lights.forEach(l=>l.visible=false);return s;}
 
-export const MOTION_PRESETS=[['emerge','Spuntano e rientrano'],['wrap','Si avvolgono alla sfera'],['roots','Radici in movimento'],['bloom','Petali che si aprono'],['chromatic','Onde cromatiche'],['breathe','Bolla che respira'],['reflect','Riflessi che girano'],['film','Colori che colano e vorticano'],['orbit','Luce che orbita'],['wave','Forma che ondeggia']];
+export const MOTION_PRESETS=[['emerge','Spuntano e rientrano'],['wrap','Avanzano intorno alla sfera'],['roots','Radici in movimento'],['bloom','Petali che si aprono'],['chromatic','Onde cromatiche'],['breathe','Bolla che respira'],['reflect','Riflessi che girano'],['film','Colori che colano e vorticano'],['orbit','Luce che orbita'],['wave','Forma che ondeggia']];
 export function motionPreset(s,key){
  upgrade(s);if(key!=='bloom'&&key!=='chromatic'){for(const t of Object.values(s.motions))t.enabled=false;s.environmentRotate=false;s.filmFlow=0;s.filmSwirl=0;for(const l of s.lights){l.orbit.enabled=false;l.pulse.enabled=false;}}
  if(!Number.isFinite(s.duration))s.duration=12;if(!Number.isFinite(s.speed))s.speed=1;if(!Number.isFinite(s.motion))s.motion=.3;
@@ -22,7 +22,7 @@ export function motionPreset(s,key){
   if(!(s.petalAmount>0))Object.assign(s,{petalAmount:1,petalCoverage:1,petalCount:8,petalRows:3,petalLength:1.05,petalWidth:.14,petalSharp:.45,petalBlend:.75,petalRoot:.25,petalWander:.35,petalDisorder:.55});
   const move=(k,amplitude,phase=0)=>s.motions[k]={...s.motions[k],enabled:true,amplitude,phase,cycles:1,direction:1,curve:'sine',mode:'wave'};
   if(key==='emerge'||key==='roots'){s.petalGrowth=.5;move('petalGrowth',.5,270);}
-  if(key==='wrap'){s.petalGrowth=1;s.petalCoil=.45;move('petalCoil',.45,270);}
+  if(key==='wrap'){Object.assign(s,{petalGrowth:1,petalCoil:.65,petalReentry:.75,petalCoverage:1,petalDirectionSpread:1,petalFlow:.6});move('petalOrbitPhase',1);s.motions.petalOrbitPhase.mode='cycle';move('petalFlowPhase',1);s.motions.petalFlowPhase.mode='cycle';}
   if(key==='roots'){s.petalCoil=.35;s.petalWander=Math.max(.35,Math.min(.75,s.petalWander||0));s.petalReentry=.4;move('petalCoil',.25);move('petalWander',.12,90);move('petalReentry',.2,90);}
  }
 
@@ -140,4 +140,4 @@ export function normalizeCreation(raw){
  s.animateColor=s.motions.gradientOffset.enabled||s.motions.colorWavePhase.enabled;s.animateLight=s.lights.some(l=>l.orbit.enabled);
  return s;
 }
-function safeTrack(base,raw,perfectLoop=true){const t={...base,enabled:raw.enabled===true};for(const k of ['amplitude','cycles','phase'])if(Number.isFinite(raw[k]))t[k]=Math.max(0,Math.min(k==='amplitude'?360:k==='cycles'?8:360,raw[k]));t.cycles=perfectLoop?Math.max(1,Math.round(t.cycles)):Math.max(.1,t.cycles);t.direction=raw.direction===-1?-1:1;if(['sine','soft','triangle'].includes(raw.curve))t.curve=raw.curve;if(['wave','cycle'].includes(raw.mode))t.mode=raw.mode;if(['x','y','z'].includes(raw.axis))t.axis=raw.axis;return t;}
+function safeTrack(base,raw,perfectLoop=true){const t={...base,enabled:raw.enabled===true};for(const k of ['pace','pacePhase','hold'])if(Number.isFinite(raw[k]))t[k]=Math.max(0,Math.min(k==='pace'?.95:k==='hold'?.8:360,raw[k]));for(const k of ['amplitude','cycles','phase'])if(Number.isFinite(raw[k]))t[k]=Math.max(0,Math.min(k==='amplitude'?360:k==='cycles'?8:360,raw[k]));t.cycles=perfectLoop?Math.max(1,Math.round(t.cycles)):Math.max(.1,t.cycles);t.direction=raw.direction===-1?-1:1;if(['sine','soft','triangle'].includes(raw.curve))t.curve=raw.curve;if(['wave','cycle'].includes(raw.mode))t.mode=raw.mode;if(['x','y','z'].includes(raw.axis))t.axis=raw.axis;return t;}

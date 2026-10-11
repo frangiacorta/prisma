@@ -37,19 +37,26 @@ vec3 coatingContrast(vec3 film){
 }
 `;
 const TAU=Math.PI*2;
-const MOTION_LIMITS={volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
+const MOTION_LIMITS={volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWeave:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
 function motionCycles(value,source){const n=Math.max(.1,Number(value)||1);return source?.perfectLoop===false?n:Math.max(1,Math.round(n));}
-function motionWave(t,phase,source){const a=phase*motionCycles(t.cycles,source)*(t.direction||1)+(t.phase||0)*Math.PI/180;const x=Math.sin(a);return t.curve==='triangle'?2/Math.PI*Math.asin(x):t.curve==='soft'?x*Math.abs(x):x}
+export function motionClock(t,phase,source){
+ const raw=phase/TAU*motionCycles(t.cycles,source)+(t.phase||0)/360*(t.direction||1),whole=Math.floor(raw);let u=raw-whole;
+ const hold=Math.max(0,Math.min(.8,t.hold||0));
+ if(hold>0){u=Math.max(0,Math.min(1,(u-hold/2)/(1-hold)));u-=Math.sin(TAU*u)/TAU;}
+ const shift=(t.pacePhase||0)*Math.PI/180;u+=(t.pace||0)*(Math.sin(TAU*u-shift)+Math.sin(shift))/TAU;
+ return (whole+u)*TAU*(t.direction||1);
+}
+function motionWave(t,phase,source){const a=motionClock(t,phase,source);const x=Math.sin(a);return t.curve==='triangle'?2/Math.PI*Math.asin(x):t.curve==='soft'?x*Math.abs(x):x}
 export function sampleFrame(source,phase=0){
  const s={...source,lights:(source.lights||[]).map(l=>({...l}))};
 
  for(const [key,t] of Object.entries(source.motions||{})){
-  if(!t.enabled)continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset'||key==='colorWavePhase'||key==='petalPhase');
-  const value=continuous?(phase/TAU*motionCycles(t.cycles,source)*(t.direction||1)+(t.phase||0)/360)*(key.startsWith('rotate')||key==='petalPhase'?360:1):motionWave(t,phase,source)*(t.amplitude||0)*(source.motion??.3)/.3;
+  if(!t.enabled)continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset'||key==='colorWavePhase'||key==='petalPhase'||key==='petalFlowPhase'||key==='petalOrbitPhase');
+  const value=continuous?(motionClock(t,phase,source)/TAU)*(key.startsWith('rotate')||key==='petalPhase'?360:1):motionWave(t,phase,source)*(t.amplitude||0)*(source.motion??.3)/.3;
   s[key]=(source[key]??(key==='petalGrowth'?1:0))+value;if(MOTION_LIMITS[key])s[key]=Math.max(MOTION_LIMITS[key][0],Math.min(MOTION_LIMITS[key][1],s[key]));
  }
  if(!source.motions){if(source.animateRotation)s.rotateY+=phase*180/Math.PI;if(source.animateShape){s.volume*=1+Math.sin(phase)*source.motion*.4;s.deform+=Math.sin(phase)*source.motion*.16}if(source.animateColor)s.gradientOffset+=phase/TAU;}
- for(const l of s.lights){if(l.orbit?.enabled){const t=l.orbit,a=t.mode==='cycle'?phase*motionCycles(t.cycles,source)*(t.direction||1)+(t.phase||0)*Math.PI/180:motionWave(t,phase,source)*t.amplitude*Math.PI/180*(source.motion??.3)/.3;const cs=Math.cos(a),sn=Math.sin(a);if(t.axis==='x'){[l.y,l.z]=[l.y*cs-l.z*sn,l.y*sn+l.z*cs]}else if(t.axis==='z'){[l.x,l.y]=[l.x*cs-l.y*sn,l.x*sn+l.y*cs]}else{[l.x,l.z]=[l.x*cs-l.z*sn,l.x*sn+l.z*cs]}}if(l.pulse?.enabled)l.power=Math.max(0,l.power*(1+motionWave(l.pulse,phase,source)*l.pulse.amplitude*(source.motion??.3)/.3))}
+ for(const l of s.lights){if(l.orbit?.enabled){const t=l.orbit,a=t.mode==='cycle'?motionClock(t,phase,source):motionWave(t,phase,source)*t.amplitude*Math.PI/180*(source.motion??.3)/.3;const cs=Math.cos(a),sn=Math.sin(a);if(t.axis==='x'){[l.y,l.z]=[l.y*cs-l.z*sn,l.y*sn+l.z*cs]}else if(t.axis==='z'){[l.x,l.y]=[l.x*cs-l.y*sn,l.x*sn+l.y*cs]}else{[l.x,l.z]=[l.x*cs-l.z*sn,l.x*sn+l.z*cs]}}if(l.pulse?.enabled)l.power=Math.max(0,l.power*(1+motionWave(l.pulse,phase,source)*l.pulse.amplitude*(source.motion??.3)/.3))}
  if(source.environmentRotate)s.environmentAngle=(source.environmentAngle||0)+phase*180/Math.PI*motionCycles(source.environmentCycles,source);
  return s;
 }
@@ -1123,8 +1130,8 @@ function hedgeAt(s,p){const amount=Math.max(0,Math.min(1,((s.petalBlend||0)+(s.p
 function crownBaseAt(s,p){const spread=s.petalCoverage||0;return spread<.0001?flowerAt(s,p):spread>.9999?hedgeAt(s,p):flowerAt(s,p)*(1-spread)+hedgeAt(s,p)*spread;}
 function crownAt(s,p){const weight=rootWeight(s);if(weight>.999999)return rootFieldAt(s,p);const base=crownBaseAt(s,p);return weight>.000001?base*(1-weight)+rootFieldAt(s,p)*weight:base;}
 function stemAt(s,p){const len=s.stemAmount*3,radius=(s.stemRadius??.09)*Math.min(1,s.stemAmount*8),bend=s.stemBend||0,a=[0,-.14,0],b=[bend*.35,-.14-len*.45,0],c=[-bend*.55,-.14-len,0],m=curveAt(a,b,c,.5);return Math.min(coneAt(p,a,m,radius,radius),coneAt(p,m,c,radius,radius));}
-const ROOT_KEYS=['petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder'];
-const GROWTH_KEYS=[...ROOT_KEYS,'petalRows','petalCount','petalOpen','petalLength','petalWidth','petalInflate','petalSharp','petalCurl','petalBlend','petalRoot','petalRandom','petalPhase','seed'];
+const ROOT_KEYS=['petalGrowth','petalDirectionSpread','petalWeave','petalFlow','petalFlowPhase','petalOrbitPhase','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder'];
+const GROWTH_KEYS=[...ROOT_KEYS,'petalWeaveTurns','petalRows','petalCount','petalOpen','petalLength','petalWidth','petalInflate','petalSharp','petalCurl','petalBlend','petalRoot','petalRandom','petalPhase','seed'];
 export function growthTable(s,storage){
  const data=storage?.data||new Float32Array(96*8*4),rowData=storage?.rowData||new Float32Array(16);data.fill(0);rowData.fill(0);const rows=Math.max(2,Math.min(8,Math.floor((s.petalRows||5)+.5)));
  const core=.62+(s.petalOpen??.65)*.14,width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),sharp=s.petalSharp||0,random=s.petalRandom||0;
@@ -1144,24 +1151,24 @@ export function growthTable(s,storage){
  }
  return {data,rowData,radiusBound:rootWeight(s)>.999999?rootRadiusBound(s):Math.max(radiusBound,rootWeight(s)>0?rootRadiusBound(s):0)};
 }
-// Advanced appendages use a fixed budget of twelve tapered curve segments.
+// Advanced appendages use a fixed budget of twenty-four tapered curve segments.
 // Geometry and BVH storage are reused; animation refits the existing tree.
 // No per-pixel all-roots search and no rebuilding/sorting during a loop.
-const ROOT_SEGMENTS=12,ROOT_TEXTURE_WIDTH=256,ROOT_TEXTURE_HEIGHT=128;
-function rootWeight(s){return Math.min(1,10*Math.max(1-(s.petalGrowth??1),...ROOT_KEYS.slice(1).map(k=>Math.abs(s[k]||0))));}
+const ROOT_SEGMENTS=24,ROOT_TEXTURE_WIDTH=256,ROOT_TEXTURE_HEIGHT=128;
+function rootWeight(s){if(s.motions?.petalFlowPhase?.enabled||s.motions?.petalOrbitPhase?.enabled)return 1;return Math.min(1,10*Math.max(1-(s.petalGrowth??1),...ROOT_KEYS.slice(1).map(k=>Math.abs(s[k]||0))));}
 function rootRadiusBound(s){
  const core=.62+(s.petalOpen??.65)*.14,random=s.petalRandom||0,len=(s.petalLength??1.05)*(1+random*.32),width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),baseGrowth=s.petalGrowth??1,growth=Math.min(1,baseGrowth*(1+(s.petalDisorder||0)*.35*(1-baseGrowth)));
  const root=Math.min(.42,Math.max(.025,width*.5+(s.petalRoot||0)*.28+(s.petalBlend||0)*.04)),tip=Math.max(.0015,width*(.9*(1-(s.petalSharp||0))+.008*(s.petalSharp||0))),reentry=s.petalReentry||0;
  const rise=len*(growth*(1-reentry)*(1-.8*Math.abs(s.petalCoil||0))+Math.sin(Math.min(.5,growth)*Math.PI)*reentry*.68),wander=(s.petalWander||0)*len*.52*growth,curl=(Math.abs(s.petalCurl||0)*.65+random*.18)*len*growth*growth;
  const radius=Math.max(root*(1+random*.18),tip)*(1+(s.petalKnots||0)*.32+(s.petalRidges||0)*.12);
- return Math.max(core,core-root*(1-random*.18)*1.1+rise+wander+curl+radius)+rootBlend(s)*.5+.025;
+ return Math.max(core,core-root*(1-random*.18)*1.1+rise+wander+curl+(s.petalWeave||0)*len*.28+radius*(1+(s.petalFlow||0)*.4))+rootBlend(s)*.5+.025;
 }
 function rootBlend(s){return .015+(s.petalBlend||0)*(.09+(s.petalRoot||0)*.16);}
 export function rootGeometry(s,storage){
  const rows=Math.max(2,Math.min(8,Math.floor((s.petalRows||5)+.5))),ringCount=Math.max(3,Math.min(24,Math.round(s.petalCount||12)));
  const spread=s.petalCoverage||0;let roots=spread<.999999?ringCount:0;for(let row=0;row<rows&&spread>.000001;row++)roots+=Math.max(3,Math.min(24,Math.round((s.petalCount||12)*Math.sin((row+.5)*Math.PI/rows))));
  const count=roots*ROOT_SEGMENTS,nodeCount=count*2-1;
- if(!storage)storage={segments:new Float32Array(2560*8),data:new Float32Array(ROOT_TEXTURE_WIDTH*ROOT_TEXTURE_HEIGHT*4),order:new Uint16Array(2560),right:new Int32Array(5120),leaf:new Int32Array(5120)};
+ if(!storage)storage={segments:new Float32Array(4096*8),data:new Float32Array(ROOT_TEXTURE_WIDTH*ROOT_TEXTURE_HEIGHT*4),order:new Uint16Array(4096),right:new Int32Array(8192),leaf:new Int32Array(8192)};
  const {segments,data}=storage,core=.62+(s.petalOpen??.65)*.14,flat=.2+.8*spread;
  const width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),sharp=s.petalSharp||0,random=s.petalRandom||0,disorder=s.petalDisorder||0,growth=s.petalGrowth??1;
  const rootRadius=Math.min(.42,Math.max(.025,width*.5+(s.petalRoot||0)*.28+(s.petalBlend||0)*.04)),tipRadius=Math.max(.0015,width*(.9*(1-sharp)+.008*sharp));
@@ -1177,18 +1184,20 @@ export function rootGeometry(s,storage){
    const ax=Math.sin(lat)*Math.cos(lon),ay=Math.cos(lat),az=Math.sin(lat)*Math.sin(lon),tx=Math.cos(lat)*Math.cos(lon),ty=-Math.sin(lat),tz=Math.cos(lat)*Math.sin(lon),bx=-Math.sin(lon),bz=Math.cos(lon);
    const len=(s.petalLength??1.05)*(1+noise(0)*random*.32),thickness=rootRadius*(1+noise(1)*random*.18),seedPhase=noise(6)*Math.PI;
    const localGrowth=Math.max(0,Math.min(1,growth*(1+noise(7)*disorder*.35*(1-growth))))*participation;
-   const bend=(s.petalCurl||0)*.65+noise(2)*random*.18,turn=coil*4.6*(1+noise(3)*disorder*.25)+reentry*(1.35+len*.55),sideTurn=noise(8)*disorder*.7;
+   const bend=(s.petalCurl||0)*.65+noise(2)*random*.18,turn=coil*4.6*(1+noise(3)*disorder*.25)+reentry*(1.35+len*.55),sideTurn=noise(8)*disorder*.7+(s.petalDirectionSpread||0)*(noise(9)*Math.PI+((row+column)%2)*Math.PI);
    const base=core-thickness*1.1-blend*.4,bodyScale=ring?flat:1;
    let prevX=0,prevY=0,prevZ=0,prevR=0;
    for(let j=0;j<=ROOT_SEGMENTS;j++){
-    const t=j/ROOT_SEGMENTS,u=t*localGrowth,angle=turn*u;
+    const t=j/ROOT_SEGMENTS,u=t*localGrowth,angle=turn*u+(s.petalOrbitPhase||0)*TAU;
     const rise=len*(u*(1-reentry)*(1-.8*Math.abs(coil))+Math.sin(Math.PI*u)*reentry*.68);
-    const radial=base+rise,ca=Math.cos(angle),sa=Math.sin(angle),sweepX=tx*Math.cos(sideTurn)+bx*Math.sin(sideTurn),sweepY=ty*Math.cos(sideTurn),sweepZ=tz*Math.cos(sideTurn)+bz*Math.sin(sideTurn);
+    const weave=(s.petalWeave||0)*len*.28*Math.sin(u*TAU*(s.petalWeaveTurns||2)+((row+column)%2)*Math.PI)*Math.sin(Math.PI*t);
+    const radial=base+rise+weave,ca=Math.cos(angle),sa=Math.sin(angle),sweepX=tx*Math.cos(sideTurn)+bx*Math.sin(sideTurn),sweepY=ty*Math.cos(sideTurn),sweepZ=tz*Math.cos(sideTurn)+bz*Math.sin(sideTurn);
     const meander=wander*len*.19*u*(1-reentry*u)*(Math.sin(u*TAU*1.4+seedPhase)-Math.sin(seedPhase)),meander2=wander*len*.14*u*(1-reentry*u)*Math.sin(u*TAU+seedPhase);
     const curl=bend*len*u*u*(1-reentry*u),dx=(ax*ca+sweepX*sa)*radial+tx*(meander+curl)+bx*meander2,dy=((ay*ca+sweepY*sa)*radial+ty*(meander+curl))*bodyScale,dz=(az*ca+sweepZ*sa)*radial+tz*(meander+curl)+bz*meander2;
     // The small, phase-shifted swellings disturb the tube itself instead of
     // faking roughness in the lighting; silhouettes and SSS follow them.
-    const profile=1+knots*.32*Math.sin(u*TAU*2.2+seedPhase)*Math.sin(Math.PI*t)+ridges*.12*Math.sin(u*TAU*4.5+seedPhase+.7)*Math.sin(Math.PI*t);
+    const flow=(s.petalFlow||0)*.4*Math.sin(u*TAU*2-(s.petalFlowPhase||0)*TAU+seedPhase)*Math.sin(Math.PI*t);
+    const profile=1+flow+knots*.32*Math.sin(u*TAU*2.2+seedPhase)*Math.sin(Math.PI*t)+ridges*.12*Math.sin(u*TAU*4.5+seedPhase+.7)*Math.sin(Math.PI*t);
     const radius=Math.max(.0001,(thickness*(1-t)+tipRadius*t)*profile*Math.min(1,localGrowth*6));
     if(j){const q=segment++*8;segments[q]=prevX;segments[q+1]=prevY;segments[q+2]=prevZ;segments[q+3]=prevR;segments[q+4]=dx;segments[q+5]=dy;segments[q+6]=dz;segments[q+7]=radius;}
     actualRadius=Math.max(actualRadius,Math.hypot(dx,dy,dz)+radius+blend*.25);prevX=dx;prevY=dy;prevZ=dz;prevR=radius;

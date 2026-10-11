@@ -1,8 +1,8 @@
-import {META} from './model.js?v=87dc341942b4';
-import {PARTICLE_META} from './particle-model.js?v=87dc341942b4';
-import {PATH_META} from './particle-paths.js?v=87dc341942b4';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=87dc341942b4';
-import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=87dc341942b4';
+import {META} from './model.js?v=8dbd9e6db53f';
+import {PARTICLE_META} from './particle-model.js?v=8dbd9e6db53f';
+import {PATH_META} from './particle-paths.js?v=8dbd9e6db53f';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=8dbd9e6db53f';
+import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=8dbd9e6db53f';
 
 // Shared by the local assistant and browser. Generated text can only propose these controls.
 const sharedParticleKeys='volume stretchX stretchY stretchZ deform twist waves waveScale scale positionX positionY rotateX rotateY rotateZ duration speed motion metal roughness gloss iridescence transparency emission glow environmentPower environmentAngle environmentCycles gradientAngle gradientScale gradientOffset colorSoftness colorWaveAmount colorWaveBands colorWavePhase colorWaveHeight colorWaveRadius colorWaveSwirl colorWaveWarp bgAngle bgHeight bgSoftness bgWash exposure brightness contrast saturation grain temperature photoTint gamma blacks highlights vignette lensDistortion'.split(' ');
@@ -43,7 +43,7 @@ export function assistantSchema(s){
  return object({message:str,clarification:nullable(str),changes:arr(object({key:{enum:Object.keys(c.parameters)},value:num})),palette:nullable(arr(str)),
   background:nullable(object({mode:{enum:['solid','gradient','transparent','studio']},colors:arr(str)})),environment:nullable({enum:['studio','sky','sunset','neon','aurora','aquarium','city']}),
   lights:arr(object({action:{enum:['add','edit','remove']},id:nullable({type:'integer'}),changes:arr(object({key:{enum:[...Object.keys(c.lightParameters),'color','enabled',...((s.engine==='particles'||s.pLiving>0)?[]:['type','visible'])]},value:{anyOf:[num,str,bool]}}))})),
-  tracks:arr(object({key:{enum:Object.keys(c.motionTracks)},enabled:bool,amplitude:num,cycles:num,phase:num,direction:{enum:[-1,1]},curve:{enum:['sine','soft','triangle']},mode:{enum:['wave','cycle']}})),
+  tracks:arr(object({key:{enum:Object.keys(c.motionTracks)},enabled:bool,amplitude:num,cycles:num,phase:num,pace:num,pacePhase:num,hold:num,direction:{enum:[-1,1]},curve:{enum:['sine','soft','triangle']},mode:{enum:['wave','cycle']}})),
   paths:arr(object({id:{type:'integer'},changes:arr(object({key:{enum:[...Object.keys(PATH_META),'mode','enabled','closed','direction']},value:{anyOf:[num,str,bool]}}))})),
   perfectLoop:nullable(bool),play:nullable(bool),shape:nullable(str),materialIndex:nullable({type:'integer'}),textureIndex:nullable({type:'integer'})});
 }

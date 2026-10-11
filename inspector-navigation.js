@@ -1,6 +1,6 @@
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
- {id:'structure',label:'Forma e moto',tabs:[['shape','Forma','shape'],['trails','Fibre e scie','motion','particles'],['motion','Movimento','motion']]},
+ {id:'structure',label:'Forma e moto',tabs:[['shape','Forma','shape'],['grains','Granelli','shape','particles'],['trails','Fibre e scie','motion','particles'],['motion','Movimento','motion']]},
  {id:'look',label:'Aspetto',tabs:[['material','Materia','material'],['color','Colori','palette'],['light','Luci','sun']]},
  {id:'scene',label:'Scena',tabs:[['background','Sfondo','background'],['photo','Finitura','photo']]},
  {id:'interaction',label:'Interazione',tabs:[['fields','Punti e percorsi','move','particles'],['body','Testa e mani','orbit'],['audio','Audio','audio']]}
@@ -21,12 +21,13 @@ export function organizeSections(root,scope){
   const summary=document.createElement('summary');summary.textContent=label;parent.append(summary);nodes[0].before(parent);parent.append(...nodes);
  }
  if(scope==='solid/shape'){
-  group('Petali, radici e crescita','shape-growth',['Petali, spine e radici','Radici, corde e intrecci','Superficie e crescita irregolare','Innesto nella sfera','Proporzioni e distribuzione','Gambo opzionale','Esempio completo · Bloom']);
+  const growth=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Petali, radici e crescita');
+  if(growth){growth.id='shape-growth';const stem=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Gambo opzionale');if(stem)growth.append(stem);}
   group('Profilo e deformazioni','shape-profile',['Profilo, torsione e curvature','Vuoto interno · anelli','Ritaglio · semilune','Lobi e onde']);
  }
  if(scope==='particles/shape')group('Struttura e dettaglio organico','particle-structure',['Lobi, rami e addensamenti','Materia organica · dettaglio procedurale','Struttura neuronale','Tentacoli del nucleo','Fasci esterni','Deformazioni aggiuntive']);
  if(scope==='solid/motion'){
-  group('Petali e radici in movimento','motion-growth',['Radici · crescita e intrecci','Radici · superficie e distribuzione','Petali e gambo · movimenti indipendenti']);
+  group('Petali e radici in movimento','motion-growth',['Radici · scorrimento e intreccio','Radici · crescita e avvolgimento','Radici · superficie e distribuzione','Petali e gambo · movimenti indipendenti']);
  }
  if(scope==='particles/motion')group('Deformazioni nel tempo','particle-motion-deform',['Vitalità e respiro','Tentacoli in movimento','Warp dello spazio','Ritmo e cadenze']);
  if(scope.endsWith('/audio')){
