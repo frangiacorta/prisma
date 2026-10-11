@@ -1,8 +1,14 @@
-import {AUDIO_HELP} from './audio-model.js?v=8dbd9e6db53f';
+import {AUDIO_HELP} from './audio-model.js?v=ce862a198a9f';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ petalCollision:'Vincoli di contatto fra segmenti: i fili si separano quando i loro spessori si incontrano. Zero conserva la geometria precedente; uno usa contatti rigidi entro la precisione scelta. Sopra zero sospende le animazioni dei percorsi: restano disponibili scorrimento della materia e rotazione.',
+ petalSphereCollision:'Impedisce ai tratti liberi di attraversare la superficie della sfera. Le zone di innesto e uscita restano ancorate e possono entrare nella materia.',
+ petalContactGap:'Distanza aggiuntiva tra i fili, oltre il loro spessore. Aiuta a mantenere gli incroci leggibili.',
+ petalContactStiffness:'Resistenza allo stiramento e alla flessione durante il contatto. Bassa: fili cedevoli. Alta: mantengono meglio il loro percorso.',
+ petalContactPasses:'Passaggi del risolutore per ogni fotogramma. Più passaggi migliorano i contatti ma aumentano il tempo di calcolo. Preview ed export usano lo stesso valore.',
+
  petalDirectionSpread:'Varia la direzione di ogni radice sulla sfera. Zero usa una direzione comune; uno distribuisce i percorsi in tutte le direzioni. Per coprire la sfera porta anche Copertura a 1.',
- petalWeave:'Alterna il percorso sopra e sotto la superficie, con fasi opposte fra radici vicine. È un intreccio geometrico, senza collisioni fisiche.',
+ petalWeave:'Alterna il percorso sopra e sotto la superficie, con fasi opposte fra radici vicine. Collisioni fisiche aggiunge la separazione dei fili ai punti di contatto.',
  petalWeaveTurns:'Numero di ondulazioni radiali lungo ogni radice. Agisce con Intreccio sopra zero.',
  petalFlow:'Intensità dei rigonfiamenti che viaggiano lungo il filo. Attiva Scorrimento lungo le radici per animarli.',
  petalFlowPhase:'Sposta la materia lungo la radice. Da 0 a 1 compie un ciclo chiuso; Movimento permette un avanzamento continuo o inverso.',

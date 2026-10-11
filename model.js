@@ -1,6 +1,6 @@
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=8dbd9e6db53f';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=8dbd9e6db53f';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=8dbd9e6db53f';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=ce862a198a9f';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=ce862a198a9f';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=ce862a198a9f';
 export const BASE = {
  ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -87,3 +87,5 @@ export function randomize(state,seed,amount,scope,locks){const r=random(seed),ou
 GROUPS.photo.push('finishRegionsEnabled','finishRegionMosaic','finishRegionRgb','finishRegionInvert','finishFeather','finishRegions');
 
 GROUPS.shape.push('petalDirectionSpread','petalWeave','petalWeaveTurns','petalFlow','petalFlowPhase','petalOrbitPhase');
+
+GROUPS.shape.push('petalCollision','petalSphereCollision','petalContactGap','petalContactStiffness','petalContactPasses');

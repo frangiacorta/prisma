@@ -1,4 +1,4 @@
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=8dbd9e6db53f';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=ce862a198a9f';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
@@ -12,6 +12,7 @@ export const TRACK_META={
 };
 export const EXTRA_BASE={
  ...FINISH_DEFAULTS,
+ petalCollision:0,petalSphereCollision:0,petalContactGap:.006,petalContactStiffness:.65,petalContactPasses:16,
  petalDirectionSpread:0,petalWeave:0,petalWeaveTurns:2,petalFlow:0,petalFlowPhase:0,petalOrbitPhase:0,
  textureDepth:.35,textureScale:1,textureOrganic:.65,textureAngle:0,textureWrinkles:0,textureFolds:0,textureWear:0,textureRipples:0,
  petalGrowth:1,petalWander:0,petalCoil:0,petalReentry:0,petalKnots:0,petalRidges:0,petalDisorder:0,
@@ -41,6 +42,7 @@ export const LIGHT_RIGS=[
 ];
 export function legacyLights(s){const build=(id,p)=>{const angle=s[p+'Angle']*Math.PI/180,height=s[p+'Height']*Math.PI/180;return{...newLight(id),visible:true,type:'bar',x:3.2*Math.sin(angle)*Math.cos(height),y:3.2*Math.sin(height),z:3.2*Math.cos(angle)*Math.cos(height),color:s[p+'Color'],power:s[p+'Power'],size:1.7,length:s[p+'Size']*.6,softness:s[p+'Size'],enabled:id===1||s.light2}};return[build(1,'light'),build(2,'light2')]}
 export const EXTRA_META={
+ petalCollision:['Contatto fra radici',0,1,.01],petalSphereCollision:['Contatto con la sfera',0,1,.01],petalContactGap:['Spazio fra i fili',0,.06,.001],petalContactStiffness:['Rigidità dei fili',0,1,.01],petalContactPasses:['Precisione dei contatti',8,32,1],
  petalDirectionSpread:['Direzioni distribuite',0,1,.01],petalWeave:['Intreccio sopra / sotto',0,1,.01],petalWeaveTurns:['Incroci lungo il percorso',1,4,1],petalFlow:['Scorrimento della materia',0,1,.01],petalFlowPhase:['Posizione dello scorrimento',0,1,.001],petalOrbitPhase:['Avanzamento sulla sfera',0,1,.001],
  ...FINISH_META,
  textureDepth:['Rilievo',0,1,.01],textureScale:['Densità della texture',.25,8,.05],textureOrganic:['Organicità',0,1,.01],textureAngle:['Direzione della texture',-180,180,1],textureWrinkles:['Grinze',0,1,.01],textureFolds:['Pieghe',0,1,.01],textureWear:['Abrasioni',0,1,.01],textureRipples:['Increspature',0,1,.01],

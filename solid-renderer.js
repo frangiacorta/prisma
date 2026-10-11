@@ -47,11 +47,14 @@ export function motionClock(t,phase,source){
  return (whole+u)*TAU*(t.direction||1);
 }
 function motionWave(t,phase,source){const a=motionClock(t,phase,source);const x=Math.sin(a);return t.curve==='triangle'?2/Math.PI*Math.asin(x):t.curve==='soft'?x*Math.abs(x):x}
+// Inter-root contact branches are stable for material flow and rigid transforms.
+// Keep independent path tracks saved, but suspend them until contacts are off.
+export function rootMotionSuspended(s,key){return (s.petalCollision||0)>0&&key.startsWith('petal')&&key!=='petalFlowPhase';}
 export function sampleFrame(source,phase=0){
  const s={...source,lights:(source.lights||[]).map(l=>({...l}))};
 
  for(const [key,t] of Object.entries(source.motions||{})){
-  if(!t.enabled)continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset'||key==='colorWavePhase'||key==='petalPhase'||key==='petalFlowPhase'||key==='petalOrbitPhase');
+  if(!t.enabled||rootMotionSuspended(source,key))continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset'||key==='colorWavePhase'||key==='petalPhase'||key==='petalFlowPhase'||key==='petalOrbitPhase');
   const value=continuous?(motionClock(t,phase,source)/TAU)*(key.startsWith('rotate')||key==='petalPhase'?360:1):motionWave(t,phase,source)*(t.amplitude||0)*(source.motion??.3)/.3;
   s[key]=(source[key]??(key==='petalGrowth'?1:0))+value;if(MOTION_LIMITS[key])s[key]=Math.max(MOTION_LIMITS[key][0],Math.min(MOTION_LIMITS[key][1],s[key]));
  }
@@ -1130,8 +1133,8 @@ function hedgeAt(s,p){const amount=Math.max(0,Math.min(1,((s.petalBlend||0)+(s.p
 function crownBaseAt(s,p){const spread=s.petalCoverage||0;return spread<.0001?flowerAt(s,p):spread>.9999?hedgeAt(s,p):flowerAt(s,p)*(1-spread)+hedgeAt(s,p)*spread;}
 function crownAt(s,p){const weight=rootWeight(s);if(weight>.999999)return rootFieldAt(s,p);const base=crownBaseAt(s,p);return weight>.000001?base*(1-weight)+rootFieldAt(s,p)*weight:base;}
 function stemAt(s,p){const len=s.stemAmount*3,radius=(s.stemRadius??.09)*Math.min(1,s.stemAmount*8),bend=s.stemBend||0,a=[0,-.14,0],b=[bend*.35,-.14-len*.45,0],c=[-bend*.55,-.14-len,0],m=curveAt(a,b,c,.5);return Math.min(coneAt(p,a,m,radius,radius),coneAt(p,m,c,radius,radius));}
-const ROOT_KEYS=['petalGrowth','petalDirectionSpread','petalWeave','petalFlow','petalFlowPhase','petalOrbitPhase','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder'];
-const GROWTH_KEYS=[...ROOT_KEYS,'petalWeaveTurns','petalRows','petalCount','petalOpen','petalLength','petalWidth','petalInflate','petalSharp','petalCurl','petalBlend','petalRoot','petalRandom','petalPhase','seed'];
+const ROOT_KEYS=['petalGrowth','petalCollision','petalSphereCollision','petalDirectionSpread','petalWeave','petalFlow','petalFlowPhase','petalOrbitPhase','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder'];
+const GROWTH_KEYS=[...ROOT_KEYS,'petalContactGap','petalContactStiffness','petalContactPasses','petalWeaveTurns','petalRows','petalCount','petalOpen','petalLength','petalWidth','petalInflate','petalSharp','petalCurl','petalBlend','petalRoot','petalRandom','petalPhase','seed'];
 export function growthTable(s,storage){
  const data=storage?.data||new Float32Array(96*8*4),rowData=storage?.rowData||new Float32Array(16);data.fill(0);rowData.fill(0);const rows=Math.max(2,Math.min(8,Math.floor((s.petalRows||5)+.5)));
  const core=.62+(s.petalOpen??.65)*.14,width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),sharp=s.petalSharp||0,random=s.petalRandom||0;
@@ -1155,13 +1158,93 @@ export function growthTable(s,storage){
 // Geometry and BVH storage are reused; animation refits the existing tree.
 // No per-pixel all-roots search and no rebuilding/sorting during a loop.
 const ROOT_SEGMENTS=24,ROOT_TEXTURE_WIDTH=256,ROOT_TEXTURE_HEIGHT=128;
+const ROOT_CONTACT_MAX_DISPLACEMENT=.55;
+// Position-based strand contacts. Each requested pose is solved from the same
+// periodic guide, independently of playback history, seeking or export order.
+// This is a quasi-static contact solve: no stored velocities or hidden pre-roll.
+export function solveRootContacts(segments,roots,steps,s,core,flat=1){
+ const per=steps+1,n=roots*per,m=roots*steps,positions=new Float64Array(n*3),target=new Float64Array(n*3),radius=new Float64Array(n),mass=new Float64Array(n),arc=new Float64Array(n);
+ const idsA=new Int32Array(m),idsB=new Int32Array(m),rest=new Float64Array(m),bend=new Float64Array(roots*(steps-1));
+ const strength=Math.max(0,Math.min(1,s.petalCollision||0)),sphere=Math.max(0,Math.min(1,s.petalSphereCollision||0)),gap=s.petalContactGap??.006,stiffness=s.petalContactStiffness??.65,passes=s.rootMeasureOnly?0:Math.round(Math.max(8,Math.min(32,s.petalContactPasses||16)));
+ const flat2=flat*flat,emergence=Math.min(1,Math.max(0,((s.petalGrowth??1)-.01)/.3));
+ for(let root=0;root<roots;root++)for(let j=0;j<=steps;j++){
+  const id=root*per+j,q=(root*steps+Math.min(j,steps-1))*8+(j===steps?4:0),p=id*3;
+  for(let k=0;k<3;k++)positions[p+k]=target[p+k]=segments[q+k];radius[id]=segments[q+3];
+  const pin=j===0||j===steps&&Math.hypot(target[p],target[p+1]/flat,target[p+2])<core+radius[id];mass[id]=pin?0:1;
+  if(j){const edge=root*steps+j-1,a=id-1;idsA[edge]=a;idsB[edge]=id;rest[edge]=Math.hypot(positions[p]-positions[p-3],positions[p+1]-positions[p-2],positions[p+2]-positions[p-1]);arc[id]=arc[a]+rest[edge];}
+  if(j>1)bend[root*(steps-1)+j-2]=Math.hypot(positions[p]-positions[p-6],positions[p+1]-positions[p-5],positions[p+2]-positions[p-4]);
+ }
+ const low=new Float64Array(m*3),high=new Float64Array(m*3),order=Array.from({length:m},(_,i)=>i),closest=new Float64Array(5);
+ let corrections=0,contacts=0,maxCorrection=0;
+ function distance(a,b,length,factor){
+  const ai=a*3,bi=b*3,x=positions[ai]-positions[bi],y=positions[ai+1]-positions[bi+1],z=positions[ai+2]-positions[bi+2],d=Math.hypot(x,y,z),w=mass[a]+mass[b];if(d<1e-10||w===0)return;
+  const q=(length-d)*factor/(d*w);positions[ai]+=x*q*mass[a];positions[ai+1]+=y*q*mass[a];positions[ai+2]+=z*q*mass[a];positions[bi]-=x*q*mass[b];positions[bi+1]-=y*q*mass[b];positions[bi+2]-=z*q*mass[b];
+ }
+ function closestPair(a,b,c,d){
+  a*=3;b*=3;c*=3;d*=3;
+  const ux=positions[b]-positions[a],uy=positions[b+1]-positions[a+1],uz=positions[b+2]-positions[a+2],vx=positions[d]-positions[c],vy=positions[d+1]-positions[c+1],vz=positions[d+2]-positions[c+2],wx=positions[a]-positions[c],wy=positions[a+1]-positions[c+1],wz=positions[a+2]-positions[c+2];
+  const aa=ux*ux+uy*uy+uz*uz,ee=vx*vx+vy*vy+vz*vz,bb=ux*vx+uy*vy+uz*vz,cc=ux*wx+uy*wy+uz*wz,ff=vx*wx+vy*wy+vz*wz,clamp=x=>Math.max(0,Math.min(1,x));let u=0,v=0;
+  if(aa<1e-12)v=ee<1e-12?0:clamp(ff/ee);else if(ee<1e-12)u=clamp(-cc/aa);else{const den=aa*ee-bb*bb;u=den>1e-12?clamp((bb*ff-cc*ee)/den):0;v=(bb*u+ff)/ee;if(v<0){v=0;u=clamp(-cc/aa);}else if(v>1){v=1;u=clamp((bb-cc)/aa);}}
+  closest[0]=u;closest[1]=v;closest[2]=wx+ux*u-vx*v;closest[3]=wy+uy*u-vy*v;closest[4]=wz+uz*u-vz*v;
+ }
+ function separate(i,j,apply=true){
+  const a=idsA[i],b=idsB[i],c=idsA[j],d=idsB[j];
+  if(Math.floor(i/steps)===Math.floor(j/steps)&&(Math.abs(i-j)<=2||Math.abs(arc[a]-arc[c])<2*(radius[a]+radius[c])+Math.max(rest[i],rest[j])))return 0;
+  closestPair(a,b,c,d);const u=closest[0],v=closest[1],ra=radius[a]*(1-u)+radius[b]*u,rb=radius[c]*(1-v)+radius[d]*v,minimum=ra+rb+gap;
+  let x=closest[2],y=closest[3],z=closest[4],len=Math.hypot(x,y,z),penetration=minimum-len;if(penetration<=0)return 0;
+  const wa=1-u,wb=u,wc=1-v,wd=v,w=mass[a]*wa*wa+mass[b]*wb*wb+mass[c]*wc*wc+mass[d]*wd*wd;if(w<1e-10)return 0;
+  // Buried attachment regions intentionally join the core. Solve their free
+  // neighbours, rather than trying to separate immovable roots inside it.
+  const px=positions[a*3]*(1-u)+positions[b*3]*u,py=positions[a*3+1]*(1-u)+positions[b*3+1]*u,pz=positions[a*3+2]*(1-u)+positions[b*3+2]*u;
+  if(Math.hypot(px,py/flat,pz)<core-Math.max(ra,rb))return 0;
+  if(!apply)return penetration;
+  if(len<1e-8){const ai=a*3,bi=b*3,ci=c*3,di=d*3,ux=positions[bi]-positions[ai],uy=positions[bi+1]-positions[ai+1],uz=positions[bi+2]-positions[ai+2],vx=positions[di]-positions[ci],vy=positions[di+1]-positions[ci+1],vz=positions[di+2]-positions[ci+2];x=uy*vz-uz*vy;y=uz*vx-ux*vz;z=ux*vy-uy*vx;len=Math.hypot(x,y,z);if(len<1e-8){x=-uy;y=ux;z=0;len=Math.hypot(x,y);if(len<1e-8){x=1;y=z=0;len=1;}}if((Math.floor(i/steps)+Math.floor(j/steps))%2){x=-x;y=-y;z=-z;}}
+  const scale=penetration*strength/(len*(w+.03*(1-strength)));x*=scale;y*=scale;z*=scale;
+  for(const [id,weight,sign] of [[a,wa,1],[b,wb,1],[c,wc,-1],[d,wd,-1]]){const f=mass[id]*weight*sign,p=id*3;positions[p]+=x*f;positions[p+1]+=y*f;positions[p+2]+=z*f;}
+  corrections++;return penetration;
+ }
+ function pairs(apply=true){
+  let max=0;
+  for(let i=0;i<m;i++){const a=idsA[i],b=idsB[i],r=Math.max(radius[a],radius[b])+gap*.5+.001;for(let k=0;k<3;k++){low[i*3+k]=Math.min(positions[a*3+k],positions[b*3+k])-r;high[i*3+k]=Math.max(positions[a*3+k],positions[b*3+k])+r;}}
+  order.sort((a,b)=>low[a*3]-low[b*3]||a-b);
+  for(let a=0;a<m;a++){const i=order[a];for(let b=a+1;b<m;b++){const j=order[b];if(low[j*3]>high[i*3])break;if(low[j*3+1]>high[i*3+1]||high[j*3+1]<low[i*3+1]||low[j*3+2]>high[i*3+2]||high[j*3+2]<low[i*3+2])continue;const p=separate(Math.min(i,j),Math.max(i,j),apply);max=Math.max(max,p);if(!apply&&p>.001)contacts++;}}
+  return max;
+ }
+ function sphereContacts(){
+  for(let i=0;i<m;i++){
+   const a=idsA[i],b=idsB[i],part=i%steps;if(part<1||part>=steps-1&&mass[b]===0)continue;
+   const ai=a*3,bi=b*3,dx=positions[bi]-positions[ai],dy=(positions[bi+1]-positions[ai+1])/flat,dz=positions[bi+2]-positions[ai+2],den=dx*dx+dy*dy+dz*dz;
+   const closestT=den>1e-12?Math.max(0,Math.min(1,-(positions[ai]*dx+positions[ai+1]/flat*dy+positions[ai+2]*dz)/den)):.5;
+   for(const t of [0,.5,1,closestT]){
+    const wa=1-t,wb=t,w=mass[a]*wa*wa+mass[b]*wb*wb;if(w<1e-10)continue;
+    const x=positions[ai]*wa+positions[bi]*wb,y=positions[ai+1]*wa+positions[bi+1]*wb,z=positions[ai+2]*wa+positions[bi+2]*wb,norm=Math.hypot(x,y/flat,z);if(norm<1e-10)continue;
+    const nx=x/norm,ny=y/(flat2*norm),nz=z/norm,gradient=Math.hypot(nx,ny,nz),r=radius[a]*wa+radius[b]*wb+gap*.5;
+    const penetration=r-(norm-core)/gradient;if(penetration<=0)continue;
+    const k=penetration*sphere*emergence/(gradient*(w+.03*(1-sphere)));
+    for(const [id,weight] of [[a,wa],[b,wb]]){const f=mass[id]*weight*k,p=id*3;positions[p]+=nx*f;positions[p+1]+=ny*f;positions[p+2]+=nz*f;}
+   }
+  }
+ }
+ for(let pass=0;pass<passes;pass++){
+  // Fixed iteration count and order keep a phase reproducible on preview/export.
+  // End with contacts so elasticity cannot immediately pull strands together.
+  const elastic=pass<passes-3;
+  if(elastic){for(let e=0;e<m;e++){const i=pass%2?m-1-e:e;distance(idsA[i],idsB[i],rest[i],.25+.65*stiffness);}for(let r=0;r<roots;r++)for(let j=0;j<steps-1;j++)distance(r*per+j,r*per+j+2,bend[r*(steps-1)+j],stiffness*.35);}
+  if(sphere>0)sphereContacts();if(strength>0)pairs();
+  for(let i=0;i<n;i++){const p=i*3,x=positions[p]-target[p],y=positions[p+1]-target[p+1],z=positions[p+2]-target[p+2],d=Math.hypot(x,y,z);if(d>ROOT_CONTACT_MAX_DISPLACEMENT){const k=ROOT_CONTACT_MAX_DISPLACEMENT/d;positions[p]=target[p]+x*k;positions[p+1]=target[p+1]+y*k;positions[p+2]=target[p+2]+z*k;}}
+ }
+ const residual=strength>0?pairs(false):0;
+ for(let i=0;i<n;i++)maxCorrection=Math.max(maxCorrection,Math.hypot(positions[i*3]-target[i*3],positions[i*3+1]-target[i*3+1],positions[i*3+2]-target[i*3+2]));
+ for(let i=0;i<m;i++)for(const [id,offset] of [[idsA[i],0],[idsB[i],4]])for(let k=0;k<3;k++)segments[i*8+offset+k]=positions[id*3+k];
+ return {corrections,remainingContacts:contacts,maxPenetration:residual,maxCorrection,passes};
+}
 function rootWeight(s){if(s.motions?.petalFlowPhase?.enabled||s.motions?.petalOrbitPhase?.enabled)return 1;return Math.min(1,10*Math.max(1-(s.petalGrowth??1),...ROOT_KEYS.slice(1).map(k=>Math.abs(s[k]||0))));}
 function rootRadiusBound(s){
  const core=.62+(s.petalOpen??.65)*.14,random=s.petalRandom||0,len=(s.petalLength??1.05)*(1+random*.32),width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),baseGrowth=s.petalGrowth??1,growth=Math.min(1,baseGrowth*(1+(s.petalDisorder||0)*.35*(1-baseGrowth)));
  const root=Math.min(.42,Math.max(.025,width*.5+(s.petalRoot||0)*.28+(s.petalBlend||0)*.04)),tip=Math.max(.0015,width*(.9*(1-(s.petalSharp||0))+.008*(s.petalSharp||0))),reentry=s.petalReentry||0;
  const rise=len*(growth*(1-reentry)*(1-.8*Math.abs(s.petalCoil||0))+Math.sin(Math.min(.5,growth)*Math.PI)*reentry*.68),wander=(s.petalWander||0)*len*.52*growth,curl=(Math.abs(s.petalCurl||0)*.65+random*.18)*len*growth*growth;
  const radius=Math.max(root*(1+random*.18),tip)*(1+(s.petalKnots||0)*.32+(s.petalRidges||0)*.12);
- return Math.max(core,core-root*(1-random*.18)*1.1+rise+wander+curl+(s.petalWeave||0)*len*.28+radius*(1+(s.petalFlow||0)*.4))+rootBlend(s)*.5+.025;
+ return Math.max(core,core-root*(1-random*.18)*1.1+rise+wander+curl+(s.petalWeave||0)*len*.28+radius*(1+(s.petalFlow||0)*.4))+rootBlend(s)*.5+.025+((s.petalCollision||s.petalSphereCollision)?ROOT_CONTACT_MAX_DISPLACEMENT:0);
 }
 function rootBlend(s){return .015+(s.petalBlend||0)*(.09+(s.petalRoot||0)*.16);}
 export function rootGeometry(s,storage){
@@ -1204,6 +1287,7 @@ export function rootGeometry(s,storage){
    }
   }
  }
+ if((s.petalCollision||s.petalSphereCollision)&&(s.petalGrowth??1)>.01){storage.contacts=solveRootContacts(segments,roots,ROOT_SEGMENTS,s,core,flat);actualRadius=core;for(let i=0;i<count*8;i+=4)actualRadius=Math.max(actualRadius,Math.hypot(segments[i],segments[i+1],segments[i+2])+segments[i+3]+blend*.25);}else storage.contacts=null;
  const topology=rows+'|'+ringCount+'|'+roots+'|'+(spread<.999999)+'|'+(spread>.000001);
  if(storage.topology!==topology){
   for(let i=0;i<count;i++)storage.order[i]=i;
