@@ -1,9 +1,9 @@
-import {MAX_FINISH_REGIONS} from './finishing.js?v=cb11746e9e46';
+import {MAX_FINISH_REGIONS} from './finishing.js?v=14002290c6c6';
 
 // Editor handles are DOM-only; exported pixels contain the effect, never its handles.
 export function mountFinishingAreas({board,getState,getTab,remember,mark,renderControls,toast}){
  let editing=false,drawing=false,selected=null,drag=null;
- const overlay=document.createElement('div');overlay.id='finish-areas';overlay.hidden=true;overlay.setAttribute('aria-label','Riquadri della finitura');board.append(overlay);
+ const overlay=document.createElement('div');overlay.id='finish-areas';overlay.hidden=true;overlay.setAttribute('aria-label','Riquadri dei filtri');board.append(overlay);
  const controls=document.querySelector('#controls');
  const regions=()=>getState().finishRegions||[];
  const current=()=>regions().find(r=>r.id===selected);

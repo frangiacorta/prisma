@@ -14862,7 +14862,7 @@
     },
     {
       "id": "roadmap-image-treatments",
-      "name": "Immagine in punti · pixel e RGB",
+      "name": "Filtri · punti, celle e segni",
       "kind": "project",
       "related": [
         "img-01",
@@ -14959,7 +14959,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Scena → Finitura; accessibile anche dal pannello Export.",
+      "where": "Scena → Filtri; accessibile anche dal pannello Export.",
       "platform": "",
       "next": "Prossima estensione di questo progetto: ingresso immagine/video e campionamento a punti. Il displacement resta nel Warp ricorsivo.",
       "keep": "",
@@ -17439,7 +17439,7 @@
     },
     {
       "id": "project-finishing",
-      "name": "Finitura · colore, mosaico e RGB",
+      "name": "Filtri · colore, mosaico e RGB",
       "kind": "project",
       "related": [
         "img-s16-mosaic",
@@ -17449,7 +17449,7 @@
       "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Finitura comune a Forme e Particelle: colore, mosaico e RGB, con riquadri disegnabili per trattamenti locali.",
+      "summary": "Filtri finali comuni a Forme e Particelle: colore, mosaico e RGB, con riquadri disegnabili per trattamenti locali.",
       "sources": [
         "https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexSubImage2D"
       ],
@@ -17469,7 +17469,7 @@
             {
               "label": "controls",
               "value": [
-                "Attiva finitura",
+                "Attiva filtri",
                 "Prima/Dopo solo in anteprima",
                 "Attiva colore",
                 "Esposizione, contrasto, saturazione e bilanciamento",
@@ -17540,7 +17540,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Scena → Finitura, oppure Esporta creazione → Regola finitura prima dell’export.",
+      "where": "Scena → Filtri, oppure Esporta creazione → Regola filtri prima dell’export.",
       "platform": "",
       "next": "",
       "keep": "",

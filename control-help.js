@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=cb11746e9e46';
+import {AUDIO_HELP} from './audio-model.js?v=14002290c6c6';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  petalCollision:'Vincoli di contatto fra segmenti: i fili si separano quando i loro spessori si incontrano. Zero conserva la geometria precedente; uno usa contatti rigidi entro la precisione scelta. Sopra zero sospende le animazioni dei percorsi: restano disponibili scorrimento della materia e rotazione.',
@@ -22,7 +22,7 @@ const HELP={
  finishRegionRgb:'La separazione RGB appare solo nelle aree selezionate.',
  finishRegionInvert:'Tratta l’esterno dell’unione dei riquadri. Serve almeno un riquadro.',
  finishFeather:'Sfuma il bordo verso l’interno delle aree, in percentuale del lato corto. Zero crea un bordo netto.',
- finishEnabled:'Attiva o esclude tutta la finitura senza perdere i valori scelti. Vale anche per l’export.',
+ finishEnabled:'Attiva o esclude tutti i filtri senza perdere i valori scelti. Vale anche per l’export.',
  finishTone:'Attiva esposizione, contrasto, saturazione e bilanciamento mantenendo i valori memorizzati.',
  finishRgb:'Sposta i tre canali di colore sull’immagine finale. Funziona su Forme, Particelle e sfondo.',
  finishMosaic:'Ricampiona il fotogramma in celle nette. Non cambia il numero o la dimensione delle particelle nella scena.',

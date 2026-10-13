@@ -2,7 +2,7 @@
 export const NAV_GROUPS=[
  {id:'structure',label:'Forma e moto',tabs:[['shape','Forma','shape'],['grains','Granelli','shape','particles'],['trails','Fibre e scie','motion','particles'],['motion','Movimento','motion']]},
  {id:'look',label:'Aspetto',tabs:[['material','Materia','material'],['color','Colori','palette'],['light','Luci','sun']]},
- {id:'scene',label:'Scena',tabs:[['background','Sfondo','background'],['photo','Finitura','photo']]},
+ {id:'scene',label:'Scena',tabs:[['background','Sfondo','background'],['photo','Filtri','photo']]},
  {id:'interaction',label:'Interazione',tabs:[['fields','Punti e percorsi','move','particles'],['body','Testa e mani','orbit'],['audio','Audio','audio']]}
 ];
 export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.filter(t=>!t[3]||t[3]===engine).map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label})));
