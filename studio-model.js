@@ -1,10 +1,11 @@
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=9259421b472f';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=3a151b6e1c4a';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
 export function track(amplitude=1,enabled=false,mode='wave'){return{enabled,amplitude,cycles:1,phase:0,direction:1,curve:'sine',pace:0,pacePhase:0,hold:0,mode}}
 export const SHAPE_TRACKS=['petalFlowPhase','petalOrbitPhase','petalWeave','volume','deform','twist','waves','hole','cut','petalOpen','petalCurl','petalInflate','petalSharp','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemBend'];
 export const TRACK_META={
+ pVeilStyle:['Petali / aureola / ventaglio',0,2,.01],pVeilMorph:['Trasformazione forma / veli',0,1,.01],pVeilSpread:['Apertura dei veli',0,1,.01],
  petalFlowPhase:['Scorrimento lungo le radici',0,1,.01],petalOrbitPhase:['Avanzamento continuo sulla sfera',0,1,.01],petalWeave:['Ampiezza intreccio',0,1,.01],
  petalGrowth:['Emersione delle radici',0,1,.01],petalWander:['Sinuosità delle radici',0,1,.01],petalCoil:['Avvolgimento intorno alla sfera',0,1,.01],petalReentry:['Rientro nella sfera',0,1,.01],petalKnots:['Nodosità delle radici',0,1,.01],petalRidges:['Nervature della superficie',0,1,.01],petalDisorder:['Disordine della crescita',0,1,.01],
  petalOpen:['Apertura dei petali',0,.6,.01],petalCurl:['Arricciatura dei petali',0,1,.01],petalInflate:['Gonfiore dei petali',0,.7,.01],petalSharp:['Petali / punte',0,.7,.01],petalPhase:['Rotazione della corona',0,360,1],petalBlend:['Fusione con la sfera',0,1,.01],petalRoot:['Ampiezza delle radici',0,1,.01],petalRandom:['Irregolarità delle punte',0,1,.01],stemBend:['Oscillazione del gambo',0,.8,.01],colorWavePhase:['Onde di colore',0,1,.01],

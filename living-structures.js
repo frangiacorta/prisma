@@ -1,5 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=9259421b472f';
-import {excludeForcePositions} from './particle-forces.js?v=9259421b472f';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=3a151b6e1c4a';
+import {excludeForcePositions} from './particle-forces.js?v=3a151b6e1c4a';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;uniform vec3 uLivingMotion;`;
 export class LivingStructures{
@@ -128,8 +128,8 @@ void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vec4(vUV,.5
   const key=JSON.stringify(Object.entries(s).filter(([k])=>k.startsWith('p')||['seed','volume','stretchX','stretchY','stretchZ','deform','twist','waves','waveScale','scale','rotateX','rotateY','rotateZ'].includes(k)));
   if(key!==this.key){const paths=this.owner.guides.paths;this.owner.guides.paths=[];try{setLivingRest(this.topology,this.capturePositions({...s,forcePoints:[],bodyForces:[],forcePaths:[]},0));}finally{this.owner.guides.paths=paths;}this.key=key;}
  }
- draw(s,phase){
-  const start=performance.now();this.prepare(s);const gl=this.gl,o=this.owner,t=this.topology;
+ sample(s,phase){
+  this.prepare(s);const gl=this.gl,o=this.owner,t=this.topology;
   this.positions=relaxLiving(t,this.capturePositions(s,phase),s.pElastic,s.pBend);
   // Weld the polar vertices after relaxation: a closed end must stay closed.
   for(const row of (s.pSkinOpening===0?[0,t.rows-1]:[t.rows-1])){const mean=[0,0,0];for(let x=0;x<t.columns;x++)for(let k=0;k<3;k++)mean[k]+=this.positions[(row*t.columns+x)*3+k]/t.columns;for(let x=0;x<t.columns;x++)this.positions.set(mean,(row*t.columns+x)*3);}
@@ -142,6 +142,9 @@ void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vec4(vUV,.5
    for(let i=0;i<this.positions.length/3;i++)this.pixels.set(this.positions.subarray(i*3,i*3+3),i*4);
    gl.activeTexture(gl.TEXTURE6);gl.bindTexture(gl.TEXTURE_2D,this.texture);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,t.columns,t.rows,gl.RGBA,gl.FLOAT,this.pixels);
   }
+  return this.positions;
+ }
+ draw(s,phase){const start=performance.now();this.sample(s,phase);const gl=this.gl,o=this.owner,t=this.topology;
   const setup=p=>{o.settings(p,s,phase);o.tex(p,'uLivingPositions',this.texture,6);gl.uniform2i(o.loc(p,'uLivingSize'),t.columns,t.rows);};
   gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
   if(s.pSkin>0){

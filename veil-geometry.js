@@ -7,6 +7,7 @@ export function makeVeilMesh(layers,columns=96,rows=40){
  return {layers,columns,rows,coords:new Float32Array(coords),triangles:new Uint32Array(triangles),vertices:new Float32Array(coords.length*3),indices:new Uint32Array(triangles.length),order:Array.from({length:triangles.length/3},(_,i)=>i),depths:new Float32Array(triangles.length/3)};
 }
 export function veilPoint(s,u,v,layer,phase){
+ const style=Math.max(0,Math.min(2,s.pVeilStyle));if(style!==Math.floor(style)){const low=Math.floor(style),f=style-low,a=veilPoint({...s,pVeilStyle:low},u,v,layer,phase),b=veilPoint({...s,pVeilStyle:low+1},u,v,layer,phase);return a.map((v,i)=>v+(b[i]-v)*f);}
  const t=TAU*phase*s.pVeilCycles,clock=t-s.pVeilRhythm*Math.sin(t),l=layer,shift=l*2.39996323;
  let x,y,z;
  if(l<0){const a=u*TAU,b=v*Math.PI,r=s.pVeilCoreRadius;x=r*Math.sin(b)*Math.cos(a);y=r*Math.sin(b)*Math.sin(a);z=r*Math.cos(b);}

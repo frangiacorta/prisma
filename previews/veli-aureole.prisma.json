@@ -1,9 +1,13 @@
 {
   "prismaProject": 2,
   "name": "Petali di velo",
-  "createdAt": "2026-10-13T21:16:36.655Z",
-  "exportedAt": "2026-10-13T21:16:36.655Z",
+  "createdAt": "2026-10-13T21:47:51.361Z",
+  "exportedAt": "2026-10-13T21:47:51.361Z",
   "state": {
+    "pVeilSourceKind": 0,
+    "pVeilFromForm": 1,
+    "pVeilMorph": 1,
+    "pVeilMemory": 0,
     "pVeilStyle": 0,
     "pVeilLayers": 6,
     "pVeilSpread": 0.72,
@@ -379,6 +383,42 @@
     "grainSize": 1,
     "photoAll": false,
     "motions": {
+      "pVeilStyle": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "pVeilMorph": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "pVeilSpread": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
       "petalFlowPhase": {
         "enabled": false,
         "amplitude": 0.2,

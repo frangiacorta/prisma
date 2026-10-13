@@ -1,4 +1,4 @@
-import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=9259421b472f';
+import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=3a151b6e1c4a';
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
 export const PARTICLE_VERSION=10;
 export const FAMILIES=['Nucleo Pathfinder'];
@@ -108,7 +108,7 @@ export function migratePathfinder(doc,base){
  return s;
 }
 export function varyParticles(source,seed,amount=.45,scope='all',surprise=false){
- if(source.pLiving===4){const r=rng(seed),s=structuredClone(source);for(const [g,keys] of Object.entries(VEIL_GROUPS))if(scope==='all'||scope===g)for(const k of keys){const [,lo,hi,step]=VEIL_META[k];const v=s[k]+(r()-.5)*(hi-lo)*amount;s[k]=Math.max(lo,Math.min(hi,step>=1?Math.round(v):v));}if(scope==='all'||scope==='shape')s.seed=seed>>>0;return s;}
+ if(source.pLiving===4){const r=rng(seed),s=structuredClone(source);for(const [g,keys] of Object.entries(VEIL_GROUPS))if(scope==='all'||scope===g)for(const k of keys){if(k==='pVeilFromForm')continue;const [,lo,hi,step]=VEIL_META[k];const v=s[k]+(r()-.5)*(hi-lo)*amount;s[k]=Math.max(lo,Math.min(hi,step>=1?Math.round(v):v));}if(scope==='all'||scope==='shape')s.seed=seed>>>0;return s;}
  const r=rng(seed),s=surprise?particleCreation(source,Math.floor(r()*PARTICLE_STUDIES.length),seed):structuredClone(source);if(scope==='all'||scope==='shape')s.seed=seed>>>0;
  for(const [group,keys] of Object.entries(PARTICLE_GROUPS))if(scope==='all'||scope===group)for(const key of keys){
   const [,lo,hi,step]=PARTICLE_META[key];

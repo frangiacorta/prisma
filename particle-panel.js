@@ -1,8 +1,8 @@
-import {veilPanel} from './veil-panel.js?v=9259421b472f';
-import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=9259421b472f';
-import {SPRITES,COLOR_MODES} from './particle-model.js?v=9259421b472f';
+import {veilPanel} from './veil-panel.js?v=3a151b6e1c4a';
+import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=3a151b6e1c4a';
+import {SPRITES,COLOR_MODES} from './particle-model.js?v=3a151b6e1c4a';
 export function particlePanel(tab,s,h,shared,selectedLight){
- const veil=s.pLiving===4?veilPanel(tab,s,h,shared,selectedLight):null;if(veil!==null)return veil;
+ const veil=s.pLiving===4?veilPanel(tab,s,{...h,baseShapePanel:()=>particlePanel('shape',{...s,pLiving:s.pVeilSourceKind===4?0:s.pVeilSourceKind,engine:'solid'},h,shared,selectedLight)},shared,selectedLight):null;if(veil!==null)return veil;
  const {slider,section,details,colorField,check}=h;
  const sliders=keys=>keys.map(k=>slider(k)).join('');
  const select=(key,label,items)=>`<label class="field">${label}<select data-particle-select="${key}">${items.map((n,i)=>`<option value="${i}" ${s[key]===i?'selected':''}>${n}</option>`).join('')}</select></label>`;

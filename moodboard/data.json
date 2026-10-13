@@ -3929,7 +3929,7 @@
           "available": true
         }
       ],
-      "duration": 24.0,
+      "duration": 24,
       "clip": "media/s07-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
@@ -15006,7 +15006,7 @@
       "state": "partial",
       "priority": true,
       "author": "",
-      "summary": "Prima versione in Prisma: petali traslucidi, aureole sovrapposte e lamelle a ventaglio, con geometria, materia e moto separati.",
+      "summary": "Veli integrati nella creazione: passaggio graduabile dalla forma corrente, ritorno alla sorgente, forme intermedie e animazioni salvate nei preset.",
       "sources": [
         "https://www.infinitemantra.ca/",
         "https://www.fooh.com/blog/lindsay-kokoska-interview"
@@ -15123,7 +15123,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "veli-aureole",
-      "where": "Forme → Tipo di forma → Veli e aureole; oppure Punti di partenza → Petali di velo / Aureola a strati.",
+      "where": "Forme → Trasforma la tua forma → Apri questa forma in veli e aureole. Anche dal selettore Struttura di fibre, tessuto, membrane e particelle.",
       "platform": "",
       "next": "Confrontare i look e il movimento con le reference e raccogliere il feedback prima delle estensioni fisiche.",
       "keep": "",
@@ -15144,9 +15144,63 @@
         "roadmap-membrane",
         "project-pellicola-viva"
       ],
-      "resultImage": "media/60b84ee706765a8b.webp",
-      "resultVideo": "../previews/veli-aureole-4s.mp4?v=33",
-      "resultUrl": "../previews/veli-aureole.html?v=33"
+      "resultImage": "media/85a4acb87a267ae1.webp",
+      "resultVideo": "../previews/veli-aureole-4s.mp4?v=34",
+      "resultUrl": "../previews/veli-aureole.html?v=34",
+      "method": "Coordinate persistenti: superficie esterna campionata dal campo delle forme scolpite, oppure superficie del solver delle strutture vive. Gli stessi vertici passano alla disposizione dei veli. Il primo 12% raccorda i due materiali ottici; a zero il renderer originale restituisce il fotogramma esatto. Strati ordinati in profondità e composizione alpha.",
+      "reuse": "Riutilizzati campo geometrico delle forme, solver delle strutture vive, palette, luci, tracce animate, filtri, preset ed esportatore Prisma. Nessun codice originale degli artisti attribuito a questa implementazione.",
+      "implemented": [
+        "Petali su avorio e aureola blu/corallo su scuro; variante lamelle a ventaglio",
+        "Da 1 a 16 strati; apertura, distanza, avvolgimento, pieghe e asimmetria",
+        "Opacità per velo, risalto e sfumatura dei bordi; dimensione e oscurità del nucleo indipendenti fino a zero",
+        "Palette radice/bordo con variazione fra strati; luci e filtri Prisma",
+        "Apertura ciclica, pieghe viaggianti, ritardi, verso, velocità e accelerazione/rallentamento",
+        "Preset scaricato e reimportato; stessa geometria in Forme e Particelle; PNG trasparente e MP4",
+        "Trasformazione continua dalla forma corrente, senza caricare un preset e senza cambiare palette, luci, durata o animazioni",
+        "Controlli della forma sorgente accessibili; ritorno esatto al volume, fibre, tessuto, membrana o particelle originali",
+        "Disposizione continua Petali ↔ Aureola ↔ Ventaglio; animazione del passaggio e dell’apertura con ritmo, fase e cicli indipendenti"
+      ],
+      "controls": [
+        "Numero e ampiezza dei petali",
+        "Apertura/chiusura",
+        "Torsione e ritardo fra strati",
+        "Ondulazione del bordo",
+        "Trasparenza e assorbimento apparente",
+        "Palette radice/bordo",
+        "Oscurità e dimensione del nucleo indipendenti",
+        "Durata loop e irregolarità periodica",
+        "Numero di strati",
+        "Distanza e variazione di scala",
+        "Ritardo di fase fra strati",
+        "Spessore e sfumatura del contorno",
+        "Apertura laterale e asimmetria",
+        "Palette radiale blu/crema/corallo",
+        "Opacità per strato",
+        "Nucleo scuro regolabile fino a zero",
+        "Trasformazione forma / veli",
+        "Rilievo ereditato dalla forma",
+        "Forme intermedie fra petali, aureola e ventaglio",
+        "Animazione del morph con ampiezza, fase, ritmo e cicli"
+      ],
+      "limits": [
+        "Superfici traslucide artistiche: niente rifrazione, collisioni fisiche o ombre reciproche",
+        "Ordinamento per triangoli; a forti intersezioni o angoli radenti possono comparire piccoli artefatti di sovrapposizione",
+        "Il nucleo è una zona di assorbimento sulla lamina, non una sfera opaca separata",
+        "Nessuna equivalenza esatta con il procedimento originale delle reference dichiarata",
+        "Nei volumi il passaggio usa la superficie esterna: cavità sovrapposte e radici molto sottili possono essere semplificate. La materia ottica originaria si raccorda alla materia dei veli",
+        "Nelle strutture vive si trasforma la superficie di supporto: non è una simulazione della fusione di ogni singolo granello o filo"
+      ],
+      "checks": [
+        "Ogni controllo cambia i pixel",
+        "Raccordo geometrico e delle normali, loop pixel identico e seek ripetibile",
+        "Alpha zero, trasparenza parziale e ricomposizione PNG su bianco",
+        "Preset dei due motori, filtri, UI dedicata, assenza overflow a 390 px",
+        "Zero e ritorno: pixel identici per 5 tipi di sorgente",
+        "Palette, luci, durata e tracce conservate passando ai veli e cambiando disposizione",
+        "Morph e forme intermedie normalizzati nei preset; loop ripetibile e nessun errore WebGL"
+      ],
+      "evidence": "reports/veil-transform/endpoints.json; reports/veil-transform/endpoints-built.json; reports/layered-veils/local.json; reports/living-integration/source.json",
+      "resultVersion": "34"
     },
     {
       "id": "roadmap-luminous-vortex",
