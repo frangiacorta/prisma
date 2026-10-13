@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-10",
+  "updated": "2026-10-13",
   "items": [
     {
       "id": "s01-01",
@@ -2126,7 +2126,8 @@
       "name": "Strange attractor — veli e fibre luminosi",
       "kind": "video",
       "related": [
-        "tool-01"
+        "tool-01",
+        "roadmap-electric-filaments"
       ],
       "state": "reference",
       "priority": false,
@@ -2267,6 +2268,7 @@
       "name": "Pathfinder particles — nucleo e scie",
       "kind": "video",
       "related": [
+        "tool-s18-bloom",
         "reuse-three-attractors",
         "tool-github-com-mrdoob-three-js-blob-dev-examples-webgpu-tsl-compute-attractors-particles-",
         "roadmap-particles",
@@ -11413,7 +11415,8 @@
       "name": "Infinite Mantra · petali di velo viola",
       "kind": "video",
       "related": [
-        "roadmap-layered-veils"
+        "roadmap-layered-veils",
+        "s18-04"
       ],
       "state": "reference",
       "priority": false,
@@ -11883,6 +11886,830 @@
       "completedProjects": []
     },
     {
+      "id": "s18-01",
+      "name": "Rembagram · vortice luminoso e variante grafica",
+      "kind": "video",
+      "related": [
+        "s18-03",
+        "roadmap-luminous-vortex",
+        "roadmap-recursive-warp",
+        "roadmap-image-treatments"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Rembagram · @rembagram",
+      "summary": "Due letture dello stesso motivo: un vortice con bordi luminosi e una versione a campiture chiare e scure.",
+      "sources": [
+        "https://linktr.ee/Rembagram",
+        "https://www.patreon.com/posts/touchdesigner-113546237"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Nucleo scuro irregolare, lembi curvi attorno e pennacchi esterni. Due riquadri, non un’unica scena.",
+                "light": "Sopra: filamenti bianchi/azzurri e flare orizzontale con frangia cromatica. Sotto: campiture grigie, avorio e verde tenue, con minore dettaglio e contrasto variabile.",
+                "motion": "Nei 12 campioni il bordo si avvolge e cambia apertura; il trattamento inferiore alterna riempimenti e sagome. Non dimostra collisioni fisiche.",
+                "organicQuality": "Coerenza della spirale con piccole ondulazioni locali; forte contrasto tra zona scura e bordo sottile."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta Prisma: campo vorticoso periodico con deformazione locale; emissione e bloom separati. La seconda resa può diventare una finitura a palette ridotta/soglie, mantenendo lo stesso moto. Non attribuire questa ricetta all’autore."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Il post cita componenti TouchDesigner. Linktree ufficiale rimanda a Patreon e vi è un post di progetto TD. Non verificata la corrispondenza fra quel download e questo vortice, né la licenza di porting. Nessuna repo pubblica specifica identificata."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Raggio nucleo fino a zero",
+                "Torsione",
+                "Apertura lembi",
+                "Velocità e ritmo",
+                "Spessore bordo",
+                "Soglia/raggio del bagliore",
+                "Flare direzionale",
+                "Numero colori della finitura"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.24166666666666667,
+                  0.725,
+                  1.2083333333333333,
+                  1.6916666666666667,
+                  2.175,
+                  2.658333333333333,
+                  3.141666666666666,
+                  3.625,
+                  4.108333333333333,
+                  4.591666666666667,
+                  5.075,
+                  5.558333333333334
+                ],
+                "contactSheet": "reports/reference-series-18/1-contact.jpg",
+                "limits": "12 fotogrammi cronologici a risoluzione originale 296×640; audio non analizzato. Tecnica interna e chiusura del loop non certificate. Le ricette Prisma sono proposte, non descrizioni del codice originale."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Riferimento acquisito, risultato Prisma ancora da costruire e confrontare in movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "motion",
+        "graphic"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Stessa forma leggibile con due trattamenti; luce sottile e nucleo controllabile.",
+      "avoid": "Moltiplicare i renderer per ogni finitura; rendere il foro centrale obbligatorio.",
+      "detailsSource": [
+        "reference\\video-series-18.json"
+      ],
+      "media": [
+        {
+          "src": "media/903ee8779fc5914d.webp",
+          "width": 296,
+          "height": 204
+        },
+        {
+          "src": "media/54d4be4e77817083.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/cf2ee8de4c9a1b0f.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/601b7818a38741a9.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/b7e24534a1b9db73.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/822ac785284a31e9.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/218522b2c02108d3.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "745877d2fe173727",
+          "name": "1-ScreenRecording_10-10-2026-21-02-50_1.mov",
+          "bytes": 1899606,
+          "available": true
+        }
+      ],
+      "duration": 5.8,
+      "clip": "media/s18-01-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s18-02",
+      "name": "Endless Edge · filamenti e scintille",
+      "kind": "video",
+      "related": [
+        "roadmap-electric-filaments",
+        "roadmap-fibre-motion"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "INCRPRL · @incrprl.dsgn",
+      "summary": "Pochi fili sottilissimi su scuro, attraversati da picchi luminosi e brevi ramificazioni.",
+      "sources": [
+        "https://boosty.to/incrprl"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Linee lunghe oblique e piccoli nodi, con molto spazio nero. Non è una nube uniformemente densa.",
+                "light": "Punti quasi bianchi, alone rosa/viola tenue e strisce di luce lungo i fili; il dettaglio più sottile resta debole.",
+                "motion": "Fra i campioni variano direzioni, estensione e luminosità dei nodi; tratti si concentrano e si disperdono. Il campionamento non quantifica i lampi più rapidi.",
+                "organicQuality": "Tensione e assottigliamento lungo percorsi continui; l’impressione elettrica deriva anche dai picchi locali."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta: curve o scie persistenti con rumore coerente, punti di emissione mobili lungo la curva e bagliore selettivo. Separare moto del filo, corsa dell’impulso e flare. Integrare nelle fibre/scie esistenti."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Trovato ENDLESS EDGE PREVIEW e il relativo .toe sulla pagina ufficiale Boosty: accesso al sorgente a pagamento, livello SHIFT. File non acquistato né eseguito. Prima scelta su PC: valutare il progetto originale; porting web e redistribuzione richiedono verifica dei termini, il .toe non gira dentro Pages."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Numero fili",
+                "Spessore minimo",
+                "Lunghezza/persistenza",
+                "Tensione e curvatura",
+                "Velocità impulsi",
+                "Frequenza lampi",
+                "Larghezza bagliore",
+                "Soglia luminosa",
+                "Nero di fondo"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.23625,
+                  0.7087499999999999,
+                  1.1812500000000001,
+                  1.6537499999999998,
+                  2.12625,
+                  2.59875,
+                  3.0712499999999996,
+                  3.5437499999999997,
+                  4.01625,
+                  4.4887500000000005,
+                  4.96125,
+                  5.43375
+                ],
+                "contactSheet": "reports/reference-series-18/2-contact.jpg",
+                "limits": "12 fotogrammi cronologici a risoluzione originale 296×640; audio non analizzato. Tecnica interna e chiusura del loop non certificate. Le ricette Prisma sono proposte, non descrizioni del codice originale."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Riferimento acquisito, risultato Prisma ancora da costruire e confrontare in movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "fibre",
+        "motion"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Pochi segni, neri ampi, dettaglio sottile e impulsi localizzati.",
+      "avoid": "Bloom uniforme su tutto lo schermo o scambio casuale di identità dei fili.",
+      "detailsSource": [
+        "reference\\video-series-18.json"
+      ],
+      "media": [
+        {
+          "src": "media/5e170397f7d8664d.webp",
+          "width": 296,
+          "height": 371
+        },
+        {
+          "src": "media/02d4a2a0b930dd98.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/a2afbbd82a1a80de.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/d2caee2bd3bb64e7.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/c4cd436170ccefb7.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/a2652b3838e76f1d.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/80a26b4dee78f710.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "d84923869e943af5",
+          "name": "2-ScreenRecording_10-12-2026-07-45-21_1.mov",
+          "bytes": 971449,
+          "available": true
+        }
+      ],
+      "duration": 5.67,
+      "clip": "media/s18-02-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s18-03",
+      "name": "Rembagram · vortice nella foresta",
+      "kind": "video",
+      "related": [
+        "s18-01",
+        "roadmap-luminous-vortex"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Rembagram · @rembagram",
+      "summary": "Una spirale scura si apre nella scena di un bosco, bordata da pennacchi luminosi e un riflesso orizzontale.",
+      "sources": [
+        "https://linktr.ee/Rembagram",
+        "https://www.patreon.com/posts/touchdesigner-113546237"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Vortice centrale con cavità e lembi esterni, apparentemente sospeso su uno sfondo boschivo.",
+                "light": "Bordi bianchi/blu e flare laterale arcobaleno; il motivo diventa più scuro al centro del filmato. Nessuna prova di illuminazione fisica del bosco.",
+                "motion": "La spirale si avvolge, il centro si allarga e i pennacchi cambiano sviluppo; nel finale ritorna una fase più luminosa. Raccordo esatto non verificato.",
+                "organicQuality": "Flusso comune e dettagli locali sfalsati, con cambi di intensità e densità apparente."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Stesso progetto del video 1: composizione di campo vorticoso, trasparenza e bordo emissivo. Per uno sfondo importato servono livello immagine/video e compositing; per Prisma 4D servirebbe invece un volume reale, non basta sovrapporre un video."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Motivo condiviso con s18-01, conservato come seconda prova e non duplicato come nuovo effetto. Rembagram offre materiali TD su Patreon, ma il progetto esatto e i suoi termini non sono stati identificati con certezza."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Densità pennacchi",
+                "Raggio cavità",
+                "Velocità di rotazione",
+                "Deformazione",
+                "Emissione",
+                "Flare",
+                "Mix con sfondo",
+                "Maschera di compositing"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.3958333333333333,
+                  1.1875,
+                  1.9791666666666667,
+                  2.7708333333333335,
+                  3.5625,
+                  4.354166666666667,
+                  5.145833333333333,
+                  5.9375,
+                  6.729166666666667,
+                  7.520833333333333,
+                  8.3125,
+                  9.104166666666666
+                ],
+                "contactSheet": "reports/reference-series-18/3-contact.jpg",
+                "limits": "12 fotogrammi cronologici a risoluzione originale 296×640; audio non analizzato. Tecnica interna e chiusura del loop non certificate. Le ricette Prisma sono proposte, non descrizioni del codice originale."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Riferimento acquisito, risultato Prisma ancora da costruire e confrontare in movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "motion",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Separazione fra massa scura, bordo luminoso e ambiente.",
+      "avoid": "Presentare il compositing come una simulazione volumetrica già accertata.",
+      "detailsSource": [
+        "reference\\video-series-18.json"
+      ],
+      "media": [
+        {
+          "src": "media/da61dabf6e515640.webp",
+          "width": 296,
+          "height": 192
+        },
+        {
+          "src": "media/c4debf3f08dcb48e.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/ac19364dc9d33ef8.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/49be1b9ca8302ccf.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/d7c03bc36f53eca9.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/ec0f862c2480b122.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/04dcdd4ae45844e9.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "8c14e762f08e0237",
+          "name": "3-ScreenRecording_10-10-2026-21-02-05_1.mov",
+          "bytes": 1863763,
+          "available": true
+        }
+      ],
+      "duration": 9.5,
+      "clip": "media/s18-03-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s18-04",
+      "name": "Cosmic Fungi · lamelle e fiori traslucidi",
+      "kind": "video",
+      "related": [
+        "roadmap-layered-veils",
+        "roadmap-membrane",
+        "s17-01"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Lindsay Kokoska · Infinite Mantra / IOGINALITY",
+      "summary": "Prima lamelle a ventaglio crema/arancio/blu, poi una forma floreale di veli viola trasparenti.",
+      "sources": [
+        "https://ioginality.io/items/4d3330de-fdf3-4aca-9cf3-796d6acd9a61"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Primi circa 5 s: fitte pieghe parallele convergono in uno stelo. Da circa 6 s: un’altra composizione con petali sovrapposti, traslucidi.",
+                "light": "Caldo al centro e blu grigio ai bordi nella prima; riflessi chiari e trasparenze viola/rosate nella seconda. Ombre tra le pieghe danno profondità.",
+                "motion": "Le lamelle si incurvano insieme; nel secondo segmento i petali cambiano apertura e sovrapposizione. Il passaggio di slide non è un morph fra le due geometrie.",
+                "organicQuality": "Pieghe coordinate a più scale, continuità delle superfici e lenta apertura floreale."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Estensione Veli già in roadmap: superfici parametriche a strati, nervature lungo coordinate della superficie, ritardi di fase per petalo e trasparenza ordinata. Due preset distinti per lamelle opache e fiori traslucidi."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Identificata la scheda ufficiale Cosmic Fungi su IOGINALITY. Descrive l’opera e un processo generale dell’artista che include compositing, animazione e AI; non documenta il generatore di questi fotogrammi. Nessuna scena o repo scaricabile verificata. Riutilizzare membrane e materiali Prisma."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Numero lamelle/petali",
+                "Frequenza e profondità pieghe",
+                "Spessore bordo",
+                "Apertura",
+                "Ritardo per strato",
+                "Trasparenza",
+                "Colore dalla base alla punta",
+                "Luce radente"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.5558333333333333,
+                  1.6674999999999998,
+                  2.779166666666667,
+                  3.890833333333333,
+                  5.0025,
+                  6.114166666666667,
+                  7.225833333333333,
+                  8.3375,
+                  9.449166666666667,
+                  10.560833333333333,
+                  11.6725,
+                  12.784166666666666
+                ],
+                "contactSheet": "reports/reference-series-18/4-contact.jpg",
+                "limits": "12 fotogrammi cronologici a risoluzione originale 296×640; audio non analizzato. Tecnica interna e chiusura del loop non certificate. Le ricette Prisma sono proposte, non descrizioni del codice originale."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Riferimento acquisito, risultato Prisma ancora da costruire e confrontare in movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "motion",
+        "fibre"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Pieghe solidali, colore sulla materia e strati leggibili.",
+      "avoid": "Una sola tinta viola per tutta la superficie; interpretare un cambio slide come deformazione continua.",
+      "detailsSource": [
+        "reference\\video-series-18.json"
+      ],
+      "media": [
+        {
+          "src": "media/e3ffba3951da24e6.webp",
+          "width": 296,
+          "height": 249
+        },
+        {
+          "src": "media/307e21c446d132df.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/9c0f180bffb35d10.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/de6ff1a46cffed2a.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/37cb75cd4c3f8459.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/97a7bdc8331d7461.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/94bd0b99cec12f60.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "588dfd1f07a5f643",
+          "name": "4-ScreenRecording_10-10-2026-22-57-26_1.mov",
+          "bytes": 5200219,
+          "available": true
+        }
+      ],
+      "duration": 13.34,
+      "clip": "media/s18-04-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
+      "id": "s18-05",
+      "name": "Nebula Supercluster · nucleo e ramificazioni di luce",
+      "kind": "video",
+      "related": [
+        "roadmap-electric-filaments",
+        "roadmap-particle-volume"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "INCRPRL · @incrprl.dsgn",
+      "summary": "Un nucleo luminoso compatto si espande in una rete nebulosa di filamenti viola, poi torna a concentrarsi.",
+      "sources": [
+        "https://boosty.to/incrprl/posts/65f922ff-fa2e-41b1-b302-90c8718007e3",
+        "https://boosty.to/incrprl"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": {
+                "shape": "Inizio: anello/volume chiuso luminoso; da circa 6 s: rete irregolare ramificata, a tratti concentrata in un nodo molto brillante.",
+                "light": "Bianco nei picchi, rosa e violetto nelle zone diffuse, fondo quasi nero. Le ramificazioni restano distinte dall’alone.",
+                "motion": "Alternanza di espansione, raccolta e allungamento; tra 10 e 20 s il nodo cambia posizione e direzione dei pennacchi. Non è dimostrato un loop continuo.",
+                "organicQuality": "Coesione variabile, dettagli a più scale e transizione tra massa compatta e filamenti radi."
+              }
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta: stesso progetto Filamenti elettrici con densità maggiore, campo di attrazione variabile, rumore coerente a più scale e impulso di emissione separato dalla velocità. Studiare prima il .toe originale per capire se usa feedback, particelle o entrambi."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "La pagina ufficiale NEBULA SUPERCLUSTER PREVIEW offre l’acquisto del sorgente .toe. Titolo e autore coincidono con il reel. Interni del progetto e prestazioni non verificati senza il file; nessuna licenza open source individuata. Non acquistato. Integrazione browser da valutare dopo l’ispezione dei nodi e dei termini."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Compattezza",
+                "Espansione",
+                "Ramificazione",
+                "Scala turbolenza",
+                "Persistenza fili",
+                "Dimensione nucleo",
+                "Emissione locale",
+                "Alone",
+                "Ritmo di apertura e raccolta"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": {
+                "chronologicalSamples": 12,
+                "times": [
+                  0.9325,
+                  2.7975,
+                  4.6625,
+                  6.5275,
+                  8.3925,
+                  10.257499999999999,
+                  12.1225,
+                  13.987499999999999,
+                  15.8525,
+                  17.717499999999998,
+                  19.5825,
+                  21.4475
+                ],
+                "contactSheet": "reports/reference-series-18/5-contact.jpg",
+                "limits": "12 fotogrammi cronologici a risoluzione originale 296×640; audio non analizzato. Tecnica interna e chiusura del loop non certificate. Le ricette Prisma sono proposte, non descrizioni del codice originale."
+              }
+            },
+            {
+              "label": "loop",
+              "value": "Riferimento acquisito, risultato Prisma ancora da costruire e confrontare in movimento."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "cloud",
+        "film",
+        "motion",
+        "fibre"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "Transizione modulabile fra nucleo e rete, bagliore che lascia leggere i rami.",
+      "avoid": "Scambiare la luminosità per densità; imporre sempre un toro o un foro centrale.",
+      "detailsSource": [
+        "reference\\video-series-18.json"
+      ],
+      "media": [
+        {
+          "src": "media/9c52796f1f9f307e.webp",
+          "width": 296,
+          "height": 372
+        },
+        {
+          "src": "media/b8ee487f2eaca53b.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/23fb98bd5c1f975b.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/9329d813b3a59052.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/348af3b83390a25c.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/12f13085144a505c.webp",
+          "width": 296,
+          "height": 640
+        },
+        {
+          "src": "media/293e77b5703b04f1.webp",
+          "width": 296,
+          "height": 640
+        }
+      ],
+      "assets": [
+        {
+          "id": "187adc5559e2f4fb",
+          "name": "5-ScreenRecording_10-12-2026-20-55-29_1.mov",
+          "bytes": 9559010,
+          "available": true
+        }
+      ],
+      "duration": 22.38,
+      "clip": "media/s18-05-study.mp4",
+      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "completedProjects": []
+    },
+    {
       "id": "roadmap-fractals",
       "name": "Frattali 3D",
       "kind": "project",
@@ -12164,7 +12991,8 @@
         "reuse-sound-to-light",
         "reuse-sndviz",
         "reuse-meyda",
-        "tool-13"
+        "tool-13",
+        "img-s18-form-vision"
       ],
       "state": "partial",
       "priority": false,
@@ -12406,7 +13234,8 @@
         "img-s16-rootstock",
         "s16-01",
         "reuse-tdxmorph",
-        "img-tdxmorph"
+        "img-tdxmorph",
+        "img-s18-form-vision"
       ],
       "state": "proposed",
       "priority": false,
@@ -12547,6 +13376,8 @@
         "s17-02",
         "reuse-pcr",
         "reuse-three-attractors",
+        "s18-05",
+        "roadmap-electric-filaments",
         "dense-cloud"
       ],
       "state": "proposed",
@@ -12710,6 +13541,7 @@
         "s11-01",
         "reuse-xpbd",
         "project-living-extensions",
+        "s18-04",
         "roadmap-layered-veils",
         "project-cobalto-oro",
         "project-pellicola-viva"
@@ -12849,7 +13681,9 @@
         "reuse-xpbd",
         "reuse-pcr",
         "project-living-extensions",
+        "s18-02",
         "roadmap-filament-planets",
+        "roadmap-electric-filaments",
         "project-trama-viva",
         "project-fibre-setose",
         "soleil"
@@ -13282,7 +14116,9 @@
       "related": [
         "img-20261010-03",
         "img-s16-displace",
-        "recursive-displace"
+        "s18-01",
+        "recursive-displace",
+        "roadmap-luminous-vortex"
       ],
       "state": "proposed",
       "priority": false,
@@ -14034,6 +14870,7 @@
         "img-s16-mosaic",
         "img-s16-rgb",
         "project-finishing",
+        "s18-01",
         "prisma-window-depth",
         "prisma-image-particles"
       ],
@@ -14152,6 +14989,7 @@
         "s17-03",
         "roadmap-membrane",
         "project-pellicola-viva",
+        "s18-04",
         "s17-02"
       ],
       "state": "proposed",
@@ -14226,7 +15064,8 @@
                 "Due preset di confronto: petali su avorio e aureola su scuro",
                 "Controllo indipendente del nucleo scuro, incluso zero",
                 "Verifica chiusura naturale senza scatti e loop senza salto",
-                "Prova prestazioni e sorting degli strati sovrapposti"
+                "Prova prestazioni e sorting degli strati sovrapposti",
+                "Lamelle a ventaglio Cosmic Fungi: pieghe coordinate e gradiente base-punta; confronto separato dai petali traslucidi"
               ]
             },
             {
@@ -14247,7 +15086,7 @@
       "result": "",
       "where": "",
       "platform": "",
-      "next": "Studio trasparenza e sovrapposizione delle lamine · Due preset di confronto: petali su avorio e aureola su scuro · Controllo indipendente del nucleo scuro, incluso zero · Verifica chiusura naturale senza scatti e loop senza salto · Prova prestazioni e sorting degli strati sovrapposti",
+      "next": "Studio trasparenza e sovrapposizione delle lamine · Due preset di confronto: petali su avorio e aureola su scuro · Controllo indipendente del nucleo scuro, incluso zero · Verifica chiusura naturale senza scatti e loop senza salto · Prova prestazioni e sorting degli strati sovrapposti · Lamelle a ventaglio Cosmic Fungi: pieghe coordinate e gradiente base-punta; confronto separato dai petali traslucidi",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -14265,6 +15104,232 @@
       "completedProjects": [
         "roadmap-membrane",
         "project-pellicola-viva"
+      ]
+    },
+    {
+      "id": "roadmap-luminous-vortex",
+      "name": "Vortici luminosi · lembi e flare",
+      "kind": "project",
+      "related": [
+        "s18-01",
+        "s18-03",
+        "roadmap-recursive-warp",
+        "tool-s18-noise",
+        "tool-s18-bloom"
+      ],
+      "state": "proposed",
+      "priority": false,
+      "author": "",
+      "summary": "Stessa spirale modulabile in resa luminosa o grafica, con cavità facoltativa e pennacchi coerenti.",
+      "sources": [
+        "https://linktr.ee/Rembagram",
+        "https://www.patreon.com/posts/touchdesigner-113546237"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Estendere campi/warp e finitura, mantenendo separati geometria, emissione, bloom e sfondo. Prima prova procedurale autonoma su nero; compositing sul bosco come verifica successiva."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Verificare il pacchetto originale Rembagram su Patreon. Alternativa browser: campo procedurale esistente con shader noise MIT e bagliore adattato da Three.js. Nessun componente originale acquisito."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Raggio nucleo fino a zero",
+                "Torsione",
+                "Apertura lembi",
+                "Velocità e ritmo",
+                "Spessore bordo",
+                "Soglia/raggio del bagliore",
+                "Flare direzionale",
+                "Numero colori della finitura"
+              ]
+            },
+            {
+              "label": "acceptance",
+              "value": [
+                "Nucleo riducibile a zero",
+                "Bordo luminoso leggibile senza saturare tutta la forma",
+                "Continuità di posa e velocità nel loop",
+                "Stesso moto nelle finiture luminosa e grafica"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "remaining",
+              "value": [
+                "Identificare il file esatto Rembagram e termini di adattamento",
+                "Prototipo del campo vorticoso",
+                "Bagliore selettivo e flare separati",
+                "Confronto con entrambe le reference e raccordo del loop"
+              ]
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "motion"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "Identificare il file esatto Rembagram e termini di adattamento · Prototipo del campo vorticoso · Bagliore selettivo e flare separati · Confronto con entrambe le reference e raccordo del loop",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/creative-roadmap.json"
+      ],
+      "media": [
+        {
+          "src": "media/903ee8779fc5914d.webp",
+          "width": 296,
+          "height": 204
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "s18-01",
+      "completedProjects": []
+    },
+    {
+      "id": "roadmap-electric-filaments",
+      "name": "Filamenti elettrici · scintille e nebulose",
+      "kind": "project",
+      "related": [
+        "s18-02",
+        "s18-05",
+        "roadmap-fibre-motion",
+        "roadmap-particle-volume",
+        "tool-s18-noise",
+        "tool-s18-bloom",
+        "s03-03"
+      ],
+      "state": "proposed",
+      "priority": false,
+      "author": "",
+      "summary": "Dai pochi fili di Endless Edge alla rete densa di Nebula: un controllo continuo di densità, coesione e luce.",
+      "sources": [
+        "https://boosty.to/incrprl",
+        "https://boosty.to/incrprl/posts/65f922ff-fa2e-41b1-b302-90c8718007e3"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Estendere fibre e campi di moto dello stesso nucleo. Impulsi luminosi scorrono sulle curve con velocità distinta; il bloom non decide la densità."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Originali .toe individuati su Boosty INCRPRL, a pagamento. Prima ispezionare nodi e licenza del progetto acquisito; alternativa browser con campi coerenti e postprocessing MIT. Nessun download a pagamento eseguito."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Numero fili",
+                "Spessore minimo",
+                "Lunghezza/persistenza",
+                "Tensione e curvatura",
+                "Velocità impulsi",
+                "Frequenza lampi",
+                "Larghezza bagliore",
+                "Soglia luminosa",
+                "Nero di fondo",
+                "Compattezza",
+                "Espansione",
+                "Ramificazione",
+                "Scala turbolenza",
+                "Persistenza fili",
+                "Dimensione nucleo",
+                "Emissione locale",
+                "Alone",
+                "Ritmo di apertura e raccolta"
+              ]
+            },
+            {
+              "label": "acceptance",
+              "value": [
+                "Fili leggibili senza bloom",
+                "Luce e densità indipendenti",
+                "Transizione nucleo/rete senza cambi casuali di identità",
+                "Loop di posa, emissione e velocità controllato"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "remaining",
+              "value": [
+                "Valutare file TD originali e termini",
+                "Prova fili sottili con identità persistente",
+                "Impulsi localizzati e bloom a più scale",
+                "Espansione/raccolta continua dal nucleo alla rete",
+                "Confronto in movimento e prestazioni"
+              ]
+            }
+          ]
+        }
+      ],
+      "families": [
+        "fibre",
+        "film",
+        "cloud"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "Valutare file TD originali e termini · Prova fili sottili con identità persistente · Impulsi localizzati e bloom a più scale · Espansione/raccolta continua dal nucleo alla rete · Confronto in movimento e prestazioni",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/creative-roadmap.json"
+      ],
+      "media": [
+        {
+          "src": "media/5e170397f7d8664d.webp",
+          "width": 296,
+          "height": 371
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "s18-02",
+      "completedProjects": [
+        "roadmap-fibre-motion"
       ]
     },
     {
@@ -16492,6 +17557,240 @@
       ],
       "assets": [],
       "illustrationFrom": "img-s16-mosaic",
+      "completedProjects": []
+    },
+    {
+      "id": "img-s18-form-vision",
+      "name": "Form Vision · composizioni audioreattive",
+      "kind": "image",
+      "related": [
+        "roadmap-audio-interaction",
+        "roadmap-preset-morphing"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "Exo Audio · @exo.aud",
+      "summary": "Più riquadri con particelle, corpo scuro, curve luminose e bande di colore; riferimento per scene composte e controlli condivisi.",
+      "sources": [
+        "https://exoaudio.com/plugins/form-vision"
+      ],
+      "sections": [
+        {
+          "title": "Cosa vediamo",
+          "fields": [
+            {
+              "label": "observed",
+              "value": "Screenshot promozionale: sei finestre visive, tra cui nuvola granulare, corpo riflettente, curve viola/verdi e bande verticali. Il singolo fotogramma non consente di misurare reattività o fluidità."
+            }
+          ]
+        },
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Proposta Prisma: riutilizzare l’audio esistente e studiare scene con moduli combinabili, preset completi e mappature separate per luce, moto e densità. Non installabile direttamente su Pages; eventuale uso esterno tramite video esportato."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Il sito ufficiale presenta Form Vision come app desktop standalone per Windows/macOS a pagamento, con 11 moduli, layout combinabili, preset e export MP4. Non individuata API web o repository pubblico. La presenza di una DAW nello screenshot non prova un formato VST. Demo richiede invio email: non richiesta."
+            }
+          ]
+        },
+        {
+          "title": "Controlli e regole",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Mix e posizione dei livelli",
+                "Sensibilità per modulo",
+                "Attacco/rilascio",
+                "Bande audio assegnabili",
+                "Preset scena",
+                "Export coerente con anteprima"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "limits",
+              "value": "Resta riferimento; audio e tracking mantengono lo stato in corso. Non sostituisce il prossimo progetto visivo."
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "inspection",
+              "value": "Screenshot osservato e specifiche confrontate con il sito ufficiale il 13 ottobre 2026. Nessun test runtime."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "interaction",
+        "workflow"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/93aab86073b1bc70.webp",
+          "width": 588,
+          "height": 1280
+        }
+      ],
+      "assets": [
+        {
+          "id": "93aab86073b1bc70",
+          "name": "6-Foto-6.jpg",
+          "bytes": 150370,
+          "available": true
+        }
+      ],
+      "completedProjects": []
+    },
+    {
+      "id": "tool-s18-noise",
+      "name": "WebGL Noise · rumore procedurale GLSL",
+      "kind": "tool",
+      "related": [
+        "roadmap-luminous-vortex",
+        "roadmap-electric-filaments"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "",
+      "summary": "Routine GLSL aperte per campi continui, candidate a deformare vortici e filamenti.",
+      "sources": [
+        "https://github.com/ashima/webgl-noise",
+        "https://github.com/ashima/webgl-noise/blob/master/LICENSE",
+        "https://github.com/ashima/webgl-noise/blob/master/src/noise3D.glsl"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Usare il rumore come ingrediente del campo. Un campo curl richiede derivate/campionamenti aggiuntivi; un loop richiede parametrizzazione periodica. Non è un effetto completo né garantisce la resa dei video."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Letti noise3D.glsl e LICENSE: rumore simplex 3D con funzioni permute/mod289 e normalizzazione dei gradienti, licenza MIT. Riuso possibile conservando gli avvisi; codice non ancora importato o testato in Prisma."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "motion",
+        "growth"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/903ee8779fc5914d.webp",
+          "width": 296,
+          "height": 204
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "roadmap-luminous-vortex",
+      "completedProjects": []
+    },
+    {
+      "id": "tool-s18-bloom",
+      "name": "UnrealBloomPass · bagliore a più scale",
+      "kind": "tool",
+      "related": [
+        "roadmap-luminous-vortex",
+        "roadmap-electric-filaments",
+        "s03-04"
+      ],
+      "state": "reference",
+      "priority": false,
+      "author": "",
+      "summary": "Soglia luminosa, sfocature a più risoluzioni e composizione: riferimento riusabile per aloni che rispettano i dettagli.",
+      "sources": [
+        "https://threejs.org/docs/pages/UnrealBloomPass.html",
+        "https://github.com/mrdoob/three.js/blob/dev/examples/jsm/postprocessing/UnrealBloomPass.js",
+        "https://github.com/mrdoob/three.js/blob/dev/LICENSE"
+      ],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Bagliore selettivo dopo il rendering, mantenendo separati colore, soglia, raggio e intensità. Flare direzionale e ramificazioni richiedono altri passaggi/geometrie."
+            }
+          ]
+        },
+        {
+          "title": "Repo, plugin e riuso",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Letti sorgente e documentazione Three.js, licenza MIT. Il pass usa render target, shader high-pass e blur separabili; dipende da Three.js. Prisma usa WebGL proprio: adattare i passaggi, non incollare la classe senza dipendenze. Nessun benchmark o integrazione eseguiti."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "film",
+        "graphic"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "",
+      "where": "",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/903ee8779fc5914d.webp",
+          "width": 296,
+          "height": 204
+        }
+      ],
+      "assets": [],
+      "illustrationFrom": "roadmap-luminous-vortex",
       "completedProjects": []
     },
     {
@@ -19512,13 +20811,13 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 178,
-    "videos": 56,
-    "images": 22,
-    "tools": 71,
-    "projects": 26,
-    "attachments": 126,
-    "clips": 56,
+    "records": 188,
+    "videos": 61,
+    "images": 23,
+    "tools": 73,
+    "projects": 28,
+    "attachments": 132,
+    "clips": 61,
     "missing": 10
   }
 }

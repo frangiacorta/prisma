@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=ce862a198a9f';
+import {AUDIO_HELP} from './audio-model.js?v=cb11746e9e46';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  petalCollision:'Vincoli di contatto fra segmenti: i fili si separano quando i loro spessori si incontrano. Zero conserva la geometria precedente; uno usa contatti rigidi entro la precisione scelta. Sopra zero sospende le animazioni dei percorsi: restano disponibili scorrimento della materia e rotazione.',
