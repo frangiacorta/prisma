@@ -1,5 +1,6 @@
 // Shared by Forme and Particelle. Changing workspace never changes the geometry.
 export const usesParticleSurface=s=>s?.engine==='particles'||s?.pLiving>0;
+export const supportsParticleFields=s=>usesParticleSurface(s)&&s.pLiving!==4;
 export function livingWeights(s){
  if(!(s.pLiving>0))return {core:1,structure:0};
  const x=Math.max(0,Math.min(1,s.pLivingBlend??.5));

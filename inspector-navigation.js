@@ -5,11 +5,11 @@ export const NAV_GROUPS=[
  {id:'scene',label:'Scena',tabs:[['background','Sfondo','background'],['photo','Filtri','photo']]},
  {id:'interaction',label:'Interazione',tabs:[['fields','Punti e percorsi','move','particles'],['body','Testa e mani','orbit'],['audio','Audio','audio']]}
 ];
-export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.filter(t=>!t[3]||t[3]===engine).map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label})));
+export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.filter(t=>(!t[3]||t[3]===engine)&&!(engine==='veils'&&['body','audio'].includes(t[0]))).map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label})));
 const clean=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 export function renderNavigation(root,engine,tab,icon){
  const tabs=navigationTabs(engine),current=tabs.find(t=>t.id===tab)||tabs[0];
- root.innerHTML='<div class="nav-groups" aria-label="Aree di lavoro">'+NAV_GROUPS.map(g=>`<button type="button" data-tab="${tabs.find(t=>t.group===g.id).id}" aria-pressed="${current.group===g.id}" class="nav-group ${current.group===g.id?'active':''}">${g.label}</button>`).join('')+'</div><div class="nav-tabs" role="tablist" aria-label="'+current.groupLabel+'">'+tabs.filter(t=>t.group===current.group).map(t=>`<button type="button" role="tab" aria-controls="controls" id="tab-${t.id}" class="tab ${tab===t.id?'active':''}" data-tab="${t.id}" aria-selected="${tab===t.id}">${icon(t.icon)}${t.label}</button>`).join('')+'</div>';
+ root.innerHTML='<div class="nav-groups" aria-label="Aree di lavoro">'+NAV_GROUPS.filter(g=>tabs.some(t=>t.group===g.id)).map(g=>`<button type="button" data-tab="${tabs.find(t=>t.group===g.id).id}" aria-pressed="${current.group===g.id}" class="nav-group ${current.group===g.id?'active':''}">${g.label}</button>`).join('')+'</div><div class="nav-tabs" role="tablist" aria-label="'+current.groupLabel+'">'+tabs.filter(t=>t.group===current.group).map(t=>`<button type="button" role="tab" aria-controls="controls" id="tab-${t.id}" class="tab ${tab===t.id?'active':''}" data-tab="${t.id}" aria-selected="${tab===t.id}">${icon(t.icon)}${t.label}</button>`).join('')+'</div>';
  document.getElementById('controls').setAttribute('aria-labelledby','tab-'+current.id);
  document.getElementById('panel-location').textContent=current.label;
 }

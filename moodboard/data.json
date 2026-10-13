@@ -12717,7 +12717,7 @@
         "s12-01"
       ],
       "state": "proposed",
-      "priority": true,
+      "priority": false,
       "author": "",
       "summary": "Mandelbulber gratuito sul PC: riusare motore, esempi e animazioni; integrazione Prisma da realizzare.",
       "sources": [
@@ -15003,10 +15003,10 @@
         "s18-04",
         "s17-02"
       ],
-      "state": "proposed",
-      "priority": false,
+      "state": "partial",
+      "priority": true,
       "author": "",
-      "summary": "Estensione delle membrane: petali semitrasparenti e aureole sovrapposte con apertura lenta, ritardi e colore per strato.",
+      "summary": "Prima versione in Prisma: petali traslucidi, aureole sovrapposte e lamelle a ventaglio, con geometria, materia e moto separati.",
       "sources": [
         "https://www.infinitemantra.ca/",
         "https://www.fooh.com/blog/lindsay-kokoska-interview"
@@ -15017,7 +15017,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Riutilizzare le superfici e il moto connesso già presenti in Particelle. Aggiungere lamine persistenti e una variante di contorni stratificati, con fase periodica esplicita. Confrontare trasparenza geometrica e feedback solo dopo un primo studio visivo."
+              "value": "Superfici parametriche con coordinate persistenti e movimento periodico. Triangoli ordinati dal fondo verso la camera, alpha premoltiplicato fra gli strati e alpha non premoltiplicato nei PNG. Composizione distinta dalla pelle a superficie più vicina delle membrane precedenti."
             }
           ]
         },
@@ -15026,7 +15026,7 @@
           "fields": [
             {
               "label": "reuse",
-              "value": "Base Prisma: living-structures.js, living-topology.js e particle-shading.js; codice XPBD già integrato. Nessuna repo originale dell’artista identificata per questi video."
+              "value": "Riutilizzati renderer particellare Prisma, palette, luci, filtri, preset, trasporto ed esportatore video. Le nuove lamine sono analitiche; nessun solver XPBD o codice originale degli artisti viene attribuito a questa geometria."
             }
           ]
         },
@@ -15069,21 +15069,49 @@
           "title": "Realizzato e da fare",
           "fields": [
             {
+              "label": "implemented",
+              "value": [
+                "Petali su avorio e aureola blu/corallo su scuro; variante lamelle a ventaglio",
+                "Da 1 a 16 strati; apertura, distanza, avvolgimento, pieghe e asimmetria",
+                "Opacità per velo, risalto e sfumatura dei bordi; dimensione e oscurità del nucleo indipendenti fino a zero",
+                "Palette radice/bordo con variazione fra strati; luci e filtri Prisma",
+                "Apertura ciclica, pieghe viaggianti, ritardi, verso, velocità e accelerazione/rallentamento",
+                "Preset scaricato e reimportato; stessa geometria in Forme e Particelle; PNG trasparente e MP4"
+              ]
+            },
+            {
               "label": "remaining",
               "value": [
-                "Studio trasparenza e sovrapposizione delle lamine",
-                "Due preset di confronto: petali su avorio e aureola su scuro",
-                "Controllo indipendente del nucleo scuro, incluso zero",
-                "Verifica chiusura naturale senza scatti e loop senza salto",
-                "Prova prestazioni e sorting degli strati sovrapposti",
-                "Lamelle a ventaglio Cosmic Fungi: pieghe coordinate e gradiente base-punta; confronto separato dai petali traslucidi"
+                "Affinare la somiglianza e il carattere del movimento con feedback sui tre look",
+                "Verificare prestazioni su telefono fisico e casi di intersezione estrema fra strati"
               ]
             },
             {
               "label": "limits",
               "value": [
-                "Le membrane v1 già completate non dimostrano ancora la qualità di queste nuove reference",
-                "Le ricette sono ipotesi di implementazione Prisma; non descrivono il codice originale"
+                "Superfici traslucide artistiche: niente rifrazione, collisioni fisiche o ombre reciproche",
+                "Ordinamento per triangoli; a forti intersezioni o angoli radenti possono comparire piccoli artefatti di sovrapposizione",
+                "Il nucleo è una zona di assorbimento sulla lamina, non una sfera opaca separata",
+                "Granelli, scie e campi non agiscono su questa nuova geometria; menu dedicati esclusi",
+                "Nessuna equivalenza esatta con il procedimento originale delle reference dichiarata"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove e provenienza",
+          "fields": [
+            {
+              "label": "evidence",
+              "value": "reports/layered-veils/local.json; render, video codificato/decodificato e screenshot desktop/mobile."
+            },
+            {
+              "label": "checks",
+              "value": [
+                "Ogni controllo cambia i pixel",
+                "Raccordo geometrico e delle normali, loop pixel identico e seek ripetibile",
+                "Alpha zero, trasparenza parziale e ricomposizione PNG su bianco",
+                "Preset dei due motori, filtri, UI dedicata, assenza overflow a 390 px"
               ]
             }
           ]
@@ -15094,10 +15122,10 @@
         "motion"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "",
-      "where": "",
+      "result": "veli-aureole",
+      "where": "Forme → Tipo di forma → Veli e aureole; oppure Punti di partenza → Petali di velo / Aureola a strati.",
       "platform": "",
-      "next": "Studio trasparenza e sovrapposizione delle lamine · Due preset di confronto: petali su avorio e aureola su scuro · Controllo indipendente del nucleo scuro, incluso zero · Verifica chiusura naturale senza scatti e loop senza salto · Prova prestazioni e sorting degli strati sovrapposti · Lamelle a ventaglio Cosmic Fungi: pieghe coordinate e gradiente base-punta; confronto separato dai petali traslucidi",
+      "next": "Confrontare i look e il movimento con le reference e raccogliere il feedback prima delle estensioni fisiche.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -15115,7 +15143,10 @@
       "completedProjects": [
         "roadmap-membrane",
         "project-pellicola-viva"
-      ]
+      ],
+      "resultImage": "media/60b84ee706765a8b.webp",
+      "resultVideo": "../previews/veli-aureole-4s.mp4?v=33",
+      "resultUrl": "../previews/veli-aureole.html?v=33"
     },
     {
       "id": "roadmap-luminous-vortex",

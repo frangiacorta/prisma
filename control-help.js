@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=b8fddb013af6';
+import {AUDIO_HELP} from './audio-model.js?v=9259421b472f';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishEdge:'Estrae i profili dal fotogramma finale. Funziona su Forme e Particelle e rileva anche i bordi della trasparenza.',

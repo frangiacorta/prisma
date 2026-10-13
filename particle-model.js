@@ -1,12 +1,13 @@
+import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=9259421b472f';
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
 export const PARTICLE_VERSION=10;
 export const FAMILIES=['Nucleo Pathfinder'];
 export const SPRITES=['Granello','Disco','Anello','Scintilla'];
 export const COLOR_MODES=['Solidale alla forma iniziale','Identità della particella','Fasci e filamenti','Campo nello spazio'];
 // label, min, max, step; grouped independently from the solid renderer.
-export const PARTICLE_META={
+export const PARTICLE_META={...VEIL_META,
  pLivingBlend:['Passaggio particelle / struttura',0,1,.01],pSurfaceBind:['Adesione dei granelli alla struttura',0,1,.01],pLivingOcclusion:['Schermatura del nucleo',0,1,.01],
- pVolumeHold:['Conservazione del volume',0,1,.01],pBundleDelay:['Ritardo tra i fasci',0,.35,.005],pFray:['Sfrangiatura dei fasci',0,1,.01],pLiving:['Struttura connessa',0,3,1],pBundles:['Numero di fasci',1,16,1],pBundleSpread:['Apertura dei fasci',.05,1,.01],pStrands:['Fili della struttura',32,2048,16],pThreadWidth:['Spessore dei fili connessi · px',.015,4,.005],pThreadOpacity:['Visibilità dei fili connessi',0,1,.01],pWeft:['Intreccio trasversale',0,1,.01],
+ pVolumeHold:['Conservazione del volume',0,1,.01],pBundleDelay:['Ritardo tra i fasci',0,.35,.005],pFray:['Sfrangiatura dei fasci',0,1,.01],pLiving:['Struttura connessa',0,4,1],pBundles:['Numero di fasci',1,16,1],pBundleSpread:['Apertura dei fasci',.05,1,.01],pStrands:['Fili della struttura',32,2048,16],pThreadWidth:['Spessore dei fili connessi · px',.015,4,.005],pThreadOpacity:['Visibilità dei fili connessi',0,1,.01],pWeft:['Intreccio trasversale',0,1,.01],
  pElastic:['Resistenza allo stiramento',0,1,.01],pBend:['Resistenza alla piega',0,1,.01],pSkin:['Continuità della membrana',0,1,.01],pSkinOffset:['Distanza della pelle dal nucleo',-.4,.6,.01],pSkinOpening:['Apertura della pelle',0,1,.01],pFoldCount:['Numero di pieghe',1,16,1],pFoldDepth:['Profondità delle pieghe',0,.6,.01],pInflate:['Respiro della pelle',0,.4,.01],pContract:['Chiusura e involuzione',0,.8,.01],pPores:['Apertura dei pori',0,.95,.01],pPoreCount:['Densità dei pori',4,64,1],
  pLinks:['Visibilità connessioni',0,1,.01],pLinkNodes:['Nodi della trama',50,4000,10],pLinkReach:['Distanza di collegamento',.03,1.5,.01],pLinkNeighbors:['Vicini scelti per nodo',1,5,1],pLinkWidth:['Spessore connessioni · px',.02,4,.01],pLinkCurve:['Curvatura dei fili',0,.8,.01],pLinkStretch:['Allungamento consentito',1,12,.1],
  pFilm:['Pellicola viva',0,1,.01],pFilmScale:['Scala delle venature',.2,5,.01],pFilmVariation:['Variazione dello spessore',0,1,.01],
@@ -28,7 +29,7 @@ export const PARTICLE_META={
  pTrailPersistence:['Persistenza della coda',0,1,.01],pTrailSoftness:['Morbidezza delle fibre',0,1,.01],pTrailCoherence:['Coesione in tessuto',0,1,.01],pTrailDensity:['Compensazione luminosità',0,1,.01],pTrailQuality:['Definizione delle curve',24,192,8],
  pColorMode:['Colore sulle particelle',0,3,1],pColorScatter:['Variazione cromatica individuale',0,1,.01],pLumaVar:['Variazione luminosità individuale',0,1,.01],pDepthFade:['Attenuazione in profondità',0,1,.01],pLighting:['Risposta alle luci',0,1,.01],
 };
-export const PARTICLE_DEFAULTS={
+export const PARTICLE_DEFAULTS={...VEIL_DEFAULTS,
  pLivingBlend:.5,pSurfaceBind:0,pLivingOcclusion:1,
  pVolumeHold:0,pBundleDelay:0,pFray:0,pLiving:0,pBundles:8,pBundleSpread:.65,pStrands:512,pThreadWidth:.45,pThreadOpacity:.8,pWeft:0,pElastic:.6,pBend:.3,pSkin:0,pSkinOffset:0,pSkinOpening:.15,pFoldCount:5,pFoldDepth:.12,pInflate:.06,pContract:.15,pPores:0,pPoreCount:24,
  pLinks:0,pLinkNodes:1500,pLinkReach:.2,pLinkNeighbors:3,pLinkWidth:.45,pLinkCurve:.12,pLinkStretch:4,
@@ -54,6 +55,7 @@ export const PARTICLE_GROUPS={
  color:['pColorMode','pColorScatter','pLumaVar'],light:['pLighting','pDepthFade'],
  motion:['pVolumeHold','pBundleDelay','pFray','pElastic','pBend','pInflate','pContract','pCohesion','pRandom','pJitter','pVortex','pReentry','pBreath','pTravel','pAttract','pRepel','pMagnet','pPoles','pRadius','pField','pCycles','pDirection','pRhythm','pPause','pSpeedSpread','pLife','pPulse','pSignal','pPropagation','pMotionSoftness','pFollow','pOrbitOval','pOrbitTilt','pOrbitPrecession','pOrbitSpread','pOrbitDrift','pWander','pWanderScale','pWanderCycles','pFlowBalance','pMotionSeed','pTentacleWave','pTentacleCycles','pSpaceWarp','pWarpScale','pWarpCycles','pWarpTwist'],
 };
+for(const [group,keys] of Object.entries(VEIL_GROUPS))PARTICLE_GROUPS[group].push(...keys);
 // Geometry-only reset: material, palette, seed and loop duration are preserved.
 export const SPHERE_FORM={pOpening:0,pThickness:.6,pFill:1,pClumps:0,pLobeDepth:0,pOrganic:0,pWarp:0,pNeural:0,pSymmetry:1,pTentacle:0,pOuter:0,pRandom:0,pJitter:0,pVortex:0,pReentry:0,pBreath:0,pLife:0,pAttract:0,pRepel:0,pMagnet:0,pOrbitOval:0,pOrbitTilt:0,pOrbitPrecession:0,pOrbitDrift:0,pWander:0,pSpaceWarp:0,deform:0,twist:0,waves:0,volume:1,stretchX:1,stretchY:1,stretchZ:1,pTravel:1};
 export function particleSphere(s){
@@ -66,6 +68,7 @@ export const LIVING_STYLES={
  fibres:{pLiving:1,pSkin:0,pWeft:0,pThreadOpacity:.85,pStrands:640,pThreadWidth:.55,pBundles:8,pBundleSpread:.55,pElastic:.7,pBend:.45},
  tissue:{pLiving:2,pSkin:.4,pWeft:.65,pThreadOpacity:.7,pStrands:256,pThreadWidth:.65,pElastic:.85,pBend:.45,pPores:.72,pPoreCount:26},
  membrane:{pLiving:3,pSkin:1,pWeft:0,pThreadOpacity:.08,pStrands:192,pThreadWidth:.3,pElastic:.65,pBend:.5,pPores:0,pSkinOpening:.35},
+ veils:{pLiving:4,pLivingBlend:1,pCount:0,pTrailCount:0,pLinks:0,pSkin:0,pThreadOpacity:0,pSurfaceBind:0},
  off:{pLiving:0}
 };
 const LIVING_BASE={...SPHERE_FORM,pFill:0,pCount:16000,pOpacity:.35,pSize:.7,pLivingBlend:1,pSurfaceBind:1,pTrailCount:0,pLinks:0,pThickness:.68,pOrganic:.18,pFrequency:1.5,pCohesion:1,pRandom:0,pJitter:0,pSpeedSpread:0,pTravel:.12,pMotionSoftness:.9,pLife:.07,pBreath:.04,pRhythm:.05,pFoldCount:5,pFoldDepth:.16,pInflate:.08,pContract:.18,pSkinOffset:.04,pSkinOpening:.18,scale:1.7,rotateX:32,rotateY:-20,rotateZ:-18,metal:.12,roughness:.32,gloss:.75,iridescence:.1,emission:.18,glow:.08,pLighting:.85,pFiberSheen:.7,pFiberSpread:.45,pFilm:.3,filmThickness:380,pFilmVariation:.25,palette:['#69779b','#aed6d3','#f3ded4'],background:'#060a12',duration:20};
@@ -105,10 +108,11 @@ export function migratePathfinder(doc,base){
  return s;
 }
 export function varyParticles(source,seed,amount=.45,scope='all',surprise=false){
+ if(source.pLiving===4){const r=rng(seed),s=structuredClone(source);for(const [g,keys] of Object.entries(VEIL_GROUPS))if(scope==='all'||scope===g)for(const k of keys){const [,lo,hi,step]=VEIL_META[k];const v=s[k]+(r()-.5)*(hi-lo)*amount;s[k]=Math.max(lo,Math.min(hi,step>=1?Math.round(v):v));}if(scope==='all'||scope==='shape')s.seed=seed>>>0;return s;}
  const r=rng(seed),s=surprise?particleCreation(source,Math.floor(r()*PARTICLE_STUDIES.length),seed):structuredClone(source);if(scope==='all'||scope==='shape')s.seed=seed>>>0;
  for(const [group,keys] of Object.entries(PARTICLE_GROUPS))if(scope==='all'||scope===group)for(const key of keys){
   const [,lo,hi,step]=PARTICLE_META[key];
-  if(['pColorMode','pSprite','pDirection','pLiving'].includes(key)){if(surprise||r()<amount*.3)s[key]=key==='pDirection'?(r()<.5?-1:1):Math.floor(lo+r()*(hi-lo+1));continue;}
+  if(['pColorMode','pSprite','pDirection','pLiving'].includes(key)){if(surprise||r()<amount*.3)s[key]=key==='pDirection'?(r()<.5?-1:1):Math.floor(lo+r()*((key==='pLiving'?3:hi)-lo+1));continue;}
   let v=s[key]+(r()-.5)*(hi-lo)*amount*.8;
   if(['pCount','pTrailCount'].includes(key))v=s[key]*Math.pow(2,(r()-.5)*amount*3);
   s[key]=Math.min(hi,Math.max(lo,step>=1?Math.round(v/step)*step:v));
