@@ -14870,6 +14870,7 @@
         "img-s16-mosaic",
         "img-s16-rgb",
         "project-finishing",
+        "tool-08",
         "s18-01",
         "prisma-window-depth",
         "prisma-image-particles"
@@ -14898,7 +14899,7 @@
           "fields": [
             {
               "label": "reuse",
-              "value": "Ladybug come riferimento di risultato. MediaPipe MIT per eventuale segmentazione; operatori TouchDesigner come ricette. Nessuna dipendenza dal servizio Ladybug."
+              "value": "Ladybug come riferimento di risultato. MediaPipe MIT per eventuale segmentazione; operatori TouchDesigner come ricette. Nessuna dipendenza dal servizio Ladybug. Atlante e campionamento ASCII adattati da morphing-ascii-shader (MIT), senza dipendenza Three.js; attribuzione conservata."
             }
           ]
         },
@@ -14939,15 +14940,20 @@
                 "Mosaico a celle X/Y sull’uscita della scena, mix e bypass",
                 "Separazione RGB con offset indipendenti, direzione e mix",
                 "Anteprima, preset, immagini, MP4 e wallpaper web",
-                "Maschere rettangolari per mosaico e RGB: fino a otto aree, spostamento, dimensioni, sfumatura e inversione"
+                "Maschere rettangolari per mosaico e RGB: fino a otto aree, spostamento, dimensioni, sfumatura e inversione",
+                "ASCII, ricamo a crocette e retino a punti sulla scena completa, per Forme e Particelle",
+                "Celle, scala, densità, colore sorgente o tinta, mix; intensità e raggio bagliore indipendenti",
+                "Passaggi morbidi fra glifi e variazione ciclica deterministica, con numero di cicli nel loop",
+                "Riquadri, inversione e sfumatura applicati alla composizione finale, inclusi gli aloni"
               ]
             },
             {
               "label": "remaining",
               "value": [
-                "Ingresso immagine/video esterno e trasformazione in punti",
+                "Glitch temporale controllato e contorni",
+                "Ingresso immagine/video esterno",
                 "Segmentazione opzionale",
-                "Ordine arbitrario dei trattamenti: attualmente colore/lente → mosaico → RGB"
+                "Ordine arbitrario: ora colore/lente → mosaico → RGB → segni/bagliore"
               ]
             }
           ]
@@ -17439,7 +17445,7 @@
     },
     {
       "id": "project-finishing",
-      "name": "Filtri · colore, mosaico e RGB",
+      "name": "Filtri · colore, mosaico, RGB e segni",
       "kind": "project",
       "related": [
         "img-s16-mosaic",
@@ -17449,9 +17455,10 @@
       "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Filtri finali comuni a Forme e Particelle: colore, mosaico e RGB, con riquadri disegnabili per trattamenti locali.",
+      "summary": "Trattamenti finali comuni a Forme e Particelle: colore, mosaico, RGB, ASCII, ricamo e punti, con bagliore e riquadri selettivi.",
       "sources": [
-        "https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexSubImage2D"
+        "https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexSubImage2D",
+        "https://github.com/niccolofanton/morphing-ascii-shader"
       ],
       "sections": [
         {
@@ -17459,7 +17466,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Riutilizzate le regolazioni fotografiche esistenti. Un passaggio GPU sull’immagine completa aggiunge mosaico e RGB dopo il rendering, una sola volta dopo accumulazione o tasselli."
+              "value": "Riutilizzate le regolazioni fotografiche esistenti. Un passaggio GPU sull’immagine completa aggiunge mosaico e RGB dopo il rendering, una sola volta dopo accumulazione o tasselli. Atlante ASCII e campionamento adattati dalla repo MIT di Niccolò Fanton; crocette e dischi analitici, bagliore GPU in due passaggi e composizione finale mascherata. Variazione calcolata dal tempo del loop, senza memoria dei fotogrammi."
             }
           ]
         },
@@ -17479,7 +17486,11 @@
                 "Fino a otto riquadri disegnabili, spostabili e ridimensionabili",
                 "Posizione e dimensioni in percentuale",
                 "Scelta indipendente: mosaico e/o RGB nelle aree",
-                "Bordi sfumati, inversione dentro/fuori, nascondi maniglie"
+                "Bordi sfumati, inversione dentro/fuori, nascondi maniglie",
+                "ASCII / Ricamo / Punti",
+                "Dimensione celle e segni, densità, colore e mix",
+                "Bagliore: intensità e raggio",
+                "Morbidezza ASCII, variazione animata, cicli nel loop"
               ]
             }
           ]
@@ -17496,17 +17507,21 @@
                 "Pixel finali inviati all’esportatore MP4; immagini e wallpaper HTML offline",
                 "Trasparenza conservata con composizione dei canali in alfa premoltiplicato",
                 "Maschera come unione di riquadri fermi nello spazio dell’immagine, salvata nel preset",
-                "Disegno mouse/touch, dimensioni numeriche, annulla/ripristina; maniglie escluse dai file esportati"
+                "Disegno mouse/touch, dimensioni numeriche, annulla/ripristina; maniglie escluse dai file esportati",
+                "ASCII, ricamo a crocette e retino a punti sulla scena completa, per Forme e Particelle",
+                "Celle, scala, densità, colore sorgente o tinta, mix; intensità e raggio bagliore indipendenti",
+                "Passaggi morbidi fra glifi e variazione ciclica deterministica, con numero di cicli nel loop",
+                "Riquadri, inversione e sfumatura applicati alla composizione finale, inclusi gli aloni"
               ]
             },
             {
               "label": "limits",
               "value": [
-                "Il grading colore conserva la scelta esistente di applicazione anche allo sfondo",
-                "Ordine fisso colore/lente → mosaico → RGB",
-                "Displacement, ingresso video/immagine e conversione in punti sono ancora da sviluppare",
-                "Riquadri applicabili a mosaico e RGB. Colore/esposizione/lente/grana conservano il loro ambito globale o soggetto",
-                "Nessun inseguimento automatico del soggetto, poligoni o maschere dipinte in questa versione"
+                "Ordine fisso colore/lente → mosaico → RGB → segni/bagliore",
+                "Glitch, contorni e ingresso video/immagine esterno restano da sviluppare",
+                "Riquadri per mosaico, RGB e segni/bagliore; colore/esposizione/lente/grana conservano il loro ambito globale o soggetto",
+                "Nessun inseguimento automatico, poligoni o maschere dipinte",
+                "Atlante ASCII fisso; nessuna inerzia temporale del MemoryGrid originale"
               ]
             }
           ]
@@ -17516,7 +17531,7 @@
           "fields": [
             {
               "label": "evidence",
-              "value": "reports/finishing/local-check.json; immagini di prova e wallpaper offline in reports/finishing/; reports/finishing-areas/local-check.json"
+              "value": "reports/finishing/local-check.json; immagini di prova e wallpaper offline in reports/finishing/; reports/finishing-areas/local-check.json; reports/glyph-filters/local.json"
             },
             {
               "label": "checks",
@@ -17528,7 +17543,9 @@
                 "Wallpaper scaricato e aperto offline",
                 "Preset, slider, shortcut da export e larghezza mobile 390 px",
                 "Maschere: pixel esterni invariati, due aree, inversione, maschera vuota e sfumatura",
-                "Preset con riquadri, input invalidi, manipolazione UI e persistenza dopo ricarica"
+                "Preset con riquadri, input invalidi, manipolazione UI e persistenza dopo ricarica",
+                "Controlli segni verificati tramite differenza pixel, loop e seek identici, maschera esterna invariata anche con bagliore",
+                "MP4 con segni codificato e decodificato; UI e preset su entrambi i motori"
               ]
             }
           ]

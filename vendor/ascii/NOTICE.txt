@@ -1,0 +1,6 @@
+Prisma glyph filters
+Adapted atlas construction and GLSL glyph sampling / adjacent-glyph blending from:
+https://github.com/niccolofanton/morphing-ascii-shader
+Commit ec44898757086d74f42dea9b1a13436ad5af0ec9
+Copyright (c) 2026 Niccolò Fanton. MIT license in LICENSE.
+Changes: native WebGL2 integration, fixed monospace atlas, bright-on-dark mapping, analytic cross-stitch and dots, deterministic loop variation, alpha-aware bloom and region composition. Temporal MemoryGrid and demo media are not included.

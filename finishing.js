@@ -2,6 +2,35 @@
 export const FINISH_DEFAULTS={finishEnabled:true,finishTone:true,finishRgb:false,finishMosaic:false,finishCompare:false,finishRgbR:8,finishRgbG:0,finishRgbB:-8,finishRgbAngle:0,finishRgbMix:1,finishCellX:12,finishCellY:12,finishMosaicMix:1};
 export const FINISH_META={finishRgbR:['Spostamento rosso',-60,60,.1],finishRgbG:['Spostamento verde',-60,60,.1],finishRgbB:['Spostamento blu',-60,60,.1],finishRgbAngle:['Direzione RGB',-180,180,1],finishRgbMix:['Intensità RGB',0,1,.01],finishCellX:['Larghezza celle',1,160,1],finishCellY:['Altezza celle',1,160,1],finishMosaicMix:['Intensità mosaico',0,1,.01]};
 export const MAX_FINISH_REGIONS=8;
+/*
+MIT License
+
+Copyright (c) 2026 Niccolò Fanton
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+*/
+// Glyph atlas/sampling adapted from Niccolo Fanton's morphing-ascii-shader (MIT).
+// See vendor/ascii/LICENSE and NOTICE.txt. No Three.js runtime is required.
+export const GLYPH_DEFAULTS={finishGlyph:false,finishGlyphStyle:0,finishGlyphCell:20,finishGlyphScale:.9,finishGlyphDensity:1.3,finishGlyphSoftness:1,finishGlyphSource:true,finishGlyphColor:'#8ef5d5',finishGlyphMix:1,finishGlyphGlow:.35,finishGlyphRadius:8,finishGlyphVariation:0,finishGlyphCycles:2,finishRegionGlyph:true};
+Object.assign(FINISH_DEFAULTS,GLYPH_DEFAULTS);
+Object.assign(FINISH_META,{finishGlyphStyle:['Stile segni',0,2,1],finishGlyphCell:['Dimensione celle',5,100,1],finishGlyphScale:['Dimensione segni',.2,1,.01],finishGlyphDensity:['Densità dei segni',.2,3,.01],finishGlyphSoftness:['Morbidezza dei passaggi',0,1,.01],finishGlyphMix:['Mix con originale',0,1,.01],finishGlyphGlow:['Intensità bagliore',0,2,.01],finishGlyphRadius:['Raggio bagliore',1,40,.5],finishGlyphVariation:['Variazione animata',0,1,.01],finishGlyphCycles:['Cicli dei segni nel loop',1,12,1]});
 Object.assign(FINISH_DEFAULTS,{finishRegionsEnabled:false,finishRegionMosaic:true,finishRegionRgb:false,finishRegionInvert:false,finishFeather:0,finishRegions:[]});
 FINISH_META.finishFeather=['Sfumatura bordo',0,20,.1];
 export function normalizeFinishRegions(raw){return (Array.isArray(raw)?raw:[]).filter(r=>r&&['x','y','w','h'].every(k=>Number.isFinite(r[k]))).slice(0,MAX_FINISH_REGIONS).map((r,i)=>{const x=Math.max(0,Math.min(99,r.x)),y=Math.max(0,Math.min(99,r.y));return {id:i+1,x,y,w:Math.max(1,Math.min(100-x,r.w)),h:Math.max(1,Math.min(100-y,r.h))};});}
@@ -33,4 +62,61 @@ export class FinishingPass{
  }
  release(){if(this.texture)this.gl.deleteTexture(this.texture);this.texture=null;this.width=this.height=0;}
  dispose(){this.release();if(this.program)this.gl.deleteProgram(this.program);if(this.vao)this.gl.deleteVertexArray(this.vao);this.program=this.vao=null;}
+}
+
+// Stateless glyph blending keeps seeking, repeated frames and offline exports identical.
+// The periodic variation travels across cells; it never depends on wall-clock frame rate.
+const GLYPH_FRAGMENT=`#version 300 es
+precision highp float;
+uniform sampler2D uImage,uAtlas;uniform vec2 uSize;uniform float uCell,uScale,uDensity,uSoft,uSource,uVariation,uPhase;uniform int uStyle;uniform vec3 uInk;
+out vec4 color;
+float glyph(float i,vec2 p){if(any(lessThan(p,vec2(0.)))||any(greaterThan(p,vec2(1.))))return 0.;return texture(uAtlas,vec2((clamp(i,0.,9.)+p.x)/10.,1.-p.y)).a;}
+void main(){vec2 pixel=gl_FragCoord.xy,cell=floor(pixel/uCell),center=(cell+.5)*uCell/uSize;
+vec4 sampleColor=texture(uImage,clamp(center,.5/uSize,1.-.5/uSize));
+float l=dot(sampleColor.rgb,vec3(.2126,.7152,.0722));
+float wave=sin(uPhase+cell.x*.37+cell.y*.23);
+float density=clamp(l*uDensity*(1.+uVariation*wave),0.,1.);
+vec2 p=(fract(pixel/uCell)-.5)/uScale+.5,q=p-.5;float mask=0.;
+if(uStyle==0){float index=density*9.,i=floor(index),f=fract(index);float width=max(.001,uSoft*.5);float blend=smoothstep(.5-width,.5+width,f);mask=mix(glyph(i,p),glyph(i+1.,p),blend);}
+else if(uStyle==1){float halfLength=.43*sqrt(density);float d=min(abs(q.x-q.y),abs(q.x+q.y))*.707107;float aa=max(.004,fwidth(q.x));mask=(1.-smoothstep(.025,.025+aa,d))*(1.-smoothstep(halfLength-aa,halfLength,max(abs(q.x),abs(q.y))));}
+else {float radius=.46*sqrt(density),aa=max(.004,fwidth(q.x));mask=1.-smoothstep(max(0.,radius-aa),radius+aa,length(q));}
+mask*=smoothstep(0.,.025,density);vec3 ink=mix(uInk,sampleColor.rgb,uSource);float alpha=clamp(mask*sampleColor.a,0.,1.);color=vec4(ink*alpha,alpha);}`;
+const GLYPH_BLUR=`#version 300 es
+precision highp float;uniform sampler2D uImage;uniform vec2 uStep;uniform vec2 uSize;out vec4 color;
+void main(){vec2 uv=gl_FragCoord.xy/uSize;color=texture(uImage,uv)*.227027;
+color+=(texture(uImage,uv+uStep*1.384615)+texture(uImage,uv-uStep*1.384615))*.316216;
+color+=(texture(uImage,uv+uStep*3.230769)+texture(uImage,uv-uStep*3.230769))*.070270;}`;
+const GLYPH_COMPOSITE=`#version 300 es
+precision highp float;uniform sampler2D uImage,uGlyph,uBloom;uniform vec2 uSize;uniform float uMix,uGlow,uTransparent;
+uniform vec4 uRects[8];uniform int uRectCount;uniform float uUseMask,uFeather,uInvert;out vec4 color;
+float regionMask(vec2 uv){if(uRectCount==0)return 0.;vec2 p=vec2(uv.x,1.-uv.y);float m=0.;for(int i=0;i<8;i++){if(i>=uRectCount)break;vec4 r=uRects[i];vec2 d=min(p-r.xy,r.xy+r.zw-p)*uSize/min(uSize.x,uSize.y);float edge=min(d.x,d.y);m=max(m,uFeather>0.?smoothstep(0.,uFeather,edge):step(0.,edge));}return mix(m,1.-m,uInvert);}
+void main(){vec2 uv=gl_FragCoord.xy/uSize;vec4 base=texture(uImage,uv);float amount=uMix*mix(1.,regionMask(uv),uUseMask);
+if(amount<=0.){color=base;return;}
+vec4 g=texture(uGlyph,uv),b=texture(uBloom,uv)*uGlow;float coverage=clamp(g.a+b.a,0.,1.);float a=mix(base.a,coverage,uTransparent);
+vec3 rgb=min(g.rgb+b.rgb,vec3(a));vec4 result=mix(vec4(base.rgb*base.a,base.a),vec4(rgb,a),amount);
+color=vec4(result.a>0.000001?result.rgb/result.a:vec3(0.),result.a);}`;
+
+export class GlyphPass{
+ constructor(gl){this.gl=gl;this.targets=[];this.programs=[];try{
+  this.vao=gl.createVertexArray();
+  for(const fragment of [GLYPH_FRAGMENT,GLYPH_BLUR,GLYPH_COMPOSITE]){const p=gl.createProgram(),shaders=[];this.programs.push(p);try{for(const [type,source]of [[gl.VERTEX_SHADER,FINISH_VERTEX],[gl.FRAGMENT_SHADER,fragment]]){const s=gl.createShader(type);shaders.push(s);gl.shaderSource(s,source);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));gl.attachShader(p,s);}gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(p));}finally{shaders.forEach(s=>gl.deleteShader(s));}}
+  // Adapted buildGlyphAtlas: fixed monospace ASCII, white alpha masks, no runtime dependency.
+  const canvas=document.createElement('canvas'),size=96,chars=' .:-=+*#%@';canvas.width=size*chars.length;canvas.height=size;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 76px monospace';for(let i=0;i<chars.length;i++)ctx.fillText(chars[i],i*size+size/2,size/2);
+  this.atlas=gl.createTexture();gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,this.atlas);this.textureSettings();gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,canvas);
+  this.locations=this.programs.map(p=>Object.fromEntries(['uImage','uAtlas','uSize','uCell','uScale','uDensity','uSoft','uSource','uVariation','uPhase','uStyle','uInk','uStep','uGlyph','uBloom','uMix','uGlow','uTransparent','uRects[0]','uRectCount','uUseMask','uFeather','uInvert'].map(n=>[n,gl.getUniformLocation(p,n)])));
+ }catch(e){this.dispose();throw e;}}
+ textureSettings(){const g=this.gl;g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);}
+ target(w,h){const g=this.gl,texture=g.createTexture(),fbo=g.createFramebuffer(),t={texture,fbo,w,h};this.targets.push(t);g.bindTexture(g.TEXTURE_2D,texture);this.textureSettings();g.texImage2D(g.TEXTURE_2D,0,g.RGBA8,w,h,0,g.RGBA,g.UNSIGNED_BYTE,null);g.bindFramebuffer(g.FRAMEBUFFER,fbo);g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,texture,0);if(g.checkFramebufferStatus(g.FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE)throw Error('Buffer Filtri non disponibile');return t;}
+ bind(texture,unit){const g=this.gl;g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,texture);}
+ begin(index,target,w,h){const g=this.gl;g.bindFramebuffer(g.FRAMEBUFFER,target?.fbo||null);g.viewport(0,0,w,h);g.useProgram(this.programs[index]);return this.locations[index];}
+ draw(s,w,h,phase=0){const g=this.gl;g.activeTexture(g.TEXTURE0);if(this.width!==w||this.height!==h){this.release();try{this.input=this.target(w,h);this.glyph=this.target(w,h);this.blurA=this.target(Math.max(1,Math.ceil(w/2)),Math.max(1,Math.ceil(h/2)));this.blurB=this.target(this.blurA.w,this.blurA.h);this.width=w;this.height=h;}catch(e){this.release();throw e;}}
+  g.bindFramebuffer(g.FRAMEBUFFER,null);this.bind(this.input.texture,0);g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.CULL_FACE);g.disable(g.SCISSOR_TEST);g.colorMask(true,true,true,true);g.bindVertexArray(this.vao);
+  const scale=Math.min(w,h)/1080;let u=this.begin(0,this.glyph,w,h);this.bind(this.input.texture,0);this.bind(this.atlas,1);g.uniform1i(u.uImage,0);g.uniform1i(u.uAtlas,1);g.uniform2f(u.uSize,w,h);g.uniform1f(u.uCell,Math.max(2,s.finishGlyphCell*scale));g.uniform1f(u.uScale,s.finishGlyphScale);g.uniform1f(u.uDensity,s.finishGlyphDensity);g.uniform1f(u.uSoft,s.finishGlyphSoftness);g.uniform1f(u.uSource,s.finishGlyphSource?1:0);g.uniform1f(u.uVariation,s.finishGlyphVariation);g.uniform1f(u.uPhase,(((phase%(Math.PI*2))+Math.PI*2)%(Math.PI*2))*Math.round(s.finishGlyphCycles));g.uniform1i(u.uStyle,Math.round(s.finishGlyphStyle));const hex=/^#[0-9a-f]{6}$/i.test(s.finishGlyphColor)?s.finishGlyphColor:'#8ef5d5';g.uniform3f(u.uInk,...[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255));g.drawArrays(g.TRIANGLES,0,3);
+  let bloom=this.glyph.texture;
+  if(s.finishGlyphGlow>0){const radius=s.finishGlyphRadius*scale;for(const [target,input,dx,dy]of [[this.blurA,this.glyph.texture,radius/w,0],[this.blurB,this.blurA.texture,0,radius/h]]){u=this.begin(1,target,target.w,target.h);this.bind(input,0);g.uniform1i(u.uImage,0);g.uniform2f(u.uSize,target.w,target.h);g.uniform2f(u.uStep,dx,dy);g.drawArrays(g.TRIANGLES,0,3);}bloom=this.blurB.texture;}
+  u=this.begin(2,null,w,h);this.bind(this.input.texture,0);this.bind(this.glyph.texture,1);this.bind(bloom,2);g.uniform1i(u.uImage,0);g.uniform1i(u.uGlyph,1);g.uniform1i(u.uBloom,2);g.uniform2f(u.uSize,w,h);g.uniform1f(u.uMix,s.finishGlyphMix);g.uniform1f(u.uGlow,s.finishGlyphGlow);g.uniform1f(u.uTransparent,s.bgMode==='transparent'?1:0);
+  const regions=normalizeFinishRegions(s.finishRegions),rects=new Float32Array(32);regions.forEach((r,i)=>rects.set([r.x/100,r.y/100,r.w/100,r.h/100],i*4));g.uniform4fv(u['uRects[0]'],rects);g.uniform1i(u.uRectCount,regions.length);g.uniform1f(u.uUseMask,s.finishRegionsEnabled&&s.finishRegionGlyph?1:0);g.uniform1f(u.uFeather,(s.finishFeather||0)/100);g.uniform1f(u.uInvert,s.finishRegionInvert?1:0);g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);g.activeTexture(g.TEXTURE0);
+ }
+ release(){for(const t of this.targets||[]){this.gl.deleteTexture(t.texture);this.gl.deleteFramebuffer(t.fbo);}this.targets=[];this.width=this.height=0;this.input=this.glyph=this.blurA=this.blurB=null;}
+ dispose(){this.release();for(const p of this.programs||[])this.gl.deleteProgram(p);this.programs=[];if(this.atlas)this.gl.deleteTexture(this.atlas);if(this.vao)this.gl.deleteVertexArray(this.vao);this.atlas=this.vao=null;}
 }

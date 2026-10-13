@@ -1,6 +1,19 @@
-import {AUDIO_HELP} from './audio-model.js?v=14002290c6c6';
+import {AUDIO_HELP} from './audio-model.js?v=afd3f16251d1';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ finishGlyph:'Trasforma il fotogramma finale in caratteri, crocette o punti; funziona con Forme e Particelle. I parametri della scena restano conservati.',
+ finishGlyphCell:'Celle grandi producono meno segni. Valore riferito a 1080 px sul lato corto, con minimo di 2 pixel effettivi.',
+ finishGlyphScale:'Dimensione del segno dentro la cella, senza cambiare il numero di celle.',
+ finishGlyphDensity:'Aumenta quanto sono pieni i segni a parità di luminosità; le zone nere rimangono vuote.',
+ finishGlyphSoftness:'Per ASCII: sfuma fra caratteri di densità vicine. Zero sceglie un carattere netto; uno rende il passaggio graduale.',
+ finishGlyphMix:'Zero mostra la sorgente; uno applica completamente segni e bagliore. Vale anche per l’export.',
+ finishGlyphGlow:'Bagliore solo dei segni, separato dalle luci e dall’emissione della scena.',
+ finishGlyphRadius:'Estensione del bagliore; ha effetto quando Intensità bagliore è sopra zero. Scala con la risoluzione.',
+ finishGlyphVariation:'Varia la densità con un’onda continua attraverso la griglia. Zero segue solo la scena; sopra zero usa il tempo del loop.',
+ finishGlyphCycles:'Numero di cicli durante il loop; più cicli aumentano la velocità. Agisce con Variazione animata sopra zero.',
+ finishGlyphSource:'Usa i colori campionati dalla scena; disattiva per scegliere un colore unico.',
+ finishRegionGlyph:'Limita segni e bagliore ai riquadri. Anche l’alone viene ritagliato, così l’esterno rimane invariato.',
+
  petalCollision:'Vincoli di contatto fra segmenti: i fili si separano quando i loro spessori si incontrano. Zero conserva la geometria precedente; uno usa contatti rigidi entro la precisione scelta. Sopra zero sospende le animazioni dei percorsi: restano disponibili scorrimento della materia e rotazione.',
  petalSphereCollision:'Impedisce ai tratti liberi di attraversare la superficie della sfera. Le zone di innesto e uscita restano ancorate e possono entrare nella materia.',
  petalContactGap:'Distanza aggiuntiva tra i fili, oltre il loro spessore. Aiuta a mantenere gli incroci leggibili.',
@@ -17,7 +30,7 @@ const HELP={
  pLivingBlend:'Passaggio continuo: 0 mostra solo particelle, scie e connessioni; 0,5 le mescola con la struttura; 1 mostra solo fibre e pelle. Non cancella i parametri delle componenti.',
  pSurfaceBind:'Porta granelli e nodi dei legami sulla superficie realmente deformata. A 1 seguono esattamente la sua apertura e le sue pieghe. Le scie restano percorsi indipendenti.',
  pLivingOcclusion:'Attenua la materia dietro la pelle, rispettando pori, continuità e trasparenza. A 0 il nucleo resta visibile attraverso la struttura.',
- finishRegionsEnabled:'Limita mosaico e/o RGB ai riquadri disegnati. Disattivalo per trattare di nuovo tutta l’immagine, conservando le aree.',
+ finishRegionsEnabled:'Limita mosaico, RGB e/o segni ai riquadri disegnati. Disattivalo per trattare di nuovo tutta l’immagine, conservando le aree.',
  finishRegionMosaic:'Il mosaico appare solo nelle aree selezionate. Gli altri trattamenti conservano le proprie impostazioni.',
  finishRegionRgb:'La separazione RGB appare solo nelle aree selezionate.',
  finishRegionInvert:'Tratta l’esterno dell’unione dei riquadri. Serve almeno un riquadro.',
