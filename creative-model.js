@@ -1,12 +1,12 @@
-import {normalizeFinishRegions} from './finishing.js?v=afd3f16251d1';
-import {normalizeAudioClip} from './audio-recording.js?v=afd3f16251d1';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=afd3f16251d1';
-import {normalizeAudio} from './audio-model.js?v=afd3f16251d1';
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=afd3f16251d1';
-import {normalizeForcePaths} from './particle-paths.js?v=afd3f16251d1';
-import {normalizeForcePoints} from './particle-forces.js?v=afd3f16251d1';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=afd3f16251d1';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=afd3f16251d1';
+import {normalizeFinishRegions} from './finishing.js?v=81754f9bfd99';
+import {normalizeAudioClip} from './audio-recording.js?v=81754f9bfd99';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=81754f9bfd99';
+import {normalizeAudio} from './audio-model.js?v=81754f9bfd99';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=81754f9bfd99';
+import {normalizeForcePaths} from './particle-paths.js?v=81754f9bfd99';
+import {normalizeForcePoints} from './particle-forces.js?v=81754f9bfd99';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=81754f9bfd99';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=81754f9bfd99';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -35,7 +35,7 @@ export function motionPreset(s,key){
  if(key==='chromatic'){s.colorWaveAmount=1;s.motions.colorWavePhase={...s.motions.colorWavePhase,enabled:true,mode:'cycle',cycles:1,phase:0,direction:1};}
  return s;
 }
-export function hasMotion(s){return (s.finishEnabled!==false&&s.finishGlyph&&s.finishGlyphMix>0&&s.finishGlyphVariation>0)||s.engine==='particles'||s.pLiving>0|| Object.values(s.motions||{}).some(t=>t.enabled)||s.lights.some(l=>l.orbit?.enabled||l.pulse?.enabled)||!!s.environmentRotate||(s.filmFlow||0)>0||(s.filmSwirl||0)>0;}
+export function hasMotion(s){return (s.finishEnabled!==false&&s.finishGlitch&&s.finishGlitchAnimate&&s.finishGlitchMix>0&&s.finishGlitchCoverage>0&&(s.finishGlitchAmount>0||s.finishGlitchSplit>0))||(s.finishEnabled!==false&&s.finishGlyph&&s.finishGlyphMix>0&&s.finishGlyphVariation>0)||s.engine==='particles'||s.pLiving>0|| Object.values(s.motions||{}).some(t=>t.enabled)||s.lights.some(l=>l.orbit?.enabled||l.pulse?.enabled)||!!s.environmentRotate||(s.filmFlow||0)>0||(s.filmSwirl||0)>0;}
 function hue(hex,angle){let [r,g,b]=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;let h=d?(max===r?(g-b)/d:max===g?(b-r)/d+2:(r-g)/d+4)/6:0;h=(h+angle/360+1)%1;const sat=max?d/max:0,x=h*6,j=Math.floor(x),f=x-j,p=max*(1-sat),q=max*(1-f*sat),t=max*(1-(1-f)*sat);const c=[[max,t,p],[q,max,p],[p,max,t],[p,q,max],[t,p,max],[max,p,q]][j%6];return '#'+c.map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');}
 const clamp=(key,value)=>META[key]?Math.max(META[key][1],Math.min(META[key][2],value)):value;
 export function similar(s,seed,count=8,strength=.7){const r=random(seed),profiles=[[1,.4,.45],[.45,1,.45],[.5,.45,1],[.9,.9,.5],[.6,.9,.9],[1,.5,.9],[.7,1,.6],[1,1,1]],amount=Math.max(0,Math.min(1,strength));return Array.from({length:count},(_,i)=>{
@@ -119,7 +119,7 @@ export function surprise(seed){
 export function normalizeCreation(raw){
  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw Error('Il file non contiene una creazione Prisma.');
  const s=preset(0);s.audioClip=normalizeAudioClip(raw.audioClip);s.audioReactive=normalizeAudio(raw.audioReactive,raw.engine);s.bodyTracking=normalizeBodyTracking(raw.bodyTracking);s.forcePoints=normalizeForcePoints(raw.forcePoints);s.forcePaths=normalizeForcePaths(raw.forcePaths);s.perfectLoop=raw.perfectLoop!==false;for(const [k,meta] of Object.entries(META)){if(Number.isFinite(raw[k]))s[k]=clamp(k,raw[k]);}
- for(const k of ['background','background2','internalColor','sssColor','finishGlyphColor'])if(/^#[0-9a-f]{6}$/i.test(raw[k]||''))s[k]=raw[k];
+ for(const k of ['background','background2','internalColor','sssColor','finishGlyphColor','finishEdgeColor'])if(/^#[0-9a-f]{6}$/i.test(raw[k]||''))s[k]=raw[k];
  if(Array.isArray(raw.palette)&&raw.palette.length&&raw.palette.every(c=>/^#[0-9a-f]{6}$/i.test(c)))s.palette=raw.palette.slice(0,12);
  if(['solid','gradient','transparent','studio'].includes(raw.bgMode))s.bgMode=raw.bgMode;
  Object.assign(s,{...MODERN_BASE,renderVersion:raw.renderVersion>=2?2:1});
@@ -132,7 +132,8 @@ export function normalizeCreation(raw){
  for(const k of ['internalColor','sssColor'])if(!/^#[0-9a-f]{6}$/i.test(s[k]||''))s[k]=k==='internalColor'?'#e6f5ff':'#ffc49b';
  for(const k of ['photoAll','environmentRotate'])s[k]=raw[k]===true;
  for(const k of ['finishEnabled','finishTone'])s[k]=raw[k]!==false;
- for(const k of ['finishRgb','finishMosaic','finishGlyph'])s[k]=raw[k]===true;
+ for(const k of ['finishRgb','finishMosaic','finishGlyph','finishGlitch','finishEdge','finishEdgeSource','finishEdgeOnly'])s[k]=raw[k]===true;
+ for(const k of ['finishGlitchAnimate','finishRegionEdge','finishRegionGlitch'])s[k]=raw[k]!==false;for(const k of ['finishGlitchCycles','finishGlitchSeed'])s[k]=Math.round(s[k]);
  s.finishGlyphStyle=Math.round(s.finishGlyphStyle);s.finishGlyphCycles=Math.round(s.finishGlyphCycles);s.finishGlyphSource=raw.finishGlyphSource!==false;s.finishRegionGlyph=raw.finishRegionGlyph!==false;s.finishCompare=false;s.finishRegions=normalizeFinishRegions(raw.finishRegions);s.finishRegionMosaic=raw.finishRegionMosaic!==false;for(const k of ['finishRegionsEnabled','finishRegionRgb','finishRegionInvert'])s[k]=raw[k]===true;
  if(s.perfectLoop)for(const k of ['environmentCycles','filmCycles'])s[k]=Math.max(1,Math.round(s[k]||1));
  s.animateRotation=['rotateX','rotateY','rotateZ'].some(k=>s.motions[k].enabled);

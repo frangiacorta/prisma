@@ -1,0 +1,5 @@
+Prisma Contorni and Glitch
+Adapted Sobel neighbourhood and RGB channel sampling from three.js SobelOperatorShader.js and DigitalGlitch.js.
+https://github.com/mrdoob/three.js/tree/286e2d8cba7088982eb9068d4bb8f68e42c3bf67/examples/jsm/shaders
+MIT copyright three.js authors (see LICENSE).
+Changes: native WebGL2, luminance and alpha edges, overlay/isolated contours, deterministic band displacement and pulse envelope, premultiplied composition and masks. No Three.js runtime, displacement texture or random frame scheduling.

@@ -1,4 +1,4 @@
-import {MAX_FINISH_REGIONS} from './finishing.js?v=afd3f16251d1';
+import {MAX_FINISH_REGIONS} from './finishing.js?v=81754f9bfd99';
 
 // Editor handles are DOM-only; exported pixels contain the effect, never its handles.
 export function mountFinishingAreas({board,getState,getTab,remember,mark,renderControls,toast}){
@@ -28,7 +28,7 @@ export function mountFinishingAreas({board,getState,getTab,remember,mark,renderC
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.regionSelect){selected=+b.dataset.regionSelect;editing=true;drawing=false;renderControls();return;}
   if(b.id==='finish-area-add'){
-   if(regions().length>=MAX_FINISH_REGIONS)return;remember();activate();const s=getState();selected=nextId();s.finishRegions=[...regions(),{id:selected,x:25,y:25,w:40,h:40}];if(s.finishRegionMosaic&&!s.finishGlyph)s.finishMosaic=true;drawing=false;mark();renderControls();
+   if(regions().length>=MAX_FINISH_REGIONS)return;remember();activate();const s=getState();selected=nextId();s.finishRegions=[...regions(),{id:selected,x:25,y:25,w:40,h:40}];if(s.finishRegionMosaic&&!s.finishGlyph&&!s.finishEdge&&!s.finishGlitch&&!s.finishRgb)s.finishMosaic=true;drawing=false;mark();renderControls();
   }
   if(b.id==='finish-area-draw'){if(!drawing&&regions().length>=MAX_FINISH_REGIONS)return;remember();activate();drawing=!drawing;mark();renderControls();if(drawing)toast('Trascina sulla scena per disegnare il riquadro');}
   if(b.id==='finish-area-edit'){if(!editing&&!getState().finishRegionsEnabled){remember();getState().finishRegionsEnabled=true;mark();}editing=!editing;drawing=false;renderControls();}
@@ -41,7 +41,7 @@ export function mountFinishingAreas({board,getState,getTab,remember,mark,renderC
  overlay.addEventListener('pointerdown',e=>{
   if(e.button!==0||drag||e.target.closest('[data-finish-done]'))return;const box=e.target.closest('[data-region]');if(!drawing&&!box)return;
   e.preventDefault();e.stopPropagation();const before=structuredClone(getState()),p=point(e);overlay.setPointerCapture(e.pointerId);
-  if(drawing){if(regions().length>=MAX_FINISH_REGIONS)return;selected=nextId();getState().finishRegions=[...regions(),{id:selected,x:Math.min(99,p.x),y:Math.min(99,p.y),w:1,h:1}];if(getState().finishRegionMosaic&&!getState().finishGlyph)getState().finishMosaic=true;}
+  if(drawing){if(regions().length>=MAX_FINISH_REGIONS)return;selected=nextId();getState().finishRegions=[...regions(),{id:selected,x:Math.min(99,p.x),y:Math.min(99,p.y),w:1,h:1}];if(getState().finishRegionMosaic&&!getState().finishGlyph&&!getState().finishEdge&&!getState().finishGlitch&&!getState().finishRgb)getState().finishMosaic=true;}
   else selected=+box.dataset.region;
   drag={pointer:e.pointerId,p,origin:{...current()},before,kind:drawing?'draw':e.target.closest('[data-resize]')?'resize':'move'};mark();
  });

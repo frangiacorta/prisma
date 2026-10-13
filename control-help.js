@@ -1,6 +1,26 @@
-import {AUDIO_HELP} from './audio-model.js?v=afd3f16251d1';
+import {AUDIO_HELP} from './audio-model.js?v=81754f9bfd99';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ finishEdge:'Estrae i profili dal fotogramma finale. Funziona su Forme e Particelle e rileva anche i bordi della trasparenza.',
+ finishEdgeWidth:'Distanza di campionamento dei contorni, riferita a 1080 px sul lato corto. Aumenta lo spessore dei dettagli rilevati; minimo mezzo pixel effettivo.',
+ finishEdgeThreshold:'Soglia bassa mostra i contrasti leggeri, alta conserva soltanto quelli forti.',
+ finishEdgeSoftness:'Rende più graduale il passaggio tra bordo rilevato e immagine senza bordo.',
+ finishEdgeOnly:'Mostra i contorni su nero, oppure su trasparenza se lo sfondo è trasparente. Disattiva per sovrapporli alla scena.',
+ finishEdgeSource:'Disattiva per una tinta unica; attiva per campionare il colore della scena.',
+ finishEdgeMix:'Zero conserva la sorgente; uno applica completamente il trattamento dei contorni.',
+ finishGlitch:'Sposta bande orizzontali e separa i colori. È un filtro sul fotogramma completo, dopo segni e bagliore.',
+ finishGlitchAmount:'Spostamento orizzontale massimo, riferito a 1080 px sul lato corto. A zero resta solo la separazione colori, se attiva.',
+ finishGlitchBand:'Altezza delle bande riferita a 1080 px. Valori piccoli producono più righe sottili.',
+ finishGlitchCoverage:'Quota delle bande interessate. Zero elimina tutto il glitch, uno interessa tutte le bande.',
+ finishGlitchSplit:'Separazione rossa e blu nelle bande attive. Zero conserva i canali uniti.',
+ finishGlitchSeed:'Cambia in modo ripetibile la disposizione e la direzione delle bande, senza modificare la scena.',
+ finishGlitchMix:'Mescola glitch e sorgente. Zero mantiene esattamente il fotogramma originale.',
+ finishGlitchAnimate:'Attiva impulsi periodici durante Esplora il movimento e nel video. Disattiva per una composizione ferma.',
+ finishGlitchCycles:'Numero di impulsi nella durata del loop. Più impulsi significano un ritmo più rapido.',
+ finishGlitchDuty:'Frazione di ogni ciclo occupata dal glitch. Valori piccoli creano colpi brevi separati da pause.',
+ finishGlitchSoftness:'Zero rende brusca entrata e uscita; uno le rende graduali per tutta la durata dell’impulso.',
+ finishRegionEdge:'Limita la composizione dei contorni ai riquadri, con inversione e sfumatura condivise.',
+ finishRegionGlitch:'Limita il risultato del glitch ai riquadri: i pixel esterni restano invariati anche con spostamento e separazione colori.',
  finishGlyph:'Trasforma il fotogramma finale in caratteri, crocette o punti; funziona con Forme e Particelle. I parametri della scena restano conservati.',
  finishGlyphCell:'Celle grandi producono meno segni. Valore riferito a 1080 px sul lato corto, con minimo di 2 pixel effettivi.',
  finishGlyphScale:'Dimensione del segno dentro la cella, senza cambiare il numero di celle.',

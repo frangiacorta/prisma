@@ -14882,7 +14882,8 @@
       "sources": [
         "https://www.theladybug.app/about/",
         "https://derivative.ca/UserGuide/Resolution_TOP",
-        "https://github.com/torinmb/mediapipe-touchdesigner"
+        "https://github.com/torinmb/mediapipe-touchdesigner",
+        "https://github.com/mrdoob/three.js/tree/286e2d8cba7088982eb9068d4bb8f68e42c3bf67/examples/jsm/shaders"
       ],
       "sections": [
         {
@@ -14899,7 +14900,7 @@
           "fields": [
             {
               "label": "reuse",
-              "value": "Ladybug come riferimento di risultato. MediaPipe MIT per eventuale segmentazione; operatori TouchDesigner come ricette. Nessuna dipendenza dal servizio Ladybug. Atlante e campionamento ASCII adattati da morphing-ascii-shader (MIT), senza dipendenza Three.js; attribuzione conservata."
+              "value": "Ladybug come riferimento di risultato. MediaPipe MIT per eventuale segmentazione; operatori TouchDesigner come ricette. Nessuna dipendenza dal servizio Ladybug. Atlante e campionamento ASCII adattati da morphing-ascii-shader (MIT), senza dipendenza Three.js; attribuzione conservata. Sobel e campionamento RGB adattati dagli shader Three.js (MIT); nessun runtime Three.js aggiunto."
             }
           ]
         },
@@ -14944,16 +14945,19 @@
                 "ASCII, ricamo a crocette e retino a punti sulla scena completa, per Forme e Particelle",
                 "Celle, scala, densità, colore sorgente o tinta, mix; intensità e raggio bagliore indipendenti",
                 "Passaggi morbidi fra glifi e variazione ciclica deterministica, con numero di cicli nel loop",
-                "Riquadri, inversione e sfumatura applicati alla composizione finale, inclusi gli aloni"
+                "Riquadri, inversione e sfumatura applicati alla composizione finale, inclusi gli aloni",
+                "Contorni di luminanza e trasparenza: spessore, soglia, morbidezza, tinta o colore sorgente, sovrapposizione o profili isolati, mix e riquadri",
+                "Glitch a bande con spostamento, altezza, quantità, separazione colori, variante ripetibile e mix",
+                "Glitch fermo o animato: impulsi per loop, durata, entrata/uscita morbide; tempo deterministico anche nel video",
+                "Preset, composizione con segni, anteprima, MP4 e wallpaper offline su Forme e Particelle"
               ]
             },
             {
               "label": "remaining",
               "value": [
-                "Glitch temporale controllato e contorni",
                 "Ingresso immagine/video esterno",
                 "Segmentazione opzionale",
-                "Ordine arbitrario: ora colore/lente → mosaico → RGB → segni/bagliore"
+                "Ordine arbitrario: ora colore/lente → mosaico → RGB → contorni → segni/bagliore → glitch"
               ]
             }
           ]
@@ -17445,7 +17449,7 @@
     },
     {
       "id": "project-finishing",
-      "name": "Filtri · colore, mosaico, RGB e segni",
+      "name": "Filtri · colore, segni, contorni e glitch",
       "kind": "project",
       "related": [
         "img-s16-mosaic",
@@ -17455,10 +17459,11 @@
       "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Trattamenti finali comuni a Forme e Particelle: colore, mosaico, RGB, ASCII, ricamo e punti, con bagliore e riquadri selettivi.",
+      "summary": "Trattamenti finali per Forme e Particelle: colore, mosaico, RGB, ASCII/ricamo/punti, contorni e glitch animato, con riquadri selettivi.",
       "sources": [
         "https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexSubImage2D",
-        "https://github.com/niccolofanton/morphing-ascii-shader"
+        "https://github.com/niccolofanton/morphing-ascii-shader",
+        "https://github.com/mrdoob/three.js/tree/286e2d8cba7088982eb9068d4bb8f68e42c3bf67/examples/jsm/shaders"
       ],
       "sections": [
         {
@@ -17466,7 +17471,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Riutilizzate le regolazioni fotografiche esistenti. Un passaggio GPU sull’immagine completa aggiunge mosaico e RGB dopo il rendering, una sola volta dopo accumulazione o tasselli. Atlante ASCII e campionamento adattati dalla repo MIT di Niccolò Fanton; crocette e dischi analitici, bagliore GPU in due passaggi e composizione finale mascherata. Variazione calcolata dal tempo del loop, senza memoria dei fotogrammi."
+              "value": "Riutilizzate le regolazioni fotografiche esistenti. Un passaggio GPU sull’immagine completa aggiunge mosaico e RGB dopo il rendering, una sola volta dopo accumulazione o tasselli. Atlante ASCII e campionamento adattati dalla repo MIT di Niccolò Fanton; crocette e dischi analitici, bagliore GPU in due passaggi e composizione finale mascherata. Variazione calcolata dal tempo del loop, senza memoria dei fotogrammi. Contorni Sobel da luminanza/alpha e separazione canali adattati da Three.js MIT. Glitch a bande con impulsi calcolati dal tempo del loop; composizione finale premoltiplicata e mascherata."
             }
           ]
         },
@@ -17490,7 +17495,11 @@
                 "ASCII / Ricamo / Punti",
                 "Dimensione celle e segni, densità, colore e mix",
                 "Bagliore: intensità e raggio",
-                "Morbidezza ASCII, variazione animata, cicli nel loop"
+                "Morbidezza ASCII, variazione animata, cicli nel loop",
+                "Contorni: spessore, soglia, morbidezza, colore, solo profili e mix",
+                "Glitch: spostamento, bande, quantità, separazione colori, variante e mix",
+                "Glitch animato: impulsi per loop, durata e morbidezza",
+                "Scelta indipendente dei riquadri per contorni e glitch"
               ]
             }
           ]
@@ -17511,17 +17520,21 @@
                 "ASCII, ricamo a crocette e retino a punti sulla scena completa, per Forme e Particelle",
                 "Celle, scala, densità, colore sorgente o tinta, mix; intensità e raggio bagliore indipendenti",
                 "Passaggi morbidi fra glifi e variazione ciclica deterministica, con numero di cicli nel loop",
-                "Riquadri, inversione e sfumatura applicati alla composizione finale, inclusi gli aloni"
+                "Riquadri, inversione e sfumatura applicati alla composizione finale, inclusi gli aloni",
+                "Contorni di luminanza e trasparenza: spessore, soglia, morbidezza, tinta o colore sorgente, sovrapposizione o profili isolati, mix e riquadri",
+                "Glitch a bande con spostamento, altezza, quantità, separazione colori, variante ripetibile e mix",
+                "Glitch fermo o animato: impulsi per loop, durata, entrata/uscita morbide; tempo deterministico anche nel video",
+                "Preset, composizione con segni, anteprima, MP4 e wallpaper offline su Forme e Particelle"
               ]
             },
             {
               "label": "limits",
               "value": [
-                "Ordine fisso colore/lente → mosaico → RGB → segni/bagliore",
-                "Glitch, contorni e ingresso video/immagine esterno restano da sviluppare",
-                "Riquadri per mosaico, RGB e segni/bagliore; colore/esposizione/lente/grana conservano il loro ambito globale o soggetto",
-                "Nessun inseguimento automatico, poligoni o maschere dipinte",
-                "Atlante ASCII fisso; nessuna inerzia temporale del MemoryGrid originale"
+                "Ordine fisso colore/lente → mosaico → RGB → contorni → segni/bagliore → glitch",
+                "Ingresso video/immagine esterno, maschere dipinte, segmentazione e ordine arbitrario restano da sviluppare",
+                "I contorni sono rilevati dal fotogramma 2D, non da geometria o profondità 3D",
+                "Colore/esposizione/lente/grana conservano il loro ambito globale o soggetto",
+                "Atlante ASCII fisso, nessuna inerzia del MemoryGrid originale"
               ]
             }
           ]
@@ -17531,7 +17544,7 @@
           "fields": [
             {
               "label": "evidence",
-              "value": "reports/finishing/local-check.json; immagini di prova e wallpaper offline in reports/finishing/; reports/finishing-areas/local-check.json; reports/glyph-filters/local.json"
+              "value": "reports/finishing/local-check.json; immagini di prova e wallpaper offline in reports/finishing/; reports/finishing-areas/local-check.json; reports/glyph-filters/local.json; reports/filter-details/local.json"
             },
             {
               "label": "checks",
@@ -17545,7 +17558,9 @@
                 "Maschere: pixel esterni invariati, due aree, inversione, maschera vuota e sfumatura",
                 "Preset con riquadri, input invalidi, manipolazione UI e persistenza dopo ricarica",
                 "Controlli segni verificati tramite differenza pixel, loop e seek identici, maschera esterna invariata anche con bagliore",
-                "MP4 con segni codificato e decodificato; UI e preset su entrambi i motori"
+                "MP4 con segni codificato e decodificato; UI e preset su entrambi i motori",
+                "Ogni controllo nuovo modifica i pixel; fasi 0/2π identiche, seek ripetibile, pausa tra impulsi e glitch fermo",
+                "Maschere e mix zero esatti, trasparenza, combinazione con segni, MP4 decodificato, wallpaper offline, UI mobile e ripristino preset"
               ]
             }
           ]

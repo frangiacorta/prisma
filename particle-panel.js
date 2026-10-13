@@ -1,5 +1,5 @@
-import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=afd3f16251d1';
-import {SPRITES,COLOR_MODES} from './particle-model.js?v=afd3f16251d1';
+import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=81754f9bfd99';
+import {SPRITES,COLOR_MODES} from './particle-model.js?v=81754f9bfd99';
 export function particlePanel(tab,s,h,shared,selectedLight){
  const {slider,section,details,colorField,check}=h;
  const sliders=keys=>keys.map(k=>slider(k)).join('');

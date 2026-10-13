@@ -1,6 +1,6 @@
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=afd3f16251d1';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=afd3f16251d1';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=afd3f16251d1';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=81754f9bfd99';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=81754f9bfd99';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=81754f9bfd99';
 export const BASE = {
  ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -92,3 +92,5 @@ GROUPS.shape.push('petalCollision','petalSphereCollision','petalContactGap','pet
 
 // Image treatments share preset groups across both engines.
 GROUPS.photo.push('finishGlyph','finishGlyphStyle','finishGlyphCell','finishGlyphScale','finishGlyphDensity','finishGlyphSoftness','finishGlyphSource','finishGlyphColor','finishGlyphMix','finishGlyphGlow','finishGlyphRadius','finishGlyphVariation','finishGlyphCycles','finishRegionGlyph');
+
+GROUPS.photo.push('finishEdge','finishEdgeWidth','finishEdgeThreshold','finishEdgeSoftness','finishEdgeColor','finishEdgeSource','finishEdgeOnly','finishEdgeMix','finishRegionEdge','finishGlitch','finishGlitchAmount','finishGlitchBand','finishGlitchCoverage','finishGlitchSplit','finishGlitchMix','finishGlitchAnimate','finishGlitchCycles','finishGlitchDuty','finishGlitchSoftness','finishGlitchSeed','finishRegionGlitch');
