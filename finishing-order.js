@@ -1,0 +1,34 @@
+import {FINISH_FILTERS,FINISH_ORDER,normalizeFinishOrder} from './finishing.js?v=b8fddb013af6';
+
+export function finishingOrderPanel(s){
+ const order=normalizeFinishOrder(s.finishOrder);
+ return `<div class="finish-order" aria-label="Ordine dei filtri"><h2>Ordine dei filtri</h2><p class="help">Dall’alto verso il basso. Trascina la maniglia oppure usa le frecce. I filtri spenti conservano il loro posto.</p><ol class="finish-order-list">${order.map((id,i)=>{const f=FINISH_FILTERS[id],on=!!s[f.enabled];return `<li data-finish-row="${id}" class="${on?'is-on':''}"><button type="button" class="finish-order-handle" data-finish-handle="${id}" aria-label="Sposta ${f.name}" title="Trascina; oppure usa Freccia su e Freccia giù">⠿</button><span class="finish-order-index" aria-hidden="true">${i+1}</span><button type="button" class="finish-order-name" data-finish-open="${id}" title="Apri i controlli di ${f.name}">${f.name}</button><button type="button" class="finish-order-toggle" data-finish-toggle="${id}" aria-pressed="${on}" aria-label="${on?'Disattiva':'Attiva'} ${f.name}">${on?'Attivo':'Spento'}</button><span class="finish-order-arrows"><button type="button" data-finish-move="${id}" data-step="-1" aria-label="Sposta ${f.name} su" ${i===0?'disabled':''}>↑</button><button type="button" data-finish-move="${id}" data-step="1" aria-label="Sposta ${f.name} giù" ${i===order.length-1?'disabled':''}>↓</button></span></li>`;}).join('')}</ol><p class="help">Base iniziale: colore, esposizione, lente e grana. Segni comprende ASCII, ricamo, punti e il loro bagliore.</p><button type="button" id="finish-order-reset" class="quiet full">Ripristina ordine iniziale</button><p id="finish-order-status" class="help" role="status" aria-live="polite"></p></div>`;
+}
+
+export function mountFinishingOrder({getState,remember,mark,renderControls}){
+ const controls=document.querySelector('#controls');let drag=null,scrollFrame=0;
+ const rows=()=>[...controls.querySelectorAll('[data-finish-row]')];
+ function focus(id,step){const query=step?`[data-finish-move="${id}"][data-step="${step}"]:not(:disabled)`:`[data-finish-handle="${id}"]`;const button=controls.querySelector(query)||controls.querySelector(`[data-finish-handle="${id}"]`);button?.focus({preventScroll:true});}
+ function announce(text){const el=controls.querySelector('#finish-order-status');if(el)el.textContent=text;}
+ function commit(order,id,step){const current=normalizeFinishOrder(getState().finishOrder);if(order.every((k,i)=>k===current[i]))return;remember();getState().finishOrder=[...order];mark();renderControls();focus(id,step);announce(`${FINISH_FILTERS[id].name}: posizione ${order.indexOf(id)+1} di ${order.length}.`);}
+ function move(id,step){const order=normalizeFinishOrder(getState().finishOrder),from=order.indexOf(id),to=Math.max(0,Math.min(order.length-1,from+step));if(from<0||from===to)return;order.splice(from,1);order.splice(to,0,id);commit(order,id,step);}
+ controls.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.finishMove)move(b.dataset.finishMove,Number(b.dataset.step));
+  if(b.dataset.finishToggle){const f=FINISH_FILTERS[b.dataset.finishToggle];remember();getState()[f.enabled]=!getState()[f.enabled];mark();renderControls();controls.querySelector(`[data-finish-toggle="${b.dataset.finishToggle}"]`)?.focus({preventScroll:true});}
+  if(b.dataset.finishOpen){const target=controls.querySelector(`[data-check="${FINISH_FILTERS[b.dataset.finishOpen].enabled}"]`);for(let p=target?.parentElement;p&&p!==controls;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;target?.scrollIntoView({block:'center',behavior:'smooth'});target?.focus({preventScroll:true});}
+  if(b.id==='finish-order-reset'){const order=normalizeFinishOrder(getState().finishOrder);if(order.every((k,i)=>k===FINISH_ORDER[i]))return;remember();getState().finishOrder=[...FINISH_ORDER];mark();renderControls();controls.querySelector('#finish-order-reset')?.focus({preventScroll:true});announce('Ordine iniziale ripristinato. Parametri e attivazioni conservati.');}
+ });
+ controls.addEventListener('keydown',e=>{const id=e.target.dataset.finishHandle;if(id&&['ArrowUp','ArrowDown','Home','End'].includes(e.key)){e.preventDefault();move(id,e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:e.key==='Home'?-5:5);}if(e.key==='Escape'&&drag){e.preventDefault();end(false);}});
+ // Moving the focused DOM row can blur its handle; Escape must still cancel that drag.
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drag){e.preventDefault();end(false);}});
+ function update(){if(!drag||!drag.row.isConnected)return;const rest=rows().filter(r=>r!==drag.row);const next=rest.find(r=>drag.y<r.getBoundingClientRect().top+r.getBoundingClientRect().height/2);const list=drag.row.parentElement;if(next)list.insertBefore(drag.row,next);else list.append(drag.row);rows().forEach((r,i)=>{r.querySelector('.finish-order-index').textContent=i+1;});}
+ function autoScroll(){if(!drag)return;const rect=controls.getBoundingClientRect();if(drag.y<rect.top+45)controls.scrollTop-=10;else if(drag.y>rect.bottom-45)controls.scrollTop+=10;update();scrollFrame=requestAnimationFrame(autoScroll);}
+ function end(save){if(!drag)return;const d=drag;drag=null;cancelAnimationFrame(scrollFrame);d.row.classList.remove('is-dragging');if(controls.hasPointerCapture(d.pointer))controls.releasePointerCapture(d.pointer);const order=rows().map(r=>r.dataset.finishRow);if(save&&order.length===FINISH_ORDER.length)commit(order,d.id);else{renderControls();focus(d.id);if(!save)announce('Spostamento annullato.');}}
+ controls.addEventListener('pointerdown',e=>{const b=e.target.closest('[data-finish-handle]');if(!b||e.button!==0||drag)return;e.preventDefault();const row=b.closest('[data-finish-row]');drag={id:b.dataset.finishHandle,row,pointer:e.pointerId,y:e.clientY};row.classList.add('is-dragging');controls.setPointerCapture(e.pointerId);b.focus({preventScroll:true});scrollFrame=requestAnimationFrame(autoScroll);});
+ controls.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.pointer)return;drag.y=e.clientY;update();});
+ controls.addEventListener('pointerup',e=>{if(drag&&e.pointerId===drag.pointer)end(true);});
+ controls.addEventListener('pointercancel',e=>{if(drag&&e.pointerId===drag.pointer)end(false);});
+ controls.addEventListener('lostpointercapture',()=>{if(drag)end(false);});
+ return {sync(){if(drag&&!drag.row.isConnected){drag=null;cancelAnimationFrame(scrollFrame);}for(const row of rows()){const f=FINISH_FILTERS[row.dataset.finishRow],on=!!getState()[f.enabled],button=row.querySelector('[data-finish-toggle]');row.classList.toggle('is-on',on);button.textContent=on?'Attivo':'Spento';button.setAttribute('aria-pressed',on);button.setAttribute('aria-label',`${on?'Disattiva':'Attiva'} ${f.name}`);}}};
+}

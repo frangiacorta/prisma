@@ -14891,7 +14891,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Usare il fotogramma composto dai renderer Prisma come sorgente dei filtri; combinare i trattamenti con mix, attivazioni e riquadri indipendenti. Prossima estensione: ordine modificabile della catena, conservato nel preset e applicato allo stesso modo in anteprima ed export."
+              "value": "Il fotogramma composto dai renderer Prisma attraversa la catena riordinabile dei cinque trattamenti, saltando quelli spenti. Colore, esposizione, lente e grana restano regolazioni di base applicate dal renderer. Ordine conservato nei preset e condiviso fra anteprima ed export."
             }
           ]
         },
@@ -14948,14 +14948,17 @@
                 "Contorni di luminanza e trasparenza: spessore, soglia, morbidezza, tinta o colore sorgente, sovrapposizione o profili isolati, mix e riquadri",
                 "Glitch a bande con spostamento, altezza, quantità, separazione colori, variante ripetibile e mix",
                 "Glitch fermo o animato: impulsi per loop, durata, entrata/uscita morbide; tempo deterministico anche nel video",
-                "Preset, composizione con segni, anteprima, MP4 e wallpaper offline su Forme e Particelle"
+                "Preset, composizione con segni, anteprima, MP4 e wallpaper offline su Forme e Particelle",
+                "Ordine trascinabile per Mosaico, RGB, Contorni, Segni e Glitch; frecce e tastiera come alternative",
+                "Ordine, attivazioni, parametri e riquadri conservati nel preset e nella creazione corrente",
+                "Catena condivisa da anteprima, immagini, MP4 e wallpaper; preset precedenti con ordine iniziale invariato"
               ]
             },
             {
               "label": "remaining",
               "value": [
-                "Ordine modificabile: attualmente colore/lente → mosaico → RGB → contorni → segni/bagliore → glitch",
-                "Migliorare il controllo della combinazione dei filtri sulla stessa scena Prisma"
+                "Preset di soli filtri da riutilizzare su altre creazioni Prisma",
+                "Maschere dipinte sulle creazioni Prisma"
               ]
             }
           ]
@@ -14969,7 +14972,7 @@
       "result": "",
       "where": "Scena → Filtri; accessibile anche dal pannello Export.",
       "platform": "",
-      "next": "Prossima estensione di questo progetto: ingresso immagine/video e campionamento a punti. Il displacement resta nel Warp ricorsivo.",
+      "next": "Preset di soli filtri: salvare una combinazione e applicarla ad altre creazioni Prisma mantenendo forma, materiali e movimento.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -17497,7 +17500,10 @@
                 "Contorni: spessore, soglia, morbidezza, colore, solo profili e mix",
                 "Glitch: spostamento, bande, quantità, separazione colori, variante e mix",
                 "Glitch animato: impulsi per loop, durata e morbidezza",
-                "Scelta indipendente dei riquadri per contorni e glitch"
+                "Scelta indipendente dei riquadri per contorni e glitch",
+                "Ordine dei filtri: maniglie mouse/touch, frecce su/giù e tastiera",
+                "Attivazione rapida e accesso ai controlli da ciascuna riga",
+                "Annulla/ripristina e reset del solo ordine"
               ]
             }
           ]
@@ -17522,17 +17528,20 @@
                 "Contorni di luminanza e trasparenza: spessore, soglia, morbidezza, tinta o colore sorgente, sovrapposizione o profili isolati, mix e riquadri",
                 "Glitch a bande con spostamento, altezza, quantità, separazione colori, variante ripetibile e mix",
                 "Glitch fermo o animato: impulsi per loop, durata, entrata/uscita morbide; tempo deterministico anche nel video",
-                "Preset, composizione con segni, anteprima, MP4 e wallpaper offline su Forme e Particelle"
+                "Preset, composizione con segni, anteprima, MP4 e wallpaper offline su Forme e Particelle",
+                "Ordine trascinabile per Mosaico, RGB, Contorni, Segni e Glitch; frecce e tastiera come alternative",
+                "Ordine, attivazioni, parametri e riquadri conservati nel preset e nella creazione corrente",
+                "Catena condivisa da anteprima, immagini, MP4 e wallpaper; preset precedenti con ordine iniziale invariato"
               ]
             },
             {
               "label": "limits",
               "value": [
-                "Ordine fisso colore/lente → mosaico → RGB → contorni → segni/bagliore → glitch",
-                "Ordine modificabile e maschere dipinte sulle creazioni Prisma restano da sviluppare",
+                "Colore, esposizione, lente e grana restano alla base della scena; la catena riordinabile comprende Mosaico, RGB, Contorni, Segni e Glitch.",
                 "I contorni sono rilevati dal fotogramma 2D, non da geometria o profondità 3D",
                 "Colore/esposizione/lente/grana conservano il loro ambito globale o soggetto",
-                "Atlante ASCII fisso, nessuna inerzia del MemoryGrid originale"
+                "Atlante ASCII fisso, nessuna inerzia del MemoryGrid originale",
+                "Preset dei soli filtri e maschere dipinte restano da sviluppare."
               ]
             }
           ]
@@ -17542,7 +17551,7 @@
           "fields": [
             {
               "label": "evidence",
-              "value": "reports/finishing/local-check.json; immagini di prova e wallpaper offline in reports/finishing/; reports/finishing-areas/local-check.json; reports/glyph-filters/local.json; reports/filter-details/local.json"
+              "value": "reports/finishing/local-check.json; immagini di prova e wallpaper offline in reports/finishing/; reports/finishing-areas/local-check.json; reports/glyph-filters/local.json; reports/filter-details/local.json; reports/filter-order/local.json"
             },
             {
               "label": "checks",
@@ -17558,7 +17567,10 @@
                 "Controlli segni verificati tramite differenza pixel, loop e seek identici, maschera esterna invariata anche con bagliore",
                 "MP4 con segni codificato e decodificato; UI e preset su entrambi i motori",
                 "Ogni controllo nuovo modifica i pixel; fasi 0/2π identiche, seek ripetibile, pausa tra impulsi e glitch fermo",
-                "Maschere e mix zero esatti, trasparenza, combinazione con segni, MP4 decodificato, wallpaper offline, UI mobile e ripristino preset"
+                "Maschere e mix zero esatti, trasparenza, combinazione con segni, MP4 decodificato, wallpaper offline, UI mobile e ripristino preset",
+                "Ordine diverso produce pixel diversi; riferimento per passaggi indipendenti e ordine iniziale identici",
+                "Trascinamento mouse e touch, tastiera, frecce, annullamento con Escape, undo/redo, reset indipendente",
+                "Preset JSON realmente esportato e reimportato, persistenza dopo ricarica, MP4 e wallpaper offline"
               ]
             }
           ]

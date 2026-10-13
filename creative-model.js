@@ -1,12 +1,12 @@
-import {normalizeFinishRegions} from './finishing.js?v=81754f9bfd99';
-import {normalizeAudioClip} from './audio-recording.js?v=81754f9bfd99';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=81754f9bfd99';
-import {normalizeAudio} from './audio-model.js?v=81754f9bfd99';
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=81754f9bfd99';
-import {normalizeForcePaths} from './particle-paths.js?v=81754f9bfd99';
-import {normalizeForcePoints} from './particle-forces.js?v=81754f9bfd99';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=81754f9bfd99';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=81754f9bfd99';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=b8fddb013af6';
+import {normalizeAudioClip} from './audio-recording.js?v=b8fddb013af6';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=b8fddb013af6';
+import {normalizeAudio} from './audio-model.js?v=b8fddb013af6';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=b8fddb013af6';
+import {normalizeForcePaths} from './particle-paths.js?v=b8fddb013af6';
+import {normalizeForcePoints} from './particle-forces.js?v=b8fddb013af6';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=b8fddb013af6';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=b8fddb013af6';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -134,7 +134,7 @@ export function normalizeCreation(raw){
  for(const k of ['finishEnabled','finishTone'])s[k]=raw[k]!==false;
  for(const k of ['finishRgb','finishMosaic','finishGlyph','finishGlitch','finishEdge','finishEdgeSource','finishEdgeOnly'])s[k]=raw[k]===true;
  for(const k of ['finishGlitchAnimate','finishRegionEdge','finishRegionGlitch'])s[k]=raw[k]!==false;for(const k of ['finishGlitchCycles','finishGlitchSeed'])s[k]=Math.round(s[k]);
- s.finishGlyphStyle=Math.round(s.finishGlyphStyle);s.finishGlyphCycles=Math.round(s.finishGlyphCycles);s.finishGlyphSource=raw.finishGlyphSource!==false;s.finishRegionGlyph=raw.finishRegionGlyph!==false;s.finishCompare=false;s.finishRegions=normalizeFinishRegions(raw.finishRegions);s.finishRegionMosaic=raw.finishRegionMosaic!==false;for(const k of ['finishRegionsEnabled','finishRegionRgb','finishRegionInvert'])s[k]=raw[k]===true;
+ s.finishOrder=normalizeFinishOrder(raw.finishOrder);s.finishGlyphStyle=Math.round(s.finishGlyphStyle);s.finishGlyphCycles=Math.round(s.finishGlyphCycles);s.finishGlyphSource=raw.finishGlyphSource!==false;s.finishRegionGlyph=raw.finishRegionGlyph!==false;s.finishCompare=false;s.finishRegions=normalizeFinishRegions(raw.finishRegions);s.finishRegionMosaic=raw.finishRegionMosaic!==false;for(const k of ['finishRegionsEnabled','finishRegionRgb','finishRegionInvert'])s[k]=raw[k]===true;
  if(s.perfectLoop)for(const k of ['environmentCycles','filmCycles'])s[k]=Math.max(1,Math.round(s[k]||1));
  s.animateRotation=['rotateX','rotateY','rotateZ'].some(k=>s.motions[k].enabled);
  s.animateShape=SHAPE_TRACKS.some(k=>s.motions[k].enabled);

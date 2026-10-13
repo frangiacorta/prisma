@@ -1,4 +1,4 @@
-import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=81754f9bfd99';
+import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=b8fddb013af6';
 export function applyLivingStyle(s,style){
  const values=LIVING_STYLES[style];if(!values)return;
  if(s.engine==='solid'&&!s.pLiving&&style!=='off'){

@@ -2,6 +2,10 @@
 export const FINISH_DEFAULTS={finishEnabled:true,finishTone:true,finishRgb:false,finishMosaic:false,finishCompare:false,finishRgbR:8,finishRgbG:0,finishRgbB:-8,finishRgbAngle:0,finishRgbMix:1,finishCellX:12,finishCellY:12,finishMosaicMix:1};
 export const FINISH_META={finishRgbR:['Spostamento rosso',-60,60,.1],finishRgbG:['Spostamento verde',-60,60,.1],finishRgbB:['Spostamento blu',-60,60,.1],finishRgbAngle:['Direzione RGB',-180,180,1],finishRgbMix:['Intensità RGB',0,1,.01],finishCellX:['Larghezza celle',1,160,1],finishCellY:['Altezza celle',1,160,1],finishMosaicMix:['Intensità mosaico',0,1,.01]};
 export const MAX_FINISH_REGIONS=8;
+export const FINISH_FILTERS=Object.freeze({mosaic:{name:'Mosaico',enabled:'finishMosaic',mix:'finishMosaicMix'},rgb:{name:'RGB',enabled:'finishRgb',mix:'finishRgbMix'},edge:{name:'Contorni',enabled:'finishEdge',mix:'finishEdgeMix'},glyph:{name:'Segni',enabled:'finishGlyph',mix:'finishGlyphMix'},glitch:{name:'Glitch',enabled:'finishGlitch',mix:'finishGlitchMix'}});
+export const FINISH_ORDER=Object.freeze(Object.keys(FINISH_FILTERS));
+export function normalizeFinishOrder(raw){const valid=Array.isArray(raw)?raw.filter(k=>typeof k==='string'&&Object.hasOwn(FINISH_FILTERS,k)):[];return [...new Set([...valid,...FINISH_ORDER])];}
+FINISH_DEFAULTS.finishOrder=[...FINISH_ORDER];
 export const EDGE_DEFAULTS={finishEdge:false,finishEdgeWidth:2,finishEdgeThreshold:.08,finishEdgeSoftness:.15,finishEdgeColor:'#d7ff91',finishEdgeSource:false,finishEdgeOnly:false,finishEdgeMix:1,finishRegionEdge:true};
 export const GLITCH_DEFAULTS={finishGlitch:false,finishGlitchAmount:65,finishGlitchBand:48,finishGlitchCoverage:.6,finishGlitchSplit:10,finishGlitchMix:1,finishGlitchAnimate:true,finishGlitchCycles:4,finishGlitchDuty:.6,finishGlitchSoftness:.35,finishGlitchSeed:42,finishRegionGlitch:true};
 Object.assign(FINISH_DEFAULTS,EDGE_DEFAULTS,GLITCH_DEFAULTS);
