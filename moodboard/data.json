@@ -14878,7 +14878,7 @@
       "state": "partial",
       "priority": false,
       "author": "",
-      "summary": "Una sezione di trattamenti per trasformare immagini, video o l’uscita della scena in punti, celle e contorni cromatici.",
+      "summary": "Filtri finali sulle forme, sulle particelle e sulle scene create in Prisma: colore, celle, segni, contorni e glitch.",
       "sources": [
         "https://www.theladybug.app/about/",
         "https://derivative.ca/UserGuide/Resolution_TOP",
@@ -14891,7 +14891,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Ingresso condiviso, campionamento in griglia, mosaico nearest e split RGB componibili. Aggiungere maschera persona dopo la prima prova statica; collegare il warp al progetto esistente."
+              "value": "Usare il fotogramma composto dai renderer Prisma come sorgente dei filtri; combinare i trattamenti con mix, attivazioni e riquadri indipendenti. Prossima estensione: ordine modificabile della catena, conservato nel preset e applicato allo stesso modo in anteprima ed export."
             }
           ]
         },
@@ -14900,7 +14900,7 @@
           "fields": [
             {
               "label": "reuse",
-              "value": "Ladybug come riferimento di risultato. MediaPipe MIT per eventuale segmentazione; operatori TouchDesigner come ricette. Nessuna dipendenza dal servizio Ladybug. Atlante e campionamento ASCII adattati da morphing-ascii-shader (MIT), senza dipendenza Three.js; attribuzione conservata. Sobel e campionamento RGB adattati dagli shader Three.js (MIT); nessun runtime Three.js aggiunto."
+              "value": "Ladybug come riferimento di risultato. operatori TouchDesigner come ricette. Nessuna dipendenza dal servizio Ladybug. Atlante e campionamento ASCII adattati da morphing-ascii-shader (MIT), senza dipendenza Three.js; attribuzione conservata. Sobel e campionamento RGB adattati dagli shader Three.js (MIT); nessun runtime Three.js aggiunto."
             }
           ]
         },
@@ -14910,7 +14910,6 @@
             {
               "label": "controls",
               "value": [
-                "Sorgente immagine/video/scena",
                 "Densità e dimensione punti",
                 "Mosaico X/Y",
                 "Soglia e contrasto",
@@ -14955,9 +14954,8 @@
             {
               "label": "remaining",
               "value": [
-                "Ingresso immagine/video esterno",
-                "Segmentazione opzionale",
-                "Ordine arbitrario: ora colore/lente → mosaico → RGB → contorni → segni/bagliore → glitch"
+                "Ordine modificabile: attualmente colore/lente → mosaico → RGB → contorni → segni/bagliore → glitch",
+                "Migliorare il controllo della combinazione dei filtri sulla stessa scena Prisma"
               ]
             }
           ]
@@ -17531,7 +17529,7 @@
               "label": "limits",
               "value": [
                 "Ordine fisso colore/lente → mosaico → RGB → contorni → segni/bagliore → glitch",
-                "Ingresso video/immagine esterno, maschere dipinte, segmentazione e ordine arbitrario restano da sviluppare",
+                "Ordine modificabile e maschere dipinte sulle creazioni Prisma restano da sviluppare",
                 "I contorni sono rilevati dal fotogramma 2D, non da geometria o profondità 3D",
                 "Colore/esposizione/lente/grana conservano il loro ambito globale o soggetto",
                 "Atlante ASCII fisso, nessuna inerzia del MemoryGrid originale"
