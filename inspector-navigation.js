@@ -20,16 +20,40 @@ export function organizeSections(root,scope){
   const parent=document.createElement('details');parent.className='control-details';parent.id=id;
   const summary=document.createElement('summary');summary.textContent=label;parent.append(summary);nodes[0].before(parent);parent.append(...nodes);
  }
+ // Presets/examples have one predictable home at the bottom of each tab.
+ const library=document.createElement('details');library.className='control-details example-library';
+ library.innerHTML='<summary>Esempi e punti di partenza</summary><p class="help">Applica un esempio, poi continua con tutti i parametri della scheda.</p>';
+ const selectors='[data-sculpt],#load-bloom-example,[data-material],#material-picker,[data-legacy-material],[data-film-look],[data-film-light],[data-texture-style],[data-motion-preset],[data-mood],#random-palette,#light-rig,[data-light-source],[data-backdrop],[data-audio-preset]';
+ const buckets=new Map(),exampleParents=new Set();
+ for(const button of [...root.querySelectorAll(selectors)]){
+  if(library.contains(button))continue;
+  const container=button.closest('.mood-grid,.field,.audio-presets')||button;
+  let ancestor=button.closest('details');while(ancestor&&root.contains(ancestor)){exampleParents.add(ancestor);ancestor=ancestor.parentElement.closest('details');}
+  const title=button.closest('details')?.querySelector(':scope > summary')?.textContent||'Esempi';
+  if(!buckets.has(title)){const block=document.createElement('details');block.className='control-details';const head=document.createElement('summary');head.textContent=title;block.append(head);buckets.set(title,block);library.append(block);}
+  buckets.get(title).append(container);
+ }
+ // Remove only empty preset wrappers, never sections with live controls.
+ for(const d of [...root.querySelectorAll('details')].reverse())if(exampleParents.has(d)&&!d.querySelector('input,select,button,details')&& ![...d.children].some(c=>!c.matches('summary,p.help')))d.remove();
+ for(const button of root.querySelectorAll('button[id^="reset-"],#perfect-sphere')){
+  const parent=button.closest('details')||root,footer=document.createElement('div');footer.className='section-reset';
+  parent.append(footer);footer.append(button);button.classList.remove('full');
+ }
  if(scope==='solid/shape'){
   const growth=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Petali, radici e crescita');
   if(growth){growth.id='shape-growth';const stem=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Gambo opzionale');if(stem)growth.append(stem);}
+  group('Struttura · membrane, fibre e lamine','shape-structure',['Struttura della forma','Membrana · svuotamento e spessore','Fibre e tessitura','Lamelle, petali e aureole','Crescita, arricciamento e pieghe']);
   group('Profilo e deformazioni','shape-profile',['Profilo, torsione e curvature','Vuoto interno · anelli','Ritaglio · semilune','Lobi e onde']);
  }
  if(scope==='particles/shape')group('Struttura e dettaglio organico','particle-structure',['Lobi, rami e addensamenti','Materia organica · dettaglio procedurale','Struttura neuronale','Tentacoli del nucleo','Fasci esterni','Deformazioni aggiuntive']);
  if(scope==='solid/motion'){
+  const general=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Movimento generale');if(general)root.prepend(general);
+  group('Struttura in movimento','motion-structure',['Respiro, battito e scorrimento','Anima le proprietà della struttura']);
   group('Petali e radici in movimento','motion-growth',['Radici · scorrimento e intreccio','Radici · crescita e avvolgimento','Radici · superficie e distribuzione','Petali e gambo · movimenti indipendenti']);
  }
  if(scope==='particles/motion')group('Deformazioni nel tempo','particle-motion-deform',['Vitalità e respiro','Tentacoli in movimento','Warp dello spazio','Ritmo e cadenze']);
+ if(scope.endsWith('/color')){const palette=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent.startsWith('La tua palette'));if(palette)root.prepend(palette);}
+ if(buckets.size)root.append(library);
  if(scope.endsWith('/audio')){
   const response=root.querySelector('#audio-response-controls'),input=root.querySelector('#audio-input-controls');if(response&&input)input.after(response);
  }

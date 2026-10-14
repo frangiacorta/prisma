@@ -1,5 +1,5 @@
-import {organizeSections} from './inspector-navigation.js?v=eaa9ff26389d';
-import {controlHelp} from './control-help.js?v=eaa9ff26389d';
+import {organizeSections} from './inspector-navigation.js?v=80e27f6de822';
+import {controlHelp} from './control-help.js?v=80e27f6de822';
 const STORE='prisma-interface-v2';
 let preferences={};try{preferences=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(preferences));}catch{}};
@@ -47,12 +47,14 @@ export function prepareInspector(root,scope){
  addHelp(root);
 }
 export function mountStudioLayout(){
+ const restart=document.getElementById('reset');restart.className='quiet new-creation';document.querySelector('.random-bar').prepend(restart);
  // Keep scene actions short; infrequent options stay in their own dialog.
  const randomBody=document.querySelector('#random-dialog .dialog-body');
  const similar=document.getElementById('similar');similar.className='outline full';randomBody.append(similar);
  similar.addEventListener('click',()=>document.getElementById('random-dialog').close(),{capture:true});
  randomBody.insertBefore(document.querySelector('.seed'),randomBody.querySelector('#random-apply'));
  const settings=document.getElementById('random-settings');settings.classList.remove('icon-button');settings.classList.add('quiet');settings.textContent='Varia…';
+ document.querySelector('.random-bar').append(restart,document.getElementById('favorite'),document.getElementById('gallery-open'),document.getElementById('randomize'),settings);
  const tools=document.querySelector('.canvas-tools'),menu=document.createElement('details');menu.className='scene-interactions';
  const summary=document.createElement('summary');summary.textContent='Interagisci';menu.append(summary);
  const choices=document.createElement('div');choices.className='scene-interaction-options';menu.append(choices);

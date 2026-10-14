@@ -1,4 +1,4 @@
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField} from './structure-model.js?v=eaa9ff26389d';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField} from './structure-model.js?v=80e27f6de822';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -759,8 +759,50 @@ MODERN_FRAG=MODERN_FRAG.replace(/\n}\n$/, '\n if(uSampling.z>.5){if(transparentE
 MODERN_FRAG=MODERN_FRAG.replace('vec3 fieldParts(vec3 world){',STRUCTURE_GLSL+'\nvec3 fieldParts(vec3 world){');
 MODERN_FRAG=MODERN_FRAG.replace('p/=vec3(uShape.y,uShape.z,volume);','p/=vec3(uShape.y,uShape.z,volume);p=structureWarp(p);');
 MODERN_FRAG=MODERN_FRAG.replace('float hole=-10000.,cut=-10000.;','d=structureField(d,p);float hole=-10000.,cut=-10000.;');
+// The core also attenuates transmitted light, independently of palette blending.
+MODERN_FRAG=MODERN_FRAG.replace('straight.rgb*=beta;', 'beta*=exp(-uStructureColor.x*(1.-smoothstep(0.,uStructureColor.y,length(local.xy/axes().xy)))*5.);straight.rgb*=beta;');
 // The centre tint is part of the existing material, under the same lights.
 MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos),specular=', 'vec3 base=palette(pos)*(1.-uStructureColor.x*(1.-smoothstep(0.,uStructureColor.y,length(local.xy/axes().xy)))),specular=');
+// A flattened 3D membrane still needs its traced silhouette, not a slice at z=0.
+MODERN_FRAG=MODERN_FRAG.replace('float flatGeometry=1.-smoothstep(.1,.45,uShape.x)', 'float flatGeometry=(dot(abs(uStructureA.xzw),vec3(1.))+abs(uStructureB.w)+abs(uStructureC.z)+abs(uStructureD.y)+dot(abs(uStructureE.xyz),vec3(1.))+dot(abs(uStructureF.xy),vec2(1.))+dot(abs(uStructureG),vec4(1.))>.000001)?0.:1.-smoothstep(.1,.45,uShape.x)');
+// Thin membranes transmit straight through all visible layers. This shares the
+// current field, palette and lights; it is not a separate surface or preset.
+MODERN_FRAG=MODERN_FRAG.replace('vec4 shade(',`vec4 structureBehind(vec3 first,vec3 rd){
+ float unused;vec4 background=sceneRay(vec3(first.xy,4.8),rd,unused);
+ vec3 sum=vec3(0.),through=vec3(1.);float remaining=1.;
+ vec3 origin=offsetBoundary(first,rd,true);
+ bool inside=materialField(origin)<0.;
+ for(int layer=0;layer<16;layer++){
+  vec3 hit;float travel;
+  if(!traceBoundary(origin,rd,20.*uFrame.x,false,hit,travel))break;
+  inside=!inside;origin=offsetBoundary(hit,rd,inside);
+  if(!inside)continue; // exiting the same sheet must not count it twice
+  vec3 local=transform(hit),n=boundaryNormal(hit);if(dot(n,rd)>0.)n=-n;
+  float facing=max(.08,dot(n,-rd));
+  float pos=dot(local,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z;
+  vec3 tint=surfacePalette(local,palette(pos))*(1.-uStructureColor.x*(1.-smoothstep(0.,uStructureColor.y,length(local.xy/axes().xy))));
+  vec3 light=environment(n,hit,1.)*.14;
+  for(int j=0;j<uLightCount;j++){vec3 off=uLights[j].xyz-hit;light+=uLightColors[j]*max(dot(n,normalize(off)),0.)*uLights[j].w*.35/(1.+dot(off,off)*.08);}
+  vec3 beta=exp(-absorptionCoefficient(tint)*max(.003,uStructureA.y)*4./facing);
+  beta*=exp(-uStructureColor.x*(1.-smoothstep(0.,uStructureColor.y,length(local.xy/axes().xy)))*5.);
+  vec3 f=fresnel(facing,1.,max(1.,uMat.y),local)*max(.1,uSurface.z);
+  f=f*2./(vec3(1.)+f);
+  vec3 transmission=beta*uMat.x*(vec3(1.)-f);
+  vec3 reflected=environment(reflect(rd,n),hit,uMat.w)*f;
+  sum+=through*(tint*light*(1.-uMat.x)*(vec3(1.)-f)+reflected+tint*uSurface.w*(1.-uMat.x));
+  through*=transmission;remaining*=min(min(transmission.r,transmission.g),transmission.b);
+  if(max(max(through.r,through.g),through.b)<.003)break;
+ }
+ return vec4(sum+through*background.rgb,1.-remaining*(1.-background.a));
+}
+vec4 shade(`);
+MODERN_FRAG=MODERN_FRAG.replace('vec4 straight=sceneRay(vec3(p.xy,4.8),rd,unused);',
+ `vec4 straight=sceneRay(vec3(p.xy,4.8),rd,unused);
+ #if THIN_SHELL_ENABLED
+ if(structureActive())straight=structureBehind(p,rd);
+ #endif
+`);
+MODERN_FRAG=guardShaderFunction(MODERN_FRAG,'structureBehind','THIN_SHELL_ENABLED');
 // Specialize only mathematically regular ellipsoids and truly thin shells.
 // This removes the general multi-interface solver from the common bubble shader.
 function specializeAnalytic(source,name,fast){
@@ -863,6 +905,21 @@ void main(){
  fragColor=vec4(high,low,0.,1.);
 }
 `;
+// A longer first-hit search preserves thin silhouettes without multiplying
+// every volumetric-refraction bounce by that cost or shader complexity.
+{
+ const start=MODERN_FRAG.indexOf('bool traceBoundary('),open=MODERN_FRAG.indexOf('{',start);let end=open+1,depth=1;
+ while(depth){depth+=(MODERN_FRAG[end]==='{')-(MODERN_FRAG[end]==='}');end++;}
+ const primary=MODERN_FRAG.slice(start,end).replace('bool traceBoundary(','bool traceStructurePrimary(').replaceAll('TRACE_STEPS','768').replaceAll('uBudget.x','(uRuntime.w*48.)');
+ MODERN_FRAG=MODERN_FRAG.replace('void main(){',primary+'\nvoid main(){');
+ MODERN_FRAG=MODERN_FRAG.replace('bool hit=traceBoundary(origin,direction,40.,true,point,distance);',`bool hit;
+ #if STRUCTURE_ENABLED
+ hit=traceStructurePrimary(origin,direction,40.,true,point,distance);
+ #else
+ hit=traceBoundary(origin,direction,40.,true,point,distance);
+ #endif
+ `);
+}
 let PREVIEW_FRAG=MODERN_FRAG.replace(CROWN_GEOMETRY.replace('float stemField',STEM_GEOMETRY+'float stemField'),'');
 PREVIEW_FRAG=PREVIEW_FRAG.replace('uniform float uGeometryRadius;',`uniform float uGeometryRadius;
 uniform highp sampler2D uFieldTexture;
@@ -1353,11 +1410,11 @@ function rendererVariant(s,options={},source=s){
  }
  const originalPetals=petals&&rootWeight(s)<.999999;
  return (modern?8:0)+(modern&&s.thinShell>=.999?16:0)+(modern&&analytic?32:0)+(crown?64:0)+ +volume+((s.subsurface||0)>.0001&&(!modern?transmission<.999:true)?2:0)+((s.dispersion||0)>.005?4:0)
-  +(originalPetals&&spread<=.9999?128:0)+(originalPetals&&spread>=.0001&&amount<.999999?256:0)+(originalPetals&&spread>=.0001&&amount>.000001?512:0)+(crown&&(s.stemAmount||0)>.000001?1024:0)+(modern&&transmission>.0001?2048:0)+(modern&&options.preview&&options.quality!=='full'?4096:0)+(petals&&rootWeight(s)>.000001?32768:0);
+  +(originalPetals&&spread<=.9999?128:0)+(originalPetals&&spread>=.0001&&amount<.999999?256:0)+(originalPetals&&spread>=.0001&&amount>.000001?512:0)+(crown&&(s.stemAmount||0)>.000001?1024:0)+(modern&&transmission>.0001?2048:0)+(modern&&options.preview&&options.quality!=='full'?4096:0)+(petals&&rootWeight(s)>.000001?32768:0)+(modern&&structureMayChange(source)?65536:0);
 }
 function variantSource(key){
  if(key===ATLAS_BAKE)return BAKE_FRAG;
- const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4,ROOTS_ENABLED:32768};
+ const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4,ROOTS_ENABLED:32768,STRUCTURE_ENABLED:65536};
  let defines=Object.entries(flags).map(([name,bit])=>'#define '+name+' '+ +!!(key&bit)).join('\n');
  if(key&8)defines+='\n#define TRACE_STEPS '+(key&ATLAS_PREVIEW?128:key&4096?128:224)+'\n#define INTERFACE_STEPS '+(key&ATLAS_PREVIEW?4:key&4096?8:32)+'\n#define LENGTH_SAMPLES '+(key&4096?8:16)+'\n#define SCATTER_SAMPLES '+(key&4096?2:4)+'\n#define SPECTRAL_SAMPLES '+(key&4096?3:5);
  return (key&ATLAS_PREVIEW?PREVIEW_FRAG:key&8?MODERN_FRAG:FRAG).replace('#version 300 es','#version 300 es\n'+defines);
@@ -1472,7 +1529,7 @@ export class Renderer{
 
  u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);
 
- u('uRuntime',[+!!options.preview,.85/(1.+(s.structCurl?Math.abs(s.structCurl):0)+(s.structFold||0)*(s.structFoldCount||1)*.8+Math.abs(s.structFlap||0)*2.+(s.structWeave||0)*(s.structDensity||20)*2.+(s.deform||0)*2.+Math.abs(s.asymmetry||0)*.6+Math.abs(s.twist||0)*.3+(s.waves||0)*(s.waveScale||1)*.15+(s.lobeAmount||0)*(s.lobes||0)*.4),options.normalDiagnostic?2:+!!options.diagnostic,16]);u('uTransport',[s.subsurface||0,s.sssRadius??.35,0,0]);u('uSssColor',rgb(s.sssColor||'#ffc49b'));
+ u('uRuntime',[+!!options.preview,.85/(1.+(s.structScallop||0)*(s.structPetalCount||8)*.9+Math.abs(s.structSpiral||0)*3+(s.structStagger||0)*(s.structPetalCount||8)*.5+(s.structRuffle||0)*(s.structPetalCount||8)*3+(s.structCurl?Math.abs(s.structCurl):0)+(s.structFold||0)*(s.structFoldCount||1)*.8+Math.abs(s.structFlap||0)*2.+(s.structWeave||0)*(s.structDensity||20)*2.+(s.deform||0)*2.+Math.abs(s.asymmetry||0)*.6+Math.abs(s.twist||0)*.3+(s.waves||0)*(s.waveScale||1)*.15+(s.lobeAmount||0)*(s.lobes||0)*.4),options.normalDiagnostic?2:+!!options.diagnostic,16]);u('uTransport',[s.subsurface||0,s.sssRadius??.35,0,0]);u('uSssColor',rgb(s.sssColor||'#ffc49b'));
  u('uInterior',[s.hollow||0,s.wallThickness??.08,s.translucency||0,s.scattering||0]);u('uScatter',[s.scatterDirection??.25,+analytic,s.thinFilm||0,s.filmThickness??420]);
  u('uPhoto1',[s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1]);u('uPhoto2',[s.temperature||0,s.photoTint||0,s.vignette||0,s.lensDistortion||0]);u('uPhoto3',[s.blacks||0,s.highlights||0,s.grainSize||1,0]);u('uPhoto4',[s.gamma||1,+!!s.photoAll,0,0]);
  const palette=s.palette.slice(0,12);while(palette.length<12)palette.push(palette[palette.length-1]||'#ffffff');g.uniform3fv(this.locations.uPalette,palette.flatMap(rgb));g.uniform1i(this.locations.uPaletteCount,Math.max(1,Math.min(12,s.palette.length)));

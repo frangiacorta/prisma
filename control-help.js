@@ -1,6 +1,13 @@
-import {AUDIO_HELP} from './audio-model.js?v=eaa9ff26389d';
+import {AUDIO_HELP} from './audio-model.js?v=80e27f6de822';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ structScallop:'Arrotonda la sagoma in lobi morbidi, sulla forma corrente. Il numero si regola con Divisioni radiali. Si combina con svuotamento, strati e ritagli.',
+ structSpiral:'Avvolge le superfici dal centro al bordo. Zero è neutro; valori positivi e negativi invertono il verso. Puoi animarlo nella scheda Movimento.',
+ structStagger:'Sposta la fase e l’inclinazione delle pieghe lungo la profondità: le lamine sovrapposte non si muovono più tutte insieme.',
+ structRuffle:'Aggiunge ondulazioni minute ai bordi, indipendenti dalle pieghe grandi. Avanzamento delle pieghe le fa scorrere in un ciclo continuo.',
+ structTaper:'Assottiglia progressivamente la membrana verso il bordo. Richiede Svuotamento sopra zero; non modifica la trasparenza della materia.',
+ structThickness:'Spessore geometrico dell’involucro. La trasparenza si regola separatamente in Materia. I bordi sottilissimi possono richiedere più risoluzione.',
+
  finishEdge:'Estrae i profili dal fotogramma finale. Funziona su Forme e Particelle e rileva anche i bordi della trasparenza.',
  finishEdgeWidth:'Distanza di campionamento dei contorni, riferita a 1080 px sul lato corto. Aumenta lo spessore dei dettagli rilevati; minimo mezzo pixel effettivo.',
  finishEdgeThreshold:'Soglia bassa mostra i contrasti leggeri, alta conserva soltanto quelli forti.',

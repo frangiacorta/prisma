@@ -15048,7 +15048,7 @@
       "state": "partial",
       "priority": true,
       "author": "",
-      "summary": "Svuotamento, fibre, tessitura, lamelle, strati e deformazioni combinabili sulla stessa forma.",
+      "summary": "Petali arrotondati, veli sottili e lamine sovrapposte ottenuti con proprietà combinabili della forma.",
       "sources": [
         "https://www.infinitemantra.ca/",
         "https://www.fooh.com/blog/lindsay-kokoska-interview"
@@ -15064,13 +15064,16 @@
             {
               "label": "implemented",
               "value": [
-                "26 proprietà combinabili, accessibili dalla forma di base senza caricare esempi",
                 "Profilo, vuoti, ritagli, materiale, palette e luci restano attivi durante la trasformazione",
                 "Crescita radiale, arricciamento e pieghe indipendenti; respiro e battito animabili",
                 "Tracce con durata, verso, fase, ritmo e pause; scorrimento delle pieghe continuo",
                 "Nucleo scuro in Colori; trasparenza e ottica in Materia",
                 "Preset conserva combinazioni e tracce; adattamento dei vecchi lavori con copia integrale dei dati precedenti",
-                "In Particelle pelle, fili longitudinali, trama trasversale e raggruppamento si regolano insieme"
+                "In Particelle pelle, fili longitudinali, trama trasversale e raggruppamento si regolano insieme",
+                "31 proprietà combinabili della struttura",
+                "Lobi arrotondati e pieghe sfalsate, senza un modo separato",
+                "Trasparenza senza rifrazione attraverso più lamine e nucleo che assorbe anche la luce trasmessa",
+                "Contorno delle membrane piatte calcolato in 3D; ricerca più precisa delle superfici sottili"
               ]
             }
           ]
@@ -15081,11 +15084,9 @@
             {
               "label": "limits",
               "value": [
-                "Deformazioni procedurali: non simulano collisioni o inerzia di un tessuto fisico.",
-                "L’adattamento dei vecchi preset conserva i dati originali, ma non promette lo stesso aspetto: geometria e comportamento ottico sono cambiati.",
-                "Anteprima ed esportazione delle proprietà comuni valutano direttamente la forma. La risoluzione e il numero di campioni restano adattivi: linee molto sottili possono richiedere una qualità maggiore e trasparenze complesse possono rallentare.",
-                "In Particelle resta la superficie guidata con XPBD e visualizzazione della pelle più vicina. Non equivale all’ottica volumetrica di Forme.",
-                "Fedeltà alle reference e fluidità su telefono fisico da verificare con l’utente."
+                "Deformazioni procedurali, senza collisioni o inerzia fisica del tessuto.",
+                "Trasparenza a lamine: composizione diretta fino a 8 strati attraversati; non simula rifrazioni o riflessi reciproci. Il materiale con rifrazione rimane disponibile, più costoso sulle strutture fitte.",
+                "Non è una replica certificata della tecnica dell’artista. Qualità e movimento verificati localmente; telefono fisico ancora da provare."
               ]
             }
           ]
@@ -15095,15 +15096,15 @@
           "fields": [
             {
               "label": "evidence",
-              "value": "reports/structure/source.json; reports/structure/source-ui.json; reports/structure/export.json"
+              "value": "reports/petals-quality/"
             },
             {
               "label": "checks",
               "value": [
-                "26 controlli con impatto sui pixel",
-                "Controlli comuni di forma e materia verificati sulle combinazioni",
-                "Passaggi intermedi continui, loop ripetibile, preset e dati originali conservati",
-                "Interfaccia a 390 px e wallpaper autonomo verificati"
+                "31 proprietà della struttura con impatto sui pixel e 8 controlli comuni ancora attivi",
+                "Loop e transizioni continue; preset e backup originali conservati",
+                "Menu, ricerca, salvataggio, nuova sfera in 16:9, desktop e 390 px verificati",
+                "MP4 reale 640×360, 4 secondi, alpha e nero puro verificati"
               ]
             }
           ]
@@ -15117,7 +15118,7 @@
       "result": "veli-aureole",
       "where": "Forme → Forma → Struttura della forma. Movimento per le tracce, Materia per la trasparenza, Colori per il nucleo. Particelle → Forma → Pelle, fibre e tessitura.",
       "platform": "",
-      "next": "Confrontare i look e il movimento con le reference e raccogliere il feedback prima delle estensioni fisiche.",
+      "next": "Confrontare le nuove pieghe in movimento con le reference; verificare le combinazioni fitte sul telefono.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -15136,19 +15137,22 @@
         "roadmap-membrane",
         "project-pellicola-viva"
       ],
-      "resultImage": "../presets/veil-petals.webp",
-      "resultVideo": "../previews/structure-combinations-4s.mp4?v=36",
-      "resultUrl": "../?engine=solid&v=36",
+      "resultImage": "../presets/petals-quality.webp",
+      "resultVideo": "../previews/petals-veils-4s.mp4?v=37",
+      "resultUrl": "../?engine=solid&v=37",
       "method": "In Forme le proprietà sono operazioni sul campo geometrico comune: svuotamento, separazione in fibre, trama trasversale, tagli planari e radiali, strati concentrici e deformazioni. Non selezionano un renderer o una forma di arrivo. In Particelle pelle, fili, trama e raggruppamento sono quantità simultanee sulla superficie connessa esistente.",
       "reuse": "Riutilizzati campo geometrico delle forme, solver delle strutture vive, palette, luci, tracce animate, filtri, preset ed esportatore Prisma. Nessun codice originale degli artisti attribuito a questa implementazione.",
       "implemented": [
-        "26 proprietà combinabili, accessibili dalla forma di base senza caricare esempi",
         "Profilo, vuoti, ritagli, materiale, palette e luci restano attivi durante la trasformazione",
         "Crescita radiale, arricciamento e pieghe indipendenti; respiro e battito animabili",
         "Tracce con durata, verso, fase, ritmo e pause; scorrimento delle pieghe continuo",
         "Nucleo scuro in Colori; trasparenza e ottica in Materia",
         "Preset conserva combinazioni e tracce; adattamento dei vecchi lavori con copia integrale dei dati precedenti",
-        "In Particelle pelle, fili longitudinali, trama trasversale e raggruppamento si regolano insieme"
+        "In Particelle pelle, fili longitudinali, trama trasversale e raggruppamento si regolano insieme",
+        "31 proprietà combinabili della struttura",
+        "Lobi arrotondati e pieghe sfalsate, senza un modo separato",
+        "Trasparenza senza rifrazione attraverso più lamine e nucleo che assorbe anche la luce trasmessa",
+        "Contorno delle membrane piatte calcolato in 3D; ricerca più precisa delle superfici sottili"
       ],
       "controls": [
         "Svuotamento e spessore",
@@ -15157,29 +15161,32 @@
         "Espansione, arricciamento e pieghe",
         "Battito, respiro e scorrimento",
         "Trasparenza e ottica comuni",
-        "Nucleo scuro"
+        "Nucleo scuro",
+        "Arrotondamento dei petali",
+        "Avvolgimento a spirale",
+        "Sfasamento fra le lamine",
+        "Ondulazione fine del bordo",
+        "Assottigliamento della membrana"
       ],
       "limits": [
-        "Deformazioni procedurali: non simulano collisioni o inerzia di un tessuto fisico.",
-        "L’adattamento dei vecchi preset conserva i dati originali, ma non promette lo stesso aspetto: geometria e comportamento ottico sono cambiati.",
-        "Anteprima ed esportazione delle proprietà comuni valutano direttamente la forma. La risoluzione e il numero di campioni restano adattivi: linee molto sottili possono richiedere una qualità maggiore e trasparenze complesse possono rallentare.",
-        "In Particelle resta la superficie guidata con XPBD e visualizzazione della pelle più vicina. Non equivale all’ottica volumetrica di Forme.",
-        "Fedeltà alle reference e fluidità su telefono fisico da verificare con l’utente."
+        "Deformazioni procedurali, senza collisioni o inerzia fisica del tessuto.",
+        "Trasparenza a lamine: composizione diretta fino a 8 strati attraversati; non simula rifrazioni o riflessi reciproci. Il materiale con rifrazione rimane disponibile, più costoso sulle strutture fitte.",
+        "Non è una replica certificata della tecnica dell’artista. Qualità e movimento verificati localmente; telefono fisico ancora da provare."
       ],
       "checks": [
-        "26 controlli con impatto sui pixel",
-        "Controlli comuni di forma e materia verificati sulle combinazioni",
-        "Passaggi intermedi continui, loop ripetibile, preset e dati originali conservati",
-        "Interfaccia a 390 px e wallpaper autonomo verificati"
+        "31 proprietà della struttura con impatto sui pixel e 8 controlli comuni ancora attivi",
+        "Loop e transizioni continue; preset e backup originali conservati",
+        "Menu, ricerca, salvataggio, nuova sfera in 16:9, desktop e 390 px verificati",
+        "MP4 reale 640×360, 4 secondi, alpha e nero puro verificati"
       ],
-      "evidence": "reports/structure/source.json; reports/structure/source-ui.json; reports/structure/export.json",
-      "resultVersion": "36",
+      "evidence": "reports/petals-quality/",
+      "resultVersion": "37",
       "integration": "Proprietà combinabili sulla forma corrente; nessun selettore esclusivo di membrane, tessuti o veli in Forme.",
-      "resultPreview": "previews/structure-combinations-4s.mp4",
+      "resultPreview": "previews/petals-veils-4s.mp4",
       "resultDuration": 4,
       "remaining": [
-        "Confronto visivo con le reference e feedback sul nuovo comportamento",
-        "Prova delle combinazioni più fitte su telefono fisico"
+        "Feedback sul nuovo aspetto e sul movimento rispetto alle reference",
+        "Prestazioni su telefono fisico e combinazioni con molte rifrazioni"
       ],
       "acceptance": [
         "Proprietà combinabili senza cambio di modalità o preset obbligatorio",

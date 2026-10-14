@@ -1,8 +1,8 @@
-import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=eaa9ff26389d';
-import {RhythmClock,TapTempo} from './audio-rhythm.js?v=eaa9ff26389d';
-import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=eaa9ff26389d';
-import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=eaa9ff26389d';
-import {META} from './model.js?v=eaa9ff26389d';
+import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=80e27f6de822';
+import {RhythmClock,TapTempo} from './audio-rhythm.js?v=80e27f6de822';
+import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=80e27f6de822';
+import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=80e27f6de822';
+import {META} from './model.js?v=80e27f6de822';
 
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountAudioReactive({getState,remember,mark,renderControls,showTab,toast,invalidate,setPlaying}) {
@@ -68,13 +68,7 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
     input.attachPlayer(document.getElementById('audio-player')||parking);
     if(resumePlayer&&input.player){const player=input.player;void player.play().catch(()=>{if(input.player===player){notice='Premi Play sul file per riprendere.';syncUi();}});}
     resumePlayer=false;syncDevices();syncUi();
-    // Direct links from existing Prisma controls, including the Motion tab.
-    const supported=audioTargets(getState().engine);
-    for(const range of controls.querySelectorAll('input[data-param]')){
-      const key=range.dataset.param,line=range.closest('.param')?.querySelector('.param-line');
-      if(!supported.includes(key)||!line||line.querySelector('[data-audio-link]'))continue;
-      const button=document.createElement('button');button.type='button';button.className='audio-link quiet';button.dataset.audioLink=key;button.textContent='♫';button.title=`Collega ${META[key][0]} all’audio`;button.setAttribute('aria-label',button.title);line.append(button);
-    }
+    // Audio assignments are edited in the Audio panel; keep parameter rows quiet.
   }
 
   async function start(file) {
@@ -220,7 +214,7 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
       remember();for(const key of audioTargets(base.engine))if(view[key]!==base[key])base[key]=view[key];cancelRecording();stopReplay(false);rhythm.stop(false);stop(false);mark();renderControls();toast('Risposta congelata · inclusa nel preset e negli export.');
     }
   });
-  const tool=document.createElement('button');tool.id='audio-tool';tool.className='tool';tool.innerHTML='♫<span class="tool-label">Audio</span>';tool.title='Voce e musica';tool.setAttribute('aria-label','Audio · voce e musica');document.querySelector('.canvas-tools .tool-separator').before(tool);
+  const tool=document.createElement('button');tool.id='audio-tool';tool.className='tool';tool.innerHTML='<span class="tool-label">Audio</span>';tool.title='Voce e musica';tool.setAttribute('aria-label','Audio · voce e musica');document.querySelector('.canvas-tools .tool-separator').before(tool);
   tool.onclick=()=>{showTab('audio');const section=document.getElementById('audio-input-controls');section.open=true;section.scrollIntoView({block:'nearest'});};
   addEventListener('pagehide',()=>{cancelRecording();stopReplay(false);rhythm.stop(false);stop(false);});
   return {

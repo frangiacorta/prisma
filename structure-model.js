@@ -4,6 +4,7 @@ export const STRUCTURE_DEFAULTS={
  structSlices:0,structSliceCount:6,structSliceWidth:.24,structRadial:0,structPetalCount:8,structPetalWidth:.45,
  structLayers:0,structLayerCount:3,structLayerWidth:.22,
  structGrowth:0,structCurl:0,structFold:0,structFoldCount:5,structBreath:0,structFlap:0,structFlowPhase:0,structDelay:.35,
+ structScallop:0,structSpiral:0,structStagger:0,structRuffle:0,structTaper:0,
  structCoreDark:0,structCoreRadius:.3
 };
 export const STRUCTURE_META={
@@ -14,14 +15,15 @@ export const STRUCTURE_META={
  structLayers:['Strati concentrici · aureole',0,1,.01],structLayerCount:['Numero di strati concentrici',2,6,1],structLayerWidth:['Spessore relativo degli strati',.15,.85,.01],
  structGrowth:['Espansione radiale',0,.8,.01],structCurl:['Arricciamento dal centro',-1,1,.01],structFold:['Ampiezza delle pieghe',0,.4,.01],structFoldCount:['Pieghe intorno alla forma',1,12,1],
  structBreath:['Dilatazione del respiro',-.3,.3,.01],structFlap:['Apertura del battito',-.6,.6,.01],structFlowPhase:['Avanzamento delle pieghe',0,1,.001],structDelay:['Sfasamento dal centro al bordo',0,1,.01],
+ structScallop:['Arrotondamento dei petali',0,1,.01],structSpiral:['Avvolgimento a spirale',-1,1,.01],structStagger:['Sfasamento fra le lamine',0,1,.01],structRuffle:['Ondulazione fine dei bordi',0,.15,.005],structTaper:['Assottigliamento verso il bordo',0,1,.01],
  structCoreDark:['Oscurità del nucleo',0,1,.01],structCoreRadius:['Estensione del nucleo',.05,.8,.01]
 };
 export const STRUCTURE_GROUPS={shape:Object.keys(STRUCTURE_DEFAULTS).filter(k=>!['structBreath','structFlap','structFlowPhase','structDelay','structCoreDark','structCoreRadius'].includes(k)),motion:['structBreath','structFlap','structFlowPhase','structDelay'],color:['structCoreDark','structCoreRadius']};
-export const STRUCTURE_TRACKS=Object.fromEntries(['structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structFlowPhase'].map(k=>[k,[STRUCTURE_META[k][0],0,k==='structBreath'?.3:k==='structFlap'?.6:k==='structFold'?.4:1,.01]]));
+export const STRUCTURE_TRACKS=Object.fromEntries(['structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structFlowPhase','structScallop','structSpiral','structStagger','structRuffle'].map(k=>[k,[STRUCTURE_META[k][0],0,k==='structBreath'?.3:k==='structFlap'?.6:k==='structFold'?.4:1,.01]]));
 export const STRUCTURE_FIELD_KEYS=Object.keys(STRUCTURE_DEFAULTS).filter(k=>!k.startsWith('structCore'));
-export function hasStructure(s){return ['structShell','structFibres','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap'].some(k=>Math.abs(s[k]||0)>1e-6);}
+export function hasStructure(s){return ['structShell','structFibres','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle'].some(k=>Math.abs(s[k]||0)>1e-6);}
 export function structureMayChange(s){return hasStructure(s)||STRUCTURE_FIELD_KEYS.some(k=>s.motions?.[k]?.enabled&&(s.motions[k].amplitude||s.motions[k].mode==='cycle'));}
-export function structureBounds(s){return (1+Math.abs(s.structGrowth||0)+Math.abs(s.structBreath||0))*(1+Math.abs(s.structCurl||0)+Math.abs(s.structFold||0)+Math.abs(s.structFlap||0));}
+export function structureBounds(s){return (1+Math.abs(s.structGrowth||0)+Math.abs(s.structBreath||0))*(1+Math.abs(s.structCurl||0)+Math.abs(s.structFold||0)+Math.abs(s.structFlap||0)+Math.abs(s.structRuffle||0)*2+Math.abs(s.structStagger||0)*.6);}
 export function structureUniforms(s,u){
  const v={...STRUCTURE_DEFAULTS,...s};
  u('uStructureA',[v.structShell,v.structThickness,v.structFibres,v.structWeft]);
@@ -30,6 +32,8 @@ export function structureUniforms(s,u){
  u('uStructureD',[v.structPetalWidth,v.structLayers,v.structLayerCount,v.structLayerWidth]);
  u('uStructureE',[v.structGrowth,v.structCurl,v.structFold,v.structFoldCount]);
  u('uStructureF',[v.structBreath,v.structFlap,v.structFlowPhase,v.structDelay]);
+ u('uStructureG',[v.structScallop,v.structSpiral,v.structStagger,v.structRuffle]);
+ u('uStructureH',[v.structTaper,0]);
  u('uStructureColor',[v.structCoreDark,v.structCoreRadius]);
 }
 // Keep the CPU query and shader algebra identical (lights, export and preview).
@@ -37,14 +41,21 @@ export function structureWarp(s,p){
  const v={...STRUCTURE_DEFAULTS,...s},q=[...p],r=Math.hypot(q[0],q[1]),a=Math.atan2(q[1],q[0]),phase=v.structFlowPhase*Math.PI*2;
  const expansion=1+v.structGrowth+v.structBreath*Math.cos(r*v.structDelay*Math.PI);
  q[0]/=expansion;q[1]/=expansion;
- const rr=Math.hypot(q[0],q[1]),falloff=rr*rr/(1+rr*rr);
+ const rr=Math.hypot(q[0],q[1]),falloff=rr*rr/(.3+rr*rr);
+ // Smooth polar warp, shared by every structural operator and the base shape.
+ const angle=a-v.structSpiral*2.8*rr-v.structStagger*q[2]*2;
+ const petal=.5+.5*Math.cos(angle*v.structPetalCount);
+ const envelope=1-v.structScallop*.62*(1-petal);
+ if(v.structScallop||v.structSpiral||v.structStagger){q[0]=Math.cos(angle)*rr/envelope;q[1]=Math.sin(angle)*rr/envelope;}
  q[2]-=falloff*(v.structCurl+v.structFold*Math.sin(a*v.structFoldCount+phase-rr*v.structDelay*Math.PI)+v.structFlap*Math.cos(rr*v.structDelay*Math.PI));
+ q[2]-=falloff*(v.structStagger*.6*Math.sin(angle*v.structPetalCount+rr*2+phase)+v.structRuffle*Math.sin(angle*(v.structPetalCount*3)+phase-rr*6));
  return q;
 }
 export function structureField(s,d,p){
  const v={...STRUCTURE_DEFAULTS,...s},r=Math.hypot(...p),phi=Math.atan2(p[1],p[0]),theta=Math.acos(Math.max(-1,Math.min(1,p[2]/Math.max(r,1e-6)))),tau=Math.PI*2;
  const a=phi*v.structDensity,b=theta*v.structDensity,phase=v.structFlowPhase*tau;
- if(v.structShell>0)d=Math.max(d,-d-v.structThickness-(1-v.structThickness)*(1-v.structShell));
+ const thickness=v.structThickness*(1-v.structTaper*.85*Math.min(1,Math.hypot(p[0],p[1])));
+ if(v.structShell>0)d=Math.max(d,-d-thickness-(1-thickness)*(1-v.structShell));
  if(v.structFibres>0){
   const width=1+(v.structThreadWidth-1)*v.structFibres,warp=(Math.abs(Math.sin(a*.5))-width)/v.structDensity*2;
   const weft=(Math.abs(Math.sin(b*.5))-width*v.structWeft)/v.structDensity*2;
@@ -57,18 +68,24 @@ export function structureField(s,d,p){
  return d;
 }
 export const STRUCTURE_GLSL=`
-uniform vec4 uStructureA,uStructureB,uStructureC,uStructureD,uStructureE,uStructureF;
-uniform vec2 uStructureColor;
+uniform vec4 uStructureA,uStructureB,uStructureC,uStructureD,uStructureE,uStructureF,uStructureG;
+uniform vec2 uStructureColor,uStructureH;
+bool structureActive(){return dot(abs(uStructureA.xzw),vec3(1.))+abs(uStructureB.w)+abs(uStructureC.z)+abs(uStructureD.y)+dot(abs(uStructureE.xyz),vec3(1.))+dot(abs(uStructureF.xy),vec2(1.))+dot(abs(uStructureG),vec4(1.))>.000001;}
 vec3 structureWarp(vec3 p){
  float r=length(p.xy),a=atan(p.y,p.x),phase=uStructureF.z*6.28318530718;
  p.xy/=1.+uStructureE.x+uStructureF.x*cos(r*uStructureF.w*3.14159265359);
- float rr=length(p.xy),falloff=rr*rr/(1.+rr*rr);
+ float rr=length(p.xy),falloff=rr*rr/(.3+rr*rr);
+ float angle=a-uStructureG.y*2.8*rr-uStructureG.z*p.z*2.;
+ float petal=.5+.5*cos(angle*uStructureC.w),envelope=1.-uStructureG.x*.62*(1.-petal);
+ if(abs(uStructureG.x)+abs(uStructureG.y)+abs(uStructureG.z)>.000001)p.xy=vec2(cos(angle),sin(angle))*rr/envelope;
  p.z-=falloff*(uStructureE.y+uStructureE.z*sin(a*uStructureE.w+phase-rr*uStructureF.w*3.14159265359)+uStructureF.y*cos(rr*uStructureF.w*3.14159265359));
+ p.z-=falloff*(uStructureG.z*.6*sin(angle*uStructureC.w+rr*2.+phase)+uStructureG.w*sin(angle*(uStructureC.w*3.)+phase-rr*6.));
  return p;
 }
 float structureField(float d,vec3 p){
  float r=length(p),phi=atan(p.y,p.x),theta=acos(clamp(p.z/max(r,.000001),-1.,1.)),a=phi*uStructureB.x,b=theta*uStructureB.x;
- if(uStructureA.x>0.)d=max(d,-d-uStructureA.y-(1.-uStructureA.y)*(1.-uStructureA.x));
+ float thickness=uStructureA.y*(1.-uStructureH.x*.85*min(1.,length(p.xy)));
+ if(uStructureA.x>0.)d=max(d,-d-thickness-(1.-thickness)*(1.-uStructureA.x));
  if(uStructureA.z>0.){
   float width=mix(1.,uStructureB.y,uStructureA.z),warp=(abs(sin(a*.5))-width)/uStructureB.x*2.;
   float weft=(abs(sin(b*.5))-width*uStructureA.w)/uStructureB.x*2.;
@@ -84,10 +101,10 @@ float structureField(float d,vec3 p){
 export function structurePanel(tab,s,{slider,details,section}){
  const sliders=keys=>keys.map(k=>slider(k)).join('');
  if(tab==='shape')return section('Struttura della forma',(s.structureOriginal?'<p class="help">La struttura precedente è stata adattata alle proprietà comuni. Il risultato può cambiare; i dati originali sono conservati nel preset.</p><button class="quiet" data-structure-original="true">Scarica anche il preset originale</button>':'')+'<p class="help">Combina le proprietà sulla forma attuale. Profilo, ritagli e materia restano attivi.</p>')
- +details('Membrana · svuotamento e spessore',sliders(['structShell','structThickness']))
+ +details('Membrana · svuotamento e spessore',sliders(['structShell','structThickness','structTaper']))
  +details('Fibre e tessitura',sliders(['structFibres','structWeft','structDensity','structThreadWidth','structWeave'])+'<p class="help">Separazione apre gli spazi fra i fili. Tessitura aggiunge i fili trasversali; lo svuotamento può limitare la trama alla pelle.</p>')
- +details('Lamelle, petali e aureole',sliders(['structSlices','structSliceCount','structSliceWidth','structRadial','structPetalCount','structPetalWidth','structLayers','structLayerCount','structLayerWidth'])+'<p class="help">Tre divisioni combinabili: piani, spicchi radiali e strati concentrici. I valori intermedi aprono progressivamente gli spazi. Gli strati interni diventano visibili con trasparenza o ritagli.</p>')
- +details('Crescita, arricciamento e pieghe',sliders(['structGrowth','structCurl','structFold','structFoldCount'])+'<p class="help">Respiro, battito e scorrimento si regolano in Movimento. Trasparenza e rifrazione sono in Materia.</p>');
+ +details('Lamelle, petali e aureole',sliders(['structScallop','structPetalCount','structRadial','structPetalWidth','structSlices','structSliceCount','structSliceWidth','structLayers','structLayerCount','structLayerWidth'])+'<p class="help">Arrotondamento disegna lobi morbidi sulla forma; Separazione radiale apre gli intervalli. Lamelle e strati concentrici aggiungono altri livelli combinabili. I valori intermedi aprono progressivamente gli spazi. Gli strati interni diventano visibili con trasparenza o ritagli.</p>')
+ +details('Crescita, arricciamento e pieghe',sliders(['structGrowth','structCurl','structSpiral','structStagger','structFold','structFoldCount','structRuffle'])+'<p class="help">Respiro, battito e scorrimento si regolano in Movimento. Trasparenza e rifrazione sono in Materia.</p>');
  if(tab==='color')return details('Nucleo scuro',sliders(['structCoreDark','structCoreRadius']));
  if(tab==='motion')return section('Respiro, battito e scorrimento',sliders(STRUCTURE_GROUPS.motion)+'<p class="help">Questi valori definiscono la posa. Apri le rispettive tracce qui sotto per animarla: ogni proprietà ha velocità, verso, fase e ritmo propri.</p>');
  return '';
