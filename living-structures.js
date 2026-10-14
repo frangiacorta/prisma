@@ -1,7 +1,8 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=71504059edf3';
-import {excludeForcePositions} from './particle-forces.js?v=71504059edf3';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=eaa9ff26389d';
+import {excludeForcePositions} from './particle-forces.js?v=eaa9ff26389d';
 
-const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;uniform vec3 uLivingMotion;`;
+const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;
+uniform float uBundleAmount;uniform vec3 uLivingMotion;`;
 export class LivingStructures{
  constructor(owner,common){
   this.owner=owner;this.gl=owner.gl;this.key='';this.builds=0;
@@ -13,7 +14,7 @@ ${controls}
 out vec3 targetPosition;
 void main(){
  vec4 r=aRandom;
- if(uLivingMode<1.5){float groups=uLivingShape.x;float band=floor(r.x*groups);r.x=(band+.5+(fract(r.x*groups)-.5)*uLivingShape.y)/groups;}
+ if(uBundleAmount>0.){float groups=uLivingShape.x;float band=floor(r.x*groups);float grouped=(band+.5+(fract(r.x*groups)-.5)*uLivingShape.y)/groups;r.x=mix(r.x,grouped,uBundleAmount);}
  r.y=mix(uLivingShape.z*.48,1.,aRandom.y);if(r.y<.00001||r.y>.99999)r.x=.5;
  float delay=uLivingMotion.x*sin(r.x*TAU);
  vec3 p=position(r,uPhase-delay),origin=vec3(uFrame.yz,0.);
@@ -39,7 +40,7 @@ ${common}
 ${controls}
 uniform sampler2D uConstraintPositions;uniform int uConstraintColumns;out vec3 targetPosition;
 void main(){
- vec4 r=aRandom;if(uLivingMode<1.5){float groups=uLivingShape.x;float band=floor(r.x*groups);r.x=(band+.5+(fract(r.x*groups)-.5)*uLivingShape.y)/groups;}
+ vec4 r=aRandom;if(uBundleAmount>0.){float groups=uLivingShape.x;float band=floor(r.x*groups);float grouped=(band+.5+(fract(r.x*groups)-.5)*uLivingShape.y)/groups;r.x=mix(r.x,grouped,uBundleAmount);}
  r.y=mix(uLivingShape.z*.48,1.,aRandom.y);if(r.y<.00001||r.y>.99999)r.x=.5;
  float phase=uPhase-uLivingMotion.x*sin(r.x*TAU);
  vec3 p=texelFetch(uConstraintPositions,ivec2(gl_VertexID%uConstraintColumns,gl_VertexID/uConstraintColumns),0).xyz;
@@ -86,7 +87,7 @@ void main(){
  int k=gl_VertexID%6;float endPoint=(k==1||k==2||k==4)?1.:0.;float side=(k==0||k==1||k==3)?-1.:1.;
  float row=float(gl_VertexID/6)+endPoint;
  float u=(float(gl_InstanceID)+.5)/uLivingThread.x;
- if(uWeft<.5&&uLivingThread.w>0.){float g=uLivingThread.w;u=(floor(u*g)+fract(u*g)*(1.-g/float(uLivingSize.x)))/g;}
+
  vec2 uv=uWeft>.5?vec2(row/float(uLivingSize.x*3),u):vec2(u,row/float((uLivingSize.y-1)*3));
  vec2 e=uWeft>.5?vec2(.002,0):vec2(0,.002);
  vec3 p=surface(uv),tangent=surface(uv+e)-surface(uv-e);
@@ -108,16 +109,16 @@ void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vec4(vUV,.5
  capturePositions(s,phase,constrain=false){
   const o=this.owner,gl=this.gl,p=constrain?this.constrain:this.capture,t=this.topology;o.settings(p,s,phase);
   if(constrain){o.tex(p,'uConstraintPositions',this.texture,6);gl.uniform1i(o.loc(p,'uConstraintColumns'),t.columns);}
-  o.u(p,'uLivingMode',s.pLiving);o.u(p,'uLivingMotion',s.pBundleDelay,s.pFray,0);o.u(p,'uLivingShape',s.pBundles,s.pBundleSpread,s.pSkinOpening,s.pSkinOffset);o.u(p,'uLivingFold',s.pFoldCount,s.pFoldDepth,s.pInflate,s.pContract);
+  o.u(p,'uBundleAmount',s.pBundleAmount??(s.pLiving===1?1:0));o.u(p,'uLivingMode',s.pLiving);o.u(p,'uLivingMotion',s.pBundleDelay,s.pFray,0);o.u(p,'uLivingShape',s.pBundles,s.pBundleSpread,s.pSkinOpening,s.pSkinOffset);o.u(p,'uLivingFold',s.pFoldCount,s.pFoldDepth,s.pInflate,s.pContract);
   gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,null);gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK,this.feedback);gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER,0,this.captureBuffer);gl.enable(gl.RASTERIZER_DISCARD);
   gl.beginTransformFeedback(gl.POINTS);gl.drawArrays(gl.POINTS,0,t.columns*t.rows);gl.endTransformFeedback();gl.disable(gl.RASTERIZER_DISCARD);gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER,0,null);gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK,null);
   gl.bindBuffer(gl.ARRAY_BUFFER,this.captureBuffer);gl.getBufferSubData(gl.ARRAY_BUFFER,0,this.target);return this.target;
  }
  prepare(s){
-  const topologyKey=[s.pLiving,s.pBundles].join(':');
+  const topologyKey='connected-surface';
   const gl=this.gl;
   if(this.topologyKey!==topologyKey){
-   this.topology=makeLivingTopology(64,49,s.pLiving,s.pBundles);const t=this.topology;
+   this.topology=makeLivingTopology(64,49,3,s.pBundles);const t=this.topology;
    this.target=new Float32Array(t.columns*t.rows*3);this.pixels=new Float32Array(t.columns*t.rows*4);
    gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.seedBuffer);gl.bufferData(gl.ARRAY_BUFFER,t.seeds,gl.STATIC_DRAW);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indices);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,t.triangles,gl.STATIC_DRAW);gl.bindVertexArray(null);
    gl.bindBuffer(gl.TRANSFORM_FEEDBACK_BUFFER,this.captureBuffer);gl.bufferData(gl.TRANSFORM_FEEDBACK_BUFFER,this.target.byteLength,gl.DYNAMIC_READ);
@@ -154,7 +155,7 @@ void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vec4(vUV,.5
   }
   if(s.pThreadOpacity>0){
    setup(this.fibres);gl.bindVertexArray(o.empty);gl.depthMask(s.pSkin===0);
-   o.u(this.fibres,'uLivingThread',s.pStrands,s.pThreadWidth,s.pThreadOpacity,s.pLiving===1?s.pBundles:0);o.u(this.fibres,'uWeft',0);gl.drawArraysInstanced(gl.TRIANGLES,0,(t.rows-1)*18,s.pStrands);
+   o.u(this.fibres,'uLivingThread',s.pStrands,s.pThreadWidth,s.pThreadOpacity,(s.pBundleAmount??(s.pLiving===1?1:0))>0?s.pBundles:0);o.u(this.fibres,'uWeft',0);gl.drawArraysInstanced(gl.TRIANGLES,0,(t.rows-1)*18,s.pStrands);
    if(s.pWeft>0){o.u(this.fibres,'uLivingThread',Math.round(s.pStrands*.65),s.pThreadWidth,s.pThreadOpacity*s.pWeft,0);o.u(this.fibres,'uWeft',1);gl.drawArraysInstanced(gl.TRIANGLES,0,t.columns*18,Math.round(s.pStrands*.65));}
   }
   gl.depthMask(true);gl.disable(gl.DEPTH_TEST);gl.blendFunc(gl.ONE,gl.ONE);this.milliseconds=performance.now()-start;

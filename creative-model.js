@@ -1,12 +1,13 @@
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=71504059edf3';
-import {normalizeAudioClip} from './audio-recording.js?v=71504059edf3';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=71504059edf3';
-import {normalizeAudio} from './audio-model.js?v=71504059edf3';
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=71504059edf3';
-import {normalizeForcePaths} from './particle-paths.js?v=71504059edf3';
-import {normalizeForcePoints} from './particle-forces.js?v=71504059edf3';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=71504059edf3';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=71504059edf3';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=eaa9ff26389d';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=eaa9ff26389d';
+import {normalizeAudioClip} from './audio-recording.js?v=eaa9ff26389d';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=eaa9ff26389d';
+import {normalizeAudio} from './audio-model.js?v=eaa9ff26389d';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=eaa9ff26389d';
+import {normalizeForcePaths} from './particle-paths.js?v=eaa9ff26389d';
+import {normalizeForcePoints} from './particle-forces.js?v=eaa9ff26389d';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=eaa9ff26389d';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=eaa9ff26389d';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -138,6 +139,11 @@ export function normalizeCreation(raw){
  if(s.perfectLoop)for(const k of ['environmentCycles','filmCycles'])s[k]=Math.max(1,Math.round(s[k]||1));
  // Existing v33 veil creations gain the editable source bridge on reopen.
  if(s.pLiving===4&&raw.pVeilFromForm===undefined){s.pVeilFromForm=1;s.pVeilMorph=1;s.pVeilSourceKind=0;s.pVeilMemory=0;}
+ for(const [k,m] of Object.entries(STRUCTURE_META))if(m[3]>=1)s[k]=Math.round(s[k]);
+ if(raw.structureOriginal&&typeof raw.structureOriginal==='object'&&!Array.isArray(raw.structureOriginal)){s.structureOriginal=structuredClone(raw.structureOriginal);delete s.structureOriginal.structureOriginal;}
+ if(raw.pBundleAmount===undefined)s.pBundleAmount=raw.pLiving===1?1:0;
+ if(!s.structureOriginal&&(s.engine==='solid'&&s.pLiving>0||s.pLiving===4)){s.structureOriginal=structuredClone(raw);delete s.structureOriginal.structureOriginal;}
+ integrateStructure(s);
  s.animateRotation=['rotateX','rotateY','rotateZ'].some(k=>s.motions[k].enabled);
  s.animateShape=SHAPE_TRACKS.some(k=>s.motions[k].enabled);
  s.animateColor=s.motions.gradientOffset.enabled||s.motions.colorWavePhase.enabled;s.animateLight=s.lights.some(l=>l.orbit.enabled);

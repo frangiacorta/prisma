@@ -1,4 +1,4 @@
-import {fieldAt} from './solid-renderer.js?v=71504059edf3';
+import {fieldAt} from './solid-renderer.js?v=eaa9ff26389d';
 
 // All leaves use the same lattice: adjacent cells share edge intersections,
 // including the tetrahedral diagonals. No cracks from mixed octree levels.

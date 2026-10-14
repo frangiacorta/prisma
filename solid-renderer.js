@@ -1,3 +1,4 @@
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField} from './structure-model.js?v=eaa9ff26389d';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -37,7 +38,7 @@ vec3 coatingContrast(vec3 film){
 }
 `;
 const TAU=Math.PI*2;
-const MOTION_LIMITS={pVeilStyle:[0,2],pVeilMorph:[0,1],pVeilSpread:[0,1],volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWeave:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
+const MOTION_LIMITS={...Object.fromEntries(Object.entries(STRUCTURE_META).map(([k,v])=>[k,v.slice(1,3)])),pVeilStyle:[0,2],pVeilMorph:[0,1],pVeilSpread:[0,1],volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWeave:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
 function motionCycles(value,source){const n=Math.max(.1,Number(value)||1);return source?.perfectLoop===false?n:Math.max(1,Math.round(n));}
 export function motionClock(t,phase,source){
  const raw=phase/TAU*motionCycles(t.cycles,source)+(t.phase||0)/360*(t.direction||1),whole=Math.floor(raw);let u=raw-whole;
@@ -54,9 +55,9 @@ export function sampleFrame(source,phase=0){
  const s={...source,lights:(source.lights||[]).map(l=>({...l}))};
 
  for(const [key,t] of Object.entries(source.motions||{})){
-  if(!t.enabled||rootMotionSuspended(source,key))continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset'||key==='colorWavePhase'||key==='petalPhase'||key==='petalFlowPhase'||key==='petalOrbitPhase');
+  if(!t.enabled||rootMotionSuspended(source,key))continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset'||key==='colorWavePhase'||key==='petalPhase'||key==='petalFlowPhase'||key==='petalOrbitPhase'||key==='structFlowPhase');
   const value=continuous?(motionClock(t,phase,source)/TAU)*(key.startsWith('rotate')||key==='petalPhase'?360:1):motionWave(t,phase,source)*(t.amplitude||0)*(key.startsWith('pVeil')?1:(source.motion??.3)/.3);
-  s[key]=(source[key]??(key==='petalGrowth'?1:0))+value;if(MOTION_LIMITS[key])s[key]=Math.max(MOTION_LIMITS[key][0],Math.min(MOTION_LIMITS[key][1],s[key]));
+  s[key]=(source[key]??(key==='petalGrowth'?1:0))+value;if(MOTION_LIMITS[key]&&!continuous)s[key]=Math.max(MOTION_LIMITS[key][0],Math.min(MOTION_LIMITS[key][1],s[key]));
  }
  if(!source.motions){if(source.animateRotation)s.rotateY+=phase*180/Math.PI;if(source.animateShape){s.volume*=1+Math.sin(phase)*source.motion*.4;s.deform+=Math.sin(phase)*source.motion*.16}if(source.animateColor)s.gradientOffset+=phase/TAU;}
  for(const l of s.lights){if(l.orbit?.enabled){const t=l.orbit,a=t.mode==='cycle'?motionClock(t,phase,source):motionWave(t,phase,source)*t.amplitude*Math.PI/180*(source.motion??.3)/.3;const cs=Math.cos(a),sn=Math.sin(a);if(t.axis==='x'){[l.y,l.z]=[l.y*cs-l.z*sn,l.y*sn+l.z*cs]}else if(t.axis==='z'){[l.x,l.y]=[l.x*cs-l.y*sn,l.x*sn+l.y*cs]}else{[l.x,l.z]=[l.x*cs-l.z*sn,l.x*sn+l.z*cs]}}if(l.pulse?.enabled)l.power=Math.max(0,l.power*(1+motionWave(l.pulse,phase,source)*l.pulse.amplitude*(source.motion??.3)/.3))}
@@ -755,6 +756,11 @@ MODERN_FRAG=MODERN_FRAG.replace('bodyAlpha=max(bodyAlpha,1.-min(min(target.r,tar
 MODERN_FRAG=MODERN_FRAG.replace('fragColor=vec4(clamp(premultiplied/max(alpha,.000001)+grain,0.,1.),alpha);','fragColor=vec4(clamp(photo(premultiplied/max(alpha,.000001),originalUV)+grain,0.,1.),alpha);');
 // Accumulate premultiplied samples in float precision, so transparent edges have no colored fringe.
 MODERN_FRAG=MODERN_FRAG.replace(/\n}\n$/, '\n if(uSampling.z>.5){if(transparentExport())fragColor.rgb*=fragColor.a;else fragColor.a=clamp(coverage*surface.a+halo,0.,1.);fragColor*=uSampling.w;}\n}\n');
+MODERN_FRAG=MODERN_FRAG.replace('vec3 fieldParts(vec3 world){',STRUCTURE_GLSL+'\nvec3 fieldParts(vec3 world){');
+MODERN_FRAG=MODERN_FRAG.replace('p/=vec3(uShape.y,uShape.z,volume);','p/=vec3(uShape.y,uShape.z,volume);p=structureWarp(p);');
+MODERN_FRAG=MODERN_FRAG.replace('float hole=-10000.,cut=-10000.;','d=structureField(d,p);float hole=-10000.,cut=-10000.;');
+// The centre tint is part of the existing material, under the same lights.
+MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos),specular=', 'vec3 base=palette(pos)*(1.-uStructureColor.x*(1.-smoothstep(0.,uStructureColor.y,length(local.xy/axes().xy)))),specular=');
 // Specialize only mathematically regular ellipsoids and truly thin shells.
 // This removes the general multi-interface solver from the common bubble shader.
 function specializeAnalytic(source,name,fast){
@@ -769,7 +775,7 @@ MODERN_FRAG=specializeAnalytic(MODERN_FRAG,'surfaceGradient',`vec3 size=vec3(uSh
 MODERN_FRAG=specializeAnalytic(MODERN_FRAG,'traceBoundary',`float t=firstRoot(ellipsoidRoots(origin,direction,1.));if(!outerOnly&&hasCavity())t=min(t,firstRoot(ellipsoidRoots(origin,direction,uInterior.x*(1.-uInterior.y))));travel=t;point=origin+direction*t;return t<maximum;`);
 MODERN_FRAG=MODERN_FRAG.replace('if(uModern.x>.999||!hit){glass=straight;}else{', '#if THIN_SHELL_ENABLED\n glass=straight;\n#else\n if(uModern.x>.999||!hit){glass=straight;}else{');
 MODERN_FRAG=MODERN_FRAG.replace('glass=mix(glass,straight,clamp(uModern.x,0.,1.));\n  }','glass=mix(glass,straight,clamp(uModern.x,0.,1.));\n  }\n#endif');
-MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos),specular=', 'vec3 base=surfacePalette(local,palette(pos)),specular=');
+MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos)*', 'vec3 base=surfacePalette(local,palette(pos))*');
 // Preview budgets are normalized independently: changing sample counts never
 // changes optical density or scattering strength. Full exports retain 16/4.
 MODERN_FRAG=MODERN_FRAG.replace('for(int j=0;j<int(uRuntime.w)*14;j++){','for(int j=0;j<TRACE_STEPS;j++){if(j>=int(uBudget.x))break;');
@@ -1004,8 +1010,8 @@ MODERN_FRAG=MODERN_FRAG.replace('(field(p+direction*probe)-field(p-direction*pro
 MODERN_FRAG=MODERN_FRAG.replace('(field(point+direction*.0005)-field(point-direction*.0005))','fieldDifference(point,direction*.0005)');
 MODERN_FRAG=MODERN_FRAG.replace('float outer=field(point);if(!outerOnly&&hasCavity()&&-outer-wallDepth()>outer)derivative=-derivative;','if(!outerOnly&&hasCavity()){float outer=field(point);if(-outer-wallDepth()>outer)derivative=-derivative;}');
 MODERN_FRAG=MODERN_FRAG.replace('vec3 n=surfaceNormal(p);float d=field(p);return hasCavity()&&-d-wallDepth()>d?-n:n;','vec3 n=surfaceNormal(p);if(!hasCavity())return n;float d=field(p);return -d-wallDepth()>d?-n:n;');
-const FIELD_KEYS=['deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','petalAmount','petalCoverage','stemAmount','stemRadius','stemBend'];
-function analyticShape(s){return !['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);}
+const FIELD_KEYS=[...STRUCTURE_FIELD_KEYS,'deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','petalAmount','petalCoverage','stemAmount','stemRadius','stemBend'];
+function analyticShape(s){return !hasStructure(s)&&!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);}
 function atlasBounds(s,growthRadius){
  // Twist preserves radius. Deformation, ripples and lobes only add their
  // bounded amplitudes; they must not expand every volume to a nine-unit box.
@@ -1022,13 +1028,13 @@ function motionInterval(s,key){
  return [Math.max(limits[0],base-amplitude),Math.min(limits[1],base+amplitude)];
 }
 function previewPlan(source){
- const rotateCrown=crownRotationReusable(source),keys=FIELD_KEYS.concat(GROWTH_KEYS).filter(k=>k!=='twist'&&!(rotateCrown&&k==='petalPhase'));
+ const rotateCrown=!structureMayChange(source)&&crownRotationReusable(source),reuseTwist=!structureMayChange(source),keys=FIELD_KEYS.concat(GROWTH_KEYS).filter(k=>(reuseTwist?k!=='twist':true)&&!(rotateCrown&&k==='petalPhase'));
  const moving=keys.filter(k=>source.motions?.[k]?.enabled&&(source.motions[k].amplitude||0)>0),dynamic=moving.length>0;
  const cullSafe=!(source.edge>0||source.glow>0||motionInterval(source,'volume')[0]<.2);
  const descriptor=keys.map(k=>[source[k]??0,source.motions?.[k]?.enabled?JSON.stringify(source.motions[k]):'off'].join(':')).join('|')+'|'+(source.motion??.3)+'|'+rotateCrown+'|'+cullSafe+'|'+(source.perfectLoop!==false);
- const roots=rootWeight(source)>.000001||ROOT_KEYS.some(k=>source.motions?.[k]?.enabled);const sharp=motionInterval(source,'petalSharp'),fine=roots||(source.petalAmount||0)>.25&&(sharp[1]>.75||(source.petalWidth??.24)<.12);
- const fineResolution=roots?(dynamic?((source.petalWidth??.24)<.08?80:64):80):!dynamic?112:(source.petalWidth??.24)<.12?128:moving.every(k=>k==='petalSharp')?80:112;
- return {descriptor,dynamic,rotateCrown,fine,fineResolution,cullSafe};
+ const roots=rootWeight(source)>.000001||ROOT_KEYS.some(k=>source.motions?.[k]?.enabled);const sharp=motionInterval(source,'petalSharp'),fine=structureMayChange(source)||roots||(source.petalAmount||0)>.25&&(sharp[1]>.75||(source.petalWidth??.24)<.12);
+ const fineResolution=structureMayChange(source)?128:roots?(dynamic?((source.petalWidth??.24)<.08?80:64):80):!dynamic?112:(source.petalWidth??.24)<.12?128:moving.every(k=>k==='petalSharp')?80:112;
+ return {descriptor,dynamic,rotateCrown,reuseTwist,fine,fineResolution,cullSafe};
 }
 function animatedBounds(source){
  // Share a coordinate grid across the loop, without combining unrelated
@@ -1054,7 +1060,7 @@ export function fieldAt(s,point){
  let p=[(point[0]-s.positionX)/s.scale,(point[1]-s.positionY)/s.scale,point[2]/s.scale];
  const rotate=(a,b,angle)=>{const c=Math.cos(angle),v=Math.sin(angle),x=p[a],y=p[b];p[a]=c*x+v*y;p[b]=-v*x+c*y;};
  const rad=Math.PI/180;rotate(0,1,(s.rotateZ||0)*rad);rotate(0,2,s.rotateY*rad);rotate(1,2,s.rotateX*rad);
- const axes=[s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ)];p=p.map((v,i)=>v/axes[i]);rotate(0,2,s.twist*p[1]*.7);
+ const axes=[s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ)];p=p.map((v,i)=>v/axes[i]);if(s.renderVersion>=2)p=structureWarp(s,p);rotate(0,2,s.twist*p[1]*.7);
  p[0]-=s.asymmetry*(p[1]*p[1]-.25)+(s.bendX||0)*(p[1]*p[1]-.3);p[1]-=(s.bendY||0)*(p[0]*p[0]-.3);
  p[0]*=1-s.asymmetry*p[1]*.18;const taper=Math.max(.35,1-(s.taper||0)*p[1]*.45);p[0]/=taper;p[2]/=taper;p[0]*=1+(s.pinch||0)*Math.exp(-p[1]*p[1]*4);
  const exponent=2+(s.roundness||0)*6,seed=(s.seed%1000)*.013;
@@ -1063,6 +1069,7 @@ export function fieldAt(s,point){
  const lobe=Math.sin(Math.atan2(p[1],p[0])*(s.lobes||5))*(s.lobeAmount||0)*(1-Math.min(1,Math.abs(p[2]))*.65);
  let d=norm-1-s.deform*wave-s.waves*ripple*.17-lobe;
  if(s.renderVersion>=2){if((s.petalAmount||0)>.000001)d=d*(1-s.petalAmount)+(crownAt(s,p)-s.deform*wave*.35-s.waves*ripple*.08)*s.petalAmount;if((s.stemAmount||0)>.000001)d=softMin(d,stemAt(s,p),.08*Math.min(1,s.stemAmount*8));}
+ if(s.renderVersion>=2)d=structureField(s,d,p);
  const pow=2+s.holeShape*5;
  const hole=s.hole>.001?s.hole-Math.pow(Math.pow(Math.abs((p[0]-s.holeX)/(s.holeAspect||1)),pow)+Math.pow(Math.abs(p[1]-s.holeY),pow),1/pow):-10000;
  const cut=s.cut>.001?s.cut-Math.hypot((p[0]-s.cutX)/(s.cutAspect||1),p[1]-s.cutY):-10000;
@@ -1323,21 +1330,21 @@ function rootFieldAt(s,p){
 
 export function geometryRadius(s,growthRadius=0){
  if(rootWeight(s)>0&&!growthRadius)growthRadius=rootRadiusBound(s);
- if(['deform','asymmetry','twist','waves','taper','bendX','bendY','lobeAmount','pinch'].some(k=>Math.abs(s[k]||0)>.000001))return 4.5;
+ if(['deform','asymmetry','twist','waves','taper','bendX','bendY','lobeAmount','pinch'].some(k=>Math.abs(s[k]||0)>.000001))return 4.5*structureBounds(s);
  const width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),length=s.petalLength??1.05;
  const flower=.17+(s.petalOpen??.65)*.25+length+width+.15,hedge=.62+(s.petalOpen??.65)*.14+length+width+.2;
  let radius=1.;if((s.petalAmount||0)>.000001){if(rootWeight(s)>.999999)radius=Math.max(radius,growthRadius);else{if((s.petalCoverage||0)<.9999)radius=Math.max(radius,flower);if((s.petalCoverage||0)>.0001)radius=Math.max(radius,hedge,growthRadius);if(rootWeight(s)>0)radius=Math.max(radius,growthRadius);}}
  if((s.stemAmount||0)>.000001)radius=Math.max(radius,s.stemAmount*3+Math.abs(s.stemBend||0)*.55+(s.stemRadius??.09)+.25);
- return radius+.02;
+ return (radius+.02)*structureBounds(s);
 }
 function rendererVariant(s,options={},source=s){
- const modern=s.renderVersion>=2,analytic=!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);
- const transmission=modern?s.transparency:s.transparency+(1-s.transparency)*(s.translucency||0),crown=modern&&(s.petalAmount||0)+(s.stemAmount||0)>.000001;
+ const modern=s.renderVersion>=2,analytic=!structureMayChange(source)&&!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);
+ const transmission=modern?s.transparency:s.transparency+(1-s.transparency)*(s.translucency||0),crown=modern&&(structureMayChange(source)||(s.petalAmount||0)+(s.stemAmount||0)>.000001);
  const amount=Math.min(1,((s.petalBlend||0)+(s.petalRoot||0)+(s.petalRandom||0))*20),spread=s.petalCoverage||0,petals=crown&&(s.petalAmount||0)>.000001;
  const volume=(s.scattering||0)+(s.translucency||0)+(s.subsurface||0)>.0001&&(!modern||transmission>.0001&&s.thinShell<.999);
  // A sculpting slider never changes the preview program. Analytic spheres and
  // the cached procedural field share the same shader and runtime uniform.
- if(modern&&options.preview&&options.quality!=='full'){
+ if(modern&&options.preview&&options.quality!=='full'&&!structureMayChange(source)){
   // An enabled transparency track can cross zero. Prepare its complete
   // optical path once, instead of switching programs at that crossing.
   const transmitting=motionInterval(source,'transparency')[1]>.0001;
@@ -1413,8 +1420,8 @@ export class Renderer{
  ensurePreviewField(frame,options,source=frame){
   const g=this.gl,plan=previewPlan(source);
   if(plan.descriptor!==this.fieldPlanKey){this.fieldPlanKey=plan.descriptor;this.motionBounds=plan.dynamic?animatedBounds(source):null;}
-  const s={...frame,twist:0,petalPhase:plan.rotateCrown?0:frame.petalPhase};
-  this.fieldWarp=[frame.twist||0,plan.rotateCrown?(frame.petalPhase||0)*Math.PI/180:0];
+  const s={...frame,twist:plan.reuseTwist?0:frame.twist,petalPhase:plan.rotateCrown?0:frame.petalPhase};
+  this.fieldWarp=[plan.reuseTwist?frame.twist||0:0,plan.rotateCrown?(frame.petalPhase||0)*Math.PI/180:0];
   if(!this.fieldTexture){
    this.fieldHalfFloat=!!g.getExtension('EXT_color_buffer_float');this.fieldTexture=g.createTexture();g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fieldTexture);
    g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);
@@ -1442,7 +1449,7 @@ export class Renderer{
    // only and without changing texture dimensions or its sample format.
    if(warmup){g.enable(g.SCISSOR_TEST);g.scissor(0,0,2,2);}
    const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v);
-   u('uRuntime',[0,0,2,0]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uOther',[0,0,s.waves,0]);
+   structureUniforms(s,u);u('uRuntime',[0,0,2,0]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uOther',[0,0,s.waves,0]);
    u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);
    u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,0,0]);
    u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*Math.PI/180,0]);
@@ -1461,11 +1468,11 @@ export class Renderer{
  async waitForGpu(options={}){const start=Date.now();let polls=0;while(this.completionSync){this.assertAvailable();if(this.pollCompletion())break;if(options.cancelled?.())return false;if(Date.now()-start>120000)throw new Error('Il calcolo richiede troppo tempo. La creazione è conservata.');if(polls++<4&&globalThis.scheduler?.yield)await globalThis.scheduler.yield();else await new Promise(r=>setTimeout(r,4));}return !options.cancelled?.();}
  draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options,source),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);let analytic=!!(key&32)||analyticShape(s);const timer=options.preview&&options.trackTiming!==false?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW){this.ensurePreviewField(s,options,source);analytic=this.cachedShapeAnalytic;}this.useVariant(key);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(key&512)this.uploadGrowth(s);if(key&32768)this.uploadRoots(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
  if(s.renderVersion>=2){u('uBudget',key&ATLAS_PREVIEW?(options.quality==='fast'?[this.fieldResolution>=96?128:96,3,4,1]:[128,4,8,2]):key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
- if(s.renderVersion>=2){u('uFilmPattern',[s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5]);u('uFilmAccent',[s.filmChroma||0,s.filmDuo||0]);u('uMaterialDetail',[s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad]);u('uMaterialLayers',[s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0]);u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);f('uNormalSamples',6);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,24]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
+ if(s.renderVersion>=2){structureUniforms(s,u);u('uFilmPattern',[s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5]);u('uFilmAccent',[s.filmChroma||0,s.filmDuo||0]);u('uMaterialDetail',[s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad]);u('uMaterialLayers',[s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0]);u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);f('uNormalSamples',6);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,24]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
  u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);
 
- u('uRuntime',[+!!options.preview,.85/(1.+(s.deform||0)*2.+Math.abs(s.asymmetry||0)*.6+Math.abs(s.twist||0)*.3+(s.waves||0)*(s.waveScale||1)*.15+(s.lobeAmount||0)*(s.lobes||0)*.4),options.normalDiagnostic?2:+!!options.diagnostic,16]);u('uTransport',[s.subsurface||0,s.sssRadius??.35,0,0]);u('uSssColor',rgb(s.sssColor||'#ffc49b'));
+ u('uRuntime',[+!!options.preview,.85/(1.+(s.structCurl?Math.abs(s.structCurl):0)+(s.structFold||0)*(s.structFoldCount||1)*.8+Math.abs(s.structFlap||0)*2.+(s.structWeave||0)*(s.structDensity||20)*2.+(s.deform||0)*2.+Math.abs(s.asymmetry||0)*.6+Math.abs(s.twist||0)*.3+(s.waves||0)*(s.waveScale||1)*.15+(s.lobeAmount||0)*(s.lobes||0)*.4),options.normalDiagnostic?2:+!!options.diagnostic,16]);u('uTransport',[s.subsurface||0,s.sssRadius??.35,0,0]);u('uSssColor',rgb(s.sssColor||'#ffc49b'));
  u('uInterior',[s.hollow||0,s.wallThickness??.08,s.translucency||0,s.scattering||0]);u('uScatter',[s.scatterDirection??.25,+analytic,s.thinFilm||0,s.filmThickness??420]);
  u('uPhoto1',[s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1]);u('uPhoto2',[s.temperature||0,s.photoTint||0,s.vignette||0,s.lensDistortion||0]);u('uPhoto3',[s.blacks||0,s.highlights||0,s.grainSize||1,0]);u('uPhoto4',[s.gamma||1,+!!s.photoAll,0,0]);
  const palette=s.palette.slice(0,12);while(palette.length<12)palette.push(palette[palette.length-1]||'#ffffff');g.uniform3fv(this.locations.uPalette,palette.flatMap(rgb));g.uniform1i(this.locations.uPaletteCount,Math.max(1,Math.min(12,s.palette.length)));

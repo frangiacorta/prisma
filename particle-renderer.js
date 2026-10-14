@@ -1,13 +1,13 @@
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=71504059edf3';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=71504059edf3';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=71504059edf3';
-import {ParticleLinks} from './particle-links.js?v=71504059edf3';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=71504059edf3';
-import {LayeredVeils} from './layered-veils.js?v=71504059edf3';
-import {LivingStructures} from './living-structures.js?v=71504059edf3';
-import {fieldGLSL} from './particle-field.js?v=71504059edf3';
-import {forceBarrierGLSL} from './particle-forces.js?v=71504059edf3';
-import {prismaShadingGLSL} from './particle-shading.js?v=71504059edf3';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=eaa9ff26389d';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=eaa9ff26389d';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=eaa9ff26389d';
+import {ParticleLinks} from './particle-links.js?v=eaa9ff26389d';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=eaa9ff26389d';
+import {LayeredVeils} from './layered-veils.js?v=eaa9ff26389d';
+import {LivingStructures} from './living-structures.js?v=eaa9ff26389d';
+import {fieldGLSL} from './particle-field.js?v=eaa9ff26389d';
+import {forceBarrierGLSL} from './particle-forces.js?v=eaa9ff26389d';
+import {prismaShadingGLSL} from './particle-shading.js?v=eaa9ff26389d';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -147,7 +147,7 @@ export class ParticleRenderer{
  settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);this.guides.bind(p);
   this.u(p,'uLivingOcclusion',this.occlusion||0);this.u(p,'uLivingDepthSize',this.width,this.height);this.tex(p,'uLivingDepth',this.depthCopy?.texture||this.seedTexture,7);
   this.u(p,'uSurfaceBind',s.pLiving>0&&s.pLiving!==4&&this.living?.texture?s.pSurfaceBind:0);this.tex(p,'uAttachedSurface',s.pLiving>0&&s.pLiving!==4&&this.living?.topology?this.living.texture:this.seedTexture,6);if(s.pLiving>0&&s.pLiving!==4&&this.living?.topology)gl.uniform2i(this.loc(p,'uAttachedSize'),this.living.topology.columns,this.living.topology.rows);
-  this.u(p,'uAttachedBundles',s.pLiving===1?s.pBundles:0);
+  this.u(p,'uAttachedBundles',0); // One continuous material surface, including grouped fibres.
   this.u(p,'uPhase',phase);this.u(p,'uSeed',(s.seed%997)*.013);this.u(p,'uResolution',this.width,this.height);
   this.u(p,'uShape',s.pFamily,s.pTarget,s.pOpening,s.pThickness);this.u(p,'uStructure',s.pFill,s.pLobes,s.pLobeDepth,s.pClumps);
   this.u(p,'uNoise',s.pOrganic,s.pFrequency,s.pDetail,s.pWarp);this.u(p,'uFlow',s.pCohesion,s.pRandom,s.pJitter,s.pRough);

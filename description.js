@@ -1,8 +1,8 @@
-import {META,MOODS,GROUPS} from './model.js?v=71504059edf3';
-import {particleSphere} from './particle-model.js?v=71504059edf3';
-import {PATH_META} from './particle-paths.js?v=71504059edf3';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=71504059edf3';
-import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=71504059edf3';
+import {META,MOODS,GROUPS} from './model.js?v=eaa9ff26389d';
+import {particleSphere} from './particle-model.js?v=eaa9ff26389d';
+import {PATH_META} from './particle-paths.js?v=eaa9ff26389d';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=eaa9ff26389d';
+import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=eaa9ff26389d';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
@@ -19,7 +19,7 @@ function shape(s,name){if((s.engine==='particles'||s.pLiving>0)&&name==='sfera')
 export function applyDescriptionPlan(current,plan){
  if(!plan||!Array.isArray(plan.operations)||plan.operations.length>100)throw Error('La richiesta non contiene modifiche valide.');const s=structuredClone(current);const notes=[];
  for(const o of plan.operations){if(!o||typeof o!=='object')throw Error('Comando non valido');
-  if(o.type==='set'){const value=scalar(o.key,o.value);if(GROUPS.material.includes(o.key)||/^(environment|film|petal|stem|colorWave|ground)/.test(o.key))upgrade(s);s[o.key]=value;if(o.key==='fullness')setFullness(s,value);notes.push(META[o.key][0]);}
+  if(o.type==='set'){const value=scalar(o.key,o.value);if(GROUPS.material.includes(o.key)||/^(struct|environment|film|petal|stem|colorWave|ground)/.test(o.key))upgrade(s);s[o.key]=value;if(o.key==='fullness')setFullness(s,value);notes.push(META[o.key][0]);}
   else if(o.type==='shape'){upgrade(s);shape(s,o.name);notes.push('Forma: '+o.name);}
   else if(o.type==='material'){if(!Number.isInteger(o.index)||!MATERIAL_STYLES[o.index])throw Error('Materia non disponibile');material(s,o.index);notes.push('Materia: '+MATERIAL_STYLES[o.index].name);}
   else if(o.type==='textureStyle'){if(!Number.isInteger(o.index)||!TEXTURE_STYLES[o.index])throw Error('Texture non disponibile');textureStyle(s,o.index);notes.push('Texture: '+TEXTURE_STYLES[o.index].name);}
