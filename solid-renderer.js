@@ -1321,7 +1321,7 @@ function rootFieldAt(s,p){
  return softMin(body,best,blend);
 }
 
-function geometryRadius(s,growthRadius=0){
+export function geometryRadius(s,growthRadius=0){
  if(rootWeight(s)>0&&!growthRadius)growthRadius=rootRadiusBound(s);
  if(['deform','asymmetry','twist','waves','taper','bendX','bendY','lobeAmount','pinch'].some(k=>Math.abs(s[k]||0)>.000001))return 4.5;
  const width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),length=s.petalLength??1.05;

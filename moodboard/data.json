@@ -15006,7 +15006,7 @@
       "state": "partial",
       "priority": true,
       "author": "",
-      "summary": "Veli integrati nella creazione: passaggio graduabile dalla forma corrente, ritorno alla sorgente, forme intermedie e animazioni salvate nei preset.",
+      "summary": "Dalla forma corrente ai veli: apertura graduale con pareti interne e ramificazioni, forme intermedie, ritorno alla sorgente e animazioni salvate nei preset.",
       "sources": [
         "https://www.infinitemantra.ca/",
         "https://www.fooh.com/blog/lindsay-kokoska-interview"
@@ -15017,7 +15017,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Superfici parametriche con coordinate persistenti e movimento periodico. Triangoli ordinati dal fondo verso la camera, alpha premoltiplicato fra gli strati e alpha non premoltiplicato nei PNG. Composizione distinta dalla pelle a superficie più vicina delle membrane precedenti."
+              "value": "Superficie completa del campo scolpito estratta su reticolo uniforme con ricerca gerarchica, comprese cavità e ramificazioni. Tagli ai confini degli strati e coordinate persistenti durante il morph; passaggio progressivo alla superficie regolare fra il 15% e l’80% di apertura. Il primo 12% raccorda i materiali ottici; a zero viene usato il renderer originale. Per le strutture vive resta la superficie del solver. Ordinamento dei triangoli in profondità e composizione alpha."
             }
           ]
         },
@@ -15026,7 +15026,7 @@
           "fields": [
             {
               "label": "reuse",
-              "value": "Riutilizzati renderer particellare Prisma, palette, luci, filtri, preset, trasporto ed esportatore video. Le nuove lamine sono analitiche; nessun solver XPBD o codice originale degli artisti viene attribuito a questa geometria."
+              "value": "Riutilizzati campo geometrico delle forme, solver delle strutture vive, palette, luci, tracce animate, filtri, preset ed esportatore Prisma. Nessun codice originale degli artisti attribuito a questa implementazione."
             }
           ]
         },
@@ -15051,7 +15051,11 @@
                 "Apertura laterale e asimmetria",
                 "Palette radiale blu/crema/corallo",
                 "Opacità per strato",
-                "Nucleo scuro regolabile fino a zero"
+                "Nucleo scuro regolabile fino a zero",
+                "Trasformazione forma / veli",
+                "Rilievo ereditato dalla forma",
+                "Forme intermedie fra petali, aureola e ventaglio",
+                "Animazione del morph con ampiezza, fase, ritmo e cicli"
               ]
             },
             {
@@ -15076,7 +15080,11 @@
                 "Opacità per velo, risalto e sfumatura dei bordi; dimensione e oscurità del nucleo indipendenti fino a zero",
                 "Palette radice/bordo con variazione fra strati; luci e filtri Prisma",
                 "Apertura ciclica, pieghe viaggianti, ritardi, verso, velocità e accelerazione/rallentamento",
-                "Preset scaricato e reimportato; stessa geometria in Forme e Particelle; PNG trasparente e MP4"
+                "Preset scaricato e reimportato; stessa geometria in Forme e Particelle; PNG trasparente e MP4",
+                "Trasformazione continua dalla forma corrente, senza caricare un preset e senza cambiare palette, luci, durata o animazioni",
+                "Controlli della forma sorgente accessibili; ritorno esatto al volume, fibre, tessuto, membrana o particelle originali",
+                "Disposizione continua Petali ↔ Aureola ↔ Ventaglio; animazione del passaggio e dell’apertura con ritmo, fase e cicli indipendenti",
+                "Pareti interne e ramificazioni conservate nella fase iniziale, tagli puliti fra strati e raccordo progressivo alla superficie dei veli; geometria riutilizzata cambiando disposizione e attraversando il morph"
               ]
             },
             {
@@ -15092,8 +15100,10 @@
                 "Superfici traslucide artistiche: niente rifrazione, collisioni fisiche o ombre reciproche",
                 "Ordinamento per triangoli; a forti intersezioni o angoli radenti possono comparire piccoli artefatti di sovrapposizione",
                 "Il nucleo è una zona di assorbimento sulla lamina, non una sfera opaca separata",
-                "Granelli, scie e campi non agiscono su questa nuova geometria; menu dedicati esclusi",
-                "Nessuna equivalenza esatta con il procedimento originale delle reference dichiarata"
+                "Nessuna equivalenza esatta con il procedimento originale delle reference dichiarata",
+                "La conversione è una ricostruzione a risoluzione finita: punte o interstizi inferiori al campionamento possono essere smussati. I dettagli interni si riassorbono progressivamente mentre la forma diventa una lamina; non vengono conservati come volumi a morph 100%.",
+                "Nelle strutture vive si trasforma la superficie di supporto: non è una simulazione della fusione di ogni singolo granello o filo",
+                "L’estrazione viene riutilizzata finché non cambia la geometria sorgente; animare anche le sculture complesse può essere più lento. Prestazioni su telefono fisico ancora da verificare."
               ]
             }
           ]
@@ -15103,7 +15113,7 @@
           "fields": [
             {
               "label": "evidence",
-              "value": "reports/layered-veils/local.json; render, video codificato/decodificato e screenshot desktop/mobile."
+              "value": "reports/veil-transform/endpoints.json; reports/veil-transform/endpoints-built.json; reports/layered-veils/local.json; reports/living-integration/source.json; reports/veil-detail/geometry.json; reports/veil-detail/source.json; reports/veil-detail/built.json"
             },
             {
               "label": "checks",
@@ -15111,7 +15121,11 @@
                 "Ogni controllo cambia i pixel",
                 "Raccordo geometrico e delle normali, loop pixel identico e seek ripetibile",
                 "Alpha zero, trasparenza parziale e ricomposizione PNG su bianco",
-                "Preset dei due motori, filtri, UI dedicata, assenza overflow a 390 px"
+                "Preset dei due motori, filtri, UI dedicata, assenza overflow a 390 px",
+                "Zero e ritorno: pixel identici per 5 tipi di sorgente",
+                "Palette, luci, durata e tracce conservate passando ai veli e cambiando disposizione",
+                "Morph e forme intermedie normalizzati nei preset; loop ripetibile e nessun errore WebGL",
+                "Sezioni geometriche di cavità e sei ramificazioni confrontate con il campo originale; continuità del cambio di superficie, alpha e video del morph"
               ]
             }
           ]
@@ -15145,9 +15159,9 @@
         "project-pellicola-viva"
       ],
       "resultImage": "media/85a4acb87a267ae1.webp",
-      "resultVideo": "../previews/veli-aureole-4s.mp4?v=34",
-      "resultUrl": "../previews/veli-aureole.html?v=34",
-      "method": "Coordinate persistenti: superficie esterna campionata dal campo delle forme scolpite, oppure superficie del solver delle strutture vive. Gli stessi vertici passano alla disposizione dei veli. Il primo 12% raccorda i due materiali ottici; a zero il renderer originale restituisce il fotogramma esatto. Strati ordinati in profondità e composizione alpha.",
+      "resultVideo": "../previews/veli-morph-4s.mp4?v=35",
+      "resultUrl": "../previews/veli-aureole.html?v=35",
+      "method": "Superficie completa del campo scolpito estratta su reticolo uniforme con ricerca gerarchica, comprese cavità e ramificazioni. Tagli ai confini degli strati e coordinate persistenti durante il morph; passaggio progressivo alla superficie regolare fra il 15% e l’80% di apertura. Il primo 12% raccorda i materiali ottici; a zero viene usato il renderer originale. Per le strutture vive resta la superficie del solver. Ordinamento dei triangoli in profondità e composizione alpha.",
       "reuse": "Riutilizzati campo geometrico delle forme, solver delle strutture vive, palette, luci, tracce animate, filtri, preset ed esportatore Prisma. Nessun codice originale degli artisti attribuito a questa implementazione.",
       "implemented": [
         "Petali su avorio e aureola blu/corallo su scuro; variante lamelle a ventaglio",
@@ -15158,7 +15172,8 @@
         "Preset scaricato e reimportato; stessa geometria in Forme e Particelle; PNG trasparente e MP4",
         "Trasformazione continua dalla forma corrente, senza caricare un preset e senza cambiare palette, luci, durata o animazioni",
         "Controlli della forma sorgente accessibili; ritorno esatto al volume, fibre, tessuto, membrana o particelle originali",
-        "Disposizione continua Petali ↔ Aureola ↔ Ventaglio; animazione del passaggio e dell’apertura con ritmo, fase e cicli indipendenti"
+        "Disposizione continua Petali ↔ Aureola ↔ Ventaglio; animazione del passaggio e dell’apertura con ritmo, fase e cicli indipendenti",
+        "Pareti interne e ramificazioni conservate nella fase iniziale, tagli puliti fra strati e raccordo progressivo alla superficie dei veli; geometria riutilizzata cambiando disposizione e attraversando il morph"
       ],
       "controls": [
         "Numero e ampiezza dei petali",
@@ -15187,8 +15202,9 @@
         "Ordinamento per triangoli; a forti intersezioni o angoli radenti possono comparire piccoli artefatti di sovrapposizione",
         "Il nucleo è una zona di assorbimento sulla lamina, non una sfera opaca separata",
         "Nessuna equivalenza esatta con il procedimento originale delle reference dichiarata",
-        "Nei volumi il passaggio usa la superficie esterna: cavità sovrapposte e radici molto sottili possono essere semplificate. La materia ottica originaria si raccorda alla materia dei veli",
-        "Nelle strutture vive si trasforma la superficie di supporto: non è una simulazione della fusione di ogni singolo granello o filo"
+        "La conversione è una ricostruzione a risoluzione finita: punte o interstizi inferiori al campionamento possono essere smussati. I dettagli interni si riassorbono progressivamente mentre la forma diventa una lamina; non vengono conservati come volumi a morph 100%.",
+        "Nelle strutture vive si trasforma la superficie di supporto: non è una simulazione della fusione di ogni singolo granello o filo",
+        "L’estrazione viene riutilizzata finché non cambia la geometria sorgente; animare anche le sculture complesse può essere più lento. Prestazioni su telefono fisico ancora da verificare."
       ],
       "checks": [
         "Ogni controllo cambia i pixel",
@@ -15197,10 +15213,11 @@
         "Preset dei due motori, filtri, UI dedicata, assenza overflow a 390 px",
         "Zero e ritorno: pixel identici per 5 tipi di sorgente",
         "Palette, luci, durata e tracce conservate passando ai veli e cambiando disposizione",
-        "Morph e forme intermedie normalizzati nei preset; loop ripetibile e nessun errore WebGL"
+        "Morph e forme intermedie normalizzati nei preset; loop ripetibile e nessun errore WebGL",
+        "Sezioni geometriche di cavità e sei ramificazioni confrontate con il campo originale; continuità del cambio di superficie, alpha e video del morph"
       ],
-      "evidence": "reports/veil-transform/endpoints.json; reports/veil-transform/endpoints-built.json; reports/layered-veils/local.json; reports/living-integration/source.json",
-      "resultVersion": "34"
+      "evidence": "reports/veil-transform/endpoints.json; reports/veil-transform/endpoints-built.json; reports/layered-veils/local.json; reports/living-integration/source.json; reports/veil-detail/geometry.json; reports/veil-detail/source.json; reports/veil-detail/built.json",
+      "resultVersion": "35"
     },
     {
       "id": "roadmap-luminous-vortex",

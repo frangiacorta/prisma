@@ -1,5 +1,5 @@
-import {beginVeilTransform} from './veil-model.js?v=3a151b6e1c4a';
-import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=3a151b6e1c4a';
+import {beginVeilTransform} from './veil-model.js?v=71504059edf3';
+import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=71504059edf3';
 export function applyLivingStyle(s,style){
  if(style==='veils'){beginVeilTransform(s);return;}
  if(style==='off'&&s.pLiving===4){s.pLiving=s.pVeilSourceKind===4?0:s.pVeilSourceKind||0;return;}
