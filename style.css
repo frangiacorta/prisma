@@ -40,7 +40,16 @@
 #force-handles{position:absolute;inset:0;pointer-events:none;z-index:3}
 .force-handle{position:absolute;width:32px;height:32px;transform:translate(-50%,-50%);border:1px solid var(--force-attract);border-radius:50%;color:var(--force-attract);background:#13221ee6;pointer-events:auto;touch-action:none;cursor:move;z-index:2;font:12px ui-monospace,monospace}
 .force-handle.repel{border-color:var(--force-repel);color:var(--force-repel);background:#2c1824e6}.force-handle.selected{outline:2px solid #ffffff90;outline-offset:3px}.force-handle.disabled{opacity:.5;border-style:dashed}
-.force-radius{position:absolute;transform:translate(-50%,-50%);border:1px dashed #bcf3a64d;border-radius:50%;background:#bcf3a604;pointer-events:none}.force-radius.repel{border-color:#efa2c74d;background:#efa2c704}
+/* Projected transparent field volumes; kept outside the export canvas. */
+.force-volumes{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;pointer-events:none}
+.force-sphere{opacity:.54}.force-sphere.selected{opacity:1}.force-sphere.disabled{opacity:.23}
+.force-volume-shell{stroke:currentColor;stroke-opacity:.65;stroke-width:1}
+.force-volume-front,.force-volume-back,.force-depth-tether,.force-depth-zero{fill:none;stroke:currentColor;stroke-width:1;vector-effect:non-scaling-stroke}
+.force-volume-front{stroke-opacity:.6}.force-volume-back{stroke-opacity:.18;stroke-dasharray:3 5}.force-depth-tether{stroke-opacity:.5;stroke-dasharray:3 4}
+.force-volume-label{fill:currentColor;font:11px ui-monospace,monospace;paint-order:stroke;stroke:#101317;stroke-width:3;stroke-linejoin:round}
+.force-depth-scale rect{fill:#101317;fill-opacity:.88;stroke:#ffffff29}.force-depth-scale text{fill:#d9e1e6;stroke:none;font:11px ui-monospace,monospace}
+.force-depth-scale path{fill:none;stroke:#ffffff60;stroke-width:1}.force-depth-scale .force-depth-span{stroke:#cce9b9;stroke-width:5;stroke-opacity:.5;stroke-linecap:round}.force-depth-scale circle{fill:#e3f5d2;stroke:#101317;stroke-width:1.5}
+
 .artboard canvas.placing-force{cursor:crosshair}.force-actions,.fiber-styles,.force-list{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:15px}.fiber-styles button{flex:1}.force-chip{border:1px solid #373c40;padding:7px 11px;border-radius:6px}.force-chip.selected{border-color:var(--accent);color:var(--accent)}
 
 /* Drawn particle guides; editor overlays never enter the render canvas. */

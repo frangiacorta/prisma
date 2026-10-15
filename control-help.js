@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=16a417d9b9a8';
+import {AUDIO_HELP} from './audio-model.js?v=0e01fd44d321';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  textureRandomness:'Varia localmente la direzione delle grinze: rompe le righe parallele mantenendo una superficie continua.',textureWarp:'Piega il disegno della texture con un campo irregolare continuo. Non modifica il contorno della forma.',textureLink:'Collega le grinze piccole alle pieghe grandi. A 1 condividono lo stesso andamento; regola entrambe le quantità per vederle insieme.',texturePatch:'Alterna zone ricche di rilievo e zone lisce, senza spostare la geometria.',textureSeed:'Cambia la disposizione della texture in modo ripetibile. Lo stesso valore torna allo stesso disegno.',

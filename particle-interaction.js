@@ -1,5 +1,6 @@
-import {supportsManualFields as usesParticleSurface} from './living-composition.js?v=16a417d9b9a8';
-import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=16a417d9b9a8';
+import {sphereOverlay} from './force-sphere-overlay.js?v=0e01fd44d321';
+import {supportsManualFields as usesParticleSurface} from './living-composition.js?v=0e01fd44d321';
+import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=0e01fd44d321';
 
 
 
@@ -7,7 +8,7 @@ export function mountParticleForces({canvas,board,getState,getMode,setMode,remem
 
  const overlay=document.querySelector('#force-handles'),controls=document.querySelector('#controls');
 
- let selected=null,drag=null,before=null,recorded=false,wheelTimer=null;
+ let sphereKey='',selected=null,drag=null,before=null,recorded=false,wheelTimer=null;
 
  const active=()=>usesParticleSurface(getState())&&['attract','repel'].includes(getMode());
 
@@ -31,7 +32,7 @@ export function mountParticleForces({canvas,board,getState,getMode,setMode,remem
 
    overlay.replaceChildren();for(const p of points){const el=document.createElement('button');el.className='force-handle';el.dataset.forceId=p.id;el.type='button';overlay.append(el);}
 
-   const ring=document.createElement('div');ring.className='force-radius';ring.setAttribute('aria-hidden','true');overlay.append(ring);
+   const volume=document.createElementNS('http://www.w3.org/2000/svg','svg');volume.classList.add('force-volumes');volume.setAttribute('aria-hidden','true');overlay.prepend(volume);sphereKey='';
 
   }
 
@@ -47,7 +48,8 @@ export function mountParticleForces({canvas,board,getState,getMode,setMode,remem
 
   }
 
-  const ring=overlay.querySelector('.force-radius'),p=current();if(ring){ring.hidden=!p;if(p){const q=forceToScreen(p,aspect,getState());ring.style.left=q.x*100+'%';ring.style.top=q.y*100+'%';ring.style.width=ring.style.height=q.radius*2*board.clientHeight+'px';ring.classList.toggle('repel',p.strength<0);}}
+  const volume=overlay.querySelector('.force-volumes');if(volume&&active()){const width=board.clientWidth,height=Math.max(1,board.clientHeight),state=getState(),key=JSON.stringify([points,selected,width,height,state.engine,state.pLiving,state.lensDistortion]);if(key!==sphereKey){sphereKey=key;volume.setAttribute('viewBox',`0 0 ${width} ${height}`);volume.innerHTML=sphereOverlay(state,selected,width,height);}}
+
 
  }
 
