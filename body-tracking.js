@@ -1,5 +1,5 @@
-import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=11e11510d06f';
-import {BodyCamera} from './body-camera.js?v=11e11510d06f';
+import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=b0f2449c8da0';
+import {BodyCamera} from './body-camera.js?v=b0f2449c8da0';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountBodyTracking({board,getState,remember,mark,renderControls,showTab,toast,invalidate}){
  const runtime=new BodyTrackingState(),overlay=document.createElement('div');
@@ -75,7 +75,7 @@ export function mountBodyTracking({board,getState,remember,mark,renderControls,s
   if(mode==='demo'){const t=now*.0006;runtime.receive({cameraActive:true,points:Object.keys(BODY_LABELS).map((id,i)=>({id,x:.5+(i%2?1:-1)*(.22+.08*Math.sin(t))+.09*Math.sin(t*.7),y:.5+.1*Math.cos(t+(i%2))+(i>1?-.12:0),ageMs:0}))},now);}
   fields=runtime.sample(getState().bodyTracking,board.clientWidth/Math.max(1,board.clientHeight),now);
   const next=JSON.stringify([settings(),...fields.map(p=>[p.id,...['x','y','z','strength','radius','swirl','opacity'].map(k=>Math.round(p[k]*10000)),p.origin,p.lost,p.unstable])]);const changed=next!==signature;signature=next;
-  if(changed){overlay.replaceChildren();if(settings().show)for(const p of fields){const dot=document.createElement('span');dot.className='body-tracking-point'+(p.lost?' lost':'');dot.textContent=p.label;dot.style.cssText=`left:${p.screen.x*100}%;top:${p.screen.y*100}%;opacity:${p.opacity}`;overlay.append(dot);}}
+  if(changed){const visible=settings().show?fields:[],ids=new Set(visible.map(p=>p.id));for(const dot of [...overlay.children])if(!ids.has(dot.dataset.point))dot.remove();for(const p of visible){let dot=overlay.querySelector(`[data-point="${p.id}"]`);if(!dot){dot=document.createElement('span');dot.dataset.point=p.id;dot.textContent=p.label;overlay.append(dot);}dot.className='body-tracking-point'+(p.lost?' lost':'');dot.style.cssText=`left:${p.screen.x*100}%;top:${p.screen.y*100}%;opacity:${p.opacity}`;}}
   if(now-lastStatus>100){updateStatus();drawCamera();lastStatus=now;}
   return changed;
  }};

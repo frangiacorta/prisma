@@ -1,5 +1,5 @@
-import {supportsParticleFields as usesParticleSurface} from './living-composition.js?v=11e11510d06f';
-import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=11e11510d06f';
+import {supportsParticleFields as usesParticleSurface} from './living-composition.js?v=b0f2449c8da0';
+import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=b0f2449c8da0';
 
 
 

@@ -5,7 +5,8 @@ export function baseFormField(p,kind=0){
  if(kind===1)return Math.max(Math.hypot(p[0],p[1])-1,Math.abs(p[2])-.12);
  const planes=BASE_PLANES[kind];return planes?Math.max(...planes.map(n=>p.reduce((d,v,i)=>d+v*n[i],-n[3]))):Math.hypot(...p)-1;
 }
-export function baseFormUniforms(s,g,locations){g.uniform1f(locations.uBaseForm,s.baseForm||0);}
+const planeBuffers=Object.fromEntries(Object.entries(BASE_PLANES).map(([k,p])=>[k,new Float32Array(p.flat())]));
+export function baseFormUniforms(s,g,locations){g.uniform1f(locations.uBaseForm,s.baseForm||0);if(locations.uPrimitivePlaneCount!=null){const p=planeBuffers[s.baseForm];g.uniform1i(locations.uPrimitivePlaneCount,p?p.length/4:0);if(p)g.uniform4fv(locations.uPrimitivePlanes,p);}}
 const glNumber=x=>Number.isInteger(x)?x+'.':String(x);
 // Reflection symmetry reduces the 6/8/20/12 faces to 3/1/4/3 planes.
 // No dynamic array traversal is nested inside a ray/interface loop.

@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=11e11510d06f';
+import {AUDIO_HELP} from './audio-model.js?v=b0f2449c8da0';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  structScallop:'Arrotonda la sagoma in lobi morbidi, sulla forma corrente. Il numero si regola con Divisioni radiali. Si combina con svuotamento, strati e ritagli.',

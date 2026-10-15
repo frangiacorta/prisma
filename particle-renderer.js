@@ -1,13 +1,13 @@
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=11e11510d06f';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=11e11510d06f';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=11e11510d06f';
-import {ParticleLinks} from './particle-links.js?v=11e11510d06f';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=11e11510d06f';
-import {LayeredVeils} from './layered-veils.js?v=11e11510d06f';
-import {LivingStructures} from './living-structures.js?v=11e11510d06f';
-import {fieldGLSL} from './particle-field.js?v=11e11510d06f';
-import {forceBarrierGLSL} from './particle-forces.js?v=11e11510d06f';
-import {prismaShadingGLSL} from './particle-shading.js?v=11e11510d06f';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=b0f2449c8da0';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=b0f2449c8da0';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=b0f2449c8da0';
+import {ParticleLinks} from './particle-links.js?v=b0f2449c8da0';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=b0f2449c8da0';
+import {LayeredVeils} from './layered-veils.js?v=b0f2449c8da0';
+import {LivingStructures} from './living-structures.js?v=b0f2449c8da0';
+import {fieldGLSL} from './particle-field.js?v=b0f2449c8da0';
+import {forceBarrierGLSL} from './particle-forces.js?v=b0f2449c8da0';
+import {prismaShadingGLSL} from './particle-shading.js?v=b0f2449c8da0';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -187,7 +187,7 @@ export class ParticleRenderer{
   phase=((phase/(Math.PI*2))%1+1)%1;const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase*Math.PI*2)};
   if(s.pLiving===4){s.pCount=0;s.pTrailCount=0;s.pLinks=0;s.pLivingBlend=1;}
   const weights=livingWeights(s);s.pOpacity*=weights.core;s.pTrailOpacity*=weights.core;s.pLinks*=weights.core;s.pSkin*=weights.structure;s.pThreadOpacity*=weights.structure;this.occlusion=0;
-  if(this.seed!==s.seed)this.geometry(s.seed);this.resize(w,h);this.guides.update(s);this.pollGpuTime();const query=this.timerExtension&&this.queries.length<3?gl.createQuery():null;
+  if(this.seed!==s.seed)this.geometry(s.seed);this.resize(w,h);this.guides.update(s);this.pollGpuTime();const query=options.trackTiming!==false&&this.timerExtension&&this.queries.length<3?gl.createQuery():null;
   if(query)gl.beginQuery(this.timerExtension.TIME_ELAPSED_EXT,query);
   const [scene,a,b]=this.targets;this.bind(scene);if(s.pLiving>0&&!scene.depth){scene.depth=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,scene.depth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT24,w,h);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,scene.depth);}gl.depthMask(true);gl.clearDepth(1);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.disable(gl.SCISSOR_TEST);gl.enable(gl.BLEND);gl.blendEquation(gl.FUNC_ADD);gl.blendFunc(gl.ONE,gl.ONE);
   if(s.pLiving===4){this.veils??=new LayeredVeils(this,common);this.veils.draw({...s,pVeilOpacity:s.pVeilOpacity*weights.structure},phase*s.pDirection,options);}
@@ -219,7 +219,7 @@ export class ParticleRenderer{
   this.u(c,'uBackground',...rgb(s.background));this.u(c,'uBackground2',...rgb(s.background2));this.u(c,'uBgMode',['solid','gradient','studio','transparent'].indexOf(s.bgMode));this.u(c,'uBg',s.bgAngle*rad,s.bgHeight,s.bgSoftness,s.bgWash);
   gl.drawArrays(gl.TRIANGLES,0,3);gl.bindVertexArray(null);
   if(query){gl.endQuery(this.timerExtension.TIME_ELAPSED_EXT);this.queries.push(query);}
-  if(this.completionSync)gl.deleteSync(this.completionSync);this.completionSync=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);gl.flush();return true;
+  if(!options.deferCompletion){if(this.completionSync)gl.deleteSync(this.completionSync);this.completionSync=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);gl.flush();}return true;
  }
  async drawAccumulated(s,p,w,h,o={}){if(o.cancelled?.())return false;this.draw(s,p,w,h,o);const ok=await this.waitForGpu(o);o.progress?.(1);return ok;}
  async drawTiled(...args){return this.drawAccumulated(...args);}

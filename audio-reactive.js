@@ -1,8 +1,8 @@
-import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=11e11510d06f';
-import {RhythmClock,TapTempo} from './audio-rhythm.js?v=11e11510d06f';
-import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=11e11510d06f';
-import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=11e11510d06f';
-import {META} from './model.js?v=11e11510d06f';
+import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=b0f2449c8da0';
+import {RhythmClock,TapTempo} from './audio-rhythm.js?v=b0f2449c8da0';
+import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=b0f2449c8da0';
+import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=b0f2449c8da0';
+import {META} from './model.js?v=b0f2449c8da0';
 
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountAudioReactive({getState,remember,mark,renderControls,showTab,toast,invalidate,setPlaying}) {
@@ -218,8 +218,9 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
   tool.onclick=()=>{showTab('audio');const section=document.getElementById('audio-input-controls');section.open=true;section.scrollIntoView({block:'nearest'});};
   addEventListener('pagehide',()=>{cancelRecording();stopReplay(false);rhythm.stop(false);stop(false);});
   return {
-    panel,beforeRender,afterRender,stop,get active(){return !!recorder||!!replay||rhythm.running||mode==='microphone'||(mode==='file'&&input.player&&!input.player.paused&&!input.player.ended)||pending||hasSignal();},preview:state=>audioPreviewState(state,bands),
+    panel,beforeRender,afterRender,stop,get active(){return !!recorder||!!replay||rhythm.running||mode==='microphone'||(mode==='file'&&input.player&&!input.player.paused&&!input.player.ended)||pending||hasSignal();},preview:state=>hasSignal()?audioPreviewState(state,bands):state,
     tick(now){
+      if(mode==='off'&&!pending&&!rhythm.running&&!recorder&&!replay&&!hasSignal()&&!Object.values(replayTail).some(v=>v>0)){lastTime=now;return false;}
       const c=settings(),dt=lastTime?Math.max(0,Math.min(.1,(now-lastTime)/1000)):1/60;lastTime=now;
       Object.assign(input,{gain:c.gain*.7,threshold:c.threshold,attack:c.attack,release:c.release,curve:c.curve,autoLevel:c.autoLevel,lowCut:c.lowCut,highCut:c.highCut,onsetSensitivity:c.onsetSensitivity,onsetHold:c.onsetHold});
       bands={...input.read(dt),beat:rhythm.tick(now,c)};
@@ -248,7 +249,7 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
         }
       }
       const next=Object.values(bands).map(value=>Math.round(value*10000)).join(','),changed=next!==signature;signature=next;
-      if(now-lastUi>100){syncUi();lastUi=now;}return changed;
+      if(now-lastUi>100||!hasSignal()){syncUi();lastUi=now;}return changed;
     }
   };
 }
