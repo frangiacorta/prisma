@@ -1,18 +1,18 @@
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=b0f2449c8da0';
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=b0f2449c8da0';
-import {normalizeAudioClip} from './audio-recording.js?v=b0f2449c8da0';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=b0f2449c8da0';
-import {normalizeAudio} from './audio-model.js?v=b0f2449c8da0';
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=b0f2449c8da0';
-import {normalizeForcePaths} from './particle-paths.js?v=b0f2449c8da0';
-import {normalizeForcePoints} from './particle-forces.js?v=b0f2449c8da0';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=b0f2449c8da0';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=b0f2449c8da0';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=6f29a1c2b99d';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=6f29a1c2b99d';
+import {normalizeAudioClip} from './audio-recording.js?v=6f29a1c2b99d';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=6f29a1c2b99d';
+import {normalizeAudio} from './audio-model.js?v=6f29a1c2b99d';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=6f29a1c2b99d';
+import {normalizeForcePaths} from './particle-paths.js?v=6f29a1c2b99d';
+import {normalizeForcePoints} from './particle-forces.js?v=6f29a1c2b99d';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=6f29a1c2b99d';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS} from './studio-model.js?v=6f29a1c2b99d';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
 export function material(s,index){Object.assign(s,MATERIAL_STYLES[index].values);s.materialName=MATERIAL_STYLES[index].name;return s;}
-export function textureStyle(s,index){if(!TEXTURE_STYLES[index])throw Error('Scegli una texture disponibile.');upgrade(s);Object.assign(s,TEXTURE_STYLES[index].values);return s;}
+export function textureStyle(s,index){if(!TEXTURE_STYLES[index])throw Error('Scegli una texture disponibile.');upgrade(s);Object.assign(s,ORGANIC_DETAIL_DEFAULTS,TEXTURE_STYLES[index].values);return s;}
 export function newCreation(){const s=preset(1);material(s,14);Object.assign(s,{materialName:'Sfera semplice',volume:1,bgMode:'solid',background:'#000000',background2:'#000000',grounding:0,palette:['#d9dce2'],roughness:.55,gloss:.25,grain:0,glow:0,edge:0,rotateX:0,rotateY:0,scale:.92,duration:12});for(const t of Object.values(s.motions))t.enabled=false;s.lights.forEach(l=>l.visible=false);return s;}
 
 export const MOTION_PRESETS=[['emerge','Spuntano e rientrano'],['wrap','Avanzano intorno alla sfera'],['roots','Radici in movimento'],['bloom','Petali che si aprono'],['chromatic','Onde cromatiche'],['breathe','Bolla che respira'],['reflect','Riflessi che girano'],['film','Colori che colano e vorticano'],['orbit','Luce che orbita'],['wave','Forma che ondeggia']];

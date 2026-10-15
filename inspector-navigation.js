@@ -3,9 +3,9 @@ export const NAV_GROUPS=[
  {id:'structure',label:'Forma e moto',tabs:[['shape','Forma','shape'],['grains','Granelli','shape','particles'],['trails','Fibre e scie','motion','particles'],['motion','Movimento','motion']]},
  {id:'look',label:'Aspetto',tabs:[['material','Materia','material'],['color','Colori','palette'],['light','Luci','sun']]},
  {id:'scene',label:'Scena',tabs:[['background','Sfondo','background'],['photo','Filtri','photo']]},
- {id:'interaction',label:'Interazione',tabs:[['fields','Punti e percorsi','move','particles'],['body','Mani e braccia','orbit'],['audio','Audio','audio']]}
+ {id:'interaction',label:'Interazione',tabs:[['fields','Punti e percorsi','move'],['body','Mani e braccia','orbit'],['audio','Audio','audio']]}
 ];
-export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.filter(t=>(!t[3]||t[3]===engine)&&!(engine==='veils'&&['body','audio'].includes(t[0]))).map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label})));
+export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.filter(t=>(!t[3]||t[3]===engine)&&!(engine==='veils'&&['fields','body','audio'].includes(t[0]))).map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label})));
 const clean=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 export function renderNavigation(root,engine,tab,icon){
  const tabs=navigationTabs(engine),current=tabs.find(t=>t.id===tab)||tabs[0];
@@ -26,6 +26,7 @@ export function organizeSections(root,scope){
  const selectors='[data-sculpt],#load-bloom-example,[data-material],#material-picker,[data-legacy-material],[data-film-look],[data-film-light],[data-texture-style],[data-motion-preset],[data-mood],#random-palette,#light-rig,[data-light-source],[data-backdrop],[data-audio-preset]';
  const buckets=new Map(),exampleParents=new Set();
  for(const button of [...root.querySelectorAll(selectors)]){
+  if(scope.endsWith('/material'))continue;
   if(library.contains(button))continue;
   const container=button.closest('.mood-grid,.field,.audio-presets')||button;
   let ancestor=button.closest('details');while(ancestor&&root.contains(ancestor)){exampleParents.add(ancestor);ancestor=ancestor.parentElement.closest('details');}
@@ -54,6 +55,17 @@ export function organizeSections(root,scope){
  if(scope==='particles/motion')group('Deformazioni nel tempo','particle-motion-deform',['Vitalità e respiro','Tentacoli in movimento','Warp dello spazio','Ritmo e cadenze']);
  if(scope.endsWith('/color')){const palette=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent.startsWith('La tua palette'));if(palette)root.prepend(palette);}
  if(buckets.size)root.append(library);
+ if(scope.endsWith('/motion')){
+  const active=document.createElement('details');active.className='control-details active-motion';active.id='active-motion';active.dataset.defaultOpen='true';active.innerHTML='<summary>Movimenti attivi</summary>';
+  const tracks=[...root.querySelectorAll('input[data-path-check$=".enabled"]')].filter(el=>el.checked);
+  for(const el of tracks){const d=el.closest('details');if(d&&!active.contains(d))active.append(d);}
+  const film=['filmFlow','filmSwirl'];for(const key of film){const el=root.querySelector('[data-param="'+key+'"]');if(el&&Number(el.value)>0)active.append(el.closest('.param'));}
+  if(film.some(key=>Number(active.querySelector('[data-param="'+key+'"]')?.value)>0)){const cycles=root.querySelector('[data-param="filmCycles"]');if(cycles)active.append(cycles.closest('.param'));}
+  const env=root.querySelector('[data-check="environmentRotate"]');if(env?.checked){active.append(env.closest('.check'));const cycles=root.querySelector('[data-param="environmentCycles"]');if(cycles)active.append(cycles.closest('.param'));}
+  if(active.children.length===1)active.innerHTML+='<p class="help">Nessun movimento attivo. Attivalo nelle sezioni qui sotto: i suoi controlli compariranno qui.</p>';
+  root.prepend(active);
+  for(const d of [...root.querySelectorAll('details')].reverse())if(d!==active&&!d.querySelector('input,select,button,details')&&d.children.length===1)d.remove();
+ }
  if(scope.endsWith('/audio')){
   const response=root.querySelector('#audio-response-controls'),input=root.querySelector('#audio-input-controls');if(response&&input)input.after(response);
  }

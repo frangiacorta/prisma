@@ -1,4 +1,4 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=b0f2449c8da0';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=6f29a1c2b99d';
 // Particle shading uses Prisma's parameter names. It does not trace solid glass.
 export const prismaShadingGLSL=`
 ${FILM_PATTERN_GLSL}
@@ -15,8 +15,8 @@ vec3 prismaPalette(vec3 p,vec3 original){
  float waves=sin(dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*uColorWave.y+uColorWave.z+p.y*uColorWave2.x+radius*uColorWave2.y+theta*uColorWave2.z+sin(p.x*3.+p.y*2.)*uColorWave2.w);
  float t=fract(.5+dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*.22*uGradient.y+uGradient.z+waves*uColorWave.x*.25);
  float index=t*float(uPaletteCount);int a=int(floor(index)),b=(a+1)%uPaletteCount;
- float blend=smoothstep(.5-.5*max(.005,uColorSoftness),.5+.5*max(.005,uColorSoftness),fract(index));
- return mix(uPalette[a],uPalette[b],blend);
+ float blend=smoothstep(.5-.5*max(.005,min(1.,uColorSoftness)),.5+.5*max(.005,min(1.,uColorSoftness)),fract(index));
+ vec3 color=mix(uPalette[a],uPalette[b],blend);if(uColorSoftness>1.){vec3 mean=vec3(0.);for(int k=0;k<uPaletteCount;k++)mean+=uPalette[k];color=mix(color,mean/float(uPaletteCount),smoothstep(1.,3.,uColorSoftness));}return color;
 }
 vec3 reflectedEnvironment(vec3 r,float rough){
  r.xz=mat2(cos(uEnvironment.y),-sin(uEnvironment.y),sin(uEnvironment.y),cos(uEnvironment.y))*r.xz;

@@ -33,3 +33,5 @@ vec3 attachedPosition(vec4 seed,float phase){
  vec3 surface=mix(mix(attachedAt(i),attachedAt(i+ivec2(1,0)),f.x),mix(attachedAt(i+ivec2(0,1)),attachedAt(i+ivec2(1,1)),f.x),f.y);
  return sceneBarriers(mix(p,surface,uSurfaceBind),seed,phase);
 }`;
+
+export const supportsManualFields=s=>!usesParticleSurface(s)||supportsParticleFields(s);

@@ -1,5 +1,5 @@
-import {supportsParticleFields as usesParticleSurface} from './living-composition.js?v=b0f2449c8da0';
-import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=b0f2449c8da0';
+import {supportsManualFields as usesParticleSurface} from './living-composition.js?v=6f29a1c2b99d';
+import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=6f29a1c2b99d';
 
 
 
@@ -37,7 +37,7 @@ export function mountParticleForces({canvas,board,getState,getMode,setMode,remem
 
   const aspect=board.clientWidth/Math.max(1,board.clientHeight);
 
-  for(const el of overlay.querySelectorAll('[data-force-id]')){const p=points.find(p=>p.id===+el.dataset.forceId),q=forceToScreen(p,aspect);
+  for(const el of overlay.querySelectorAll('[data-force-id]')){const p=points.find(p=>p.id===+el.dataset.forceId),q=forceToScreen(p,aspect,getState());
 
    el.style.left=q.x*100+'%';el.style.top=q.y*100+'%';el.textContent=(p.strength<0?'−':'+')+p.id;
 
@@ -47,7 +47,7 @@ export function mountParticleForces({canvas,board,getState,getMode,setMode,remem
 
   }
 
-  const ring=overlay.querySelector('.force-radius'),p=current();if(ring){ring.hidden=!p;if(p){const q=forceToScreen(p,aspect);ring.style.left=q.x*100+'%';ring.style.top=q.y*100+'%';ring.style.width=ring.style.height=q.radius*2*board.clientHeight+'px';ring.classList.toggle('repel',p.strength<0);}}
+  const ring=overlay.querySelector('.force-radius'),p=current();if(ring){ring.hidden=!p;if(p){const q=forceToScreen(p,aspect,getState());ring.style.left=q.x*100+'%';ring.style.top=q.y*100+'%';ring.style.width=ring.style.height=q.radius*2*board.clientHeight+'px';ring.classList.toggle('repel',p.strength<0);}}
 
  }
 
@@ -59,9 +59,9 @@ export function mountParticleForces({canvas,board,getState,getMode,setMode,remem
 
   if(!active())return;e.preventDefault();e.stopImmediatePropagation();if(drag||e.button>0)return;
 
-  if((getState().forcePoints||[]).length>=MAX_FORCE_POINTS){toast('Puoi usare fino a 8 punti. Trascinane uno o rimuovilo in Moto.');return;}
+  if((getState().forcePoints||[]).length>=MAX_FORCE_POINTS){toast('Puoi usare fino a 8 punti. Trascinane uno o rimuovilo in Punti e percorsi.');return;}
 
-  remember();const q=pointer(e),p=addForcePoint(getState(),getMode(),q.x,q.y,q.aspect);start(e,p,canvas);mark();
+  remember();if(getState().engine!=='particles')getState().renderVersion=2;const q=pointer(e),p=addForcePoint(getState(),getMode(),q.x,q.y,q.aspect);start(e,p,canvas);mark();
 
  },true);
 
@@ -71,7 +71,7 @@ export function mountParticleForces({canvas,board,getState,getMode,setMode,remem
 
   if(e.shiftKey)p.z=clamp('z',drag.start.z+(drag.clientY-e.clientY)*.02);
 
-  else{const a=screenToForce(q.x,q.y,q.aspect,p.z),b=screenToForce(drag.x,drag.y,q.aspect,p.z);p.x=clamp('x',drag.start.x+a.x-b.x);p.y=clamp('y',drag.start.y+a.y-b.y);}
+  else{const a=screenToForce(q.x,q.y,q.aspect,p.z,getState()),b=screenToForce(drag.x,drag.y,q.aspect,p.z,getState());p.x=clamp('x',drag.start.x+a.x-b.x);p.y=clamp('y',drag.start.y+a.y-b.y);}
 
   mark();syncInputs();
 

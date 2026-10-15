@@ -1,5 +1,5 @@
-import {organizeSections} from './inspector-navigation.js?v=b0f2449c8da0';
-import {controlHelp} from './control-help.js?v=b0f2449c8da0';
+import {organizeSections} from './inspector-navigation.js?v=6f29a1c2b99d';
+import {controlHelp} from './control-help.js?v=6f29a1c2b99d';
 const STORE='prisma-interface-v2';
 let preferences={};try{preferences=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(preferences));}catch{}};
@@ -41,7 +41,7 @@ export function prepareInspector(root,scope){
  for(const [index,d] of nodes.entries()){
   const parent=d.parentElement.closest('details'),id=d.id||slug(d.querySelector(':scope > summary')?.textContent||'');
   const key=scope+'/'+(parent?.dataset.disclosurePath||'')+'/'+id;d.dataset.disclosurePath=(parent?.dataset.disclosurePath||'')+'/'+id;
-  d.open=Object.hasOwn(preferences,key)?preferences[key]:index===0;
+  d.open=Object.hasOwn(preferences,key)?preferences[key]:d.dataset.defaultOpen==='true'||index===0;
   d.addEventListener('toggle',()=>{if(!d.isConnected)return;preferences[key]=d.open;save();});
  }
  addHelp(root);
