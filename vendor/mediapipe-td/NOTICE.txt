@@ -1,0 +1,9 @@
+MediaPipe TouchDesigner — Torin Blankensmith, MIT (LICENSE).
+https://github.com/torinmb/mediapipe-touchdesigner
+Commit bb01606926edeec828cc123e86a4a300bdc96c9b
+poseTracking.upstream.js is the original src/poseTracking.js, retained for lineage.
+limb-detectors.js adapts its GPU Pose Full configuration and task creation to
+Prisma's worker. It adds OffscreenCanvas, resource cleanup and a CPU/Lite fallback.
+HandLandmarker is retained instead of the plugin's GestureRecognizer because this
+feature uses coordinates rather than classified gestures. No .tox component is
+claimed to run in Prisma. The 1 Euro filter comes from Casiez's original repository.

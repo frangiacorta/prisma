@@ -12889,9 +12889,9 @@
       "state": "partial",
       "priority": false,
       "author": "",
-      "summary": "Webcam direttamente in Prisma online: due mani e due braccia controllano movimento, inclinazione, dimensione e campi locali.",
+      "summary": "Controllo diretto mani/braccia: GPU e Pose Full dal workflow MediaPipe per TouchDesigner, filtro 1€ originale, identità e riaggancio protetti. Prova reale da confermare dopo la segnalazione di instabilità.",
       "sources": [
-        "https://frangiacorta.github.io/prisma/?engine=solid&v=38"
+        "https://frangiacorta.github.io/prisma/?engine=solid&v=39"
       ],
       "sections": [
         {
@@ -12899,7 +12899,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "MediaPipe Hand Landmarker e Pose Landmarker Lite 1, sul dispositivo in un worker. Spalle, gomiti e polsi definiscono le braccia; il polso può continuare il movimento quando le dita non sono rilevate. La testa è esclusa dal controllo creativo. Il progetto prospettiva 4D resta separato."
+              "value": "MediaPipe Hand Landmarker e Pose Landmarker Lite 1, sul dispositivo in un worker. Spalle, gomiti e polsi definiscono le braccia; il polso può continuare il movimento quando le dita non sono rilevate. La testa è esclusa dal controllo creativo. Il progetto prospettiva 4D resta separato. GPU/Pose Full adattato dal plugin TouchDesigner, fallback CPU/Lite, filtro originale Casiez 1€. Tre campioni coerenti richiesti per grandi salti; dati incerti trattenuti."
             }
           ]
         },
@@ -12908,7 +12908,7 @@
           "fields": [
             {
               "label": "feasible",
-              "value": "Webcam direttamente in Prisma online: due mani e due braccia controllano movimento, inclinazione, dimensione e campi locali."
+              "value": "Controllo diretto mani/braccia: GPU e Pose Full dal workflow MediaPipe per TouchDesigner, filtro 1€ originale, identità e riaggancio protetti. Prova reale da confermare dopo la segnalazione di instabilità."
             }
           ]
         },
@@ -12945,7 +12945,9 @@
               "value": [
                 "reports/hands-arms/model.json",
                 "reports/hands-arms/source.json",
-                "reports/hands-arms/online.json"
+                "reports/hands-arms/online.json",
+                "reports/hands-arms-stability/model.json",
+                "reports/hands-arms-stability/backends.json"
               ]
             }
           ]
@@ -12955,7 +12957,7 @@
         "interaction"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "https://frangiacorta.github.io/prisma/?engine=solid&v=38",
+      "result": "https://frangiacorta.github.io/prisma/?engine=solid&v=39",
       "where": "Interazione → Mani e braccia",
       "platform": "Browser · webcam locale",
       "next": "Verificare dal vivo precisione e latenza con la webcam dell’utente, mani di taglio, braccia incrociate e bordi · Tarare guadagni e raggio sulle forme reali · Registrare i gesti come traiettorie modificabili e raccordabili in loop · Valutare deformazioni locali delle superfici solide oltre ai campi particellari",

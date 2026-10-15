@@ -1,5 +1,5 @@
-import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=70b6470e0c8d';
-import {BodyCamera} from './body-camera.js?v=70b6470e0c8d';
+import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=ee2a8198ec2b';
+import {BodyCamera} from './body-camera.js?v=ee2a8198ec2b';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountBodyTracking({board,getState,remember,mark,renderControls,showTab,toast,invalidate}){
  const runtime=new BodyTrackingState(),overlay=document.createElement('div');
@@ -12,6 +12,7 @@ export function mountBodyTracking({board,getState,remember,mark,renderControls,s
   if(mode==='off')return connection||'Webcam spenta. Avviala oppure prova i gesti simulati.';
   if(mode==='demo')return 'Demo · mani e braccia simulate, webcam spenta';
   if(connection!=='Webcam attiva')return connection;
+  const unstable=fields.filter(p=>p.unstable);if(unstable.length)return 'Aggancio instabile · '+unstable.map(p=>p.label).join(' · ')+' · attendo conferma prima di muovere';
   const current=fields.filter(p=>!p.lost);
   return current.length?'Rilevati: '+current.map(p=>p.label+(p.partial?' (polso)':'')).join(' · '):'Webcam attiva · inquadra mani, gomiti e spalle. Una persona alla volta.';
  }
@@ -23,7 +24,7 @@ export function mountBodyTracking({board,getState,remember,mark,renderControls,s
   const video=camera.video;canvas.height=Math.round(canvas.width*video.videoHeight/video.videoWidth);
   ctx.drawImage(video,0,0,canvas.width,canvas.height);ctx.strokeStyle='#a6efcd';ctx.lineWidth=2;
   if(performance.now()-lastPacket>500)return;
-  for(const arm of arms){ctx.beginPath();arm.joints.forEach((p,i)=>ctx[i?'lineTo':'moveTo'](p.x*canvas.width,p.y*canvas.height));ctx.stroke();}
+  for(const arm of arms){if(runtime.tracks.get(arm.id)?.rejected)continue;ctx.beginPath();arm.joints.forEach((p,i)=>ctx[i?'lineTo':'moveTo'](p.x*canvas.width,p.y*canvas.height));ctx.stroke();}
   for(const [id,t] of runtime.tracks){if(performance.now()-t.seen>500)continue;ctx.fillStyle=id.startsWith('arm')?'#ffe2a8':'#a6efcd';ctx.beginPath();ctx.arc(t.raw.x*canvas.width,t.raw.y*canvas.height,4,0,Math.PI*2);ctx.fill();ctx.font='12px sans-serif';ctx.fillText(BODY_LABELS[id],Math.min(canvas.width-65,Math.max(2,t.raw.x*canvas.width+6)),Math.max(14,t.raw.y*canvas.height-6));}
  }
  function panel(){
@@ -71,7 +72,7 @@ export function mountBodyTracking({board,getState,remember,mark,renderControls,s
   if(mode==='off'){updateStatus();return false;}
   if(mode==='demo'){const t=now*.0006;runtime.receive({cameraActive:true,points:Object.keys(BODY_LABELS).map((id,i)=>({id,x:.5+(i%2?1:-1)*(.22+.08*Math.sin(t))+.09*Math.sin(t*.7),y:.5+.1*Math.cos(t+(i%2))+(i>1?-.12:0),ageMs:0}))},now);}
   fields=runtime.sample(getState().bodyTracking,board.clientWidth/Math.max(1,board.clientHeight),now);
-  const next=JSON.stringify([settings(),...fields.map(p=>[p.id,...['x','y','z','strength','radius','swirl','opacity'].map(k=>Math.round(p[k]*10000)),p.origin,p.lost])]);const changed=next!==signature;signature=next;
+  const next=JSON.stringify([settings(),...fields.map(p=>[p.id,...['x','y','z','strength','radius','swirl','opacity'].map(k=>Math.round(p[k]*10000)),p.origin,p.lost,p.unstable])]);const changed=next!==signature;signature=next;
   if(changed){overlay.replaceChildren();if(settings().show)for(const p of fields){const dot=document.createElement('span');dot.className='body-tracking-point'+(p.lost?' lost':'');dot.textContent=p.label;dot.style.cssText=`left:${p.screen.x*100}%;top:${p.screen.y*100}%;opacity:${p.opacity}`;overlay.append(dot);}}
   if(now-lastStatus>100){updateStatus();drawCamera();lastStatus=now;}
   return changed;

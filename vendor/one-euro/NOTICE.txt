@@ -1,0 +1,5 @@
+One Euro Filter — Gery Casiez, Copyright 2019 Inria, BSD-3-Clause.
+Original JavaScript implementation copied unchanged, including its full license.
+https://github.com/casiez/OneEuroFilter
+Commit d78925584245597f2aa9c4c01a802eb0f0b77fb9, javascript/OneEuroFilter.js
+Used on accepted camera measurements at their actual timestamps.

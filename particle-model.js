@@ -1,4 +1,4 @@
-import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=70b6470e0c8d';
+import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=ee2a8198ec2b';
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
 export const PARTICLE_VERSION=10;
 export const FAMILIES=['Nucleo Pathfinder'];
