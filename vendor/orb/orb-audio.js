@@ -1,7 +1,7 @@
 // Adapted from OrbAudioInput, copyright (c) 2026 LerSent001, MIT.
 // Upstream, changes and original source: NOTICE.txt; full license: LICENSE.txt.
-import {SpectralFluxDetector} from '../sound-to-light/spectral-flux.js?v=80e27f6de822';
-import {timbreFeatures} from '../meyda/timbre.js?v=80e27f6de822';
+import {SpectralFluxDetector} from '../sound-to-light/spectral-flux.js?v=70b6470e0c8d';
+import {timbreFeatures} from '../meyda/timbre.js?v=70b6470e0c8d';
 export const silentBands = () => ({ low: 0, mid: 0, high: 0, all: 0, peak: 0, onset: 0, brightness:0, texture:0 });
 
 /** Independent local input; microphone is never connected to the speakers. */

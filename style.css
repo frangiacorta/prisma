@@ -181,3 +181,5 @@ body.preview-expanded{overflow:hidden}
 @media(max-width:760px){.random-bar .new-creation{min-height:44px}}
 
 @media(max-width:760px){.random-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.random-bar>button{margin:0;width:100%;min-height:40px;justify-content:center}.random-bar #randomize{grid-column:span 2}}
+
+.body-camera-preview{display:block;width:100%;height:auto;border-radius:10px;margin:12px 0;background:#000}.body-camera-preview[hidden]{display:none}

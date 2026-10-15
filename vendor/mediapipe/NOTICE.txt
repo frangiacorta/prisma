@@ -1,0 +1,14 @@
+MediaPipe Tasks Vision 1.1.0, Google LLC, Apache-2.0 (see LICENSE).
+Runtime copied from the pinned @mediapipe/tasks-vision dependency.
+https://github.com/google-ai-edge/mediapipe
+https://developers.google.com/edge/mediapipe/solutions/vision/pose_landmarker/web_js
+
+Official models, downloaded as fixed version 1:
+https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
+SHA256 fbc2a30080c3c557093b5ddfc334698132eb341044ccee322ccf8bcf3607cde1
+https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task
+SHA256 59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a
+
+Used locally in a dedicated worker for hands and arms. No face landmarks are
+returned to the editor. Video frames never leave the browser. Models load
+only after the user starts the camera. No automatic camera activation.

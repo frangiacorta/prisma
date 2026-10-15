@@ -12877,7 +12877,7 @@
     },
     {
       "id": "roadmap-body-interaction",
-      "name": "Testa e mani muovono la materia",
+      "name": "Mani e braccia muovono la materia",
       "kind": "project",
       "related": [
         "img-04",
@@ -12889,9 +12889,9 @@
       "state": "partial",
       "priority": false,
       "author": "",
-      "summary": "Prima integrazione sul PC: testa e due mani comandano tre campi mobili. Demo disponibile anche online.",
+      "summary": "Webcam direttamente in Prisma online: due mani e due braccia controllano movimento, inclinazione, dimensione e campi locali.",
       "sources": [
-        "https://frangiacorta.github.io/prisma/?engine=particles"
+        "https://frangiacorta.github.io/prisma/?engine=solid&v=38"
       ],
       "sections": [
         {
@@ -12899,7 +12899,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "La camera del pannello 4D alimenta sia la prospettiva sia un canale creativo separato. Testa dal rilevatore posteriore esistente, mani da MediaPipe Hand Landmarker locale. Particelle e fibre deformate dai campi; Forme traslate come oggetto unico."
+              "value": "MediaPipe Hand Landmarker e Pose Landmarker Lite 1, sul dispositivo in un worker. Spalle, gomiti e polsi definiscono le braccia; il polso può continuare il movimento quando le dita non sono rilevate. La testa è esclusa dal controllo creativo. Il progetto prospettiva 4D resta separato."
             }
           ]
         },
@@ -12908,7 +12908,7 @@
           "fields": [
             {
               "label": "feasible",
-              "value": "Prima integrazione sul PC: testa e due mani comandano tre campi mobili. Demo disponibile anche online."
+              "value": "Webcam direttamente in Prisma online: due mani e due braccia controllano movimento, inclinazione, dimensione e campi locali."
             }
           ]
         },
@@ -12918,23 +12918,21 @@
             {
               "label": "implemented",
               "value": [
-                "Tre sorgenti indipendenti con attrazione, repulsione, raggio, avvolgimento e profondità manuale",
-                "Sensibilità X/Y, offset, inversioni, correzione obliqua, filtro del tremolio e morbidezza",
-                "Ultima posizione mantenuta in perdita, scelta tra mantenimento forza e attenuazione; rientro smussato",
-                "Impostazioni nei preset; collegamento esplicito, nessuna riattivazione automatica della camera",
-                "Demo senza camera; congela influenza nei punti del preset per gli export",
-                "Tracking testa ai bordi migliorato con RGB, recupero ruotato e tolleranza delle dimensioni: prova reale confermata dall’utente il 9 ottobre",
-                "Recupero mani con aree sovrapposte, viste ruotate e continuità visiva breve; verificato su casi sintetici, prova reale di taglio ancora da completare"
+                "Quattro sorgenti indipendenti: mano A/B e braccio A/B; attivazione, intensità e verso per ciascuna",
+                "Traslazione, rotazione e dimensione combinate con i parametri della forma corrente, con intensità separate",
+                "Posizione neutra automatica e ricentratura manuale; morbidezza, sensibilità, inversioni e perdita progressiva",
+                "Particelle: attrazione/repulsione, raggio, avvolgimento e profondità manuale per ciascuna sorgente",
+                "Avvio webcam esplicito su HTTPS/localhost, anteprima con braccia e punti, spegnimento delle tracce video",
+                "Impostazioni nei preset, demo senza camera, congelamento della posa o dei campi per export"
               ]
             },
             {
               "label": "remaining",
               "value": [
-                "Riprendere la prova delle mani ai bordi, ruotate, di taglio e negli incroci: rimandata dall’utente",
-                "Tarare guadagni, risposta temporale e raggio sulle forme reali",
-                "Completare calibrazione metrica e validazione off-axis sulla parete",
+                "Verificare dal vivo precisione e latenza con la webcam dell’utente, mani di taglio, braccia incrociate e bordi",
+                "Tarare guadagni e raggio sulle forme reali",
                 "Registrare i gesti come traiettorie modificabili e raccordabili in loop",
-                "Valutare deformazioni locali delle superfici solide dopo la prova dei campi particellari"
+                "Valutare deformazioni locali delle superfici solide oltre ai campi particellari"
               ]
             }
           ]
@@ -12945,9 +12943,9 @@
             {
               "label": "evidence",
               "value": [
-                "reports/pathfinder/body-tracking-check.json",
-                "reports/pathfinder/body-tracking-gpu.json",
-                "reports/pathfinder/body-tracking-hands.json"
+                "reports/hands-arms/model.json",
+                "reports/hands-arms/source.json",
+                "reports/hands-arms/online.json"
               ]
             }
           ]
@@ -12957,10 +12955,10 @@
         "interaction"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "",
-      "where": "",
-      "platform": "PC · calibrazione locale",
-      "next": "Riprendere la prova delle mani ai bordi, ruotate, di taglio e negli incroci: rimandata dall’utente · Tarare guadagni, risposta temporale e raggio sulle forme reali · Completare calibrazione metrica e validazione off-axis sulla parete · Registrare i gesti come traiettorie modificabili e raccordabili in loop · Valutare deformazioni locali delle superfici solide dopo la prova dei campi particellari",
+      "result": "https://frangiacorta.github.io/prisma/?engine=solid&v=38",
+      "where": "Interazione → Mani e braccia",
+      "platform": "Browser · webcam locale",
+      "next": "Verificare dal vivo precisione e latenza con la webcam dell’utente, mani di taglio, braccia incrociate e bordi · Tarare guadagni e raggio sulle forme reali · Registrare i gesti come traiettorie modificabili e raccordabili in loop · Valutare deformazioni locali delle superfici solide oltre ai campi particellari",
       "keep": "",
       "avoid": "",
       "detailsSource": [
