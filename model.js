@@ -1,7 +1,7 @@
-import {STRUCTURE_GROUPS} from './structure-model.js?v=8288d008070e';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=8288d008070e';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=8288d008070e';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=8288d008070e';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=11e11510d06f';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=11e11510d06f';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=11e11510d06f';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=11e11510d06f';
 export const BASE = {
  ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -67,7 +67,7 @@ export const META = {
  bgAngle:['Direzione sfondo',-180,180,1],scale:['Dimensione figura',.35,1.7,.01],positionX:['Posizione orizzontale',-1.5,1.5,.01],positionY:['Posizione verticale',-1.5,1.5,.01],rotateX:['Rotazione verticale',-180,180,1],rotateY:['Rotazione orizzontale',-180,180,1],motion:['Intensità delle oscillazioni',0,1,.01],duration:['Durata di base (secondi)',2,300,.5],speed:['Velocità globale',.25,2,.05]
 };
 export const GROUPS={
- shape:[...STRUCTURE_GROUPS.shape,'volume','stretchX','stretchY','stretchZ','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','cut','cutX','cutY','edge','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','holeAspect','cutAspect'],
+ shape:['baseForm',...STRUCTURE_GROUPS.shape,'volume','stretchX','stretchY','stretchZ','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','cut','cutX','cutY','edge','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','holeAspect','cutAspect'],
  material:['filmPattern','filmPatternScale','filmPatternWarp','filmPatternDetail','filmChroma','filmDuo','transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture','textureDepth','textureScale','textureOrganic','textureAngle','textureWrinkles','textureFolds','textureWear','textureRipples','hollow','wallThickness','translucency','scattering','scatterDirection','thinFilm','filmThickness','subsurface','sssRadius','sssColor','fullness','internalColor','thinShell','renderVersion'],
  color:[...STRUCTURE_GROUPS.color,'palette','gradientAngle','gradientScale','gradientOffset','colorSoftness','glow'],
  light:['lights','environment','environmentAngle','environmentPower','environmentRefraction','environmentRotate','environmentCycles'],

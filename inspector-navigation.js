@@ -35,7 +35,7 @@ export function organizeSections(root,scope){
  }
  // Remove only empty preset wrappers, never sections with live controls.
  for(const d of [...root.querySelectorAll('details')].reverse())if(exampleParents.has(d)&&!d.querySelector('input,select,button,details')&& ![...d.children].some(c=>!c.matches('summary,p.help')))d.remove();
- for(const button of root.querySelectorAll('button[id^="reset-"],#perfect-sphere')){
+ for(const button of root.querySelectorAll('button[id^="reset-"]')){
   const parent=button.closest('details')||root,footer=document.createElement('div');footer.className='section-reset';
   parent.append(footer);footer.append(button);button.classList.remove('full');
  }

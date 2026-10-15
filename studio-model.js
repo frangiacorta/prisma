@@ -1,5 +1,5 @@
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=8288d008070e';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=8288d008070e';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=11e11510d06f';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=11e11510d06f';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
@@ -14,6 +14,7 @@ export const TRACK_META={
  rotateY:['Rotazione orizzontale',0,360,1],rotateX:['Rotazione verticale',0,180,1],rotateZ:['Rotazione sul piano',0,360,1],volume:['Volume',0,.6,.01],deform:['Deformazione',0,.4,.01],twist:['Torsione',0,2,.01],waves:['Increspature',0,.3,.01],hole:['Apertura del vuoto',0,.6,.01],cut:['Ritaglio',0,.8,.01],scale:['Dimensione',0,.7,.01],positionX:['Posizione orizzontale',0,1.2,.01],positionY:['Posizione verticale',0,1.2,.01],gradientOffset:['Scorrimento colori',0,1,.01],iridescence:['Iridescenza',0,.7,.01],roughness:['Rugosità',0,.6,.01],transparency:['Trasparenza',0,.7,.01]
 };
 export const EXTRA_BASE={
+ baseForm:0,
  ...STRUCTURE_DEFAULTS,
  ...FINISH_DEFAULTS,
  petalCollision:0,petalSphereCollision:0,petalContactGap:.006,petalContactStiffness:.65,petalContactPasses:16,
@@ -46,6 +47,7 @@ export const LIGHT_RIGS=[
 ];
 export function legacyLights(s){const build=(id,p)=>{const angle=s[p+'Angle']*Math.PI/180,height=s[p+'Height']*Math.PI/180;return{...newLight(id),visible:true,type:'bar',x:3.2*Math.sin(angle)*Math.cos(height),y:3.2*Math.sin(height),z:3.2*Math.cos(angle)*Math.cos(height),color:s[p+'Color'],power:s[p+'Power'],size:1.7,length:s[p+'Size']*.6,softness:s[p+'Size'],enabled:id===1||s.light2}};return[build(1,'light'),build(2,'light2')]}
 export const EXTRA_META={
+ baseForm:['Forma di base',0,6,1],
  ...STRUCTURE_META,
  petalCollision:['Contatto fra radici',0,1,.01],petalSphereCollision:['Contatto con la sfera',0,1,.01],petalContactGap:['Spazio fra i fili',0,.06,.001],petalContactStiffness:['Rigidità dei fili',0,1,.01],petalContactPasses:['Precisione dei contatti',8,32,1],
  petalDirectionSpread:['Direzioni distribuite',0,1,.01],petalWeave:['Intreccio sopra / sotto',0,1,.01],petalWeaveTurns:['Incroci lungo il percorso',1,4,1],petalFlow:['Scorrimento della materia',0,1,.01],petalFlowPhase:['Posizione dello scorrimento',0,1,.001],petalOrbitPhase:['Avanzamento sulla sfera',0,1,.001],
