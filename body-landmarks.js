@@ -1,12 +1,16 @@
 // Only hand/arm landmarks leave the detector worker. Camera pixels stay local.
-const visible=p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.x<=1&&p.y>=0&&p.y<=1&&(p.visibility??1)>.75&&(p.presence??1)>.75;
+const visible=(p,threshold=.75)=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.x<=1&&p.y>=0&&p.y<=1&&(p.visibility??1)>threshold&&(p.presence??1)>threshold;
 export function limbPoints(hands={},pose={}){
- const points=[],arms=[],p=pose.landmarks?.[0],wrists=[];
+ const points=[],arms=[],diagnostics=[],p=pose.landmarks?.[0],wrists=[];
  for(const [side,s,e,w] of [['a',11,13,15],['b',12,14,16]]){
-  if(![s,e,w].every(i=>visible(p?.[i])))continue;
-  const upper=Math.hypot(p[s].x-p[e].x,p[s].y-p[e].y),lower=Math.hypot(p[e].x-p[w].x,p[e].y-p[w].y);
-  if(upper<.025||lower<.025||upper>.6||lower>.6||upper/lower>3||lower/upper>3)continue;
-  wrists.push({side,point:p[w]});
+  // A trustworthy wrist remains useful even if the shoulder/elbow is occluded.
+  if(visible(p?.[w],.5))wrists.push({side,point:p[w]});
+  const missing=[[s,'spalla'],[e,'gomito'],[w,'polso']].filter(([i])=>!visible(p?.[i],.5)).map(([,name])=>name);
+  diagnostics.push({id:'arm-'+side,missing});
+  if(missing.length)continue;
+  // Projected segment lengths/ratios cannot validate anatomy: foreshortening
+  // can put a visible elbow almost on top of the shoulder. Temporal jump
+  // rejection is handled independently by BodyTrackingState.
   const joints=[p[s],p[e],p[w]].map(({x,y})=>({x,y}));arms.push({id:'arm-'+side,joints});
   points.push({id:'arm-'+side,x:(p[s].x+p[e].x+p[w].x)/3,y:(p[s].y+p[e].y+p[w].y)/3,ageMs:0});
  }
@@ -33,5 +37,5 @@ export function limbPoints(hands={},pose={}){
  if(!p)for(const h of candidates){if(used.has(h.side))continue;used.add(h.side);points.push({id:'hand-'+h.side,x:h.x,y:h.y,ageMs:0});}
  // A visible pose wrist can continue broad movement when fingers turn edge-on.
  for(const w of wrists)if(!used.has(w.side))points.push({id:'hand-'+w.side,x:w.point.x,y:w.point.y,ageMs:0,partial:true});
- return {points,arms};
+ return {points,arms,diagnostics};
 }

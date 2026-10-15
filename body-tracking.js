@@ -1,13 +1,13 @@
-import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=ee2a8198ec2b';
-import {BodyCamera} from './body-camera.js?v=ee2a8198ec2b';
+import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=8288d008070e';
+import {BodyCamera} from './body-camera.js?v=8288d008070e';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountBodyTracking({board,getState,remember,mark,renderControls,showTab,toast,invalidate}){
  const runtime=new BodyTrackingState(),overlay=document.createElement('div');
  overlay.id='body-tracking-overlay';overlay.setAttribute('aria-hidden','true');board.append(overlay);
- let mode='off',connection='',fields=[],arms=[],signature='',lastStatus=0,lastPacket=0;
- const camera=new BodyCamera({onStatus:message=>{connection=message;updateStatus();},onError:message=>{stop();connection=message;updateStatus();},onResult:packet=>{runtime.receive(packet,performance.now());arms=packet.arms;lastPacket=performance.now();}});
+ let mode='off',connection='',fields=[],arms=[],diagnostics=[],signature='',lastStatus=0,lastPacket=0;
+ const camera=new BodyCamera({onStatus:message=>{connection=message;updateStatus();},onError:message=>{stop();connection=message;updateStatus();},onResult:packet=>{runtime.receive(packet,performance.now());arms=packet.arms;diagnostics=packet.diagnostics||[];lastPacket=performance.now();}});
  const settings=()=>normalizeBodyTracking(getState().bodyTracking);
- function stop(){camera.stop();mode='off';connection='';runtime.clear();fields=[];arms=[];signature='';overlay.replaceChildren();invalidate();drawCamera();}
+ function stop(){camera.stop();mode='off';connection='';runtime.clear();fields=[];arms=[];diagnostics=[];signature='';overlay.replaceChildren();invalidate();drawCamera();}
  function status(){
   if(mode==='off')return connection||'Webcam spenta. Avviala oppure prova i gesti simulati.';
   if(mode==='demo')return 'Demo · mani e braccia simulate, webcam spenta';
@@ -16,7 +16,8 @@ export function mountBodyTracking({board,getState,remember,mark,renderControls,s
   const current=fields.filter(p=>!p.lost);
   return current.length?'Rilevati: '+current.map(p=>p.label+(p.partial?' (polso)':'')).join(' · '):'Webcam attiva · inquadra mani, gomiti e spalle. Una persona alla volta.';
  }
- function updateStatus(){const el=document.getElementById('body-tracking-status');if(el&&el.textContent!==status())el.textContent=status();}
+ function diagnosticText(){if(mode!=='camera'||connection!=='Webcam attiva')return '';return diagnostics.map(d=>BODY_LABELS[d.id]+': '+(!settings().sources[d.id]?.enabled?'disattivato nei controlli':d.missing.length?d.missing.join(', ')+' non abbastanza visibili':'spalla, gomito e polso rilevati')).join(' · ');}
+ function updateStatus(){const note=document.getElementById('body-camera-diagnostics');if(note){note.textContent=diagnosticText();note.hidden=!note.textContent;}const el=document.getElementById('body-tracking-status');if(el&&el.textContent!==status())el.textContent=status();}
  function drawCamera(){
   const canvas=document.getElementById('body-camera-preview');if(!canvas)return;
   canvas.hidden=mode!=='camera'||!camera.stream;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -35,6 +36,7 @@ export function mountBodyTracking({board,getState,remember,mark,renderControls,s
    <p id="body-tracking-status" class="help" role="status">${escape(status())}</p>
    <div class="force-actions"><button class="outline" data-body-action="connect">Avvia webcam</button><button class="quiet" data-body-action="stop">Spegni webcam</button><button class="quiet" data-body-action="demo">Prova i gesti</button></div>
    <canvas id="body-camera-preview" class="body-camera-preview" width="320" height="240" hidden aria-label="Anteprima webcam con mani e braccia rilevate"></canvas>
+   <p id="body-camera-diagnostics" class="help" ${diagnosticText()?'':'hidden'}>${escape(diagnosticText())}</p>
    <p class="help">Inquadra mani, gomiti e spalle. I punti A e B sono indicati nel video. Il riconoscimento avviene sul dispositivo; il video non viene registrato né inviato.</p>
    <button class="outline full" data-body-action="centre">Fissa posizione neutra</button>
    <p class="help">Mettiti comodo e premi per partire da qui. La prima posizione rilevata è usata automaticamente come riferimento.</p>

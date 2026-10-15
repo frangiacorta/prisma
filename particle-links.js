@@ -1,7 +1,7 @@
-import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=ee2a8198ec2b';
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=ee2a8198ec2b';
-import {guideGLSL} from './particle-path-field.js?v=ee2a8198ec2b';
-import {forceBarrierGLSL} from './particle-forces.js?v=ee2a8198ec2b';
+import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=8288d008070e';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=8288d008070e';
+import {guideGLSL} from './particle-path-field.js?v=8288d008070e';
+import {forceBarrierGLSL} from './particle-forces.js?v=8288d008070e';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.
