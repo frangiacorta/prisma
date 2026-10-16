@@ -1,4 +1,4 @@
-import {forceToScreen} from './particle-forces.js?v=faae5dff344a';
+import {forceToScreen} from './particle-forces.js?v=5087711c9751';
 // Editor-only volumes, projected through the same camera as their force centres.
 const dot=(a,b)=>a.reduce((n,v,i)=>n+v*b[i],0),norm=a=>{const d=Math.hypot(...a);return a.map(v=>v/d);},cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
 const number=v=>Number(v.toFixed(2)),fmt=v=>(v>0?'+':'')+number(v);

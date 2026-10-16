@@ -1,8 +1,8 @@
-import {BASE_FORM_GLSL} from './base-forms.js?v=faae5dff344a';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=faae5dff344a';
-import {FILM_SPECTRUM} from './solid-renderer.js?v=faae5dff344a';
-import {prismaShadingGLSL} from './particle-shading.js?v=faae5dff344a';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=faae5dff344a';
+import {BASE_FORM_GLSL} from './base-forms.js?v=5087711c9751';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=5087711c9751';
+import {FILM_SPECTRUM} from './solid-renderer.js?v=5087711c9751';
+import {prismaShadingGLSL} from './particle-shading.js?v=5087711c9751';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=5087711c9751';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -68,12 +68,18 @@ void main(){vec2 uv=(gl_FragCoord.xy/uCameraSize.zw*2.-1.)*uCameraSize.xy;uv*=1.
 `;
 const GROOM=`
 uniform sampler2D uRoots,uNormals;
-uniform vec4 uHairA,uHairB,uHairC,uHairD;
+uniform vec4 uHairA,uHairB,uHairC,uHairD,uHairBase;
 uniform float uSeed,uSegments,uScatter,uTube,uSides,uRootCore;
 float rnd(float x){return fract(sin(x*127.1+uSeed)*43758.5453);}
 vec3 guide(float id,float count){float z=1.-2.*(id+.5)/count,a=id*2.39996323+uSeed;return normalize(vec3(cos(a)*sqrt(max(0.,1.-z*z)),sin(a)*sqrt(max(0.,1.-z*z)),z)+uScatter/sqrt(count)*vec3(rnd(id+41.)-.5,rnd(id+71.)-.5,rnd(id+91.)-.5)*2.);}
 float strandLength(float id,float clusterId){float variation=mix(rnd(id+19.),.75*rnd(clusterId+114.)+.25*rnd(id+19.),uHairC.x);return uHairA.x*mix(1.,.12+.88*variation,uHairB.x);}
-float strandRadius(float t,float len){float r=uHairA.y*.5*min(1.,uHairA.x/.025),embed=min(uHairA.y*.65,len*.08),height=len*t-embed*(1.-smoothstep(0.,.3,t)),foot=min(len*.2,r*1.5),q=clamp(1.-height/max(.00001,foot),0.,1.);return r*(mix(1.,max(.002,pow(max(0.,1.-t),.85)),uHairA.z)*mix(smoothstep(0.,.035,t),1.,uRootCore)+uRootCore*1.2*(1.-sqrt(max(.000001,1.-q*q))));}
+float baseHeight(float len,float r){return min(len*.4,r*uHairBase.y);}
+float strandRadius(float t,float len){
+ float r=uHairA.y*.5*min(1.,uHairA.x/.025),embed=min(uHairA.y*.65,len*.08),height=len*t-embed*(1.-smoothstep(0.,.3,t));
+ float q=clamp(1.-height/max(.00001,baseHeight(len,r)),0.,1.);
+ float profile=mix(q,1.-sqrt(max(0.,1.-q*q)),uHairBase.z);
+ return r*(mix(1.,max(.002,pow(max(0.,1.-t),.85)),uHairA.z)+uHairBase.x*profile);
+}
 vec3 strand(vec3 root,vec3 n,float id,float clusterId,float t){
  vec3 axis=abs(n.y)<.95?vec3(0,1,0):vec3(1,0,0),b=normalize(cross(n,axis)),c=cross(n,b);
  float az=rnd(id+7.)*6.2831853;vec3 side=b*cos(az)+c*sin(az),around=normalize(cross(vec3(0,1,.0001),n));
@@ -91,14 +97,16 @@ vec3 strand(vec3 root,vec3 n,float id,float clusterId,float t){
 const HAIR_VERT=HEADER+SPACE+GROOM+`
 out vec3 vWorld,vTangent,vNormal;out vec2 vAcross;out float vAlong,vRandom,vCoverage,vJoin;
 void main(){int id=gl_InstanceID,vertex=gl_VertexID,faces=uTube>.5?int(uSides):1,seg=vertex/(6*faces),facet=(vertex/6)%faces,k=vertex%6;
- float end=(k==1||k==2||k==4)?1.:0.,side=(k==0||k==1||k==3)?-1.:1.,t=(float(seg)+end)/uSegments;if(uTube>.5)t=t*t;
+ float end=(k==1||k==2||k==4)?1.:0.,side=(k==0||k==1||k==3)?-1.:1.,t=(float(seg)+end)/uSegments;
  ivec2 at=ivec2(id%256,id/256);vec4 root=texelFetch(uRoots,at,0),nr=texelFetch(uNormals,at,0);
  if(root.w<.5){gl_Position=vec4(2,2,2,1);vCoverage=0.;return;}
+ float len=strandLength(float(id),nr.w);
+ if(uTube>.5){float foot=min(.45,(min(uHairA.y*.65,len*.08)+baseHeight(len,uHairA.y*.5))/max(.00001,len));float focused=t<.3?foot*pow(t/.3,1.4):mix(foot,1.,(t-.3)/.7);t=mix(t*t,focused,smoothstep(0.,.15,uHairBase.x));}
  vec3 p=strand(root.xyz,nr.xyz,float(id),nr.w,t),next=strand(root.xyz,nr.xyz,float(id),nr.w,min(1.,t+.002)),prev=strand(root.xyz,nr.xyz,float(id),nr.w,max(0.,t-.002));
  vec3 tangent=normalize(next-prev),right=cross(tangent,uCameraZ);right=length(right)<.00001?uCameraX:normalize(right);
- float len=strandLength(float(id),nr.w),radius=strandRadius(t,len)*uFrame.x;
+ float radius=strandRadius(t,len)*uFrame.x;
  float rootRadius=uHairA.y*.5*min(1.,uHairA.x/.025),height=len*t-min(uHairA.y*.65,len*.08)*(1.-smoothstep(0.,.3,t));
- vJoin=uRootCore*(1.-smoothstep(0.,max(.00001,min(len*.2,rootRadius*1.5)),height));
+ vJoin=uRootCore*uHairBase.w*smoothstep(0.,.15,uHairBase.x)*(1.-smoothstep(0.,max(.00001,baseHeight(len,rootRadius)),height));
  float pixel=2.*uCameraSize.y/uCameraSize.w,aa=max(radius,pixel*.55),coverage=min(1.,radius/(pixel*.55));
  vNormal=vec3(0);vWorld=p;vTangent=tangent;vAcross=vec2(side,radius);vAlong=t;vRandom=rnd(float(id)+4.);vCoverage=coverage;
  if(uTube>.5){
@@ -111,7 +119,7 @@ void main(){int id=gl_InstanceID,vertex=gl_VertexID,faces=uTube>.5?int(uSides):1
  }else gl_Position=project(p+right*side*aa);}
 `;
 const HAIR_FRAG=HEADER+`
-in vec3 vWorld,vTangent,vNormal;uniform float uTube,uRepOpacity;in vec2 vAcross;in float vAlong,vRandom,vCoverage,vJoin;
+in vec3 vWorld,vTangent,vNormal;uniform float uTube,uRepOpacity,uStrandSilk;in vec2 vAcross;in float vAlong,vRandom,vCoverage,vJoin;
 uniform sampler2D uRootScene;uniform vec2 uViewSize;
 uniform sampler2D uShadow;
 uniform vec3 uShadowX,uShadowY,uShadowZ;
@@ -123,15 +131,15 @@ float hairShadow(vec3 p){vec2 uv=vec2(dot(p,uShadowX),dot(p,uShadowY))/uShadowEx
  float sum=0.;for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++){float d=texture(uShadow,uv+vec2(x,y)/2048.).r;sum+=depth<=d?1.:0.;}return .3+.7*sum/9.;}
 ${prismaShadingGLSL.replace('lit+=power*','if(i==0)power*=hairShadow(p);lit+=power*')}
 vec3 photoHair(vec3 c){c=max(vec3(0),c*exp2(uPhoto1.x));c=mat3(.59719,.076,.0284,.35458,.90834,.13383,.04823,.01566,.83777)*c;c=(c*(c+.0245786)-.000090537)/(c*(.983729*c+.432951)+.238081);c=clamp(mat3(1.60475,-.10208,-.00327,-.53108,1.10813,-.07276,-.07367,-.00605,1.07602)*c,0.,1.);c=mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(vec3(.0031308),c));c+=uPhoto1.y;float lum=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(lum),c,uPhoto1.w);c=(c-.5)*uPhoto1.z+.5;c+=uPhoto3.x*pow(max(0.,1.-lum),2.)+uPhoto3.y*pow(max(0.,lum),2.);c*=vec3(1.+uPhoto2.x*.18+uPhoto2.y*.08,1.-uPhoto2.y*.14,1.-uPhoto2.x*.18+uPhoto2.y*.08);return pow(max(c,vec3(0)),vec3(1./uPhoto4.x))*(1.-uPhoto2.z*smoothstep(.3,2.4,length(vWorld.xy)));}
-void main(){gl_FragDepth=gl_FragCoord.z;float barrier;sculptMap(vWorld,barrier);if(barrier>.0001)discard;float edge=1.-smoothstep(.7,1.,abs(vAcross.x)),alpha=edge*vCoverage*mix(1.,.08,uHairColor.w)*uRepOpacity;
+void main(){gl_FragDepth=gl_FragCoord.z;float barrier;sculptMap(vWorld,barrier);if(barrier>.0001)discard;float edge=1.-smoothstep(.7,1.,abs(vAcross.x)),baseAlpha=edge*vCoverage*mix(1.,.08,uHairColor.w),alpha=1.-pow(max(.0001,1.-baseAlpha),uRepOpacity);
  if(alpha<.001)discard;if(uOpaquePass>.5&&(vCoverage<.999||uHairColor.w>.05||uRepOpacity<.999))discard;if(uOpaquePass<.5&&uShadowPass<.5&&vCoverage>=.999&&uHairColor.w<=.05&&uRepOpacity>=.999)discard;if(uShadowPass>.5){if(alpha<fract(sin(dot(floor(gl_FragCoord.xy),vec2(12.9898,78.233)))*43758.5453))discard;color=vec4(1);return;}
  vec3 view=vec3(0,0,1),right=normalize(cross(vTangent,view)+vec3(.000001,0,0)),radial=normalize(view-vTangent*dot(view,vTangent)+vec3(0,.000001,0));
  vec3 n=uTube>.5?normalize(vNormal):normalize(radial*sqrt(max(0.,1.-vAcross.x*vAcross.x))+right*vAcross.x);
  
  float index=clamp(vAlong+(vRandom-.5)*uHairColor.y,0.,.99999)*float(max(1,uPaletteCount-1));int a=int(floor(index)),b=min(a+1,uPaletteCount-1);vec3 along=mix(uPalette[a],uPalette[b],fract(index));
- float attachment=uRootCore*(1.-smoothstep(.015,.14,vAlong));
+ float attachment=clamp(vJoin,0.,1.);
  vec3 base=mix(prismaPalette(vWorld,along),along,uHairColor.x*(1.-attachment));base*=mix(1.-uHairColor.z*.9*(1.-attachment),1.,smoothstep(0.,.85,vAlong));
- vec3 lit=shadeMatter(base,vWorld,n,normalize(vTangent),uTube>.5?.15:1.);
+ vec3 lit=shadeMatter(base,vWorld,n,normalize(vTangent),uStrandSilk);
  // The short geometric fillet inherits the already shaded parent surface at its seam.
  vec3 shaded=mix(photoHair(lit),texture(uRootScene,gl_FragCoord.xy/uViewSize).rgb,clamp(vJoin,0.,1.));
  if(uOpaquePass>.5){gl_FragDepth=gl_FragCoord.z-(uTube>.5?0.:sqrt(max(0.,1.-vAcross.x*vAcross.x))*vAcross.y/24.);color=vec4(shaded,alpha);extinction=vec4(0);return;}alpha=min(.98,alpha);float weight=clamp(pow(1.-gl_FragCoord.z,12.)*5000.,.02,100.);color=vec4(shaded*alpha*weight,alpha*weight);extinction=vec4(-log(max(.001,1.-alpha)),0,0,0);}
@@ -153,10 +161,10 @@ export class FilamentPass{
  hair(s,camera,w,h,phase){const physical=Math.max(0,Math.min(1,(s.filWidth-.006)/.006)),projected=camera.shadow?0:Math.max(0,Math.min(1,(s.filWidth*.5*s.scale*h/(2*camera.ey)-.6)/.8)),x=Math.max(physical,projected),mix=x*x*(3-2*x);if(mix<1)this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)this.hairPart(s,camera,w,h,phase,true,mix);}
  hairPart(s,camera,w,h,phase,tube,opacity){const g=this.gl,p=this.hairProgram;this.common(p,s,camera,w,h);this.tex(p,'uRoots',this.roots.textures[0],0);this.tex(p,'uNormals',this.roots.textures[1],1);this.tex(p,'uShadow',camera.shadow?this.roots.textures[0]:this.shadow.depth,2);
  const pixelsPerUnit=s.scale*h/(2*camera.ey),radiusPixels=s.filWidth*.5*pixelsPerUnit;
- const sides=Math.max(8,Math.min(24,Math.ceil(Math.PI*Math.sqrt(Math.max(1,radiusPixels)/.18)/2)*2));
+ const sides=Math.max(12,Math.min(32,Math.ceil(Math.PI*Math.sqrt(Math.max(1,radiusPixels*(1+s.filBaseWidth))/.12)/2)*2));
  const curvature=.08+Math.abs(s.filBend)*.3+Math.abs(s.filComb)*.25+s.filClump*.5+s.filCurl*4+s.filFrizz*6+s.filWind;
  const segments=Math.max(24,Math.min(112,Math.ceil(Math.sqrt(s.filLength*pixelsPerUnit*curvature)*2.2/4)*4));
- this.tex(p,'uRootScene',this.scene,5);this.u(p,'uViewSize',w,h);this.u(p,'uRootCore',s.filCore*(1-s.transparency));this.u(p,'uRepOpacity',opacity);this.u(p,'uTube',+tube);this.u(p,'uSides',sides);this.u(p,'uOpaquePass',camera.opaque?1:0);this.u(p,'uSegments',segments);this.u(p,'uHairA',s.filLength,s.filWidth,s.filTaper,0);this.u(p,'uHairB',s.filVariation,s.filBend,s.filComb,s.filCurl);this.u(p,'uHairC',s.filClump,s.filClumps,s.filSpread,s.filFrizz);this.u(p,'uHairD',s.filPhase,s.filWind,0,0);this.u(p,'uHairColor',s.filColor,s.filColorScatter,s.filRootShade,s.transparency);this.u(p,'uShadowX',...this.lightCamera.x);this.u(p,'uShadowY',...this.lightCamera.y);this.u(p,'uShadowZ',...this.lightCamera.z);this.u(p,'uShadowExtent',this.lightCamera.ex);
+ this.tex(p,'uRootScene',this.scene,5);this.u(p,'uViewSize',w,h);this.u(p,'uRootCore',s.filCore*(1-s.transparency));this.u(p,'uHairBase',s.filBaseWidth,s.filBaseHeight,s.filBaseCurve,s.filBaseBlend);const silk=Math.max(0,Math.min(1,(s.filWidth-.006)/.014));this.u(p,'uStrandSilk',1-.85*silk*silk*(3-2*silk));this.u(p,'uRepOpacity',opacity);this.u(p,'uTube',+tube);this.u(p,'uSides',sides);this.u(p,'uOpaquePass',camera.opaque?1:0);this.u(p,'uSegments',segments);this.u(p,'uHairA',s.filLength,s.filWidth,s.filTaper,0);this.u(p,'uHairB',s.filVariation,s.filBend,s.filComb,s.filCurl);this.u(p,'uHairC',s.filClump,s.filClumps,s.filSpread,s.filFrizz);this.u(p,'uHairD',s.filPhase,s.filWind,0,0);this.u(p,'uHairColor',s.filColor,s.filColorScatter,s.filRootShade,s.transparency);this.u(p,'uShadowX',...this.lightCamera.x);this.u(p,'uShadowY',...this.lightCamera.y);this.u(p,'uShadowZ',...this.lightCamera.z);this.u(p,'uShadowExtent',this.lightCamera.ex);
  this.u(p,'uMaterial',s.metal,s.roughness,s.gloss,s.iridescence);this.u(p,'uFinish',s.emission,1,1,1);this.u(p,'uFiberLight',1,.35);this.u(p,'uFilmPattern',s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5);this.u(p,'uFilmAccent',s.filmChroma||0,s.filmDuo||0);this.u(p,'uFilmLayer',s.film||s.thinFilm||0,s.iridScale||1,s.filmVariation||0,0);this.u(p,'uParticleFilmMotion',phase*(s.filmCycles||1),s.filmFlow||0,s.filmSwirl||0,0);this.u(p,'uFilmObject',s.scale,s.positionX,s.positionY,0);this.u(p,'uFilmRotation',s.rotateX*Math.PI/180,s.rotateY*Math.PI/180,s.rotateZ*Math.PI/180);g.uniform3fv(p.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(p.locations.uFilmWhite,FILM_SPECTRUM.white);this.u(p,'uPearl',s.iridShift||0,s.filmThickness||420);this.u(p,'uEnvironment',['studio','sunset','neon','sky','aquarium','aurora','city'].indexOf(s.environment),s.environmentAngle*Math.PI/180,s.environmentPower,0);this.u(p,'uGradient',s.gradientAngle*Math.PI/180,s.gradientScale,s.gradientOffset,1);this.u(p,'uColorSoftness',s.colorSoftness);this.u(p,'uColorWave',s.colorWaveAmount,s.colorWaveBands,s.colorWavePhase*Math.PI*2,0);this.u(p,'uColorWave2',s.colorWaveHeight,s.colorWaveRadius,s.colorWaveSwirl,s.colorWaveWarp);g.uniform1i(p.locations.uPaletteCount,s.palette.length);g.uniform3fv(p.locations.uPalette,s.palette.flatMap(rgb));const lights=s.lights.filter(l=>l.enabled).slice(0,8);g.uniform1i(p.locations.uLightCount,lights.length);if(lights.length){g.uniform4fv(p.locations.uLights,lights.flatMap(l=>[l.x,l.y,l.z,l.power]));g.uniform3fv(p.locations.uLightColors,lights.flatMap(l=>rgb(l.color)));g.uniform1fv(p.locations.uLightSizes,lights.map(l=>l.size));}
  this.u(p,'uPhoto1',s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1);this.u(p,'uPhoto2',s.temperature||0,s.photoTint||0,s.vignette||0,0);this.u(p,'uPhoto3',s.blacks||0,s.highlights||0,0,0);this.u(p,'uPhoto4',s.gamma||1,0,0,0);g.drawArraysInstanced(g.TRIANGLES,0,segments*6*(tube?sides:1),Math.round(s.filCount));}
  draw(frame,phase,w,h,solid,options={}){const s={...FILAMENT_DEFAULTS,...frame};if(s.filLength<=.000001)return;const g=this.gl;

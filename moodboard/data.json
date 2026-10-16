@@ -14659,7 +14659,7 @@
           "fields": [
             {
               "label": "implemented",
-              "value": "19 controlli combinabili in Forma, Colori e Movimento. Curve con dettaglio proporzionato alla dimensione sullo schermo; sezioni 3D anche per i fili visibili nelle macro. Spine con sezione stabile e raccordi curvi alla superficie. Ombre dalla luce principale, palette comune e movimento ciclico delle punte."
+              "value": "23 controlli combinabili. Svasatura, altezza e profilo della base indipendenti; raccordo del colore con la superficie. Dettaglio 3D adattivo allo zoom, luce tangente conservata sui fili sottili e transizione continua fra rappresentazioni. Movimento ciclico delle punte, palette e materiali comuni."
             }
           ]
         },
@@ -14783,7 +14783,7 @@
           "fields": [
             {
               "label": "evidence",
-              "value": "v47: macro native a 2048 px, confronto con la versione precedente, curve adattive allo zoom, spine con sezione tonda e raccordo alla superficie. Due video di 6 secondi a 24 fps con camera e corpo fermi: si muovono soltanto i filamenti. Verificati 19 controlli, continuità, preset, campi, export e loop. Prove locali in reports/filament-planets/macro-fixed."
+              "value": "v48: confronto delle quattro basi a parità di forma, nuovi dettagli blu e rame ottenuti da render nativi a 4096 px. Verificati tutti i 23 parametri, preset, base disattivata, continuità, loop, export e combinazioni. Le immagini precedenti e i video a camera ferma documentano v46/v47. Raccordo visivo e geometrico, non fusione volumetrica. Le macro non sono ancora equivalenti alle reference per profondità e trasporto della luce."
             }
           ]
         },
@@ -14803,16 +14803,31 @@
         "cloud"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "../?engine=solid&v=47",
-      "where": "Forma > Filamenti e spine; Movimento > Filamenti e spine; Colori > Colore dei filamenti.",
+      "result": "../?engine=solid&v=48",
+      "where": "Forma > Filamenti e spine > Base; Colori > Colore dei filamenti; Movimento > Filamenti e spine.",
       "platform": "",
-      "next": "Appendici lunghe e fasci appiattiti; misurare la qualità adattiva su telefono reale.",
+      "next": "Raffinare profondità e luce nelle macro, appendici lunghe e fasci appiattiti; misura su telefono reale.",
       "keep": "Volume pieno e controllabile, passaggio dal globo al dettaglio, filamenti persistenti e palette sulla singola fibra.",
       "avoid": "Anello fisso al centro, scie dipendenti dagli FPS usate come finto pelo, migliaia di tubi pesanti, colore sovrapposto allo schermo.",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "../previews/filamenti-basi.webp",
+          "width": 1280,
+          "height": 1360
+        },
+        {
+          "src": "../previews/filamenti-blu-macro.png",
+          "width": 900,
+          "height": 900
+        },
+        {
+          "src": "../previews/filamenti-blu-sfera.png",
+          "width": 768,
+          "height": 768
+        },
         {
           "src": "../previews/filamenti-qualita.webp",
           "width": 1200,
@@ -14837,7 +14852,7 @@
       "resultImage": "../previews/filamenti-qualita.webp",
       "resultVideo": "../previews/filamenti-movimento.mp4",
       "engine": "solid",
-      "resultUrl": "../?engine=solid&v=47"
+      "resultUrl": "../?engine=solid&v=48"
     },
     {
       "id": "roadmap-soft-knots",

@@ -1,7 +1,11 @@
-import {AUDIO_HELP} from './audio-model.js?v=faae5dff344a';
+import {AUDIO_HELP} from './audio-model.js?v=5087711c9751';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  filLength:'Fa crescere filamenti sulla superficie della forma corrente. Zero conserva esattamente la forma iniziale. Lunghezza e spessore sono nello spazio 3D, non in pixel.',
+ filBaseWidth:'Allargamento della base rispetto al raggio del filo. Zero elimina la svasatura. Non modifica lo spessore del resto del filamento.',
+ filBaseHeight:'Estensione del raccordo lungo il filo, misurata rispetto al suo raggio. Non cambia la lunghezza complessiva.',
+ filBaseCurve:'Zero produce una base conica; uno un raccordo arrotondato. La svasatura deve essere maggiore di zero.',
+ filBaseBlend:'Quanto il colore della base si raccorda alla superficie visibile. Zero mantiene il materiale del filo; uno raccorda completamente il bordo. Non cambia la geometria.',
  filWidth:'Diametro alla base: valori piccoli producono pelo e filamenti; valori maggiori aghi e spine con volume e ombre.',
  filCore:'Presenza della superficie sotto i filamenti. Uno conserva il corpo pieno; zero lascia i soli filamenti. Non cambia i punti di nascita e non agisce con Lunghezza zero.',
  filClump:'Raccoglie i fili intorno a guide distribuite sull’intera forma. Numero di ciuffi ne regola la scala; Apertura separa le estremità.',

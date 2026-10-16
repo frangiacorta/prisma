@@ -1,4 +1,4 @@
-import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=faae5dff344a';
+import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=5087711c9751';
 // Layered sheets share Prisma's renderer, palette, lights, loop and export.
 export const VEIL_DEFAULTS={pVeilSourceKind:0,pVeilFromForm:0,pVeilMorph:1,pVeilMemory:.35,pVeilStyle:0,pVeilLayers:6,pVeilSpread:.72,pVeilSpacing:.09,pVeilTwist:.6,pVeilRipple:.12,pVeilFolds:5,pVeilAsymmetry:.55,pVeilOpacity:.27,pVeilEdge:.55,pVeilFeather:.025,pVeilCoreRadius:.2,pVeilCoreDark:1,pVeilLayerColor:.25,pVeilBreath:.18,pVeilFlow:.3,pVeilDelay:.18,pVeilCycles:1,pVeilRhythm:.25};
 export const VEIL_META={
