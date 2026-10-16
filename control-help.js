@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=16723df41639';
+import {AUDIO_HELP} from './audio-model.js?v=adcb7f564c42';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  filLength:'Fa crescere filamenti sulla superficie della forma corrente. Zero conserva esattamente la forma iniziale. Lunghezza e spessore sono nello spazio 3D, non in pixel.',
