@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=5087711c9751';
+import {AUDIO_HELP} from './audio-model.js?v=16723df41639';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  filLength:'Fa crescere filamenti sulla superficie della forma corrente. Zero conserva esattamente la forma iniziale. Lunghezza e spessore sono nello spazio 3D, non in pixel.',
@@ -11,7 +11,7 @@ const HELP={
  filClump:'Raccoglie i fili intorno a guide distribuite sull’intera forma. Numero di ciuffi ne regola la scala; Apertura separa le estremità.',
  filPhase:'Fase dell’oscillazione delle punte. Richiede Oscillazione delle punte sopra zero. Zero e uno coincidono; attiva la traccia Scorrimento per il movimento continuo.',
  filWind:'Ampiezza dell’oscillazione delle punte. Le basi restano ancorate alla forma. La traccia Scorrimento regola velocità, verso, pause e accelerazione.',
- filColor:'Mescola la colorazione della forma con la palette distribuita dalla base alla punta di ogni filamento. Non cambia la palette salvata.',
+ filColor:'A zero eredita sfumature e pigmenti nel punto di nascita sulla forma. A uno distribuisce la palette dalla base alla punta. Pellicola, luci e materiale restano quelli della creazione.',
  filCount:'Numero di filamenti distribuiti sulla superficie. Valori elevati richiedono più lavoro alla GPU; non modifica il numero delle particelle.',
  loopAmount:'Trasforma gradualmente il volume iniziale in un anello. Zero mantiene la forma di partenza. Gli altri controlli geometrici e la materia restano combinabili.',
  loopKnot:'Separa i due passaggi dell’anello in un percorso annodato chiuso. Richiede Apertura ad anello. Uno spessore elevato può fondere i passaggi.',

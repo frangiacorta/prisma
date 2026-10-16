@@ -1,4 +1,4 @@
-import {samplePath} from './particle-paths.js?v=5087711c9751';
+import {samplePath} from './particle-paths.js?v=16723df41639';
 // Manual sculpting fields live in scene space, independently of the object transform.
 // The inverse map keeps the original material, topology and animation composable.
 export const hasSolidForces=s=>(s.forcePoints||[]).some(p=>p.enabled&&(Math.abs(p.strength)>1e-6||Math.abs(p.swirl)>1e-6))||(s.forcePaths||[]).some(p=>p.enabled&&p.strength>1e-6);

@@ -1,6 +1,6 @@
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=5087711c9751';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=5087711c9751';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=5087711c9751';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=16723df41639';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=16723df41639';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=16723df41639';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -1731,3 +1731,15 @@ export function startWallpaper(canvas,source){
  raf=requestAnimationFrame(frame);
  return {stop(){stopped=true;cancelAnimationFrame(raf);renderer.dispose();status.remove();},getStats(){return {paused,limit,width:canvas.width,height:canvas.height,gpuMilliseconds:renderer.gpuMilliseconds,growthUploads:renderer.growthUploads||0,bakeUploads:renderer.bakeUploads||0,bakeWarmups:renderer.bakeWarmups||0,fieldResolution:renderer.fieldResolution||0,fieldAllocations:renderer.fieldAllocations||0,completedFrames:renderer.completedFrames,phase};}};
 }
+
+// The strand pass uses the same final material functions as the surface shader.
+// Extract complete functions after the modern shader substitutions, so palette,
+// spectral substrate and environment fixes cannot silently diverge between passes.
+export const FORM_MATERIAL_GLSL=['palette','colorCoordinate','layeredPigment','surfacePalette','fixture','envLight','environment','fresnel','xyzRGB','soapFilm','absorptionCoefficient','organicHash','organicNoise','materialRelief','reliefNormal'].map(name=>{
+ const start=MODERN_FRAG.search(new RegExp('(?:vec[234]|float|bool|void)\\s+'+name+'\\s*\\('));
+ if(start<0)throw Error('Missing shared surface function: '+name);
+ let end=MODERN_FRAG.indexOf('{',start)+1,depth=1;
+ while(depth&&end<MODERN_FRAG.length){depth+=(MODERN_FRAG[end]==='{')-(MODERN_FRAG[end]==='}');end++;}
+ if(depth)throw Error('Incomplete shared surface function: '+name);
+ return MODERN_FRAG.slice(start,end);
+}).join('\n');

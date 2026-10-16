@@ -14659,7 +14659,7 @@
           "fields": [
             {
               "label": "implemented",
-              "value": "23 controlli combinabili. Svasatura, altezza e profilo della base indipendenti; raccordo del colore con la superficie. Dettaglio 3D adattivo allo zoom, luce tangente conservata sui fili sottili e transizione continua fra rappresentazioni. Movimento ciclico delle punte, palette e materiali comuni."
+              "value": "23 controlli combinabili. Base regolabile; pigmenti ereditati nel punto di nascita. Palette, pellicola spettrale, ambiente, luci, anisotropia e rilievi usano le funzioni della forma. Trasparenza continua senza retino casuale; antialiasing aggiuntivo dei fili trasparenti sulle GPU compatibili e fino a 4 megapixel."
             }
           ]
         },
@@ -14783,7 +14783,7 @@
           "fields": [
             {
               "label": "evidence",
-              "value": "v48: confronto delle quattro basi a parità di forma, nuovi dettagli blu e rame ottenuti da render nativi a 4096 px. Verificati tutti i 23 parametri, preset, base disattivata, continuità, loop, export e combinazioni. Le immagini precedenti e i video a camera ferma documentano v46/v47. Raccordo visivo e geometrico, non fusione volumetrica. Le macro non sono ancora equivalenti alle reference per profondità e trasporto della luce."
+              "value": "v49: verifiche locali su una creazione con 54.100 fili e materiale metallico trasparente con pellicola. Confronto a parametri invariati, controlli ottici, trasparenza, export e fallback grafico. Le immagini della scheda documentano v46–v48; i video v46/v47. Il trasporto nei singoli fili resta approssimato: non viene tracciata la rifrazione completa fra fibre sovrapposte."
             }
           ]
         },
@@ -14803,7 +14803,7 @@
         "cloud"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "../?engine=solid&v=48",
+      "result": "../?engine=solid&v=49",
       "where": "Forma > Filamenti e spine > Base; Colori > Colore dei filamenti; Movimento > Filamenti e spine.",
       "platform": "",
       "next": "Raffinare profondità e luce nelle macro, appendici lunghe e fasci appiattiti; misura su telefono reale.",
@@ -14852,7 +14852,7 @@
       "resultImage": "../previews/filamenti-qualita.webp",
       "resultVideo": "../previews/filamenti-movimento.mp4",
       "engine": "solid",
-      "resultUrl": "../?engine=solid&v=48"
+      "resultUrl": "../?engine=solid&v=49"
     },
     {
       "id": "roadmap-soft-knots",
