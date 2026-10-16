@@ -1,6 +1,6 @@
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=0e01fd44d321';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=0e01fd44d321';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField} from './structure-model.js?v=0e01fd44d321';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=4d2cde175a7f';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=4d2cde175a7f';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=4d2cde175a7f';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -57,7 +57,7 @@ export function sampleFrame(source,phase=0){
  const s={...source,lights:(source.lights||[]).map(l=>({...l}))};
 
  for(const [key,t] of Object.entries(source.motions||{})){
-  if(!t.enabled||rootMotionSuspended(source,key))continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset'||key==='colorWavePhase'||key==='petalPhase'||key==='petalFlowPhase'||key==='petalOrbitPhase'||key==='structFlowPhase');
+  if(!t.enabled||rootMotionSuspended(source,key))continue;const continuous=t.mode==='cycle'&&(key.startsWith('rotate')||key==='gradientOffset'||key==='colorWavePhase'||key==='petalPhase'||key==='petalFlowPhase'||key==='petalOrbitPhase'||key==='structFlowPhase'||key==='loopPhase');
   const value=continuous?(motionClock(t,phase,source)/TAU)*(key.startsWith('rotate')||key==='petalPhase'?360:1):motionWave(t,phase,source)*(t.amplitude||0)*(key.startsWith('pVeil')?1:(source.motion??.3)/.3);
   s[key]=(source[key]??(key==='petalGrowth'?1:0))+value;if(MOTION_LIMITS[key]&&!continuous)s[key]=Math.max(MOTION_LIMITS[key][0],Math.min(MOTION_LIMITS[key][1],s[key]));
  }
@@ -782,7 +782,7 @@ MODERN_FRAG=MODERN_FRAG.replace('fragColor=vec4(clamp(premultiplied/max(alpha,.0
 MODERN_FRAG=MODERN_FRAG.replace(/\n}\n$/, '\n if(uSampling.z>.5){if(transparentExport())fragColor.rgb*=fragColor.a;else fragColor.a=clamp(coverage*surface.a+halo,0.,1.);fragColor*=uSampling.w;}\n}\n');
 MODERN_FRAG=MODERN_FRAG.replace('vec3 fieldParts(vec3 world){',BASE_FORM_GLSL+'\n'+STRUCTURE_GLSL+'\nvec3 fieldParts(vec3 world){');
 MODERN_FRAG=MODERN_FRAG.replace('p/=vec3(uShape.y,uShape.z,volume);','p/=vec3(uShape.y,uShape.z,volume);p=structureWarp(p);');
-MODERN_FRAG=MODERN_FRAG.replace('float hole=-10000.,cut=-10000.;','d=structureField(d,p);float hole=-10000.,cut=-10000.;');
+MODERN_FRAG=MODERN_FRAG.replace('float hole=-10000.,cut=-10000.;','d=loopBlend(d,p);d=structureField(d,p);float hole=-10000.,cut=-10000.;');
 MODERN_FRAG=MODERN_FRAG.replace('float d=norm-1.-uWarp.x*w-uOther.z*ripple*.17-lobe;', 'float d=(uBaseForm>.5?baseFormField(p)+norm-length(p):norm-1.)-uWarp.x*w-uOther.z*ripple*.17-lobe;');
 MODERN_FRAG=MODERN_FRAG.replace('float sx=sin(p.x*3.4+uSeed)', 'if(uBaseForm>.5)gradient+=baseFormGradient(p)-p/max(length(p),.000001);float sx=sin(p.x*3.4+uSeed)');
 MODERN_FRAG=MODERN_FRAG.replace('vec3 parts=vec3(norm-1.-uWarp.x*sx', 'vec3 parts=vec3((uBaseForm>.5?baseFormField(p)+norm-length(p):norm-1.)-uWarp.x*sx');
@@ -1153,6 +1153,15 @@ MODERN_FRAG=MODERN_FRAG.replace('(field(point+direction*.0005)-field(point-direc
 MODERN_FRAG=MODERN_FRAG.replace('float outer=field(point);if(!outerOnly&&hasCavity()&&-outer-wallDepth()>outer)derivative=-derivative;','if(!outerOnly&&hasCavity()){float outer=field(point);if(-outer-wallDepth()>outer)derivative=-derivative;}');
 MODERN_FRAG=MODERN_FRAG.replace('vec3 n=surfaceNormal(p);float d=field(p);return hasCavity()&&-d-wallDepth()>d?-n:n;','vec3 n=surfaceNormal(p);if(!hasCavity())return n;float d=field(p);return -d-wallDepth()>d?-n:n;');
 const SCULPT_ENABLED=1048576;
+const LOOP_ENABLED=2097152,SIMPLE_LOOP_STRUCTURE=4194304,SIMPLE_LOOP_FIELD=8388608;
+const LOOP_STRUCTURE_MODIFIERS=['structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structFibres','structSlices','structRadial','structLayers'];
+const LOOP_BASE_MODIFIERS=['baseForm','deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'];
+function loopVariant(source){
+ if(!(source.loopAmount>0||source.motions?.loopAmount?.enabled))return 0;
+ const complex=LOOP_STRUCTURE_MODIFIERS.some(k=>Math.abs(source[k]||0)>.000001||source.motions?.[k]?.enabled);
+ const plain=!complex&&!hasSolidForces(source)&&!LOOP_BASE_MODIFIERS.some(k=>Math.abs(source[k]||0)>.000001||source.motions?.[k]?.enabled);
+ return LOOP_ENABLED+(complex?0:SIMPLE_LOOP_STRUCTURE)+(plain?SIMPLE_LOOP_FIELD:0);
+}
 const SCULPT_FRAG=withSolidForces(MODERN_FRAG);
 const SCULPT_PREVIEW_FRAG=withSolidForces(PREVIEW_FRAG);
 const FIELD_KEYS=['baseForm',...STRUCTURE_FIELD_KEYS,'deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','petalAmount','petalCoverage','stemAmount','stemRadius','stemBend'];
@@ -1215,7 +1224,7 @@ export function fieldAt(s,point){
  const lobe=Math.sin(Math.atan2(p[1],p[0])*(s.lobes||5))*(s.lobeAmount||0)*(1-Math.min(1,Math.abs(p[2]))*.65);
  let d=(s.baseForm>0?baseFormField(p,s.baseForm)+norm-Math.hypot(...p):norm-1)-s.deform*wave-s.waves*ripple*.17-lobe;
  if(s.renderVersion>=2){if((s.petalAmount||0)>.000001)d=d*(1-s.petalAmount)+(crownAt(s,p)-s.deform*wave*.35-s.waves*ripple*.08)*s.petalAmount;if((s.stemAmount||0)>.000001)d=softMin(d,stemAt(s,p),.08*Math.min(1,s.stemAmount*8));}
- if(s.renderVersion>=2)d=structureField(s,d,p);
+ if(s.renderVersion>=2)d=structureField(s,loopBlend(s,d,p),p);
  const pow=2+s.holeShape*5;
  const hole=s.hole>.001?s.hole-Math.pow(Math.pow(Math.abs((p[0]-s.holeX)/(s.holeAspect||1)),pow)+Math.pow(Math.abs(p[1]-s.holeY),pow),1/pow):-10000;
  const cut=s.cut>.001?s.cut-Math.hypot((p[0]-s.cutX)/(s.cutAspect||1),p[1]-s.cutY):-10000;
@@ -1488,9 +1497,13 @@ function rendererVariant(s,options={},source=s){
  const transmission=modern?s.transparency:s.transparency+(1-s.transparency)*(s.translucency||0),crown=modern&&(structureMayChange(source)||(s.petalAmount||0)+(s.stemAmount||0)>.000001);
  const amount=Math.min(1,((s.petalBlend||0)+(s.petalRoot||0)+(s.petalRandom||0))*20),spread=s.petalCoverage||0,petals=crown&&(s.petalAmount||0)>.000001;
  const volume=(s.scattering||0)+(s.translucency||0)+(s.subsurface||0)>.0001&&(!modern||transmission>.0001&&s.thinShell<.999);
+ // A ribbon thinner than the field grid can disappear during interpolation.
+ // Use the exact compact field for this case, including the complete motion
+ // interval so playback does not switch shader at a thickness crossing.
+ const thinLoop=!!(loopVariant(source)&SIMPLE_LOOP_FIELD)&&motionInterval(source,'loopTube')[0]*(1-.86*motionInterval(source,'loopFlat')[1])<.025;
  // Field parameters share one preview program once enabled. Analytic spheres and
  // the cached procedural field share the same shader and runtime uniform.
- if(modern&&options.preview&&options.quality!=='full'&&(options.quality==='fast'||!structureMayChange(source)||transmission>.0001||volume)){
+ if(modern&&options.preview&&!thinLoop&&options.quality!=='full'&&(options.quality==='fast'||!structureMayChange(source)||transmission>.0001||volume)){
   // An enabled transparency track can cross zero. Prepare its complete
   // optical path once, instead of switching programs at that crossing.
   const transmitting=motionInterval(source,'transparency')[1]>.0001;
@@ -1498,7 +1511,7 @@ function rendererVariant(s,options={},source=s){
   return 8+4096+ATLAS_PREVIEW+(s.thinShell>=.999?16:0)+ +scattering+((s.subsurface||0)>.0001?2:0)+(transmitting?2048:0)+(hasSolidForces(s)?SCULPT_ENABLED:0);
  }
  const originalPetals=petals&&rootWeight(s)<.999999;
- return (modern?8:0)+(modern&&s.thinShell>=.999?16:0)+(modern&&analytic?32:0)+(crown?64:0)+ +volume+((s.subsurface||0)>.0001&&(!modern?transmission<.999:true)?2:0)+((s.dispersion||0)>.005?4:0)
+ return (modern?8+loopVariant(source):0)+(modern&&s.thinShell>=.999?16:0)+(modern&&analytic?32:0)+(crown?64:0)+ +volume+((s.subsurface||0)>.0001&&(!modern?transmission<.999:true)?2:0)+((s.dispersion||0)>.005?4:0)
   +(originalPetals&&spread<=.9999?128:0)+(originalPetals&&spread>=.0001&&amount<.999999?256:0)+(originalPetals&&spread>=.0001&&amount>.000001?512:0)+(crown&&(s.stemAmount||0)>.000001?1024:0)+(modern&&transmission>.0001?2048:0)+(modern&&options.preview&&options.quality!=='full'?4096:0)+(petals&&rootWeight(s)>.000001?32768:0)+(modern&&structureMayChange(source)?65536:0)+(modern?Math.round(s.baseForm||0)*131072:0)+(modern&&hasSolidForces(s)?SCULPT_ENABLED:0);
 }
 function variantSource(key,floatAtlas=false){
@@ -1506,7 +1519,18 @@ function variantSource(key,floatAtlas=false){
  const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4,ROOTS_ENABLED:32768,STRUCTURE_ENABLED:65536};
  let defines='#define FLOAT_ATLAS '+ +floatAtlas+'\n#define BASE_FORM_KIND '+(key&ATLAS_PREVIEW?-1:(Math.floor(key/131072)&7))+'\n'+Object.entries(flags).map(([name,bit])=>'#define '+name+' '+ +!!(key&bit)).join('\n');
  if(key&8)defines+='\n#define TRACE_STEPS '+(key&ATLAS_PREVIEW?128:key&4096?128:224)+'\n#define INTERFACE_STEPS '+(key&ATLAS_PREVIEW?4:key&4096?8:32)+'\n#define LENGTH_SAMPLES '+(key&4096?8:16)+'\n#define SCATTER_SAMPLES '+(key&4096?2:4)+'\n#define SPECTRAL_SAMPLES '+(key&4096?3:5);
- return (key&ATLAS_PREVIEW?(key&SCULPT_ENABLED?SCULPT_PREVIEW_FRAG:PREVIEW_FRAG):key&8?(key&SCULPT_ENABLED?SCULPT_FRAG:MODERN_FRAG):FRAG).replace('#version 300 es','#version 300 es\n'+defines);
+ let source=key&ATLAS_PREVIEW?(key&SCULPT_ENABLED?SCULPT_PREVIEW_FRAG:PREVIEW_FRAG):key&8?(key&SCULPT_ENABLED?SCULPT_FRAG:MODERN_FRAG):FRAG;
+ if(key&8&&!(key&ATLAS_PREVIEW)){
+  if(!(key&LOOP_ENABLED))source=shaderFunction(source,'loopBlend','float loopBlend(float d,vec3 p){return d;}');
+  // Keep inactive operators out of the deeply nested refractive solver.
+  // Any enabled geometry track selects the complete operator before playback.
+  if(key&SIMPLE_LOOP_STRUCTURE){
+   source=shaderFunction(source,'structureWarp','vec3 structureWarp(vec3 p){return p;}');
+   source=shaderFunction(source,'structureField',`float structureField(float d,vec3 p){float thickness=uStructureA.y*(1.-uStructureH.x*.85*min(1.,length(p.xy)));return uStructureA.x>0.?max(d,-d-thickness-(1.-thickness)*(1.-uStructureA.x)):d;}`);
+  }
+  if(key&SIMPLE_LOOP_FIELD)source=shaderFunction(source,'fieldParts',`vec3 fieldParts(vec3 world){vec3 p=transform(world);float volume=max(.06,uShape.x*uShape.w);p/=vec3(uShape.y,uShape.z,volume);float d=structureField(loopBlend(length(p)-1.,p),p);return vec3(d,-10000.,-10000.)*min(min(uShape.y,uShape.z),volume)*uFrame.x*.5;}`);
+ }
+ return source.replace('#version 300 es','#version 300 es\n'+defines);
 }
 export class Renderer{
  constructor(canvas){
@@ -1623,7 +1647,7 @@ export class Renderer{
 
  u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);
 
- u('uRuntime',[+!!options.preview,.85/(1.+solidForceSlope(s)+(s.structScallop||0)*(s.structPetalCount||8)*.9+Math.abs(s.structSpiral||0)*3+(s.structStagger||0)*(s.structPetalCount||8)*.5+(s.structRuffle||0)*(s.structPetalCount||8)*3+(s.structCurl?Math.abs(s.structCurl):0)+(s.structFold||0)*(s.structFoldCount||1)*.8+Math.abs(s.structFlap||0)*2.+(s.structWeave||0)*(s.structDensity||20)*2.+(s.deform||0)*2.+Math.abs(s.asymmetry||0)*.6+Math.abs(s.twist||0)*.3+(s.waves||0)*(s.waveScale||1)*.15+(s.lobeAmount||0)*(s.lobes||0)*.4),options.normalDiagnostic?2:+!!options.diagnostic,16]);u('uTransport',[s.subsurface||0,s.sssRadius??.35,0,0]);u('uSssColor',rgb(s.sssColor||'#ffc49b'));
+ u('uRuntime',[+!!options.preview,.85/(1.+solidForceSlope(s)+(s.loopAmount||0)*(2+Math.abs(s.loopTwist||0)*2)+(s.structScallop||0)*(s.structPetalCount||8)*.9+Math.abs(s.structSpiral||0)*3+(s.structStagger||0)*(s.structPetalCount||8)*.5+(s.structRuffle||0)*(s.structPetalCount||8)*3+(s.structCurl?Math.abs(s.structCurl):0)+(s.structFold||0)*(s.structFoldCount||1)*.8+Math.abs(s.structFlap||0)*2.+(s.structWeave||0)*(s.structDensity||20)*2.+(s.deform||0)*2.+Math.abs(s.asymmetry||0)*.6+Math.abs(s.twist||0)*.3+(s.waves||0)*(s.waveScale||1)*.15+(s.lobeAmount||0)*(s.lobes||0)*.4),options.normalDiagnostic?2:+!!options.diagnostic,16]);u('uTransport',[s.subsurface||0,s.sssRadius??.35,0,0]);u('uSssColor',rgb(s.sssColor||'#ffc49b'));
  u('uInterior',[s.hollow||0,s.wallThickness??.08,s.translucency||0,s.scattering||0]);u('uScatter',[s.scatterDirection??.25,+analytic,s.thinFilm||0,s.filmThickness??420]);
  u('uPhoto1',[s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1]);u('uPhoto2',[s.temperature||0,s.photoTint||0,s.vignette||0,s.lensDistortion||0]);u('uPhoto3',[s.blacks||0,s.highlights||0,s.grainSize||1,0]);u('uPhoto4',[s.gamma||1,+!!s.photoAll,0,0]);
  const palette=s.palette.slice(0,12);const average=palette.map(rgb).reduce((sum,c)=>sum.map((v,i)=>v+c[i]/Math.max(1,palette.length)),[0,0,0]);u('uPaletteMean',average);while(palette.length<12)palette.push(palette[palette.length-1]||'#ffffff');g.uniform3fv(this.locations.uPalette,palette.flatMap(rgb));g.uniform1i(this.locations.uPaletteCount,Math.max(1,Math.min(12,s.palette.length)));

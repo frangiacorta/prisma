@@ -14830,7 +14830,7 @@
         "img-s14-08-09",
         "img-s14-10"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
       "summary": "Superfici annodate continue con due materiali confrontabili: strisce ancorate alla forma e lacca colorata con riflessi bianchi.",
@@ -14882,10 +14882,10 @@
         "film"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "",
-      "where": "",
+      "result": "Forma → Anelli e nodi: apertura continua dalla sfera, raggio, spessore, intreccio, appiattimento, torsione e variazione di spessore. Movimento → Anelli e nodi: scorrimento ciclico e tracce indipendenti. Materia, colori, membrane e campi restano combinabili.",
+      "where": "Forma → Anelli e nodi; Movimento → Anelli e nodi",
       "platform": "",
-      "next": "Prototipo di una sola geometria annodata nei due materiali e confronto affiancato con le reference.",
+      "next": "Aggiungere bande che seguano la coordinata del percorso e confrontare i materiali laccati con le reference. La geometria di base è integrata; il progetto completo delle reference resta in corso.",
       "keep": "",
       "avoid": "",
       "detailsSource": [

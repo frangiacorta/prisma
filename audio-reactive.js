@@ -1,8 +1,8 @@
-import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=0e01fd44d321';
-import {RhythmClock,TapTempo} from './audio-rhythm.js?v=0e01fd44d321';
-import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=0e01fd44d321';
-import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=0e01fd44d321';
-import {META} from './model.js?v=0e01fd44d321';
+import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=4d2cde175a7f';
+import {RhythmClock,TapTempo} from './audio-rhythm.js?v=4d2cde175a7f';
+import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=4d2cde175a7f';
+import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=4d2cde175a7f';
+import {META} from './model.js?v=4d2cde175a7f';
 
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountAudioReactive({getState,remember,mark,renderControls,showTab,toast,invalidate,setPlaying}) {
@@ -102,7 +102,7 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
       <div class="audio-levels">${Object.entries(AUDIO_BANDS).filter(([key])=>key!=='beat').map(([key,label])=>`<label>${label}<meter data-audio-meter="${key}" min="0" max="1" value="0" aria-label="Livello ${label.toLowerCase()}"></meter><output data-audio-level="${key}">0%</output></label>`).join('')}</div>
       <div class="force-actions"><button type="button" class="primary" data-audio-preset="diretta">Diretta · moto completo</button></div>
       ${slider('gain',c.gain)}${slider('mix',c.mix)}<label class="check"><input data-audio type="checkbox" data-audio-setting="autoLevel" ${c.autoLevel?'checked':''}>Adatta il livello alla sorgente</label><label class="check"><input data-audio type="checkbox" data-audio-setting="animate" ${c.animate?'checked':''}>Avvia anche il moto</label><p class="help">Diretta collega subito correnti, orbite e warp. Elaborazione sul dispositivo; nessun ascolto automatico.</p></details>
-      <details id="audio-rhythm-controls" class="control-details primary-section"><summary>Ritmo · BPM e Tap</summary>
+      <details id="audio-rhythm-controls" class="control-details primary-section"><summary>Ritmo</summary>
       <p class="help">Impulsi regolari per muovere la scena, anche senza microfono. Puoi combinarli con voce e musica.</p>
       <div class="force-actions"><button type="button" class="primary" data-audio-action="rhythm-start">Avvia ritmo</button><button type="button" class="outline" data-audio-action="rhythm-stop">Ferma ritmo</button></div>
       <p id="audio-rhythm-status" class="help" role="status"></p><div class="audio-levels"><label>Impulso Ritmo<meter data-audio-meter="beat" min="0" max="1" value="0" aria-label="Livello ritmo"></meter><output data-audio-level="beat">0%</output></label></div>
@@ -112,7 +112,7 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
       ${slider('rhythmWidth',c.rhythmWidth)}${slider('rhythmSoftness',c.rhythmSoftness)}${slider('rhythmPhase',c.rhythmPhase)}
       <button type="button" class="outline full" data-audio-preset="ritmo">Risposta Ritmo · moto e riflessi</button>
       <p class="help">Il primo avvio aggiunge i collegamenti Ritmo se mancano. Per personalizzarli scegli il segnale Ritmo in Risposta e collegamenti. Ferma ritmo usa il Rilascio; Ferma ascolto ferma solo il microfono o il file. BPM impostato a mano, senza sincronizzazione automatica con la musica.</p></details>
-      <details id="audio-record-controls" class="control-details primary-section"><summary>Registra e ripeti la reazione</summary>
+      <details id="audio-record-controls" class="control-details primary-section"><summary>Registrazione</summary>
       <p class="help">Registra come il suono muove la scena. Poi ripeti la reazione senza microfono, anche con altri collegamenti.</p>
       ${slider('recordSeconds',c.recordSeconds)}
       <div class="force-actions"><button type="button" class="primary" data-audio-action="record">Registra reazione</button><button type="button" class="outline" data-audio-action="record-cancel">Annulla registrazione</button></div>
@@ -121,7 +121,7 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
       <label class="check"><input data-audio type="checkbox" data-audio-setting="clipLoop" ${c.clipLoop?'checked':''}>Ripeti in loop</label>
       ${slider('clipSeam',c.clipSeam)}
       <details class="control-details"><summary>Salvataggio e limiti</summary><p class="help">Avvia prima microfono, file o Ritmo. Una registrazione per preset: quella nuova sostituisce la precedente solo quando è completa. Il replay ferma gli ingressi live e usa i collegamenti attuali. I segnali si salvano nel preset, senza voce né file sonoro. Il raccordo chiude la reazione, non garantisce un loop perfetto della geometria. Replay ed esportazione video non sono ancora collegati.</p><button type="button" class="quiet" data-audio-action="clip-delete">Elimina registrazione</button></details></details>
-      <details id="audio-response-controls" class="control-details primary-section"><summary>Risposta e collegamenti · ${c.mappings.length}/24</summary><div class="force-actions audio-presets">${Object.entries({diretta:'Diretta',respiro:'Respiro',marea:'Orbite',tentacoli:'Tentacoli',impulsi:'Impulsi',timbro:'Timbro'}).map(([id,label])=>`<button type="button" class="outline" data-audio-preset="${id}">${label}</button>`).join('')}</div><p class="help">Cambiano i collegamenti e i tempi audio. Timbro lega suoni brillanti ai riflessi e suoni rumorosi a correnti e deformazioni. I valori originali restano recuperabili.</p>
+      <details id="audio-response-controls" class="control-details primary-section"><summary>Collegamenti · ${c.mappings.length}/24</summary><div class="force-actions audio-presets">${Object.entries({diretta:'Diretta',respiro:'Respiro',marea:'Orbite',tentacoli:'Tentacoli',impulsi:'Impulsi',timbro:'Timbro'}).map(([id,label])=>`<button type="button" class="outline" data-audio-preset="${id}">${label}</button>`).join('')}</div><p class="help">Cambiano i collegamenti e i tempi audio. Timbro lega suoni brillanti ai riflessi e suoni rumorosi a correnti e deformazioni. I valori originali restano recuperabili.</p>
       ${slider('attack',c.attack)}${slider('release',c.release)}${slider('curve',c.curve)}
       ${c.mappings.map((row,i)=>`<details class="control-details audio-mapping"><summary>${escape(AUDIO_BANDS[row.band])} → ${escape(META[row.target][0])}${row.enabled?'':' · spento'}</summary>
         <label class="check"><input data-audio type="checkbox" data-audio-map="${i}.enabled" ${row.enabled?'checked':''}>Usa questo collegamento</label>
@@ -135,7 +135,7 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
         <label class="field">Direzione<select data-audio data-audio-map="${i}.reverse">${options({false:'Aumenta rispetto alla base',true:'Diminuisci rispetto alla base'},String(row.reverse))}</select></label>
         ${!Object.hasOwn(targets,row.target)?'<p class="help">Questo parametro appartiene all’altro motore: collegamento conservato, senza influenza sulla scena attuale.</p>':''}<button type="button" class="quiet" data-audio-remove="${i}">Rimuovi collegamento</button></details>`).join('')}
       <button type="button" class="outline full" data-audio-action="add" ${c.mappings.length>=24?'disabled':''}>Aggiungi collegamento</button></details>
-      <details id="audio-filter-controls" class="control-details primary-section"><summary>Rumore, frequenze e impulsi</summary><button type="button" class="outline full" data-audio-action="noise">Calibra rumore · 2 secondi in silenzio</button>${slider('threshold',c.threshold)}${slider('lowCut',c.lowCut)}${slider('highCut',c.highCut)}${slider('onsetSensitivity',c.onsetSensitivity)}${slider('onsetHold',c.onsetHold)}<p class="help">Impulsi segue gli attacchi dello spettro: non è una stima del BPM.</p></details>
+      <details id="audio-filter-controls" class="control-details primary-section"><summary>Analisi del segnale</summary><button type="button" class="outline full" data-audio-action="noise">Calibra rumore · 2 secondi in silenzio</button>${slider('threshold',c.threshold)}${slider('lowCut',c.lowCut)}${slider('highCut',c.highCut)}${slider('onsetSensitivity',c.onsetSensitivity)}${slider('onsetHold',c.onsetHold)}<p class="help">Impulsi segue gli attacchi dello spettro: non è una stima del BPM.</p></details>
       <details id="audio-save-controls" class="control-details primary-section"><summary>Preset ed esportazione</summary><p class="help">I collegamenti audio si salvano con il preset Prisma. Aprire l’editor non avvia l’ascolto. Il file musicale e i suoni non vengono inseriti nel preset.</p><button type="button" class="outline full" data-audio-action="freeze">Congela risposta nella scena</button><p class="help">Congela l’influenza attuale per includerla negli export. Puoi registrare e ripetere la reazione nella sezione dedicata. Gli export attuali usano la scena di base o lo stato congelato; il replay animato e il suono nel video sono ancora da collegare.</p></details>`;
   }
 

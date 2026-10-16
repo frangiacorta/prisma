@@ -1,9 +1,9 @@
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
- {id:'structure',label:'Forma e moto',tabs:[['shape','Forma','shape'],['grains','Granelli','shape','particles'],['trails','Fibre e scie','motion','particles'],['motion','Movimento','motion']]},
+ {id:'structure',label:'Struttura',tabs:[['shape','Forma','shape'],['grains','Particelle','shape','particles'],['trails','Fibre e scie','motion','particles'],['motion','Movimento','motion']]},
  {id:'look',label:'Aspetto',tabs:[['material','Materia','material'],['color','Colori','palette'],['light','Luci','sun']]},
  {id:'scene',label:'Scena',tabs:[['background','Sfondo','background'],['photo','Filtri','photo']]},
- {id:'interaction',label:'Interazione',tabs:[['fields','Punti e percorsi','move'],['body','Mani e braccia','orbit'],['audio','Audio','audio']]}
+ {id:'interaction',label:'Interazione',tabs:[['fields','Campi','move'],['body','Mani e braccia','orbit'],['audio','Audio','audio']]}
 ];
 export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.filter(t=>(!t[3]||t[3]===engine)&&!(engine==='veils'&&['fields','body','audio'].includes(t[0]))).map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label})));
 const clean=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
@@ -22,7 +22,7 @@ export function organizeSections(root,scope){
  }
  // Presets/examples have one predictable home at the bottom of each tab.
  const library=document.createElement('details');library.className='control-details example-library';
- library.innerHTML='<summary>Esempi e punti di partenza</summary><p class="help">Applica un esempio, poi continua con tutti i parametri della scheda.</p>';
+ library.innerHTML='<summary>Esempi</summary><p class="help">Applica un esempio, poi continua con tutti i parametri della scheda.</p>';
  const selectors='[data-sculpt],#load-bloom-example,[data-material],#material-picker,[data-legacy-material],[data-film-look],[data-film-light],[data-texture-style],[data-motion-preset],[data-mood],#random-palette,#light-rig,[data-light-source],[data-backdrop],[data-audio-preset]';
  const buckets=new Map(),exampleParents=new Set();
  for(const button of [...root.querySelectorAll(selectors)]){
@@ -41,19 +41,19 @@ export function organizeSections(root,scope){
   parent.append(footer);footer.append(button);button.classList.remove('full');
  }
  if(scope==='solid/shape'){
-  const growth=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Petali, radici e crescita');
-  if(growth){growth.id='shape-growth';const stem=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Gambo opzionale');if(stem)growth.append(stem);}
-  group('Struttura · membrane, fibre e lamine','shape-structure',['Struttura della forma','Membrana · svuotamento e spessore','Fibre e tessitura','Lamelle, petali e aureole','Crescita, arricciamento e pieghe']);
-  group('Profilo e deformazioni','shape-profile',['Profilo, torsione e curvature','Vuoto interno · anelli','Ritaglio · semilune','Lobi e onde']);
+  const growth=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Petali e radici');
+  if(growth){growth.id='shape-growth';const stem=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Gambo');if(stem)growth.append(stem);}
+  group('Struttura','shape-structure',['Proprietà','Membrana','Fibre e tessitura','Lamelle e strati','Pieghe e curvatura']);
+  group('Profilo','shape-profile',['Deformazioni','Foro','Ritaglio','Lobi e onde']);
  }
- if(scope==='particles/shape')group('Struttura e dettaglio organico','particle-structure',['Lobi, rami e addensamenti','Materia organica · dettaglio procedurale','Struttura neuronale','Tentacoli del nucleo','Fasci esterni','Deformazioni aggiuntive']);
+ if(scope==='particles/shape')group('Struttura','particle-structure',['Lobi, rami e addensamenti','Dettaglio organico','Struttura neuronale','Tentacoli del nucleo','Fasci esterni','Deformazioni']);
  if(scope==='solid/motion'){
-  const general=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Movimento generale');if(general)root.prepend(general);
-  group('Struttura in movimento','motion-structure',['Respiro, battito e scorrimento','Anima le proprietà della struttura']);
-  group('Petali e radici in movimento','motion-growth',['Radici · scorrimento e intreccio','Radici · crescita e avvolgimento','Radici · superficie e distribuzione','Petali e gambo · movimenti indipendenti']);
+  const general=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Tempo');if(general)root.prepend(general);
+  group('Struttura','motion-structure',['Posa','Animazione']);
+  group('Petali e radici','motion-growth',['Radici: scorrimento','Radici: crescita','Radici: distribuzione','Petali e gambo']);
  }
- if(scope==='particles/motion')group('Deformazioni nel tempo','particle-motion-deform',['Vitalità e respiro','Tentacoli in movimento','Warp dello spazio','Ritmo e cadenze']);
- if(scope.endsWith('/color')){const palette=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent.startsWith('La tua palette'));if(palette)root.prepend(palette);}
+ if(scope==='particles/motion')group('Deformazioni','particle-motion-deform',['Pulsazione','Tentacoli in movimento','Distorsione','Ritmo e cadenze']);
+ if(scope.endsWith('/color')){const palette=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent.startsWith('Palette'));if(palette)root.prepend(palette);}
  if(buckets.size)root.append(library);
  if(scope.endsWith('/motion')){
   const active=document.createElement('details');active.className='control-details active-motion';active.id='active-motion';active.dataset.defaultOpen='true';active.innerHTML='<summary>Movimenti attivi</summary>';

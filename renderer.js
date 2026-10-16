@@ -1,8 +1,8 @@
-import {VeilTransition} from './veil-transition.js?v=0e01fd44d321';
-import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=0e01fd44d321';
-import {ParticleRenderer} from './particle-renderer.js?v=0e01fd44d321';
-import {FinishingPass,GlyphPass,DetailPass,FINISH_DEFAULTS,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=0e01fd44d321';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=0e01fd44d321';
+import {VeilTransition} from './veil-transition.js?v=4d2cde175a7f';
+import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=4d2cde175a7f';
+import {ParticleRenderer} from './particle-renderer.js?v=4d2cde175a7f';
+import {FinishingPass,GlyphPass,DetailPass,FINISH_DEFAULTS,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=4d2cde175a7f';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=4d2cde175a7f';
 // One editor and export contract; the saved creation chooses its renderer.
 export class Renderer{
  constructor(canvas){this.canvas=canvas;this.context=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!this.context)throw Error('WebGL 2 non disponibile.');this.frameTimer=this.context.getExtension('EXT_disjoint_timer_query_webgl2');this.frameQueries=[];this.frameGpuSample=0;this.frameGpuMs=null;}

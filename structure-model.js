@@ -1,5 +1,6 @@
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
+ loopAmount:0,loopKnot:0,loopRadius:.8,loopTube:.22,loopFlat:0,loopTwist:0,loopWave:0,loopPhase:0,
  structShell:0,structThickness:.09,structFibres:0,structWeft:0,structDensity:20,structThreadWidth:.32,structWeave:0,
  structSlices:0,structSliceCount:6,structSliceWidth:.24,structRadial:0,structPetalCount:8,structPetalWidth:.45,
  structLayers:0,structLayerCount:3,structLayerWidth:.22,
@@ -8,6 +9,7 @@ export const STRUCTURE_DEFAULTS={
  structCoreDark:0,structCoreRadius:.3
 };
 export const STRUCTURE_META={
+ loopAmount:['Apertura ad anello',0,1,.01],loopKnot:['Intreccio del nodo',0,1,.01],loopRadius:['Raggio del percorso',.6,1.6,.01],loopTube:['Spessore del tubo',.06,.6,.005],loopFlat:['Appiattimento a nastro',0,1,.01],loopTwist:['Torsione del nastro',-2,2,.01],loopWave:['Variazione di spessore',0,.35,.005],loopPhase:['Scorrimento',0,1,.001],
  structShell:['Svuotamento · pieno → membrana',0,1,.01],structThickness:['Spessore della membrana',.035,.4,.005],
  structFibres:['Separazione in fibre',0,1,.01],structWeft:['Fili trasversali · tessitura',0,1,.01],structDensity:['Fili intorno alla forma',6,48,1],structThreadWidth:['Larghezza dei fili',.15,.9,.01],structWeave:['Intreccio sopra / sotto',0,.16,.005],
  structSlices:['Separazione in lamelle',0,1,.01],structSliceCount:['Numero di lamelle',2,12,1],structSliceWidth:['Spessore relativo delle lamelle',.12,.85,.01],
@@ -18,14 +20,15 @@ export const STRUCTURE_META={
  structScallop:['Arrotondamento dei petali',0,1,.01],structSpiral:['Avvolgimento a spirale',-1,1,.01],structStagger:['Sfasamento fra le lamine',0,1,.01],structRuffle:['Ondulazione fine dei bordi',0,.15,.005],structTaper:['Assottigliamento verso il bordo',0,1,.01],
  structCoreDark:['Oscurità del nucleo',0,1,.01],structCoreRadius:['Estensione del nucleo',.05,.8,.01]
 };
-export const STRUCTURE_GROUPS={shape:Object.keys(STRUCTURE_DEFAULTS).filter(k=>!['structBreath','structFlap','structFlowPhase','structDelay','structCoreDark','structCoreRadius'].includes(k)),motion:['structBreath','structFlap','structFlowPhase','structDelay'],color:['structCoreDark','structCoreRadius']};
-export const STRUCTURE_TRACKS=Object.fromEntries(['structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structFlowPhase','structScallop','structSpiral','structStagger','structRuffle'].map(k=>[k,[STRUCTURE_META[k][0],0,k==='structBreath'?.3:k==='structFlap'?.6:k==='structFold'?.4:1,.01]]));
+export const STRUCTURE_GROUPS={shape:Object.keys(STRUCTURE_DEFAULTS).filter(k=>!['loopPhase','structBreath','structFlap','structFlowPhase','structDelay','structCoreDark','structCoreRadius'].includes(k)),motion:['loopPhase','structBreath','structFlap','structFlowPhase','structDelay'],color:['structCoreDark','structCoreRadius']};
+export const STRUCTURE_TRACKS=Object.fromEntries(['loopAmount','loopKnot','loopRadius','loopTube','loopFlat','loopTwist','loopWave','loopPhase','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structFlowPhase','structScallop','structSpiral','structStagger','structRuffle'].map(k=>[k,[STRUCTURE_META[k][0],0,k==='structBreath'?.3:k==='structFlap'?.6:k==='structFold'?.4:k==='loopTwist'?2:k==='loopWave'?.35:k==='loopTube'?.6:1,.01]]));
 export const STRUCTURE_FIELD_KEYS=Object.keys(STRUCTURE_DEFAULTS).filter(k=>!k.startsWith('structCore'));
-export function hasStructure(s){return ['structShell','structFibres','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle'].some(k=>Math.abs(s[k]||0)>1e-6);}
+export function hasStructure(s){return ['loopAmount','structShell','structFibres','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle'].some(k=>Math.abs(s[k]||0)>1e-6);}
 export function structureMayChange(s){return hasStructure(s)||STRUCTURE_FIELD_KEYS.some(k=>s.motions?.[k]?.enabled&&(s.motions[k].amplitude||s.motions[k].mode==='cycle'));}
-export function structureBounds(s){return (1+Math.abs(s.structGrowth||0)+Math.abs(s.structBreath||0))*(1+Math.abs(s.structCurl||0)+Math.abs(s.structFold||0)+Math.abs(s.structFlap||0)+Math.abs(s.structRuffle||0)*2+Math.abs(s.structStagger||0)*.6);}
+export function structureBounds(s){return Math.max(1,(s.loopAmount||0)>0?(s.loopRadius??.8)+.36*(s.loopKnot||0)+(s.loopTube??.22)*(1+(s.loopWave||0)):1)*(1+Math.abs(s.structGrowth||0)+Math.abs(s.structBreath||0))*(1+Math.abs(s.structCurl||0)+Math.abs(s.structFold||0)+Math.abs(s.structFlap||0)+Math.abs(s.structRuffle||0)*2+Math.abs(s.structStagger||0)*.6);}
 export function structureUniforms(s,u){
  const v={...STRUCTURE_DEFAULTS,...s};
+ u('uLoopA',[v.loopAmount,v.loopKnot,v.loopRadius,v.loopTube]);u('uLoopB',[v.loopFlat,v.loopTwist,v.loopWave,v.loopPhase]);
  u('uStructureA',[v.structShell,v.structThickness,v.structFibres,v.structWeft]);
  u('uStructureB',[v.structDensity,v.structThreadWidth,v.structWeave,v.structSlices]);
  u('uStructureC',[v.structSliceCount,v.structSliceWidth,v.structRadial,v.structPetalCount]);
@@ -36,6 +39,15 @@ export function structureUniforms(s,u){
  u('uStructureH',[v.structTaper,0]);
  u('uStructureColor',[v.structCoreDark,v.structCoreRadius]);
 }
+// Closed (2,3) torus-knot branches; parameterization also used by Three.js TorusKnotGeometry.
+// Own implicit cross-section implementation: two branches, no mesh or sampled-segment traversal.
+export function loopField(s,p){
+ const a=Math.atan2(p[1],p[0]),r=Math.hypot(p[0],p[1]),phase=(s.loopPhase||0)*Math.PI*2,thin=1-.86*(s.loopFlat||0),twist=(s.loopTwist||0)*Math.sin(2*a+phase);
+ const c=Math.cos(twist),sn=Math.sin(twist),tube=(s.loopTube??.22)*(1+(s.loopWave||0)*Math.sin(3*a-phase));let distance=1e9;
+ for(let j=0;j<2;j++){const t=a*.5+j*Math.PI,k=.36*(s.loopKnot||0),x=r-(s.loopRadius??.8)-k*Math.cos(3*t),z=p[2]-k*Math.sin(3*t);const u=c*x+sn*z,v=-sn*x+c*z;distance=Math.min(distance,(Math.hypot(u,v/thin)-tube)*thin);}
+ return distance;
+}
+export function loopBlend(s,d,p){return (s.loopAmount||0)>0?d+s.loopAmount*(loopField(s,p)-(Math.hypot(...p)-1)):d;}
 // Keep the CPU query and shader algebra identical (lights, export and preview).
 export function structureWarp(s,p){
  const v={...STRUCTURE_DEFAULTS,...s},q=[...p],r=Math.hypot(q[0],q[1]),a=Math.atan2(q[1],q[0]),phase=v.structFlowPhase*Math.PI*2;
@@ -70,7 +82,18 @@ export function structureField(s,d,p){
 export const STRUCTURE_GLSL=`
 uniform vec4 uStructureA,uStructureB,uStructureC,uStructureD,uStructureE,uStructureF,uStructureG;
 uniform vec2 uStructureColor,uStructureH;
-bool structureActive(){return dot(abs(uStructureA.xzw),vec3(1.))+abs(uStructureB.w)+abs(uStructureC.z)+abs(uStructureD.y)+dot(abs(uStructureE.xyz),vec3(1.))+dot(abs(uStructureF.xy),vec2(1.))+dot(abs(uStructureG),vec4(1.))>.000001;}
+uniform vec4 uLoopA,uLoopB;
+bool structureActive(){return uLoopA.x+dot(abs(uStructureA.xzw),vec3(1.))+abs(uStructureB.w)+abs(uStructureC.z)+abs(uStructureD.y)+dot(abs(uStructureE.xyz),vec3(1.))+dot(abs(uStructureF.xy),vec2(1.))+dot(abs(uStructureG),vec4(1.))>.000001;}
+float loopField(vec3 p){
+ float a=atan(p.y,p.x),r=length(p.xy),phase=uLoopB.w*6.28318530718,thin=1.-.86*uLoopB.x,angle=uLoopB.y*sin(2.*a+phase);
+ float c=cos(angle),sn=sin(angle),tube=uLoopA.w*(1.+uLoopB.z*sin(3.*a-phase));
+ vec2 center=vec2(r-uLoopA.z,p.z),offset=.36*uLoopA.y*vec2(cos(1.5*a),sin(1.5*a));
+ vec2 q=center-offset,v=center+offset;
+ q=vec2(c*q.x+sn*q.y,(-sn*q.x+c*q.y)/thin);
+ v=vec2(c*v.x+sn*v.y,(-sn*v.x+c*v.y)/thin);
+ return (min(length(q),length(v))-tube)*thin;
+}
+float loopBlend(float d,vec3 p){return uLoopA.x>0.?d+uLoopA.x*(loopField(p)-(length(p)-1.)):d;}
 vec3 structureWarp(vec3 p){
  float r=length(p.xy),a=atan(p.y,p.x),phase=uStructureF.z*6.28318530718;
  p.xy/=1.+uStructureE.x+uStructureF.x*cos(r*uStructureF.w*3.14159265359);
@@ -100,13 +123,13 @@ float structureField(float d,vec3 p){
 `;
 export function structurePanel(tab,s,{slider,details,section}){
  const sliders=keys=>keys.map(k=>slider(k)).join('');
- if(tab==='shape')return section('Struttura della forma',(s.structureOriginal?'<p class="help">La struttura precedente è stata adattata alle proprietà comuni. Il risultato può cambiare; i dati originali sono conservati nel preset.</p><button class="quiet" data-structure-original="true">Scarica anche il preset originale</button>':'')+'<p class="help">Combina le proprietà sulla forma attuale. Profilo, ritagli e materia restano attivi.</p>')
- +details('Membrana · svuotamento e spessore',sliders(['structShell','structThickness','structTaper']))
+ if(tab==='shape')return details('Anelli e nodi',sliders(['loopAmount','loopRadius','loopTube','loopKnot','loopFlat','loopTwist','loopWave'])+'<p class="help">Apertura 0 mantiene la forma iniziale; 1 la trasforma in un anello. Intreccio separa e annoda il percorso. Appiattimento e torsione modellano il nastro. Spessore elevato può unire i passaggi del nodo.</p>')+section('Proprietà',(s.structureOriginal?'<p class="help">La struttura precedente è stata adattata alle proprietà comuni. Il risultato può cambiare; i dati originali sono conservati nel preset.</p><button class="quiet" data-structure-original="true">Scarica anche il preset originale</button>':'')+'<p class="help">Combina le proprietà sulla forma attuale. Profilo, ritagli e materia restano attivi.</p>')
+ +details('Membrana',sliders(['structShell','structThickness','structTaper']))
  +details('Fibre e tessitura',sliders(['structFibres','structWeft','structDensity','structThreadWidth','structWeave'])+'<p class="help">Separazione apre gli spazi fra i fili. Tessitura aggiunge i fili trasversali; lo svuotamento può limitare la trama alla pelle.</p>')
- +details('Lamelle, petali e aureole',sliders(['structScallop','structPetalCount','structRadial','structPetalWidth','structSlices','structSliceCount','structSliceWidth','structLayers','structLayerCount','structLayerWidth'])+'<p class="help">Arrotondamento disegna lobi morbidi sulla forma; Separazione radiale apre gli intervalli. Lamelle e strati concentrici aggiungono altri livelli combinabili. I valori intermedi aprono progressivamente gli spazi. Gli strati interni diventano visibili con trasparenza o ritagli.</p>')
- +details('Crescita, arricciamento e pieghe',sliders(['structGrowth','structCurl','structSpiral','structStagger','structFold','structFoldCount','structRuffle'])+'<p class="help">Respiro, battito e scorrimento si regolano in Movimento. Trasparenza e rifrazione sono in Materia.</p>');
+ +details('Lamelle e strati',sliders(['structScallop','structPetalCount','structRadial','structPetalWidth','structSlices','structSliceCount','structSliceWidth','structLayers','structLayerCount','structLayerWidth'])+'<p class="help">Arrotondamento disegna lobi morbidi sulla forma; Separazione radiale apre gli intervalli. Lamelle e strati concentrici aggiungono altri livelli combinabili. I valori intermedi aprono progressivamente gli spazi. Gli strati interni diventano visibili con trasparenza o ritagli.</p>')
+ +details('Pieghe e curvatura',sliders(['structGrowth','structCurl','structSpiral','structStagger','structFold','structFoldCount','structRuffle'])+'<p class="help">La posa e la sua animazione si regolano in Movimento. Trasparenza e rifrazione sono in Materia.</p>');
  if(tab==='color')return details('Nucleo scuro',sliders(['structCoreDark','structCoreRadius']));
- if(tab==='motion')return section('Respiro, battito e scorrimento',sliders(STRUCTURE_GROUPS.motion)+'<p class="help">Questi valori definiscono la posa. Apri le rispettive tracce qui sotto per animarla: ogni proprietà ha velocità, verso, fase e ritmo propri.</p>');
+ if(tab==='motion')return section('Posa',sliders(STRUCTURE_GROUPS.motion.filter(k=>k!=='loopPhase'))+'<p class="help">Questi valori definiscono la posa. Apri le rispettive tracce qui sotto per animarla: ogni proprietà ha velocità, verso, fase e ritmo propri.</p>');
  return '';
 }
 
