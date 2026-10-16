@@ -1,6 +1,14 @@
-import {AUDIO_HELP} from './audio-model.js?v=4d2cde175a7f';
+import {AUDIO_HELP} from './audio-model.js?v=c76d08458d01';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ filLength:'Fa crescere filamenti sulla superficie della forma corrente. Zero conserva esattamente la forma iniziale. Lunghezza e spessore sono nello spazio 3D, non in pixel.',
+ filWidth:'Diametro alla base: valori piccoli producono pelo e filamenti; valori maggiori aghi e spine con volume e ombre.',
+ filCore:'Presenza della superficie sotto i filamenti. Uno conserva il corpo pieno; zero lascia i soli filamenti. Non cambia i punti di nascita e non agisce con Lunghezza zero.',
+ filClump:'Raccoglie i fili intorno a guide distribuite sull’intera forma. Numero di ciuffi ne regola la scala; Apertura separa le estremità.',
+ filPhase:'Fase dell’oscillazione delle punte. Richiede Oscillazione delle punte sopra zero. Zero e uno coincidono; attiva la traccia Scorrimento per il movimento continuo.',
+ filWind:'Ampiezza dell’oscillazione delle punte. Le basi restano ancorate alla forma. La traccia Scorrimento regola velocità, verso, pause e accelerazione.',
+ filColor:'Mescola la colorazione della forma con la palette distribuita dalla base alla punta di ogni filamento. Non cambia la palette salvata.',
+ filCount:'Numero di filamenti distribuiti sulla superficie. Valori elevati richiedono più lavoro alla GPU; non modifica il numero delle particelle.',
  loopAmount:'Trasforma gradualmente il volume iniziale in un anello. Zero mantiene la forma di partenza. Gli altri controlli geometrici e la materia restano combinabili.',
  loopKnot:'Separa i due passaggi dell’anello in un percorso annodato chiuso. Richiede Apertura ad anello. Uno spessore elevato può fondere i passaggi.',
  loopRadius:'Distanza del percorso dal centro. Aumenta il diametro dell’anello senza cambiare lo spessore del tubo.',

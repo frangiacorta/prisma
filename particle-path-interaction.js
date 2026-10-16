@@ -1,6 +1,6 @@
-import {supportsManualFields as usesParticleSurface} from './living-composition.js?v=4d2cde175a7f';
-import {MAX_FORCE_PATHS,PATH_META,pathValue,newForcePath,samplePath,ellipseKnots} from './particle-paths.js?v=4d2cde175a7f';
-import {screenToForce,forceToScreen} from './particle-forces.js?v=4d2cde175a7f';
+import {supportsManualFields as usesParticleSurface} from './living-composition.js?v=c76d08458d01';
+import {MAX_FORCE_PATHS,PATH_META,pathValue,newForcePath,samplePath,ellipseKnots} from './particle-paths.js?v=c76d08458d01';
+import {screenToForce,forceToScreen} from './particle-forces.js?v=c76d08458d01';
 
 export function mountParticlePaths({canvas,board,getState,getMode,setMode,remember,mark,renderControls,showTab,toast}){
  const overlay=document.querySelector('#guide-handles'),controls=document.querySelector('#controls');

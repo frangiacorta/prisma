@@ -14638,10 +14638,10 @@
         "s16-03",
         "roadmap-soft-knots"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
-      "author": "Reference: Christoph Pauschenwein; futura interpretazione Prisma",
-      "summary": "Globi di fili finissimi, ciuffi morbidi e colori individuali: estensione delle fibre di Prisma ispirata alla serie Planets.",
+      "author": "Prisma; reference visive di Christoph Pauschenwein",
+      "summary": "Filamenti e spine sulla forma corrente: dalla sfera a pelo, ciuffi, aghi e ricci, con parametri continui e combinabili.",
       "sources": [
         "https://www.pauschenwein.ch/kreationsprozessplaneten",
         "https://www.pauschenwein.ch/the-apanage-days-cyprus",
@@ -14655,11 +14655,20 @@
       ],
       "sections": [
         {
+          "title": "Disponibile in Prisma",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": "Lunghezza, densità, spessore, punte, variazione, distribuzione, curvatura, pettinatura, riccioli, irregolarità, ciuffi, apertura, superficie, colori e movimento. Le spine più spesse hanno sezione 3D; i fili fini conservano copertura anche sotto il pixel. Ombre dalla luce principale e occlusione della superficie."
+            }
+          ]
+        },
+        {
           "title": "Come lo portiamo in Prisma",
           "fields": [
             {
               "label": "method",
-              "value": "Curve con radici stabili su un globo, guide e fili figli, ciuffi gerarchici, curl/frizz e colore per attributi. Integrare nel nucleo Particelle con compositing e ombre adatti ai fili densi. Le scie temporali attuali da sole non producono questo tipo di pelo. Ricerca e piano completi nel dossier collegato."
+              "value": "Integrato in Forma. Radici ancorate al campo della superficie, guide per i ciuffi, curve persistenti e spine a sezione tridimensionale. Palette, materiali, movimenti, campi e filtri restano condivisi. Lunghezza zero conserva la forma originale."
             }
           ]
         },
@@ -14765,7 +14774,7 @@
           "fields": [
             {
               "label": "remaining",
-              "value": "Ricerca strumenti e codice completata; campione Blender, groom Prisma, compositing/ombre e confronto in movimento ancora da realizzare. Nessun risultato visivo equivalente dichiarato."
+              "value": "Restano il confronto delle macro e delle appendici molto lunghe, i fasci appiattiti e la misura su telefono reale. I fili sottili usano un compositing approssimato; non sono un trasporto ottico completo del pelo. Le superfici concave sono campionate dalla parte esterna e possono avere una densità meno uniforme. Nessuna equivalenza pixel per pixel con le opere originali dichiarata."
             }
           ]
         },
@@ -14774,7 +14783,7 @@
           "fields": [
             {
               "label": "evidence",
-              "value": "Ricerca e audit, demo web pubblica avviata. Nessun plugin installato, acquisto effettuato, scena Blender/TD aperta o nuovo renderer implementato. Audit locale: reference/filament-planets-research-2026-10-10.json."
+              "value": "v46: prove a 1024 px di globo radiale, ciuffi bianchi, riccio marino e riccio di castagna; tre angolazioni e loop dei ciuffi. Verificati 19 controlli, continuità del loop, preset, geometrie combinate, campi, filtri, export trasparente e wallpaper. Prove locali in reports/filament-planets. Nessun file originale dell’autore copiato."
             }
           ]
         }
@@ -14785,16 +14794,21 @@
         "cloud"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "",
-      "where": "Percorso proposto: Particelle → Forma e fibre; moto e materiale nei gruppi esistenti.",
+      "result": "../?engine=solid&v=46",
+      "where": "Forma > Filamenti e spine; Movimento > Filamenti e spine; Colori > Colore dei filamenti.",
       "platform": "",
-      "next": "1. Costruire una scena campione Blender con tre varianti: globo radiale rosa/ciano, ciuffi bianchi e pelo pettinato. Stesse inquadrature delle reference; salvare parametri e render di confronto. Poi prova WebGL2 nello stesso editor; WebGPU solo se il confronto evidenzia un limite concreto.",
+      "next": "Rifinire macro e fasci appiattiti senza introdurre modalità separate; verificare densità e ombre su telefono reale.",
       "keep": "Volume pieno e controllabile, passaggio dal globo al dettaglio, filamenti persistenti e palette sulla singola fibra.",
       "avoid": "Anello fisso al centro, scie dipendenti dagli FPS usate come finto pelo, migliaia di tubi pesanti, colore sovrapposto allo schermo.",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "../previews/filamenti-qualita.webp",
+          "width": 1200,
+          "height": 1260
+        },
         {
           "src": "media/284ec59aba2ee96f.webp",
           "width": 296,
@@ -14805,7 +14819,11 @@
       "completedProjects": [
         "roadmap-fibre-motion",
         "project-fibre-setose"
-      ]
+      ],
+      "resultImage": "../previews/filamenti-qualita.webp",
+      "resultVideo": "../previews/filamenti-ciuffi.webm",
+      "engine": "solid",
+      "resultUrl": "../?engine=solid&v=46"
     },
     {
       "id": "roadmap-soft-knots",

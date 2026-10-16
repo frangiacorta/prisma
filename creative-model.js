@@ -1,13 +1,13 @@
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=4d2cde175a7f';
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=4d2cde175a7f';
-import {normalizeAudioClip} from './audio-recording.js?v=4d2cde175a7f';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=4d2cde175a7f';
-import {normalizeAudio} from './audio-model.js?v=4d2cde175a7f';
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=4d2cde175a7f';
-import {normalizeForcePaths} from './particle-paths.js?v=4d2cde175a7f';
-import {normalizeForcePoints} from './particle-forces.js?v=4d2cde175a7f';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=4d2cde175a7f';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS} from './studio-model.js?v=4d2cde175a7f';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=c76d08458d01';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=c76d08458d01';
+import {normalizeAudioClip} from './audio-recording.js?v=c76d08458d01';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=c76d08458d01';
+import {normalizeAudio} from './audio-model.js?v=c76d08458d01';
+import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=c76d08458d01';
+import {normalizeForcePaths} from './particle-paths.js?v=c76d08458d01';
+import {normalizeForcePoints} from './particle-forces.js?v=c76d08458d01';
+import {preset,MOODS,META,GROUPS,random} from './model.js?v=c76d08458d01';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS} from './studio-model.js?v=c76d08458d01';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}

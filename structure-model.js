@@ -1,5 +1,7 @@
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=c76d08458d01';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
+ ...FILAMENT_DEFAULTS,
  loopAmount:0,loopKnot:0,loopRadius:.8,loopTube:.22,loopFlat:0,loopTwist:0,loopWave:0,loopPhase:0,
  structShell:0,structThickness:.09,structFibres:0,structWeft:0,structDensity:20,structThreadWidth:.32,structWeave:0,
  structSlices:0,structSliceCount:6,structSliceWidth:.24,structRadial:0,structPetalCount:8,structPetalWidth:.45,
@@ -9,6 +11,7 @@ export const STRUCTURE_DEFAULTS={
  structCoreDark:0,structCoreRadius:.3
 };
 export const STRUCTURE_META={
+ ...FILAMENT_META,
  loopAmount:['Apertura ad anello',0,1,.01],loopKnot:['Intreccio del nodo',0,1,.01],loopRadius:['Raggio del percorso',.6,1.6,.01],loopTube:['Spessore del tubo',.06,.6,.005],loopFlat:['Appiattimento a nastro',0,1,.01],loopTwist:['Torsione del nastro',-2,2,.01],loopWave:['Variazione di spessore',0,.35,.005],loopPhase:['Scorrimento',0,1,.001],
  structShell:['Svuotamento · pieno → membrana',0,1,.01],structThickness:['Spessore della membrana',.035,.4,.005],
  structFibres:['Separazione in fibre',0,1,.01],structWeft:['Fili trasversali · tessitura',0,1,.01],structDensity:['Fili intorno alla forma',6,48,1],structThreadWidth:['Larghezza dei fili',.15,.9,.01],structWeave:['Intreccio sopra / sotto',0,.16,.005],
@@ -20,9 +23,9 @@ export const STRUCTURE_META={
  structScallop:['Arrotondamento dei petali',0,1,.01],structSpiral:['Avvolgimento a spirale',-1,1,.01],structStagger:['Sfasamento fra le lamine',0,1,.01],structRuffle:['Ondulazione fine dei bordi',0,.15,.005],structTaper:['Assottigliamento verso il bordo',0,1,.01],
  structCoreDark:['Oscurità del nucleo',0,1,.01],structCoreRadius:['Estensione del nucleo',.05,.8,.01]
 };
-export const STRUCTURE_GROUPS={shape:Object.keys(STRUCTURE_DEFAULTS).filter(k=>!['loopPhase','structBreath','structFlap','structFlowPhase','structDelay','structCoreDark','structCoreRadius'].includes(k)),motion:['loopPhase','structBreath','structFlap','structFlowPhase','structDelay'],color:['structCoreDark','structCoreRadius']};
-export const STRUCTURE_TRACKS=Object.fromEntries(['loopAmount','loopKnot','loopRadius','loopTube','loopFlat','loopTwist','loopWave','loopPhase','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structFlowPhase','structScallop','structSpiral','structStagger','structRuffle'].map(k=>[k,[STRUCTURE_META[k][0],0,k==='structBreath'?.3:k==='structFlap'?.6:k==='structFold'?.4:k==='loopTwist'?2:k==='loopWave'?.35:k==='loopTube'?.6:1,.01]]));
-export const STRUCTURE_FIELD_KEYS=Object.keys(STRUCTURE_DEFAULTS).filter(k=>!k.startsWith('structCore'));
+export const STRUCTURE_GROUPS={shape:Object.keys(STRUCTURE_DEFAULTS).filter(k=>!['filPhase','filWind','filColor','filColorScatter','filRootShade','loopPhase','structBreath','structFlap','structFlowPhase','structDelay','structCoreDark','structCoreRadius'].includes(k)),motion:['filPhase','filWind','loopPhase','structBreath','structFlap','structFlowPhase','structDelay'],color:['filColor','filColorScatter','filRootShade','structCoreDark','structCoreRadius']};
+export const STRUCTURE_TRACKS={...FILAMENT_TRACKS,...Object.fromEntries(['loopAmount','loopKnot','loopRadius','loopTube','loopFlat','loopTwist','loopWave','loopPhase','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structFlowPhase','structScallop','structSpiral','structStagger','structRuffle'].map(k=>[k,[STRUCTURE_META[k][0],0,k==='structBreath'?.3:k==='structFlap'?.6:k==='structFold'?.4:k==='loopTwist'?2:k==='loopWave'?.35:k==='loopTube'?.6:1,.01]]))};
+export const STRUCTURE_FIELD_KEYS=Object.keys(STRUCTURE_DEFAULTS).filter(k=>!k.startsWith('structCore')&&!k.startsWith('fil'));
 export function hasStructure(s){return ['loopAmount','structShell','structFibres','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle'].some(k=>Math.abs(s[k]||0)>1e-6);}
 export function structureMayChange(s){return hasStructure(s)||STRUCTURE_FIELD_KEYS.some(k=>s.motions?.[k]?.enabled&&(s.motions[k].amplitude||s.motions[k].mode==='cycle'));}
 export function structureBounds(s){return Math.max(1,(s.loopAmount||0)>0?(s.loopRadius??.8)+.36*(s.loopKnot||0)+(s.loopTube??.22)*(1+(s.loopWave||0)):1)*(1+Math.abs(s.structGrowth||0)+Math.abs(s.structBreath||0))*(1+Math.abs(s.structCurl||0)+Math.abs(s.structFold||0)+Math.abs(s.structFlap||0)+Math.abs(s.structRuffle||0)*2+Math.abs(s.structStagger||0)*.6);}
@@ -123,13 +126,13 @@ float structureField(float d,vec3 p){
 `;
 export function structurePanel(tab,s,{slider,details,section}){
  const sliders=keys=>keys.map(k=>slider(k)).join('');
- if(tab==='shape')return details('Anelli e nodi',sliders(['loopAmount','loopRadius','loopTube','loopKnot','loopFlat','loopTwist','loopWave'])+'<p class="help">Apertura 0 mantiene la forma iniziale; 1 la trasforma in un anello. Intreccio separa e annoda il percorso. Appiattimento e torsione modellano il nastro. Spessore elevato può unire i passaggi del nodo.</p>')+section('Proprietà',(s.structureOriginal?'<p class="help">La struttura precedente è stata adattata alle proprietà comuni. Il risultato può cambiare; i dati originali sono conservati nel preset.</p><button class="quiet" data-structure-original="true">Scarica anche il preset originale</button>':'')+'<p class="help">Combina le proprietà sulla forma attuale. Profilo, ritagli e materia restano attivi.</p>')
+ if(tab==='shape')return filamentPanel(tab,s,{slider,details})+ details('Anelli e nodi',sliders(['loopAmount','loopRadius','loopTube','loopKnot','loopFlat','loopTwist','loopWave'])+'<p class="help">Apertura 0 mantiene la forma iniziale; 1 la trasforma in un anello. Intreccio separa e annoda il percorso. Appiattimento e torsione modellano il nastro. Spessore elevato può unire i passaggi del nodo.</p>')+section('Proprietà',(s.structureOriginal?'<p class="help">La struttura precedente è stata adattata alle proprietà comuni. Il risultato può cambiare; i dati originali sono conservati nel preset.</p><button class="quiet" data-structure-original="true">Scarica anche il preset originale</button>':'')+'<p class="help">Combina le proprietà sulla forma attuale. Profilo, ritagli e materia restano attivi.</p>')
  +details('Membrana',sliders(['structShell','structThickness','structTaper']))
  +details('Fibre e tessitura',sliders(['structFibres','structWeft','structDensity','structThreadWidth','structWeave'])+'<p class="help">Separazione apre gli spazi fra i fili. Tessitura aggiunge i fili trasversali; lo svuotamento può limitare la trama alla pelle.</p>')
  +details('Lamelle e strati',sliders(['structScallop','structPetalCount','structRadial','structPetalWidth','structSlices','structSliceCount','structSliceWidth','structLayers','structLayerCount','structLayerWidth'])+'<p class="help">Arrotondamento disegna lobi morbidi sulla forma; Separazione radiale apre gli intervalli. Lamelle e strati concentrici aggiungono altri livelli combinabili. I valori intermedi aprono progressivamente gli spazi. Gli strati interni diventano visibili con trasparenza o ritagli.</p>')
  +details('Pieghe e curvatura',sliders(['structGrowth','structCurl','structSpiral','structStagger','structFold','structFoldCount','structRuffle'])+'<p class="help">La posa e la sua animazione si regolano in Movimento. Trasparenza e rifrazione sono in Materia.</p>');
- if(tab==='color')return details('Nucleo scuro',sliders(['structCoreDark','structCoreRadius']));
- if(tab==='motion')return section('Posa',sliders(STRUCTURE_GROUPS.motion.filter(k=>k!=='loopPhase'))+'<p class="help">Questi valori definiscono la posa. Apri le rispettive tracce qui sotto per animarla: ogni proprietà ha velocità, verso, fase e ritmo propri.</p>');
+ if(tab==='color')return filamentPanel(tab,s,{slider,details})+ details('Nucleo scuro',sliders(['structCoreDark','structCoreRadius']));
+ if(tab==='motion')return section('Posa',sliders(STRUCTURE_GROUPS.motion.filter(k=>k!=='loopPhase'&&!k.startsWith('fil')))+'<p class="help">Questi valori definiscono la posa. Apri le rispettive tracce qui sotto per animarla: ogni proprietà ha velocità, verso, fase e ritmo propri.</p>');
  return '';
 }
 

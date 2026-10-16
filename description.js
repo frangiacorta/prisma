@@ -1,8 +1,8 @@
-import {META,MOODS,GROUPS} from './model.js?v=4d2cde175a7f';
-import {particleSphere} from './particle-model.js?v=4d2cde175a7f';
-import {PATH_META} from './particle-paths.js?v=4d2cde175a7f';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=4d2cde175a7f';
-import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=4d2cde175a7f';
+import {META,MOODS,GROUPS} from './model.js?v=c76d08458d01';
+import {particleSphere} from './particle-model.js?v=c76d08458d01';
+import {PATH_META} from './particle-paths.js?v=c76d08458d01';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES} from './studio-model.js?v=c76d08458d01';
+import {material,sculpt,motionPreset,upgrade,setFullness,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=c76d08458d01';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);
@@ -19,7 +19,7 @@ function shape(s,name){if((s.engine==='particles'||s.pLiving>0)&&name==='sfera')
 export function applyDescriptionPlan(current,plan){
  if(!plan||!Array.isArray(plan.operations)||plan.operations.length>100)throw Error('La richiesta non contiene modifiche valide.');const s=structuredClone(current);const notes=[];
  for(const o of plan.operations){if(!o||typeof o!=='object')throw Error('Comando non valido');
-  if(o.type==='set'){const value=scalar(o.key,o.value);if(GROUPS.material.includes(o.key)||/^(struct|environment|film|petal|stem|colorWave|ground)/.test(o.key))upgrade(s);s[o.key]=value;if(o.key==='fullness')setFullness(s,value);notes.push(META[o.key][0]);}
+  if(o.type==='set'){const value=scalar(o.key,o.value);if(GROUPS.material.includes(o.key)||/^(fil|loop|struct|environment|film|petal|stem|colorWave|ground)/.test(o.key))upgrade(s);s[o.key]=value;if(o.key==='fullness')setFullness(s,value);notes.push(META[o.key][0]);}
   else if(o.type==='shape'){upgrade(s);shape(s,o.name);notes.push('Forma: '+o.name);}
   else if(o.type==='material'){if(!Number.isInteger(o.index)||!MATERIAL_STYLES[o.index])throw Error('Materia non disponibile');material(s,o.index);notes.push('Materia: '+MATERIAL_STYLES[o.index].name);}
   else if(o.type==='textureStyle'){if(!Number.isInteger(o.index)||!TEXTURE_STYLES[o.index])throw Error('Texture non disponibile');textureStyle(s,o.index);notes.push('Texture: '+TEXTURE_STYLES[o.index].name);}
@@ -52,7 +52,7 @@ export function applyDescriptionPlan(current,plan){
     else if(key==='phase'&&Number.isFinite(value)&&value>=0&&value<=360)values[key]=value;
     else if(key==='direction'&&(value===1||value===-1))values[key]=value;
     else if(key==='curve'&&['sine','soft','triangle'].includes(value))values[key]=value;
-    else if(key==='mode'&&(['wave'].includes(value)||(value==='cycle'&&/^(rotate[XYZ]|gradientOffset|colorWavePhase|petalPhase|petalFlowPhase|petalOrbitPhase)$/.test(o.key))))values[key]=value;
+    else if(key==='mode'&&(['wave'].includes(value)||(value==='cycle'&&/^(rotate[XYZ]|gradientOffset|colorWavePhase|petalPhase|petalFlowPhase|petalOrbitPhase|filPhase|loopPhase|structFlowPhase)$/.test(o.key))))values[key]=value;
     else throw Error('Proprietà del movimento non valida');
    }upgrade(s);s.motions[o.key]={...(s.motions[o.key]||track()),...values};notes.push('Movimento: '+TRACK_META[o.key][0]);
   }
