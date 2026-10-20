@@ -1,7 +1,7 @@
-import {BASE_FORM_GLSL} from './base-forms.js?v=adcb7f564c42';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=adcb7f564c42';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=adcb7f564c42';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=adcb7f564c42';
+import {BASE_FORM_GLSL} from './base-forms.js?v=a20f263b137b';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=a20f263b137b';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=a20f263b137b';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=a20f263b137b';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.

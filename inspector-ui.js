@@ -1,9 +1,9 @@
-import {organizeSections} from './inspector-navigation.js?v=adcb7f564c42';
-import {controlHelp} from './control-help.js?v=adcb7f564c42';
+import {organizeSections} from './inspector-navigation.js?v=a20f263b137b';
+import {controlHelp} from './control-help.js?v=a20f263b137b';
 const STORE='prisma-interface-v2';
 let preferences={};try{preferences=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(preferences));}catch{}};
-const slug=text=>text.toLowerCase().split('·')[0].trim().replace(/\d+/g,'#');
+const slug=text=>text.toLowerCase().trim();
 let tip,owner,pinned=false,serial=0;
 function hideTip(){if(tip)tip.hidden=true;owner=null;pinned=false;}
 function showTip(button,pin=false){
@@ -32,6 +32,7 @@ function addHelp(root){
   else{const wrap=document.createElement('div');wrap.className='control-with-help';host.before(wrap);wrap.append(host,button,desc);}
  }
 }
+export function captureInspector(root){for(const d of root.querySelectorAll('details[data-disclosure-key]'))preferences[d.dataset.disclosureKey]=d.open;save();}
 export function prepareInspector(root,scope){
  hideTip();
  // Legacy scene tools use sections; keep their IDs and delegate handlers intact.
@@ -40,7 +41,7 @@ export function prepareInspector(root,scope){
  const nodes=[...root.querySelectorAll('details')];
  for(const [index,d] of nodes.entries()){
   const parent=d.parentElement.closest('details'),id=d.id||slug(d.querySelector(':scope > summary')?.textContent||'');
-  const key=scope+'/'+(parent?.dataset.disclosurePath||'')+'/'+id;d.dataset.disclosurePath=(parent?.dataset.disclosurePath||'')+'/'+id;
+  const key=scope+'/'+(parent?.dataset.disclosurePath||'')+'/'+id;d.dataset.disclosureKey=key;d.dataset.disclosurePath=(parent?.dataset.disclosurePath||'')+'/'+id;
   d.open=Object.hasOwn(preferences,key)?preferences[key]:d.dataset.defaultOpen==='true'||index===0;
   d.addEventListener('toggle',()=>{if(!d.isConnected)return;preferences[key]=d.open;save();});
  }

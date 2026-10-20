@@ -1,13 +1,13 @@
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=adcb7f564c42';
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=adcb7f564c42';
-import {normalizeAudioClip} from './audio-recording.js?v=adcb7f564c42';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=adcb7f564c42';
-import {normalizeAudio} from './audio-model.js?v=adcb7f564c42';
-import {PARTICLE_META,PARTICLE_VERSION} from './particle-model.js?v=adcb7f564c42';
-import {normalizeForcePaths} from './particle-paths.js?v=adcb7f564c42';
-import {normalizeForcePoints} from './particle-forces.js?v=adcb7f564c42';
-import {preset,MOODS,META,GROUPS,random} from './model.js?v=adcb7f564c42';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS} from './studio-model.js?v=adcb7f564c42';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=a20f263b137b';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=a20f263b137b';
+import {normalizeAudioClip} from './audio-recording.js?v=a20f263b137b';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=a20f263b137b';
+import {normalizeAudio} from './audio-model.js?v=a20f263b137b';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles} from './particle-model.js?v=a20f263b137b';
+import {normalizeForcePaths} from './particle-paths.js?v=a20f263b137b';
+import {normalizeForcePoints} from './particle-forces.js?v=a20f263b137b';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=a20f263b137b';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=a20f263b137b';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -15,7 +15,7 @@ export function material(s,index){Object.assign(s,MATERIAL_STYLES[index].values)
 export function textureStyle(s,index){if(!TEXTURE_STYLES[index])throw Error('Scegli una texture disponibile.');upgrade(s);Object.assign(s,ORGANIC_DETAIL_DEFAULTS,TEXTURE_STYLES[index].values);return s;}
 export function newCreation(){const s=preset(1);material(s,14);Object.assign(s,{materialName:'Sfera semplice',volume:1,bgMode:'solid',background:'#000000',background2:'#000000',grounding:0,palette:['#d9dce2'],roughness:.55,gloss:.25,grain:0,glow:0,edge:0,rotateX:0,rotateY:0,scale:.92,duration:12});for(const t of Object.values(s.motions))t.enabled=false;s.lights.forEach(l=>l.visible=false);return s;}
 
-export const MOTION_PRESETS=[['emerge','Spuntano e rientrano'],['wrap','Avanzano intorno alla sfera'],['roots','Radici in movimento'],['bloom','Petali che si aprono'],['chromatic','Onde cromatiche'],['breathe','Bolla che respira'],['reflect','Riflessi che girano'],['film','Colori che colano e vorticano'],['orbit','Luce che orbita'],['wave','Forma che ondeggia']];
+export const MOTION_PRESETS=[['turn','Rotazione'],['float','Fluttuazione'],['pulse','Pulsazione'],['emerge','Spuntano e rientrano'],['wrap','Avanzano intorno alla sfera'],['roots','Radici in movimento'],['bloom','Petali che si aprono'],['chromatic','Onde cromatiche'],['breathe','Bolla che respira'],['reflect','Riflessi che girano'],['film','Colori che colano e vorticano'],['orbit','Luce che orbita'],['wave','Forma che ondeggia']];
 export function motionPreset(s,key){
  upgrade(s);if(key!=='bloom'&&key!=='chromatic'){for(const t of Object.values(s.motions))t.enabled=false;s.environmentRotate=false;s.filmFlow=0;s.filmSwirl=0;for(const l of s.lights){l.orbit.enabled=false;l.pulse.enabled=false;}}
  if(!Number.isFinite(s.duration))s.duration=12;if(!Number.isFinite(s.speed))s.speed=1;if(!Number.isFinite(s.motion))s.motion=.3;
@@ -27,6 +27,9 @@ export function motionPreset(s,key){
   if(key==='roots'){s.petalCoil=.35;s.petalWander=Math.max(.35,Math.min(.75,s.petalWander||0));s.petalReentry=.4;move('petalCoil',.25);move('petalWander',.12,90);move('petalReentry',.2,90);}
  }
 
+ if(key==='turn')s.motions.rotateY={...s.motions.rotateY,enabled:true,amplitude:360,mode:'cycle',cycles:1,direction:1};
+ if(key==='float')for(const [k,amp,phase]of [['positionX',.18,0],['positionY',.12,90]])s.motions[k]={...s.motions[k],enabled:true,amplitude:amp,mode:'wave',curve:'sine',cycles:1,phase};
+ if(key==='pulse')s.motions.scale={...s.motions.scale,enabled:true,amplitude:.08,mode:'wave',curve:'sine',cycles:2,phase:0};
  if(key==='breathe'){s.motions.volume={...s.motions.volume,enabled:true,amplitude:.045,curve:'sine',phase:0,cycles:1};s.motions.scale={...s.motions.scale,enabled:true,amplitude:.018,phase:0,cycles:1};}
  if(key==='reflect')s.environmentRotate=true;
  if(key==='film'){s.thinFilm=Math.max(.7,s.thinFilm||0);s.filmFlow=.7;s.filmSwirl=.6;s.filmCycles=1;}
@@ -36,7 +39,7 @@ export function motionPreset(s,key){
  if(key==='chromatic'){s.colorWaveAmount=1;s.motions.colorWavePhase={...s.motions.colorWavePhase,enabled:true,mode:'cycle',cycles:1,phase:0,direction:1};}
  return s;
 }
-export function hasMotion(s){return (s.finishEnabled!==false&&s.finishGlitch&&s.finishGlitchAnimate&&s.finishGlitchMix>0&&s.finishGlitchCoverage>0&&(s.finishGlitchAmount>0||s.finishGlitchSplit>0))||(s.finishEnabled!==false&&s.finishGlyph&&s.finishGlyphMix>0&&s.finishGlyphVariation>0)||s.engine==='particles'||s.pLiving>0|| Object.values(s.motions||{}).some(t=>t.enabled)||s.lights.some(l=>l.orbit?.enabled||l.pulse?.enabled)||!!s.environmentRotate||(s.filmFlow||0)>0||(s.filmSwirl||0)>0;}
+export function hasMotion(s){return (s.finishEnabled!==false&&((s.finishWarp&&s.finishWarpMix>0&&s.finishWarpMotion>0)||(s.finishGlass&&s.finishGlassMix>0&&s.finishGlassMotion>0)))||(s.finishEnabled!==false&&s.finishGlitch&&s.finishGlitchAnimate&&s.finishGlitchMix>0&&s.finishGlitchCoverage>0&&(s.finishGlitchAmount>0||s.finishGlitchSplit>0))||(s.finishEnabled!==false&&s.finishGlyph&&s.finishGlyphMix>0&&s.finishGlyphVariation>0)||s.engine==='particles'||s.pLiving>0|| Object.values(s.motions||{}).some(t=>t.enabled)||s.lights.some(l=>l.orbit?.enabled||l.pulse?.enabled)||!!s.environmentRotate||(s.filmFlow||0)>0||(s.filmSwirl||0)>0;}
 function hue(hex,angle){let [r,g,b]=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;let h=d?(max===r?(g-b)/d:max===g?(b-r)/d+2:(r-g)/d+4)/6:0;h=(h+angle/360+1)%1;const sat=max?d/max:0,x=h*6,j=Math.floor(x),f=x-j,p=max*(1-sat),q=max*(1-f*sat),t=max*(1-(1-f)*sat);const c=[[max,t,p],[q,max,p],[p,max,t],[p,q,max],[t,p,max],[max,p,q]][j%6];return '#'+c.map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');}
 const clamp=(key,value)=>META[key]?Math.max(META[key][1],Math.min(META[key][2],value)):value;
 export function similar(s,seed,count=8,strength=.7){const r=random(seed),profiles=[[1,.4,.45],[.45,1,.45],[.5,.45,1],[.9,.9,.5],[.6,.9,.9],[1,.5,.9],[.7,1,.6],[1,1,1]],amount=Math.max(0,Math.min(1,strength));return Array.from({length:count},(_,i)=>{
@@ -133,8 +136,9 @@ export function normalizeCreation(raw){
  for(const k of ['internalColor','sssColor'])if(!/^#[0-9a-f]{6}$/i.test(s[k]||''))s[k]=k==='internalColor'?'#e6f5ff':'#ffc49b';
  for(const k of ['photoAll','environmentRotate'])s[k]=raw[k]===true;
  for(const k of ['finishEnabled','finishTone'])s[k]=raw[k]!==false;
- for(const k of ['finishRgb','finishMosaic','finishGlyph','finishGlitch','finishEdge','finishEdgeSource','finishEdgeOnly'])s[k]=raw[k]===true;
- for(const k of ['finishGlitchAnimate','finishRegionEdge','finishRegionGlitch'])s[k]=raw[k]!==false;for(const k of ['finishGlitchCycles','finishGlitchSeed'])s[k]=Math.round(s[k]);
+ for(const k of ['finishRgb','finishMosaic','finishGlyph','finishGlitch','finishEdge','finishEdgeSource','finishEdgeOnly','finishWarp','finishGlass'])s[k]=raw[k]===true;
+ for(const k of ['finishGlitchAnimate','finishRegionEdge','finishRegionGlitch','finishRegionWarp','finishRegionGlass'])s[k]=raw[k]!==false;for(const k of ['finishGlitchCycles','finishGlitchSeed'])s[k]=Math.round(s[k]);
+ for(const k of ['finishGlyphFont','finishGlyphSet','finishGlyphSeed','finishGlitchShape','finishWarpLayers','finishWarpCycles','finishWarpSeed','finishGlassShape','finishGlassCycles'])s[k]=Math.round(s[k]);s.finishGlyphChars=typeof raw.finishGlyphChars==='string'?Array.from(raw.finishGlyphChars.replace(/[\x00-\x1f\x7f]/g,'')).slice(0,64).join('')||' .:-=+*#%@':' .:-=+*#%@';
  s.finishOrder=normalizeFinishOrder(raw.finishOrder);s.finishGlyphStyle=Math.round(s.finishGlyphStyle);s.finishGlyphCycles=Math.round(s.finishGlyphCycles);s.finishGlyphSource=raw.finishGlyphSource!==false;s.finishRegionGlyph=raw.finishRegionGlyph!==false;s.finishCompare=false;s.finishRegions=normalizeFinishRegions(raw.finishRegions);s.finishRegionMosaic=raw.finishRegionMosaic!==false;for(const k of ['finishRegionsEnabled','finishRegionRgb','finishRegionInvert'])s[k]=raw[k]===true;
  if(s.perfectLoop)for(const k of ['environmentCycles','filmCycles'])s[k]=Math.max(1,Math.round(s[k]||1));
  // Existing v33 veil creations gain the editable source bridge on reopen.
@@ -150,3 +154,25 @@ export function normalizeCreation(raw){
  return s;
 }
 function safeTrack(base,raw,perfectLoop=true){const t={...base,enabled:raw.enabled===true};for(const k of ['pace','pacePhase','hold'])if(Number.isFinite(raw[k]))t[k]=Math.max(0,Math.min(k==='pace'?.95:k==='hold'?.8:360,raw[k]));for(const k of ['amplitude','cycles','phase'])if(Number.isFinite(raw[k]))t[k]=Math.max(0,Math.min(k==='amplitude'?360:k==='cycles'?8:360,raw[k]));t.cycles=perfectLoop?Math.max(1,Math.round(t.cycles)):Math.max(.1,t.cycles);t.direction=raw.direction===-1?-1:1;if(['sine','soft','triangle'].includes(raw.curve))t.curve=raw.curve;if(['wave','cycle'].includes(raw.mode))t.mode=raw.mode;if(['x','y','z'].includes(raw.axis))t.axis=raw.axis;return t;}
+
+// Scoped variations never switch renderer or revive unrelated controls from a stale anchor.
+export function varyCreation(source,seed,amount=.45,scope='all',locks={}){
+ if(amount<=0)return structuredClone(source);
+ const particle=source.engine==='particles'||source.pLiving>0;
+ let out=randomize(source,seed,amount,scope,locks);
+ if(particle){const p=varyParticles(source,seed,amount,scope);for(const k of Object.keys(PARTICLE_META))out[k]=p[k];}
+ const allowed=g=>!locks[g]&&(scope==='all'||scope===g);
+ if(!particle&&allowed('shape')){const target=surprise(seed);for(const k of GROUPS.shape){if(Object.hasOwn(PARTICLE_META,k))continue;if(typeof source[k]==='number'&&typeof target[k]==='number'){const m=META[k];out[k]=source[k]+(target[k]-source[k])*amount;if(m?.[3]>=1)out[k]=Math.round(out[k]);}}}
+ if((allowed('motion')||scope==='sceneMotion')&&!locks.motion){
+  const r=random(seed^0x72963),keys=scope==='sceneMotion'?['rotateX','rotateY','rotateZ','positionX','positionY','scale']:Object.keys(TRACK_META).filter(k=>!k.startsWith('petal')&&!k.startsWith('struct')&&!k.startsWith('fil')&&!k.startsWith('loop')||source[k]>0||source.motions[k]?.enabled);
+  out.motions=structuredClone(source.motions);
+  const active=keys.filter(k=>source.motions[k]?.enabled),chosen=active.length?active:keys.filter(k=>['rotateY','positionY','scale'].includes(k));
+  for(const k of chosen){const t=out.motions[k],m=TRACK_META[k];if(!t||!m)continue;t.enabled=true;t.amplitude=Math.max(m[1],Math.min(m[2],t.amplitude+(m[2]*(.08+r()*.3)-t.amplitude)*amount));t.cycles=1+Math.floor(r()*3);t.phase=Math.round(r()*360);t.direction=r()<.5?-1:1;t.curve=['sine','soft','triangle'][Math.floor(r()*3)];}
+  if(scope==='sceneMotion'){out.environmentRotate=r()>.5;out.environmentCycles=1+Math.floor(r()*3);out.lights=structuredClone(source.lights);for(const l of out.lights)if(l.orbit?.enabled||l.pulse?.enabled){l.orbit.cycles=1+Math.floor(r()*3);l.orbit.phase=r()*360;l.pulse.cycles=1+Math.floor(r()*3);}}
+ }
+ for(const [g,keys]of Object.entries(GROUPS))if(!allowed(g)&&!(g==='motion'&&scope==='sceneMotion'))for(const k of keys)out[k]=structuredClone(source[k]);
+ if(scope==='sceneMotion'&&!locks.motion&&!locks.light){const r=random(seed^0x144ab);out.environmentRotate=true;out.environmentCycles=1+Math.floor(r()*3);out.lights=structuredClone(source.lights);for(const l of out.lights){if(l.orbit?.enabled){l.orbit.cycles=1+Math.floor(r()*3);l.orbit.phase=r()*360;}if(l.pulse?.enabled){l.pulse.cycles=1+Math.floor(r()*3);l.pulse.phase=r()*360;}}}
+ if(!allowed('shape'))out.seed=source.seed;
+ out.engine=source.engine;out.renderVersion=source.renderVersion;out.pLiving=source.pLiving;out.pVeilFromForm=source.pVeilFromForm;out.pVeilSourceKind=source.pVeilSourceKind;
+ return normalizeCreation(out);
+}

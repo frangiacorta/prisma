@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-13",
+  "updated": "2026-10-21",
   "items": [
     {
       "id": "s01-01",
@@ -14162,58 +14162,48 @@
         "recursive-displace",
         "roadmap-luminous-vortex"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
-      "summary": "Deformazioni ricorsive della scena. Progetto TouchDesigner originale a pagamento.",
+      "summary": "Warp ricorsivo integrato come filtro modulabile sulla scena. Feedback temporale ancora da sviluppare.",
       "sources": [
-        "https://www.patreon.com/posts/recursive-ii-in-72162284"
+        "https://www.patreon.com/posts/recursive-ii-in-72162284",
+        "https://derivative.ca/UserGuide/Displace_TOP"
       ],
       "sections": [
         {
-          "title": "Come lo portiamo in Prisma",
+          "title": "Implementazione",
           "fields": [
             {
               "label": "method",
-              "value": "Warp e feedback controllati; iterazioni, scala, rotazione, persistenza e reset."
-            }
-          ]
-        },
-        {
-          "title": "Repo, plugin e riuso",
-          "fields": [
-            {
-              "label": "feasible",
-              "value": "Deformazioni ricorsive della scena. Progetto TouchDesigner originale a pagamento."
-            }
-          ]
-        },
-        {
-          "title": "Controlli e regole",
-          "fields": [
+              "value": "Da uno a sei ricampionamenti successivi del fotogramma, guidati da un campo deformabile e dai colori della scena. Ampiezza, scala, decadimento, influenza della scena, seed e animazione ciclica. La ricorsione avviene dentro il fotogramma: non è feedback temporale."
+            },
             {
               "label": "controls",
               "value": [
-                "Intensità warp",
-                "Scala campo",
-                "Iterazioni",
-                "Ricorsione",
-                "Rotazione",
-                "Zoom",
-                "Persistenza",
-                "Smussatura",
-                "Decadimento",
-                "Ripristina stato"
+                "Mix",
+                "Ampiezza",
+                "Scala del campo",
+                "Passaggi ricorsivi",
+                "Persistenza tra passaggi",
+                "Influenza dei colori della scena",
+                "Seed",
+                "Movimento e cicli",
+                "Riquadri e ordine dei filtri"
               ]
+            }
+          ]
+        },
+        {
+          "title": "Riuso e limiti",
+          "fields": [
+            {
+              "label": "reuse",
+              "value": "Ricetta Displace TOP documentata da Derivative; shader Prisma autonomo. Il progetto PAKETA12 è a pagamento e non è stato incorporato o dichiarato equivalente."
             },
             {
-              "label": "acceptance",
-              "value": [
-                "Effetto zero restituisce la scena originale",
-                "Feedback limitato senza esplosione luminosa",
-                "Reset ripetibile",
-                "Chiusura del loop verificata dopo preriscaldamento"
-              ]
+              "label": "remaining",
+              "value": "Feedback temporale con memoria, zoom e rotazione. Il filtro attuale non richiede preriscaldamento e rimane identico durante seek ed export."
             }
           ]
         }
@@ -14222,10 +14212,10 @@
         "workflow"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "",
-      "where": "",
+      "result": "Deformazione iterativa per fotogramma, combinabile con tutti i filtri.",
+      "where": "Scena → Post-processing → Warp ricorsivo",
       "platform": "",
-      "next": "",
+      "next": "Feedback temporale, zoom e rotazione con memoria dei fotogrammi; confronto dedicato con la reference PAKETA12.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -14962,12 +14952,13 @@
         "tool-08",
         "s18-01",
         "prisma-window-depth",
-        "prisma-image-particles"
+        "prisma-image-particles",
+        "roadmap-optical-glass"
       ],
       "state": "partial",
       "priority": false,
       "author": "",
-      "summary": "Filtri finali sulle forme, sulle particelle e sulle scene create in Prisma: colore, celle, segni, contorni e glitch.",
+      "summary": "Trattamenti finali combinabili su Forme e Particelle: mosaico, RGB, ASCII, contorni, glitch, warp e vetro. Regolazioni colore separate.",
       "sources": [
         "https://www.theladybug.app/about/",
         "https://derivative.ca/UserGuide/Resolution_TOP",
@@ -14980,7 +14971,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Il fotogramma composto dai renderer Prisma attraversa la catena riordinabile dei cinque trattamenti, saltando quelli spenti. Colore, esposizione, lente e grana restano regolazioni di base applicate dal renderer. Ordine conservato nei preset e condiviso fra anteprima ed export."
+              "value": "Il fotogramma composto dai renderer Prisma attraversa la catena riordinabile dei sette trattamenti, saltando quelli spenti. Colore, esposizione, lente e grana restano regolazioni di base applicate dal renderer. Ordine conservato nei preset e condiviso fra anteprima ed export."
             }
           ]
         },
@@ -15040,7 +15031,11 @@
                 "Preset, composizione con segni, anteprima, MP4 e wallpaper offline su Forme e Particelle",
                 "Ordine trascinabile per Mosaico, RGB, Contorni, Segni e Glitch; frecce e tastiera come alternative",
                 "Ordine, attivazioni, parametri e riquadri conservati nel preset e nella creazione corrente",
-                "Catena condivisa da anteprima, immagini, MP4 e wallpaper; preset precedenti con ordine iniziale invariato"
+                "Catena condivisa da anteprima, immagini, MP4 e wallpaper; preset precedenti con ordine iniziale invariato",
+                "Glitch: bande, blocchi e colonne; dimensioni irregolari, angolo, ritmo, sfasamento e rinnovo per impulso.",
+                "ASCII: quattro font, set predefiniti o caratteri personalizzati, font mescolati, casualità di caratteri, dimensione, rotazione e posizione.",
+                "Regolazioni separate dal post-processing. Sette filtri riordinabili, con attivazioni, riquadri, parametri e ordine salvati nel preset.",
+                "Warp ricorsivo e vetro ottico applicati alla creazione corrente, sia Forme sia Particelle; loop deterministici e video esportato verificato."
               ]
             },
             {
@@ -15059,7 +15054,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Scena → Filtri; accessibile anche dal pannello Export.",
+      "where": "Scena → Regolazioni per colore, esposizione, lente e grana; Scena → Post-processing per i sette filtri.",
       "platform": "",
       "next": "Preset di soli filtri: salvare una combinazione e applicarla ad altre creazioni Prisma mantenendo forma, materiali e movimento.",
       "keep": "",
@@ -17579,12 +17574,13 @@
       "related": [
         "img-s16-mosaic",
         "img-s16-rgb",
-        "roadmap-image-treatments"
+        "roadmap-image-treatments",
+        "roadmap-optical-glass"
       ],
       "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Trattamenti finali per Forme e Particelle: colore, mosaico, RGB, ASCII/ricamo/punti, contorni e glitch animato, con riquadri selettivi.",
+      "summary": "Trattamenti finali combinabili su Forme e Particelle: mosaico, RGB, ASCII, contorni, glitch, warp e vetro. Regolazioni colore separate.",
       "sources": [
         "https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexSubImage2D",
         "https://github.com/niccolofanton/morphing-ascii-shader",
@@ -17655,16 +17651,20 @@
                 "Preset, composizione con segni, anteprima, MP4 e wallpaper offline su Forme e Particelle",
                 "Ordine trascinabile per Mosaico, RGB, Contorni, Segni e Glitch; frecce e tastiera come alternative",
                 "Ordine, attivazioni, parametri e riquadri conservati nel preset e nella creazione corrente",
-                "Catena condivisa da anteprima, immagini, MP4 e wallpaper; preset precedenti con ordine iniziale invariato"
+                "Catena condivisa da anteprima, immagini, MP4 e wallpaper; preset precedenti con ordine iniziale invariato",
+                "Glitch: bande, blocchi e colonne; dimensioni irregolari, angolo, ritmo, sfasamento e rinnovo per impulso.",
+                "ASCII: quattro font, set predefiniti o caratteri personalizzati, font mescolati, casualità di caratteri, dimensione, rotazione e posizione.",
+                "Regolazioni separate dal post-processing. Sette filtri riordinabili, con attivazioni, riquadri, parametri e ordine salvati nel preset.",
+                "Warp ricorsivo e vetro ottico applicati alla creazione corrente, sia Forme sia Particelle; loop deterministici e video esportato verificato."
               ]
             },
             {
               "label": "limits",
               "value": [
-                "Colore, esposizione, lente e grana restano alla base della scena; la catena riordinabile comprende Mosaico, RGB, Contorni, Segni e Glitch.",
+                "Colore, esposizione, lente e grana restano alla base della scena; la catena riordinabile comprende Mosaico, RGB, Contorni, Segni, Glitch, Warp e Vetro.",
                 "I contorni sono rilevati dal fotogramma 2D, non da geometria o profondità 3D",
                 "Colore/esposizione/lente/grana conservano il loro ambito globale o soggetto",
-                "Atlante ASCII fisso, nessuna inerzia del MemoryGrid originale",
+                "Atlante ASCII personalizzabile con font locali; nessuna inerzia del MemoryGrid originale",
                 "Preset dei soli filtri e maschere dipinte restano da sviluppare."
               ]
             }
@@ -17706,7 +17706,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Scena → Filtri, oppure Esporta creazione → Regola filtri prima dell’export.",
+      "where": "Scena → Regolazioni per colore, esposizione, lente e grana; Scena → Post-processing per i sette filtri.",
       "platform": "",
       "next": "",
       "keep": "",
@@ -20761,6 +20761,88 @@
         }
       ],
       "completedProjects": []
+    },
+    {
+      "id": "roadmap-optical-glass",
+      "name": "Vetro ottico",
+      "kind": "project",
+      "related": [
+        "roadmap-image-treatments",
+        "roadmap-recursive-warp"
+      ],
+      "state": "implemented",
+      "priority": false,
+      "author": "Prisma",
+      "summary": "Scanalature, lenti e profilo prismatico sul risultato della scena. Rifrazione, dispersione, ondulazione, sfocatura e movimento combinabili con gli altri filtri.",
+      "sources": [
+        "https://derivative.ca/UserGuide/Displace_TOP",
+        "https://docs.blender.org/manual/en/dev/render/shader_nodes/shader/glass.html"
+      ],
+      "sections": [
+        {
+          "title": "Tecnica e provenienza",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Trattamento WebGL del fotogramma finale. Ispirazione visiva dalle reference di vetro ottico e Optic Lab; documentazione Displace TOP e Glass BSDF consultata. Nessun codice o addon Blender incorporato."
+            },
+            {
+              "label": "limits",
+              "value": "Deformazione 2D: non simula lo spessore di un oggetto di vetro, riflessi dell’ambiente 3D o rifrazione fisica. Il riflesso delle scanalature è regolabile e può essere azzerato."
+            }
+          ]
+        },
+        {
+          "title": "Controlli",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Profilo: scanalature, lenti o prisma",
+                "Mix e rifrazione",
+                "Passo e angolo",
+                "Ondulazione",
+                "Sfocatura e dispersione RGB",
+                "Riflesso",
+                "Movimento e cicli",
+                "Riquadri, ordine dei filtri e reset indipendente"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Verifica",
+          "fields": [
+            {
+              "label": "evidence",
+              "value": "reports/random-optics: differenze pixel per ogni controllo, mix zero, maschere, alpha, loop, ordine, preset, Forme e Particelle, MP4 e wallpaper offline."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "graphic",
+        "film"
+      ],
+      "familyBasis": "Deformazione ottica del fotogramma, modulabile per strati.",
+      "result": "Integrato nel post-processing della creazione corrente.",
+      "where": "Scena → Post-processing → Vetro",
+      "platform": "WebGL2",
+      "next": "",
+      "keep": "Controlli indipendenti, effetti combinabili, intensità zero neutra.",
+      "avoid": "Confondere il filtro finale con un materiale di vetro fisico.",
+      "detailsSource": [
+        "reference/creative-roadmap.json"
+      ],
+      "media": [
+        {
+          "src": "../previews/vetro-ottico.png",
+          "width": 640,
+          "height": 360
+        }
+      ],
+      "assets": [],
+      "completedProjects": []
     }
   ],
   "families": [
@@ -20977,11 +21059,11 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 188,
+    "records": 189,
     "videos": 61,
     "images": 23,
     "tools": 73,
-    "projects": 28,
+    "projects": 29,
     "attachments": 132,
     "clips": 61,
     "missing": 10

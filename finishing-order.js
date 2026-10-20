@@ -1,4 +1,4 @@
-import {FINISH_FILTERS,FINISH_ORDER,normalizeFinishOrder} from './finishing.js?v=adcb7f564c42';
+import {FINISH_FILTERS,FINISH_ORDER,normalizeFinishOrder} from './finishing.js?v=a20f263b137b';
 
 export function finishingOrderPanel(s){
  const order=normalizeFinishOrder(s.finishOrder);
@@ -19,7 +19,7 @@ export function mountFinishingOrder({getState,remember,mark,renderControls}){
   if(b.dataset.finishOpen){const target=controls.querySelector(`[data-check="${FINISH_FILTERS[b.dataset.finishOpen].enabled}"]`);for(let p=target?.parentElement;p&&p!==controls;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;target?.scrollIntoView({block:'center',behavior:'smooth'});target?.focus({preventScroll:true});}
   if(b.id==='finish-order-reset'){const order=normalizeFinishOrder(getState().finishOrder);if(order.every((k,i)=>k===FINISH_ORDER[i]))return;remember();getState().finishOrder=[...FINISH_ORDER];mark();renderControls();controls.querySelector('#finish-order-reset')?.focus({preventScroll:true});announce('Ordine iniziale ripristinato. Parametri e attivazioni conservati.');}
  });
- controls.addEventListener('keydown',e=>{const id=e.target.dataset.finishHandle;if(id&&['ArrowUp','ArrowDown','Home','End'].includes(e.key)){e.preventDefault();move(id,e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:e.key==='Home'?-5:5);}if(e.key==='Escape'&&drag){e.preventDefault();end(false);}});
+ controls.addEventListener('keydown',e=>{const id=e.target.dataset.finishHandle;if(id&&['ArrowUp','ArrowDown','Home','End'].includes(e.key)){e.preventDefault();move(id,e.key==='ArrowUp'?-1:e.key==='ArrowDown'?1:e.key==='Home'?-FINISH_ORDER.length:FINISH_ORDER.length);}if(e.key==='Escape'&&drag){e.preventDefault();end(false);}});
  // Moving the focused DOM row can blur its handle; Escape must still cancel that drag.
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drag){e.preventDefault();end(false);}});
  function update(){if(!drag||!drag.row.isConnected)return;const rest=rows().filter(r=>r!==drag.row);const next=rest.find(r=>drag.y<r.getBoundingClientRect().top+r.getBoundingClientRect().height/2);const list=drag.row.parentElement;if(next)list.insertBefore(drag.row,next);else list.append(drag.row);rows().forEach((r,i)=>{r.querySelector('.finish-order-index').textContent=i+1;});}

@@ -2,7 +2,7 @@
 export const NAV_GROUPS=[
  {id:'structure',label:'Struttura',tabs:[['shape','Forma','shape'],['grains','Particelle','shape','particles'],['trails','Fibre e scie','motion','particles'],['motion','Movimento','motion']]},
  {id:'look',label:'Aspetto',tabs:[['material','Materia','material'],['color','Colori','palette'],['light','Luci','sun']]},
- {id:'scene',label:'Scena',tabs:[['background','Sfondo','background'],['photo','Filtri','photo']]},
+ {id:'scene',label:'Scena',tabs:[['background','Sfondo','background'],['tone','Regolazioni','photo'],['photo','Post-processing','photo']]},
  {id:'interaction',label:'Interazione',tabs:[['fields','Campi','move'],['body','Mani e braccia','orbit'],['audio','Audio','audio']]}
 ];
 export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.filter(t=>(!t[3]||t[3]===engine)&&!(engine==='veils'&&['fields','body','audio'].includes(t[0]))).map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label})));
@@ -26,7 +26,7 @@ export function organizeSections(root,scope){
  const selectors='[data-sculpt],#load-bloom-example,[data-material],#material-picker,[data-legacy-material],[data-film-look],[data-film-light],[data-texture-style],[data-motion-preset],[data-mood],#random-palette,#light-rig,[data-light-source],[data-backdrop],[data-audio-preset]';
  const buckets=new Map(),exampleParents=new Set();
  for(const button of [...root.querySelectorAll(selectors)]){
-  if(scope.endsWith('/material'))continue;
+  if(scope.endsWith('/material')||(scope.endsWith('/motion')&&button.matches('[data-motion-preset]')))continue;
   if(library.contains(button))continue;
   const container=button.closest('.mood-grid,.field,.audio-presets')||button;
   let ancestor=button.closest('details');while(ancestor&&root.contains(ancestor)){exampleParents.add(ancestor);ancestor=ancestor.parentElement.closest('details');}
@@ -49,6 +49,8 @@ export function organizeSections(root,scope){
  if(scope==='particles/shape')group('Struttura','particle-structure',['Lobi, rami e addensamenti','Dettaglio organico','Struttura neuronale','Tentacoli del nucleo','Fasci esterni','Deformazioni']);
  if(scope==='solid/motion'){
   const general=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Tempo');if(general)root.prepend(general);
+  group('Scena','motion-scene',['Rotazione','Posizione e dimensione','Luci','Ambiente e pellicola']);
+  const scene=root.querySelector('#motion-scene');if(scene&&general)general.after(scene);
   group('Struttura','motion-structure',['Posa','Animazione']);
   group('Petali e radici','motion-growth',['Radici: scorrimento','Radici: crescita','Radici: distribuzione','Petali e gambo']);
  }
@@ -56,10 +58,11 @@ export function organizeSections(root,scope){
  if(scope.endsWith('/color')){const palette=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent.startsWith('Palette'));if(palette)root.prepend(palette);}
  if(buckets.size)root.append(library);
  if(scope.endsWith('/motion')){
+  const examples=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Esempi di movimento');if(examples){examples.dataset.defaultOpen='true';root.prepend(examples);}
   const active=document.createElement('details');active.className='control-details active-motion';active.id='active-motion';active.dataset.defaultOpen='true';active.innerHTML='<summary>Movimenti attivi</summary>';
   const tracks=[...root.querySelectorAll('input[data-path-check$=".enabled"]')].filter(el=>el.checked);
   for(const el of tracks){const d=el.closest('details');if(d&&!active.contains(d))active.append(d);}
-  const film=['filmFlow','filmSwirl'];for(const key of film){const el=root.querySelector('[data-param="'+key+'"]');if(el&&Number(el.value)>0)active.append(el.closest('.param'));}
+  const film=['filmFlow','filmSwirl'];for(const key of [...film,...(scope.startsWith('particles/')?['pTravel','pVortex','pReentry','pLife','pBreath','pPulse','pSignal','pRandom','pJitter','pWander','pSpaceWarp']:[])]){const el=root.querySelector('[data-param="'+key+'"]');if(el&&Number(el.value)>0)active.append(el.closest('.param'));}
   if(film.some(key=>Number(active.querySelector('[data-param="'+key+'"]')?.value)>0)){const cycles=root.querySelector('[data-param="filmCycles"]');if(cycles)active.append(cycles.closest('.param'));}
   const env=root.querySelector('[data-check="environmentRotate"]');if(env?.checked){active.append(env.closest('.check'));const cycles=root.querySelector('[data-param="environmentCycles"]');if(cycles)active.append(cycles.closest('.param'));}
   if(active.children.length===1)active.innerHTML+='<p class="help">Nessun movimento attivo. Attivalo nelle sezioni qui sotto: i suoi controlli compariranno qui.</p>';
@@ -91,7 +94,8 @@ export function mountControlSearch({getEngine,getMarkup,showTab}){
    for(const el of template.content.querySelectorAll(searchable)){
     const selector=address(el),label=entryLabel(el);if(!selector||!label)continue;
     const ancestors=[];let d=el.closest('details,section.control-section');while(d){ancestors.unshift(d.querySelector(':scope > summary,:scope > h2')?.textContent||'');d=d.parentElement?.closest('details,section.control-section');}
-    entries.push({tab:tab.id,label,path:[tab.groupLabel,tab.label,...ancestors].join(' › '),selector,haystack:clean([label,...ancestors,tab.label].join(' '))});
+    const aliases={tone:'esposizione luminosita saturazione correzione colore fotografia',photo:'filtri effetti finitura post processing',motion:'moto animazione animare muovere movimento ritmo velocita',fields:'attrazione repulsione magneti',body:'webcam tracking mani braccia'};
+    entries.push({tab:tab.id,label,path:[tab.groupLabel,tab.label,...ancestors].join(' › '),selector,haystack:clean([label,...ancestors,tab.label,aliases[tab.id]||''].join(' '))});
    }
   }
  }

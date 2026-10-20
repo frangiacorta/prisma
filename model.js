@@ -1,7 +1,8 @@
-import {STRUCTURE_GROUPS} from './structure-model.js?v=adcb7f564c42';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=adcb7f564c42';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=adcb7f564c42';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=adcb7f564c42';
+import {FINISH_DEFAULTS} from './finishing.js?v=a20f263b137b';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=a20f263b137b';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=a20f263b137b';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=a20f263b137b';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=a20f263b137b';
 export const BASE = {
  ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -83,7 +84,7 @@ for(const [g,keys]of Object.entries(PARTICLE_GROUPS)){GROUPS[g]??=[];GROUPS[g].p
 export function preset(i){const s={...structuredClone(BASE),...structuredClone(EXTRA_BASE),...structuredClone(PRESETS[i].values)};s.lights=PRESETS[i].values.lights?structuredClone(PRESETS[i].values.lights):legacyLights(s);if(i===1){s.animateShape=false;s.motions.volume.enabled=false;s.motions.deform.enabled=false;}return s}
 export function random(seed){let t=seed>>>0;return()=>{t+=0x6D2B79F5;let a=Math.imul(t^t>>>15,1|t);a^=a+Math.imul(a^a>>>7,61|a);return((a^a>>>14)>>>0)/4294967296}}
 function mixColor(a,b,t){return '#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)*(1-t)+parseInt(b.slice(i,i+2),16)*t).toString(16).padStart(2,'0')).join('')}
-export function randomize(state,seed,amount,scope,locks){const r=random(seed),out=structuredClone(state);for(const [group,keys] of Object.entries(GROUPS)){if(locks[group]||(scope!=='all'&&scope!==group))continue;for(const k of keys){if(k==='lights'){out.lights=out.lights.map(l=>({...l,x:l.x+(r()*8-4-l.x)*amount,y:l.y+(r()*8-4-l.y)*amount,z:l.z+(r()*8-4-l.z)*amount,power:l.power+(r()*3+.5-l.power)*amount,color:mixColor(l.color,MOODS[Math.floor(r()*MOODS.length)].colors[0],amount)}));continue}if(k==='palette'){const palette=MOODS[Math.floor(r()*MOODS.length)].colors;out.palette=out.palette.map((c,i)=>mixColor(c,palette[i%palette.length],amount));continue}if(typeof out[k]==='string'){if(!/^#[0-9a-f]{6}$/i.test(out[k]))continue;const color=k.startsWith('background')?MOODS[Math.floor(r()*MOODS.length)].colors[0]:MOODS[Math.floor(r()*MOODS.length)].colors[2];out[k]=mixColor(out[k],color,amount);continue}const m=META[k];if(!m)continue;let target=m[1]+r()*(m[2]-m[1]);if(k==='hole'||k==='cut')target=r()<.65?0:target*.65;if(k==='edge')target*=.5;if(k==='lightPower'||k==='light2Power')target=Math.max(.4,target);out[k]=Math.max(m[1],Math.min(m[2],out[k]+(target-out[k])*amount))}}out.seed=seed;return out}
+export function randomize(state,seed,amount,scope,locks){const r=random(seed),out=structuredClone(state);for(const [group,keys] of Object.entries(GROUPS)){if(locks[group]||(scope!=='all'&&scope!==group))continue;for(const k of keys){if(['engine','renderVersion','particleVersion','pLiving','pVeilFromForm','pVeilSourceKind'].includes(k)||(state.engine!=='particles'&&!(state.pLiving>0)&&Object.hasOwn(PARTICLE_META,k)))continue;if(k==='lights'){out.lights=out.lights.map(l=>({...l,x:l.x+(r()*8-4-l.x)*amount,y:l.y+(r()*8-4-l.y)*amount,z:l.z+(r()*8-4-l.z)*amount,power:l.power+(r()*3+.5-l.power)*amount,color:mixColor(l.color,MOODS[Math.floor(r()*MOODS.length)].colors[0],amount)}));continue}if(k==='palette'){const palette=MOODS[Math.floor(r()*MOODS.length)].colors;out.palette=out.palette.map((c,i)=>mixColor(c,palette[i%palette.length],amount));continue}if(typeof out[k]==='string'){if(!/^#[0-9a-f]{6}$/i.test(out[k]))continue;const color=k.startsWith('background')?MOODS[Math.floor(r()*MOODS.length)].colors[0]:MOODS[Math.floor(r()*MOODS.length)].colors[2];out[k]=mixColor(out[k],color,amount);continue}const m=META[k];if(!m)continue;let target=m[1]+r()*(m[2]-m[1]);if(k==='hole'||k==='cut')target=r()<.65?0:target*.65;if(k==='edge')target*=.5;if(k==='lightPower'||k==='light2Power')target=Math.max(.4,target);out[k]=Math.max(m[1],Math.min(m[2],out[k]+(target-out[k])*amount));if(m[3]>=1)out[k]=Math.round(out[k])}}out.seed=seed;return out}
 
 GROUPS.photo.push('finishRegionsEnabled','finishRegionMosaic','finishRegionRgb','finishRegionInvert','finishFeather','finishRegions');
 
@@ -102,3 +103,8 @@ GROUPS.motion.push(...STRUCTURE_GROUPS.motion);
 
 GROUPS.material.push('textureRandomness','textureWarp','textureLink','texturePatch','textureSeed');
 GROUPS.color.push('colorLayers','colorLayerScale','colorLayerShift','colorLayerMix');
+
+for(const k of Object.keys(FINISH_DEFAULTS))if(!GROUPS.photo.includes(k))GROUPS.photo.push(k);
+
+GROUPS.tone=['exposure','brightness','contrast','saturation','temperature','photoTint','gamma','blacks','highlights','vignette','lensDistortion','grainSize','grain','photoAll','finishTone'];
+GROUPS.photo=GROUPS.photo.filter(k=>!GROUPS.tone.includes(k));
