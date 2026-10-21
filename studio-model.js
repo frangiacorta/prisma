@@ -1,5 +1,6 @@
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=a20f263b137b';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=a20f263b137b';
+import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=eae52296f762';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=eae52296f762';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=eae52296f762';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
@@ -166,3 +167,5 @@ Object.assign(EXTRA_META,{
  textureRandomness:['Direzioni irregolari',0,1,.01],textureWarp:['Torsione locale delle grinze',0,2,.01],textureLink:['Grinze collegate alle pieghe',0,1,.01],texturePatch:['Distribuzione a chiazze',0,1,.01],textureSeed:['Variazione della texture',0,9999,1],
  colorLayers:['Stratificazione dei colori',0,1,.01],colorLayerScale:['Strati in profondità',.2,6,.01],colorLayerShift:['Posizione degli strati',0,1,.01],colorLayerMix:['Sovrapposizione dei pigmenti',0,1,.01]
 });
+
+Object.assign(EXTRA_BASE,GROWTH_DEFAULTS);Object.assign(EXTRA_META,GROWTH_META);

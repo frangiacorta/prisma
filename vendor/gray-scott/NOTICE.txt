@@ -1,0 +1,13 @@
+Prisma organic growth material
+
+Gray-Scott finite-difference update adapted from:
+https://github.com/dueyama/gray-scott-3d
+Copyright (c) 2026 Daishin Ueyama. MIT License (see LICENSE).
+Inspected source: js/workers/simWorker.js, October 2026.
+
+Prisma additions: seeded distributed nuclei, packed concentration/gradients,
+periodic object-space texture, bounded worker cache, material shading and UI.
+No TouchDesigner plugin or commercial project is bundled.
+
+Background on the model and parameter behavior:
+https://www.karlsims.com/rd.html

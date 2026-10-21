@@ -1,6 +1,7 @@
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=a20f263b137b';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=a20f263b137b';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=a20f263b137b';
+import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=eae52296f762';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=eae52296f762';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=eae52296f762';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=eae52296f762';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -284,6 +285,7 @@ function shaderFunction(source,name,replacement){
  return source.slice(0,start)+replacement+source.slice(end);
 }
 let MODERN_FRAG=FRAG.replace('precision highp float;','precision highp float;\nprecision highp int;').replace('uniform vec2 uResolution;','uniform vec2 uResolution;\nuniform vec4 uEnvironment,uFilmMotion,uSampling,uModern,uPetals,uPetalTip,uPetalSpread,uStem,uColorWave,uColorAxis,uOrganic,uBudget;\nuniform vec3 uInternalColor;\nuniform vec4 uMaterialDetail,uMaterialLayers,uOrganicDetail,uColorLayers;uniform float uTextureSeed;\nuniform highp sampler2D uGrowth;\nuniform vec2 uGrowthRows[8];\nuniform highp sampler2D uRootTree;\nuniform vec4 uRoots;');
+MODERN_FRAG=MODERN_FRAG.replace('uniform vec2 uResolution;',GROWTH_GLSL+'\nuniform vec2 uResolution;');
 MODERN_FRAG=MODERN_FRAG.replace('if(inside){radiance+=','if(inside){if(uColorLayers.x>0.)sigmaA=absorptionCoefficient(mix(tint,layeredPigment(transform(origin+direction*distance*.5)),uColorLayers.x));radiance+=');
 const CROWN_GEOMETRY=`
 #if CROWN_ENABLED
@@ -496,7 +498,9 @@ vec3 layeredPigment(vec3 p){
 }
 vec3 surfacePalette(vec3 p,vec3 base){
  base=mix(base,palette(colorCoordinate(p)),uColorWave.x);
- return uColorLayers.x>0.?mix(base,layeredPigment(p),uColorLayers.x):base;
+ base=uColorLayers.x>0.?mix(base,layeredPigment(p),uColorLayers.x):base;
+ if(uGrowthShape.x>0.){float h=organicGrowth(p/axes()).x;base=mix(base,palette(h*float(uPaletteCount-1)/float(uPaletteCount)+uGradient.z),uGrowthShape.x*uGrowthLook.x);}
+ return base;
 }
 vec3 bg(vec2 p){`);
 MODERN_FRAG=MODERN_FRAG.replaceAll('palette(dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*uGradient.y*.3+uGradient.z)','surfacePalette(p,palette(dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*uGradient.y*.3+uGradient.z))');
@@ -672,6 +676,7 @@ vec4 materialRelief(vec3 local,vec3 geometricNormal,vec3 rd){
   gradient+=derivative*cos(phase)*.05*uMaterialLayers.w*band;
  }
  gradient=transpose(mapping)*gradient*organicMask;gradient*=density*uMaterialDetail.x;gradient.xy=rot(-uMaterialDetail.w)*gradient.xy;gradient/=size;
+ if(uGrowthShape.x>0.){vec4 growth=organicGrowth(local/size);gradient+=growth.yzw/size*uGrowthShape.z*uGrowthShape.x*.12;roughening+=growth.x*uGrowthLook.z*uGrowthShape.x*.45;}
  gradient.yz=rot(-uOther.y)*gradient.yz;gradient.xz=rot(-uOther.x)*gradient.xz;gradient.xy=rot(-uExtraShape3.z)*gradient.xy;
  gradient-=geometricNormal*dot(gradient,geometricNormal);
  gradient*=min(1.,1.05/max(.000001,length(gradient)))*smoothstep(.035,.28,view);
@@ -679,9 +684,15 @@ vec4 materialRelief(vec3 local,vec3 geometricNormal,vec3 rd){
 }
 vec3 reliefNormal(vec3 original,vec3 geometricNormal,vec3 rd,vec3 gradient){
  vec3 n=normalize(original-gradient);
- // A perturbed shading normal must never reflect into the physical surface.
  if(dot(reflect(rd,n),geometricNormal)<.001)n=normalize(mix(n,geometricNormal,.75));
  if(dot(reflect(rd,n),geometricNormal)<0.)n=geometricNormal;
+ if(uGrowthShape.x>0.){
+  // Continuous conservative slope limit: no abrupt normal flip at grazing
+  // angles or on the brightly lit sides of growing cells.
+  vec3 g=gradient-(original-geometricNormal);g-=geometricNormal*dot(g,geometricNormal);
+  float limit=tan(.48*asin(clamp(dot(geometricNormal,-rd),.001,1.)));
+  g*=limit/(limit+length(g));return normalize(mix(n,normalize(geometricNormal-g),smoothstep(0.,.15,uGrowthShape.x)));
+ }
  return n;
 }
 `+'\nvec4 shade(');
@@ -690,7 +701,7 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  float textureFilter=1.-smoothstep(.28,.65,84.*3.4/min(uResolution.x,uResolution.y)/(2.*PI));
  if(uTexture.z>.001)n=normalize(n+vec3(sin(local.y*84.),cos(local.x*71.),sin(local.z*69.))*uTexture.z*.045*textureFilter);
  float localRoughness=uMat.w,coatRoughness=uCoat.y;
- bool reliefActive=dot(uMaterialLayers,vec4(1.))>.000001;
+ bool reliefActive=dot(uMaterialLayers,vec4(1.))>.000001||uGrowthShape.x>0.;
  if(reliefActive){vec4 detail=materialRelief(local,geometricNormal,rd);n=reliefNormal(n,geometricNormal,rd,detail.xyz);localRoughness=clamp(localRoughness+detail.w*(1.-localRoughness),0.,1.);coatRoughness=clamp(coatRoughness+detail.w*.25,0.,1.);}
  float facing=max(dot(n,-rd),0.),pos=dot(local,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z;
  vec3 base=palette(pos),specular=environment(reflect(rd,n),p,localRoughness);
@@ -1558,17 +1569,18 @@ export class Renderer{
   for(let i=0;i<count;i++){const u=g.getActiveUniform(v.program,i);v.locations[u.name.replace('[0]','')]=g.getUniformLocation(v.program,u.name);}v.ready=true;
  }
  prepare(source,phase=0,options={}){
+  const growthReady=prepareGrowth(source);
   const key=rendererVariant(sampleFrame(source,phase),options,source),programs=[this.variant(key)];
   // Compile the small geometry kernel while the first sphere is preparing, so
   // the first touch of the petal slider never starts a new driver compilation.
   if(key&ATLAS_PREVIEW)programs.push(this.variant(ATLAS_BAKE));
-  let ready=true;for(const v of programs){if(!v.ready&&this.parallelExtension&&!this.gl.getProgramParameter(v.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}this.finishVariant(v);}return ready;
+  let ready=growthReady;for(const v of programs){if(!v.ready&&this.parallelExtension&&!this.gl.getProgramParameter(v.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}this.finishVariant(v);}return ready;
  }
  async prepareAsync(source,phase=0,options={}){
   // Driver compilation is not the video duration or a failed render. Keep a
   // healthy asynchronous compile alive; cancellation and context loss remain
   // observable, while actual GPU submissions retain their watchdog.
-  options.onStage?.('preparing');const started=Date.now();let slow=false;
+  options.onStage?.('preparing');if(!await prepareGrowthAsync(source,options))return false;const started=Date.now();let slow=false;
   while(true){if(options.cancelled?.())return false;this.assertAvailable();if(this.prepare(source,phase,options)){options.onStage?.('rendering');return true;}if(!slow&&Date.now()-started>30000){slow=true;options.onStage?.('preparing-slow');}await new Promise(r=>setTimeout(r,16));}
  }
  useVariant(key){const v=this.variant(key);this.finishVariant(v);this.program=v.program;this.locations=v.locations;this.gl.useProgram(this.program);}
@@ -1642,7 +1654,7 @@ export class Renderer{
  bindPreviewField(){const g=this.gl;g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fieldTexture);g.uniform1i(this.locations.uFieldTexture,2);g.uniform1f(this.locations.uBasePrimitive,+this.cachedBasePrimitive);g.uniform1f(this.locations.uDeferredStructure,+this.deferredStructure);g.uniform2fv(this.locations.uFieldWarp,this.fieldWarp||[0,0]);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);g.uniform1f(this.locations.uFieldEncoding,+this.fieldHalfFloat);g.uniform4fv(this.locations.uFieldAtlas,this.fieldAtlas);g.uniform3fv(this.locations.uFieldMin,this.fieldMin);g.uniform3fv(this.locations.uFieldMax,this.fieldMax);g.activeTexture(g.TEXTURE0);}
  pollCompletion(){const g=this.gl;if(this.completionSync&&!g.isContextLost()){const status=g.clientWaitSync(this.completionSync,0,0);if(status===g.ALREADY_SIGNALED||status===g.CONDITION_SATISFIED){g.deleteSync(this.completionSync);this.completionSync=null;this.completedFrames++;return true;}}return false;}
  async waitForGpu(options={}){const start=Date.now();let polls=0;while(this.completionSync){this.assertAvailable();if(this.pollCompletion())break;if(options.cancelled?.())return false;if(Date.now()-start>120000)throw new Error('Il calcolo richiede troppo tempo. La creazione è conservata.');if(polls++<4&&globalThis.scheduler?.yield)await globalThis.scheduler.yield();else await new Promise(r=>setTimeout(r,4));}return !options.cancelled?.();}
- draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options,source),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);let analytic=!!(key&32)||analyticShape(s);const timer=options.preview&&options.trackTiming!==false?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW){this.ensurePreviewField(s,options,source);analytic=this.cachedShapeAnalytic;}this.useVariant(key);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(s.renderVersion>=2&&hasSolidForces(s)){uploadSolidForces(this,s);if(hasSolidForces(s))analytic=false;}if(key&512)this.uploadGrowth(s);if(key&32768)this.uploadRoots(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
+ draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options,source),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);let analytic=!!(key&32)||analyticShape(s);const timer=options.preview&&options.trackTiming!==false?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW){this.ensurePreviewField(s,options,source);analytic=this.cachedShapeAnalytic;}this.useVariant(key);bindGrowth(g,this.program,s,phase);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(s.renderVersion>=2&&hasSolidForces(s)){uploadSolidForces(this,s);if(hasSolidForces(s))analytic=false;}if(key&512)this.uploadGrowth(s);if(key&32768)this.uploadRoots(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
  if(s.renderVersion>=2){u('uBudget',key&ATLAS_PREVIEW?(options.quality==='fast'?[hasSolidForces(s)?384:structureMayChange(source)?512:this.fieldResolution>=96?128:96,3,4,1]:[hasSolidForces(s)?512:structureMayChange(source)?768:128,4,8,2]):key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
  if(s.renderVersion>=2){baseFormUniforms(s,g,this.locations);structureUniforms(s,u);u('uFilmPattern',[s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5]);u('uFilmAccent',[s.filmChroma||0,s.filmDuo||0]);u('uMaterialDetail',[s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad]);u('uMaterialLayers',[s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0]);u('uOrganicDetail',[s.textureRandomness||0,s.textureWarp||0,s.textureLink||0,s.texturePatch||0]);f('uTextureSeed',s.textureSeed||0);u('uColorLayers',[s.colorLayers||0,s.colorLayerScale??1,s.colorLayerShift||0,s.colorLayerMix??.5]);u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);f('uNormalSamples',6);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,24]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
@@ -1707,7 +1719,7 @@ export class Renderer{
   if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);this.accumulation=null;}
   this.canvas.width=1;this.canvas.height=1;g.viewport(0,0,1,1);return true;
  }
- dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.sculptTexture)g.deleteTexture(this.sculptTexture);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.rootTexture)g.deleteTexture(this.rootTexture);if(this.fieldTexture)g.deleteTexture(this.fieldTexture);if(this.fieldFramebuffer)g.deleteFramebuffer(this.fieldFramebuffer);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
+ dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}disposeGrowth(g);for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.sculptTexture)g.deleteTexture(this.sculptTexture);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.rootTexture)g.deleteTexture(this.rootTexture);if(this.fieldTexture)g.deleteTexture(this.fieldTexture);if(this.fieldFramebuffer)g.deleteFramebuffer(this.fieldFramebuffer);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
 }
 // Included verbatim in exported HTML: no imports, network or application state.
 export function startWallpaper(canvas,source){

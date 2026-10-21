@@ -1,7 +1,8 @@
-import {BASE_FORM_GLSL} from './base-forms.js?v=a20f263b137b';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=a20f263b137b';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=a20f263b137b';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=a20f263b137b';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=eae52296f762';
+import {BASE_FORM_GLSL} from './base-forms.js?v=eae52296f762';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=eae52296f762';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=eae52296f762';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=eae52296f762';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -138,6 +139,7 @@ uniform vec3 uFilmResponse[24],uFilmWhite;
 mat2 rot(float a){return turn(a);}vec3 axes(){return uAxes.xyz;}
 ${FILM_PATTERN_GLSL}
 float filteredInterference(float phase){float width=max(.0001,fwidth(phase)*.5);return cos(phase)*sin(min(width,PI))/width;}
+${GROWTH_GLSL}
 ${FORM_MATERIAL_GLSL.replaceAll('uSeed','uSurfaceSeed').replace('cos(4.*PI*n1*max(20.,thickness)*c1/wavelength)', 'filteredInterference(4.*PI*n1*max(20.,thickness)*c1/wavelength)')}
 vec4 strandMaterial(vec3 base,vec3 local,vec3 p,vec3 normal,vec3 tangent,float radius){
  vec3 view=vec3(0,0,1),n=normal;if(dot(n,view)<0.)n=-n;
@@ -151,7 +153,7 @@ vec4 strandMaterial(vec3 base,vec3 local,vec3 p,vec3 normal,vec3 tangent,float r
  vec3 parent=normalize(vRootNormal);if(dot(parent,view)<0.)parent=-parent;
  n=normalize(mix(n,parent,clamp(vJoin,0.,1.)));
  float rough=uMat.w;
- if(dot(uMaterialLayers,vec4(1.))>.00001){vec4 detail=materialRelief(local,n,-view);n=reliefNormal(n,n,-view,detail.xyz*mix(resolved,1.,clamp(vJoin,0.,1.)));rough=clamp(rough+detail.w*(1.-rough),0.,1.);}
+ if(dot(uMaterialLayers,vec4(1.))>.00001||uGrowthShape.x>0.){vec4 detail=materialRelief(local,n,-view);n=reliefNormal(n,n,-view,detail.xyz*mix(resolved,1.,clamp(vJoin,0.,1.)));rough=clamp(rough+detail.w*(1.-rough),0.,1.);}
  // Filter unresolved normal variation instead of turning it into coloured glitter.
  rough=max(rough,max(mix(.38,0.,resolved),min(.7,sqrt(length(fwidth(n)))*.3)));
  float facing=max(.001,dot(n,view));vec3 spec=environment(reflect(-view,n),p,rough),diffuse=environment(n,p,1.)*.14;
@@ -209,6 +211,7 @@ export class FilamentPass{
  common(p,s,camera,w,h){const g=this.gl;g.useProgram(p.program);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uAxes',s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ),0);this.u(p,'uAngles',s.rotateX*Math.PI/180,s.rotateY*Math.PI/180,s.rotateZ*Math.PI/180,0);this.u(p,'uCameraX',...camera.x);this.u(p,'uCameraY',...camera.y);this.u(p,'uCameraZ',...camera.z);this.u(p,'uCameraSize',camera.ex,camera.ey,w,h);this.u(p,'uLens',camera.shadow?0:s.lensDistortion||0);this.u(p,'uShadowPass',+!!camera.shadow);this.u(p,'uSeed',(s.seed%997)*.013);this.u(p,'uHairScatter',s.filScatter);this.locations=p.locations;uploadSolidForces(this,s);}
  hair(s,camera,w,h,phase){const physical=Math.max(0,Math.min(1,(s.filWidth-.006)/.006)),projected=camera.shadow?0:Math.max(0,Math.min(1,(s.filWidth*.5*s.scale*h/(2*camera.ey)-.6)/.8)),x=Math.max(physical,projected),mix=x*x*(3-2*x);if(s.transparency===0){this.hairPart(s,camera,w,h,phase,mix>0,1,mix);return;}if(mix<1)this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)this.hairPart(s,camera,w,h,phase,true,mix);}
  hairPart(s,camera,w,h,phase,tube,opacity,tubeDepth=1){const g=this.gl,p=this.hairProgram;this.common(p,s,camera,w,h);this.tex(p,'uRoots',this.roots.textures[0],0);this.tex(p,'uNormals',this.roots.textures[1],1);this.tex(p,'uShadow',camera.shadow?this.roots.textures[0]:this.shadow.depth,2);
+ bindGrowth(g,p.program,s,phase);
  const pixelsPerUnit=s.scale*h/(2*camera.ey),radiusPixels=s.filWidth*.5*pixelsPerUnit;
  const sides=Math.max(12,Math.min(32,Math.ceil(Math.PI*Math.sqrt(Math.max(1,radiusPixels*(1+s.filBaseWidth))/.12)/2)*2));
  const curvature=.08+Math.abs(s.filBend)*.3+Math.abs(s.filComb)*.25+s.filClump*.5+s.filCurl*4+s.filFrizz*6+s.filWind;

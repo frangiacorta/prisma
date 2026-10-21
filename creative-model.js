@@ -1,13 +1,13 @@
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=a20f263b137b';
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=a20f263b137b';
-import {normalizeAudioClip} from './audio-recording.js?v=a20f263b137b';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=a20f263b137b';
-import {normalizeAudio} from './audio-model.js?v=a20f263b137b';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles} from './particle-model.js?v=a20f263b137b';
-import {normalizeForcePaths} from './particle-paths.js?v=a20f263b137b';
-import {normalizeForcePoints} from './particle-forces.js?v=a20f263b137b';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=a20f263b137b';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=a20f263b137b';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=eae52296f762';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=eae52296f762';
+import {normalizeAudioClip} from './audio-recording.js?v=eae52296f762';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=eae52296f762';
+import {normalizeAudio} from './audio-model.js?v=eae52296f762';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles} from './particle-model.js?v=eae52296f762';
+import {normalizeForcePaths} from './particle-paths.js?v=eae52296f762';
+import {normalizeForcePoints} from './particle-forces.js?v=eae52296f762';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=eae52296f762';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=eae52296f762';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -39,7 +39,7 @@ export function motionPreset(s,key){
  if(key==='chromatic'){s.colorWaveAmount=1;s.motions.colorWavePhase={...s.motions.colorWavePhase,enabled:true,mode:'cycle',cycles:1,phase:0,direction:1};}
  return s;
 }
-export function hasMotion(s){return (s.finishEnabled!==false&&((s.finishWarp&&s.finishWarpMix>0&&s.finishWarpMotion>0)||(s.finishGlass&&s.finishGlassMix>0&&s.finishGlassMotion>0)))||(s.finishEnabled!==false&&s.finishGlitch&&s.finishGlitchAnimate&&s.finishGlitchMix>0&&s.finishGlitchCoverage>0&&(s.finishGlitchAmount>0||s.finishGlitchSplit>0))||(s.finishEnabled!==false&&s.finishGlyph&&s.finishGlyphMix>0&&s.finishGlyphVariation>0)||s.engine==='particles'||s.pLiving>0|| Object.values(s.motions||{}).some(t=>t.enabled)||s.lights.some(l=>l.orbit?.enabled||l.pulse?.enabled)||!!s.environmentRotate||(s.filmFlow||0)>0||(s.filmSwirl||0)>0;}
+export function hasMotion(s){return (s.growthAmount>0&&s.growthFlow>0)||(s.finishEnabled!==false&&((s.finishWarp&&s.finishWarpMix>0&&s.finishWarpMotion>0)||(s.finishGlass&&s.finishGlassMix>0&&s.finishGlassMotion>0)))||(s.finishEnabled!==false&&s.finishGlitch&&s.finishGlitchAnimate&&s.finishGlitchMix>0&&s.finishGlitchCoverage>0&&(s.finishGlitchAmount>0||s.finishGlitchSplit>0))||(s.finishEnabled!==false&&s.finishGlyph&&s.finishGlyphMix>0&&s.finishGlyphVariation>0)||s.engine==='particles'||s.pLiving>0|| Object.values(s.motions||{}).some(t=>t.enabled)||s.lights.some(l=>l.orbit?.enabled||l.pulse?.enabled)||!!s.environmentRotate||(s.filmFlow||0)>0||(s.filmSwirl||0)>0;}
 function hue(hex,angle){let [r,g,b]=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;let h=d?(max===r?(g-b)/d:max===g?(b-r)/d+2:(r-g)/d+4)/6:0;h=(h+angle/360+1)%1;const sat=max?d/max:0,x=h*6,j=Math.floor(x),f=x-j,p=max*(1-sat),q=max*(1-f*sat),t=max*(1-(1-f)*sat);const c=[[max,t,p],[q,max,p],[p,max,t],[p,q,max],[t,p,max],[max,p,q]][j%6];return '#'+c.map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');}
 const clamp=(key,value)=>META[key]?Math.max(META[key][1],Math.min(META[key][2],value)):value;
 export function similar(s,seed,count=8,strength=.7){const r=random(seed),profiles=[[1,.4,.45],[.45,1,.45],[.5,.45,1],[.9,.9,.5],[.6,.9,.9],[1,.5,.9],[.7,1,.6],[1,1,1]],amount=Math.max(0,Math.min(1,strength));return Array.from({length:count},(_,i)=>{
@@ -130,7 +130,7 @@ export function normalizeCreation(raw){
  for(const k of Object.keys(MODERN_BASE))if(typeof raw[k]===typeof MODERN_BASE[k]&&k!=='renderVersion')s[k]=typeof raw[k]==='number'&&META[k]?clamp(k,raw[k]):raw[k];
  if(!['studio','sunset','neon','sky','aquarium','aurora','city'].includes(s.environment))s.environment='studio';
  if(MATERIAL_STYLES.some(m=>m.name===raw.materialName))s.materialName=raw.materialName;
- s.baseForm=Math.round(s.baseForm||0);s.renderVersion=raw.renderVersion>=2?2:1;s.thinShell=Math.max(0,Math.min(1,Number(raw.thinShell)||0));s.seed=Number(raw.seed)>>>0;s.engine=raw.engine==='particles'?'particles':'solid';s.particleVersion=PARTICLE_VERSION;for(const [key,meta]of Object.entries(PARTICLE_META))if(meta[3]>=1)s[key]=Math.round(s[key]);if(s.pDirection!==-1)s.pDirection=1;
+ for(const k of ['growthAge','growthCycles','growthSeed'])s[k]=Math.round(s[k]);s.baseForm=Math.round(s.baseForm||0);s.renderVersion=raw.renderVersion>=2?2:1;s.thinShell=Math.max(0,Math.min(1,Number(raw.thinShell)||0));s.seed=Number(raw.seed)>>>0;s.engine=raw.engine==='particles'?'particles':'solid';s.particleVersion=PARTICLE_VERSION;for(const [key,meta]of Object.entries(PARTICLE_META))if(meta[3]>=1)s[key]=Math.round(s[key]);if(s.pDirection!==-1)s.pDirection=1;
  if(Array.isArray(raw.lights))s.lights=raw.lights.slice(0,8).map((l,i)=>{const v=newLight(i+1);for(const k of ['x','y','z'])if(Number.isFinite(l[k]))v[k]=Math.max(-5,Math.min(5,l[k]));for(const k of ['power','size','length','roll','softness','cone','grid'])if(Number.isFinite(l[k]))v[k]=Math.max(k==='roll'?-180:0,Math.min(k==='power'?6:k==='roll'?180:k==='cone'?85:k==='grid'?12:3,l[k]));if(/^#[0-9a-f]{6}$/i.test(l.color))v.color=l.color;if(['circle','bar','spot','diffuser','grid','ring','orb'].includes(l.type))v.type=l.type;v.enabled=l.enabled!==false;v.visible=l.visible===true;for(const key of ['orbit','pulse'])if(l[key])v[key]=safeTrack(v[key],l[key],s.perfectLoop);return v;});
  for(const k of Object.keys(s.motions))if(raw.motions?.[k])s.motions[k]=safeTrack(s.motions[k],raw.motions[k],s.perfectLoop);
  for(const k of ['internalColor','sssColor'])if(!/^#[0-9a-f]{6}$/i.test(s[k]||''))s[k]=k==='internalColor'?'#e6f5ff':'#ffc49b';

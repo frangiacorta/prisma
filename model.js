@@ -1,8 +1,9 @@
-import {FINISH_DEFAULTS} from './finishing.js?v=a20f263b137b';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=a20f263b137b';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=a20f263b137b';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=a20f263b137b';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=a20f263b137b';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=eae52296f762';
+import {FINISH_DEFAULTS} from './finishing.js?v=eae52296f762';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=eae52296f762';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=eae52296f762';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=eae52296f762';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=eae52296f762';
 export const BASE = {
  ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -108,3 +109,5 @@ for(const k of Object.keys(FINISH_DEFAULTS))if(!GROUPS.photo.includes(k))GROUPS.
 
 GROUPS.tone=['exposure','brightness','contrast','saturation','temperature','photoTint','gamma','blacks','highlights','vignette','lensDistortion','grainSize','grain','photoAll','finishTone'];
 GROUPS.photo=GROUPS.photo.filter(k=>!GROUPS.tone.includes(k));
+
+GROUPS.material.push(...Object.keys(GROWTH_DEFAULTS).filter(k=>!['growthFlow','growthCycles'].includes(k)));GROUPS.motion.push('growthFlow','growthCycles');

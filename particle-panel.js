@@ -1,6 +1,6 @@
-import {veilPanel} from './veil-panel.js?v=a20f263b137b';
-import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=a20f263b137b';
-import {SPRITES,COLOR_MODES} from './particle-model.js?v=a20f263b137b';
+import {veilPanel} from './veil-panel.js?v=eae52296f762';
+import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=eae52296f762';
+import {SPRITES,COLOR_MODES} from './particle-model.js?v=eae52296f762';
 export function particlePanel(tab,s,h,shared,selectedLight){
  const veil=s.pLiving===4?veilPanel(tab,s,{...h,baseShapePanel:()=>particlePanel('shape',{...s,pLiving:s.pVeilSourceKind===4?0:s.pVeilSourceKind,engine:'solid'},h,shared,selectedLight)},shared,selectedLight):null;if(veil!==null)return veil;
  const {slider,section,details,colorField,check}=h;

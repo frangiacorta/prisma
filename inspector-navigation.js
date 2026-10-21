@@ -62,6 +62,7 @@ export function organizeSections(root,scope){
   const active=document.createElement('details');active.className='control-details active-motion';active.id='active-motion';active.dataset.defaultOpen='true';active.innerHTML='<summary>Movimenti attivi</summary>';
   const tracks=[...root.querySelectorAll('input[data-path-check$=".enabled"]')].filter(el=>el.checked);
   for(const el of tracks){const d=el.closest('details');if(d&&!active.contains(d))active.append(d);}
+  const growth=root.querySelector('[data-param="growthFlow"]');if(growth&&Number(growth.value)>0){active.append(growth.closest('.param'));const cycles=root.querySelector('[data-param="growthCycles"]');if(cycles)active.append(cycles.closest('.param'));}
   const film=['filmFlow','filmSwirl'];for(const key of [...film,...(scope.startsWith('particles/')?['pTravel','pVortex','pReentry','pLife','pBreath','pPulse','pSignal','pRandom','pJitter','pWander','pSpaceWarp']:[])]){const el=root.querySelector('[data-param="'+key+'"]');if(el&&Number(el.value)>0)active.append(el.closest('.param'));}
   if(film.some(key=>Number(active.querySelector('[data-param="'+key+'"]')?.value)>0)){const cycles=root.querySelector('[data-param="filmCycles"]');if(cycles)active.append(cycles.closest('.param'));}
   const env=root.querySelector('[data-check="environmentRotate"]');if(env?.checked){active.append(env.closest('.check'));const cycles=root.querySelector('[data-param="environmentCycles"]');if(cycles)active.append(cycles.closest('.param'));}

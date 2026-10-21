@@ -1,6 +1,15 @@
-import {AUDIO_HELP} from './audio-model.js?v=a20f263b137b';
+import {AUDIO_HELP} from './audio-model.js?v=eae52296f762';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ growthAmount:'Miscela gradualmente la crescita con la materia esistente. A zero la superficie resta quella originale. Colori, trasparenza, forma e luci continuano a funzionare.',
+ growthVeins:'Passa da zone piene a reti di bordi. I valori intermedi combinano cellule e contorni sulla stessa trama.',
+ growthDepth:'Valori negativi danno incisioni, positivi rilievi. Cambia le normali e la luce della materia, senza aggiungere geometria o cambiare il contorno.',
+ growthColor:'Distribuisce i colori della palette in base alla crescita. A zero conserva il colore precedente; una palette con un solo colore resta uniforme.',
+ growthFeed:'Quantità che alimenta la reazione. Lavora insieme a Consumo: non tutte le coppie producono un disegno. Ricalcola la trama dopo il trascinamento.',
+ growthKill:'Velocità di rimozione nella reazione. Con Nutrimento determina zone, cellule e collegamenti; valori estremi possono spegnere la crescita.',
+ growthAge:'Numero di passi della simulazione. Mostra un diverso stadio di sviluppo; richiede un nuovo calcolo, non è la velocità del movimento.',
+ growthFlow:'Fa scorrere il campo tridimensionale calcolato lungo un percorso chiuso. Premi Riproduci. Non ricalcola la simulazione a ogni fotogramma.',
+ growthSeed:'Cambia i nuclei iniziali della crescita mantenendo gli altri parametri. Lo stesso valore riproduce lo stesso campo.',
  filLength:'Fa crescere filamenti sulla superficie della forma corrente. Zero conserva esattamente la forma iniziale. Lunghezza e spessore sono nello spazio 3D, non in pixel.',
  filBaseWidth:'Allargamento della base rispetto al raggio del filo. Zero elimina la svasatura. Non modifica lo spessore del resto del filamento.',
  filBaseHeight:'Estensione del raccordo lungo il filo, misurata rispetto al suo raggio. Non cambia la lunghezza complessiva.',

@@ -20843,6 +20843,103 @@
       ],
       "assets": [],
       "completedProjects": []
+    },
+    {
+      "id": "roadmap-organic-growth",
+      "name": "Crescita organica",
+      "kind": "project",
+      "engine": "solid",
+      "related": [
+        "roadmap-cellular",
+        "roadmap-recursive-warp"
+      ],
+      "state": "implemented",
+      "priority": false,
+      "author": "Prisma",
+      "summary": "Reazione-diffusione 3D nella materia della forma corrente: cellule, venature, colore, rilievo e rugosità combinabili. Due studi: Venature di rame e Cellule di porcellana.",
+      "sources": [
+        "https://github.com/dueyama/gray-scott-3d",
+        "https://www.karlsims.com/rd.html"
+      ],
+      "sections": [
+        {
+          "title": "Metodo e riuso",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Campo Gray–Scott periodico 64³ calcolato in worker. Passo numerico adattato dal progetto MIT di Daishin Ueyama; licenza conservata. Prisma aggiunge semi distribuiti, cache, ricostruzione cubica e volume a mezza precisione, parametri di materia e scorrimento ciclico."
+            },
+            {
+              "label": "limits",
+              "value": "Rilievo nelle normali della superficie, senza spostamento geometrico o collisioni. Scorrimento del campo calcolato, non simulazione temporale in loop. Le cellule instanziate e le colonie del progetto separato restano da sviluppare."
+            }
+          ]
+        },
+        {
+          "title": "Controlli",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Intensità, densità, rete di bordi",
+                "Incisione / rilievo, colore, contrasto, estensione",
+                "Rugosità, irregolarità",
+                "Nutrimento, consumo, diffusione, sviluppo, variante",
+                "Scorrimento, cicli, reset indipendente"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Prove",
+          "fields": [
+            {
+              "label": "evidence",
+              "value": "reports/organic-growth: 16 parametri verificati sul rendering, zero neutro, loop e ricerca temporale ripetibili, preset, alpha, filamenti, worker limitati, macro e MP4 720p."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "growth",
+        "film"
+      ],
+      "familyBasis": "Crescita locale, zone collegate e rilievo modulabile sulla forma esistente.",
+      "result": "Integrato nella Materia. Esempi facoltativi; nessuna nuova modalità.",
+      "where": "Aspetto → Materia → Crescita organica; Struttura → Movimento → Crescita organica",
+      "platform": "WebGL2 + worker locale",
+      "next": "Eventuale sviluppo geometrico del rilievo e crescita animata, da valutare separatamente.",
+      "keep": "Tutti i parametri combinabili, intensità zero neutra, preset completi riproducibili.",
+      "avoid": "Scambiare il rilievo di superficie per una geometria o la traslazione del campo per la crescita temporale.",
+      "detailsSource": [
+        "reference/creative-roadmap.json"
+      ],
+      "media": [
+        {
+          "src": "../previews/venature-rame.png",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "../previews/cellule-porcellana.png",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "../previews/venature-rame-macro.png",
+          "width": 1600,
+          "height": 900
+        },
+        {
+          "src": "../previews/cellule-porcellana-macro.png",
+          "width": 1600,
+          "height": 900
+        }
+      ],
+      "assets": [],
+      "completedProjects": [],
+      "resultVideo": "../previews/venature-rame.mp4",
+      "resultUrl": "../previews/crescita-organica.html"
     }
   ],
   "families": [
