@@ -1,11 +1,11 @@
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
- {id:'structure',label:'Geometria',tabs:[['shape','Forma e deformazioni','shape'],['grains','Particelle','shape','particles'],['trails','Fibre e scie','motion','particles']]},
+ {id:'structure',label:'Forma',tabs:[['shape','Forma e deformazioni','shape'],['grains','Particelle','shape','particles'],['trails','Fibre e scie','motion','particles']]},
  {id:'movement',label:'Movimento',tabs:[['motion','Animazione','motion']]},
- {id:'look',label:'Materiale e luce',tabs:[['material','Materiale','material'],['color','Colori','palette'],['light','Luci','sun']]},
+ {id:'look',label:'Aspetto',tabs:[['material','Materiale','material'],['color','Colori','palette'],['light','Luci','sun']]},
  {id:'scene',label:'Scena',tabs:[['background','Sfondo','background'],['tone','Correzione colore','photo']]},
- {id:'post',label:'Post-processing',tabs:[['photo','Filtri','photo']]},
- {id:'interaction',label:'Modulazione',tabs:[['fields','Campi di forza','move'],['body','Tracking corporeo','orbit'],['audio','Analisi audio','audio']]}
+ {id:'post',label:'Filtri',tabs:[['photo','Filtri','photo']]},
+ {id:'interaction',label:'Interazione',tabs:[['fields','Campi di forza','move'],['body','Mani e braccia','orbit'],['audio','Audio','audio']]}
 ];
 const PROCEDURES=[{"label": "Guscio e spessore", "aliases": ["Membrana", "Membrane vive"], "description": "Svuota il volume della forma mantenendo una parete di spessore regolabile. È una costruzione geometrica; non simula una membrana fisica."}, {"label": "Reticolo di fibre", "aliases": ["Fibre e tessitura", "Tessuto e connessioni"], "description": "Separa la superficie in fili longitudinali e trasversali. Densità, larghezza e intreccio modificano la stessa struttura."}, {"label": "Suddivisione radiale e strati", "aliases": ["Lamelle e strati", "Veli e aureole", "Veli trasparenti e aureole"], "description": "Apre intervalli radiali, sezioni e gusci concentrici nella forma corrente. Trasparenza ed emissione si regolano nel materiale."}, {"label": "Filamenti su superficie", "aliases": ["Filamenti e spine", "Pianeti di filamenti"], "description": "Distribuisce filamenti ancorati alla superficie. Lunghezza, diametro, curvatura e raggruppamento permettono pelo, ciuffi e spine."}, {"label": "Curve toroidali e nodi", "aliases": ["Anelli e nodi", "Nodi morbidi"], "description": "Costruisce tubi o nastri lungo percorsi chiusi. Raggio, sezione, torsione e intreccio sono indipendenti."}, {"label": "Reazione-diffusione", "aliases": ["Crescita organica", "Gray Scott"], "description": "Il modello Gray–Scott genera un campo 3D. Qui il campo modifica colore, rugosità e normali (bump), non il contorno. Scorrimento trasporta il campo già calcolato."}, {"label": "Interferenza di pellicola", "aliases": ["Interferenza e iridescenza", "Cobalto e oro", "Pellicola madreperlacea"], "description": "I riflessi dipendono dallo spessore ottico e dalla variazione della pellicola. Cobalto e oro è un esempio di valori, non una modalità."}, {"label": "Bump procedurale", "aliases": ["Texture organica", "Grinze", "Pieghe della materia"], "description": "Una trama perturba le normali usate dalla luce. Produce l’aspetto di un rilievo senza cambiare la silhouette della geometria."}, {"label": "Distorsione ricorsiva 2D", "aliases": ["Warp ricorsivo", "Warp"], "description": "Ripete una deformazione delle coordinate dell’immagine nello stesso fotogramma. Non conserva immagini precedenti: il feedback temporale è un’altra funzione."}, {"label": "Rifrazione 2D", "aliases": ["Vetro", "Vetro ottico"], "description": "Deforma e filtra l’immagine della scena. È un trattamento finale, distinto dalla rifrazione del materiale 3D."}, {"label": "Oscillazione delle fibre", "aliases": ["Fibre che respirano", "Respiro delle fibre"], "description": "Varia periodicamente la posa delle fibre. Ampiezza, fase e ritardo regolano il movimento; non implica una simulazione di vento."}];
 export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.filter(t=>(!t[3]||t[3]===engine)&&!(engine==='veils'&&['fields','body','audio'].includes(t[0]))).map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label})));
@@ -60,19 +60,6 @@ export function organizeSections(root,scope){
  if(scope==='particles/motion')group('Deformazioni','particle-motion-deform',['Pulsazione','Tentacoli in movimento','Distorsione','Ritmo e cadenze']);
  if(scope.endsWith('/color')){const palette=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent.startsWith('Palette'));if(palette)root.prepend(palette);}
  if(buckets.size)root.append(library);
- if(scope.endsWith('/motion')){
-  const examples=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Esempi di movimento');if(examples){examples.dataset.defaultOpen='true';root.prepend(examples);}
-  const active=document.createElement('details');active.className='control-details active-motion';active.id='active-motion';active.dataset.defaultOpen='true';active.innerHTML='<summary>Movimenti attivi</summary>';
-  const tracks=[...root.querySelectorAll('input[data-path-check$=".enabled"]')].filter(el=>el.checked);
-  for(const el of tracks){const d=el.closest('details');if(d&&!active.contains(d))active.append(d);}
-  const growth=root.querySelector('[data-param="growthFlow"]');if(growth&&Number(growth.value)>0){active.append(growth.closest('.param'));const cycles=root.querySelector('[data-param="growthCycles"]');if(cycles)active.append(cycles.closest('.param'));}
-  const film=['filmFlow','filmSwirl'];for(const key of [...film,...(scope.startsWith('particles/')?['pTravel','pVortex','pReentry','pLife','pBreath','pPulse','pSignal','pRandom','pJitter','pWander','pSpaceWarp']:[])]){const el=root.querySelector('[data-param="'+key+'"]');if(el&&Number(el.value)>0)active.append(el.closest('.param'));}
-  if(film.some(key=>Number(active.querySelector('[data-param="'+key+'"]')?.value)>0)){const cycles=root.querySelector('[data-param="filmCycles"]');if(cycles)active.append(cycles.closest('.param'));}
-  const env=root.querySelector('[data-check="environmentRotate"]');if(env?.checked){active.append(env.closest('.check'));const cycles=root.querySelector('[data-param="environmentCycles"]');if(cycles)active.append(cycles.closest('.param'));}
-  if(active.children.length===1)active.innerHTML+='<p class="help">Nessun movimento attivo. Attivalo nelle sezioni qui sotto: i suoi controlli compariranno qui.</p>';
-  root.prepend(active);
-  for(const d of [...root.querySelectorAll('details')].reverse())if(d!==active&&!d.querySelector('input,select,button,details')&&d.children.length===1)d.remove();
- }
  for(const d of root.querySelectorAll('details')){
   const title=d.querySelector(':scope > summary')?.textContent,term=PROCEDURES.find(t=>t.label===title);
   if(term&&!d.querySelector(':scope > .procedure-help')){const p=document.createElement('p');p.className='help procedure-help';p.textContent=term.description;d.querySelector('summary').after(p);}
@@ -106,7 +93,7 @@ export function mountControlSearch({getEngine,getMarkup,showTab}){
     const oldNames=PROCEDURES.filter(t=>ancestors.some(a=>a.includes(t.label))).flatMap(t=>t.aliases);
     const parameterAliases={growthFeed:['Nutrimento'],growthKill:['Consumo'],growthAge:['Sviluppo della trama'],growthDepth:['Incisione / rilievo'],filPhase:['Scorrimento'],filWind:['Oscillazione delle punte'],structBreath:['Dilatazione del respiro'],structFlap:['Apertura del battito'],glow:['Diffusione alone'],emission:['Luce propria']};
     oldNames.push(...(parameterAliases[el.dataset.param]||[]));
-    entries.push({tab:tab.id,label,path:[tab.groupLabel,tab.label,...ancestors].join(' › '),selector,haystack:clean([label,...ancestors,...oldNames,tab.label,aliases[tab.id]||''].join(' '))});
+    entries.push({tab:tab.id,label,path:[tab.groupLabel,tab.label,...ancestors].join(' › '),selector,haystack:clean([label,...ancestors,...oldNames,tab.label,({structure:'geometria forma',look:'materiale luce aspetto',post:'post processing filtri',interaction:'modulazione interazione'})[tab.group]||'',aliases[tab.id]||''].join(' '))});
    }
   }
  }
@@ -116,7 +103,7 @@ export function mountControlSearch({getEngine,getMarkup,showTab}){
   results.replaceChildren();results.hidden=false;status.textContent=found.length?found.length+' risultati'+(found.length>24?' · precisa la ricerca':''):'Nessun risultato · prova «orbita», «spessore» o «luce»';
   for(const entry of found.slice(0,24)){
    const b=document.createElement('button');b.type='button';b.className='control-search-result';const title=document.createElement('strong'),path=document.createElement('small');title.textContent=entry.label;path.textContent=entry.path;b.append(title,path);
-   b.onclick=()=>{input.value='';close();showTab(entry.tab);const target=document.getElementById('controls').querySelector(entry.selector);if(!target)return;let d=target.closest('details');while(d){d.open=true;d=d.parentElement.closest('details');}const host=target.closest('.param,.field,.check,.color-field')||target;host.classList.add('search-highlight');requestAnimationFrame(()=>{target.focus({preventScroll:true});target.scrollIntoView({block:'center',behavior:'smooth'});});setTimeout(()=>host.classList.remove('search-highlight'),2200);};results.append(b);
+   b.onclick=()=>{input.value='';close();showTab(entry.tab);document.getElementById('controls').classList.remove('only-changed');const target=document.getElementById('controls').querySelector(entry.selector);if(!target)return;let d=target.closest('details');while(d){d.open=true;d=d.parentElement.closest('details');}const host=target.closest('.param,.field,.check,.color-field')||target;host.classList.add('search-highlight');requestAnimationFrame(()=>{target.focus({preventScroll:true});target.scrollIntoView({block:'center',behavior:'smooth'});});setTimeout(()=>host.classList.remove('search-highlight'),2200);};results.append(b);
   }
  }
  input.addEventListener('focus',()=>{refresh();search();});input.addEventListener('input',search);

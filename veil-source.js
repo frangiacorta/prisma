@@ -1,6 +1,6 @@
-import {fieldAt,geometryRadius} from './solid-renderer.js?v=a68b59d20aef';
-import {extractVeilSurface} from './veil-surface.js?v=a68b59d20aef';
-import {makeVeilMesh,veilPoint} from './veil-geometry.js?v=a68b59d20aef';
+import {fieldAt,geometryRadius} from './solid-renderer.js?v=ff848c0060d6';
+import {extractVeilSurface} from './veil-surface.js?v=ff848c0060d6';
+import {makeVeilMesh,veilPoint} from './veil-geometry.js?v=ff848c0060d6';
 // A regular sheet atlas receives the full source surface during opening.
 // The atlas alone retains the outer profile at the completely open endpoint.
 export const VEIL_SOURCE_KEYS=['seed','renderVersion','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','rimRound','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','petalDirectionSpread','petalWeave','petalWeaveTurns','petalFlow','petalFlowPhase','petalOrbitPhase','petalCollision','petalSphereCollision','petalContactGap','petalContactStiffness','petalContactPasses','stemAmount','stemRadius','stemBend'];

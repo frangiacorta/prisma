@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=a68b59d20aef';
+import {AUDIO_HELP} from './audio-model.js?v=ff848c0060d6';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  growthAmount:'Miscela gradualmente la crescita con la materia esistente. A zero la superficie resta quella originale. Colori, trasparenza, forma e luci continuano a funzionare.',
