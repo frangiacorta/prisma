@@ -151,7 +151,12 @@
       "duration": 11.21,
       "clip": "media/s01-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "s01-02",
@@ -299,7 +304,12 @@
       "duration": 5.03,
       "clip": "media/s01-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "s01-03",
@@ -448,7 +458,12 @@
       "duration": 8.85,
       "clip": "media/s01-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "s01-04",
@@ -591,7 +606,12 @@
       "duration": 19.03,
       "clip": "media/s01-04-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "s01-05",
@@ -740,7 +760,12 @@
       "duration": 18.75,
       "clip": "media/s01-05-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "growth"
+      ],
+      "category": "form"
     },
     {
       "id": "s01-06",
@@ -883,7 +908,12 @@
       "duration": 11.49,
       "clip": "media/s01-06-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "gradients"
+      ],
+      "category": "appearance"
     },
     {
       "id": "s01-07",
@@ -1026,7 +1056,12 @@
       "duration": 8.05,
       "clip": "media/s01-07-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "s01-08",
@@ -1150,7 +1185,12 @@
       "duration": 3.17,
       "clip": "media/s01-08-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance"
     },
     {
       "id": "s02-01",
@@ -1338,7 +1378,14 @@
       "completedProjects": [
         "roadmap-membrane",
         "roadmap-tissue"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces",
+        "points",
+        "fibres"
+      ],
+      "category": "form"
     },
     {
       "id": "s02-02",
@@ -1499,7 +1546,12 @@
       "duration": 45.13,
       "clip": "media/s02-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "s02-03",
@@ -1669,7 +1721,12 @@
       "duration": 17.24,
       "clip": "media/s02-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "s02-04",
@@ -1821,7 +1878,12 @@
       "duration": 31.83,
       "clip": "media/s02-04-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "s03-01",
@@ -1973,7 +2035,12 @@
       "completedProjects": [
         "roadmap-fibre-motion",
         "roadmap-tissue"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "fibres"
+      ],
+      "category": "form"
     },
     {
       "id": "s03-02",
@@ -2119,11 +2186,16 @@
       "duration": 8.86,
       "clip": "media/s03-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "s03-03",
-      "name": "Strange attractor — veli e fibre luminosi",
+      "name": "Fibre luminose · Strange attractor",
       "kind": "video",
       "related": [
         "tool-01",
@@ -2261,7 +2333,14 @@
       "duration": 29.34,
       "clip": "media/s03-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Strange attractor — veli e fibre luminosi"
+      ],
+      "topics": [
+        "electric"
+      ],
+      "category": "movement"
     },
     {
       "id": "s03-04",
@@ -2415,7 +2494,12 @@
       "completedProjects": [
         "roadmap-particles",
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "s04-01",
@@ -2572,7 +2656,12 @@
         "roadmap-membrane",
         "roadmap-fibre-motion",
         "project-pellicola-viva"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s04-02",
@@ -2724,7 +2813,12 @@
       "completedProjects": [
         "roadmap-membrane",
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s04-03",
@@ -2871,7 +2965,12 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-tissue"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "fibres"
+      ],
+      "category": "form"
     },
     {
       "id": "s05-01",
@@ -3021,7 +3120,12 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s05-02",
@@ -3176,7 +3280,12 @@
         "roadmap-fibre-motion",
         "roadmap-tissue",
         "project-fibre-setose"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s05-03",
@@ -3336,11 +3445,16 @@
         "roadmap-membrane",
         "roadmap-fibre-motion",
         "roadmap-tissue"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s06-01",
-      "name": "Veli di fibre",
+      "name": "Fasci di fibre",
       "kind": "video",
       "related": [
         "roadmap-fibre-motion",
@@ -3489,7 +3603,14 @@
       "completedProjects": [
         "roadmap-fibre-motion",
         "project-fibre-setose"
-      ]
+      ],
+      "aliases": [
+        "Veli di fibre"
+      ],
+      "topics": [
+        "fibres"
+      ],
+      "category": "form"
     },
     {
       "id": "s06-02",
@@ -3640,7 +3761,12 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-tissue"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "fibres"
+      ],
+      "category": "form"
     },
     {
       "id": "s06-03",
@@ -3790,7 +3916,12 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s07-01",
@@ -3934,7 +4065,12 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s07-02",
@@ -4080,7 +4216,12 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s07-03",
@@ -4233,7 +4374,12 @@
       "completedProjects": [
         "roadmap-membrane",
         "project-pellicola-viva"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s07-04",
@@ -4378,7 +4524,12 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s07-05",
@@ -4533,7 +4684,12 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-tissue"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "fibres"
+      ],
+      "category": "form"
     },
     {
       "id": "s07-06",
@@ -4681,7 +4837,12 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "fibres"
+      ],
+      "category": "form"
     },
     {
       "id": "s08-01",
@@ -4837,11 +4998,16 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s11-01",
-      "name": "Interferenza viva · cobalto e oro",
+      "name": "Interferenza cromatica · cobalto e oro",
       "kind": "video",
       "related": [
         "project-cobalto-oro",
@@ -5003,7 +5169,14 @@
       "completedProjects": [
         "project-cobalto-oro",
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [
+        "Interferenza viva · cobalto e oro"
+      ],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance"
     },
     {
       "id": "s12-01",
@@ -5175,7 +5348,12 @@
       "duration": 42.55,
       "clip": "media/s12-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "fractals"
+      ],
+      "category": "form"
     },
     {
       "id": "img-01",
@@ -5303,7 +5481,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "img-03",
@@ -5387,7 +5570,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tracking"
+      ],
+      "category": "interaction"
     },
     {
       "id": "img-04",
@@ -5500,7 +5688,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tracking"
+      ],
+      "category": "interaction"
     },
     {
       "id": "img-05",
@@ -5578,7 +5771,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tracking"
+      ],
+      "category": "interaction"
     },
     {
       "id": "img-06",
@@ -5661,7 +5859,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tracking"
+      ],
+      "category": "interaction"
     },
     {
       "id": "img-07",
@@ -5739,7 +5942,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance"
     },
     {
       "id": "img-08",
@@ -5817,7 +6025,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance"
     },
     {
       "id": "img-09",
@@ -5895,7 +6108,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance"
     },
     {
       "id": "img-10",
@@ -5973,7 +6191,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance"
     },
     {
       "id": "img-20261010-01",
@@ -6077,7 +6300,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "img-20261010-02",
@@ -6188,7 +6416,12 @@
       "completedProjects": [
         "project-trama-viva",
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "img-20261010-03",
@@ -6314,7 +6547,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "img-20261010-04",
@@ -6421,7 +6659,13 @@
       "completedProjects": [
         "roadmap-membrane",
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "materials",
+        "strands"
+      ],
+      "category": "appearance"
     },
     {
       "id": "tool-01",
@@ -6521,7 +6765,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "fractals"
+      ],
+      "category": "form"
     },
     {
       "id": "tool-02",
@@ -6676,7 +6925,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "growth"
+      ],
+      "category": "form"
     },
     {
       "id": "tool-03",
@@ -6767,7 +7021,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-04",
@@ -6859,7 +7118,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-05",
@@ -6945,7 +7209,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "tool-06",
@@ -7036,7 +7305,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "tool-07",
@@ -7125,7 +7399,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-08",
@@ -7215,7 +7494,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-09",
@@ -7301,7 +7585,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "tool-10",
@@ -7440,7 +7729,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "fluids"
+      ],
+      "category": "movement"
     },
     {
       "id": "tool-11",
@@ -7530,7 +7824,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-12",
@@ -7670,7 +7969,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-13",
@@ -7824,7 +8128,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "tool-14",
@@ -7910,7 +8219,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "gradients"
+      ],
+      "category": "appearance"
     },
     {
       "id": "tool-15",
@@ -8000,7 +8314,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-16",
@@ -8090,7 +8409,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "tool-17",
@@ -8190,7 +8514,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-18",
@@ -8280,7 +8609,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-19",
@@ -8381,7 +8715,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "gradients"
+      ],
+      "category": "appearance"
     },
     {
       "id": "tool-20",
@@ -8471,7 +8810,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "tool-21",
@@ -8563,7 +8907,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "s09-01",
@@ -8667,11 +9016,16 @@
       "duration": 0.88,
       "clip": "media/s09-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "s09-02",
-      "name": "Velo di particelle · pulsazioni luminose",
+      "name": "Nuvola di punti · pulsazioni",
       "kind": "video",
       "related": [
         "reuse-pcr",
@@ -8777,7 +9131,14 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [
+        "Velo di particelle · pulsazioni luminose"
+      ],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "s09-03",
@@ -8893,7 +9254,13 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "fluids",
+        "points"
+      ],
+      "category": "movement"
     },
     {
       "id": "s09-04",
@@ -9001,7 +9368,12 @@
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s09-05",
@@ -9112,7 +9484,12 @@
       "duration": 0.93,
       "clip": "media/s09-05-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "s13-01",
@@ -9255,7 +9632,12 @@
       "duration": 22.03,
       "clip": "media/s13-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s13-02",
@@ -9398,7 +9780,12 @@
       "duration": 16.53,
       "clip": "media/s13-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s13-03",
@@ -9566,7 +9953,12 @@
       "duration": 26.38,
       "clip": "media/s13-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s14-01",
@@ -9721,7 +10113,12 @@
       "duration": 4.08,
       "clip": "media/s14-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s14-02",
@@ -9901,7 +10298,12 @@
       "duration": 31.84,
       "clip": "media/s14-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s14-03",
@@ -10055,7 +10457,12 @@
       "duration": 1.88,
       "clip": "media/s14-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s14-04",
@@ -10215,7 +10622,12 @@
       "duration": 12.64,
       "clip": "media/s14-04-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s14-05",
@@ -10380,7 +10792,12 @@
       "duration": 17.53,
       "clip": "media/s14-05-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s14-06",
@@ -10545,7 +10962,12 @@
       "duration": 12.47,
       "clip": "media/s14-06-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s15-01",
@@ -10729,7 +11151,12 @@
       "duration": 27.3,
       "clip": "media/s15-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s15-02",
@@ -10914,7 +11341,12 @@
       "duration": 25.2,
       "clip": "media/s15-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "s16-01",
@@ -11079,7 +11511,12 @@
       "duration": 19.25,
       "clip": "media/s16-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance"
     },
     {
       "id": "s16-02",
@@ -11244,7 +11681,12 @@
       "duration": 6.54,
       "clip": "media/s16-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "s16-03",
@@ -11408,11 +11850,16 @@
       "duration": 14.92,
       "clip": "media/s16-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "s17-01",
-      "name": "Infinite Mantra · petali di velo viola",
+      "name": "Lamelle radiali · Infinite Mantra",
       "kind": "video",
       "related": [
         "roadmap-layered-veils",
@@ -11566,11 +12013,18 @@
       "duration": 15.07,
       "clip": "media/s17-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Infinite Mantra · petali di velo viola"
+      ],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s17-02",
-      "name": "Infinite Mantra · nube di luce pulsante",
+      "name": "Volume luminoso · Infinite Mantra",
       "kind": "video",
       "related": [
         "roadmap-particle-volume",
@@ -11725,11 +12179,19 @@
       "duration": 16.05,
       "clip": "media/s17-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Infinite Mantra · nube di luce pulsante"
+      ],
+      "topics": [
+        "points",
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "s17-03",
-      "name": "Infinite Mantra · aureola a strati",
+      "name": "Strati concentrici · Infinite Mantra",
       "kind": "video",
       "related": [
         "roadmap-layered-veils"
@@ -11883,11 +12345,19 @@
       "duration": 8.45,
       "clip": "media/s17-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Infinite Mantra · aureola a strati"
+      ],
+      "topics": [
+        "surfaces",
+        "materials"
+      ],
+      "category": "form"
     },
     {
       "id": "s18-01",
-      "name": "Rembagram · vortice luminoso e variante grafica",
+      "name": "Vortice · Rembagram, varianti",
       "kind": "video",
       "related": [
         "s18-03",
@@ -12049,7 +12519,14 @@
       "duration": 5.8,
       "clip": "media/s18-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Rembagram · vortice luminoso e variante grafica"
+      ],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "s18-02",
@@ -12213,11 +12690,16 @@
       "duration": 5.67,
       "clip": "media/s18-02-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "electric"
+      ],
+      "category": "movement"
     },
     {
       "id": "s18-03",
-      "name": "Rembagram · vortice nella foresta",
+      "name": "Vortice · Rembagram, nella foresta",
       "kind": "video",
       "related": [
         "s18-01",
@@ -12377,11 +12859,18 @@
       "duration": 9.5,
       "clip": "media/s18-03-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Rembagram · vortice nella foresta"
+      ],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "s18-04",
-      "name": "Cosmic Fungi · lamelle e fiori traslucidi",
+      "name": "Lamelle traslucide · Cosmic Fungi",
       "kind": "video",
       "related": [
         "roadmap-layered-veils",
@@ -12541,11 +13030,19 @@
       "duration": 13.34,
       "clip": "media/s18-04-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Cosmic Fungi · lamelle e fiori traslucidi"
+      ],
+      "topics": [
+        "surfaces",
+        "materials"
+      ],
+      "category": "form"
     },
     {
       "id": "s18-05",
-      "name": "Nebula Supercluster · nucleo e ramificazioni di luce",
+      "name": "Ramificazioni luminose · Nebula Supercluster",
       "kind": "video",
       "related": [
         "roadmap-electric-filaments",
@@ -12707,7 +13204,14 @@
       "duration": 22.38,
       "clip": "media/s18-05-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Nebula Supercluster · nucleo e ramificazioni di luce"
+      ],
+      "topics": [
+        "electric"
+      ],
+      "category": "movement"
     },
     {
       "id": "roadmap-fractals",
@@ -12792,11 +13296,16 @@
       ],
       "assets": [],
       "illustrationFrom": "s12-01",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "fractals"
+      ],
+      "category": "form"
     },
     {
       "id": "roadmap-particles",
-      "name": "Particelle e percorsi",
+      "name": "Percorsi delle particelle",
       "kind": "project",
       "related": [
         "img-s16-rootstock",
@@ -12856,7 +13365,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Particelle → Struttura → Movimento",
       "platform": "",
       "next": "",
       "keep": "",
@@ -12873,11 +13382,18 @@
       ],
       "assets": [],
       "illustrationFrom": "img-s16-rootstock",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Particelle e percorsi"
+      ],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "roadmap-body-interaction",
-      "name": "Mani e braccia muovono la materia",
+      "name": "Mani e braccia",
       "kind": "project",
       "related": [
         "img-04",
@@ -12977,11 +13493,18 @@
       "illustrationFrom": "img-04",
       "completedProjects": [
         "roadmap-particles"
-      ]
+      ],
+      "aliases": [
+        "Mani e braccia muovono la materia"
+      ],
+      "topics": [
+        "tracking"
+      ],
+      "category": "interaction"
     },
     {
       "id": "roadmap-audio-interaction",
-      "name": "Audio e moto in tempo reale",
+      "name": "Modulazione audio",
       "kind": "project",
       "related": [
         "s09-02",
@@ -13206,7 +13729,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Interazione → Audio",
       "platform": "",
       "next": "Taratura con microfono e voce reali e prova su telefono fisico; test mani già rimandato · Collegare replay registrato e fase della scena all’export deterministico; aggiungere suono opzionale nei video, selezione del tratto e gestione di più clip · Prova Sndviz/audioAnalysis in TouchDesigner e ponte locale OSC/WebSocket verso le stesse mappature · Pitch affidabile, riconoscimento automatico BPM e Morph A/B; impulsi attuali non equivalgono a beat/BPM affidabili · Pubblicazione Pages della versione audio",
       "keep": "",
@@ -13223,7 +13746,14 @@
       ],
       "assets": [],
       "illustrationFrom": "s09-02",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Audio e moto in tempo reale"
+      ],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "roadmap-preset-morphing",
@@ -13362,11 +13892,16 @@
       ],
       "assets": [],
       "illustrationFrom": "s09-05",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "presets"
+      ],
+      "category": "workflow"
     },
     {
       "id": "roadmap-particle-volume",
-      "name": "Densità e ombre nelle particelle",
+      "name": "Volumi di particelle",
       "kind": "project",
       "related": [
         "s09-01",
@@ -13517,11 +14052,18 @@
       ],
       "assets": [],
       "illustrationFrom": "s09-01",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Densità e ombre nelle particelle"
+      ],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "roadmap-membrane",
-      "name": "Membrane vive",
+      "name": "Membrane",
       "kind": "project",
       "related": [
         "s09-04",
@@ -13615,7 +14157,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "membrana-viva",
-      "where": "Forme → Forma → Struttura della forma. Movimento per le tracce, Materia per la trasparenza, Colori per il nucleo. Particelle → Forma → Pelle, fibre e tessitura.",
+      "where": "Struttura → Forma → Struttura → Membrana",
       "platform": "",
       "next": "",
       "keep": "",
@@ -13674,11 +14216,19 @@
         "Proprietà combinabili senza cambio di modalità o preset obbligatorio",
         "Parametri comuni ancora disponibili e verificati",
         "Transizioni intermedie, animazioni indipendenti e salvataggio delle combinazioni"
-      ]
+      ],
+      "aliases": [
+        "Membrane vive"
+      ],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form",
+      "engine": "solid"
     },
     {
       "id": "roadmap-fibre-motion",
-      "name": "Fibre che respirano",
+      "name": "Movimento delle fibre",
       "kind": "project",
       "related": [
         "s09-02",
@@ -13771,7 +14321,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "fibre-vive",
-      "where": "Forme → Forma → Struttura della forma. Movimento per le tracce, Materia per la trasparenza, Colori per il nucleo. Particelle → Forma → Pelle, fibre e tessitura.",
+      "where": "Struttura → Forma → Struttura → Fibre e tessitura; Struttura → Movimento",
       "platform": "",
       "next": "",
       "keep": "",
@@ -13830,11 +14380,19 @@
         "Proprietà combinabili senza cambio di modalità o preset obbligatorio",
         "Parametri comuni ancora disponibili e verificati",
         "Transizioni intermedie, animazioni indipendenti e salvataggio delle combinazioni"
-      ]
+      ],
+      "aliases": [
+        "Fibre che respirano"
+      ],
+      "topics": [
+        "fibres"
+      ],
+      "category": "form",
+      "engine": "solid"
     },
     {
       "id": "roadmap-tissue",
-      "name": "Tessuto e connessioni",
+      "name": "Tessitura e connessioni",
       "kind": "project",
       "related": [
         "s07-05",
@@ -13916,7 +14474,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "tessuto-connesso",
-      "where": "Forme → Forma → Struttura della forma. Movimento per le tracce, Materia per la trasparenza, Colori per il nucleo. Particelle → Forma → Pelle, fibre e tessitura.",
+      "where": "Struttura → Forma → Struttura → Fibre e tessitura",
       "platform": "",
       "next": "",
       "keep": "",
@@ -13974,11 +14532,19 @@
         "Proprietà combinabili senza cambio di modalità o preset obbligatorio",
         "Parametri comuni ancora disponibili e verificati",
         "Transizioni intermedie, animazioni indipendenti e salvataggio delle combinazioni"
-      ]
+      ],
+      "aliases": [
+        "Tessuto e connessioni"
+      ],
+      "topics": [
+        "fibres"
+      ],
+      "category": "form",
+      "engine": "solid"
     },
     {
       "id": "roadmap-4d",
-      "name": "Da completare · Prisma 4D",
+      "name": "Prospettiva 4D",
       "kind": "project",
       "related": [
         "img-03",
@@ -14042,7 +14608,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Pannello 4D locale → Webcam e calibrazione. La sola pagina Studio online non comprende la configurazione locale.",
       "platform": "PC · calibrazione locale",
       "next": "Calibrazione metrica e verifica della prospettiva sulla parete · Prototipo Gaussian Splatting: import locale di un ambiente, confronto con la scena geometrica e prova di prestazioni; non ancora implementato",
       "keep": "",
@@ -14059,11 +14625,18 @@
       ],
       "assets": [],
       "illustrationFrom": "img-03",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Da completare · Prisma 4D"
+      ],
+      "topics": [
+        "tracking"
+      ],
+      "category": "interaction"
     },
     {
       "id": "roadmap-cellular",
-      "name": "Cellule e colonie",
+      "name": "Cellule instanziate",
       "kind": "project",
       "related": [
         "img-20261010-03",
@@ -14149,11 +14722,18 @@
       ],
       "assets": [],
       "illustrationFrom": "img-20261010-03",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Cellule e colonie"
+      ],
+      "topics": [
+        "growth"
+      ],
+      "category": "form"
     },
     {
       "id": "roadmap-recursive-warp",
-      "name": "Warp ricorsivo",
+      "name": "Distorsione ricorsiva e feedback",
       "kind": "project",
       "related": [
         "img-20261010-03",
@@ -14230,7 +14810,14 @@
       ],
       "assets": [],
       "illustrationFrom": "img-20261010-03",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Warp ricorsivo"
+      ],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "roadmap-liquid-painting",
@@ -14318,7 +14905,12 @@
       ],
       "assets": [],
       "illustrationFrom": "img-20261010-03",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "fluids"
+      ],
+      "category": "movement"
     },
     {
       "id": "roadmap-lumen-print",
@@ -14404,11 +14996,16 @@
       ],
       "assets": [],
       "illustrationFrom": "img-20261010-03",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "roadmap-note-events",
-      "name": "Più avanti · Musica in note",
+      "name": "Trascrizione audio in note",
       "kind": "project",
       "related": [
         "img-20261010-01",
@@ -14496,11 +15093,18 @@
       ],
       "assets": [],
       "illustrationFrom": "img-20261010-01",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Più avanti · Musica in note"
+      ],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "project-living-extensions",
-      "name": "Strutture vive · crescita e simulazione avanzata",
+      "name": "Simulazione di fibre e superfici",
       "kind": "project",
       "related": [
         "s09-02",
@@ -14590,11 +15194,19 @@
         "roadmap-fibre-motion",
         "roadmap-tissue",
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [
+        "Strutture vive · crescita e simulazione avanzata"
+      ],
+      "topics": [
+        "fibres",
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "roadmap-filament-planets",
-      "name": "Pianeti di filamenti",
+      "name": "Filamenti e spine",
       "kind": "project",
       "related": [
         "s13-01",
@@ -14794,7 +15406,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "../?engine=solid&v=49",
-      "where": "Forma > Filamenti e spine > Base; Colori > Colore dei filamenti; Movimento > Filamenti e spine.",
+      "where": "Struttura → Forma → Filamenti e spine; Struttura → Movimento → Filamenti e spine",
       "platform": "",
       "next": "Raffinare profondità e luce nelle macro, appendici lunghe e fasci appiattiti; misura su telefono reale.",
       "keep": "Volume pieno e controllabile, passaggio dal globo al dettaglio, filamenti persistenti e palette sulla singola fibra.",
@@ -14842,11 +15454,18 @@
       "resultImage": "../previews/filamenti-qualita.webp",
       "resultVideo": "../previews/filamenti-movimento.mp4",
       "engine": "solid",
-      "resultUrl": "../?engine=solid&v=49"
+      "resultUrl": "../?engine=solid&v=49",
+      "aliases": [
+        "Pianeti di filamenti"
+      ],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "roadmap-soft-knots",
-      "name": "Nodi morbidi · bande e lacca",
+      "name": "Anelli e nodi",
       "kind": "project",
       "related": [
         "s16-02",
@@ -14920,7 +15539,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "Forma → Anelli e nodi: apertura continua dalla sfera, raggio, spessore, intreccio, appiattimento, torsione e variazione di spessore. Movimento → Anelli e nodi: scorrimento ciclico e tracce indipendenti. Materia, colori, membrane e campi restano combinabili.",
-      "where": "Forma → Anelli e nodi; Movimento → Anelli e nodi",
+      "where": "Struttura → Forma → Anelli e nodi; Struttura → Movimento → Anelli e nodi",
       "platform": "",
       "next": "Aggiungere bande che seguano la coordinata del percorso e confrontare i materiali laccati con le reference. La geometria di base è integrata; il progetto completo delle reference resta in corso.",
       "keep": "",
@@ -14937,11 +15556,19 @@
       ],
       "assets": [],
       "illustrationFrom": "s16-02",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Nodi morbidi · bande e lacca"
+      ],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement",
+      "engine": "solid"
     },
     {
       "id": "roadmap-image-treatments",
-      "name": "Filtri · punti, celle e segni",
+      "name": "Segni, mosaico e contorni",
       "kind": "project",
       "related": [
         "img-01",
@@ -15054,7 +15681,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Scena → Regolazioni per colore, esposizione, lente e grana; Scena → Post-processing per i sette filtri.",
+      "where": "Scena → Post-processing → Segni, Contorni, Glitch",
       "platform": "",
       "next": "Preset di soli filtri: salvare una combinazione e applicarla ad altre creazioni Prisma mantenendo forma, materiali e movimento.",
       "keep": "",
@@ -15073,11 +15700,18 @@
       "illustrationFrom": "img-01",
       "completedProjects": [
         "project-finishing"
-      ]
+      ],
+      "aliases": [
+        "Filtri · punti, celle e segni"
+      ],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "roadmap-layered-veils",
-      "name": "Veli trasparenti e aureole",
+      "name": "Lamelle e strati",
       "kind": "project",
       "related": [
         "s17-01",
@@ -15158,7 +15792,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "veli-aureole",
-      "where": "Forme → Forma → Struttura della forma. Movimento per le tracce, Materia per la trasparenza, Colori per il nucleo. Particelle → Forma → Pelle, fibre e tessitura.",
+      "where": "Struttura → Forma → Struttura → Lamelle e strati; Aspetto → Materia per la trasparenza",
       "platform": "",
       "next": "Confrontare le nuove pieghe in movimento con le reference; verificare le combinazioni fitte sul telefono.",
       "keep": "",
@@ -15234,11 +15868,20 @@
         "Proprietà combinabili senza cambio di modalità o preset obbligatorio",
         "Parametri comuni ancora disponibili e verificati",
         "Transizioni intermedie, animazioni indipendenti e salvataggio delle combinazioni"
-      ]
+      ],
+      "aliases": [
+        "Veli trasparenti e aureole"
+      ],
+      "topics": [
+        "surfaces",
+        "materials"
+      ],
+      "category": "form",
+      "engine": "solid"
     },
     {
       "id": "roadmap-luminous-vortex",
-      "name": "Vortici luminosi · lembi e flare",
+      "name": "Vortici",
       "kind": "project",
       "related": [
         "s18-01",
@@ -15339,11 +15982,18 @@
       ],
       "assets": [],
       "illustrationFrom": "s18-01",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Vortici luminosi · lembi e flare"
+      ],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "roadmap-electric-filaments",
-      "name": "Filamenti elettrici · scintille e nebulose",
+      "name": "Scariche e scie luminose",
       "kind": "project",
       "related": [
         "s18-02",
@@ -15460,7 +16110,14 @@
       "illustrationFrom": "s18-02",
       "completedProjects": [
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [
+        "Filamenti elettrici · scintille e nebulose"
+      ],
+      "topics": [
+        "electric"
+      ],
+      "category": "movement"
     },
     {
       "id": "method-living-moodboard",
@@ -15549,7 +16206,12 @@
       ],
       "completedProjects": [
         "project-moodboard"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "img-tdxmorph",
@@ -15607,11 +16269,16 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "presets"
+      ],
+      "category": "workflow"
     },
     {
       "id": "project-trama-viva",
-      "name": "Trama viva",
+      "name": "Connessioni tra particelle",
       "kind": "project",
       "related": [
         "img-20261010-02",
@@ -15664,7 +16331,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "trama-viva",
-      "where": "Particelle → Punti di partenza → Trama viva. Controlli: Forma e moto → Fibre e scie → Connessioni.",
+      "where": "Particelle → Struttura → Fibre e scie → Connessioni",
       "platform": "",
       "next": "Elasticità e membrane disponibili nel progetto Tessuto e connessioni. Questa ricetta conserva i legami visivi originali di Particle Hero.",
       "keep": "",
@@ -15686,11 +16353,18 @@
       "completedProjects": [
         "roadmap-tissue",
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [
+        "Trama viva"
+      ],
+      "topics": [
+        "fibres"
+      ],
+      "category": "form"
     },
     {
       "id": "project-cobalto-oro",
-      "name": "Cobalto e oro",
+      "name": "Interferenza cromatica",
       "kind": "project",
       "related": [
         "s11-01",
@@ -15737,7 +16411,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "cobalto-oro",
-      "where": "Aspetto → Materia → Cobalto e oro; disponibile in Forme e Particelle.",
+      "where": "Aspetto → Materia → Interferenza e iridescenza (Forme); Pellicola → Interferenza (Particelle)",
       "platform": "",
       "next": "",
       "keep": "",
@@ -15758,11 +16432,19 @@
       "resultUrl": "../previews/cobalto-oro.html",
       "completedProjects": [
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [
+        "Cobalto e oro"
+      ],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance",
+      "engine": "solid"
     },
     {
       "id": "project-fibre-setose",
-      "name": "Riflessi setosi",
+      "name": "Riflessi delle fibre",
       "kind": "project",
       "related": [
         "roadmap-fibre-motion",
@@ -15811,7 +16493,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "fibre-setose",
-      "where": "Particelle → Aspetto → Materia → Riflessi setosi delle fibre.",
+      "where": "Particelle → Aspetto → Materia → Riflessi delle fibre",
       "platform": "",
       "next": "",
       "keep": "",
@@ -15832,11 +16514,19 @@
       "resultUrl": "../previews/fibre-setose.html",
       "completedProjects": [
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [
+        "Riflessi setosi"
+      ],
+      "topics": [
+        "materials",
+        "strands"
+      ],
+      "category": "appearance"
     },
     {
       "id": "project-pellicola-viva",
-      "name": "Pellicola madreperlacea",
+      "name": "Pellicola ottica",
       "kind": "project",
       "related": [
         "roadmap-membrane",
@@ -15884,7 +16574,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "pellicola-viva",
-      "where": "Particelle → Aspetto → Materia → Pellicola madreperlacea viva.",
+      "where": "Particelle → Aspetto → Materia → Pellicola",
       "platform": "",
       "next": "",
       "keep": "",
@@ -15905,7 +16595,14 @@
       "resultUrl": "../previews/pellicola-viva.html",
       "completedProjects": [
         "roadmap-membrane"
-      ]
+      ],
+      "aliases": [
+        "Pellicola madreperlacea"
+      ],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance"
     },
     {
       "id": "project-moodboard",
@@ -15955,7 +16652,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Prisma → Moodboard. Tre viste: Moodboard, Roadmap, In Prisma.",
+      "where": "Prisma → Moodboard → Riferimenti, Progetti, Disponibili",
       "platform": "",
       "next": "Aggiungere le prossime reference e usare i feedback nelle prove successive. Generazione e varianti restano nello Studio.",
       "keep": "",
@@ -15972,7 +16669,12 @@
       ],
       "assets": [],
       "illustrationFrom": "method-living-moodboard",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "archive-calibration-20261009",
@@ -16090,7 +16792,12 @@
         }
       ],
       "illustrationFrom": "roadmap-4d",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tracking"
+      ],
+      "category": "interaction"
     },
     {
       "id": "reuse-three-filament-lines",
@@ -16165,7 +16872,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-filament-planets",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "img-s14-07",
@@ -16278,7 +16990,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "img-s14-08-09",
@@ -16408,7 +17125,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "img-s14-10",
@@ -16522,7 +17244,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "reuse-blender-procedural-groom",
@@ -16621,7 +17348,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-filament-planets",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "reuse-td-organic-fur",
@@ -16719,7 +17451,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-filament-planets",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "reuse-td-hairy-banana",
@@ -16816,7 +17553,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-filament-planets",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "reuse-frostbitten-hair",
@@ -16923,7 +17665,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-filament-planets",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "reuse-tressfx-strands",
@@ -17009,7 +17756,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-filament-planets",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "reuse-hairtool-groom",
@@ -17091,7 +17843,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-filament-planets",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "research-hair-alternatives",
@@ -17155,7 +17912,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-filament-planets",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "strands"
+      ],
+      "category": "form"
     },
     {
       "id": "img-s16-rootstock",
@@ -17265,7 +18027,12 @@
       ],
       "completedProjects": [
         "roadmap-particles"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "presets"
+      ],
+      "category": "workflow"
     },
     {
       "id": "img-s16-displace",
@@ -17363,7 +18130,12 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "img-s16-mosaic",
@@ -17463,7 +18235,12 @@
       ],
       "completedProjects": [
         "project-finishing"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "img-s16-rgb",
@@ -17565,11 +18342,16 @@
       ],
       "completedProjects": [
         "project-finishing"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "project-finishing",
-      "name": "Filtri · colore, segni, contorni e glitch",
+      "name": "Ordine, aree e preset dei filtri",
       "kind": "project",
       "related": [
         "img-s16-mosaic",
@@ -17706,7 +18488,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Scena → Regolazioni per colore, esposizione, lente e grana; Scena → Post-processing per i sette filtri.",
+      "where": "Scena → Post-processing → Ordine dei filtri e aree; Scena → Regolazioni per esposizione e colore",
       "platform": "",
       "next": "",
       "keep": "",
@@ -17723,7 +18505,14 @@
       ],
       "assets": [],
       "illustrationFrom": "img-s16-mosaic",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "Filtri · colore, segni, contorni e glitch"
+      ],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "img-s18-form-vision",
@@ -17832,7 +18621,14 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio",
+        "presets",
+        "paths"
+      ],
+      "category": "interaction"
     },
     {
       "id": "tool-s18-noise",
@@ -17894,7 +18690,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-luminous-vortex",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "electric"
+      ],
+      "category": "movement"
     },
     {
       "id": "tool-s18-bloom",
@@ -17957,7 +18758,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-luminous-vortex",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "electric"
+      ],
+      "category": "movement"
     },
     {
       "id": "reuse-tdxmorph",
@@ -18054,7 +18860,12 @@
       ],
       "assets": [],
       "illustrationFrom": "s09-05",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "presets"
+      ],
+      "category": "workflow"
     },
     {
       "id": "reuse-pcr",
@@ -18152,7 +18963,12 @@
       "illustrationFrom": "s09-01",
       "completedProjects": [
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "reuse-inkfield",
@@ -18228,7 +19044,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "reuse-brush",
@@ -18310,7 +19131,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "reuse-xpbd",
@@ -18412,7 +19238,12 @@
         "roadmap-membrane",
         "roadmap-fibre-motion",
         "roadmap-tissue"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "fibres"
+      ],
+      "category": "form"
     },
     {
       "id": "reuse-three-attractors",
@@ -18508,7 +19339,12 @@
       "illustrationFrom": "s09-03",
       "completedProjects": [
         "roadmap-particles"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "reuse-sound-to-light",
@@ -18587,7 +19423,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-audio-interaction",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "reuse-sndviz",
@@ -18666,7 +19507,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-audio-interaction",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "reuse-meyda",
@@ -18758,7 +19604,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-audio-interaction",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "tool-ascii",
@@ -18799,7 +19650,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "tool-feralui-gradient-builder",
@@ -18842,7 +19698,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "gradients"
+      ],
+      "category": "appearance"
     },
     {
       "id": "tool-incrprl-dsgn-primary-fear-e-lumen-chamber",
@@ -18894,7 +19755,12 @@
       ],
       "assets": [],
       "illustrationFrom": "s03-01",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-holotx-compute-agenti-top-to-pop",
@@ -18938,7 +19804,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-forside-art-membrane-fibre-e-tessuti",
@@ -18977,7 +19848,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "surfaces"
+      ],
+      "category": "form"
     },
     {
       "id": "tool-palette-audioanalysis",
@@ -19025,7 +19901,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "tool-audioanalysis-extended",
@@ -19073,7 +19954,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "tool-tdableton",
@@ -19122,7 +20008,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "tool-td-demucs",
@@ -19170,7 +20061,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "basic-pitch",
@@ -19261,11 +20157,16 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-note-events",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "audio"
+      ],
+      "category": "interaction"
     },
     {
       "id": "dense-cloud",
-      "name": "github.com/dannystuart/particle-hero",
+      "name": "Particle Hero · Danny Stuart",
       "kind": "tool",
       "related": [
         "roadmap-particle-volume",
@@ -19378,7 +20279,14 @@
       "illustrationFrom": "roadmap-particle-volume",
       "completedProjects": [
         "project-trama-viva"
-      ]
+      ],
+      "aliases": [
+        "github.com/dannystuart/particle-hero"
+      ],
+      "topics": [
+        "points"
+      ],
+      "category": "form"
     },
     {
       "id": "liquid-painting",
@@ -19466,7 +20374,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-liquid-painting",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "fluids"
+      ],
+      "category": "movement"
     },
     {
       "id": "lumen-print",
@@ -19553,7 +20466,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-lumen-print",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "cellular-instancing",
@@ -19642,7 +20560,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-cellular",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "growth"
+      ],
+      "category": "form"
     },
     {
       "id": "recursive-displace",
@@ -19739,7 +20662,12 @@
       ],
       "assets": [],
       "illustrationFrom": "roadmap-recursive-warp",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "soleil",
@@ -19841,11 +20769,16 @@
       "illustrationFrom": "roadmap-fibre-motion",
       "completedProjects": [
         "roadmap-fibre-motion"
-      ]
+      ],
+      "aliases": [],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance"
     },
     {
       "id": "tool-github-com-dannystuart-3d-shape-generator",
-      "name": "github.com/dannystuart/3d-shape-generator",
+      "name": "3D Shape Generator · Danny Stuart",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -19899,11 +20832,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "github.com/dannystuart/3d-shape-generator"
+      ],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-github-com-dannystuart-code-garden",
-      "name": "github.com/dannystuart/code-garden",
+      "name": "Code Garden · Danny Stuart",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -19949,11 +20889,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "github.com/dannystuart/code-garden"
+      ],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-github-com-dannystuart-dannystuartcreator",
-      "name": "github.com/dannystuart/dannystuartcreator",
+      "name": "Portfolio sorgente · Danny Stuart",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -19998,11 +20945,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "github.com/dannystuart/dannystuartcreator"
+      ],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-dannystuart-substack-com-p-animated-background-prompts",
-      "name": "dannystuart.substack.com/p/animated-background-prompts",
+      "name": "Animated Background Prompts · Danny Stuart",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -20038,11 +20992,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "dannystuart.substack.com/p/animated-background-prompts"
+      ],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-www-dannystuart-com",
-      "name": "www.dannystuart.com/",
+      "name": "Portfolio · Danny Stuart",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -20078,11 +21039,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "www.dannystuart.com/"
+      ],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-www-newlayer-co",
-      "name": "www.newlayer.co/",
+      "name": "New Layer",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -20118,11 +21086,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "www.newlayer.co/"
+      ],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-vanta-supply",
-      "name": "vanta.supply",
+      "name": "Vanta Supply",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -20158,11 +21133,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "vanta.supply"
+      ],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-www-threads-net-dannystuart",
-      "name": "www.threads.net/@dannystuart",
+      "name": "Profilo Threads · Danny Stuart",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -20198,11 +21180,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "www.threads.net/@dannystuart"
+      ],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-github-com-mrdoob-three-js-blob-dev-examples-webgpu-tsl-compute-attractors-particles-",
-      "name": "github.com/mrdoob/three.js/blob/dev/examples/webgpu_tsl_compute_attractors_particles.html",
+      "name": "Attrattori GPU · esempio Three.js",
       "kind": "tool",
       "related": [
         "s03-01",
@@ -20259,11 +21248,18 @@
       ],
       "assets": [],
       "illustrationFrom": "s03-01",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "github.com/mrdoob/three.js/blob/dev/examples/webgpu_tsl_compute_attractors_particles.html"
+      ],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "tool-github-com-mrdoob-three-js-blob-dev-examples-webgpu-tsl-vfx-linkedparticles-html",
-      "name": "github.com/mrdoob/three.js/blob/dev/examples/webgpu_tsl_vfx_linkedparticles.html",
+      "name": "Particelle collegate · esempio Three.js",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -20309,7 +21305,14 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "github.com/mrdoob/three.js/blob/dev/examples/webgpu_tsl_vfx_linkedparticles.html"
+      ],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "tool-glsl-compute-shader-agent-simulation-part-1",
@@ -20352,7 +21355,12 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "tool-glsl-top-to-pop",
@@ -20403,11 +21411,16 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "prisma-window-depth",
-      "name": "prisma-window-depth",
+      "name": "Studio tecnico · prospettiva 4D",
       "kind": "tool",
       "related": [
         "img-03",
@@ -20480,11 +21493,18 @@
       ],
       "assets": [],
       "illustrationFrom": "img-03",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "prisma-window-depth"
+      ],
+      "topics": [
+        "tracking"
+      ],
+      "category": "interaction"
     },
     {
       "id": "prisma-light-play",
-      "name": "prisma-light-play",
+      "name": "Studio tecnico · luce",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -20536,11 +21556,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "prisma-light-play"
+      ],
+      "topics": [
+        "materials"
+      ],
+      "category": "appearance"
     },
     {
       "id": "prisma-contour-frequency",
-      "name": "prisma-contour-frequency",
+      "name": "Studio tecnico · contorni FM",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -20592,11 +21619,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "prisma-contour-frequency"
+      ],
+      "topics": [
+        "paths"
+      ],
+      "category": "movement"
     },
     {
       "id": "prisma-image-particles",
-      "name": "prisma-image-particles",
+      "name": "Studio tecnico · immagine a punti",
       "kind": "tool",
       "related": [
         "img-01",
@@ -20660,11 +21694,18 @@
       ],
       "assets": [],
       "illustrationFrom": "img-01",
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "prisma-image-particles"
+      ],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "prisma-portal-reference",
-      "name": "prisma-portal-reference",
+      "name": "Studio tecnico · portale AR",
       "kind": "tool",
       "related": [],
       "state": "reference",
@@ -20716,11 +21757,18 @@
       ],
       "media": [],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "prisma-portal-reference"
+      ],
+      "topics": [
+        "tracking"
+      ],
+      "category": "interaction"
     },
     {
       "id": "archive-144a5817f0f6b4e5",
-      "name": "1-Foto-1.jpg",
+      "name": "Allegato conservato · 144a5817",
       "kind": "archive",
       "related": [],
       "summary": "Documento tecnico conservato nell’archivio locale.",
@@ -20738,11 +21786,18 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "1-Foto-1.jpg"
+      ],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "archive-3c2f1ef232ccfa7f",
-      "name": "1-Foto-1.jpg",
+      "name": "Allegato conservato · 3c2f1ef2",
       "kind": "archive",
       "related": [],
       "summary": "Documento tecnico conservato nell’archivio locale.",
@@ -20760,7 +21815,14 @@
           "available": true
         }
       ],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [
+        "1-Foto-1.jpg"
+      ],
+      "topics": [
+        "tools"
+      ],
+      "category": "workflow"
     },
     {
       "id": "roadmap-optical-glass",
@@ -20842,11 +21904,16 @@
         }
       ],
       "assets": [],
-      "completedProjects": []
+      "completedProjects": [],
+      "aliases": [],
+      "topics": [
+        "post"
+      ],
+      "category": "filters"
     },
     {
       "id": "roadmap-organic-growth",
-      "name": "Crescita organica",
+      "name": "Trame di reazione-diffusione",
       "kind": "project",
       "engine": "solid",
       "related": [
@@ -20939,7 +22006,14 @@
       "assets": [],
       "completedProjects": [],
       "resultVideo": "../previews/venature-rame.mp4",
-      "resultUrl": "../previews/crescita-organica.html"
+      "resultUrl": "../previews/crescita-organica.html",
+      "aliases": [
+        "Crescita organica"
+      ],
+      "topics": [
+        "growth"
+      ],
+      "category": "form"
     }
   ],
   "families": [
@@ -21164,5 +22238,145 @@
     "attachments": 132,
     "clips": 61,
     "missing": 10
-  }
+  },
+  "categories": [
+    {
+      "id": "form",
+      "name": "Forma"
+    },
+    {
+      "id": "appearance",
+      "name": "Materia e colore"
+    },
+    {
+      "id": "movement",
+      "name": "Movimento"
+    },
+    {
+      "id": "filters",
+      "name": "Filtri"
+    },
+    {
+      "id": "interaction",
+      "name": "Interazione"
+    },
+    {
+      "id": "workflow",
+      "name": "Strumenti e lavoro"
+    }
+  ],
+  "topics": [
+    {
+      "id": "surfaces",
+      "name": "Membrane e lamine",
+      "category": "form",
+      "description": "Superfici continue: pelle, pieghe, petali e strati. Un alone luminoso non è una seconda superficie.",
+      "cover": "s17-01"
+    },
+    {
+      "id": "fibres",
+      "name": "Fibre e tessuti",
+      "category": "form",
+      "description": "Fili collegati e reti che si deformano insieme. Distinti dai filamenti che nascono sulla superficie.",
+      "cover": "s06-01"
+    },
+    {
+      "id": "strands",
+      "name": "Filamenti e spine",
+      "category": "form",
+      "description": "Fili distribuiti su una forma: ciuffi, pelo, ricci e spine. La serie Planets è una famiglia di esempi.",
+      "cover": "img-s14-07"
+    },
+    {
+      "id": "points",
+      "name": "Punti e volumi",
+      "category": "form",
+      "description": "Nuvole di punti, densità, cavità e ombre interne. Non implica una superficie continua.",
+      "cover": "s09-01"
+    },
+    {
+      "id": "growth",
+      "name": "Crescita e cellule",
+      "category": "form",
+      "description": "Trame e strutture cellulari. Il rilievo nella luce e le aperture geometriche sono progetti distinti.",
+      "cover": "s07-05"
+    },
+    {
+      "id": "fractals",
+      "name": "Frattali",
+      "category": "form",
+      "description": "Strutture ricorsive e dettagli ripetuti a più scale.",
+      "cover": "s12-01"
+    },
+    {
+      "id": "materials",
+      "name": "Materiali e riflessi",
+      "category": "appearance",
+      "description": "Trasparenza, interferenza, riflessi e luce sulla materia. Non cambiano da soli la geometria.",
+      "cover": "s11-01"
+    },
+    {
+      "id": "gradients",
+      "name": "Gradienti e campi di colore",
+      "category": "appearance",
+      "description": "Distribuzione e movimento del colore, sulla forma o sullo sfondo.",
+      "cover": "s01-06"
+    },
+    {
+      "id": "paths",
+      "name": "Curve, anelli e vortici",
+      "category": "movement",
+      "description": "Traiettorie e torsioni: un vortice descrive il percorso, non il materiale o il tipo di particella.",
+      "cover": "s18-01"
+    },
+    {
+      "id": "electric",
+      "name": "Scie e scariche",
+      "category": "movement",
+      "description": "Tracce persistenti, accensioni e ramificazioni luminose. Bagliore e percorso restano regolazioni distinte.",
+      "cover": "s18-02"
+    },
+    {
+      "id": "fluids",
+      "name": "Flussi e pittura",
+      "category": "movement",
+      "description": "Trasporto e mescolamento di materia o colore; distinguere simulazioni da deformazioni visive.",
+      "cover": "s09-03"
+    },
+    {
+      "id": "post",
+      "name": "Filtri e feedback",
+      "category": "filters",
+      "description": "Trattamenti del risultato: segni, mosaico, distorsioni, vetro e feedback. Non importazione obbligatoria di foto o clip."
+    },
+    {
+      "id": "audio",
+      "name": "Audio e note",
+      "category": "interaction",
+      "description": "Suono come sorgente di modulazione: analisi, bande e risposta dei parametri.",
+      "cover": "img-s18-form-vision"
+    },
+    {
+      "id": "tracking",
+      "name": "Tracking e prospettiva 4D",
+      "category": "interaction",
+      "description": "Mani e braccia per i controlli; punto di vista per il progetto 4D. Obiettivi distinti.",
+      "cover": "img-03"
+    },
+    {
+      "id": "presets",
+      "name": "Preset e transizioni",
+      "category": "workflow",
+      "description": "Salvataggio, variazioni e passaggi tra configurazioni.",
+      "cover": "img-tdxmorph"
+    },
+    {
+      "id": "tools",
+      "name": "Strumenti e metodo",
+      "category": "workflow",
+      "description": "Applicazioni, librerie e raccolte trasversali. La disponibilità di una repo non equivale a integrazione.",
+      "cover": "method-living-moodboard"
+    }
+  ],
+  "organizationVersion": 1
 }
