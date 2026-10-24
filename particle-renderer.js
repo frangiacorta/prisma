@@ -1,13 +1,13 @@
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=c360f55c36e3';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=c360f55c36e3';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=c360f55c36e3';
-import {ParticleLinks} from './particle-links.js?v=c360f55c36e3';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=c360f55c36e3';
-import {LayeredVeils} from './layered-veils.js?v=c360f55c36e3';
-import {LivingStructures} from './living-structures.js?v=c360f55c36e3';
-import {fieldGLSL} from './particle-field.js?v=c360f55c36e3';
-import {forceBarrierGLSL} from './particle-forces.js?v=c360f55c36e3';
-import {prismaShadingGLSL} from './particle-shading.js?v=c360f55c36e3';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=a68b59d20aef';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=a68b59d20aef';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=a68b59d20aef';
+import {ParticleLinks} from './particle-links.js?v=a68b59d20aef';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=a68b59d20aef';
+import {LayeredVeils} from './layered-veils.js?v=a68b59d20aef';
+import {LivingStructures} from './living-structures.js?v=a68b59d20aef';
+import {fieldGLSL} from './particle-field.js?v=a68b59d20aef';
+import {forceBarrierGLSL} from './particle-forces.js?v=a68b59d20aef';
+import {prismaShadingGLSL} from './particle-shading.js?v=a68b59d20aef';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;

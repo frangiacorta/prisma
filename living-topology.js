@@ -1,4 +1,4 @@
-import {projectTension} from './vendor/xpbd/distance.js?v=c360f55c36e3';
+import {projectTension} from './vendor/xpbd/distance.js?v=a68b59d20aef';
 
 // Persistent material coordinates: every fibre, pore and triangle keeps its identity.
 export function makeLivingTopology(columns=64,rows=49,mode=1,bundles=8){
