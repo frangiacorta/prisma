@@ -1,14 +1,18 @@
+import {SECTION_NAMES} from './control-vocabulary.js?v=2b61b8601b38';
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
- {id:'structure',label:'Forma',tabs:[['shape','Forma e deformazioni','shape'],['grains','Particelle','shape','particles'],['trails','Fibre e scie','motion','particles']]},
- {id:'movement',label:'Movimento',tabs:[['motion','Animazione','motion']]},
- {id:'look',label:'Aspetto',tabs:[['material','Materiale','material'],['color','Colori','palette'],['light','Luci','sun']]},
- {id:'scene',label:'Scena',tabs:[['background','Sfondo','background'],['tone','Correzione colore','photo']]},
- {id:'post',label:'Filtri',tabs:[['photo','Filtri','photo']]},
- {id:'interaction',label:'Interazione',tabs:[['fields','Campi di forza','move'],['body','Mani e braccia','orbit'],['audio','Audio','audio']]}
+ {id:'shape',label:'Forma',tabs:[['shape','Forma','shape']]},
+ {id:'material',label:'Materiale',tabs:[['material','Materiale','material']]},
+ {id:'color',label:'Colori',tabs:[['color','Colori','palette']]},
+ {id:'light',label:'Luci',tabs:[['light','Luci','sun']]},
+ {id:'scene',label:'Scena',tabs:[['background','Scena','background']]},
+ {id:'photo',label:'Filtri',tabs:[['photo','Filtri','photo']]},
+ {id:'motion',label:'Movimento',tabs:[['motion','Movimento','motion']]},
+ {id:'interaction',label:'Interazione',tabs:[['fields','Interazione','move']]},
+ {id:'library',label:'Libreria',tabs:[['library','Libreria','palette']]}
 ];
 const PROCEDURES=[{"label": "Guscio e spessore", "aliases": ["Membrana", "Membrane vive"], "description": "Svuota il volume della forma mantenendo una parete di spessore regolabile. È una costruzione geometrica; non simula una membrana fisica."}, {"label": "Reticolo di fibre", "aliases": ["Fibre e tessitura", "Tessuto e connessioni"], "description": "Separa la superficie in fili longitudinali e trasversali. Densità, larghezza e intreccio modificano la stessa struttura."}, {"label": "Suddivisione radiale e strati", "aliases": ["Lamelle e strati", "Veli e aureole", "Veli trasparenti e aureole"], "description": "Apre intervalli radiali, sezioni e gusci concentrici nella forma corrente. Trasparenza ed emissione si regolano nel materiale."}, {"label": "Filamenti su superficie", "aliases": ["Filamenti e spine", "Pianeti di filamenti"], "description": "Distribuisce filamenti ancorati alla superficie. Lunghezza, diametro, curvatura e raggruppamento permettono pelo, ciuffi e spine."}, {"label": "Curve toroidali e nodi", "aliases": ["Anelli e nodi", "Nodi morbidi"], "description": "Costruisce tubi o nastri lungo percorsi chiusi. Raggio, sezione, torsione e intreccio sono indipendenti."}, {"label": "Reazione-diffusione", "aliases": ["Crescita organica", "Gray Scott"], "description": "Il modello Gray–Scott genera un campo 3D. Qui il campo modifica colore, rugosità e normali (bump), non il contorno. Scorrimento trasporta il campo già calcolato."}, {"label": "Interferenza di pellicola", "aliases": ["Interferenza e iridescenza", "Cobalto e oro", "Pellicola madreperlacea"], "description": "I riflessi dipendono dallo spessore ottico e dalla variazione della pellicola. Cobalto e oro è un esempio di valori, non una modalità."}, {"label": "Bump procedurale", "aliases": ["Texture organica", "Grinze", "Pieghe della materia"], "description": "Una trama perturba le normali usate dalla luce. Produce l’aspetto di un rilievo senza cambiare la silhouette della geometria."}, {"label": "Distorsione ricorsiva 2D", "aliases": ["Warp ricorsivo", "Warp"], "description": "Ripete una deformazione delle coordinate dell’immagine nello stesso fotogramma. Non conserva immagini precedenti: il feedback temporale è un’altra funzione."}, {"label": "Rifrazione 2D", "aliases": ["Vetro", "Vetro ottico"], "description": "Deforma e filtra l’immagine della scena. È un trattamento finale, distinto dalla rifrazione del materiale 3D."}, {"label": "Oscillazione delle fibre", "aliases": ["Fibre che respirano", "Respiro delle fibre"], "description": "Varia periodicamente la posa delle fibre. Ampiezza, fase e ritardo regolano il movimento; non implica una simulazione di vento."}];
-export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.filter(t=>(!t[3]||t[3]===engine)&&!(engine==='veils'&&['fields','body','audio'].includes(t[0]))).map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label})));
+export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label}))).concat([{id:'body',label:'Mani e braccia',icon:'orbit',group:'interaction',groupLabel:'Interazione'},{id:'audio',label:'Audio',icon:'audio',group:'interaction',groupLabel:'Interazione'}]);
 const clean=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 export function renderNavigation(root,engine,tab,icon){
  const tabs=navigationTabs(engine),current=tabs.find(t=>t.id===tab)||tabs[0];
@@ -17,39 +21,24 @@ export function renderNavigation(root,engine,tab,icon){
  document.getElementById('panel-location').textContent=current.label;
 }
 export function organizeSections(root,scope){
+ if(scope.endsWith('/library'))return;
  // Deep shape controls belong under their parent instead of a long flat list.
  function group(label,id,titles){
   const nodes=[...root.children].filter(d=>titles.includes(d.querySelector(':scope > summary')?.textContent));if(!nodes.length)return;
   const parent=document.createElement('details');parent.className='control-details';parent.id=id;
   const summary=document.createElement('summary');summary.textContent=label;parent.append(summary);nodes[0].before(parent);parent.append(...nodes);
  }
- // Presets/examples have one predictable home at the bottom of each tab.
- const library=document.createElement('details');library.className='control-details example-library';
- library.innerHTML='<summary>Esempi</summary><p class="help">Applica un esempio, poi continua con tutti i parametri della scheda.</p>';
- const selectors='[data-sculpt],#load-bloom-example,[data-material],#material-picker,[data-legacy-material],[data-film-look],[data-film-light],[data-texture-style],[data-motion-preset],[data-mood],#random-palette,#light-rig,[data-light-source],[data-backdrop],[data-audio-preset]';
- const buckets=new Map(),exampleParents=new Set();
- for(const button of [...root.querySelectorAll(selectors)]){
-  if(scope.endsWith('/material')||(scope.endsWith('/motion')&&button.matches('[data-motion-preset]')))continue;
-  if(library.contains(button))continue;
-  const container=button.closest('.mood-grid,.field,.audio-presets')||button;
-  let ancestor=button.closest('details');while(ancestor&&root.contains(ancestor)){exampleParents.add(ancestor);ancestor=ancestor.parentElement.closest('details');}
-  const title=button.closest('details')?.querySelector(':scope > summary')?.textContent||'Esempi';
-  if(!buckets.has(title)){const block=document.createElement('details');block.className='control-details';const head=document.createElement('summary');head.textContent=title;block.append(head);buckets.set(title,block);library.append(block);}
-  buckets.get(title).append(container);
- }
- // Remove only empty preset wrappers, never sections with live controls.
- for(const d of [...root.querySelectorAll('details')].reverse())if(exampleParents.has(d)&&!d.querySelector('input,select,button,details')&& ![...d.children].some(c=>!c.matches('summary,p.help')))d.remove();
  for(const button of root.querySelectorAll('button[id^="reset-"]')){
   const parent=button.closest('details')||root,footer=document.createElement('div');footer.className='section-reset';
   parent.append(footer);footer.append(button);button.classList.remove('full');
  }
  if(scope==='solid/shape'){
-  const growth=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Petali e radici');
+  const growth=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Appendici: petali e radici');
   if(growth){growth.id='shape-growth';const stem=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Gambo');if(stem)growth.append(stem);}
-  group('Struttura','shape-structure',['Proprietà','Guscio e spessore','Reticolo di fibre','Suddivisione radiale e strati','Piegatura e curvatura']);
+  group('Costruzione','shape-structure',['Composizione della struttura','Guscio e spessore','Reticolo di fibre','Suddivisione radiale e strati','Piegatura e curvatura']);
   group('Profilo','shape-profile',['Deformazioni','Foro','Ritaglio','Lobi e onde']);
  }
- if(scope==='particles/shape')group('Struttura','particle-structure',['Lobi, rami e addensamenti','Rumore multiscala','Rete di percorsi','Tentacoli del nucleo','Fasci esterni','Deformazioni']);
+ if(scope==='particles/shape')group('Costruzione','particle-structure',['Lobi, rami e addensamenti','Rumore multiscala','Rete di percorsi','Tentacoli del nucleo','Fasci esterni','Deformazioni']);
  if(scope==='solid/motion'){
   const general=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Tempo');if(general)root.prepend(general);
   group('Scena','motion-scene',['Rotazione','Posizione e dimensione','Luci','Ambiente e pellicola']);
@@ -59,16 +48,16 @@ export function organizeSections(root,scope){
  }
  if(scope==='particles/motion')group('Deformazioni','particle-motion-deform',['Pulsazione','Tentacoli in movimento','Distorsione','Ritmo e cadenze']);
  if(scope.endsWith('/color')){const palette=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent.startsWith('Palette'));if(palette)root.prepend(palette);}
- if(buckets.size)root.append(library);
+
  for(const d of root.querySelectorAll('details')){
-  const title=d.querySelector(':scope > summary')?.textContent,term=PROCEDURES.find(t=>t.label===title);
+  const title=d.querySelector(':scope > summary')?.textContent,term=PROCEDURES.find(t=>(SECTION_NAMES[t.label]||t.label)===title);
   if(term&&!d.querySelector(':scope > .procedure-help')){const p=document.createElement('p');p.className='help procedure-help';p.textContent=term.description;d.querySelector('summary').after(p);}
  }
  if(scope.endsWith('/audio')){
   const response=root.querySelector('#audio-response-controls'),input=root.querySelector('#audio-input-controls');if(response&&input)input.after(response);
  }
 }
-const searchable='input:not(.number):not(.hex-input):not([type=file]):not([type=hidden]),select,button:not([data-help-text]):not(.audio-link)';
+const searchable='input:not(.number):not(.hex-input):not([type=file]):not([type=hidden]),select,button:not([data-help-text]):not(.audio-link):not([data-animate-open])';
 function address(el){
  for(const a of el.attributes)if(a.name==='id')return '#'+CSS.escape(a.value);
  const attrs=[...el.attributes].filter(a=>a.name.startsWith('data-'));
@@ -84,16 +73,16 @@ export function mountControlSearch({getEngine,getMarkup,showTab}){
  function close(){results.hidden=true;status.textContent='';}
  function refresh(){
   entries=[];
-  for(const tab of navigationTabs(getEngine())){
+  for(const tab of navigationTabs(getEngine()).filter(t=>t.id!=='library')){
    const template=document.createElement('template');template.innerHTML=getMarkup(tab.id);
    for(const el of template.content.querySelectorAll(searchable)){
     const selector=address(el),label=entryLabel(el);if(!selector||!label)continue;
     const ancestors=[];let d=el.closest('details,section.control-section');while(d){ancestors.unshift(d.querySelector(':scope > summary,:scope > h2')?.textContent||'');d=d.parentElement?.closest('details,section.control-section');}
     const aliases={tone:'esposizione luminosita saturazione correzione colore fotografia',photo:'filtri effetti finitura post processing',motion:'moto animazione animare muovere movimento ritmo velocita',fields:'attrazione repulsione magneti',body:'webcam tracking mani braccia'};
-    const oldNames=PROCEDURES.filter(t=>ancestors.some(a=>a.includes(t.label))).flatMap(t=>t.aliases);
+    const oldNames=PROCEDURES.filter(t=>ancestors.some(a=>a.includes(t.label)||a.includes(SECTION_NAMES[t.label]||t.label))).flatMap(t=>[t.label,...t.aliases]);
     const parameterAliases={growthFeed:['Nutrimento'],growthKill:['Consumo'],growthAge:['Sviluppo della trama'],growthDepth:['Incisione / rilievo'],filPhase:['Scorrimento'],filWind:['Oscillazione delle punte'],structBreath:['Dilatazione del respiro'],structFlap:['Apertura del battito'],glow:['Diffusione alone'],emission:['Luce propria']};
     oldNames.push(...(parameterAliases[el.dataset.param]||[]));
-    entries.push({tab:tab.id,label,path:[tab.groupLabel,tab.label,...ancestors].join(' › '),selector,haystack:clean([label,...ancestors,...oldNames,tab.label,({structure:'geometria forma',look:'materiale luce aspetto',post:'post processing filtri',interaction:'modulazione interazione'})[tab.group]||'',aliases[tab.id]||''].join(' '))});
+    entries.push({tab:tab.id,label,path:[...(tab.groupLabel===tab.label?[tab.label]:[tab.groupLabel,tab.label]),...ancestors].join(' › '),selector,haystack:clean([label,...ancestors,...oldNames,el.dataset.searchAliases||'',tab.label,({structure:'geometria forma',look:'materiale luce aspetto',post:'post processing filtri',interaction:'modulazione interazione'})[tab.group]||'',aliases[tab.id]||''].join(' '))});
    }
   }
  }
@@ -103,7 +92,7 @@ export function mountControlSearch({getEngine,getMarkup,showTab}){
   results.replaceChildren();results.hidden=false;status.textContent=found.length?found.length+' risultati'+(found.length>24?' · precisa la ricerca':''):'Nessun risultato · prova «orbita», «spessore» o «luce»';
   for(const entry of found.slice(0,24)){
    const b=document.createElement('button');b.type='button';b.className='control-search-result';const title=document.createElement('strong'),path=document.createElement('small');title.textContent=entry.label;path.textContent=entry.path;b.append(title,path);
-   b.onclick=()=>{input.value='';close();showTab(entry.tab);document.getElementById('controls').classList.remove('only-changed');const target=document.getElementById('controls').querySelector(entry.selector);if(!target)return;let d=target.closest('details');while(d){d.open=true;d=d.parentElement.closest('details');}const host=target.closest('.param,.field,.check,.color-field')||target;host.classList.add('search-highlight');requestAnimationFrame(()=>{target.focus({preventScroll:true});target.scrollIntoView({block:'center',behavior:'smooth'});});setTimeout(()=>host.classList.remove('search-highlight'),2200);};results.append(b);
+   b.onclick=()=>{input.value='';close();showTab(entry.tab);document.getElementById('controls').classList.remove('only-changed');const target=document.getElementById('controls').querySelector(entry.selector);if(!target)return;let d=target.closest('details');while(d){d.open=true;d=d.parentElement.closest('details');}const host=target.closest('.param,.field,.check,.color-field')||target;host.classList.add('search-highlight');requestAnimationFrame(()=>{document.getElementById('controls').classList.add('search-reveal');target.focus({preventScroll:true});target.scrollIntoView({block:'center',behavior:'smooth'});});setTimeout(()=>host.classList.remove('search-highlight'),2200);};results.append(b);
   }
  }
  input.addEventListener('focus',()=>{refresh();search();});input.addEventListener('input',search);

@@ -26,8 +26,8 @@ export function simplifyMotion(state,amount=0){
 const EFFECTS=[
  ['loopAmount','Curve toroidali e nodi'],['structShell','Guscio e spessore'],['structFibres','Reticolo di fibre'],['structRadial','Suddivisione radiale e strati','structSlices','structLayers'],
  ['filLength','Filamenti su superficie'],['petalAmount','Petali e radici'],['stemAmount','Gambo'],['hole','Foro'],['cut','Ritaglio'],['lobeAmount','Lobi e onde','waves'],
- ['textureDepth','Bump procedurale'],['growthAmount','Reazione-diffusione'],['iridescence','Interferenza di pellicola'],['colorWaveAmount','Onde di colore'],
- ['finishWarp','Distorsione ricorsiva 2D'],['finishGlass','Rifrazione 2D'],['finishGlitch','Glitch'],['finishGlyph','Segni / ASCII'],['finishEdge','Contorni'],['finishMosaic','Mosaico'],['finishRgb','Separazione RGB'],
+ ['textureDepth','Rilievo di superficie'],['growthAmount','Reazione-diffusione'],['iridescence','Iridescenza'],['colorWaveAmount','Onde di colore'],
+ ['finishWarp','Distorsione ricorsiva'],['finishGlass','Vetro ottico'],['finishGlitch','Glitch'],['finishGlyph','Segni e caratteri'],['finishEdge','Contorni'],['finishMosaic','Mosaico'],['finishRgb','Separazione dei colori'],
  ['pLiving','Superficie e reticolo'],['pLinks','Connessioni'],['pTrailCount','Scie'],['pTentacle','Tentacoli del nucleo'],['pOuter','Fasci esterni']
 ];
 const active=v=>typeof v==='boolean'?v:typeof v==='number'&&Math.abs(v)>1e-7;
@@ -50,7 +50,7 @@ export function decorateInspector({root,state,baseline,tab,edit}){
  const toggle=document.createElement('button');toggle.type='button';toggle.id='controls-changed';toggle.className='quiet';toggle.textContent='Solo modificati';toggle.setAttribute('aria-pressed','false');toggle.onclick=()=>{const on=root.classList.toggle('only-changed');toggle.setAttribute('aria-pressed',String(on));if(on)for(const d of root.querySelectorAll('details.has-changes'))d.open=true;};heading.append(toggle);toolbar.append(heading);
  const hint=document.createElement('p');hint.className='help';hint.textContent='Modificati: valori diversi da quelli iniziali.';toolbar.append(hint);
  const select=document.createElement('select');select.setAttribute('aria-label','Vai a una sezione');select.innerHTML='<option value="">Vai a una sezione…</option>';
- const sections=[...root.querySelectorAll(':scope > details')];sections.forEach((d,i)=>{const opt=document.createElement('option');opt.value=i;opt.textContent=d.querySelector('summary')?.textContent;select.append(opt);});select.onchange=()=>{if(select.value!==''){reveal(sections[+select.value].querySelector('summary'));select.value='';}};toolbar.append(select);
+ const sections=[...root.querySelectorAll(':scope > details')];sections.forEach((d,i)=>{const opt=document.createElement('option');opt.value=i;opt.textContent=[...d.querySelector('summary').childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();select.append(opt);});select.onchange=()=>{if(select.value!==''){reveal(sections[+select.value].querySelector('summary'));select.value='';}};toolbar.append(select);
  const activeList=document.createElement('div');activeList.className='active-effect-list';toolbar.append(activeList);
  if(['shape','motion'].includes(tab)){
   const actions=document.createElement('div');actions.className='simplify-actions';
@@ -59,6 +59,10 @@ export function decorateInspector({root,state,baseline,tab,edit}){
   }
   toolbar.append(actions);const help=document.createElement('p');help.className='help';help.textContent=tab==='shape'?'Riduci dimezza le deformazioni. Forma base rimuove aggiunte e campi manuali. Materiale e colori restano. Puoi annullare.':'Riduci conserva durata e giri completi. Rimuovi ferma le animazioni; audio e tracking restano in Interazione. Puoi annullare.';toolbar.append(help);
  }
+ const actions=toolbar.querySelector('.simplify-actions'),help=[...toolbar.querySelectorAll(':scope > .help')];
+ const activeMenu=document.createElement('details');activeMenu.className='overview-active';const activeSummary=document.createElement('summary');activeSummary.textContent='In uso';activeMenu.append(activeSummary,activeList);
+ const more=document.createElement('details');more.className='overview-actions';more.innerHTML='<summary aria-label="Azioni della scheda">⋯</summary>';more.append(select);if(actions)more.append(actions);for(const p of help)more.append(p);
+ heading.replaceChildren(activeMenu,toggle,more);toolbar.replaceChildren(heading);
  root.prepend(toolbar);
  const records=[];
  const motionEffects=tab==='motion'?[['pTravel','Orbite delle particelle'],['pVortex','Vorticità'],['pReentry','Rientro'],['pLife','Pulsazione'],['pBreath','Dilatazione'],['pRandom','Irregolarità del moto'],['pJitter','Microfluttuazioni'],['pWander','Deriva'],['pSpaceWarp','Distorsione spaziale'],['growthFlow','Scorrimento della trama'],['filmFlow','Scorrimento della pellicola'],['filmSwirl','Rotazione della pellicola'],['environmentRotate','Rotazione dei riflessi']]:[];
@@ -68,7 +72,7 @@ export function decorateInspector({root,state,baseline,tab,edit}){
   records.push({label,keys,el});
  }
  for(const el of root.querySelectorAll('[data-path-check$=".enabled"]')){
-  const d=el.closest('details');if(!d)continue;const summary=d.querySelector(':scope > summary'),label=summary.textContent;records.push({label,el,path:el.dataset.pathCheck});
+  const d=el.closest('details');if(!d)continue;const summary=d.querySelector(':scope > summary'),label=[...summary.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();records.push({label,el,path:el.dataset.pathCheck});
  }
  const sectionResets=[];
  for(const d of sections){
@@ -89,10 +93,10 @@ export function decorateInspector({root,state,baseline,tab,edit}){
    if(on){let d=r.el.closest('details');while(d){d.classList.add('has-changes');d=d.parentElement.closest('details');}const chip=document.createElement('span');chip.className='active-effect';const jump=document.createElement('button');jump.type='button';jump.textContent=r.label;jump.onclick=()=>reveal(r.el);const off=document.createElement('button');off.type='button';off.textContent='×';off.setAttribute('aria-label','Disattiva '+r.label);off.onclick=()=>{if(r.path){r.el.checked=false;r.el.dispatchEvent(new Event('change',{bubbles:true}));}else edit(s=>{for(const k of r.keys){s[k]=typeof s[k]==='boolean'?false:0;if(s.motions?.[k])s.motions[k].enabled=false;}},r.label+' disattivato');};chip.append(jump,off);activeList.append(chip);}
   }
   if(!activeList.children.length){const empty=document.createElement('span');empty.className='help';empty.textContent='Nessun effetto con interruttore attivo in questa scheda.';activeList.append(empty);}
-  for(const d of root.querySelectorAll('details')){const effects=records.filter(r=>d.contains(r.el));if(!effects.length)continue;let badge=d.querySelector(':scope > summary > .effect-status');if(!badge){badge=document.createElement('span');badge.className='effect-status';d.querySelector(':scope > summary').append(badge);}const on=effects.filter(r=>r.on).length;badge.textContent=on?(on===1?'Attivo':on+' attivi'):'Spento';badge.dataset.on=String(on>0);d.classList.toggle('effect-off',on===0);}
+  for(const d of root.querySelectorAll('details')){const effects=records.filter(r=>d.contains(r.el));if(!effects.length)continue;let badge=d.querySelector(':scope > summary > .effect-status');if(!badge){badge=document.createElement('span');badge.className='effect-status';d.querySelector(':scope > summary').append(badge);}const on=effects.filter(r=>r.on).length;const onlyTracks=effects.every(r=>r.path);badge.textContent=on?(onlyTracks?(on+' animazioni'):(on===1?'Attivo':on+' attivi')):(onlyTracks?'':'Spento');badge.dataset.on=String(on>0);d.classList.toggle('effect-off',on===0);}
   const n=root.querySelectorAll('.is-changed').length;toggle.textContent=`Solo modificati (${n})`;
-  empty.hidden=n>0;for(const r of sectionResets)r.button.disabled=!r.d.querySelector('.is-changed');
-  if(!records.length){heading.querySelector('strong').textContent='Comandi';activeList.hidden=true;}
+  activeSummary.textContent='In uso ('+records.filter(r=>r.on).length+')';empty.hidden=n>0;for(const r of sectionResets)r.button.disabled=!r.d.querySelector('.is-changed');
+  if(!records.length){activeSummary.textContent='In uso (0)';activeList.hidden=true;}
  }
  refresh();return {refresh};
 }

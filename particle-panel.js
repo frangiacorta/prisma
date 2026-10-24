@@ -1,6 +1,6 @@
-import {veilPanel} from './veil-panel.js?v=ff848c0060d6';
-import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=ff848c0060d6';
-import {SPRITES,COLOR_MODES} from './particle-model.js?v=ff848c0060d6';
+import {veilPanel} from './veil-panel.js?v=2b61b8601b38';
+import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=2b61b8601b38';
+import {SPRITES,COLOR_MODES} from './particle-model.js?v=2b61b8601b38';
 export function particlePanel(tab,s,h,shared,selectedLight){
  const veil=s.pLiving===4?veilPanel(tab,s,{...h,baseShapePanel:()=>particlePanel('shape',{...s,pLiving:s.pVeilSourceKind===4?0:s.pVeilSourceKind,engine:'solid'},h,shared,selectedLight)},shared,selectedLight):null;if(veil!==null)return veil;
  const {slider,section,details,colorField,check}=h;
@@ -34,6 +34,6 @@ export function particlePanel(tab,s,h,shared,selectedLight){
   +details('Campi',sliders(['pAttract','pRepel','pMagnet','pPoles','pRadius','pField'])+'<p class="help">Campi artistici periodici: i poli attirano, respingono e avvolgono la materia. Raggio sposta i poli; Influenza ne regola l’area d’azione.</p>')
   +shared('particle-motion',s,h,selectedLight);
  if(tab==='light')return section('Illuminazione',sliders(['pLighting','pDepthFade']))+shared('particle-light',s,h,selectedLight);
- if(tab==='background')return section('Sfondo',`<label class="field">Tipo di sfondo<select id="bg-mode">${[['solid','Tinta unita'],['gradient','Gradiente'],['studio','Fondale morbido'],['transparent','Trasparente · PNG']].map(([v,n])=>`<option value="${v}" ${s.bgMode===v?'selected':''}>${n}</option>`).join('')}</select></label>`+colorField('background','Colore di fondo')+(s.bgMode!=='solid'?colorField('background2','Secondo colore'):'')+(s.bgMode==='gradient'?slider('bgAngle'):'')+(s.bgMode==='studio'?sliders(['bgHeight','bgSoftness','bgWash']):''));
+ if(tab==='background')return shared(tab,s,h,selectedLight).replace(/<details class="control-details"><summary>Ombra e caustica<\/summary>[\s\S]*?<\/details>/,'');
  return shared(tab,s,h,selectedLight);
 }

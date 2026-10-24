@@ -1,4 +1,4 @@
-import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=ff848c0060d6';
+import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=2b61b8601b38';
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
 export const PARTICLE_VERSION=10;
 export const FAMILIES=['Nucleo Pathfinder'];
@@ -73,11 +73,11 @@ export const LIVING_STYLES={
 };
 const LIVING_BASE={...SPHERE_FORM,pFill:0,pCount:16000,pOpacity:.35,pSize:.7,pLivingBlend:1,pSurfaceBind:1,pTrailCount:0,pLinks:0,pThickness:.68,pOrganic:.18,pFrequency:1.5,pCohesion:1,pRandom:0,pJitter:0,pSpeedSpread:0,pTravel:.12,pMotionSoftness:.9,pLife:.07,pBreath:.04,pRhythm:.05,pFoldCount:5,pFoldDepth:.16,pInflate:.08,pContract:.18,pSkinOffset:.04,pSkinOpening:.18,scale:1.7,rotateX:32,rotateY:-20,rotateZ:-18,metal:.12,roughness:.32,gloss:.75,iridescence:.1,emission:.18,glow:.08,pLighting:.85,pFiberSheen:.7,pFiberSpread:.45,pFilm:.3,filmThickness:380,pFilmVariation:.25,palette:['#69779b','#aed6d3','#f3ded4'],background:'#060a12',duration:20};
 export const PARTICLE_STUDIES=[
- {name:'Nucleo vivo',label:'Pathfinder · equilibrio',values:{}},
+ {name:'Nucleo vivo',label:'Nucleo · equilibrio',values:{}},
  {name:'Polvere fine',label:'Volume · micrograni',values:{pOpening:0,pCount:180000,pSize:.55,pOpacity:.7,pFill:1,pOrganic:.4,pTrailCount:0,palette:['#31456d','#6398b0','#b4e4ce','#f5e9b8']}},
  {name:'Filamenti',label:'Anello · scie sottili',values:{pOpening:.65,pCount:55000,pSize:.7,pNeural:.4,pTrailCount:1500,pTrailWidth:.3,pTrailLength:.2,pTrailOpacity:.3,pOrganic:.35,palette:['#413568','#948cbb','#e2bebb','#e1e8df']}},
  {name:'Sfera piena',label:'Volume · senza vuoto',values:{...SPHERE_FORM,pSize:.75,pCount:110000,pTrailCount:0,pSizeVar:.35,palette:['#efe5d5','#b9e6e0','#d1c9e4','#faf6ea']}},
- {name:'Espanso',label:'Pathfinder · repulsione',values:{pOpening:.8,pThickness:.3,pRepel:1,pAttract:0,pCohesion:.4,pVortex:.9,pOrganic:.7,pOuter:.2,pReach:1.2,pSize:.85}},
+ {name:'Espanso',label:'Nucleo · repulsione',values:{pOpening:.8,pThickness:.3,pRepel:1,pAttract:0,pCohesion:.4,pVortex:.9,pOrganic:.7,pOuter:.2,pReach:1.2,pSize:.85}},
  {name:'Pulsante',label:'Nucleo · vitalità',values:{pOpening:0,pLobeDepth:.3,pLife:.8,pPulse:3,pSignal:.7,pPropagation:.7,pNeural:.65,pNodes:32,pConnect:.7,pOrganic:.3,pSize:.9,palette:['#1d3667','#43898c','#b6d89b','#e7d6a0']}},
  {name:'Trama viva',label:'Ragnatela · connessioni 3D',values:{"pLinks":0.75,"pLinkNodes":1800,"pLinkReach":0.23,"pLinkWidth":0.75,"pLinkCurve":0.14,"pLinkStretch":7,"pFiberSheen":0.5,"pFiberSpread":0.5,"pLife":0.13,"pSignal":0,"pCount":42000,"pSize":0.7,"pOpacity":0.22,"pOpening":0.06,"pThickness":0.57,"pFill":0.22,"pLobes":5,"pLobeDepth":0.28,"pOrganic":0.48,"pWarp":0.18,"pRandom":0,"pJitter":0,"pVortex":0.18,"pBreath":0.08,"pTravel":0.28,"pMotionSoftness":0.8,"pAttract":0,"pRepel":0,"pMagnet":0,"pRhythm":0.15,"pSpeedSpread":0,"pTrailCount":0,"pLighting":0.7,"metal":0.2,"gloss":0.75,"iridescence":0.12,"emission":0.4,"palette":["#505476","#99c4cd","#ece6cf"],"glow":0.12,"background":"#05080e","scale":1.65,"rotateX":22,"rotateY":-20}},
  {name:'Fibre che respirano',label:'Fasci · pieghe condivise',values:{...LIVING_BASE,...LIVING_STYLES.fibres,pFoldDepth:.22,pSkinOpening:.35,stretchY:1.2,scale:1.3,pBundleDelay:.08,pFray:.1}},

@@ -12,7 +12,7 @@ export class BodyCamera{
    stream.getVideoTracks()[0].onended=()=>{if(current())this.fail('La webcam è stata scollegata. Riavviala per continuare.');};
    await this.video.play();if(!current())return;
    this.onStatus('Carico il riconoscimento di mani e braccia…');
-   this.worker=new Worker(new URL('./body-camera-worker.js?v=ff848c0060d6',import.meta.url));
+   this.worker=new Worker(new URL('./body-camera-worker.js?v=2b61b8601b38',import.meta.url));
    this.watchdog=setTimeout(()=>{if(current())this.fail('Il riconoscimento non risponde. Verifica la connessione e riprova.');},60000);
    this.worker.onerror=()=>{if(current())this.fail('Impossibile avviare il riconoscimento. Riprova in Chrome aggiornato.');};
    this.worker.onmessage=({data})=>{

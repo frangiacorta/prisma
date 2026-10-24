@@ -1,19 +1,19 @@
-import {GROWTH_STUDIES} from './growth-material.js?v=ff848c0060d6';
-import {GLYPH_FONTS} from './finishing.js?v=ff848c0060d6';
-import {BASE_FORMS} from './base-forms.js?v=ff848c0060d6';
-import {structurePanel,STRUCTURE_TRACKS} from './structure-model.js?v=ff848c0060d6';
-import {finishingOrderPanel} from './finishing-order.js?v=ff848c0060d6';
-import {rootMotionSuspended} from './solid-renderer.js?v=ff848c0060d6';
-import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=ff848c0060d6';
-import {MOODS} from './model.js?v=ff848c0060d6';
-import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=ff848c0060d6';
+import {GROWTH_STUDIES} from './growth-material.js?v=2b61b8601b38';
+import {GLYPH_FONTS} from './finishing.js?v=2b61b8601b38';
+import {BASE_FORMS} from './base-forms.js?v=2b61b8601b38';
+import {structurePanel,STRUCTURE_TRACKS} from './structure-model.js?v=2b61b8601b38';
+import {finishingOrderPanel} from './finishing-order.js?v=2b61b8601b38';
+import {rootMotionSuspended} from './solid-renderer.js?v=2b61b8601b38';
+import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=2b61b8601b38';
+import {MOODS} from './model.js?v=2b61b8601b38';
+import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=2b61b8601b38';
 export function pathValue(s,path){const parts=path.split('.');let value=s;for(let i=0;i<parts.length;i++){if(i===1&&parts[0]==='lights')value=value.find(l=>l.id===Number(parts[i]));else value=value?.[parts[i]];}return value}
 export function pathMeta(path,state){const parts=path.split('.'),last=parts.at(-1);if(last==='cycles')return state?.perfectLoop===false?['Ripetizioni nel ciclo',.1,8,.1]:['Ripetizioni nel loop',1,8,1];if(last==='pace')return['Accelerazione / decelerazione',0,.95,.01];if(last==='pacePhase')return['Punto di massima velocità',0,360,1];if(last==='hold')return['Pausa a ogni giro',0,.8,.01];if(last==='phase')return['Fase di partenza',0,360,1];if(last==='amplitude'){if(parts[0]==='motions'){const m=TRACK_META[parts[1]];return ['Ampiezza',m[1],m[2],m[3]]}return parts[2]==='orbit'?['Ampiezza orbita',0,180,1]:['Ampiezza pulsazione',0,1,.01]}return LIGHT_META[last]}
 export function writePath(s,path,value){const parts=path.split('.');let object=s;for(let i=0;i<parts.length-1;i++){if(i===1&&parts[0]==='lights')object=object.find(l=>l.id===Number(parts[i]));else object=object[parts[i]];}if(object)object[parts.at(-1)]=value}
-import {livingChooser} from './living-panel.js?v=ff848c0060d6';
-import {particlePanel} from './particle-panel.js?v=ff848c0060d6';
+import {livingChooser} from './living-panel.js?v=2b61b8601b38';
+import {particlePanel} from './particle-panel.js?v=2b61b8601b38';
 export function buildPanel(tab,s,h,selectedLight){return s.engine==='particles'||s.pLiving>0?particlePanel(tab,s,h,sharedPanel,selectedLight):sharedPanel(tab,s,h,selectedLight);}
-function sharedPanel(tab,s,h,selectedLight){
+export function sharedPanel(tab,s,h,selectedLight){
  const {slider,section,details,colorField,check,icon}=h;
  if(tab==='fields')return (h.forcePanel?.()||'')+(h.guidePanel?.()||'');
  const regularMoods=MOODS.map((m,i)=>({m,i})).filter(({m})=>!m.referenceFamily);
