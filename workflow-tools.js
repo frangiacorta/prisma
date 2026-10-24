@@ -1,5 +1,5 @@
-import {newCreation,material} from './creative-model.js?v=2b61b8601b38';
-import {WORK_TABS} from './workflow-panels.js?v=2b61b8601b38';
+import {newCreation,material} from './creative-model.js?v=14e2ae89e5f8';
+import {WORK_TABS} from './workflow-panels.js?v=14e2ae89e5f8';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){

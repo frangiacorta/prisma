@@ -1,4 +1,4 @@
-import {nameControls} from './control-vocabulary.js?v=2b61b8601b38';
+import {nameControls} from './control-vocabulary.js?v=14e2ae89e5f8';
 const html=s=>{const d=document.createElement('div');d.innerHTML=s;return d;};
 export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['fields','Interazione']];
 const exampleSelector='#load-bloom-example,[data-sculpt],[data-material],#material-picker,[data-legacy-material],[data-film-look],[data-film-light],[data-texture-style],[data-motion-preset],[data-mood],#light-rig,[data-light-source],[data-backdrop],[data-audio-preset],[data-growth-study],[data-particle-material],[data-particle-film],[data-fiber-style],[data-link-style],[data-living-style],[data-veil-look]';

@@ -1,4 +1,4 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=2b61b8601b38';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=14e2ae89e5f8';
 // Particle shading uses Prisma's parameter names. It does not trace solid glass.
 export const prismaShadingGLSL=`
 ${FILM_PATTERN_GLSL}
