@@ -1,6 +1,6 @@
-import {veilPanel} from './veil-panel.js?v=eae52296f762';
-import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=eae52296f762';
-import {SPRITES,COLOR_MODES} from './particle-model.js?v=eae52296f762';
+import {veilPanel} from './veil-panel.js?v=c360f55c36e3';
+import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=c360f55c36e3';
+import {SPRITES,COLOR_MODES} from './particle-model.js?v=c360f55c36e3';
 export function particlePanel(tab,s,h,shared,selectedLight){
  const veil=s.pLiving===4?veilPanel(tab,s,{...h,baseShapePanel:()=>particlePanel('shape',{...s,pLiving:s.pVeilSourceKind===4?0:s.pVeilSourceKind,engine:'solid'},h,shared,selectedLight)},shared,selectedLight):null;if(veil!==null)return veil;
  const {slider,section,details,colorField,check}=h;
@@ -11,8 +11,8 @@ export function particlePanel(tab,s,h,shared,selectedLight){
  if(tab==='shape')return livingPanel(s,h)+section('Forma',slider('pOpening',['Sfera · nessun foro','Anello aperto'])+sliders(['pFill','pThickness'])+`<button id="particle-sphere" class="outline full">Sfera piena · elimina deformazioni</button><p class="help">Azzera deformazioni e campi, conservando materia, palette e durata.</p>`)
   +details('Trasformazione',sliders(['scale','positionX','positionY','rotateX','rotateY','rotateZ'])+details('Proporzioni',sliders(['volume','stretchX','stretchY','stretchZ'])))
   +details('Lobi, rami e addensamenti',sliders(['pLobes','pLobeDepth','pClumps','pSymmetry']))
-  +details('Dettaglio organico',sliders(['pOrganic','pFrequency','pDetail','pRough','pWarp'])+'<p class="help">Scala del campo decide la grandezza delle pieghe. Le ottave sovrappongono dettagli più fini; il loro peso è indipendente.</p>')
-  +details('Struttura neuronale',sliders(['pNeural','pNodes','pConnect'])+'<p class="help">Raggruppa i percorsi del nucleo in fibre collegate. Nodi e connettività agiscono quando Struttura neuronale è maggiore di zero. I segnali si regolano in Moto.</p>')
+  +details('Rumore multiscala',sliders(['pOrganic','pFrequency','pDetail','pRough','pWarp'])+'<p class="help">Scala del campo decide la grandezza delle pieghe. Le ottave sovrappongono dettagli più fini; il loro peso è indipendente.</p>')
+  +details('Rete di percorsi',sliders(['pNeural','pNodes','pConnect'])+'<p class="help">Raggruppa i percorsi del nucleo in fibre collegate. Nodi e connettività agiscono quando Rete di percorsi è maggiore di zero. I segnali si regolano in Moto.</p>')
   +details('Tentacoli del nucleo',sliders(['pTentacle','pTentacleCount','pTentacleLength','pTentacleTaper','pTentacleCurl'])+'<p class="help">La stessa materia si allunga in bracci. Porta Tentacolarità sopra 0; in Moto puoi farli ondeggiare.</p>')
   +details('Fasci esterni',sliders(['pOuter','pReach','pBranches'])+'<p class="help">Porta Fasci esterni a 0 per tenere tutta la materia nel nucleo.</p>')
   +details('Deformazioni',sliders(['deform','twist','waves','waveScale']));
@@ -24,8 +24,8 @@ export function particlePanel(tab,s,h,shared,selectedLight){
   +details('Trasparenza ed emissione',sliders(['iridShift','transparency','emission']));
  if(tab==='color')return shared(tab,s,{...h,particleColorPanel:()=>details('Distribuzione sulle particelle',select('pColorMode','Il gradiente segue…',COLOR_MODES)+sliders(['pColorScatter','pLumaVar'])+'<p class="help">Solidale alla forma iniziale assegna il colore prima del movimento: resta sulla stessa particella. Campo nello spazio fa attraversare il gradiente alla materia.</p>')},selectedLight);
  if(tab==='motion')return section('Tempo',sliders(['duration','speed','pCycles'])+`<label class="field">Verso<select data-particle-select="pDirection"><option value="1" ${s.pDirection===1?'selected':''}>Normale</option><option value="-1" ${s.pDirection===-1?'selected':''}>Inverso</option></select></label>`+check('perfectLoop','Loop perfetto · include colori e luci')+`<p class="help">Durata effettiva: <strong id="effective-duration">${(s.duration/s.speed).toFixed(1)} s</strong>. Il campo di particelle torna sempre al punto di partenza.</p>`)
-  +livingMotion(s,h)+section('Fluidità',sliders(['pMotionSoftness','pFollow','pCohesion'])+'<p class="help">Morbidezza distende accelerazioni, dettagli rapidi e microfluttuazioni. Ritardo sfalsa la risposta delle fibre.</p>')
-  +details('Orbite',sliders(['pTravel','pOrbitOval','pOrbitTilt'])+details('Precessione e dispersione',sliders(['pOrbitPrecession','pOrbitSpread','pOrbitDrift']))+details('Vortici e rientro nel nucleo',sliders(['pVortex','pReentry']))+'<p class="help">Ampiezza regola quanto si allontanano le particelle; ovalità e inclinazione disegnano le orbite. Precessione ne fa ruotare il piano.</p>')
+  +livingMotion(s,h)+section('Interpolazione del moto',sliders(['pMotionSoftness','pFollow','pCohesion'])+'<p class="help">Morbidezza distende accelerazioni, dettagli rapidi e microfluttuazioni. Ritardo sfalsa la risposta delle fibre.</p>')
+  +details('Orbite',sliders(['pTravel','pOrbitOval','pOrbitTilt'])+details('Precessione e dispersione',sliders(['pOrbitPrecession','pOrbitSpread','pOrbitDrift']))+details('Rotazione e ricircolo',sliders(['pVortex','pReentry']))+'<p class="help">Ampiezza regola quanto si allontanano le particelle; ovalità e inclinazione disegnano le orbite. Precessione ne fa ruotare il piano.</p>')
   +details('Pulsazione',sliders(['pLife','pBreath','pPulse'])+details('Segnali lungo le fibre',sliders(['pSignal','pPropagation']))+'<p class="help">Vitalità deforma la materia con pulsazioni coordinate. I segnali viaggiano lungo i filamenti; Propagazione ne sfalsa l’arrivo tra le zone.</p>')
   +details('Casualità del movimento',sliders(['pWander','pFlowBalance','pRandom'])+'<button id="vary-motion" type="button" class="secondary full">Varia solo il movimento</button>'+details('Scala, frequenza e seed',sliders(['pWanderScale','pWanderCycles','pJitter','pMotionSeed']))+'<p class="help">Esplorazione casuale attiva le correnti. Corale / individuale: 0 muove le zone insieme, 1 rende indipendenti le particelle. Il seed cambia i percorsi conservando materia e colori.</p>')
   +details('Tentacoli in movimento',sliders(['pTentacleWave','pTentacleCycles'])+'<p class="help">Con Tentacolarità sopra 0, le onde viaggiano lungo i bracci. Numero, lunghezza e arricciamento sono in Forma.</p>')

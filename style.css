@@ -197,3 +197,6 @@ body.preview-expanded{overflow:hidden}
 
 /* Compact movement recipes, with visible labels on every screen. */
 .motion-presets,.motion-shortcuts{display:flex;flex-wrap:wrap;gap:6px}.motion-presets button,.motion-shortcuts button{flex:0 1 auto;min-height:34px;padding:6px 10px;font-size:12px;text-align:left}.motion-presets button::before{display:none}
+
+
+.nav-groups{grid-template-columns:repeat(3,minmax(0,1fr))}.nav-group{min-height:40px}.procedure-help{border-left:2px solid #c9ee9a55;padding-left:10px}

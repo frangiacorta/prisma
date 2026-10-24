@@ -1,9 +1,9 @@
-import {GROWTH_DEFAULTS} from './growth-material.js?v=eae52296f762';
-import {FINISH_DEFAULTS} from './finishing.js?v=eae52296f762';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=eae52296f762';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=eae52296f762';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=eae52296f762';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=eae52296f762';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=c360f55c36e3';
+import {FINISH_DEFAULTS} from './finishing.js?v=c360f55c36e3';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=c360f55c36e3';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=c360f55c36e3';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=c360f55c36e3';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=c360f55c36e3';
 export const BASE = {
  ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -64,7 +64,7 @@ export const META = {
  ...PARTICLE_META,
  ...EXTRA_META,
  volume:['Volume',.08,1.5,.01],stretchX:['Larghezza',.45,1.7,.01],stretchY:['Altezza',.45,1.7,.01],stretchZ:['Profondità',.45,1.7,.01],deform:['Deformazione',0,.75,.01],asymmetry:['Asimmetria',-.6,.6,.01],twist:['Torsione',-2.5,2.5,.01],waves:['Increspature',0,.4,.01],waveScale:['Frequenza onde',1,9,.1],hole:['Apertura del vuoto',0,.95,.01],holeX:['Vuoto · orizzontale',-.8,.8,.01],holeY:['Vuoto · verticale',-.8,.8,.01],holeShape:['Vuoto · rotondo / quadrato',0,1,.01],cut:['Dimensione del ritaglio',0,1.6,.01],cutX:['Ritaglio · orizzontale',-1.4,1.4,.01],cutY:['Ritaglio · verticale',-1.4,1.4,.01],edge:['Contorno sfumato',0,.45,.005],
- transparency:['Trasparenza',0,1,.01],refraction:['Rifrazione',1,2.4,.01],thickness:['Spessore ottico',0,2,.01],metal:['Metallicità',0,1,.01],roughness:['Rugosità',0,1,.01],gloss:['Lucentezza',0,1,.01],iridescence:['Iridescenza',0,1,.01],emission:['Luce propria',0,1,.01],gradientAngle:['Direzione gradiente',-180,180,1],gradientScale:['Distribuzione colori',.2,3,.01],gradientOffset:['Posizione colori',0,1,.01],colorSoftness:['Fusione dei colori',0,3,.01],glow:['Diffusione alone',0,1,.01],grain:['Grana',0,.2,.005],
+ transparency:['Trasparenza',0,1,.01],refraction:['Rifrazione',1,2.4,.01],thickness:['Spessore ottico',0,2,.01],metal:['Metallicità',0,1,.01],roughness:['Rugosità',0,1,.01],gloss:['Lucentezza',0,1,.01],iridescence:['Iridescenza',0,1,.01],emission:['Emissione',0,1,.01],gradientAngle:['Direzione gradiente',-180,180,1],gradientScale:['Distribuzione colori',.2,3,.01],gradientOffset:['Posizione colori',0,1,.01],colorSoftness:['Fusione dei colori',0,3,.01],glow:['Diffusione luminosa',0,1,.01],grain:['Grana',0,.2,.005],
  lightAngle:['Angolo orizzontale',-180,180,1],lightHeight:['Altezza della luce',-85,85,1],lightPower:['Intensità',0,4,.01],lightSize:['Ampiezza riflesso',.05,1,.01],light2Angle:['Angolo orizzontale',-180,180,1],light2Height:['Altezza della luce',-85,85,1],light2Power:['Intensità',0,4,.01],light2Size:['Ampiezza riflesso',.05,1,.01],
  bgAngle:['Direzione sfondo',-180,180,1],scale:['Dimensione figura',.35,1.7,.01],positionX:['Posizione orizzontale',-1.5,1.5,.01],positionY:['Posizione verticale',-1.5,1.5,.01],rotateX:['Rotazione verticale',-180,180,1],rotateY:['Rotazione orizzontale',-180,180,1],motion:['Intensità delle oscillazioni',0,1,.01],duration:['Durata di base (secondi)',2,300,.5],speed:['Velocità globale',.25,2,.05]
 };

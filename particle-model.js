@@ -1,4 +1,4 @@
-import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=eae52296f762';
+import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=c360f55c36e3';
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
 export const PARTICLE_VERSION=10;
 export const FAMILIES=['Nucleo Pathfinder'];
@@ -8,7 +8,7 @@ export const COLOR_MODES=['Solidale alla forma iniziale','Identità della partic
 export const PARTICLE_META={...VEIL_META,
  pLivingBlend:['Passaggio particelle / struttura',0,1,.01],pSurfaceBind:['Adesione dei granelli alla struttura',0,1,.01],pLivingOcclusion:['Schermatura del nucleo',0,1,.01],
  pBundleAmount:['Raggruppamento in fasci',0,1,.01],pVolumeHold:['Conservazione del volume',0,1,.01],pBundleDelay:['Ritardo tra i fasci',0,.35,.005],pFray:['Sfrangiatura dei fasci',0,1,.01],pLiving:['Struttura connessa',0,4,1],pBundles:['Numero di fasci',1,16,1],pBundleSpread:['Apertura dei fasci',.05,1,.01],pStrands:['Fili della struttura',32,2048,16],pThreadWidth:['Spessore dei fili connessi · px',.015,4,.005],pThreadOpacity:['Visibilità dei fili connessi',0,1,.01],pWeft:['Intreccio trasversale',0,1,.01],
- pElastic:['Resistenza allo stiramento',0,1,.01],pBend:['Resistenza alla piega',0,1,.01],pSkin:['Continuità della membrana',0,1,.01],pSkinOffset:['Distanza della pelle dal nucleo',-.4,.6,.01],pSkinOpening:['Apertura della pelle',0,1,.01],pFoldCount:['Numero di pieghe',1,16,1],pFoldDepth:['Profondità delle pieghe',0,.6,.01],pInflate:['Respiro della pelle',0,.4,.01],pContract:['Chiusura e involuzione',0,.8,.01],pPores:['Apertura dei pori',0,.95,.01],pPoreCount:['Densità dei pori',4,64,1],
+ pElastic:['Resistenza allo stiramento',0,1,.01],pBend:['Resistenza alla piega',0,1,.01],pSkin:['Continuità della membrana',0,1,.01],pSkinOffset:['Distanza della pelle dal nucleo',-.4,.6,.01],pSkinOpening:['Apertura della pelle',0,1,.01],pFoldCount:['Numero di pieghe',1,16,1],pFoldDepth:['Profondità delle pieghe',0,.6,.01],pInflate:['Pulsazione della superficie',0,.4,.01],pContract:['Contrazione della superficie',0,.8,.01],pPores:['Apertura dei pori',0,.95,.01],pPoreCount:['Densità dei pori',4,64,1],
  pLinks:['Visibilità connessioni',0,1,.01],pLinkNodes:['Nodi della trama',50,4000,10],pLinkReach:['Distanza di collegamento',.03,1.5,.01],pLinkNeighbors:['Vicini scelti per nodo',1,5,1],pLinkWidth:['Spessore connessioni · px',.02,4,.01],pLinkCurve:['Curvatura dei fili',0,.8,.01],pLinkStretch:['Allungamento consentito',1,12,.1],
  pFilm:['Pellicola viva',0,1,.01],pFilmScale:['Scala delle venature',.2,5,.01],pFilmVariation:['Variazione dello spessore',0,1,.01],
  pFiberSheen:['Riflesso setoso',0,1,.01],pFiberSpread:['Larghezza del riflesso',0,1,.01],
