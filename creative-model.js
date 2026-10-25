@@ -1,13 +1,13 @@
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=14e2ae89e5f8';
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=14e2ae89e5f8';
-import {normalizeAudioClip} from './audio-recording.js?v=14e2ae89e5f8';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=14e2ae89e5f8';
-import {normalizeAudio} from './audio-model.js?v=14e2ae89e5f8';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles} from './particle-model.js?v=14e2ae89e5f8';
-import {normalizeForcePaths} from './particle-paths.js?v=14e2ae89e5f8';
-import {normalizeForcePoints} from './particle-forces.js?v=14e2ae89e5f8';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=14e2ae89e5f8';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=14e2ae89e5f8';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=e62bfeba18ff';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=e62bfeba18ff';
+import {normalizeAudioClip} from './audio-recording.js?v=e62bfeba18ff';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=e62bfeba18ff';
+import {normalizeAudio} from './audio-model.js?v=e62bfeba18ff';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles} from './particle-model.js?v=e62bfeba18ff';
+import {normalizeForcePaths} from './particle-paths.js?v=e62bfeba18ff';
+import {normalizeForcePoints} from './particle-forces.js?v=e62bfeba18ff';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=e62bfeba18ff';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=e62bfeba18ff';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -122,7 +122,7 @@ export function surprise(seed){
 }
 export function normalizeCreation(raw){
  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw Error('Il file non contiene una creazione Prisma.');
- const s=preset(0);s.controlLocks=Array.isArray(raw.controlLocks)?[...new Set(raw.controlLocks.filter(k=>typeof k==='string'&&(META[k]||PARTICLE_META[k])))].slice(0,1000):[];s.audioClip=normalizeAudioClip(raw.audioClip);s.audioReactive=normalizeAudio(raw.audioReactive,raw.engine);s.bodyTracking=normalizeBodyTracking(raw.bodyTracking);s.forcePoints=normalizeForcePoints(raw.forcePoints);s.forcePaths=normalizeForcePaths(raw.forcePaths);s.perfectLoop=raw.perfectLoop!==false;for(const [k,meta] of Object.entries(META)){if(Number.isFinite(raw[k]))s[k]=clamp(k,raw[k]);}
+ const s=preset(0);s.layerMemory={};for(const key of ['pLinks','pTrailCount','pLiving'])if(Number.isFinite(raw.layerMemory?.[key]))s.layerMemory[key]=Math.max(0,Math.min(key==='pLinks'?1:key==='pLiving'?4:60000,raw.layerMemory[key]));s.controlLocks=Array.isArray(raw.controlLocks)?[...new Set(raw.controlLocks.filter(k=>typeof k==='string'&&(META[k]||PARTICLE_META[k])))].slice(0,1000):[];s.audioClip=normalizeAudioClip(raw.audioClip);s.audioReactive=normalizeAudio(raw.audioReactive,raw.engine);s.bodyTracking=normalizeBodyTracking(raw.bodyTracking);s.forcePoints=normalizeForcePoints(raw.forcePoints);s.forcePaths=normalizeForcePaths(raw.forcePaths);s.perfectLoop=raw.perfectLoop!==false;for(const [k,meta] of Object.entries(META)){if(Number.isFinite(raw[k]))s[k]=clamp(k,raw[k]);}
  for(const k of ['background','background2','internalColor','sssColor','finishGlyphColor','finishEdgeColor'])if(/^#[0-9a-f]{6}$/i.test(raw[k]||''))s[k]=raw[k];
  if(Array.isArray(raw.palette)&&raw.palette.length&&raw.palette.every(c=>/^#[0-9a-f]{6}$/i.test(c)))s.palette=raw.palette.slice(0,12);
  if(['solid','gradient','transparent','studio'].includes(raw.bgMode))s.bgMode=raw.bgMode;

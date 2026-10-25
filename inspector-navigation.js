@@ -1,4 +1,4 @@
-import {SECTION_NAMES} from './control-vocabulary.js?v=14e2ae89e5f8';
+import {SECTION_NAMES} from './control-vocabulary.js?v=e62bfeba18ff';
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
  {id:'shape',label:'Forma',tabs:[['shape','Forma','shape']]},
@@ -8,16 +8,15 @@ export const NAV_GROUPS=[
  {id:'scene',label:'Scena',tabs:[['background','Scena','background']]},
  {id:'photo',label:'Filtri',tabs:[['photo','Filtri','photo']]},
  {id:'motion',label:'Movimento',tabs:[['motion','Movimento','motion']]},
- {id:'interaction',label:'Interazione',tabs:[['fields','Interazione','move']]},
  {id:'library',label:'Libreria',tabs:[['library','Libreria','palette']]}
 ];
 const PROCEDURES=[{"label": "Guscio e spessore", "aliases": ["Membrana", "Membrane vive"], "description": "Svuota il volume della forma mantenendo una parete di spessore regolabile. È una costruzione geometrica; non simula una membrana fisica."}, {"label": "Reticolo di fibre", "aliases": ["Fibre e tessitura", "Tessuto e connessioni"], "description": "Separa la superficie in fili longitudinali e trasversali. Densità, larghezza e intreccio modificano la stessa struttura."}, {"label": "Suddivisione radiale e strati", "aliases": ["Lamelle e strati", "Veli e aureole", "Veli trasparenti e aureole"], "description": "Apre intervalli radiali, sezioni e gusci concentrici nella forma corrente. Trasparenza ed emissione si regolano nel materiale."}, {"label": "Filamenti su superficie", "aliases": ["Filamenti e spine", "Pianeti di filamenti"], "description": "Distribuisce filamenti ancorati alla superficie. Lunghezza, diametro, curvatura e raggruppamento permettono pelo, ciuffi e spine."}, {"label": "Curve toroidali e nodi", "aliases": ["Anelli e nodi", "Nodi morbidi"], "description": "Costruisce tubi o nastri lungo percorsi chiusi. Raggio, sezione, torsione e intreccio sono indipendenti."}, {"label": "Reazione-diffusione", "aliases": ["Crescita organica", "Gray Scott"], "description": "Il modello Gray–Scott genera un campo 3D. Qui il campo modifica colore, rugosità e normali (bump), non il contorno. Scorrimento trasporta il campo già calcolato."}, {"label": "Interferenza di pellicola", "aliases": ["Interferenza e iridescenza", "Cobalto e oro", "Pellicola madreperlacea"], "description": "I riflessi dipendono dallo spessore ottico e dalla variazione della pellicola. Cobalto e oro è un esempio di valori, non una modalità."}, {"label": "Bump procedurale", "aliases": ["Texture organica", "Grinze", "Pieghe della materia"], "description": "Una trama perturba le normali usate dalla luce. Produce l’aspetto di un rilievo senza cambiare la silhouette della geometria."}, {"label": "Distorsione ricorsiva 2D", "aliases": ["Warp ricorsivo", "Warp"], "description": "Ripete una deformazione delle coordinate dell’immagine nello stesso fotogramma. Non conserva immagini precedenti: il feedback temporale è un’altra funzione."}, {"label": "Rifrazione 2D", "aliases": ["Vetro", "Vetro ottico"], "description": "Deforma e filtra l’immagine della scena. È un trattamento finale, distinto dalla rifrazione del materiale 3D."}, {"label": "Oscillazione delle fibre", "aliases": ["Fibre che respirano", "Respiro delle fibre"], "description": "Varia periodicamente la posa delle fibre. Ampiezza, fase e ritardo regolano il movimento; non implica una simulazione di vento."}];
-export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label}))).concat([{id:'body',label:'Mani e braccia',icon:'orbit',group:'interaction',groupLabel:'Interazione'},{id:'audio',label:'Audio',icon:'audio',group:'interaction',groupLabel:'Interazione'}]);
+export const navigationTabs=engine=>NAV_GROUPS.flatMap(g=>g.tabs.map(t=>({id:t[0],label:t[1],icon:t[2],group:g.id,groupLabel:g.label}))).concat([{id:'fields',label:'Campi e tracciati',icon:'move',group:'motion',groupLabel:'Movimento'},{id:'body',label:'Mani e braccia',icon:'orbit',group:'motion',groupLabel:'Movimento'},{id:'audio',label:'Audio',icon:'audio',group:'motion',groupLabel:'Movimento'}]);
 const clean=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 export function renderNavigation(root,engine,tab,icon){
  const tabs=navigationTabs(engine),current=tabs.find(t=>t.id===tab)||tabs[0];
- root.innerHTML='<div class="nav-groups" aria-label="Aree di lavoro">'+NAV_GROUPS.filter(g=>tabs.some(t=>t.group===g.id)).map(g=>`<button type="button" data-tab="${tabs.find(t=>t.group===g.id).id}" aria-pressed="${current.group===g.id}" class="nav-group ${current.group===g.id?'active':''}">${g.label}</button>`).join('')+'</div><div class="nav-tabs" role="tablist" aria-label="'+current.groupLabel+'">'+tabs.filter(t=>t.group===current.group).map(t=>`<button type="button" role="tab" aria-controls="controls" id="tab-${t.id}" class="tab ${tab===t.id?'active':''}" data-tab="${t.id}" aria-selected="${tab===t.id}">${icon(t.icon)}${t.label}</button>`).join('')+'</div>';
- document.getElementById('controls').setAttribute('aria-labelledby','tab-'+current.id);
+ root.innerHTML='<button type="button" class="library-entry '+(tab==='library'?'active':'')+'" data-tab="library" aria-pressed="'+(tab==='library')+'">Libreria · esempi e preset</button><div class="nav-groups" aria-label="Aree di lavoro">'+NAV_GROUPS.filter(g=>g.id!=='library').map(g=>`<button id="nav-${g.id}" type="button" data-tab="${g.tabs[0][0]}" aria-pressed="${current.group===g.id}" class="nav-group ${current.group===g.id?'active':''}">${g.label}</button>`).join('')+'</div>'+( ['fields','body','audio'].includes(tab)?'<button class="quiet" data-tab="motion">← Movimento</button>':'');
+ document.getElementById('controls').setAttribute('aria-label',current.label);
  document.getElementById('panel-location').textContent=current.label;
 }
 export function organizeSections(root,scope){
@@ -38,7 +37,7 @@ export function organizeSections(root,scope){
   group('Costruzione','shape-structure',['Composizione della struttura','Guscio e spessore','Reticolo di fibre','Suddivisione radiale e strati','Piegatura e curvatura']);
   group('Profilo','shape-profile',['Deformazioni','Foro','Ritaglio','Lobi e onde']);
  }
- if(scope==='particles/shape')group('Costruzione','particle-structure',['Lobi, rami e addensamenti','Rumore multiscala','Rete di percorsi','Tentacoli del nucleo','Fasci esterni','Deformazioni']);
+ if(scope==='particles/shape'&&!root.querySelector('[data-particle-layer]'))group('Costruzione','particle-structure',['Lobi, rami e addensamenti','Rumore multiscala','Rete di percorsi','Tentacoli del nucleo','Fasci esterni','Deformazioni']);
  if(scope==='solid/motion'){
   const general=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Tempo');if(general)root.prepend(general);
   group('Scena','motion-scene',['Rotazione','Posizione e dimensione','Luci','Ambiente e pellicola']);
@@ -68,7 +67,7 @@ function entryLabel(el){
  if(host){const clone=host.cloneNode(true);clone.querySelectorAll('input,select,output,button,.range-ends').forEach(n=>n.remove());return clone.textContent.trim();}
  return el.getAttribute('aria-label')||el.textContent.trim();
 }
-export function mountControlSearch({getEngine,getMarkup,showTab}){
+export function mountControlSearch({getEngine,getMarkup,showTab,revealControl}){
  const input=document.getElementById('control-search'),results=document.getElementById('control-search-results'),status=document.getElementById('control-search-status');let entries=[];
  function close(){results.hidden=true;status.textContent='';}
  function refresh(){
@@ -92,7 +91,7 @@ export function mountControlSearch({getEngine,getMarkup,showTab}){
   results.replaceChildren();results.hidden=false;status.textContent=found.length?found.length+' risultati'+(found.length>24?' · precisa la ricerca':''):'Nessun risultato · prova «orbita», «spessore» o «luce»';
   for(const entry of found.slice(0,24)){
    const b=document.createElement('button');b.type='button';b.className='control-search-result';const title=document.createElement('strong'),path=document.createElement('small');title.textContent=entry.label;path.textContent=entry.path;b.append(title,path);
-   b.onclick=()=>{input.value='';close();showTab(entry.tab);document.getElementById('controls').classList.remove('only-changed');const target=document.getElementById('controls').querySelector(entry.selector);if(!target)return;let d=target.closest('details');while(d){d.open=true;d=d.parentElement.closest('details');}const host=target.closest('.param,.field,.check,.color-field')||target;host.classList.add('search-highlight');requestAnimationFrame(()=>{document.getElementById('controls').classList.add('search-reveal');target.focus({preventScroll:true});target.scrollIntoView({block:'center',behavior:'smooth'});});setTimeout(()=>host.classList.remove('search-highlight'),2200);};results.append(b);
+   b.onclick=()=>{input.value='';close();showTab(entry.tab);document.getElementById('controls').classList.remove('only-changed');const target=document.getElementById('controls').querySelector(entry.selector);if(!target){revealControl?.(entry);return;}let d=target.closest('details');while(d){d.open=true;d=d.parentElement.closest('details');}const host=target.closest('.param,.field,.check,.color-field')||target;host.classList.add('search-highlight');requestAnimationFrame(()=>{document.getElementById('controls').classList.add('search-reveal');target.focus({preventScroll:true});target.scrollIntoView({block:'center',behavior:'smooth'});});setTimeout(()=>host.classList.remove('search-highlight'),2200);};results.append(b);
   }
  }
  input.addEventListener('focus',()=>{refresh();search();});input.addEventListener('input',search);

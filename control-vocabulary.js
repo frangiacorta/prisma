@@ -20,3 +20,29 @@ export function nameControls(root){
   const reset=root.querySelector('#reset-'+key);if(reset)reset.textContent='Ripristina '+name.toLowerCase();
  }
 }
+// Explicit editorial selections. Arrays are deliberately curated, never positional.
+export const ESSENTIALS={
+ solid:{
+  shape:{base:['volume','deform'],profile:['twist','hole','cut'],shell:['structShell','structThickness'],fibre:['structFibres','structWeft'],layers:['structRadial','structLayers'],folds:['structCurl','structFold'],appendices:['petalAmount','petalLength','petalOpen'],filaments:['filLength','filWidth'],curves:['loopAmount','loopRadius']},
+  material:{surface:['metal','roughness','gloss'],glass:['transparency','refraction'],film:['iridescence','filmThickness'],relief:['textureDepth','textureScale'],growth:['growthAmount','growthScale'],emission:['emission']},
+  color:{gradient:['gradientAngle','gradientScale'],layers:['colorLayers'],waves:['colorWaveAmount'],glow:['glow']},
+  light:{environment:['environmentPower'],source:['power','size'],motion:['environmentCycles']},
+  background:{frame:['scale','positionX','positionY','rotateY'],tone:['exposure','saturation','contrast'],shadow:['grounding']},
+  photo:{warp:['finishWarpMix'],glass:['finishGlassMix'],glyph:['finishGlyphMix','finishGlyphCell'],edge:['finishEdgeMix'],glitch:['finishGlitchMix'],mosaic:['finishMosaicMix','finishCellX','finishCellY'],rgb:['finishRgbMix']},
+  motion:{time:['duration','speed','motion']}
+ },
+ particles:{
+  shape:{core:['pOpening','pFill','pThickness','pOrganic'],grains:['pCount','pSize','pOpacity'],links:['pLinks','pLinkNodes','pLinkWidth','pLinkReach'],trails:['pTrailLength','pTrailWidth','pTrailCount'],skin:['pSkin','pFoldDepth','pPores']},
+  material:{surface:['metal','roughness','gloss'],trails:['pFiberSheen','pFiberSpread'],film:['pFilm','filmThickness'],opacity:['transparency','emission']},
+  color:{gradient:['gradientAngle','gradientScale'],particles:['pColorScatter'],glow:['glow']},
+  light:{environment:['environmentPower'],source:['power','size'],particles:['pLighting']},
+  background:{frame:['scale','positionX','positionY','rotateY'],tone:['exposure','saturation','contrast']},
+  photo:{mosaic:['finishMosaicMix','finishCellX'],glitch:['finishGlitchMix'],glyph:['finishGlyphMix','finishGlyphCell'],glass:['finishGlassMix'],warp:['finishWarpMix'],rgb:['finishRgbMix'],edge:['finishEdgeMix']},
+  motion:{time:['duration','speed','pCycles']}
+ }
+};
+export const EXPERT_KEYS=new Set(['seed','textureSeed','growthSeed','growthFeed','growthKill','growthDiffusion','growthAge','pMotionSeed','finishWarpSeed','finishGlyphSeed','finishGlitchSeed','petalCollision','petalSphereCollision','petalContactPasses','petalContactGap','petalContactDamping','petalContactFriction','pTrailQuality']);
+export const ESSENTIAL_FLAGS=new Set(['perfectLoop','thinShellMode','environmentRotate','finishEnabled','finishWarp','finishGlass','finishGlyph','finishEdge','finishGlitch','finishMosaic','finishRgb']);
+export const ESSENTIAL_FIELDS=new Set(['bg-mode','environment','glyph-characters','pSprite','pColorMode','pDirection']);
+export const ESSENTIAL_BUTTONS='[data-base-form],#particle-sphere,#add-color,[data-remove-color],#add-light,[data-light-select],#show-lights,[data-remove-light],[data-animate-open],[data-animate-path],[data-animation-group],[data-parameter-jump],[data-open-library],[data-motion-preset],[data-jump-tab],#add-animation';
+export function essentialKeys(engine,tab){return new Set(Object.values(ESSENTIALS[engine==='particles'?'particles':'solid']?.[tab]||{}).flat());}

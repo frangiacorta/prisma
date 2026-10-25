@@ -28,7 +28,7 @@ const EFFECTS=[
  ['filLength','Filamenti su superficie'],['petalAmount','Petali e radici'],['stemAmount','Gambo'],['hole','Foro'],['cut','Ritaglio'],['lobeAmount','Lobi e onde','waves'],
  ['textureDepth','Rilievo di superficie'],['growthAmount','Reazione-diffusione'],['iridescence','Iridescenza'],['colorWaveAmount','Onde di colore'],
  ['finishWarp','Distorsione ricorsiva'],['finishGlass','Vetro ottico'],['finishGlitch','Glitch'],['finishGlyph','Segni e caratteri'],['finishEdge','Contorni'],['finishMosaic','Mosaico'],['finishRgb','Separazione dei colori'],
- ['pLiving','Superficie e reticolo'],['pLinks','Connessioni'],['pTrailCount','Scie'],['pTentacle','Tentacoli del nucleo'],['pOuter','Fasci esterni']
+ ['pLiving','Pelle'],['pLinks','Fili'],['pTrailCount','Scie'],['pTentacle','Tentacoli del nucleo'],['pOuter','Fasci esterni']
 ];
 const active=v=>typeof v==='boolean'?v:typeof v==='number'&&Math.abs(v)>1e-7;
 const equal=(a,b)=>typeof a==='number'&&typeof b==='number'?Math.abs(a-b)<1e-7:a===b;
@@ -55,7 +55,7 @@ export function decorateInspector({root,state,baseline,tab,edit}){
  if(['shape','motion'].includes(tab)){
   const actions=document.createElement('div');actions.className='simplify-actions';
   for(const [label,amount] of tab==='shape'?[['Riduci deformazioni',.5],['Solo forma base',0]]:[['Riduci ampiezze',.5],['Rimuovi animazioni',0]]){
-   const button=document.createElement('button');button.type='button';button.className='outline';button.textContent=label;button.dataset.simplify=tab+'-'+amount;button.onclick=()=>edit(s=>(tab==='shape'?simplifyShape:simplifyMotion)(s,amount),label+' · puoi annullare',tab==='motion'&&amount===0);actions.append(button);
+   const button=document.createElement('button');button.type='button';button.className='outline';button.textContent=state.engine==='particles'&&tab==='shape'?(amount===0?'Ripristina il nucleo':'Riduci irregolarità'):label;button.dataset.simplify=tab+'-'+amount;button.onclick=()=>edit(s=>(tab==='shape'?simplifyShape:simplifyMotion)(s,amount),label+' · puoi annullare',tab==='motion'&&amount===0);actions.append(button);
   }
   toolbar.append(actions);const help=document.createElement('p');help.className='help';help.textContent=tab==='shape'?'Riduci dimezza le deformazioni. Forma base rimuove aggiunte e campi manuali. Materiale e colori restano. Puoi annullare.':'Riduci conserva durata e giri completi. Rimuovi ferma le animazioni; audio e tracking restano in Interazione. Puoi annullare.';toolbar.append(help);
  }
@@ -92,11 +92,13 @@ export function decorateInspector({root,state,baseline,tab,edit}){
    const on=r.path?r.el.checked:r.keys.some(k=>active(state[k])||state.motions?.[k]?.enabled)&&(!r.keys[0].startsWith('finish')||state.finishEnabled!==false);r.on=on;
    if(on){let d=r.el.closest('details');while(d){d.classList.add('has-changes');d=d.parentElement.closest('details');}const chip=document.createElement('span');chip.className='active-effect';const jump=document.createElement('button');jump.type='button';jump.textContent=r.label;jump.onclick=()=>reveal(r.el);const off=document.createElement('button');off.type='button';off.textContent='×';off.setAttribute('aria-label','Disattiva '+r.label);off.onclick=()=>{if(r.path){r.el.checked=false;r.el.dispatchEvent(new Event('change',{bubbles:true}));}else edit(s=>{for(const k of r.keys){s[k]=typeof s[k]==='boolean'?false:0;if(s.motions?.[k])s.motions[k].enabled=false;}},r.label+' disattivato');};chip.append(jump,off);activeList.append(chip);}
   }
+  const omitted=(root.omittedControls||[]).filter(r=>!equal(at(state,r.key),at(baseline,r.key)));
+  for(const r of omitted){const b=document.createElement('button');b.type='button';b.className='animation-link';b.dataset.revealOmitted=r.key;b.textContent=r.label+' · modificato';activeList.append(b);}
   if(!activeList.children.length){const empty=document.createElement('span');empty.className='help';empty.textContent='Nessun effetto con interruttore attivo in questa scheda.';activeList.append(empty);}
   for(const d of root.querySelectorAll('details')){const effects=records.filter(r=>d.contains(r.el));if(!effects.length)continue;let badge=d.querySelector(':scope > summary > .effect-status');if(!badge){badge=document.createElement('span');badge.className='effect-status';d.querySelector(':scope > summary').append(badge);}const on=effects.filter(r=>r.on).length;const onlyTracks=effects.every(r=>r.path);badge.textContent=on?(onlyTracks?(on+' animazioni'):(on===1?'Attivo':on+' attivi')):(onlyTracks?'':'Spento');badge.dataset.on=String(on>0);d.classList.toggle('effect-off',on===0);}
-  const n=root.querySelectorAll('.is-changed').length;toggle.textContent=`Solo modificati (${n})`;
-  activeSummary.textContent='In uso ('+records.filter(r=>r.on).length+')';empty.hidden=n>0;for(const r of sectionResets)r.button.disabled=!r.d.querySelector('.is-changed');
-  if(!records.length){activeSummary.textContent='In uso (0)';activeList.hidden=true;}
+  const n=root.querySelectorAll('.is-changed').length+omitted.length;toggle.textContent=`Solo modificati (${n})`;
+  activeSummary.textContent='In uso ('+(records.filter(r=>r.on).length+omitted.length)+')';empty.hidden=n>0;for(const r of sectionResets)r.button.disabled=!r.d.querySelector('.is-changed');
+  if(!records.length&&!omitted.length){activeSummary.textContent='In uso (0)';activeList.hidden=true;}
  }
  refresh();return {refresh};
 }
