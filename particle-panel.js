@@ -1,6 +1,6 @@
-import {veilPanel} from './veil-panel.js?v=e62bfeba18ff';
-import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=e62bfeba18ff';
-import {SPRITES,COLOR_MODES} from './particle-model.js?v=e62bfeba18ff';
+import {veilPanel} from './veil-panel.js?v=d90836d59387';
+import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=d90836d59387';
+import {SPRITES,COLOR_MODES} from './particle-model.js?v=d90836d59387';
 export function particlePanel(tab,s,h,shared,selectedLight){
  const veil=s.pLiving===4?veilPanel(tab,s,{...h,baseShapePanel:()=>particlePanel('shape',{...s,pLiving:s.pVeilSourceKind===4?0:s.pVeilSourceKind,engine:'solid'},h,shared,selectedLight)},shared,selectedLight):null;if(veil!==null)return veil;
  const {slider,section,details,colorField,check}=h;
@@ -34,6 +34,6 @@ export function particlePanel(tab,s,h,shared,selectedLight){
   +details('Campi',sliders(['pAttract','pRepel','pMagnet','pPoles','pRadius','pField'])+'<p class="help">Campi artistici periodici: i poli attirano, respingono e avvolgono la materia. Raggio sposta i poli; Influenza ne regola l’area d’azione.</p>')
   +shared('particle-motion',s,h,selectedLight);
  if(tab==='light')return section('Illuminazione',sliders(['pLighting','pDepthFade']))+shared('particle-light',s,h,selectedLight);
- if(tab==='background')return shared(tab,s,h,selectedLight).replace(/<details class="control-details"><summary>Ombra e caustica<\/summary>[\s\S]*?<\/details>/,'');
+ if(tab==='background')return shared(tab,s,h,selectedLight).replace(/<details class="control-details"><summary>Ombra e caustica<\/summary>[\s\S]*?<\/details>/,'')+details('Ombra sul piano',sliders(['pShadow','pShadowHeight','pShadowSoftness'])+`<label class="field">Luce dell’ombra<select data-particle-select="pShadowLight"><option value="-1" ${s.pShadowLight<0?'selected':''}>Automatica · più intensa</option>${s.pShadowLight>=0&&!s.lights.some(l=>l.id===s.pShadowLight)?`<option selected value="${s.pShadowLight}">Luce rimossa · scegli una sorgente</option>`:''}${s.lights.map((l,i)=>`<option value="${l.id}" ${s.pShadowLight===l.id?'selected':''}>Luce ${i+1}${l.enabled?'':' · spenta'}</option>`).join('')}</select></label><p class="help">Proiezione di granelli, fili, scie e pelle su un piano orizzontale. Il piano resta fermo quando sposti la figura. Solo le parti fra piano e luce proiettano ombra. Dimensione della luce e morbidezza sfumano i bordi. Sul nero puro l’ombra non è visibile; nel PNG trasparente viene conservata. Non include ombre reciproche o caustiche.</p>`);
  return shared(tab,s,h,selectedLight);
 }

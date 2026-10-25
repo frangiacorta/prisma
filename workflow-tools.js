@@ -1,7 +1,7 @@
-import {newCreation,material} from './creative-model.js?v=e62bfeba18ff';
-import {MOODS} from './model.js?v=e62bfeba18ff';
-import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=e62bfeba18ff';
-import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=e62bfeba18ff';
+import {newCreation,material} from './creative-model.js?v=d90836d59387';
+import {MOODS} from './model.js?v=d90836d59387';
+import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=d90836d59387';
+import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=d90836d59387';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){

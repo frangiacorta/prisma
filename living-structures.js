@@ -1,5 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=e62bfeba18ff';
-import {excludeForcePositions} from './particle-forces.js?v=e62bfeba18ff';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=d90836d59387';
+import {excludeForcePositions} from './particle-forces.js?v=d90836d59387';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;
 uniform float uBundleAmount;uniform vec3 uLivingMotion;`;
@@ -76,7 +76,7 @@ void main(){
  float a=uLivingSurface.x*coverage*uFinish.z;
  vec3 lit=shadeParticle(base,vPosition,n);
  color=vec4(lit*a,a);
-}`);
+}`,null,true);
   this.fibres=owner.program(`#version 300 es
 precision highp float;precision highp int;precision highp sampler2D;
 ${common}
@@ -145,20 +145,20 @@ void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vec4(vUV,.5
   }
   return this.positions;
  }
- draw(s,phase){const start=performance.now();this.sample(s,phase);const gl=this.gl,o=this.owner,t=this.topology;
+ draw(s,phase){const start=performance.now();if(!this.owner.shadowPass)this.sample(s,phase);const gl=this.gl,o=this.owner,t=this.topology;
   const setup=p=>{o.settings(p,s,phase);o.tex(p,'uLivingPositions',this.texture,6);gl.uniform2i(o.loc(p,'uLivingSize'),t.columns,t.rows);};
-  gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
+  if(o.shadowPass)gl.disable(gl.DEPTH_TEST);else gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
   if(s.pSkin>0){
    setup(this.skin);o.u(this.skin,'uLivingSurface',s.pSkin,s.pPores,s.pPoreCount,0);gl.bindVertexArray(this.vao);
    // Nearest-surface prepass avoids accumulating the back of translucent folds.
-   gl.depthMask(true);gl.colorMask(false,false,false,false);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);gl.drawElements(gl.TRIANGLES,t.triangles.length,gl.UNSIGNED_INT,0);gl.disable(gl.POLYGON_OFFSET_FILL);gl.colorMask(true,true,true,true);gl.depthMask(false);gl.drawElements(gl.TRIANGLES,t.triangles.length,gl.UNSIGNED_INT,0);
+   if(!o.shadowPass){gl.depthMask(true);gl.colorMask(false,false,false,false);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);gl.drawElements(gl.TRIANGLES,t.triangles.length,gl.UNSIGNED_INT,0);gl.disable(gl.POLYGON_OFFSET_FILL);gl.colorMask(true,true,true,true);}gl.depthMask(false);gl.drawElements(gl.TRIANGLES,t.triangles.length,gl.UNSIGNED_INT,0);
   }
   if(s.pThreadOpacity>0){
    setup(this.fibres);gl.bindVertexArray(o.empty);gl.depthMask(s.pSkin===0);
    o.u(this.fibres,'uLivingThread',s.pStrands,s.pThreadWidth,s.pThreadOpacity,(s.pBundleAmount??(s.pLiving===1?1:0))>0?s.pBundles:0);o.u(this.fibres,'uWeft',0);gl.drawArraysInstanced(gl.TRIANGLES,0,(t.rows-1)*18,s.pStrands);
    if(s.pWeft>0){o.u(this.fibres,'uLivingThread',Math.round(s.pStrands*.65),s.pThreadWidth,s.pThreadOpacity*s.pWeft,0);o.u(this.fibres,'uWeft',1);gl.drawArraysInstanced(gl.TRIANGLES,0,t.columns*18,Math.round(s.pStrands*.65));}
   }
-  gl.depthMask(true);gl.disable(gl.DEPTH_TEST);gl.blendFunc(gl.ONE,gl.ONE);this.milliseconds=performance.now()-start;
+  gl.depthMask(true);gl.disable(gl.DEPTH_TEST);gl.blendFunc(gl.ONE,o.shadowPass?gl.ONE_MINUS_SRC_ALPHA:gl.ONE);this.milliseconds=performance.now()-start;
  }
  dispose(){const gl=this.gl;for(const p of [this.capture,this.constrain,this.skin,this.fibres])gl.deleteProgram(p.program);for(const b of [this.captureBuffer,this.seedBuffer,this.indices])gl.deleteBuffer(b);gl.deleteTransformFeedback(this.feedback);gl.deleteVertexArray(this.vao);gl.deleteTexture(this.texture);}
 }
