@@ -1,14 +1,16 @@
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=d90836d59387';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=d90836d59387';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=d90836d59387';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=d90836d59387';
-import {ParticleLinks} from './particle-links.js?v=d90836d59387';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=d90836d59387';
-import {LayeredVeils} from './layered-veils.js?v=d90836d59387';
-import {LivingStructures} from './living-structures.js?v=d90836d59387';
-import {fieldGLSL} from './particle-field.js?v=d90836d59387';
-import {forceBarrierGLSL} from './particle-forces.js?v=d90836d59387';
-import {prismaShadingGLSL} from './particle-shading.js?v=d90836d59387';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=00de7b19c225';
+import {ParticleOptics} from './particle-optics.js?v=00de7b19c225';
+import {shadowLight} from './particle-shadow.js?v=00de7b19c225';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=00de7b19c225';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=00de7b19c225';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=00de7b19c225';
+import {ParticleLinks} from './particle-links.js?v=00de7b19c225';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=00de7b19c225';
+import {LayeredVeils} from './layered-veils.js?v=00de7b19c225';
+import {LivingStructures} from './living-structures.js?v=00de7b19c225';
+import {fieldGLSL} from './particle-field.js?v=00de7b19c225';
+import {forceBarrierGLSL} from './particle-forces.js?v=00de7b19c225';
+import {prismaShadingGLSL} from './particle-shading.js?v=00de7b19c225';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -86,7 +88,7 @@ const blurFrag=`#version 300 es
 precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage;uniform vec2 uStep;
 void main(){vec4 c=texture(uImage,uv)*.227027;c+=texture(uImage,uv+uStep*1.384615)*.316216;c+=texture(uImage,uv-uStep*1.384615)*.316216;c+=texture(uImage,uv+uStep*3.230769)*.070270;c+=texture(uImage,uv-uStep*3.230769)*.070270;color=c;}`;
 const composeFrag=`#version 300 es
-precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage,uBloom,uShadow;uniform float uShadowStrength;uniform float uGlow,uBgMode,uPhotoAll,uVeilCompose;
+precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage,uBloom,uShadow,uCausticMap;uniform float uCausticOn,uShadowStrength;uniform float uGlow,uBgMode,uPhotoAll,uVeilCompose;
 uniform vec4 uGrade,uPhoto,uTone,uLens,uBg;uniform vec3 uBackground,uBackground2;
 vec3 grade(vec3 c){c=(c*exp2(uGrade.x)+uGrade.y-.5)*uGrade.z+.5;float grey=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(grey),c,uGrade.w);c*=vec3(1.+uPhoto.x*.25,1.+uPhoto.y*.2,1.-uPhoto.x*.25);c+=uTone.x*pow(1.-clamp(c,0.,1.),vec3(2.))+uTone.y*pow(clamp(c,0.,1.),vec3(2.));return pow(max(c,0.),vec3(1./max(.1,uPhoto.z)));}
 void main(){vec2 p=uv-.5,q=.5+p*(1.+uLens.x*dot(p,p));vec4 src=texture(uImage,q),bloom=texture(uBloom,q);
@@ -111,6 +113,12 @@ void main(){vec2 p=uv-.5,q=.5+p*(1.+uLens.x*dot(p,p));vec4 src=texture(uImage,q)
  c+=noise*uLens.y;
  if(uVeilCompose>.5&&uBgMode>2.5)c=alpha>.00001?c/alpha:vec3(0.);
  if(uBgMode>2.5&&shadow>0.){float combined=alpha+(1.-alpha)*shadow;c*=alpha/max(.00001,combined);alpha=combined;}
+ if(uCausticOn>.5){
+  vec4 flux=texture(uCausticMap,q);vec3 light=1.-exp(-max(vec3(0.),flux.rgb));float coverage=1.-exp(-max(0.,flux.a));
+  if(uPhotoAll>.5)light=clamp(grade(light)-grade(vec3(0.)),0.,1.);
+  if(uBgMode>2.5){float combined=alpha+(1.-alpha)*coverage;c=(c*alpha+light*(1.-alpha))/max(.00001,combined);alpha=combined;}
+  else c+=light*(1.-alpha);
+ }
  color=vec4(clamp(c,0.,1.),uBgMode>2.5?alpha:1.);
 }`;
 const rad=Math.PI/180,rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
@@ -144,12 +152,12 @@ export class ParticleRenderer{
   if(this.float){this.pathTarget=this.target(segments+3,1024);gl.bindTexture(gl.TEXTURE_2D,this.pathTarget.texture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,segments+3,1024,0,gl.RGBA,gl.FLOAT,null);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.NEAREST);}
  }
  target(w,h){const gl=this.gl,texture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,texture);gl.texImage2D(gl.TEXTURE_2D,0,this.float?gl.RGBA16F:gl.RGBA8,w,h,0,gl.RGBA,this.float?gl.HALF_FLOAT:gl.UNSIGNED_BYTE,null);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.LINEAR);for(const k of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,k,gl.CLAMP_TO_EDGE);const fbo=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('Buffer grafico non disponibile.');return {texture,fbo,w,h};}
- releaseSurface(){this.shadow?.release();if(this.depthCopy){this.gl.deleteTexture(this.depthCopy.texture);this.gl.deleteFramebuffer(this.depthCopy.fbo);this.depthCopy=null;}for(const t of this.targets){this.gl.deleteTexture(t.texture);this.gl.deleteFramebuffer(t.fbo);if(t.depth)this.gl.deleteRenderbuffer(t.depth);}this.targets=[];this.width=0;this.height=0;this.canvas.width=1;this.canvas.height=1;return true;}
+ releaseSurface(){this.optics?.release();this.shadow?.release();if(this.depthCopy){this.gl.deleteTexture(this.depthCopy.texture);this.gl.deleteFramebuffer(this.depthCopy.fbo);this.depthCopy=null;}for(const t of this.targets){this.gl.deleteTexture(t.texture);this.gl.deleteFramebuffer(t.fbo);if(t.depth)this.gl.deleteRenderbuffer(t.depth);}this.targets=[];this.width=0;this.height=0;this.canvas.width=1;this.canvas.height=1;return true;}
  resize(w,h){if(this.width===w&&this.height===h){if(this.canvas.width!==w)this.canvas.width=w;if(this.canvas.height!==h)this.canvas.height=h;return;}this.releaseSurface();this.width=w;this.height=h;this.canvas.width=w;this.canvas.height=h;this.targets=[this.target(w,h),this.target(Math.ceil(w/4),Math.ceil(h/4)),this.target(Math.ceil(w/4),Math.ceil(h/4))];}
  bind(t){const gl=this.gl;gl.bindFramebuffer(gl.FRAMEBUFFER,t?.fbo||null);gl.viewport(0,0,t?.w||this.width,t?.h||this.height);}
  tex(p,key,texture,unit){const gl=this.gl;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(this.loc(p,key),unit);}
  settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);this.guides.bind(p);
-  this.u(p,'uShadowPass',this.shadowPass?1:0);this.u(p,'uShadowHeight',s.pShadowHeight??-1.6);this.u(p,'uShadowOpacity',p.materialAlpha?1:Math.max(0,1-s.transparency));if(this.shadowPass)this.u(p,'uShadowLight',this.shadowPass.light.x,this.shadowPass.light.y,this.shadowPass.light.z);
+  this.u(p,'uShadowPass',this.shadowPass?(this.shadowPass.mode||1):0);if(this.optics)this.optics.uniforms(p,s);else{this.u(p,'uOpticalShadow',0,0,0,0);this.tex(p,'uOpticalMap',this.seedTexture,8);}this.u(p,'uShadowHeight',s.pShadowHeight??-1.6);this.u(p,'uShadowOpacity',p.materialAlpha?1:Math.max(0,1-s.transparency));if(this.shadowPass)this.u(p,'uShadowLight',this.shadowPass.light.x,this.shadowPass.light.y,this.shadowPass.light.z);
   this.u(p,'uLivingOcclusion',this.occlusion||0);this.u(p,'uLivingDepthSize',this.width,this.height);this.tex(p,'uLivingDepth',this.depthCopy?.texture||this.seedTexture,7);
   this.u(p,'uSurfaceBind',s.pLiving>0&&s.pLiving!==4&&this.living?.texture?s.pSurfaceBind:0);this.tex(p,'uAttachedSurface',s.pLiving>0&&s.pLiving!==4&&this.living?.topology?this.living.texture:this.seedTexture,6);if(s.pLiving>0&&s.pLiving!==4&&this.living?.topology)gl.uniform2i(this.loc(p,'uAttachedSize'),this.living.topology.columns,this.living.topology.rows);
   this.u(p,'uAttachedBundles',0); // One continuous material surface, including grouped fibres.
@@ -194,11 +202,23 @@ export class ParticleRenderer{
   const weights=livingWeights(s);s.pOpacity*=weights.core;s.pTrailOpacity*=weights.core;s.pLinks*=weights.core;s.pSkin*=weights.structure;s.pThreadOpacity*=weights.structure;this.occlusion=0;
   if(this.seed!==s.seed)this.geometry(s.seed);this.resize(w,h);this.guides.update(s);this.pollGpuTime();const query=options.trackTiming!==false&&this.timerExtension&&this.queries.length<3?gl.createQuery():null;
   if(query)gl.beginQuery(this.timerExtension.TIME_ELAPSED_EXT,query);
-  const [scene,a,b]=this.targets;this.drawGeometry(scene,s,phase,options,weights);
+  const [scene,a,b]=this.targets;let sceneDrawn=false;
+  const transmission=s.pLiving===4?1-s.pVeilOpacity:s.transparency;
+  const opticalLight=(s.pSelfShadow>0||(s.pCaustic>0&&transmission>0&&s.refraction>1&&s.metal<1))?shadowLight(s):null;
+  if(this.optics){this.optics.ready=false;this.optics.causticActive=false;}
+  // Prepare living geometry once. The light pass and shaded pass reuse it.
+  if(opticalLight){
+   this.optics??=new ParticleOptics(this);this.optics.configure(s,opticalLight);
+   if(s.pLiving>0){this.drawGeometry(scene,s,phase,options,weights);sceneDrawn=true;}
+   this.optics.capture(s,phase,options,weights);
+   this.reuseGeometry=true;
+  }
+  try{if(!sceneDrawn||s.pSelfShadow>0)this.drawGeometry(scene,s,phase,options,weights);}finally{this.reuseGeometry=false;}
+  const causticTexture=opticalLight?this.optics.drawCaustic(s):null;
   let shadowTexture=null;if(s.pShadow>0){this.shadow??=new ParticleShadow(this);shadowTexture=this.shadow.draw(s,phase,options,weights);}
   gl.depthMask(true);gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);gl.bindVertexArray(this.empty);gl.useProgram(this.blur.program);
   for(const [dst,src,step]of [[a,scene,[2/w,0]],[b,a,[0,1/a.h]],[a,b,[1/a.w,0]]]){this.bind(dst);this.tex(this.blur,'uImage',src.texture,0);this.u(this.blur,'uStep',...step);gl.drawArrays(gl.TRIANGLES,0,3);}
-  this.bind(null);const c=this.compose;gl.useProgram(c.program);this.tex(c,'uImage',scene.texture,0);this.tex(c,'uBloom',a.texture,1);this.tex(c,'uShadow',shadowTexture||scene.texture,4);this.u(c,'uShadowStrength',shadowTexture?this.shadow.strength:0);this.u(c,'uGlow',s.glow);this.u(c,'uVeilCompose',s.pLiving===4?1:0);
+  this.bind(null);const c=this.compose;gl.useProgram(c.program);this.tex(c,'uImage',scene.texture,0);this.tex(c,'uBloom',a.texture,1);this.tex(c,'uShadow',shadowTexture||scene.texture,4);this.u(c,'uShadowStrength',shadowTexture?this.shadow.strength:0);this.tex(c,'uCausticMap',causticTexture||scene.texture,5);this.u(c,'uCausticOn',causticTexture?1:0);this.u(c,'uGlow',s.glow);this.u(c,'uVeilCompose',s.pLiving===4?1:0);
   this.u(c,'uGrade',s.exposure,s.brightness,s.contrast,s.saturation);this.u(c,'uPhoto',s.temperature,s.photoTint,s.gamma,s.vignette);this.u(c,'uTone',s.blacks,s.highlights,0,0);this.u(c,'uLens',s.lensDistortion,s.grain,s.grainSize,0);this.u(c,'uPhotoAll',+s.photoAll);
   this.u(c,'uBackground',...rgb(s.background));this.u(c,'uBackground2',...rgb(s.background2));this.u(c,'uBgMode',['solid','gradient','studio','transparent'].indexOf(s.bgMode));this.u(c,'uBg',s.bgAngle*rad,s.bgHeight,s.bgSoftness,s.bgWash);
   gl.drawArrays(gl.TRIANGLES,0,3);gl.bindVertexArray(null);
@@ -206,7 +226,7 @@ export class ParticleRenderer{
   if(!options.deferCompletion){if(this.completionSync)gl.deleteSync(this.completionSync);this.completionSync=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);gl.flush();}return true;
  }
  drawGeometry(scene,s,phase,options,weights){
-  const gl=this.gl,w=this.width,h=this.height;this.bind(scene);if(!this.shadowPass&&s.pLiving>0&&!scene.depth){scene.depth=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,scene.depth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT24,w,h);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,scene.depth);}gl.depthMask(true);gl.clearDepth(1);gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.disable(gl.SCISSOR_TEST);gl.enable(gl.BLEND);gl.blendEquation(gl.FUNC_ADD);gl.blendFunc(gl.ONE,this.shadowPass?gl.ONE_MINUS_SRC_ALPHA:gl.ONE);
+  const gl=this.gl,w=this.width,h=this.height;this.bind(scene);if(!this.shadowPass&&s.pLiving>0&&!scene.depth){scene.depth=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,scene.depth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT24,w,h);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,scene.depth);}gl.depthMask(true);gl.clearDepth(1);gl.clearColor(this.shadowPass?.mode===2?1:0,this.shadowPass?.mode===2?1:0,this.shadowPass?.mode===2?1:0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.disable(gl.SCISSOR_TEST);gl.enable(gl.BLEND);gl.blendEquation(gl.FUNC_ADD);gl.blendFunc(gl.ONE,this.shadowPass?gl.ONE_MINUS_SRC_ALPHA:gl.ONE);
   if(s.pLiving===4){this.veils??=new LayeredVeils(this,common);this.veils.draw({...s,pVeilOpacity:s.pVeilOpacity*weights.structure},phase*s.pDirection,options);}
   else if(s.pLiving>0){this.living??=new LivingStructures(this,common);this.living.draw(s,phase*s.pDirection);}
   if(!this.shadowPass&&s.pLiving>0&&s.pLiving!==4&&s.pSkin>0){
@@ -224,12 +244,13 @@ export class ParticleRenderer{
     this.bind(scene);gl.disable(gl.DEPTH_TEST);gl.enable(gl.BLEND);setup(this.lines);gl.uniform1i(this.loc(this.lines,'uBatchStart'),start);gl.uniform1i(this.loc(this.lines,'uBaked'),this.float?1:0);this.tex(this.lines,'uPaths',this.pathTarget?.texture||this.seedTexture,3);
     // Preview uses a representative subset; compensate coverage so density remains readable.
     this.u(this.lines,'uFiber',s.pTrailPersistence,s.pTrailSoftness,s.pTrailCoherence,fiberGain(s)*total/count);
-    gl.bindVertexArray(this.lineVAO);gl.drawElementsInstanced(gl.TRIANGLES,segments*6,gl.UNSIGNED_SHORT,0,batch);
+    gl.bindVertexArray(this.lineVAO);this.opticalDrawState();gl.drawElementsInstanced(gl.TRIANGLES,segments*6,gl.UNSIGNED_SHORT,0,batch);
    }
   }else this.previewTrailCount=0;
   if(s.pLinks>0){this.connections??=new ParticleLinks(this,common);this.connections.draw(s,phase*s.pDirection);}
-  if(s.pCount>0&&s.pOpacity>0){this.settings(this.points,s,phase*s.pDirection);gl.bindVertexArray(this.pointVAO);gl.drawArrays(gl.POINTS,0,Math.round(s.pCount));}
+  if(s.pCount>0&&s.pOpacity>0){this.settings(this.points,s,phase*s.pDirection);gl.bindVertexArray(this.pointVAO);this.opticalDrawState();gl.drawArrays(gl.POINTS,0,Math.round(s.pCount));}
  }
+ opticalDrawState(){if(this.shadowPass?.mode===2){const g=this.gl;g.enable(g.DEPTH_TEST);g.depthFunc(g.LEQUAL);g.depthMask(true);g.disable(g.BLEND);}}
  async drawAccumulated(s,p,w,h,o={}){if(o.cancelled?.())return false;this.draw(s,p,w,h,o);const ok=await this.waitForGpu(o);o.progress?.(1);return ok;}
  async drawTiled(...args){return this.drawAccumulated(...args);}
  pollCompletion(){if(!this.completionSync)return true;const gl=this.gl,result=gl.clientWaitSync(this.completionSync,0,0);if(result===gl.WAIT_FAILED)throw Error('Sincronizzazione GPU interrotta.');if(result===gl.TIMEOUT_EXPIRED)return false;gl.deleteSync(this.completionSync);this.completionSync=null;this.completedFrames++;return true;}
@@ -237,5 +258,5 @@ export class ParticleRenderer{
  pollGpuTime(){const gl=this.gl,e=this.timerExtension;if(!e)return;const disjoint=gl.getParameter(e.GPU_DISJOINT_EXT);while(this.queries.length&&(disjoint||gl.getQueryParameter(this.queries[0],gl.QUERY_RESULT_AVAILABLE))){const q=this.queries.shift();if(!disjoint){this.gpuMilliseconds=gl.getQueryParameter(q,gl.QUERY_RESULT)/1e6;this.gpuSample++;}gl.deleteQuery(q);}}
  hardwareInfo(){const gl=this.gl,e=gl.getExtension('WEBGL_debug_renderer_info'),name=gl.getParameter(e?e.UNMASKED_RENDERER_WEBGL:gl.RENDERER);return {name,software:/swiftshader|llvmpipe/i.test(name),timingAvailable:!!this.timerExtension};}
  pixels(){const gl=this.gl,a=new Uint8Array(this.width*this.height*4),out=new Uint8Array(a.length),stride=this.width*4;gl.readPixels(0,0,this.width,this.height,gl.RGBA,gl.UNSIGNED_BYTE,a);for(let y=0;y<this.height;y++)out.set(a.subarray(y*stride,(y+1)*stride),(this.height-y-1)*stride);return out;}
- dispose({loseContext=false}={}){const gl=this.gl;if(this.completionSync)gl.deleteSync(this.completionSync);for(const q of this.queries)gl.deleteQuery(q);this.living?.dispose();this.veils?.dispose();this.connections?.dispose();this.guides.dispose();this.releaseSurface();if(this.buffer)gl.deleteBuffer(this.buffer);if(this.lineIndices)gl.deleteBuffer(this.lineIndices);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pathTarget){gl.deleteTexture(this.pathTarget.texture);gl.deleteFramebuffer(this.pathTarget.fbo);}for(const p of [this.points,this.lines,this.pathProgram,this.blur,this.compose])if(p)gl.deleteProgram(p.program);for(const v of [this.pointVAO,this.lineVAO,this.empty])if(v)gl.deleteVertexArray(v);gl.bindVertexArray(null);if(loseContext)this.recoveryExtension?.loseContext();}
+ dispose({loseContext=false}={}){const gl=this.gl;if(this.completionSync)gl.deleteSync(this.completionSync);for(const q of this.queries)gl.deleteQuery(q);this.living?.dispose();this.veils?.dispose();this.connections?.dispose();this.guides.dispose();this.optics?.dispose();this.releaseSurface();if(this.buffer)gl.deleteBuffer(this.buffer);if(this.lineIndices)gl.deleteBuffer(this.lineIndices);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pathTarget){gl.deleteTexture(this.pathTarget.texture);gl.deleteFramebuffer(this.pathTarget.fbo);}for(const p of [this.points,this.lines,this.pathProgram,this.blur,this.compose])if(p)gl.deleteProgram(p.program);for(const v of [this.pointVAO,this.lineVAO,this.empty])if(v)gl.deleteVertexArray(v);gl.bindVertexArray(null);if(loseContext)this.recoveryExtension?.loseContext();}
 }

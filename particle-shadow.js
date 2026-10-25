@@ -4,6 +4,7 @@ export function shadowProgram(vertex,fragment,varyings){
  if(varyings||!vertex.includes('vec4 project(vec3 p)')||!fragment.includes('in vec3 v')||!fragment.includes('vPosition'))return {vertex,fragment};
  const uniforms='uniform float uShadowPass,uShadowHeight,uShadowOpacity;uniform vec3 uShadowLight;\n';
  vertex=vertex.replace('vec4 project(vec3 p){',uniforms+`vec4 project(vec3 p){
+ if(uShadowPass>1.5)return opticalProject(p);
  if(uShadowPass>.5){
   // Keep crossing segments continuous. Rejecting a vertex with a dummy
   // clip position creates long triangles when a strand crosses the receiver.
@@ -14,7 +15,12 @@ export function shadowProgram(vertex,fragment,varyings){
  fragment=fragment.replace('void main(){',uniforms+'void shadowSourceMain(){')+`
  void main(){
   shadowSourceMain();
-  if(uShadowPass>.5){
+  if(uShadowPass>1.5){
+   if(color.a<.01)discard;
+   float depth=min(gl_FragCoord.z,.999999);
+   vec3 packed=fract(depth*vec3(1.,255.,65025.));packed-=packed.yzz*vec3(1./255.,1./255.,0.);
+   color=vec4(packed,clamp(color.a,0.,1.));
+  }else if(uShadowPass>.5){
    if(vPosition.y<=uShadowHeight||vPosition.y>=uShadowLight.y-.02)discard;
    float a=1.-exp(-max(0.,color.a)*uShadowOpacity);
    color=vec4(vec3(a),a);

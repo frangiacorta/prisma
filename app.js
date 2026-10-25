@@ -1,35 +1,35 @@
-import {composePanel,refinePanel} from './workflow-panels.js?v=d90836d59387';
-import {mountWorkflowTools} from './workflow-tools.js?v=d90836d59387';
-import {decorateInspector} from './inspector-state.js?v=d90836d59387';
-import {GROWTH_DEFAULTS,GROWTH_STUDIES} from './growth-material.js?v=d90836d59387';
-import {BASE_FORMS} from './base-forms.js?v=d90836d59387';
-import {integrateStructure,STRUCTURE_DEFAULTS} from './structure-model.js?v=d90836d59387';
-import {applyVeilLook,applyVeilGeometry,beginVeilTransform,VEIL_LOOKS} from './veil-model.js?v=d90836d59387';
-import {mountFinishingOrder} from './finishing-order.js?v=d90836d59387';
-import {mountFinishingAreas} from './finishing-areas.js?v=d90836d59387';
-import {INTERFERENCE_STYLE} from './studio-model.js?v=d90836d59387';
-import {FINISH_DEFAULTS,GLYPH_DEFAULTS,EDGE_DEFAULTS,GLITCH_DEFAULTS,TONE_NEUTRAL,PHOTO_NEUTRAL} from './finishing.js?v=d90836d59387';
-import {mountBodyTracking} from './body-tracking.js?v=d90836d59387';
-import {mountAudioReactive} from './audio-reactive.js?v=d90836d59387';
-import {Renderer,fieldAt,sampleFrame} from './renderer.js?v=d90836d59387';
-import {buildPanel,pathValue,pathMeta,writePath} from './panels.js?v=d90836d59387';
-import {MAX_COLORS,MAX_LIGHTS,newLight,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,EXTRA_BASE,BACKDROPS,SHAPE_TRACKS,LIGHT_SOURCES} from './studio-model.js?v=d90836d59387';
-import {BASE,PRESETS,MOODS,META,GROUPS,preset,randomize} from './model.js?v=d90836d59387';
-import {newCreation,material,upgrade,setFullness,motionPreset,surprise,similar,varyCreation,hasMotion,normalizeCreation,sculpt,bloomExample,lightRig,textureStyle} from './creative-model.js?v=d90836d59387';
-import {interpretDescription,applyDescriptionPlan,descriptionCatalog} from './description.js?v=d90836d59387';
-import {PreviewQuality,PREVIEW_MODES} from './preview-quality.js?v=d90836d59387';
-import {cleanPresetName,favoriteName,favoriteDate,uniqueDownloadName,presetDocument,readPreset} from './preset-files.js?v=d90836d59387';
-import {VideoExportSession} from './video-export.js?v=d90836d59387';
-import {RenderSession} from './render-session.js?v=d90836d59387';
-import {usesParticleSurface} from './living-composition.js?v=d90836d59387';
-import {applyLivingStyle} from './living-panel.js?v=d90836d59387';
-import {PARTICLE_META,PARTICLE_STUDIES,particleSphere,particleCreation,varyParticles,varyParticleMotion,FIBER_STYLES,FILM_STYLES,LINK_STYLES,LIVING_STYLES} from './particle-model.js?v=d90836d59387';
-import {mountCreativeAssistant} from './assistant-client.js?v=d90836d59387';
-import {assistantCatalog} from './assistant-model.js?v=d90836d59387';
-import {mountParticlePaths} from './particle-path-interaction.js?v=d90836d59387';
-import {mountParticleForces} from './particle-interaction.js?v=d90836d59387';
-import {renderNavigation,navigationTabs,mountControlSearch} from './inspector-navigation.js?v=d90836d59387';
-import {prepareInspector,captureInspector,mountStudioLayout} from './inspector-ui.js?v=d90836d59387';
+import {composePanel,refinePanel} from './workflow-panels.js?v=00de7b19c225';
+import {mountWorkflowTools} from './workflow-tools.js?v=00de7b19c225';
+import {decorateInspector} from './inspector-state.js?v=00de7b19c225';
+import {GROWTH_DEFAULTS,GROWTH_STUDIES} from './growth-material.js?v=00de7b19c225';
+import {BASE_FORMS} from './base-forms.js?v=00de7b19c225';
+import {integrateStructure,STRUCTURE_DEFAULTS} from './structure-model.js?v=00de7b19c225';
+import {applyVeilLook,applyVeilGeometry,beginVeilTransform,VEIL_LOOKS} from './veil-model.js?v=00de7b19c225';
+import {mountFinishingOrder} from './finishing-order.js?v=00de7b19c225';
+import {mountFinishingAreas} from './finishing-areas.js?v=00de7b19c225';
+import {INTERFERENCE_STYLE} from './studio-model.js?v=00de7b19c225';
+import {FINISH_DEFAULTS,GLYPH_DEFAULTS,EDGE_DEFAULTS,GLITCH_DEFAULTS,TONE_NEUTRAL,PHOTO_NEUTRAL} from './finishing.js?v=00de7b19c225';
+import {mountBodyTracking} from './body-tracking.js?v=00de7b19c225';
+import {mountAudioReactive} from './audio-reactive.js?v=00de7b19c225';
+import {Renderer,fieldAt,sampleFrame} from './renderer.js?v=00de7b19c225';
+import {buildPanel,pathValue,pathMeta,writePath} from './panels.js?v=00de7b19c225';
+import {MAX_COLORS,MAX_LIGHTS,newLight,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,EXTRA_BASE,BACKDROPS,SHAPE_TRACKS,LIGHT_SOURCES} from './studio-model.js?v=00de7b19c225';
+import {BASE,PRESETS,MOODS,META,GROUPS,preset,randomize} from './model.js?v=00de7b19c225';
+import {newCreation,material,upgrade,setFullness,motionPreset,surprise,similar,varyCreation,hasMotion,normalizeCreation,sculpt,bloomExample,lightRig,textureStyle} from './creative-model.js?v=00de7b19c225';
+import {interpretDescription,applyDescriptionPlan,descriptionCatalog} from './description.js?v=00de7b19c225';
+import {PreviewQuality,PREVIEW_MODES} from './preview-quality.js?v=00de7b19c225';
+import {cleanPresetName,favoriteName,favoriteDate,uniqueDownloadName,presetDocument,readPreset} from './preset-files.js?v=00de7b19c225';
+import {VideoExportSession} from './video-export.js?v=00de7b19c225';
+import {RenderSession} from './render-session.js?v=00de7b19c225';
+import {usesParticleSurface} from './living-composition.js?v=00de7b19c225';
+import {applyLivingStyle} from './living-panel.js?v=00de7b19c225';
+import {PARTICLE_META,PARTICLE_STUDIES,particleSphere,particleCreation,varyParticles,varyParticleMotion,FIBER_STYLES,FILM_STYLES,LINK_STYLES,LIVING_STYLES} from './particle-model.js?v=00de7b19c225';
+import {mountCreativeAssistant} from './assistant-client.js?v=00de7b19c225';
+import {assistantCatalog} from './assistant-model.js?v=00de7b19c225';
+import {mountParticlePaths} from './particle-path-interaction.js?v=00de7b19c225';
+import {mountParticleForces} from './particle-interaction.js?v=00de7b19c225';
+import {renderNavigation,navigationTabs,mountControlSearch} from './inspector-navigation.js?v=00de7b19c225';
+import {prepareInspector,captureInspector,mountStudioLayout} from './inspector-ui.js?v=00de7b19c225';
 let inspectorStatus,workflowTools;let panelCache=new Map();
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const paths={photo:'M4 7h4l2-3h4l2 3h4v14H4ZM12 10a4 4 0 1 0 0 8 4 4 0 0 0 0-8',undo:'M3 9h10a7 7 0 0 1 0 14M3 9l5-5M3 9l5 5',redo:'M21 9H11a7 7 0 0 0 0 14M21 9l-5-5M21 9l-5 5',download:'M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5',reset:'M3 11a9 9 0 1 1 2 7M3 4v7h7',frame:'M5 3H3v5m16-5h2v5M3 16v5h5m13-5v5h-5',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',orbit:'M12 3a9 9 0 1 0 9 9M3 12h18M12 3c-5 5-5 13 0 18 4-4 5-10 2-15M18 3h3v3',move:'M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3m12-6 3 3-3 3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1',focus:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8',play:'m9 5 11 7-11 7Z',pause:'M8 5v14M16 5v14',sliders:'M4 5h6m4 0h6M4 12h11m4 0h1M4 19h1m4 0h11M10 2v6m5 1v6M5 16v6',shuffle:'M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 3-2 5-5m3-5c1-1 2-2 4-2h3m-4-4 4 4-4 4',shape:'M12 3c6-2 12 7 8 13-4 8-17 3-17-3 0-4 5-9 9-10Z',material:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M5 7c9-1 5 9 14 10M7 5c8 1 2 11 10 14',palette:'M12 3a9 9 0 0 0 0 18c3 0 3-3 2-4-2-2 0-4 2-3 7 1 5-11-4-11M7 10h.01M10 6h.01M15 6h.01',motion:'M3 8c4-9 8 14 12 5s5-6 6-4M3 16c4-9 8 7 12 3',background:'M3 3h18v18H3ZM3 16l6-7 5 6 3-3 4 4',lock:'M6 10h12v11H6ZM8 10V6a4 4 0 0 1 8 0v4',unlock:'M6 10h12v11H6ZM8 10V6a4 4 0 0 1 8 0'};
@@ -304,7 +304,7 @@ $('#export-dialog').addEventListener('cancel',e=>{if(busy){e.preventDefault();ca
 async function download(){if(busy)return;let rendererFailed=false;const snapshot=structuredClone(state),capturePhase=phase,resumePlaying=playing;setPlaying(false);previewRevision++;cancelled=false;$('#export-cancel').disabled=false;$('#export-message').textContent='';
  try{if(exportType!=='wallpaper'){exportWidth=+$('#export-width').value;exportHeight=+$('#export-height').value;if(!Number.isInteger(exportWidth)||!Number.isInteger(exportHeight)||exportWidth<64||exportHeight<64||exportWidth>4096||exportHeight>4096)throw new Error('Scegli dimensioni intere tra 64 e 4096 pixel.');if(exportType==='video'&&(exportWidth%2||exportHeight%2))throw new Error('Per il video, larghezza e altezza devono essere numeri pari.');updateExportSize(exportWidth,exportHeight)}
  busyUI(true);progress(0,'Preparo la tua creazione…');await awaitIdleStop();await thumbnailQueue;await waitPaint();if(exportType!=='wallpaper'&&renderer&&!renderer.gl.isContextLost())await renderer.waitForGpu({cancelled:()=>cancelled});if(cancelled)return;
- if(exportType==='wallpaper'){const modules=await Promise.all(['./solid-renderer.js?v=d90836d59387','./finishing.js?v=d90836d59387','./renderer.js?v=d90836d59387','./structure-model.js?v=d90836d59387','./base-forms.js?v=d90836d59387','./particle-paths.js?v=d90836d59387','./solid-forces.js?v=d90836d59387','./filament-model.js?v=d90836d59387','./particle-shading.js?v=d90836d59387','./filament-renderer.js?v=d90836d59387','./growth-material.js?v=d90836d59387'].map(url=>fetch(url).then(r=>{if(!r.ok)throw new Error('Impossibile preparare il wallpaper.');return r.text()})));const source=modules[10]+'\nconst {samplePath}=(()=>{'+modules[5].replace(/export /g,'')+';return {samplePath};})();\n'+modules[6].replace(/^import .*;$/gm,'')+'\n'+modules[4]+'\n'+modules[7]+'\n'+modules[3].replace(/^import .*;$/gm,'')+'\n'+modules[0].replace(/^import .*;$/gm,'').replace('export class Renderer','export class SolidRenderer')+'\n'+modules[1]+'\n'+modules[8].replace(/^import .*;$/gm,'')+'\nconst FilamentPass=(()=>{'+modules[9].replace(/^import .*;$/gm,'').replace(/export /g,'')+';return FilamentPass;})();\n'+modules[2].replace(/^import .*;$/gm,'').replace(/^export \{fieldAt,sampleFrame\}.*;$/gm,'');if(cancelled)return;const exported={...snapshot,finishCompare:false,bgMode:snapshot.bgMode==='transparent'?'solid':snapshot.bgMode};const serialized=JSON.stringify(exported).replace(/</g,'\\u003c');const html=`<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prisma Wallpaper</title><style>html,body{margin:0;overflow:hidden;background:${snapshot.background};width:100%;height:100%}canvas{width:100%;height:100%;display:block}</style><canvas id="art"></canvas><script type="module">${source}\nstartWallpaper(document.getElementById('art'),${serialized});<\/script></html>`;save(new Blob([html],{type:'text/html'}),uniqueDownloadName('prisma-wallpaper','html'));toast('Wallpaper HTML scaricato');return}
+ if(exportType==='wallpaper'){const modules=await Promise.all(['./solid-renderer.js?v=00de7b19c225','./finishing.js?v=00de7b19c225','./renderer.js?v=00de7b19c225','./structure-model.js?v=00de7b19c225','./base-forms.js?v=00de7b19c225','./particle-paths.js?v=00de7b19c225','./solid-forces.js?v=00de7b19c225','./filament-model.js?v=00de7b19c225','./particle-shading.js?v=00de7b19c225','./filament-renderer.js?v=00de7b19c225','./growth-material.js?v=00de7b19c225'].map(url=>fetch(url).then(r=>{if(!r.ok)throw new Error('Impossibile preparare il wallpaper.');return r.text()})));const source=modules[10]+'\nconst {samplePath}=(()=>{'+modules[5].replace(/export /g,'')+';return {samplePath};})();\n'+modules[6].replace(/^import .*;$/gm,'')+'\n'+modules[4]+'\n'+modules[7]+'\n'+modules[3].replace(/^import .*;$/gm,'')+'\n'+modules[0].replace(/^import .*;$/gm,'').replace('export class Renderer','export class SolidRenderer')+'\n'+modules[1]+'\n'+modules[8].replace(/^import .*;$/gm,'')+'\nconst FilamentPass=(()=>{'+modules[9].replace(/^import .*;$/gm,'').replace(/export /g,'')+';return FilamentPass;})();\n'+modules[2].replace(/^import .*;$/gm,'').replace(/^export \{fieldAt,sampleFrame\}.*;$/gm,'');if(cancelled)return;const exported={...snapshot,finishCompare:false,bgMode:snapshot.bgMode==='transparent'?'solid':snapshot.bgMode};const serialized=JSON.stringify(exported).replace(/</g,'\\u003c');const html=`<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prisma Wallpaper</title><style>html,body{margin:0;overflow:hidden;background:${snapshot.background};width:100%;height:100%}canvas{width:100%;height:100%;display:block}</style><canvas id="art"></canvas><script type="module">${source}\nstartWallpaper(document.getElementById('art'),${serialized});<\/script></html>`;save(new Blob([html],{type:'text/html'}),uniqueDownloadName('prisma-wallpaper','html'));toast('Wallpaper HTML scaricato');return}
  if(!exportRenderer||exportRenderer.gl.isContextLost()){exportRenderer?.dispose();exportRenderer=new Renderer(document.createElement('canvas'));}const output=exportRenderer.canvas;if(exportWidth>exportRenderer.maxSize||exportHeight>exportRenderer.maxSize)throw new Error(`Questo dispositivo supporta al massimo ${exportRenderer.maxSize} pixel per lato.`);
  if(exportType==='image'){const format=$('#file-format').value;if(format==='jpeg'&&snapshot.bgMode==='transparent')snapshot.bgMode='solid';await exportRenderer.drawAccumulated(snapshot,capturePhase,exportWidth,exportHeight,{samples:16,cancelled:()=>cancelled,onStage:stage=>{if(stage==='preparing')progress(0,'Preparo il rendering dell’immagine…');else if(stage==='preparing-slow')progress(0,'Preparazione ancora in corso · puoi annullare in qualsiasi momento');},progress:f=>progress(f*.8,`Rifinisco l’immagine · ${Math.round(f*100)}%`)});progress(.8,'Preparo il file alla risoluzione scelta…');await waitPaint();if(cancelled)return;const mime=`image/${format}`;const blob=await new Promise(r=>output.toBlob(r,mime,.95));if(cancelled)return;if(!blob)throw new Error('Memoria insufficiente: prova una risoluzione più piccola.');if(blob.type!==mime)throw new Error('Il browser non supporta questo formato. Scegli PNG.');save(blob,uniqueDownloadName(`prisma-${snapshot.seed}-${exportWidth}x${exportHeight}`,format==='jpeg'?'jpg':format));toast('Immagine scaricata');}
  else{

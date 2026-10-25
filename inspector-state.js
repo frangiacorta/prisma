@@ -28,7 +28,7 @@ const EFFECTS=[
  ['filLength','Filamenti su superficie'],['petalAmount','Petali e radici'],['stemAmount','Gambo'],['hole','Foro'],['cut','Ritaglio'],['lobeAmount','Lobi e onde','waves'],
  ['textureDepth','Rilievo di superficie'],['growthAmount','Reazione-diffusione'],['iridescence','Iridescenza'],['colorWaveAmount','Onde di colore'],
  ['finishWarp','Distorsione ricorsiva'],['finishGlass','Vetro ottico'],['finishGlitch','Glitch'],['finishGlyph','Segni e caratteri'],['finishEdge','Contorni'],['finishMosaic','Mosaico'],['finishRgb','Separazione dei colori'],
- ['pShadow','Ombra sul piano'],['pLiving','Pelle'],['pLinks','Fili'],['pTrailCount','Scie'],['pTentacle','Tentacoli del nucleo'],['pOuter','Fasci esterni']
+ ['pSelfShadow','Ombre reciproche'],['pCaustic','Caustica'],['pShadow','Ombra sul piano'],['pLiving','Pelle'],['pLinks','Fili'],['pTrailCount','Scie'],['pTentacle','Tentacoli del nucleo'],['pOuter','Fasci esterni']
 ];
 const active=v=>typeof v==='boolean'?v:typeof v==='number'&&Math.abs(v)>1e-7;
 const equal=(a,b)=>typeof a==='number'&&typeof b==='number'?Math.abs(a-b)<1e-7:a===b;

@@ -1,8 +1,8 @@
-import {META} from './model.js?v=d90836d59387';
-import {PARTICLE_META} from './particle-model.js?v=d90836d59387';
-import {PATH_META} from './particle-paths.js?v=d90836d59387';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=d90836d59387';
-import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=d90836d59387';
+import {META} from './model.js?v=00de7b19c225';
+import {PARTICLE_META} from './particle-model.js?v=00de7b19c225';
+import {PATH_META} from './particle-paths.js?v=00de7b19c225';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=00de7b19c225';
+import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=00de7b19c225';
 
 // Shared by the local assistant and browser. Generated text can only propose these controls.
 const sharedParticleKeys='volume stretchX stretchY stretchZ deform twist waves waveScale scale positionX positionY rotateX rotateY rotateZ duration speed motion metal roughness gloss iridescence transparency emission glow environmentPower environmentAngle environmentCycles gradientAngle gradientScale gradientOffset colorSoftness colorWaveAmount colorWaveBands colorWavePhase colorWaveHeight colorWaveRadius colorWaveSwirl colorWaveWarp bgAngle bgHeight bgSoftness bgWash exposure brightness contrast saturation grain temperature photoTint gamma blacks highlights vignette lensDistortion'.split(' ');
@@ -24,7 +24,7 @@ export function assistantCatalog(s){
    'pSpaceWarp attiva il warp globale; pWarpScale/Cycles/Twist hanno effetto con pSpaceWarp>0. pWarp è invece distorsione del campo organico fine.',
    'pNeural raggruppa fibre, pLife pulsa, pSignal illumina impulsi: metafore artistiche, non simulazioni biologiche.',
    'pSize e pTrailWidth sono pixel a 1080p: .08-.6 finissimi, 1 normale. Colore pColorMode=0 resta assegnato alla stessa particella. 3 è colore nello spazio.',
-   'pOuter=0 spegne fasci esterni. Nessuna sorgente luminosa visibile sui granelli. pShadow attiva ombre proiettate su un piano orizzontale: pShadowHeight ne regola la quota, pShadowSoftness i bordi, pShadowLight=-1 sceglie la luce attiva più intensa oppure usa il suo id. Il piano resta fermo; ombre reciproche e caustiche non sono simulate. Gestisci x/y/z, power, size, color, enabled delle luci.',
+   'pOuter=0 spegne fasci esterni. Nessuna sorgente luminosa visibile sui granelli. pShadow attiva ombre proiettate su un piano orizzontale: pShadowHeight ne regola la quota, pShadowSoftness i bordi, pShadowLight=-1 sceglie la luce attiva più intensa oppure usa il suo id. Il piano resta fermo; pSelfShadow attenua la luce selezionata fra parti della geometria (richiede pLighting>0); pCaustic rifrange la prima superficie verso il piano, richiede transparency>0, refraction>1, metal<1. Veli usano pVeilOpacity. Sono approssimazioni a raggi paralleli con una sola superficie, non ray tracing multirimbalzo. pOpticalExtent delimita la mappa luce; pSelfShadowBias evita autoartefatti. Gestisci x/y/z, power, size, color, enabled delle luci.',
    'Riflessi setosi: pFiberSheen 0-1 orienta la luce sulla tangente 3D delle fibre; pFiberSpread 0-1 va da stretto a diffuso. Richiede fibre visibili, gloss e pLighting sopra 0. Per seta prova .75/.35; per madreperla regola anche iridescence e filmThickness. Conserva palette e forma; non cambia i granelli né crea una mesh tessuta.',
    'Nel motore Particelle. pLivingBlend 0=particelle, .5=insieme, 1=struttura; pSurfaceBind lega granelli e nodi alla superficie; pLivingOcclusion attenua quelli dietro la pelle. pCount e pOpacity devono essere maggiori di zero per i granelli.',
    'Superficie connessa: pLiving 0=spento, 2=attivo. Pelle, fibre e tessitura sono componenti simultanee, non modalità esclusive. pBundleAmount miscela il raggruppamento in fasci. pBundles/pBundleSpread regolano fasci; pStrands/pThreadWidth/pThreadOpacity i fili; pWeft intreccia; pSkin mostra la superficie; pPores/pPoreCount aprono pori. pElastic/pBend resistono alle deformazioni, pVolumeHold conserva il volume con apertura chiusa virtualmente. pSkinOpening apre una coppa; pSkinOffset separa pelle e nucleo; pFoldCount/pFoldDepth danno pieghe; pInflate/pContract respirano e richiudono; pBundleDelay sfalsa zone, pFray sfrangia. Geometria guidata periodica con vincoli XPBD, senza collisioni o inerzia libera. Preservare forma, palette e durata quando si applica una struttura.',

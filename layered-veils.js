@@ -1,6 +1,6 @@
-import {LivingStructures} from './living-structures.js?v=d90836d59387';
-import {VEIL_SOURCE_KEYS,extractVeilSource,makeSourceVeilMesh,updateSourceVeilMesh,sampleLivingVeilSource} from './veil-source.js?v=d90836d59387';
-import {makeVeilMesh,updateVeilMesh} from './veil-geometry.js?v=d90836d59387';
+import {LivingStructures} from './living-structures.js?v=00de7b19c225';
+import {VEIL_SOURCE_KEYS,extractVeilSource,makeSourceVeilMesh,updateSourceVeilMesh,sampleLivingVeilSource} from './veil-source.js?v=00de7b19c225';
+import {makeVeilMesh,updateVeilMesh} from './veil-geometry.js?v=00de7b19c225';
 export class LayeredVeils{
  constructor(owner,common){this.common=common;this.owner=owner;const gl=this.gl=owner.gl;this.program=owner.program(`#version 300 es
 precision highp float;precision highp int;
@@ -35,7 +35,7 @@ void main(){
  vec3 lit=shadeParticle(base,vPosition,n)*(1.-uVeilMaterial.y*rim*.3);
  color=vec4(lit*alpha,alpha);
 }`,null,true);this.vao=gl.createVertexArray();this.buffer=gl.createBuffer();this.indices=gl.createBuffer();this.validBuffer=gl.createBuffer();gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);for(let k=0;k<3;k++){gl.enableVertexAttribArray(k);gl.vertexAttribPointer(k,3,gl.FLOAT,false,36,k*12);}gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indices);gl.bindVertexArray(null);}
- draw(s,phase,options={}){const gl=this.gl,o=this.owner,p=this.program,layers=Math.round(s.pVeilLayers),start=performance.now();if(!o.shadowPass){const low=options.preview&&Math.min(o.width,o.height)<700,columns=low?64:96,rows=low?28:40;if(!s.pVeilFromForm&&(this.mesh?.source||this.mesh?.layers!==layers||this.mesh?.columns!==columns)){this.mesh=makeVeilMesh(layers,columns,rows);this.key='';}
+ draw(s,phase,options={}){const gl=this.gl,o=this.owner,p=this.program,layers=Math.round(s.pVeilLayers),start=performance.now();if(!o.shadowPass&&!o.reuseGeometry){const low=options.preview&&Math.min(o.width,o.height)<700,columns=low?64:96,rows=low?28:40;if(!s.pVeilFromForm&&(this.mesh?.source||this.mesh?.layers!==layers||this.mesh?.columns!==columns)){this.mesh=makeVeilMesh(layers,columns,rows);this.key='';}
  if(s.pVeilFromForm&&s.pVeilSourceKind>0){this.sourceLiving??=new LivingStructures(o,this.common);const base={...s,pLiving:s.pVeilSourceKind===4?3:s.pVeilSourceKind};for(const k of Object.keys(base))if(k.startsWith('pVeil'))delete base[k];this.sourceLiving.sample(base,phase);if(!this.liveMesh||this.liveMesh.layers!==layers||this.liveMesh.columns!==columns){this.liveMesh=makeVeilMesh(layers,columns,rows);this.liveMesh.source=true;this.liveMesh.origins=new Float32Array(this.liveMesh.coords.length);this.liveMesh.valid=new Float32Array(this.liveMesh.coords.length/3).fill(1);}sampleLivingVeilSource(this.liveMesh,this.sourceLiving);this.mesh=this.liveMesh;this.key='';}
 
  else if(s.pVeilFromForm){
@@ -51,7 +51,7 @@ void main(){
  if(key!==this.key){if(s.pVeilFromForm)updateSourceVeilMesh(this.mesh,s,phase);else updateVeilMesh(this.mesh,s,phase);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.bufferData(gl.ARRAY_BUFFER,this.mesh.vertices,gl.DYNAMIC_DRAW);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indices);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.mesh.indices,gl.DYNAMIC_DRAW);this.key=key;}
  }
  gl.bindVertexArray(this.vao);o.settings(p,{...s,transparency:0},phase);o.u(p,'uVeilDetails',this.mesh.detailStart!==undefined?1:0);o.u(p,'uVeilSourceKind',s.pVeilSourceKind||0);o.u(p,'uVeilMorph',s.pVeilFromForm?s.pVeilMorph:1);o.u(p,'uVeilMaterial',s.pVeilOpacity,s.pVeilEdge,s.pVeilFeather,0);o.u(p,'uVeilColor',s.pVeilStyle,s.pVeilLayerColor,s.pVeilCoreRadius>0?s.pVeilCoreDark:0,s.pVeilCoreRadius);
- gl.disable(gl.CULL_FACE);gl.disable(gl.DEPTH_TEST);gl.depthMask(false);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);gl.drawElements(gl.TRIANGLES,this.mesh.indices.length,gl.UNSIGNED_INT,0);gl.depthMask(true);gl.blendFunc(gl.ONE,o.shadowPass?gl.ONE_MINUS_SRC_ALPHA:gl.ONE);this.milliseconds=performance.now()-start;
+ gl.disable(gl.CULL_FACE);gl.disable(gl.DEPTH_TEST);gl.depthMask(false);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);o.opticalDrawState?.();gl.drawElements(gl.TRIANGLES,this.mesh.indices.length,gl.UNSIGNED_INT,0);gl.depthMask(true);gl.blendFunc(gl.ONE,o.shadowPass?gl.ONE_MINUS_SRC_ALPHA:gl.ONE);this.milliseconds=performance.now()-start;
  }
  dispose(){this.sourceLiving?.dispose();const g=this.gl;g.deleteProgram(this.program.program);g.deleteBuffer(this.buffer);g.deleteBuffer(this.indices);g.deleteBuffer(this.validBuffer);g.deleteVertexArray(this.vao);}
 }

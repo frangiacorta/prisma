@@ -1,7 +1,9 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=d90836d59387';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=00de7b19c225';
+import {opticalGLSL} from './particle-optics.js?v=00de7b19c225';
 // Particle shading uses Prisma's parameter names. It does not trace solid glass.
 export const prismaShadingGLSL=`
 ${FILM_PATTERN_GLSL}
+${opticalGLSL}
 uniform vec4 uMaterial,uFinish,uEnvironment,uGradient;
 uniform vec2 uPearl,uFiberLight;
 uniform vec4 uFilmLayer,uParticleFilmMotion,uFilmObject;
@@ -115,6 +117,7 @@ vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
    vec3 power=uLightColors[i]*uLights[i].w/(1.+distance2*.045);
    vec3 specular=pearlFresnel(f0,max(0.,dot(view,halfVector)),irid,rough);
    specular=mix(specular,film,coating);
+   float visibility=opticalVisibility(p,i);if(visibility<1.)power*=visibility;
    lit+=power*(base*diffuse*(1.-metal)*.7*uFinish.z+specular*spec*gloss*2.);
  }
  // Unlit is a usable palette view even with emission at zero.

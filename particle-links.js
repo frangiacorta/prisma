@@ -1,7 +1,7 @@
-import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=d90836d59387';
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=d90836d59387';
-import {guideGLSL} from './particle-path-field.js?v=d90836d59387';
-import {forceBarrierGLSL} from './particle-forces.js?v=d90836d59387';
+import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=00de7b19c225';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=00de7b19c225';
+import {guideGLSL} from './particle-path-field.js?v=00de7b19c225';
+import {forceBarrierGLSL} from './particle-forces.js?v=00de7b19c225';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.
@@ -82,7 +82,7 @@ void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vForceSeed,
   this.prepare(s);if(!this.count)return;
   const o=this.owner,gl=this.gl,p=this.program;o.settings(p,s,phase);o.tex(p,'uSeeds',o.seedTexture,2);
   o.u(p,'uLinks',s.pLinks,s.pLinkWidth,s.pLinkCurve,s.pLinkStretch);
-  gl.bindVertexArray(this.vao);gl.drawArraysInstanced(gl.TRIANGLES,0,48,this.count);
+  gl.bindVertexArray(this.vao);o.opticalDrawState?.();gl.drawArraysInstanced(gl.TRIANGLES,0,48,this.count);
  }
  dispose(){const gl=this.gl;gl.deleteProgram(this.program.program);gl.deleteProgram(this.capture.program);gl.deleteTransformFeedback(this.feedback);gl.deleteBuffer(this.captureBuffer);gl.deleteBuffer(this.buffer);gl.deleteVertexArray(this.vao);}
 }
