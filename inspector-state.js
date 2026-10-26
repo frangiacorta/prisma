@@ -18,7 +18,7 @@ export function simplifyMotion(state,amount=0){
   else if(t.enabled&&Number.isFinite(t.amplitude)&&t.mode!=='cycle')t.amplitude*=amount;
  }
  for(const k of MOTION_ZERO)if(Number.isFinite(state[k]))state[k]*=amount;
- if(amount===0){state.environmentRotate=false;state.finishGlitchAnimate=false;for(const k of ['animateRotation','animateShape','animateColor','animateLight'])state[k]=false;}
+ if(amount===0){state.environmentRotate=false;state.finishGlitchAnimate=false;state.finishScanAnimate=false;for(const k of ['animateRotation','animateShape','animateColor','animateLight'])state[k]=false;}
  return state;
 }
 // An effect is on only when its enabling amount/checkbox is on. Subparameters
@@ -27,7 +27,7 @@ const EFFECTS=[
  ['loopAmount','Curve toroidali e nodi'],['structShell','Guscio e spessore'],['structFibres','Reticolo di fibre'],['structRadial','Suddivisione radiale e strati','structSlices','structLayers'],
  ['filLength','Filamenti su superficie'],['petalAmount','Petali e radici'],['stemAmount','Gambo'],['hole','Foro'],['cut','Ritaglio'],['lobeAmount','Lobi e onde','waves'],
  ['textureDepth','Rilievo di superficie'],['growthAmount','Reazione-diffusione'],['iridescence','Iridescenza'],['colorWaveAmount','Onde di colore'],
- ['finishWarp','Distorsione ricorsiva'],['finishGlass','Vetro ottico'],['finishGlitch','Glitch'],['finishGlyph','Segni e caratteri'],['finishEdge','Contorni'],['finishMosaic','Mosaico'],['finishRgb','Separazione dei colori'],
+ ['finishScan','Linee modulate'],['finishWarp','Distorsione ricorsiva'],['finishGlass','Vetro ottico'],['finishGlitch','Glitch'],['finishGlyph','Segni e caratteri'],['finishEdge','Contorni'],['finishMosaic','Mosaico'],['finishRgb','Separazione dei colori'],
  ['pSelfShadow','Ombre reciproche'],['pCaustic','Caustica'],['pShadow','Ombra sul piano'],['pLiving','Pelle'],['pLinks','Fili'],['pTrailCount','Scie'],['pTentacle','Tentacoli del nucleo'],['pOuter','Fasci esterni']
 ];
 const active=v=>typeof v==='boolean'?v:typeof v==='number'&&Math.abs(v)>1e-7;

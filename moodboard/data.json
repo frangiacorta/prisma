@@ -1,13 +1,15 @@
 {
   "schema": 1,
-  "updated": "2026-10-21",
+  "updated": "2026-10-26",
   "items": [
     {
       "id": "s01-01",
       "name": "Contorni FM",
       "kind": "video",
-      "related": [],
-      "state": "reference",
+      "related": [
+        "roadmap-image-treatments"
+      ],
+      "state": "partial",
       "priority": false,
       "author": "decayingsun",
       "summary": "Busto rosso ricostruito con linee orizzontali; i contorni si deformano in picchi verticali e cambiano densita. Variante compressa del riferimento gia ricevuto il 7 ottobre, non una nuova famiglia di effetti.",
@@ -54,7 +56,7 @@
           "fields": [
             {
               "label": "reuse",
-              "value": "Componente Frequency Modulation di Decaying Sun identificato su Patreon; file e licenza di integrazione non acquisiti. Versione autonoma shader possibile."
+              "value": "Fonti originali Decaying Sun verificate: componente Frequency Modulation distribuito su Patreon. Nessun codice del componente copiato. Implementazione Prisma autonoma della modulazione della fase di linee tramite luminanza."
             }
           ]
         },
@@ -100,6 +102,23 @@
               "value": "Modulazione e sorgente entrambe periodiche; evitare casualità diversa a ogni fotogramma."
             }
           ]
+        },
+        {
+          "title": "Implementazione Prisma v59",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": "v59: Linee modulate su Forme e Particelle. Passo, spessore, rilievo, lettura morbida del chiaroscuro, direzione, soglia, onde, colore e scorrimento ciclico. Mix, ordine, riquadri e preset condivisi con gli altri filtri."
+            },
+            {
+              "label": "limits",
+              "value": "Trattamento 2D della scena composta, non curve 3D. Shader Prisma autonomo: il componente TouchDesigner non è stato acquisito né integrato. Parità visiva e funzionale completa con la reference non dichiarata."
+            },
+            {
+              "label": "acceptance",
+              "value": "Verificati: entrambi i motori, mix zero esatto, riquadri, ordine, tutti i controlli, alpha, loop, preset, PNG, MP4 decodificato, wallpaper offline e pannello mobile. Report: reports/scanlines."
+            }
+          ]
         }
       ],
       "families": [
@@ -107,10 +126,10 @@
         "interaction"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "",
-      "where": "",
-      "platform": "",
-      "next": "",
+      "result": "v59: Linee modulate su Forme e Particelle. Passo, spessore, rilievo, lettura morbida del chiaroscuro, direzione, soglia, onde, colore e scorrimento ciclico. Mix, ordine, riquadri e preset condivisi con gli altri filtri.",
+      "where": "Filtri → Linee modulate · Forme e Particelle",
+      "platform": "Prisma · filtro del risultato",
+      "next": "Valutare il risultato su scene diverse dalla sfera; l’equivalenza completa con il componente originale resta da verificare.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -152,11 +171,16 @@
       "clip": "media/s01-01-study.mp4",
       "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
       "completedProjects": [],
-      "aliases": [],
-      "topics": [
-        "paths"
+      "aliases": [
+        "Linee modulate"
       ],
-      "category": "movement"
+      "topics": [
+        "post"
+      ],
+      "category": "filters",
+      "resultUrl": "../previews/linee-modulate.html",
+      "resultVideo": "../previews/linee-modulate.mp4",
+      "resultImage": "../previews/linee-modulate.png"
     },
     {
       "id": "s01-02",
@@ -15619,12 +15643,14 @@
         "s18-01",
         "prisma-window-depth",
         "prisma-image-particles",
-        "roadmap-optical-glass"
+        "roadmap-optical-glass",
+        "s01-01",
+        "prisma-contour-frequency"
       ],
       "state": "partial",
       "priority": false,
       "author": "",
-      "summary": "Trattamenti finali combinabili su Forme e Particelle: mosaico, RGB, ASCII, contorni, glitch, warp e vetro. Regolazioni colore separate.",
+      "summary": "Trattamenti finali combinabili su Forme e Particelle: mosaico, RGB, ASCII, contorni, glitch, warp, vetro e linee modulate. Regolazioni colore separate.",
       "sources": [
         "https://www.theladybug.app/about/",
         "https://derivative.ca/UserGuide/Resolution_TOP",
@@ -15637,7 +15663,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Il fotogramma composto dai renderer Prisma attraversa la catena riordinabile dei sette trattamenti, saltando quelli spenti. Colore, esposizione, lente e grana restano regolazioni di base applicate dal renderer. Ordine conservato nei preset e condiviso fra anteprima ed export."
+              "value": "Il fotogramma composto attraversa una catena riordinabile di otto filtri; quelli spenti sono saltati. Linee modulate legge il chiaroscuro a una scala regolabile e sposta una trama periodica, poi applica colore, alpha, mix e riquadri."
             }
           ]
         },
@@ -15700,8 +15726,9 @@
                 "Catena condivisa da anteprima, immagini, MP4 e wallpaper; preset precedenti con ordine iniziale invariato",
                 "Glitch: bande, blocchi e colonne; dimensioni irregolari, angolo, ritmo, sfasamento e rinnovo per impulso.",
                 "ASCII: quattro font, set predefiniti o caratteri personalizzati, font mescolati, casualità di caratteri, dimensione, rotazione e posizione.",
-                "Regolazioni separate dal post-processing. Sette filtri riordinabili, con attivazioni, riquadri, parametri e ordine salvati nel preset.",
-                "Warp ricorsivo e vetro ottico applicati alla creazione corrente, sia Forme sia Particelle; loop deterministici e video esportato verificato."
+                "Regolazioni separate dal post-processing. Otto filtri riordinabili, con attivazioni, riquadri, parametri e ordine salvati nel preset.",
+                "Warp ricorsivo e vetro ottico applicati alla creazione corrente, sia Forme sia Particelle; loop deterministici e video esportato verificato.",
+                "v59: Linee modulate su Forme e Particelle. Passo, spessore, rilievo, lettura morbida del chiaroscuro, direzione, soglia, onde, colore e scorrimento ciclico. Mix, ordine, riquadri e preset condivisi con gli altri filtri."
               ]
             },
             {
@@ -15720,7 +15747,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Filtri → Segni e caratteri, Contorni, Glitch",
+      "where": "Filtri → Linee modulate, Segni e caratteri, Contorni, Glitch, Distorsione ricorsiva e Vetro ottico",
       "platform": "",
       "next": "Preset di soli filtri: salvare una combinazione e applicarla ad altre creazioni Prisma mantenendo forma, materiali e movimento.",
       "keep": "",
@@ -21634,8 +21661,10 @@
       "id": "prisma-contour-frequency",
       "name": "Studio tecnico · contorni FM",
       "kind": "tool",
-      "related": [],
-      "state": "reference",
+      "related": [
+        "roadmap-image-treatments"
+      ],
+      "state": "partial",
       "priority": false,
       "author": "decayingsun",
       "summary": "Video di 11.207 secondi: busto rosso su nero formato da linee orizzontali e punti, con forti deformazioni verticali. Didascalia riferita a sperimentazione di frequency modulation in TouchDesigner.",
@@ -21667,16 +21696,33 @@
               "value": "12 fotogrammi distribuiti lungo il video sono stati osservati. Il grafo originale e il segnale di controllo non sono disponibili. Non equivale all'illusione off-axis."
             }
           ]
+        },
+        {
+          "title": "Implementazione Prisma v59",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": "v59: Linee modulate su Forme e Particelle. Passo, spessore, rilievo, lettura morbida del chiaroscuro, direzione, soglia, onde, colore e scorrimento ciclico. Mix, ordine, riquadri e preset condivisi con gli altri filtri."
+            },
+            {
+              "label": "limits",
+              "value": "Trattamento 2D della scena composta, non curve 3D. Shader Prisma autonomo: il componente TouchDesigner non è stato acquisito né integrato. Parità visiva e funzionale completa con la reference non dichiarata."
+            },
+            {
+              "label": "acceptance",
+              "value": "Verificati: entrambi i motori, mix zero esatto, riquadri, ordine, tutti i controlli, alpha, loop, preset, PNG, MP4 decodificato, wallpaper offline e pannello mobile. Report: reports/scanlines."
+            }
+          ]
         }
       ],
       "families": [
         "graphic"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "",
-      "where": "",
-      "platform": "",
-      "next": "",
+      "result": "v59: Linee modulate su Forme e Particelle. Passo, spessore, rilievo, lettura morbida del chiaroscuro, direzione, soglia, onde, colore e scorrimento ciclico. Mix, ordine, riquadri e preset condivisi con gli altri filtri.",
+      "where": "Filtri → Linee modulate · Forme e Particelle",
+      "platform": "Prisma · filtro del risultato",
+      "next": "Valutare il risultato su scene diverse dalla sfera; l’equivalenza completa con il componente originale resta da verificare.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -21686,12 +21732,16 @@
       "assets": [],
       "completedProjects": [],
       "aliases": [
-        "prisma-contour-frequency"
+        "prisma-contour-frequency",
+        "Linee modulate"
       ],
       "topics": [
-        "paths"
+        "post"
       ],
-      "category": "movement"
+      "category": "filters",
+      "resultUrl": "../previews/linee-modulate.html",
+      "resultVideo": "../previews/linee-modulate.mp4",
+      "resultImage": "../previews/linee-modulate.png"
     },
     {
       "id": "prisma-image-particles",

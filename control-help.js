@@ -1,6 +1,8 @@
-import {AUDIO_HELP} from './audio-model.js?v=00de7b19c225';
+import {AUDIO_HELP} from './audio-model.js?v=5c0a82a28740';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ finishScanSmooth:'Legge una versione più morbida del chiaroscuro senza sfocare l’immagine originale. Aumentala per collegare le linee fra i granelli; zero conserva i dettagli più fini.',finishScanMix:'Miscela il trattamento a linee con la scena. Zero conserva esattamente il risultato precedente.',finishScanSpacing:'Distanza fra le linee a 1080 px sul lato corto. Valori piccoli producono una trama più fitta.',finishScanWidth:'Spessore delle linee. Il filtro attenua le frequenze troppo fitte per evitare sfarfallii.',finishScanDepth:'La luminosità sposta la fase delle linee: zero le lascia dritte; valori negativi invertono rilievi e avvallamenti.',finishScanAngle:'Ruota insieme trama e direzione delle onde. Zero produce linee orizzontali.',finishScanThreshold:'Nasconde le linee nelle zone più scure. Abbassala se scompaiono dettagli del soggetto.',finishScanWave:'Aggiunge ondulazioni lungo le linee, più marcate nelle zone luminose.',finishScanFrequency:'Numero di onde lungo una distanza pari al lato corto della scena.',finishScanCycles:'Scorrimenti completi durante il loop. Il segno cambia il verso; zero ferma il filtro. Attiva Anima le linee e premi Riproduci.',
+
  growthAmount:'Miscela gradualmente la crescita con la materia esistente. A zero la superficie resta quella originale. Colori, trasparenza, forma e luci continuano a funzionare.',
  growthVeins:'Passa da zone piene a reti di bordi. I valori intermedi combinano cellule e contorni sulla stessa trama.',
  growthDepth:'Valori negativi danno incisioni, positivi rilievi. Cambia le normali e la luce della materia, senza aggiungere geometria o cambiare il contorno.',

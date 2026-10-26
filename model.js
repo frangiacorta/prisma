@@ -1,9 +1,9 @@
-import {GROWTH_DEFAULTS} from './growth-material.js?v=00de7b19c225';
-import {FINISH_DEFAULTS} from './finishing.js?v=00de7b19c225';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=00de7b19c225';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=00de7b19c225';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=00de7b19c225';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=00de7b19c225';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=5c0a82a28740';
+import {FINISH_DEFAULTS} from './finishing.js?v=5c0a82a28740';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=5c0a82a28740';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=5c0a82a28740';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=5c0a82a28740';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=5c0a82a28740';
 export const BASE = {
  ...PARTICLE_DEFAULTS,engine:'solid',
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
