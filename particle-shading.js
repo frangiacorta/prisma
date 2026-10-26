@@ -1,5 +1,5 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=5c0a82a28740';
-import {opticalGLSL} from './particle-optics.js?v=5c0a82a28740';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=9d7adea7a5ff';
+import {opticalGLSL} from './particle-optics.js?v=9d7adea7a5ff';
 // Particle shading uses Prisma's parameter names. It does not trace solid glass.
 export const prismaShadingGLSL=`
 ${FILM_PATTERN_GLSL}
@@ -8,18 +8,31 @@ uniform vec4 uMaterial,uFinish,uEnvironment,uGradient;
 uniform vec2 uPearl,uFiberLight;
 uniform vec4 uFilmLayer,uParticleFilmMotion,uFilmObject;
 uniform vec3 uFilmRotation,uFilmResponse[24],uFilmWhite;
-uniform vec4 uColorWave;uniform vec4 uColorWave2;uniform float uColorSoftness;
+uniform vec4 uColorLayers,uParticleCore;uniform vec4 uColorWave;uniform vec4 uColorWave2;uniform float uColorSoftness;
 uniform vec3 uPalette[12];uniform highp int uPaletteCount,uLightCount;
 uniform vec4 uLights[8];uniform vec3 uLightColors[8];uniform float uLightSizes[8];
-vec3 prismaPalette(vec3 p,vec3 original){
+vec3 prismaPaletteAt(float t){
+ t=fract(t);
+ float index=t*float(uPaletteCount);int a=int(floor(index)),b=(a+1)%uPaletteCount;
+ float blend=smoothstep(.5-.5*max(.005,min(1.,uColorSoftness)),.5+.5*max(.005,min(1.,uColorSoftness)),fract(index));
+ vec3 color=mix(uPalette[a],uPalette[b],blend);if(uColorSoftness>1.){vec3 mean=vec3(0.);for(int k=0;k<uPaletteCount;k++)mean+=uPalette[k];color=mix(color,mean/float(uPaletteCount),smoothstep(1.,3.,uColorSoftness));}return color;
+}vec3 prismaPaletteBase(vec3 p,vec3 original){
  if(uGradient.w<.5)return original;
  float theta=atan(p.y,p.x),radius=length(p.xy);
  float waves=sin(dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*uColorWave.y+uColorWave.z+p.y*uColorWave2.x+radius*uColorWave2.y+theta*uColorWave2.z+sin(p.x*3.+p.y*2.)*uColorWave2.w);
  float t=fract(.5+dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*.22*uGradient.y+uGradient.z+waves*uColorWave.x*.25);
- float index=t*float(uPaletteCount);int a=int(floor(index)),b=(a+1)%uPaletteCount;
- float blend=smoothstep(.5-.5*max(.005,min(1.,uColorSoftness)),.5+.5*max(.005,min(1.,uColorSoftness)),fract(index));
- vec3 color=mix(uPalette[a],uPalette[b],blend);if(uColorSoftness>1.){vec3 mean=vec3(0.);for(int k=0;k<uPaletteCount;k++)mean+=uPalette[k];color=mix(color,mean/float(uPaletteCount),smoothstep(1.,3.,uColorSoftness));}return color;
+ return prismaPaletteAt(t);
 }
+
+vec3 prismaColorLayers(vec3 p,vec3 base){
+ if(uColorLayers.x<=0.||uGradient.w<.5)return base;
+ float t=dot(p,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z;
+ vec3 a=prismaPaletteAt(t+p.z*uColorLayers.y*.35+uColorLayers.z);
+ vec3 b=prismaPaletteAt(t-p.z*uColorLayers.y*.21+uColorLayers.z+.37);
+ return mix(base,mix(a,a*b*1.6,uColorLayers.w),uColorLayers.x);
+}
+vec3 prismaPalette(vec3 p,vec3 original){return prismaColorLayers(p,prismaPaletteBase(p,original));}
+
 vec3 reflectedEnvironment(vec3 r,float rough){
  r.xz=mat2(cos(uEnvironment.y),-sin(uEnvironment.y),sin(uEnvironment.y),cos(uEnvironment.y))*r.xz;
  // The studio is neutral so it can be used to judge a chosen palette.
@@ -49,6 +62,17 @@ vec3 pearlFresnel(vec3 f0,float cosine,float irid,float rough){
 // Reuses Prisma Forme's soapFilm air/water/air interference and its 24 CIE
 // samples. This is a coating on the existing particles, not a refracting mesh.
 mat2 filmRotate(float a){return mat2(cos(a),-sin(a),sin(a),cos(a));}
+float particleCoreShade(vec3 world){
+ if(uParticleCore.x<=0.)return 1.;
+ vec3 local=(world-vec3(uFilmObject.yz,0.))/max(.001,uFilmObject.x);
+ local.xz=filmRotate(-uFilmRotation.y)*local.xz;
+ local.yz=filmRotate(-uFilmRotation.x)*local.yz;
+ local.xy=filmRotate(-uFilmRotation.z)*local.xy;
+ float radius=length(local.xy/max(vec2(.001),uParticleCore.zw));
+ float weight=1.-smoothstep(0.,max(.001,uParticleCore.y),radius);
+ // Apply after lighting: metallic coating and emission must not erase the dark center.
+ return pow(max(0.,1.-uParticleCore.x*weight),3.);
+}
 vec3 filmRGB(vec3 xyz){return mat3(3.2406,-.9689,.0557,-1.5372,1.8758,-.204,-.4986,.0415,1.057)*xyz;}
 vec3 livingFilm(vec3 world,float facing,float rough){
  vec3 local=(world-vec3(uFilmObject.yz,0.))/max(.001,uFilmObject.x);
@@ -121,7 +145,7 @@ vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
    lit+=power*(base*diffuse*(1.-metal)*.7*uFinish.z+specular*spec*gloss*2.);
  }
  // Unlit is a usable palette view even with emission at zero.
- return mix(base*uFinish.z,lit,uFinish.y);
+ return mix(base*uFinish.z,lit,uFinish.y)*particleCoreShade(p);
 }
 vec3 shadeParticle(vec3 base,vec3 p,vec3 n){return shadeMatter(base,p,n,vec3(0.),0.);}
 vec3 shadeFibre(vec3 base,vec3 p,vec3 n,vec3 direction){

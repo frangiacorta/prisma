@@ -1,8 +1,9 @@
-import {packPathCurves,PATH_SAMPLES} from './particle-paths.js?v=5c0a82a28740';
+import {packPathCurves,PATH_SAMPLES} from './particle-paths.js?v=9d7adea7a5ff';
 
 export const guideGLSL=`
 uniform highp sampler2D uGuideCurves,uGuideMap;
 uniform highp int uGuideCount;uniform bool uGuideBaked;
+uniform vec2 uGuideScreenSize;uniform float uGuideDrawPass;
 uniform vec4 uGuideBounds[4],uGuideA[4],uGuideB[4],uGuideC[4],uGuideD[4];
 vec4 guideCurve(int row,float progress){
  bool closed=uGuideC[row].w>.5;float f=(closed?fract(progress):clamp(progress,0.,1.))*(closed?128.:127.);
@@ -20,10 +21,11 @@ vec4 nearestGuide(int row,vec2 p){
   return mix(mix(texelFetch(uGuideMap,ivec2(a.x,a.y+y),0),texelFetch(uGuideMap,ivec2(b.x,a.y+y),0),f.x),mix(texelFetch(uGuideMap,ivec2(a.x,b.y+y),0),texelFetch(uGuideMap,ivec2(b.x,b.y+y),0),f.x),f.y);
  }
  // Same behavior on GPUs without floating point render targets; slower fallback.
- vec4 best=vec4(0.,0.,0.,1e10);bool closed=uGuideC[row].w>.5;
+ vec4 best=vec4(0.,0.,0.,1e10);bool closed=uGuideC[row].w>.5,inside=false;
  for(int j=0;j<128;j++){if(!closed&&j==127)break;vec2 a=texelFetch(uGuideCurves,ivec2(j,row),0).xy,b=texelFetch(uGuideCurves,ivec2((j+1)%128,row),0).xy;
+  if((a.y>p.y)!=(b.y>p.y))if(p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)inside=!inside;
   vec2 v=b-a;float t=clamp(dot(p-a,v)/max(dot(v,v),1e-9),0.,1.);vec2 q=a+v*t;float d=length(p-q);if(d<best.w)best=vec4(q,(float(j)+t)/(closed?128.:127.),d);
- }return best;
+ }if(uGuideD[row].z>1.5&&closed&&inside)best.w=-best.w;return best;
 }
 float guideHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float guideParticipation(int i,vec4 r,float phase){
@@ -50,7 +52,41 @@ vec3 lockGuidePosition(vec3 p,vec4 r,float phase){
   float participation=guideParticipation(i,r,phase);if(participation>0.)return mix(p,guideDestination(i,r,phase),participation);
  }return p;
 }
-float guideCore(int i,vec4 r,float phase){return uGuideD[i].z>.5?uGuideA[i].z*smoothstep(1.2,3.,uGuideA[i].y)*guideParticipation(i,r,phase):0.;}
+float guideCore(int i,vec4 r,float phase){return uGuideD[i].z>.5&&uGuideD[i].z<1.5?uGuideA[i].z*smoothstep(1.2,3.,uGuideA[i].y)*guideParticipation(i,r,phase):0.;}
+float perimeterDistance(int i,vec2 p){
+ vec4 box=uGuideBounds[i];vec2 uv=(p-box.xy)/box.zw;vec4 near=nearestGuide(i,p);
+ return any(lessThan(uv,vec2(0.)))||any(greaterThan(uv,vec2(1.)))?length(p-near.xy):near.w;
+}
+vec2 perimeterPlane(vec3 p,int i){return p.xy*(7.5-uGuideA[i].w)/max(2.,7.5-p.z);}
+bool outsideGuidePerimeter(vec3 p,vec4 r,float phase){
+ for(int i=0;i<4;i++){if(i>=uGuideCount)break;if(uGuideD[i].z<1.5||uGuideC[i].w<.5||uGuideA[i].y<2.99999||guideParticipation(i,r,phase)<.99999)continue;
+  if(perimeterDistance(i,perimeterPlane(p,i))>0.)return true;
+ }return false;
+}
+// The perimeter is a boundary in the view, extruded through depth along camera rays.
+// Test actual fragments as well as centers, so large sprites and thick ribbons cannot leak.
+vec3 guidePixelPosition(vec2 pixel,vec3 world){
+ if(uGuideDrawPass>.5)return world;
+ return vec3((pixel/uGuideScreenSize*2.-1.)*vec2(uGuideScreenSize.x/uGuideScreenSize.y,1.)*max(2.,7.5-world.z)/2.6,world.z);
+}
+bool outsideGuidePixel(vec2 pixel,vec3 world,vec4 r,float phase){
+ if(uGuideDrawPass>.5)return outsideGuidePerimeter(world,r,phase);
+ for(int i=0;i<4;i++){if(i>=uGuideCount)break;if(uGuideD[i].z<1.5||uGuideC[i].w<.5||uGuideA[i].y<2.99999||guideParticipation(i,r,phase)<.99999)continue;
+  vec2 p=(pixel/uGuideScreenSize*2.-1.)*vec2(uGuideScreenSize.x/uGuideScreenSize.y,1.)*(7.5-uGuideA[i].w)/2.6;
+  if(perimeterDistance(i,p)>0.)return true;
+ }return false;
+}
+vec3 containGuidePosition(vec3 p,vec4 r,float phase){
+ for(int pass=0;pass<3;pass++)for(int i=0;i<4;i++){if(i>=uGuideCount)break;if(uGuideD[i].z<1.5||uGuideC[i].w<.5)continue;
+  float gain=smoothstep(0.,3.,uGuideA[i].y)*guideParticipation(i,r,phase);if(gain<=0.)continue;
+  vec2 plane=perimeterPlane(p,i);if(perimeterDistance(i,plane)<=0.)continue;
+  vec4 near=nearestGuide(i,plane),curve=guideCurve(i,near.z);vec2 n=vec2(-curve.w,curve.z);
+  float pad=uGuideBaked?length(uGuideBounds[i].zw)/256.*1.5:.002;
+  if(perimeterDistance(i,near.xy+n*pad)>0.)n=-n;
+  vec2 target=near.xy+n*pad;
+  p.xy=mix(p.xy,target*max(2.,7.5-p.z)/(7.5-uGuideA[i].w),pass==0?gain:step(.99999,gain));
+ }return p;
+}
 float guideClearance(int i,vec2 p){
  vec4 box=uGuideBounds[i];vec2 uv=(p-box.xy)/box.zw;
  if(any(lessThan(uv,vec2(0.)))||any(greaterThan(uv,vec2(1.))))return 1e10;
@@ -85,6 +121,7 @@ vec3 guidePosition(vec3 base,vec4 r,float phase){
  vec3 change=vec3(0.);float total=0.;
  for(int i=0;i<4;i++){if(i>=uGuideCount)break;
   vec4 a=uGuideA[i],b=uGuideB[i],c=uGuideC[i],d=uGuideD[i],box=uGuideBounds[i];
+  if(d.z>1.5)continue;
   if(guideHash(r.xy+vec2(d.w*.017,4.13))>=a.x||a.y<=0.)continue;
   vec2 uv=(base.xy-box.xy)/box.zw;if(any(lessThan(uv,vec2(0.)))||any(greaterThan(uv,vec2(1.))))continue;
   vec4 near=nearestGuide(i,base.xy);float distance=length(vec2(near.w,base.z-a.w));
@@ -118,11 +155,12 @@ const vertex=`#version 300 es
 void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2.-1.,0.,1.);}`;
 const fragment=`#version 300 es
 precision highp float;precision highp sampler2D;
-uniform sampler2D uCurve;uniform int uRow;uniform bool uClosed;uniform vec4 uBounds;out vec4 color;
+uniform sampler2D uCurve;uniform int uRow;uniform bool uClosed,uContain;uniform vec4 uBounds;out vec4 color;
 void main(){vec2 p=uBounds.xy+(gl_FragCoord.xy-vec2(0.,float(uRow)*256.))/256.*uBounds.zw;vec4 best=vec4(0.,0.,0.,1e10);
- for(int i=0;i<128;i++){if(!uClosed&&i==127)break;vec2 a=texelFetch(uCurve,ivec2(i,uRow),0).xy,b=texelFetch(uCurve,ivec2((i+1)%128,uRow),0).xy,v=b-a;
+ bool inside=false;for(int i=0;i<128;i++){if(!uClosed&&i==127)break;vec2 a=texelFetch(uCurve,ivec2(i,uRow),0).xy,b=texelFetch(uCurve,ivec2((i+1)%128,uRow),0).xy,v=b-a;
+  if((a.y>p.y)!=(b.y>p.y))if(p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x)inside=!inside;
   float t=clamp(dot(p-a,v)/max(dot(v,v),1e-9),0.,1.);vec2 q=a+v*t;float d=length(p-q);if(d<best.w)best=vec4(q,(float(i)+t)/(uClosed?128.:127.),d);
- }color=best;}`;
+ }if(uContain&&uClosed&&inside)best.w=-best.w;color=best;}`;
 
 // A distance atlas is rebuilt only when a guide's geometry/influence changes.
 // Every particle and every fibre sample then uses four texture reads, not 128 segments.
@@ -130,7 +168,7 @@ export class GuideField{
  constructor(renderer){this.r=renderer;this.gl=renderer.gl;this.key=null;this.paths=[];this.bounds=[];this.program=renderer.float?renderer.program(vertex,fragment):null;}
  update(state){
   const paths=(state.forcePaths||[]).filter(p=>p.enabled&&p.points?.length>=2).slice(0,4);this.paths=paths;
-  const key=JSON.stringify(paths.map(p=>[p.points,p.closed,p.radius]));if(this.key===key)return;this.key=key;
+  const key=JSON.stringify(paths.map(p=>[p.points,p.closed,p.radius,p.mode]));if(this.key===key)return;this.key=key;
   const r=this.r,gl=this.gl,{data,bounds}=packPathCurves(paths);this.bounds=bounds;
   if(!this.curves)this.curves=gl.createTexture();gl.activeTexture(gl.TEXTURE4);gl.bindTexture(gl.TEXTURE_2D,this.curves);
   gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,PATH_SAMPLES,4,0,gl.RGBA,gl.FLOAT,data);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.NEAREST);
@@ -138,7 +176,7 @@ export class GuideField{
   if(!this.atlas)this.atlas=r.target(256,1024);gl.activeTexture(gl.TEXTURE5);gl.bindTexture(gl.TEXTURE_2D,this.atlas.texture);
   gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,256,1024,0,gl.RGBA,gl.FLOAT,null);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.NEAREST);
   gl.bindFramebuffer(gl.FRAMEBUFFER,this.atlas.fbo);gl.disable(gl.BLEND);gl.bindVertexArray(r.empty);gl.useProgram(this.program.program);r.tex(this.program,'uCurve',this.curves,4);
-  paths.forEach((p,i)=>{gl.viewport(0,i*256,256,256);gl.uniform1i(r.loc(this.program,'uRow'),i);gl.uniform1i(r.loc(this.program,'uClosed'),p.closed?1:0);r.u(this.program,'uBounds',...bounds[i]);gl.drawArrays(gl.TRIANGLES,0,3);});
+  paths.forEach((p,i)=>{gl.viewport(0,i*256,256,256);gl.uniform1i(r.loc(this.program,'uRow'),i);gl.uniform1i(r.loc(this.program,'uClosed'),p.closed?1:0);gl.uniform1i(r.loc(this.program,'uContain'),p.mode==='contain'?1:0);r.u(this.program,'uBounds',...bounds[i]);gl.drawArrays(gl.TRIANGLES,0,3);});
  }
  bind(program){
   const r=this.r,gl=this.gl,ps=this.paths;gl.uniform1i(r.loc(program,'uGuideCount'),ps.length);gl.uniform1i(r.loc(program,'uGuideBaked'),this.program?1:0);
@@ -148,7 +186,7 @@ export class GuideField{
   gl.uniform4fv(r.loc(program,'uGuideA'),ps.flatMap(p=>[p.coverage/100,p.strength,p.radius,p.z]));
   gl.uniform4fv(r.loc(program,'uGuideB'),ps.flatMap(p=>[p.adherence,0,p.orbitRadius,p.cycles]));
   gl.uniform4fv(r.loc(program,'uGuideC'),ps.flatMap(p=>[p.orbitTurns,p.release/100,p.softness,p.closed?1:0]));
-  gl.uniform4fv(r.loc(program,'uGuideD'),ps.flatMap(p=>[p.direction,p.phase,p.mode==='avoid'?1:0,p.id]));
+  gl.uniform4fv(r.loc(program,'uGuideD'),ps.flatMap(p=>[p.direction,p.phase,p.mode==='contain'?2:p.mode==='avoid'?1:0,p.id]));
  }
  dispose(){const gl=this.gl;if(this.curves)gl.deleteTexture(this.curves);if(this.atlas){gl.deleteTexture(this.atlas.texture);gl.deleteFramebuffer(this.atlas.fbo);}if(this.program)gl.deleteProgram(this.program.program);}
 }

@@ -5,7 +5,7 @@ export const MOTION_ZERO=['growthFlow','filmFlow','filmSwirl','pTravel','pVortex
 export function simplifyShape(state,amount=0){
  const keys=[...SHAPE_ZERO,...(state.engine==='particles'?PARTICLE_ZERO:[])];
  for(const k of keys)if(Number.isFinite(state[k]))state[k]*=amount;
- for(const k of ['volume','stretchX','stretchY','stretchZ'])if(Number.isFinite(state[k]))state[k]=1+(state[k]-1)*amount;
+ for(const k of ['volume','stretchX','stretchY','stretchZ',...(state.engine==='particles'?['pGrainSpacing','pGroupSpacing']:[])])if(Number.isFinite(state[k]))state[k]=1+(state[k]-1)*amount;
  if(amount===0){state.pLiving=0;state.pLivingBlend=0;state.pSurfaceBind=0;}
  if(state.engine==='particles'&&amount===0){state.pTrailCount=0;state.pLinks=0;state.pFill=1;state.pSymmetry=1;}
  for(const [k,t] of Object.entries(state.motions||{}))if(keys.includes(k)||['volume','stretchX','stretchY','stretchZ'].includes(k)){if(amount===0)t.enabled=false;else if(Number.isFinite(t.amplitude))t.amplitude*=amount;}
@@ -26,7 +26,7 @@ export function simplifyMotion(state,amount=0){
 const EFFECTS=[
  ['loopAmount','Curve toroidali e nodi'],['structShell','Guscio e spessore'],['structFibres','Reticolo di fibre'],['structRadial','Suddivisione radiale e strati','structSlices','structLayers'],
  ['filLength','Filamenti su superficie'],['petalAmount','Petali e radici'],['stemAmount','Gambo'],['hole','Foro'],['cut','Ritaglio'],['lobeAmount','Lobi e onde','waves'],
- ['textureDepth','Rilievo di superficie'],['growthAmount','Reazione-diffusione'],['iridescence','Iridescenza'],['colorWaveAmount','Onde di colore'],
+ ['structCoreDark','Nucleo scuro'],['colorLayers','Strati di colore'],['textureDepth','Rilievo di superficie'],['growthAmount','Reazione-diffusione'],['iridescence','Iridescenza'],['colorWaveAmount','Onde di colore'],
  ['finishScan','Linee modulate'],['finishWarp','Distorsione ricorsiva'],['finishGlass','Vetro ottico'],['finishGlitch','Glitch'],['finishGlyph','Segni e caratteri'],['finishEdge','Contorni'],['finishMosaic','Mosaico'],['finishRgb','Separazione dei colori'],
  ['pSelfShadow','Ombre reciproche'],['pCaustic','Caustica'],['pShadow','Ombra sul piano'],['pLiving','Pelle'],['pLinks','Fili'],['pTrailCount','Scie'],['pTentacle','Tentacoli del nucleo'],['pOuter','Fasci esterni']
 ];
@@ -44,7 +44,7 @@ export function decorateInspector({root,state,baseline,tab,edit}){
   reset.onclick=()=>edit(s=>assign(s,key,base),'Parametro ripristinato');host.querySelector('.param-line')?.append(reset);
   rangeRows.push({host,el,key,base,reset});
  }
- const flags=[...root.querySelectorAll('[data-check],[data-path-check],[data-particle-select],[data-path-select]')].map(el=>({el,key:el.dataset.check||el.dataset.pathCheck||el.dataset.particleSelect||el.dataset.pathSelect,host:el.closest('.check,.field')})).filter(r=>r.host&&at(baseline,r.key)!==undefined);
+ const flags=[...root.querySelectorAll('[data-check],[data-path-check],[data-particle-select],[data-path-select],[data-finish-select]')].map(el=>({el,key:el.dataset.check||el.dataset.pathCheck||el.dataset.particleSelect||el.dataset.pathSelect||el.dataset.finishSelect,host:el.closest('.check,.field')})).filter(r=>r.host&&at(baseline,r.key)!==undefined);
  const toolbar=document.createElement('div');toolbar.className='inspector-overview';
  const heading=document.createElement('div');heading.className='overview-heading';heading.innerHTML='<strong>In uso</strong>';
  const toggle=document.createElement('button');toggle.type='button';toggle.id='controls-changed';toggle.className='quiet';toggle.textContent='Solo modificati';toggle.setAttribute('aria-pressed',String(root.classList.contains('only-changed')));toggle.onclick=()=>{const on=root.classList.toggle('only-changed');toggle.setAttribute('aria-pressed',String(on));if(on)for(const d of root.querySelectorAll('details.has-changes'))d.open=true;};heading.append(toggle);toolbar.append(heading);

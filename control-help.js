@@ -1,4 +1,4 @@
-import {AUDIO_HELP} from './audio-model.js?v=5c0a82a28740';
+import {AUDIO_HELP} from './audio-model.js?v=9d7adea7a5ff';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishScanSmooth:'Legge una versione più morbida del chiaroscuro senza sfocare l’immagine originale. Aumentala per collegare le linee fra i granelli; zero conserva i dettagli più fini.',finishScanMix:'Miscela il trattamento a linee con la scena. Zero conserva esattamente il risultato precedente.',finishScanSpacing:'Distanza fra le linee a 1080 px sul lato corto. Valori piccoli producono una trama più fitta.',finishScanWidth:'Spessore delle linee. Il filtro attenua le frequenze troppo fitte per evitare sfarfallii.',finishScanDepth:'La luminosità sposta la fase delle linee: zero le lascia dritte; valori negativi invertono rilievi e avvallamenti.',finishScanAngle:'Ruota insieme trama e direzione delle onde. Zero produce linee orizzontali.',finishScanThreshold:'Nasconde le linee nelle zone più scure. Abbassala se scompaiono dettagli del soggetto.',finishScanWave:'Aggiunge ondulazioni lungo le linee, più marcate nelle zone luminose.',finishScanFrequency:'Numero di onde lungo una distanza pari al lato corto della scena.',finishScanCycles:'Scorrimenti completi durante il loop. Il segno cambia il verso; zero ferma il filtro. Attiva Anima le linee e premi Riproduci.',
@@ -131,6 +131,7 @@ const HELP={
  pPores:'Ritaglia aperture nella membrana lasciando collegati i bordi. A zero la superficie è continua.',
  pPoreCount:'Quanti pori distribuire sulla superficie; agisce con Apertura dei pori sopra zero.',
  pLinks:'Visibilità dei fili che collegano particelle vicine. A zero le connessioni sono spente.',
+ pGrainSpacing:'Dispersione dei granelli attorno al centro del loro gruppo. 1 conserva la distribuzione originale; non garantisce collisioni o una distanza minima durante il moto.',pGroupSpacing:'Allontana o avvicina i centri dei gruppi senza cambiare la dispersione interna.',pDistributionCells:'Suddivisione della distribuzione iniziale. Cambia i gruppi quando dispersione o distanza sono diverse da 1.',pLinkNodeSize:'Diametro dei granelli usati come nodi dei legami, da 0 a 128 px a 1080p. 0 usa il diametro comune. Richiede granelli visibili e connessioni attive.',
  pLinkNodes:'Da 50 a 4000 punti usati per la trama, indipendenti dai granelli visibili. Più nodi creano una rete più fitta.',
  pLinkReach:'Distanza massima fra i punti nel nucleo iniziale, prima del movimento. Cambiarla ricostruisce i legami.',
  pLinkNeighbors:'Ogni nodo sceglie da 1 a 5 vicini. Può ricevere altri legami dai nodi che lo scelgono.',

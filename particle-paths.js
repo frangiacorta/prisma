@@ -33,7 +33,7 @@ export function normalizeForcePaths(raw){
   const closed=!!item.closed;if(closed&&points.length>2&&dist(points[0],points.at(-1))<1e-4)points.pop();
   if(points.length<2)continue;if(points.length>MAX_PATH_KNOTS)points=resamplePolyline(points,MAX_PATH_KNOTS,closed);
   let id=Number.isSafeInteger(item.id)&&item.id>0&&item.id<=999999?item.id:1;while(ids.has(id))id++;ids.add(id);
-  const p={...PATH_DEFAULTS,id,points,closed:closed&&points.length>2,mode:item.mode==='avoid'?'avoid':'follow',enabled:item.enabled!==false,direction:item.direction===-1?-1:1};
+  const p={...PATH_DEFAULTS,id,points,closed:closed&&points.length>2,mode:item.mode==='contain'&&closed&&points.length>2?'contain':(item.mode==='avoid'||item.mode==='contain')?'avoid':'follow',enabled:item.enabled!==false,direction:item.direction===-1?-1:1};
   for(const key of Object.keys(PATH_META))if(Number.isFinite(item[key]))p[key]=pathValue(key,item[key]);
   out.push(p);if(out.length===MAX_FORCE_PATHS)break;
  }return out;

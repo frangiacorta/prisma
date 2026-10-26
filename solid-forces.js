@@ -1,10 +1,10 @@
-import {samplePath} from './particle-paths.js?v=5c0a82a28740';
+import {samplePath} from './particle-paths.js?v=9d7adea7a5ff';
 // Manual sculpting fields live in scene space, independently of the object transform.
 // The inverse map keeps the original material, topology and animation composable.
-export const hasSolidForces=s=>(s.forcePoints||[]).some(p=>p.enabled&&(Math.abs(p.strength)>1e-6||Math.abs(p.swirl)>1e-6))||(s.forcePaths||[]).some(p=>p.enabled&&p.strength>1e-6);
+export const hasSolidForces=s=>(s.forcePoints||[]).some(p=>p.enabled&&(Math.abs(p.strength)>1e-6||Math.abs(p.swirl)>1e-6))||(s.forcePaths||[]).some(p=>p.enabled&&p.mode!=='contain'&&p.strength>1e-6);
 export function solidForceSlope(s){return (s.forcePoints||[]).filter(p=>p.enabled).reduce((n,p)=>n+Math.abs(p.strength)*.6+Math.abs(p.swirl||0)*.6,0)+(s.forcePaths||[]).filter(p=>p.enabled).reduce((n,p)=>n+p.strength*.6,0);}
 const solidCurveCache=new WeakMap();
-function solidCurves(s){const paths=(s.forcePaths||[]).filter(p=>p.enabled&&p.strength>1e-6).slice(0,4);return paths.map(p=>{const key=JSON.stringify([p.points,p.closed]);let cached=solidCurveCache.get(p);if(cached?.key!==key){cached={key,points:samplePath(p,32)};solidCurveCache.set(p,cached);}return {path:p,points:cached.points};});}
+function solidCurves(s){const paths=(s.forcePaths||[]).filter(p=>p.enabled&&p.mode!=='contain'&&p.strength>1e-6).slice(0,4);return paths.map(p=>{const key=JSON.stringify([p.points,p.closed]);let cached=solidCurveCache.get(p);if(cached?.key!==key){cached={key,points:samplePath(p,32)};solidCurveCache.set(p,cached);}return {path:p,points:cached.points};});}
 function solidClosest(points,closed,p,z){let best=Infinity,q;for(let i=0;i<(closed?points.length:points.length-1);i++){const a=points[i],b=points[(i+1)%points.length],dx=b.x-a.x,dy=b.y-a.y,t=Math.max(0,Math.min(1,((p[0]-a.x)*dx+(p[1]-a.y)*dy)/Math.max(1e-9,dx*dx+dy*dy))),v=[a.x+t*dx,a.y+t*dy,z],d=Math.hypot(...p.map((x,k)=>x-v[k]));if(d<best){best=d;q=v;}}return q;}
 export function solidForceMap(s,p){let delta=[0,0,0],barrier=-1e6;const fields=(s.forcePoints||[]).filter(f=>f.enabled).slice(0,8).map(f=>({center:[f.x,f.y,f.z],...f}));for(const {path,points} of solidCurves(s))fields.push({center:solidClosest(points,path.closed,p,path.z),radius:path.radius,strength:path.strength*(path.mode==='avoid'?-1:1),swirl:0});
  for(const f of fields){const v=p.map((x,k)=>x-f.center[k]),r=Math.max(.05,f.radius),d=Math.hypot(...v),t=Math.max(0,1-d/r),w=t*t*(3-2*t),power=Math.max(-3,Math.min(3,f.strength));for(let k=0;k<3;k++)delta[k]+=v[k]*power*w*.38;delta[0]+=-v[1]*(f.swirl||0)*w*.4;delta[1]+=v[0]*(f.swirl||0)*w*.4;if(power<-1.2){const x=Math.min(1,(-power-1.2)/1.8);barrier=Math.max(barrier,r*x*x*(3-2*x)-d);}}

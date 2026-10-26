@@ -14,10 +14,10 @@ export function normalizeFinishOrder(raw){const valid=Array.isArray(raw)?raw.fil
 FINISH_DEFAULTS.finishOrder=[...FINISH_ORDER];
 export const EDGE_DEFAULTS={finishEdge:false,finishEdgeWidth:2,finishEdgeThreshold:.08,finishEdgeSoftness:.15,finishEdgeColor:'#d7ff91',finishEdgeSource:false,finishEdgeOnly:false,finishEdgeMix:1,finishRegionEdge:true};
 export const GLITCH_DEFAULTS={finishGlitch:false,finishGlitchAmount:65,finishGlitchBand:48,finishGlitchCoverage:.6,finishGlitchSplit:10,finishGlitchMix:1,finishGlitchAnimate:true,finishGlitchCycles:4,finishGlitchDuty:.6,finishGlitchSoftness:.35,finishGlitchSeed:42,finishRegionGlitch:true};
-Object.assign(GLITCH_DEFAULTS,{finishGlitchShape:0,finishGlitchWidth:180,finishGlitchSizeRandom:0,finishGlitchRhythm:0,finishGlitchScatter:0,finishGlitchRenew:0,finishGlitchAngle:0});
-Object.assign(FINISH_META,{finishGlitchShape:['Struttura glitch',0,2,1],finishGlitchWidth:['Larghezza blocchi',8,1080,1],finishGlitchSizeRandom:['Variazione dimensioni',0,1,.01],finishGlitchRhythm:['Irregolarità del ritmo',0,1,.01],finishGlitchScatter:['Sfasamento tra zone',0,1,.01],finishGlitchRenew:['Rinnovo a ogni impulso',0,1,.01],finishGlitchAngle:['Direzione delle zone',-180,180,1]});
+Object.assign(GLITCH_DEFAULTS,{finishGlitchShape:0,finishGlitchWidth:180,finishGlitchSizeRandom:0,finishGlitchRhythm:0,finishGlitchScatter:0,finishGlitchRenew:0,finishGlitchAngle:0,finishGlitchDirectionRandom:0,finishGlitchCross:1,finishGlitchFlash:false,finishGlitchFlashMs:30});
+Object.assign(FINISH_META,{finishGlitchFlashMs:['Durata flash · ms',5,500,1],finishGlitchDirectionRandom:['Variazione direzione',0,1,.01],finishGlitchCross:['Intensità verticale',0,1,.01],finishGlitchShape:['Struttura glitch',0,3,1],finishGlitchWidth:['Larghezza blocchi',8,1080,1],finishGlitchSizeRandom:['Variazione dimensioni',0,1,.01],finishGlitchRhythm:['Irregolarità del ritmo',0,1,.01],finishGlitchScatter:['Sfasamento tra zone',0,1,.01],finishGlitchRenew:['Rinnovo a ogni impulso',0,1,.01],finishGlitchAngle:['Direzione delle zone',-180,180,1]});
 Object.assign(FINISH_DEFAULTS,EDGE_DEFAULTS,GLITCH_DEFAULTS);
-Object.assign(FINISH_META,{finishEdgeWidth:['Spessore contorni',.5,12,.1],finishEdgeThreshold:['Soglia dei dettagli',.01,1,.01],finishEdgeSoftness:['Morbidezza contorni',.01,.6,.01],finishEdgeMix:['Mix contorni',0,1,.01],finishGlitchAmount:['Spostamento bande',0,180,1],finishGlitchBand:['Altezza bande',4,240,1],finishGlitchCoverage:['Quantità di bande',0,1,.01],finishGlitchSplit:['Separazione colori',0,60,1],finishGlitchMix:['Mix glitch',0,1,.01],finishGlitchCycles:['Impulsi nel loop',1,24,1],finishGlitchDuty:['Durata di ogni impulso',.1,1,.01],finishGlitchSoftness:['Entrata e uscita morbide',0,1,.01],finishGlitchSeed:['Variante delle bande',1,9999,1]});
+Object.assign(FINISH_META,{finishEdgeWidth:['Spessore contorni',.5,12,.1],finishEdgeThreshold:['Soglia dei dettagli',.01,1,.01],finishEdgeSoftness:['Morbidezza contorni',.01,.6,.01],finishEdgeMix:['Mix contorni',0,1,.01],finishGlitchAmount:['Spostamento bande',0,180,1],finishGlitchBand:['Altezza bande',4,240,1],finishGlitchCoverage:['Quantità di bande',0,1,.01],finishGlitchSplit:['Separazione colori',0,60,1],finishGlitchMix:['Mix glitch',0,1,.01],finishGlitchCycles:['Impulsi nel loop',1,24,1],finishGlitchDuty:['Durata relativa dell’impulso',.001,1,.001],finishGlitchSoftness:['Entrata e uscita morbide',0,1,.01],finishGlitchSeed:['Variante delle bande',1,9999,1]});
 /*
 MIT License
 
@@ -164,8 +164,21 @@ out vec4 color;
 vec4 samplePM(vec2 uv){vec4 c=texture(uImage,clamp(uv,.5/uSize,1.-.5/uSize));return vec4(c.rgb*c.a,c.a);}
 vec2 signalAt(vec2 uv){vec4 c=samplePM(uv);return vec2(dot(c.rgb,vec3(.2126,.7152,.0722)),c.a);}
 float regionMask(vec2 uv){if(uRectCount==0)return 0.;vec2 p=vec2(uv.x,1.-uv.y);float m=0.;for(int i=0;i<8;i++){if(i>=uRectCount)break;vec4 r=uRects[i];vec2 d=min(p-r.xy,r.xy+r.zw-p)*uSize/min(uSize.x,uSize.y);float edge=min(d.x,d.y);m=max(m,uFeather>0.?smoothstep(0.,uFeather,edge):step(0.,edge));}return mix(m,1.-m,uInvert);}
-uniform vec4 uRandom;uniform float uBlockWidth,uShape,uAngle,uCycles;
+uniform vec4 uRandom;uniform float uBlockWidth,uShape,uAngle,uCycles,uDirectionRandom,uCross;
 float hashBand(float n){return fract(sin(n*127.1+uSeed*311.7)*43758.5453);}
+vec3 glitchBand(float id){
+ float clock=uAnimate*(uPhase/6.28318530718+uRandom.y*.4*sin(uPhase/max(1.,uCycles)))+uRandom.z*hashBand(id+14.);
+ float event=mod(floor(clock+.5),max(1.,uCycles)),r=hashBand(id);
+ float key=id+event*177.*uRandom.w;
+ float selected=step(hashBand(key),uCoverage)*step(.0001,uCoverage);
+ float dist=abs(fract(clock+.5)-.5)*2.;
+ float pulse=1.-smoothstep(max(0.,uDuty-max(.002,uPulseSoft*uDuty)),uDuty,dist);
+ pulse=mix(1.,pulse,uAnimate);float motion=mix(1.,cos(uPhase+r*6.28318530718),uAnimate);
+ float shift=(hashBand(key+53.)*2.-1.)*uAmount*motion*selected*pulse;
+ float split=uSplit*selected*pulse;
+ return vec3(shift,split,(hashBand(key+321.)*2.-1.)*uDirectionRandom*1.57079632679);
+}
+vec2 glitchAxis(vec2 axis,float a){return mat2(cos(a),sin(a),-sin(a),cos(a))*axis;}
 void main(){vec2 uv=gl_FragCoord.xy/uSize;vec4 original=texture(uImage,uv),base=vec4(original.rgb*original.a,original.a);
 float amount=uMix*mix(1.,regionMask(uv),uUseMask);if(amount<=0.){color=original;return;}
 vec4 effect=base;
@@ -182,33 +195,33 @@ if(uKind==0){
  vec4 only=vec4(ink*edge,mix(max(base.a,edge),edge,uTransparent));effect=mix(over,only,uOnly);
 }else{
  float ca=cos(uAngle),sa=sin(uAngle);mat2 turn=mat2(ca,-sa,sa,ca);vec2 local=turn*(gl_FragCoord.xy-uSize*.5);
- if(uShape>1.5)local=local.yx;
+ if(uShape>1.5&&uShape<2.5)local=local.yx;
  float row=floor(local.y/uBand+uRandom.x*.8*sin(local.y/uBand*.63+uSeed));
  float column=floor(local.x/(uBlockWidth*mix(1.,.25+hashBand(row+8.)*1.75,uRandom.x)));
  float id=row+(uShape>.5&&uShape<1.5?column*97.:0.);
- float clock=uAnimate*(uPhase/6.28318530718+uRandom.y*.4*sin(uPhase/max(1.,uCycles)))+uRandom.z*hashBand(id+14.);
- float event=mod(floor(clock+.5),max(1.,uCycles)),r=hashBand(id);
- float key=id+event*177.*uRandom.w;
- float selected=step(hashBand(key),uCoverage)*step(.0001,uCoverage);
- float dist=abs(fract(clock+.5)-.5)*2.;
- float pulse=1.-smoothstep(max(0.,uDuty-max(.002,uPulseSoft*uDuty)),uDuty,dist);
- pulse=mix(1.,pulse,uAnimate);float motion=mix(1.,cos(uPhase+r*6.28318530718),uAnimate);
- float shift=(hashBand(key+53.)*2.-1.)*uAmount*motion*selected*pulse;
- float split=uSplit*selected*pulse;vec2 axis=vec2(ca,-sa);if(uShape>1.5)axis=vec2(sa,ca);
- vec2 p=uv+axis*shift/uSize,offset=axis*split/uSize;
+ vec3 horizontal=glitchBand(id);vec2 axis=vec2(ca,-sa);if(uShape>1.5&&uShape<2.5)axis=vec2(sa,ca);
+ axis=glitchAxis(axis,horizontal.z);
+ vec2 displacement=axis*horizontal.x,chromatic=axis*horizontal.y;
+ if(uShape>2.5){
+  float verticalRow=floor(local.x/uBlockWidth+uRandom.x*.8*sin(local.x/uBlockWidth*.63+uSeed+37.));
+  vec3 vertical=glitchBand(verticalRow+8192.);
+  vec2 second=glitchAxis(vec2(sa,ca),vertical.z);
+  displacement+=second*vertical.x*uCross;chromatic+=second*vertical.y*uCross;
+ }
+ vec2 p=uv+displacement/uSize,offset=chromatic/uSize;
  vec4 cr=samplePM(p+offset),cg=samplePM(p),cb=samplePM(p-offset);
  effect=vec4(cr.r,cg.g,cb.b,max(cr.a,max(cg.a,cb.a)));
 }
 vec4 c=mix(base,effect,amount);color=vec4(c.a>0.000001?c.rgb/c.a:vec3(0.),c.a);}`;
 export class DetailPass extends FinishingPass{
- constructor(gl){super(gl,DETAIL_FRAGMENT,['uImage','uSize','uKind','uMix','uTransparent','uWidth','uThreshold','uSoftness','uOnly','uSource','uInk','uRandom','uBlockWidth','uShape','uAngle','uCycles','uAmount','uBand','uCoverage','uSplit','uPhase','uDuty','uPulseSoft','uSeed','uAnimate','uRects[0]','uRectCount','uUseMask','uFeather','uInvert']);}
+ constructor(gl){super(gl,DETAIL_FRAGMENT,['uImage','uSize','uKind','uMix','uTransparent','uWidth','uThreshold','uSoftness','uOnly','uSource','uInk','uRandom','uDirectionRandom','uCross','uBlockWidth','uShape','uAngle','uCycles','uAmount','uBand','uCoverage','uSplit','uPhase','uDuty','uPulseSoft','uSeed','uAnimate','uRects[0]','uRectCount','uUseMask','uFeather','uInvert']);}
  draw(s,w,h,phase=0,kind=0){const g=this.gl,u=this.uniforms,scale=Math.min(w,h)/1080;g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE0);
   if(!this.texture){this.texture=g.createTexture();g.bindTexture(g.TEXTURE_2D,this.texture);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);}else g.bindTexture(g.TEXTURE_2D,this.texture);
   if(this.width!==w||this.height!==h){g.texImage2D(g.TEXTURE_2D,0,g.RGBA8,w,h,0,g.RGBA,g.UNSIGNED_BYTE,null);this.width=w;this.height=h;}
   g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.CULL_FACE);g.disable(g.SCISSOR_TEST);g.colorMask(true,true,true,true);g.viewport(0,0,w,h);g.bindVertexArray(this.vao);g.useProgram(this.program);
   g.uniform1i(u.uImage,0);g.uniform2f(u.uSize,w,h);g.uniform1i(u.uKind,kind);g.uniform1f(u.uMix,kind?s.finishGlitchMix:s.finishEdgeMix);g.uniform1f(u.uTransparent,s.bgMode==='transparent'?1:0);
   g.uniform1f(u.uWidth,Math.max(.5,s.finishEdgeWidth*scale));g.uniform1f(u.uThreshold,s.finishEdgeThreshold);g.uniform1f(u.uSoftness,s.finishEdgeSoftness);g.uniform1f(u.uOnly,s.finishEdgeOnly?1:0);g.uniform1f(u.uSource,s.finishEdgeSource?1:0);const hex=/^#[0-9a-f]{6}$/i.test(s.finishEdgeColor)?s.finishEdgeColor:'#d7ff91';g.uniform3f(u.uInk,...[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255));
-  g.uniform4f(u.uRandom,s.finishGlitchSizeRandom||0,s.finishGlitchRhythm||0,s.finishGlitchScatter||0,s.finishGlitchRenew||0);g.uniform1f(u.uShape,s.finishGlitchShape||0);g.uniform1f(u.uBlockWidth,Math.max(1,(s.finishGlitchWidth||180)*scale));g.uniform1f(u.uAngle,(s.finishGlitchAngle||0)*Math.PI/180);g.uniform1f(u.uCycles,s.finishGlitchCycles);g.uniform1f(u.uAmount,s.finishGlitchAmount*scale);g.uniform1f(u.uBand,Math.max(1,s.finishGlitchBand*scale));g.uniform1f(u.uCoverage,s.finishGlitchCoverage);g.uniform1f(u.uSplit,s.finishGlitchSplit*scale);g.uniform1f(u.uPhase,(((phase%(Math.PI*2))+Math.PI*2)%(Math.PI*2))*Math.round(s.finishGlitchCycles));g.uniform1f(u.uDuty,s.finishGlitchDuty);g.uniform1f(u.uPulseSoft,s.finishGlitchSoftness);g.uniform1f(u.uSeed,Math.round(s.finishGlitchSeed));g.uniform1f(u.uAnimate,s.finishGlitchAnimate?1:0);
+  g.uniform1f(u.uDirectionRandom,s.finishGlitchDirectionRandom||0);g.uniform1f(u.uCross,s.finishGlitchCross??1);g.uniform4f(u.uRandom,s.finishGlitchSizeRandom||0,s.finishGlitchRhythm||0,s.finishGlitchScatter||0,s.finishGlitchRenew||0);g.uniform1f(u.uShape,s.finishGlitchShape||0);g.uniform1f(u.uBlockWidth,Math.max(1,(s.finishGlitchWidth||180)*scale));g.uniform1f(u.uAngle,(s.finishGlitchAngle||0)*Math.PI/180);g.uniform1f(u.uCycles,s.finishGlitchCycles);g.uniform1f(u.uAmount,s.finishGlitchAmount*scale);g.uniform1f(u.uBand,Math.max(1,s.finishGlitchBand*scale));g.uniform1f(u.uCoverage,s.finishGlitchCoverage);g.uniform1f(u.uSplit,s.finishGlitchSplit*scale);g.uniform1f(u.uPhase,(((phase%(Math.PI*2))+Math.PI*2)%(Math.PI*2))*Math.round(s.finishGlitchCycles));const period=s.keepMotionSpeed!==false&&s.motionPeriod>0?s.motionPeriod:(s.duration||12);const duty=s.finishGlitchFlash?Math.min(1,(s.finishGlitchFlashMs??30)/1000*(s.speed||1)*s.finishGlitchCycles/period):s.finishGlitchDuty;g.uniform1f(u.uDuty,Math.max(.00001,duty));g.uniform1f(u.uPulseSoft,s.finishGlitchSoftness);g.uniform1f(u.uSeed,Math.round(s.finishGlitchSeed));g.uniform1f(u.uAnimate,s.finishGlitchAnimate?1:0);
   const regions=normalizeFinishRegions(s.finishRegions),rects=new Float32Array(32);regions.forEach((r,i)=>rects.set([r.x/100,r.y/100,r.w/100,r.h/100],i*4));g.uniform4fv(u['uRects[0]'],rects);g.uniform1i(u.uRectCount,regions.length);g.uniform1f(u.uUseMask,s.finishRegionsEnabled&&(kind?s.finishRegionGlitch:s.finishRegionEdge)?1:0);g.uniform1f(u.uFeather,(s.finishFeather||0)/100);g.uniform1f(u.uInvert,s.finishRegionInvert?1:0);g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);
  }
 }
@@ -227,7 +240,7 @@ export class GlyphPass{
  begin(index,target,w,h){const g=this.gl;g.bindFramebuffer(g.FRAMEBUFFER,target?.fbo||null);g.viewport(0,0,w,h);g.useProgram(this.programs[index]);return this.locations[index];}
  draw(s,w,h,phase=0){this.updateAtlas(s);const g=this.gl;g.activeTexture(g.TEXTURE0);if(this.width!==w||this.height!==h){this.release();try{this.input=this.target(w,h);this.glyph=this.target(w,h);this.blurA=this.target(Math.max(1,Math.ceil(w/2)),Math.max(1,Math.ceil(h/2)));this.blurB=this.target(this.blurA.w,this.blurA.h);this.width=w;this.height=h;}catch(e){this.release();throw e;}}
   g.bindFramebuffer(g.FRAMEBUFFER,null);this.bind(this.input.texture,0);g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.CULL_FACE);g.disable(g.SCISSOR_TEST);g.colorMask(true,true,true,true);g.bindVertexArray(this.vao);
-  const scale=Math.min(w,h)/1080;let u=this.begin(0,this.glyph,w,h);this.bind(this.input.texture,0);this.bind(this.atlas,1);g.uniform1i(u.uImage,0);g.uniform1i(u.uAtlas,1);g.uniform2f(u.uSize,w,h);g.uniform1f(u.uCell,Math.max(2,s.finishGlyphCell*scale));g.uniform1f(u.uScale,s.finishGlyphScale);g.uniform1f(u.uDensity,s.finishGlyphDensity);g.uniform1f(u.uSoft,s.finishGlyphSoftness);g.uniform1f(u.uSource,s.finishGlyphSource?1:0);g.uniform1f(u.uVariation,s.finishGlyphVariation);g.uniform1f(u.uPhase,(((phase%(Math.PI*2))+Math.PI*2)%(Math.PI*2))*Math.round(s.finishGlyphCycles));g.uniform4f(u.uRandom,s.finishGlyphRandom||0,0,0,0);g.uniform4f(u.uLayout,s.finishGlyphSizeRandom||0,(s.finishGlyphRotation||0)*Math.PI/180,s.finishGlyphJitter||0,0);g.uniform1f(u.uSeed,s.finishGlyphSeed||42);g.uniform1f(u.uFont,s.finishGlyphFont||0);g.uniform1f(u.uCount,this.glyphCount);g.uniform1f(u.uFontRandom,s.finishGlyphFontRandom||0);g.uniform1f(u.uRhythm,s.finishGlyphRhythm||0);g.uniform1f(u.uCycles,s.finishGlyphCycles);g.uniform1i(u.uStyle,Math.round(s.finishGlyphStyle));const hex=/^#[0-9a-f]{6}$/i.test(s.finishGlyphColor)?s.finishGlyphColor:'#8ef5d5';g.uniform3f(u.uInk,...[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255));g.drawArrays(g.TRIANGLES,0,3);
+  const scale=Math.min(w,h)/1080;let u=this.begin(0,this.glyph,w,h);this.bind(this.input.texture,0);this.bind(this.atlas,1);g.uniform1i(u.uImage,0);g.uniform1i(u.uAtlas,1);g.uniform2f(u.uSize,w,h);g.uniform1f(u.uCell,Math.max(2,s.finishGlyphCell*scale));g.uniform1f(u.uScale,s.finishGlyphScale);g.uniform1f(u.uDensity,s.finishGlyphDensity);g.uniform1f(u.uSoft,s.finishGlyphSoftness);g.uniform1f(u.uSource,s.finishGlyphSource?1:0);g.uniform1f(u.uVariation,s.finishGlyphVariation);g.uniform1f(u.uPhase,(((phase%(Math.PI*2))+Math.PI*2)%(Math.PI*2))*Math.round(s.finishGlyphCycles));g.uniform1f(u.uDirectionRandom,s.finishGlitchDirectionRandom||0);g.uniform1f(u.uCross,s.finishGlitchCross??1);g.uniform4f(u.uRandom,s.finishGlyphRandom||0,0,0,0);g.uniform4f(u.uLayout,s.finishGlyphSizeRandom||0,(s.finishGlyphRotation||0)*Math.PI/180,s.finishGlyphJitter||0,0);g.uniform1f(u.uSeed,s.finishGlyphSeed||42);g.uniform1f(u.uFont,s.finishGlyphFont||0);g.uniform1f(u.uCount,this.glyphCount);g.uniform1f(u.uFontRandom,s.finishGlyphFontRandom||0);g.uniform1f(u.uRhythm,s.finishGlyphRhythm||0);g.uniform1f(u.uCycles,s.finishGlyphCycles);g.uniform1i(u.uStyle,Math.round(s.finishGlyphStyle));const hex=/^#[0-9a-f]{6}$/i.test(s.finishGlyphColor)?s.finishGlyphColor:'#8ef5d5';g.uniform3f(u.uInk,...[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255));g.drawArrays(g.TRIANGLES,0,3);
   let bloom=this.glyph.texture;
   if(s.finishGlyphGlow>0){const radius=s.finishGlyphRadius*scale;for(const [target,input,dx,dy]of [[this.blurA,this.glyph.texture,radius/w,0],[this.blurB,this.blurA.texture,0,radius/h]]){u=this.begin(1,target,target.w,target.h);this.bind(input,0);g.uniform1i(u.uImage,0);g.uniform2f(u.uSize,target.w,target.h);g.uniform2f(u.uStep,dx,dy);g.drawArrays(g.TRIANGLES,0,3);}bloom=this.blurB.texture;}
   u=this.begin(2,null,w,h);this.bind(this.input.texture,0);this.bind(this.glyph.texture,1);this.bind(bloom,2);g.uniform1i(u.uImage,0);g.uniform1i(u.uGlyph,1);g.uniform1i(u.uBloom,2);g.uniform2f(u.uSize,w,h);g.uniform1f(u.uMix,s.finishGlyphMix);g.uniform1f(u.uGlow,s.finishGlyphGlow);g.uniform1f(u.uTransparent,s.bgMode==='transparent'?1:0);

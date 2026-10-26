@@ -1,12 +1,12 @@
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=5c0a82a28740';
-import {forceBarrierGLSL} from './particle-forces.js?v=5c0a82a28740';
+import {guideGLSL} from './particle-path-field.js?v=9d7adea7a5ff';
+import {forceBarrierGLSL} from './particle-forces.js?v=9d7adea7a5ff';
 export const fieldGLSL=`
 ${guideGLSL}
 ${forceBarrierGLSL}
 const float TAU=6.28318530718;
 uniform float uPhase,uSeed,uBreath,uPoleRadius,uPoleField;
-uniform vec2 uResolution;
+uniform vec2 uResolution;uniform vec3 uSpacing;
 uniform vec4 uShape,uStructure,uNoise,uFlow,uDynamics,uPoles,uOuter,uClock,uPoints,uTrails,uTail,uColor;
 uniform vec4 uForm,uWarp,uFrame,uRotation;
 uniform vec4 uLife,uNetwork;uniform float uSymmetry;
@@ -21,7 +21,7 @@ float clockAt(float q){
  return TAU*e-.92*uClock.y*(1.-.55*uMotionQuality.x)*sin(TAU*e);
 }
 vec3 curl(vec3 p,float t){return vec3(cos(p.y+t)-sin(p.z-t),cos(p.z+t)-sin(p.x-t),cos(p.x+t)-sin(p.y-t));}
-vec3 shape(vec4 r,float t,float family){
+vec3 shapeBase(vec4 r,float t,float family){
  float cell=floor(r.x*uNetwork.y),local=fract(r.x*uNetwork.y);
  // A continuous sphere-to-ring nucleus. Zero opening has no hidden major radius.
  float a=(cell+local*mix(1.,.12,uNetwork.x))/uNetwork.y*TAU+t;
@@ -41,6 +41,16 @@ vec3 shape(vec4 r,float t,float family){
  p*=mix(1.,cluster,uStructure.w*.6);
  return p;
 }
+vec3 shape(vec4 r,float t,float family){
+ vec3 p=shapeBase(r,t,family);
+ if(abs(uSpacing.x-1.)+abs(uSpacing.y-1.)>.00001){
+  float cells=max(2.,floor(uSpacing.z+.5));
+  vec4 anchor=vec4((floor(r.xyz*cells)+.5)/cells,r.w);
+  vec3 center=shapeBase(anchor,t,family);
+  p=center*uSpacing.y+(p-center)*uSpacing.x;
+ }
+ return p;
+}
 vec3 restPoint(vec4 r){return mix(shape(r,0.,uShape.x),shape(r,0.,uShape.y),uDynamics.w);}
 // Repulsive volumes have priority over positive routes. Final depth escape
 // resolves intersections between point spheres and path tubes without undoing either.
@@ -54,7 +64,7 @@ vec3 sceneBarriers(vec3 p,vec4 r,float phase){
   for(int i=0;i<11;i++){if(i>=uForceCount)break;float core=forceCore(i),xy=distance(p.xy,uForcePoints[i].xy);if(core<=0.||xy>=core)continue;
    float dz=sqrt(max(0.,core*core-xy*xy))+.00002;upper=max(upper,uForcePoints[i].z+dz);lower=min(lower,uForcePoints[i].z-dz);
   }p.z=upper-p.z<=p.z-lower?upper:lower;
- }return p;
+ }return containGuidePosition(p,r,phase);
 }
 vec3 position(vec4 r,float phase){
  float global=clockAt(phase*uClock.x),c=1.+floor(r.z*3.)*step(1.-uClock.w,r.w);
@@ -132,8 +142,9 @@ vec3 position(vec4 r,float phase){
 vec4 project(vec3 p){float depth=max(2.,7.5-p.z);return vec4(p.xy*vec2(uResolution.y/uResolution.x,1.)*2.6/depth,(depth-3.)/12.,1.);}
 vec3 particleColor(vec4 r,vec3 p){
  vec3 rest=restPoint(r),coord=uColor.x<.5?rest:uColor.x<1.5?vec3((r.z-.5)*4.5,0.,0.):uColor.x<2.5?vec3((floor(r.x*uOuter.z)/uOuter.z-.5)*4.5,0.,0.):p;
- vec3 base=prismaPalette(coord,vec3(1.));
- base=mix(base,prismaPalette(vec3((r.w-.5)*5.,0.,0.),vec3(1.)),uColor.y);
+ vec3 base=prismaPaletteBase(coord,vec3(1.));
+ base=mix(base,prismaPaletteBase(vec3((r.w-.5)*5.,0.,0.),vec3(1.)),uColor.y);
+ base=prismaColorLayers(uColor.x>2.5?p:rest,base);
  base*=mix(1.,.25+r.z*1.5,uColor.z)*mix(1.,.2+.8*smoothstep(-2.,2.,p.z),uColor.w);
  float wave=pow(.5+.5*sin(r.y*TAU-clockAt(uPhase*uClock.x)*uLife.y-r.x*TAU*uLife.w),8.);
  base*=mix(1.,.2+wave*4.,uLife.z);

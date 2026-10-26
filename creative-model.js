@@ -1,13 +1,13 @@
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=5c0a82a28740';
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=5c0a82a28740';
-import {normalizeAudioClip} from './audio-recording.js?v=5c0a82a28740';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=5c0a82a28740';
-import {normalizeAudio} from './audio-model.js?v=5c0a82a28740';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles} from './particle-model.js?v=5c0a82a28740';
-import {normalizeForcePaths} from './particle-paths.js?v=5c0a82a28740';
-import {normalizeForcePoints} from './particle-forces.js?v=5c0a82a28740';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=5c0a82a28740';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=5c0a82a28740';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=9d7adea7a5ff';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=9d7adea7a5ff';
+import {normalizeAudioClip} from './audio-recording.js?v=9d7adea7a5ff';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=9d7adea7a5ff';
+import {normalizeAudio} from './audio-model.js?v=9d7adea7a5ff';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles} from './particle-model.js?v=9d7adea7a5ff';
+import {normalizeForcePaths} from './particle-paths.js?v=9d7adea7a5ff';
+import {normalizeForcePoints} from './particle-forces.js?v=9d7adea7a5ff';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=9d7adea7a5ff';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=9d7adea7a5ff';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -122,7 +122,7 @@ export function surprise(seed){
 }
 export function normalizeCreation(raw){
  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw Error('Il file non contiene una creazione Prisma.');
- const s=preset(0);s.layerMemory={};for(const key of ['pLinks','pTrailCount','pLiving'])if(Number.isFinite(raw.layerMemory?.[key]))s.layerMemory[key]=Math.max(0,Math.min(key==='pLinks'?1:key==='pLiving'?4:60000,raw.layerMemory[key]));s.controlLocks=Array.isArray(raw.controlLocks)?[...new Set(raw.controlLocks.filter(k=>typeof k==='string'&&(META[k]||PARTICLE_META[k])))].slice(0,1000):[];s.audioClip=normalizeAudioClip(raw.audioClip);s.audioReactive=normalizeAudio(raw.audioReactive,raw.engine);s.bodyTracking=normalizeBodyTracking(raw.bodyTracking);s.forcePoints=normalizeForcePoints(raw.forcePoints);s.forcePaths=normalizeForcePaths(raw.forcePaths);s.perfectLoop=raw.perfectLoop!==false;for(const [k,meta] of Object.entries(META)){if(Number.isFinite(raw[k]))s[k]=clamp(k,raw[k]);}
+ const s=preset(0);s.layerMemory={};for(const key of ['pLinks','pTrailCount','pLiving'])if(Number.isFinite(raw.layerMemory?.[key]))s.layerMemory[key]=Math.max(0,Math.min(key==='pLinks'?1:key==='pLiving'?4:60000,raw.layerMemory[key]));s.controlLocks=Array.isArray(raw.controlLocks)?[...new Set(raw.controlLocks.filter(k=>typeof k==='string'&&(META[k]||PARTICLE_META[k])))].slice(0,1000):[];s.audioClip=normalizeAudioClip(raw.audioClip);s.audioReactive=normalizeAudio(raw.audioReactive,raw.engine);s.bodyTracking=normalizeBodyTracking(raw.bodyTracking);s.forcePoints=normalizeForcePoints(raw.forcePoints);s.forcePaths=normalizeForcePaths(raw.forcePaths);s.keepMotionSpeed=raw.keepMotionSpeed!==false;s.motionPeriod=Number.isFinite(raw.motionPeriod)&&raw.motionPeriod>0?Math.max(2,Math.min(300,raw.motionPeriod)):0;s.perfectLoop=raw.perfectLoop!==false;for(const [k,meta] of Object.entries(META)){if(Number.isFinite(raw[k]))s[k]=clamp(k,raw[k]);}
  for(const k of ['background','background2','internalColor','sssColor','finishGlyphColor','finishEdgeColor','finishScanColor'])if(/^#[0-9a-f]{6}$/i.test(raw[k]||''))s[k]=raw[k];
  if(Array.isArray(raw.palette)&&raw.palette.length&&raw.palette.every(c=>/^#[0-9a-f]{6}$/i.test(c)))s.palette=raw.palette.slice(0,12);
  if(['solid','gradient','transparent','studio'].includes(raw.bgMode))s.bgMode=raw.bgMode;
@@ -136,7 +136,7 @@ export function normalizeCreation(raw){
  for(const k of ['internalColor','sssColor'])if(!/^#[0-9a-f]{6}$/i.test(s[k]||''))s[k]=k==='internalColor'?'#e6f5ff':'#ffc49b';
  for(const k of ['photoAll','environmentRotate'])s[k]=raw[k]===true;
  for(const k of ['finishEnabled','finishTone'])s[k]=raw[k]!==false;
- for(const k of ['finishScan','finishScanSource','finishScanAnimate','finishRgb','finishMosaic','finishGlyph','finishGlitch','finishEdge','finishEdgeSource','finishEdgeOnly','finishWarp','finishGlass'])s[k]=raw[k]===true;
+ for(const k of ['finishGlitchFlash','finishScan','finishScanSource','finishScanAnimate','finishRgb','finishMosaic','finishGlyph','finishGlitch','finishEdge','finishEdgeSource','finishEdgeOnly','finishWarp','finishGlass'])s[k]=raw[k]===true;
  for(const k of ['finishScanOnly','finishRegionScan','finishGlitchAnimate','finishRegionEdge','finishRegionGlitch','finishRegionWarp','finishRegionGlass'])s[k]=raw[k]!==false;for(const k of ['finishGlitchCycles','finishGlitchSeed'])s[k]=Math.round(s[k]);
  for(const k of ['finishScanCycles','finishGlyphFont','finishGlyphSet','finishGlyphSeed','finishGlitchShape','finishWarpLayers','finishWarpCycles','finishWarpSeed','finishGlassShape','finishGlassCycles'])s[k]=Math.round(s[k]);s.finishGlyphChars=typeof raw.finishGlyphChars==='string'?Array.from(raw.finishGlyphChars.replace(/[\x00-\x1f\x7f]/g,'')).slice(0,64).join('')||' .:-=+*#%@':' .:-=+*#%@';
  s.finishOrder=normalizeFinishOrder(raw.finishOrder);s.finishGlyphStyle=Math.round(s.finishGlyphStyle);s.finishGlyphCycles=Math.round(s.finishGlyphCycles);s.finishGlyphSource=raw.finishGlyphSource!==false;s.finishRegionGlyph=raw.finishRegionGlyph!==false;s.finishCompare=false;s.finishRegions=normalizeFinishRegions(raw.finishRegions);s.finishRegionMosaic=raw.finishRegionMosaic!==false;for(const k of ['finishRegionsEnabled','finishRegionRgb','finishRegionInvert'])s[k]=raw[k]===true;

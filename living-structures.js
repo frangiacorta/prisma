@@ -1,5 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=5c0a82a28740';
-import {excludeForcePositions} from './particle-forces.js?v=5c0a82a28740';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=9d7adea7a5ff';
+import {excludeForcePositions} from './particle-forces.js?v=9d7adea7a5ff';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;
 uniform float uBundleAmount;uniform vec3 uLivingMotion;`;
@@ -67,7 +67,7 @@ in vec3 vPosition,vNormal,vCoord;out vec4 color;
 uniform vec4 uLivingSurface;
 void main(){
  vec2 vUV=vec2(fract(atan(vCoord.y,vCoord.x)/TAU),vCoord.z);
- if(insideForceCore(vPosition)||insideGuideCore(vPosition,vec4(vUV,.5,.5),uPhase))discard;
+ vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vec4(vUV,.5,.5),uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vec4(vUV,.5,.5),uPhase))discard;
  float hole=length((fract(vUV*vec2(uLivingSurface.z,uLivingSurface.z*.65))-.5)*2.);
  float coverage=uLivingSurface.y<=0.?1.:1.-smoothstep(hole-fwidth(hole),hole+fwidth(hole),uLivingSurface.y);
  if(coverage<.05)discard;
@@ -100,7 +100,7 @@ void main(){
 precision highp float;precision highp int;
 ${common}
 in vec3 vPosition,vNormal,vTangent;in vec2 vUV;in float vSide,vAlpha;out vec4 color;
-void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vec4(vUV,.5,.5),uPhase))discard;float a=vAlpha*(1.-smoothstep(.25,1.,abs(vSide)));if(a<.003)discard;
+void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vec4(vUV,.5,.5),uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vec4(vUV,.5,.5),uPhase))discard;float a=vAlpha*(1.-smoothstep(.25,1.,abs(vSide)));if(a<.003)discard;
  vec3 lit=shadeFibre(particleColor(vec4(vUV,.5,.5),vPosition),vPosition,normalize(vNormal),vTangent);
  color=vec4(lit*a,a);}`);
   this.feedback=gl.createTransformFeedback();this.captureBuffer=gl.createBuffer();this.seedBuffer=gl.createBuffer();this.indices=gl.createBuffer();this.vao=gl.createVertexArray();this.texture=gl.createTexture();

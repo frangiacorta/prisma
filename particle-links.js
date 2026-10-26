@@ -1,11 +1,11 @@
-import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=5c0a82a28740';
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=5c0a82a28740';
-import {guideGLSL} from './particle-path-field.js?v=5c0a82a28740';
-import {forceBarrierGLSL} from './particle-forces.js?v=5c0a82a28740';
+import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=9d7adea7a5ff';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=9d7adea7a5ff';
+import {guideGLSL} from './particle-path-field.js?v=9d7adea7a5ff';
+import {forceBarrierGLSL} from './particle-forces.js?v=9d7adea7a5ff';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.
-const GRAPH_KEYS=['seed','pLinkNodes','pLinkReach','pLinkNeighbors','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pNeural','pNodes','pConnect','stretchX','stretchY','stretchZ','volume'];
+const GRAPH_KEYS=['pGrainSpacing','pGroupSpacing','pDistributionCells','seed','pLinkNodes','pLinkReach','pLinkNeighbors','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pNeural','pNodes','pConnect','stretchX','stretchY','stretchZ','volume'];
 export class ParticleLinks {
  constructor(owner,common){
   this.owner=owner;this.gl=owner.gl;this.count=0;this.builds=0;this.key='';
@@ -52,7 +52,7 @@ ${forceBarrierGLSL}
 ${guideGLSL}
 uniform float uPhase;
 ${livingOcclusionGLSL}
-void main(){if(insideForceCore(vPosition)||insideGuideCore(vPosition,vForceSeed,uPhase))discard;float a=livingVisibility()*vOpacity*(1.-smoothstep(.1,1.,abs(vSide)));color=vec4(vColor*a,a);}`);
+void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;float a=livingVisibility()*vOpacity*(1.-smoothstep(.1,1.,abs(vSide)));color=vec4(vColor*a,a);}`);
   this.feedback=gl.createTransformFeedback();this.captureBuffer=gl.createBuffer();
   this.buffer=gl.createBuffer();this.vao=gl.createVertexArray();
   gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);

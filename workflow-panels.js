@@ -1,4 +1,5 @@
-import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=5c0a82a28740';
+import {clockStatus} from './animation-clock.js?v=9d7adea7a5ff';
+import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=9d7adea7a5ff';
 export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['library','Libreria']];
 const html=s=>{const d=document.createElement('div');d.innerHTML=s;return d;};
 const section=(title,id)=>{const d=document.createElement('details');d.className='control-details';if(id)d.id=id;const h=document.createElement('summary');h.textContent=title;d.append(h);return d;};
@@ -35,7 +36,7 @@ function baseMarkup(id,raw,state){
 function particleLayers(root,state){
  const layers=[section('Nucleo','layer-core'),section('Granelli','layer-grains'),section('Fili','layer-links'),section('Scie','layer-trails'),section('Pelle','layer-skin')];
  const skin=/^p(?:Skin|Thread|Weft|Strands|Bundle|Bundles|Fray|Fold|Pore|Living|SurfaceBind)/;
- const classify=k=>/^pLink/.test(k)?2:/^pTrail/.test(k)?3:skin.test(k)?4:['pCount','pSize','pOpacity','pSoftness','pSizeVar','pSprite'].includes(k)?1:0;
+ const classify=k=>/^pLink/.test(k)?2:/^pTrail/.test(k)?3:skin.test(k)?4:['pCount','pSize','pOpacity','pSoftness','pSizeVar','pSprite','pGrainSpacing','pGroupSpacing','pDistributionCells'].includes(k)?1:0;
  for(const node of [...root.children]){
   if(!node.matches('details')){layers[0].append(node);continue;}
   const e=node.querySelector('[data-param],[data-particle-select],[data-living-enabled]');const k=e?.dataset.param||e?.dataset.particleSelect||(e?.hasAttribute('data-living-enabled')?'pLiving':'');
@@ -70,7 +71,7 @@ export function composePanel(id,raw,state){
   for(const [i,g]of motionGroups(raw).entries()){const b=document.createElement('button');b.className='animation-link';b.dataset.animationGroup=String(i);b.textContent=g.querySelector('summary').textContent;list.append(b);}
   for(const e of original.querySelectorAll('[data-motion-preset],#roots-flow-loop,#roots-orbit-loop,#vary-motion,[data-check^=animate]'))recipes.append(e.matches('input')?rowFor(e):e);
   for(const [tab,label]of [['audio','Audio'],['body','Mani e braccia'],['fields','Campi e tracciati']]){const b=document.createElement('button');b.type='button';b.className='outline';b.dataset.jumpTab=tab;b.textContent=label;reactions.append(b);}
-  root.append(time,list,recipes,reactions);nameControls(root);return root.innerHTML;
+  const preserve=document.createElement('label');preserve.className='check';preserve.innerHTML='<input type="checkbox" data-check="keepMotionSpeed" '+(state.keepMotionSpeed!==false?'checked':'')+'> Mantieni velocità quando cambi durata';time.append(preserve);const status=document.createElement('p');status.className='help';status.id='motion-clock-status';status.setAttribute('role','status');status.textContent=clockStatus(state);time.append(status);const duration=document.createElement('p');duration.className='help';duration.setAttribute('role','status');duration.innerHTML='Durata video: <strong id="effective-duration">'+(state.duration/state.speed).toFixed(1)+' s</strong>';time.append(duration);const loopLabel=time.querySelector('[data-check=perfectLoop]')?.closest('label');if(loopLabel)for(const text of loopLabel.childNodes)if(text.nodeType===3)text.textContent=' Cicli interi per colori, luci e forma';root.append(time,list,recipes,reactions);nameControls(root);return root.innerHTML;
  }
  const root=baseMarkup(id,raw,state);for(const e of [...root.querySelectorAll(exampleSelector)])(e.matches('select')?rowFor(e):e).remove();
  // The editor is created on demand; no animation form is hidden in the panel DOM.
@@ -92,7 +93,7 @@ export function refinePanel(root,level='simple',{state={},baseline={},tab='shape
  if(level!=='expert')for(const e of root.querySelectorAll('input.number,input.hex-input'))e.remove();
  if(level==='simple'){
   root.querySelector('.finish-order')?.remove();
-  for(const e of [...root.querySelectorAll('input[data-check],select')]){const key=e.dataset.check||e.dataset.particleSelect||e.id;if(!(e.matches('select')?ESSENTIAL_FIELDS.has(key)||key==='add-animation':ESSENTIAL_FLAGS.has(key)))rowFor(e).remove();}
+  for(const e of [...root.querySelectorAll('input[data-check],select')]){const key=e.dataset.check||e.dataset.particleSelect||e.dataset.finishSelect||e.id;if(!(e.matches('select')?ESSENTIAL_FIELDS.has(key)||key==='add-animation':ESSENTIAL_FLAGS.has(key)))rowFor(e).remove();}
   for(const e of [...root.querySelectorAll('button')])if(!e.matches(ESSENTIAL_BUTTONS)&&!e.closest('.base-form-grid,.light-list'))e.remove();
  }
  if(level==='simple')for(const layer of root.querySelectorAll('[data-particle-layer]'))for(const d of [...layer.querySelectorAll('details')].reverse()){d.querySelector(':scope > summary')?.remove();for(const p of d.querySelectorAll(':scope > .help'))p.remove();d.replaceWith(...d.childNodes);}

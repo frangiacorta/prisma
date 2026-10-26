@@ -1,11 +1,11 @@
-import {GROWTH_DEFAULTS} from './growth-material.js?v=5c0a82a28740';
-import {FINISH_DEFAULTS} from './finishing.js?v=5c0a82a28740';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=5c0a82a28740';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=5c0a82a28740';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=5c0a82a28740';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=5c0a82a28740';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=9d7adea7a5ff';
+import {FINISH_DEFAULTS} from './finishing.js?v=9d7adea7a5ff';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=9d7adea7a5ff';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=9d7adea7a5ff';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=9d7adea7a5ff';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=9d7adea7a5ff';
 export const BASE = {
- ...PARTICLE_DEFAULTS,engine:'solid',
+ ...PARTICLE_DEFAULTS,engine:'solid',keepMotionSpeed:true,motionPeriod:0,
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
   hole:0, holeX:0, holeY:0, holeShape:0, cut:0, cutX:.7, cutY:.1, edge:.015,
   transparency:.58, refraction:1.38, thickness:.7, metal:.38, roughness:.12, gloss:.9, iridescence:.7, emission:.02,
@@ -111,3 +111,5 @@ GROUPS.tone=['exposure','brightness','contrast','saturation','temperature','phot
 GROUPS.photo=GROUPS.photo.filter(k=>!GROUPS.tone.includes(k));
 
 GROUPS.material.push(...Object.keys(GROWTH_DEFAULTS).filter(k=>!['growthFlow','growthCycles'].includes(k)));GROUPS.motion.push('growthFlow','growthCycles');
+
+GROUPS.motion.push('keepMotionSpeed','motionPeriod');
