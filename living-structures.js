@@ -1,5 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=dbc2871327ae';
-import {excludeForcePositions} from './particle-forces.js?v=dbc2871327ae';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=13c4abb4756d';
+import {excludeForcePositions} from './particle-forces.js?v=13c4abb4756d';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;
 uniform float uBundleAmount;uniform vec3 uLivingMotion;`;
@@ -44,7 +44,7 @@ void main(){
  r.y=mix(uLivingShape.z*.48,1.,aRandom.y);if(r.y<.00001||r.y>.99999)r.x=.5;
  float phase=uPhase-uLivingMotion.x*sin(r.x*TAU);
  vec3 p=texelFetch(uConstraintPositions,ivec2(gl_VertexID%uConstraintColumns,gl_VertexID/uConstraintColumns),0).xyz;
- targetPosition=dynamicsForward(sceneBarriers(lockGuidePosition(p,r,phase),r,phase));gl_Position=vec4(0.,0.,0.,1.);
+ targetPosition=constrainedDynamics(lockGuidePosition(p,r,phase),r,phase);gl_Position=vec4(0.,0.,0.,1.);
 }`,`#version 300 es
 precision highp float;out vec4 color;void main(){color=vec4(0.);}`,['targetPosition']);
   const sampling=`uniform sampler2D uLivingPositions;uniform ivec2 uLivingSize;

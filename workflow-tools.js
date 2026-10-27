@@ -1,8 +1,8 @@
-import {newCreation,material} from './creative-model.js?v=dbc2871327ae';
-import {addHelp} from './inspector-ui.js?v=dbc2871327ae';
-import {MOODS} from './model.js?v=dbc2871327ae';
-import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=dbc2871327ae';
-import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=dbc2871327ae';
+import {newCreation,material} from './creative-model.js?v=13c4abb4756d';
+import {addHelp} from './inspector-ui.js?v=13c4abb4756d';
+import {MOODS} from './model.js?v=13c4abb4756d';
+import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=13c4abb4756d';
+import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=13c4abb4756d';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){

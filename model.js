@@ -1,10 +1,10 @@
-import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=dbc2871327ae';
-import {GROWTH_DEFAULTS} from './growth-material.js?v=dbc2871327ae';
-import {FINISH_DEFAULTS} from './finishing.js?v=dbc2871327ae';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=dbc2871327ae';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=dbc2871327ae';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=dbc2871327ae';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=dbc2871327ae';
+import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=13c4abb4756d';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=13c4abb4756d';
+import {FINISH_DEFAULTS} from './finishing.js?v=13c4abb4756d';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=13c4abb4756d';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=13c4abb4756d';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=13c4abb4756d';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=13c4abb4756d';
 export const BASE = {
  ...DYNAMICS_DEFAULTS,...PARTICLE_DEFAULTS,engine:'solid',keepMotionSpeed:true,motionPeriod:0,
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,

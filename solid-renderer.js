@@ -1,7 +1,7 @@
-import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=dbc2871327ae';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=dbc2871327ae';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=dbc2871327ae';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=dbc2871327ae';
+import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=13c4abb4756d';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=13c4abb4756d';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=13c4abb4756d';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=13c4abb4756d';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -1736,9 +1736,9 @@ export function startWallpaper(canvas,source){
   if(stopped)return;raf=requestAnimationFrame(frame);if(document.hidden||paused){lastTick=0;return;}
   try{renderer.pollGpuTime();if(renderer.gpuSample!==lastGpu){lastGpu=renderer.gpuSample;const ms=renderer.gpuMilliseconds;if(ms>25){limit=Math.max(160,limit*Math.max(.4,Math.min(.9,Math.sqrt(20/ms))));fast=0;}else if(ms<12&&++fast>20){limit=Math.min(900,limit*1.08);fast=0;}}
    if(renderer.pollCompletion()){status.hidden=true;if(first){first=false;last=0;}}
-   if(!lastTick)lastTick=t;const dt=Math.max(0,(t-lastTick)/1000);lastTick=t;if(!first)phase=(phase+dt*(source.speed||1)/(source.duration||12)*TAU)%TAU;
+   if(!lastTick)lastTick=t;const dt=Math.max(0,(t-lastTick)/1000);lastTick=t;if(!first){phase+=(source.dynAmount>0?Math.min(dt,.1):dt)*(source.speed||1)/(source.duration||12)*TAU;if(!(source.dynAmount>0))phase%=TAU;}
    if(renderer.completionSync||t-last<16)return;
-   const options={preview:true,quality:'fast'};
+   const options={preview:true,quality:'fast',liveDynamics:true};
    if(!renderer.prepare(source,phase,options))return;
    const max=first?Math.min(192,limit):limit,scale=Math.min(1.25,devicePixelRatio||1,max/Math.max(1,innerWidth,innerHeight));
    renderer.draw(source,phase,Math.max(1,Math.round(innerWidth*scale)),Math.max(1,Math.round(innerHeight*scale)),options);last=t;

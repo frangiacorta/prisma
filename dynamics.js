@@ -1,5 +1,5 @@
-import {projectDistance} from './vendor/xpbd/distance.js?v=dbc2871327ae';
-import {samplePath} from './particle-paths.js?v=dbc2871327ae';
+import {projectDistance} from './vendor/xpbd/distance.js?v=13c4abb4756d';
+import {samplePath} from './particle-paths.js?v=13c4abb4756d';
 // A deformable simulation cage, shared by implicit surfaces and explicit geometry.
 // The cage carries inertia; it is not per-grain or strand/strand self-collision.
 export const DYNAMICS_DEFAULTS={dynAmount:0,dynMass:1,dynStiffness:.5,dynDamping:.45,dynCoupling:.6,dynGravity:.35,dynWind:.7,dynWindAngle:0,dynGust:.5,dynFrequency:.6,dynTurbulence:.45,dynPin:0,dynExtent:2.4,dynFields:0,dynFloor:0,dynFloorY:-1.4,dynBounce:.15,dynFriction:.3,dynObstacle:0,dynObstacleX:.8,dynObstacleY:0,dynObstacleZ:0,dynObstacleSize:.55,dynObstacleAspect:1,dynMargin:.02};
@@ -30,7 +30,11 @@ export class DynamicsSolver{
  constructor(s,drive){this.s={...DYNAMICS_DEFAULTS,...s};this.drive=drive;this.paths=(s.forcePaths||[]).filter(p=>p.enabled&&p.mode!=='contain').slice(0,4).map(p=>({...p,samples:samplePath(p,24)}));this.extent=this.s.dynExtent;this.rest=new Float32Array(COUNT*3);this.p=new Float32Array(COUNT*3);this.v=new Float32Array(COUNT*3);this.old=new Float32Array(COUNT*3);this.edges=[];this.tick=0;this.checkpoints=new Map();
   const id=(x,y,z)=>x+N*(y+N*z),h=2*this.extent/(N-1);
   for(let z=0;z<N;z++)for(let y=0;y<N;y++)for(let x=0;x<N;x++){const i=id(x,y,z);this.rest.set([(x-3)*h,(y-3)*h,(z-3)*h],i*3);for(const [dx,dy,dz]of [[1,0,0],[0,1,0],[0,0,1],[1,1,0],[1,-1,0],[1,0,1],[1,0,-1],[0,1,1],[0,1,-1]])if(x+dx<N&&y+dy>=0&&y+dy<N&&z+dz>=0&&z+dz<N)this.edges.push([i,id(x+dx,y+dy,z+dz),Math.hypot(dx,dy,dz)*h]);}
-  this.p.set(this.rest);this.lambda=new Float32Array(this.edges.length);this.save();
+  this.p.set(this.rest);
+  // Resolve initial penetration before the first displayed frame, rather than
+  // pushing the cage out of the floor/obstacle on the next frame in one jump.
+  if(this.s.dynFloor>.5||this.s.dynObstacle){const origin=[this.s.positionX||0,this.s.positionY||0,0];for(let i=0;i<COUNT;i++){const q=projectDynamicsContact(this.s,[this.p[i*3]+origin[0],this.p[i*3+1]+origin[1],this.p[i*3+2]]);for(let c=0;c<3;c++)this.p[i*3+c]=q[c]-origin[c];}}
+  this.lambda=new Float32Array(this.edges.length);this.save();
  }
  save(){this.checkpoints.set(this.tick,{p:this.p.slice(),v:this.v.slice()});if(this.checkpoints.size>18){const key=[...this.checkpoints.keys()].find(k=>k!==0);this.checkpoints.delete(key);}}
  restore(tick){let best=0;for(const k of this.checkpoints.keys())if(k<=tick&&k>best)best=k;const c=this.checkpoints.get(best);this.p.set(c.p);this.v.set(c.v);this.tick=best;}
@@ -48,6 +52,10 @@ export class DynamicsSolver{
    // Bound deformation relative to the cage. This is a reduced physical model,
    // with no unconstrained escape or explosive accumulation at large forces.
    for(let c=0;c<3;c++)p[j+c]=clamp(p[j+c],rest[j+c]-1.4,rest[j+c]+1.4);
+   // Limit impulses from competing distance/contact constraints. This bounds
+   // per-step travel, not the accumulated deformation or the collision radius.
+   const travel=Math.hypot(p[j]-old[j],p[j+1]-old[j+1],p[j+2]-old[j+2]),maxTravel=6*DT;
+   if(travel>maxTravel)for(let c=0;c<3;c++)p[j+c]=old[j+c]+(p[j+c]-old[j+c])*maxTravel/travel;
    const world=[p[j]+origin[0],p[j+1]+origin[1],p[j+2]],contact=projectDynamicsContact(s,world),delta=contact.map((x,c)=>x-world[c]),depth=Math.hypot(...delta);
    for(let c=0;c<3;c++)v[j+c]=(p[j+c]-old[j+c])/DT;
    if(depth>1e-9){const n=delta.map(x=>x/depth),vn=v[j]*n[0]+v[j+1]*n[1]+v[j+2]*n[2];for(let c=0;c<3;c++){p[j+c]+=delta[c];v[j+c]=(v[j+c]-n[c]*Math.min(0,vn)*(1+s.dynBounce))*(1-s.dynFriction*.25);}}
@@ -58,8 +66,23 @@ export class DynamicsSolver{
  frame(seconds,amount=1){if(this.lastFrame?.seconds===seconds&&this.lastFrame?.amount===amount)return this.lastFrame;const fraction=clamp(seconds/DT-this.tick,0,1),data=new Float32Array(COUNT*8);let max=0;for(let i=0;i<COUNT;i++)for(let c=0;c<3;c++){const d=(this.p[i*3+c]+fraction*DT*this.v[i*3+c]-this.rest[i*3+c])*amount;data[i*4+c]=d;max=Math.max(max,Math.abs(d));}for(let i=0;i<COUNT;i++){const p=Array.from(this.rest.subarray(i*3,i*3+3));let q=p.slice();for(let j=0;j<12;j++){const d=gridSample(data,this.extent,q);q=q.map((v,k)=>v*.25+(p[k]-d[k])*.75);}for(let c=0;c<3;c++)data[(COUNT+i)*4+c]=q[c]-p[c];}return this.lastFrame={data,amount,extent:this.extent,max,seconds,n:N,center:[this.s.positionX||0,this.s.positionY||0,0]};}
 }
 export class Dynamics{
- constructor(sample){this.sample=sample;}
- state(s,seconds,budget=16){if(!(s.dynAmount>0))return s;const animated=DRIVE_KEYS.some(k=>s.motions?.[k]?.enabled),period=s.keepMotionSpeed!==false&&s.motionPeriod>0?s.motionPeriod:s.duration||12,key=JSON.stringify([...Object.keys(DYNAMICS_DEFAULTS).filter(k=>k!=='dynAmount').map(k=>s[k]??DYNAMICS_DEFAULTS[k]),...DRIVE_KEYS.map(k=>[s[k],s.motions?.[k]]),s.motion,s.perfectLoop,period,s.dynFields>0?[s.forcePoints,s.forcePaths]:null]);if(key!==this.key){this.key=key;this.solver=new DynamicsSolver(s,animated&&this.sample?t=>this.sample(s,t/period*Math.PI*2):null);}if(!this.solver.advance(seconds,budget))return null;return {...s,_dynamics:this.solver.frame(seconds,s.dynAmount)};}
+ constructor(sample,live=false){this.sample=sample;this.live=live;}
+ reset(){this.solver=null;this.key=null;}
+ updateLive(s,drive,seconds){
+  const previous=this.solver,next=new DynamicsSolver(s,drive);
+  next.tick=Math.floor(Math.max(0,seconds)/DT+1e-7);
+  if(previous){
+   if(previous.extent===next.extent){next.p.set(previous.p);next.v.set(previous.v);next.tick=previous.tick;}
+   else{
+    const field=previous.frame(previous.tick*DT,1),velocity=new Float32Array(COUNT*4);
+    for(let i=0;i<COUNT;i++)velocity.set(previous.v.subarray(i*3,i*3+3),i*4);
+    for(let i=0;i<COUNT;i++){const rest=Array.from(next.rest.subarray(i*3,i*3+3)),delta=gridSample(field.data,previous.extent,rest),v=gridSample(velocity,previous.extent,rest);for(let c=0;c<3;c++){next.p[i*3+c]=rest[c]+delta[c];next.v[i*3+c]=v[c];}}
+    next.tick=previous.tick;
+   }
+  }
+  next.checkpoints.clear();next.save();this.solver=next;
+ }
+ state(s,seconds,budget=16){if(!(s.dynAmount>0)){if(this.live)this.reset();return s;}if(this.live&&this.solver&&seconds+1e-7<this.solver.tick*DT)this.reset();const animated=DRIVE_KEYS.some(k=>s.motions?.[k]?.enabled),period=s.keepMotionSpeed!==false&&s.motionPeriod>0?s.motionPeriod:s.duration||12,key=JSON.stringify([...Object.keys(DYNAMICS_DEFAULTS).filter(k=>k!=='dynAmount').map(k=>s[k]??DYNAMICS_DEFAULTS[k]),...DRIVE_KEYS.map(k=>[s[k],s.motions?.[k]]),s.motion,s.perfectLoop,period,s.dynFields>0?[s.forcePoints,s.forcePaths]:null]);if(key!==this.key){this.key=key;const drive=animated&&this.sample?t=>this.sample(s,t/period*Math.PI*2):null;if(this.live)this.updateLive(s,drive,seconds);else this.solver=new DynamicsSolver(s,drive);}if(!this.solver.advance(seconds,budget))return null;return {...s,_dynamics:this.solver.frame(seconds,s.dynAmount)};}
  async stateAsync(s,seconds,o={}){let frame;while(!(frame=this.state(s,seconds,48))){if(o.cancelled?.())return null;o.onStage?.('preparing');await new Promise(r=>setTimeout(r,0));}return o.cancelled?.()?null:frame;}
 }
 // Packed forward/inverse grids. Manual interpolation keeps subpixel normals smooth; hardware linear filtering quantizes interpolation weights.

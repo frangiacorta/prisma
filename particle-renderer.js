@@ -1,17 +1,17 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=dbc2871327ae';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=dbc2871327ae';
-import {ParticleOptics} from './particle-optics.js?v=dbc2871327ae';
-import {shadowLight} from './particle-shadow.js?v=dbc2871327ae';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=dbc2871327ae';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=dbc2871327ae';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=dbc2871327ae';
-import {ParticleLinks} from './particle-links.js?v=dbc2871327ae';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=dbc2871327ae';
-import {LayeredVeils} from './layered-veils.js?v=dbc2871327ae';
-import {LivingStructures} from './living-structures.js?v=dbc2871327ae';
-import {fieldGLSL} from './particle-field.js?v=dbc2871327ae';
-import {forceBarrierGLSL} from './particle-forces.js?v=dbc2871327ae';
-import {prismaShadingGLSL} from './particle-shading.js?v=dbc2871327ae';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=13c4abb4756d';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=13c4abb4756d';
+import {ParticleOptics} from './particle-optics.js?v=13c4abb4756d';
+import {shadowLight} from './particle-shadow.js?v=13c4abb4756d';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=13c4abb4756d';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=13c4abb4756d';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=13c4abb4756d';
+import {ParticleLinks} from './particle-links.js?v=13c4abb4756d';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=13c4abb4756d';
+import {LayeredVeils} from './layered-veils.js?v=13c4abb4756d';
+import {LivingStructures} from './living-structures.js?v=13c4abb4756d';
+import {fieldGLSL} from './particle-field.js?v=13c4abb4756d';
+import {forceBarrierGLSL} from './particle-forces.js?v=13c4abb4756d';
+import {prismaShadingGLSL} from './particle-shading.js?v=13c4abb4756d';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -146,14 +146,15 @@ const fiberGain=s=>Math.pow(Math.min(1,4000/Math.max(1,s.pTrailCount*Math.max(1,
 export class ParticleRenderer{
  constructor(canvas){
   this.canvas=canvas;const gl=this.gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});
-  if(!gl)throw Error('WebGL 2 non disponibile.');this.float=!!gl.getExtension('EXT_color_buffer_float');this.pointSizeLimit=gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1];
+  if(!gl)throw Error('WebGL 2 non disponibile.');this.parallelExtension=gl.getExtension('KHR_parallel_shader_compile');this.pendingPrograms=new Set();this.float=!!gl.getExtension('EXT_color_buffer_float');this.pointSizeLimit=gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1];
   this.points=this.program(pointVert,pointFrag);this.lines=this.program(trailVert,trailFrag);this.pathProgram=this.float?this.program(screenVert,pathFrag):null;this.blur=this.program(screenVert,blurFrag);this.compose=this.program(screenVert,composeFrag);
   this.empty=gl.createVertexArray();this.guides=new GuideField(this);this.targets=[];this.width=0;this.height=0;this.seed=null;this.completedFrames=0;this.gpuSample=0;this.gpuMilliseconds=null;
   this.maxSize=Math.min(4096,gl.getParameter(gl.MAX_TEXTURE_SIZE),gl.getParameter(gl.MAX_RENDERBUFFER_SIZE));this.recoveryExtension=gl.getExtension('WEBGL_lose_context');
   this.timerExtension=gl.getExtension('EXT_disjoint_timer_query_webgl2');this.queries=[];
  }
- program(v,f,varyings=null,materialAlpha=false){const shaders=shadowProgram(v,f,varyings);v=shaders.vertex;f=shaders.fragment;const gl=this.gl,program=gl.createProgram();for(const [type,source]of [[gl.VERTEX_SHADER,v],[gl.FRAGMENT_SHADER,f]]){const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(shader));gl.attachShader(program,shader);gl.deleteShader(shader);}if(varyings)gl.transformFeedbackVaryings(program,varyings,gl.INTERLEAVED_ATTRIBS);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));return {program,uniforms:new Map(),materialAlpha};}
- loc(p,k){if(!p.uniforms.has(k))p.uniforms.set(k,this.gl.getUniformLocation(p.program,k));return p.uniforms.get(k);}
+ program(v,f,varyings=null,materialAlpha=false){const shaders=shadowProgram(v,f,varyings);v=shaders.vertex;f=shaders.fragment;const gl=this.gl,program=gl.createProgram();for(const [type,source]of [[gl.VERTEX_SHADER,v],[gl.FRAGMENT_SHADER,f]]){const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);gl.attachShader(program,shader);gl.deleteShader(shader);}if(varyings)gl.transformFeedbackVaryings(program,varyings,gl.INTERLEAVED_ATTRIBS);gl.linkProgram(program);const result={program,uniforms:new Map(),materialAlpha,ready:false};this.pendingPrograms.add(result);return result;}
+ finishProgram(p){if(p.ready)return;if(!this.gl.getProgramParameter(p.program,this.gl.LINK_STATUS))throw Error(this.gl.getProgramInfoLog(p.program)||'Impossibile preparare le particelle.');p.ready=true;this.pendingPrograms.delete(p);}
+ loc(p,k){this.finishProgram(p);if(!p.uniforms.has(k))p.uniforms.set(k,this.gl.getUniformLocation(p.program,k));return p.uniforms.get(k);}
  u(p,k,...v){const loc=this.loc(p,k);if(loc!==null)this.gl['uniform'+v.length+'f'](loc,...v);}
  geometry(seed){const gl=this.gl;if(this.buffer)gl.deleteBuffer(this.buffer);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pointVAO)gl.deleteVertexArray(this.pointVAO);if(this.quadVAO)gl.deleteVertexArray(this.quadVAO);
   const r=rng(seed),random=new Float32Array(1024*293*4);for(let i=0;i<random.length;i++)random[i]=r();
@@ -210,9 +211,24 @@ export class ParticleRenderer{
   const lights=s.lights.filter(l=>l.enabled).slice(0,8);gl.uniform1i(this.loc(p,'uLightCount'),lights.length);
   if(lights.length){gl.uniform4fv(this.loc(p,'uLights'),lights.flatMap(l=>[l.x,l.y,l.z,l.power]));gl.uniform3fv(this.loc(p,'uLightColors'),lights.flatMap(l=>linearRgb(l.color)));gl.uniform1fv(this.loc(p,'uLightSizes'),lights.map(l=>l.size));}
  }
- prepare(){return true;}async prepareAsync(s,p,o={}){return !o.cancelled?.();}
+ prepare(source,phase=0){
+  if(this.gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');
+  const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};
+  // Queue optional geometry programs before drawing, without blocking the UI
+  // on LINK_STATUS while the driver is still compiling them.
+  if(s.pLiving===4)this.veils??=new LayeredVeils(this,common);
+  else if(s.pLiving>0)this.living??=new LivingStructures(this,common);
+  if(s.pLinks>0&&s.pLiving!==4)this.connections??=new ParticleLinks(this,common);
+  const required=new Set([this.points,this.blur,this.compose]);
+  if(s.pTrailCount>0&&s.pTrailLength>0){required.add(this.lines);if(this.pathProgram)required.add(this.pathProgram);}
+  if(this.guides.program&&s.forcePaths?.some(p=>p.enabled&&p.points?.length>=2))required.add(this.guides.program);
+  for(const effect of [s.pLiving===4?this.veils:s.pLiving>0?this.living:null,s.pLinks>0&&s.pLiving!==4?this.connections:null])if(effect)for(const p of Object.values(effect))if(p?.uniforms instanceof Map)required.add(p);
+  // An effect switched off while it compiles must not hold up the active scene.
+  let ready=true;for(const p of required){if(p.ready)continue;if(this.parallelExtension&&!this.gl.getProgramParameter(p.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}this.finishProgram(p);}return ready;
+ }
+ async prepareAsync(s,p,o={}){let slow=false;const start=performance.now();o.onStage?.('preparing');while(!o.cancelled?.()){if(this.prepare(s,p)){o.onStage?.('rendering');return true;}if(!slow&&performance.now()-start>30000){slow=true;o.onStage?.('preparing-slow');}await new Promise(r=>setTimeout(r,16));}return false;}
  draw(source,phase=0,w=this.canvas.width,h=this.canvas.height,options={}){
-  const gl=this.gl;if(gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');
+  const gl=this.gl;if(gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');if(options.preview&&!this.prepare(source,phase))return false;
   phase=((phase/(Math.PI*2))%1+1)%1;const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase*Math.PI*2)};
   if(s.pLiving===4){s.pCount=0;s.pTrailCount=0;s.pLinks=0;s.pLivingBlend=1;}
   const weights=livingWeights(s);s.pOpacity*=weights.core;s.pTrailOpacity*=weights.core;s.pLinks*=weights.core;s.pSkin*=weights.structure;s.pThreadOpacity*=weights.structure;this.occlusion=0;
@@ -273,7 +289,7 @@ export class ParticleRenderer{
   }
  }
  opticalDrawState(){if(this.shadowPass?.mode===2){const g=this.gl;g.enable(g.DEPTH_TEST);g.depthFunc(g.LEQUAL);g.depthMask(true);g.disable(g.BLEND);}}
- async drawAccumulated(s,p,w,h,o={}){if(o.cancelled?.())return false;this.draw(s,p,w,h,o);const ok=await this.waitForGpu(o);o.progress?.(1);return ok;}
+ async drawAccumulated(s,p,w,h,o={}){if(!await this.prepareAsync(s,p,o))return false;this.draw(s,p,w,h,o);const ok=await this.waitForGpu(o);o.progress?.(1);return ok;}
  async drawTiled(...args){return this.drawAccumulated(...args);}
  pollCompletion(){if(!this.completionSync)return true;const gl=this.gl,result=gl.clientWaitSync(this.completionSync,0,0);if(result===gl.WAIT_FAILED)throw Error('Sincronizzazione GPU interrotta.');if(result===gl.TIMEOUT_EXPIRED)return false;gl.deleteSync(this.completionSync);this.completionSync=null;this.completedFrames++;return true;}
  async waitForGpu(o={}){const start=performance.now();while(!this.pollCompletion()){if(this.gl.isContextLost()||performance.now()-start>120000)throw Error('La GPU non risponde.');await new Promise(r=>setTimeout(r,4));}return !o.cancelled?.();}
