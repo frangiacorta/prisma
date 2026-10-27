@@ -1,0 +1,275 @@
+{
+  "checked": "2026-10-27",
+  "title": "Playground · studio del flusso VJ",
+  "status": "Ricerca verificata e prova GPU isolata; dashboard di produzione ancora da completare",
+  "decision": "Un banco performance con due scene A/B, mix visivo e trasformazione dei parametri distinti, tempo indipendente, macro e mappature. Le scene sono create in Prisma; nessun caricamento di clip richiesto.",
+  "software": [
+    {
+      "name": "Resolume Avenue / Arena + Wire",
+      "version": "7.28.1 rev 26535, 6 ottobre 2026",
+      "sources": [
+        "https://resolume.com/download/",
+        "https://resolume.com/support/en/composition",
+        "https://resolume.com/support/dashboard"
+      ],
+      "verified": "Bus A/B, curve del crossfader, macro con più parametri e intervalli. Arena aggiunge funzioni per uscite e mapping.",
+      "useInPrisma": "Ispirazione per gerarchia e comportamento. Non è una libreria da incorporare."
+    },
+    {
+      "name": "TouchDesigner",
+      "version": "Official 2025.33230, 1 settembre 2026",
+      "sources": [
+        "https://derivative.ca/download",
+        "https://derivative.ca/UserGuide/TDAbleton",
+        "https://docs.derivative.ca/Ableton_Link_CHOP"
+      ],
+      "verified": "TDAbleton collega Live tramite script e OSC; Link CHOP espone tempo e sincronizzazione. Progetti .tox richiedono TouchDesigner.",
+      "useInPrisma": "Ponte locale futuro per segnali e sincronizzazione. La versione Pages deve funzionare anche senza TouchDesigner."
+    },
+    {
+      "name": "VDMX6",
+      "version": "1.3.12, annuncio ufficiale del 23 ottobre 2026",
+      "sources": [
+        "https://discourse.vidvox.net/t/vdmx6-1-3-12-update/9020",
+        "https://docs.vidvox.net/vdmx/vdmx_versions.html"
+      ],
+      "verified": "Cue, controllo del tempo, superfici di controllo; piattaforma macOS.",
+      "useInPrisma": "Riferimento d'interfaccia, non software da installare sul PC Windows. L'endpoint versionInfo indicava ancora 1.3.6: prevale l'annuncio datato più recente."
+    },
+    {
+      "name": "Synesthesia",
+      "version": "1.25.2 indicata come corrente nella documentazione consultata",
+      "sources": [
+        "https://app.synesthesia.live/docs/resources/changelogs.html",
+        "https://app.synesthesia.live/docs/manual/presets.html",
+        "https://app.synesthesia.live/docs/manual/controls.html"
+      ],
+      "verified": "Controlli di scena e globali, gruppi escludibili dai richiami, slot di preferiti e playlist.",
+      "useInPrisma": "Separare comandi globali e parametri della scena; richiamare colori senza sostituire forma o movimento."
+    },
+    {
+      "name": "Photism",
+      "version": "Versione numerica non accertata nel manuale consultato",
+      "sources": [
+        "https://photism.app/manual/"
+      ],
+      "verified": "Finestra di controllo e uscita pulita; macro, tastiera, richiamo e morph degli aspetti.",
+      "useInPrisma": "Riprendere la facilità della performance, conservando la modulabilità dei motori Prisma."
+    },
+    {
+      "name": "Form Vision",
+      "version": "1.7, 17 moduli nella pagina prodotto consultata",
+      "sources": [
+        "https://exoaudio.com/plugins/form-vision"
+      ],
+      "verified": "Il materiale precedente mostrava 11 e poi 15 moduli. La pagina attuale descrive FV Link, trattamenti e uscite Spout/Syphon/NDI.",
+      "useInPrisma": "Riferimento per moduli e trattamenti combinabili; nessun renderer pubblico riutilizzabile identificato. Una sorgente video non rende modificabile la geometria originale."
+    }
+  ],
+  "professionalCases": [
+    {
+      "name": "Plastikman · Richie Hawtin / Ali Demirel",
+      "period": "Caso storico, tour 2010",
+      "source": "https://derivative.ca/community-post/plastikman-derivative-team-2010-tour/60824",
+      "evidence": "TouchDesigner, collegamento con Ableton e interfaccia performativa personalizzata.",
+      "lesson": "Collegare eventi e parametri espressivi, senza ridurre tutto alla sola intensità audio."
+    },
+    {
+      "name": "Armin Only · Eyesupply",
+      "period": "Caso storico documentato da Resolume; non affermazione sul setup attuale",
+      "sources": [
+        "https://resolume.com/blog/9746",
+        "https://www.resolume.com/blog/7946"
+      ],
+      "evidence": "Arena e sincronizzazione SMPTE, con margine per improvvisazione.",
+      "lesson": "Lanci sincronizzati e azioni manuali devono convivere; il clock non deve impedire gli interventi live."
+    }
+  ],
+  "reuseCandidates": [
+    {
+      "name": "TDXMorph",
+      "repository": "https://github.com/DarienBrito/TDXMorph",
+      "revision": "55578f036d301940c7ceb6b0f89203ea7989b7f3",
+      "version": "README: PresetManager 4.4.5, ControlMapper 1.1.2; ultimo tag release restituito: v4.3.8. Il progetto dichiara beta pubblica.",
+      "inspected": [
+        "README.md",
+        "Documentation/PresetManager.md",
+        "albero dei file e release"
+      ],
+      "license": "Sei componenti MIT; esempio CC BY-NC 4.0; ParameterMorpher e SceneLauncher commerciali.",
+      "finding": "Il motore gratuito espone blending A/B, tempi e curve per traccia, pause e sequenze. La distribuzione è .tox, senza moduli Python separati nell'albero consultato.",
+      "decision": "Candidato diretto nel percorso TouchDesigner. Per Pages servono un adattatore o una trasposizione mirata; non dichiarare il componente già installato né importabile come JavaScript.",
+      "sources": [
+        "https://github.com/DarienBrito/TDXMorph/blob/master/README.md",
+        "https://github.com/DarienBrito/TDXMorph/blob/master/Documentation/PresetManager.md"
+      ]
+    },
+    {
+      "name": "GL Transitions",
+      "repository": "https://github.com/gl-transitions/gl-transitions",
+      "version": "package 2.0.0",
+      "revision": "0efa1651dfdbc0cdbd57f4cda55f12d8b3dbc0c5",
+      "license": "MIT per i tre shader ispezionati; attribuzione gre conservata",
+      "inspected": [
+        "Fade.glsl",
+        "DirectionalWipe.glsl",
+        "LumaWipe.glsl",
+        "LICENSE"
+      ],
+      "decision": "Riuso diretto provato nel laboratorio WebGL2. Adattatore per alpha e valori esatti agli estremi; le transizioni miscelano immagini, non trasformano geometrie.",
+      "proof": "reports/playground-vj-research/result.json"
+    },
+    {
+      "name": "WEBMIDI.js",
+      "repository": "https://github.com/djipco/webmidi",
+      "version": "3.3.1; tag del 15 settembre 2026",
+      "license": "Apache-2.0",
+      "inspected": [
+        "package.json",
+        "release"
+      ],
+      "decision": "Candidato per ingresso MIDI, clock ed eventi strutturati. Nessuna prova con controller fisico effettuata; non risolve da solo mapping, curve, priorità o sincronizzazione del rendering."
+    },
+    {
+      "name": "Hydra Synth",
+      "repository": "https://github.com/hydra-synth/hydra-synth",
+      "version": "package 1.4.0 sul ramo consultato",
+      "license": "AGPL-3.0 indicata dal repository",
+      "inspected": [
+        "README",
+        "package.json"
+      ],
+      "decision": "Interessante per feedback e composizione generativa; non incorporare l'intero motore nel primo Playground. Introdurrebbe un'altra pipeline e richiede una valutazione della licenza. Non è un plugin universale di transizione."
+    }
+  ],
+  "moodboardConnections": [
+    {
+      "ids": [
+        "img-tdxmorph",
+        "reuse-tdxmorph",
+        "roadmap-preset-morphing"
+      ],
+      "role": "Unificare il vecchio progetto morph con il Playground: A/B, curve, richiami parziali e sequenze. Nessun progetto duplicato."
+    },
+    {
+      "ids": [
+        "img-s19-photism-oracle",
+        "img-s19-photism-relic-ingot",
+        "img-s19-photism-ink-morphogen"
+      ],
+      "role": "Macro leggibili, separazione scena/aspetto e uscita pulita; le scene restano materiali creativi per i banchi A/B."
+    },
+    {
+      "ids": [
+        "img-s18-form-vision",
+        "s23-01",
+        "s23-02"
+      ],
+      "role": "Modulazione di forma, colore, filtri e moto; layer di trattamento sopra il risultato."
+    },
+    {
+      "ids": [
+        "reuse-sndviz",
+        "roadmap-audio-interaction"
+      ],
+      "role": "Riutilizzare i segnali audio già previsti. Il .tox Sndviz 0.5.5 è presente nell'archivio locale, ciò non prova che il ponte live sia operativo."
+    },
+    {
+      "ids": [
+        "roadmap-recursive-warp",
+        "recursive-displace",
+        "roadmap-image-treatments"
+      ],
+      "role": "Controlli di effetti momentanei e intensità del trattamento; non sostituire la scena quando si attiva un filtro."
+    }
+  ],
+  "design": {
+    "principles": [
+      "Editor Esperto come avvio; sfera semplice, 16:9 e nero puro conservati.",
+      "Qualsiasi effetto della moodboard resta raggiungibile attraverso parametri combinabili.",
+      "Il Playground controlla le stesse scene e gli stessi parametri dell'editor.",
+      "Mostrare sempre destinazione A/B/uscita, valore, stato e sorgente che sta controllando un parametro.",
+      "Controlli globali, mapping e progetto performativo non vengono azzerati caricando un aspetto."
+    ],
+    "topRow": [
+      "Uscita finale e indicatore scena pronta",
+      "Lancio A / B",
+      "Mix A–B",
+      "Tipo di transizione",
+      "Durata",
+      "Velocità movimento",
+      "Tempo BPM e Tap",
+      "Nero / ripristino"
+    ],
+    "mainControls": [
+      "8 macro rinominabili con più destinazioni e intervalli individuali",
+      "Pad XY assegnabile",
+      "Slot di stati con miniatura e destinazione esplicita",
+      "Forza dei filtri e bypass temporaneo",
+      "Pausa e ripresa con continuità"
+    ],
+    "secondaryControls": [
+      "Forma e distribuzione",
+      "Materia e trasparenza",
+      "Palette e sfumature",
+      "Luci",
+      "Camera",
+      "Dinamica e campi",
+      "Reattività audio",
+      "Dettaglio dei singoli filtri"
+    ],
+    "mapping": [
+      "Clic su Assegna, poi movimento del controllo",
+      "Mouse/touch, tastiera, gamepad e MIDI",
+      "Tasto momentaneo, interruttore o incremento",
+      "Valore minimo/massimo, inversione e curva",
+      "Ripresa del valore senza salto e zona morta degli stick",
+      "Stato di connessione e ripristino dei tasti al distacco",
+      "Mappature salvate nel progetto; assegnazione anche ai comandi di mix e lancio"
+    ],
+    "transitions": {
+      "mix": "Due scene renderizzate separatamente e composte: dissolvenza, taglio, passaggio direzionale, maschera di luminanza. Funziona anche tra Forma e Particelle.",
+      "morph": "Interpolazione selettiva dei parametri sullo stesso motore: mantiene una sola scena modificabile. Angoli, colori, quantità discrete e liste richiedono regole specifiche.",
+      "duration": "Secondi oppure battiti; avvio libero, sul prossimo battito o sulla prossima battuta.",
+      "curve": "Lineare, morbida, accelerazione, decelerazione; avanti e ritorno con tempi indipendenti.",
+      "motion": "Clock della scena indipendente dalla durata della transizione. Aumentare il fade non deve rallentare i movimenti.",
+      "interruption": "Interrompere una transizione ripartendo dal risultato corrente, senza ricaricare il punto iniziale.",
+      "performance": "Preparare B prima del lancio; mostrare lo stato di preparazione. Non sostituire di nascosto una scena live con un'immagine ferma."
+    },
+    "output": "Prima uscita browser pulita su secondo schermo. Spout, OSC UDP e Ableton Link nativi richiedono un percorso locale dedicato; fullscreen non equivale al mapping di più proiettori."
+  },
+  "implementationOrder": [
+    {
+      "step": 1,
+      "name": "Banco e trasformazione",
+      "deliver": "Macro multParametro, snapshot A/B sullo stesso motore, curva/durata, clock indipendente, learn e salvataggio.",
+      "doneWhen": "Gli estremi ripristinano i valori esatti; i gruppi bloccati non cambiano; il cambio di velocità non salta di fase."
+    },
+    {
+      "step": 2,
+      "name": "Mixer di scene",
+      "deliver": "Due scene, anteprima della successiva, crossfader e tre transizioni GL già provate; uscita pulita.",
+      "doneWhen": "Forma e Particelle restano entrambe in movimento durante il mix; preparare B non blocca A; nessun nero involontario."
+    },
+    {
+      "step": 3,
+      "name": "Tempo e sequenza",
+      "deliver": "Tap/BPM, lanci quantizzati, slot e sequenza, ripresa dopo interruzione, registrazione dei gesti.",
+      "doneWhen": "Lanci rispettano la griglia, niente salto cambiando BPM; salvataggio e riproduzione della performance verificati."
+    },
+    {
+      "step": 4,
+      "name": "Collegamenti da palco",
+      "deliver": "Valutare MIDI clock, ponte TouchDesigner/OSC e uscita Spout; controller fisico e secondo schermo.",
+      "doneWhen": "Verifica reale di collegamento, perdita e riaggancio; carico di due scene complesse misurato sul PC."
+    }
+  ],
+  "lab": {
+    "test": "checks/playground-vj-research.mjs",
+    "result": "reports/playground-vj-research/result.json",
+    "source": "Due fotogrammi originali generati da Prisma v66: Forma e Particelle. Nessun preset privato o media della moodboard pubblicato.",
+    "passed": "Tre shader compilati su RTX 5090 Laptop; A/B esatti pixel per pixel; direzioni diverse con effetto misurabile; zero errori GL/JS.",
+    "timing": "Passaggio di mix 1920×1080: mediane GPU circa 0,011–0,012 ms, 12 campioni per shader. Sorgenti già renderizzate a 640×360.",
+    "limits": "Non misura il costo di due scene animate complete, non dimostra 60 fps su scene complesse, non verifica controller reali. Nessun software desktop terzo installato."
+  }
+}

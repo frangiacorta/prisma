@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-27",
+  "scope": "Mixer experiment on two rendered Prisma frames, not a complete live dual-deck performance benchmark",
+  "checks": [
+    {
+      "name": "Fade",
+      "endpointA": {
+        "max": 0,
+        "mean": 0
+      },
+      "endpointB": {
+        "max": 0,
+        "mean": 0
+      }
+    },
+    {
+      "name": "DirectionalWipe",
+      "endpointA": {
+        "max": 0,
+        "mean": 0
+      },
+      "endpointB": {
+        "max": 0,
+        "mean": 0
+      }
+    },
+    {
+      "name": "Horizontal vs vertical",
+      "difference": {
+        "max": 236,
+        "mean": 7.543870442708333
+      }
+    },
+    {
+      "name": "LumaWipe",
+      "endpointA": {
+        "max": 0,
+        "mean": 0
+      },
+      "endpointB": {
+        "max": 0,
+        "mean": 0
+      }
+    }
+  ],
+  "errors": [],
+  "timings": [
+    {
+      "name": "Fade",
+      "width": 1920,
+      "height": 1080,
+      "medianGpuMs": 0.011456,
+      "samples": 12
+    },
+    {
+      "name": "DirectionalWipe",
+      "width": 1920,
+      "height": 1080,
+      "medianGpuMs": 0.012032,
+      "samples": 12
+    },
+    {
+      "name": "LumaWipe",
+      "width": 1920,
+      "height": 1080,
+      "medianGpuMs": 0.012384,
+      "samples": 12
+    }
+  ],
+  "preparations": [
+    3941.5,
+    4614.100000023842
+  ],
+  "adapter": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)"
+}

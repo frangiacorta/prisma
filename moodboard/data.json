@@ -13783,7 +13783,7 @@
     },
     {
       "id": "roadmap-preset-morphing",
-      "name": "Morphing tra preset",
+      "name": "Playground · morph e mix A/B",
       "kind": "project",
       "related": [
         "s09-05",
@@ -13798,7 +13798,8 @@
       "author": "",
       "summary": "TDXMorph include già PresetManager MIT gratuito con A/B e motore multitraccia. Valutare uso diretto sul PC o port selettivo per Prisma web; salvataggio/import/export Prisma esistenti restano la base.",
       "sources": [
-        "https://github.com/DarienBrito/TDXMorph"
+        "https://github.com/DarienBrito/TDXMorph",
+        "https://frangiacorta.github.io/prisma/previews/playground-ricerca/"
       ],
       "sections": [
         {
@@ -13893,6 +13894,29 @@
               ]
             }
           ]
+        },
+        {
+          "title": "Ricerca VJ · 27 ottobre 2026",
+          "fields": [
+            {
+              "label": "Verifica",
+              "value": "Ricerca VJ verificata il 27 ottobre: mix di due scene e morph dei parametri distinti; tempo del movimento indipendente dalla transizione. Tre shader GL Transitions MIT provati su fotogrammi Prisma. Il Playground completo resta da implementare e collaudare."
+            },
+            {
+              "label": "Prossimi controlli",
+              "value": [
+                "Macro con più parametri",
+                "Snapshot e richiami parziali",
+                "Mix di due scene A/B",
+                "Durata in secondi o battiti",
+                "Curve di entrata e uscita",
+                "Clock del movimento indipendente",
+                "Lancio quantizzato",
+                "Mappature mouse, tastiera, joystick e MIDI",
+                "Uscita pulita su secondo schermo"
+              ]
+            }
+          ]
         }
       ],
       "families": [
@@ -13903,7 +13927,7 @@
       "result": "",
       "where": "",
       "platform": "",
-      "next": "",
+      "next": "Banco A/B con trasformazione e mix distinti, macro e clock indipendente. Il laboratorio di transizioni è verificato; la performance con due scene vive resta da completare.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -13919,7 +13943,12 @@
       "assets": [],
       "illustrationFrom": "s09-05",
       "completedProjects": [],
-      "aliases": [],
+      "aliases": [
+        "Morphing tra preset",
+        "VJ",
+        "Performance",
+        "Mix A/B"
+      ],
       "topics": [
         "presets"
       ],
