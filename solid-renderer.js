@@ -1,7 +1,7 @@
-import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=5298b13e4def';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=5298b13e4def';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=5298b13e4def';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=5298b13e4def';
+import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=127aa74b1cae';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=127aa74b1cae';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=127aa74b1cae';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=127aa74b1cae';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -1027,30 +1027,35 @@ PREVIEW_FRAG=shaderFunction(PREVIEW_FRAG,'rayEpsilon',`float rayEpsilon(){
  float voxel=min(min(uShape.y,uShape.z),max(.06,uShape.x*uShape.w))*uFrame.x*(uFieldMax.x-uFieldMin.x)/max(1.,uFieldAtlas.x-1.);
  return max(original,min(wallDepth()*.04,voxel*.002));
 }`);
+// One field evaluation site for marching, grazing probes and bisection.
+// Same samples and tolerances; avoids inlining the sculpt map five times.
 PREVIEW_FRAG=shaderFunction(PREVIEW_FRAG,'traceBoundary',`bool traceBoundary(vec3 origin,vec3 direction,float maximum,bool outerOnly,out vec3 point,out float travel){
  float eps=rayEpsilon();
  if(uScatter.y>.5){float t=firstRoot(ellipsoidRoots(origin,direction,1.));if(!outerOnly&&hasCavity())t=min(t,firstRoot(ellipsoidRoots(origin,direction,uInterior.x*(1.-uInterior.y))));travel=t;point=origin+direction*t;return t<maximum;}
  vec2 interval=objectInterval(origin,direction);float t=max(0.,interval.x),end=min(maximum,interval.y);
  if(t>end){travel=end;point=origin+direction*max(0.,end);return false;}
- float previousT=t,previousD=traceField(origin+direction*t,outerOnly),a=t,b=t,da=previousD;bool found=false;
- for(int j=0;j<int(min(uBudget.x,768.));j++){
-  if(t>end)break;point=origin+direction*t;float d=traceField(point,outerOnly);
-  if(j>0&&d*previousD<0.){a=previousT;b=t;da=previousD;found=true;break;}
-  if(abs(d)<eps&&t>eps*3.){
-   if(primaryTrace){travel=t;point=origin+direction*t;return true;}
-   // A near-zero value can be the boundary we have just left, especially at
-   // grazing refraction angles. Require a sign crossing before changing media.
-   float probe=eps*4.,slope=abs((traceField(point+direction*probe,outerOnly)-d)/probe);
-   float ahead=min(end-t,clamp(eps*8./max(.015,slope),eps*8.,.025*uFrame.x));
-   if(ahead<=0.)break;float after=traceField(origin+direction*(t+ahead),outerOnly);
-   if(previousD*after<0.){a=previousT;b=t+ahead;da=previousD;found=true;break;}
-   previousT=t;previousD=d;t+=ahead;continue;
+ float previousT=t,previousD=0.,a=t,b=t,da=0.,surfaceD=0.,ahead=0.,probe=eps*4.;bool found=false;
+ int stage=0,stepIndex=0,refine=0,steps=int(min(uBudget.x,768.)),refinements=int(min(16.,uRuntime.w));
+ for(int evaluation=0;evaluation<steps*3+refinements;evaluation++){
+  if(stage==0){if(stepIndex>=steps||t>end)break;point=origin+direction*t;}
+  float middle=(a+b)*.5;vec3 samplePoint=stage==0?point:stage==1?point+direction*probe:stage==2?origin+direction*(t+ahead):origin+direction*middle;
+  float value=traceField(samplePoint,outerOnly);
+  if(stage==0){
+   surfaceD=value;if(stepIndex==0)previousD=value;
+   if(stepIndex>0&&value*previousD<0.){a=previousT;b=t;da=previousD;found=true;stage=3;continue;}
+   if(abs(value)<eps&&t>eps*3.){if(primaryTrace){travel=t;return true;}stage=1;continue;}
+   previousT=t;previousD=value;t+=max(min(abs(value)*uRuntime.y*1.5,.22*uFrame.x),eps*2.);stepIndex++;
+  }else if(stage==1){
+   float slope=abs((value-surfaceD)/probe);ahead=min(end-t,clamp(eps*8./max(.015,slope),eps*8.,.025*uFrame.x));if(ahead<=0.)break;stage=2;
+  }else if(stage==2){
+   if(previousD*value<0.){a=previousT;b=t+ahead;da=previousD;found=true;stage=3;continue;}
+   previousT=t;previousD=surfaceD;t+=ahead;stepIndex++;stage=0;
+  }else{
+   if(da*value>0.){a=middle;da=value;}else b=middle;
+   refine++;if(refine>=refinements)break;
   }
-  previousT=t;previousD=d;t+=max(min(abs(d)*uRuntime.y*1.5,.22*uFrame.x),eps*2.);
  }
- if(found){for(int k=0;k<int(min(16.,uRuntime.w));k++){float m=(a+b)*.5,dm=traceField(origin+direction*m,outerOnly);if(da*dm>0.){a=m;da=dm;}else b=m;}travel=(a+b)*.5;}
- else travel=end;
- point=origin+direction*travel;return found;
+ travel=found?(a+b)*.5:end;point=origin+direction*travel;return found;
 }`);
 // Preview scattering uses a bounded estimate of occupied distance. Avoid a
 // nested field-sampling loop inside every light, scattering sample and bounce:

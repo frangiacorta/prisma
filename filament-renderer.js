@@ -1,8 +1,8 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=5298b13e4def';
-import {BASE_FORM_GLSL} from './base-forms.js?v=5298b13e4def';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=5298b13e4def';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=5298b13e4def';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=5298b13e4def';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=127aa74b1cae';
+import {BASE_FORM_GLSL} from './base-forms.js?v=127aa74b1cae';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=127aa74b1cae';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=127aa74b1cae';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=127aa74b1cae';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -21,7 +21,7 @@ vec4 project(vec3 p){vec2 xy=vec2(dot(p,uCameraX),dot(p,uCameraY));
  if(abs(uLens)>.00001){vec2 target=xy;float r=length(target),x=r;for(int i=0;i<8;i++)x=max(0.,x-(x*(1.+uLens*x*x*.18)-r)/max(.1,1.+uLens*x*x*.54));xy*=x/max(.00001,r);}
  return vec4(xy/uCameraSize.xy,-dot(p,uCameraZ)/12.,1.);}
 ${SOLID_FORCES_GLSL}
-vec3 deformWorld(vec3 p){if(!sculptActive())return p;p=dynamicsForward(p);vec3 q=p;float barrier;for(int i=0;i<5;i++)q+=clamp(p-sculptMap(q,barrier),vec3(-.15),vec3(.15));
+vec3 deformWorld(vec3 p){if(!sculptActive())return p;p=dynamicsForward(p);vec3 q=p;float barrier;for(int i=0;i<uSculptIterations;i++)q+=clamp(p-sculptMap(q,barrier),vec3(-.15),vec3(.15));
  for(int i=0;i<uSculptPointCount;i++){vec3 v=q-uSculptPoints[i].xyz;float d=length(v),r=uSculptPointOptions[i].x*smoothstep(1.2,3.,-uSculptPoints[i].w);if(d<r)q=uSculptPoints[i].xyz+v/max(.00001,d)*r;}
  for(int i=0;i<uSculptPathCount;i++){vec3 center=sculptClosest(q,i,uSculptPaths[i].w>.5),v=q-center;float d=length(v),r=uSculptPaths[i].y*smoothstep(1.2,3.,-uSculptPaths[i].x);if(d<r)q=center+v/max(.00001,d)*r;}
  return dynamicsContact(q);}

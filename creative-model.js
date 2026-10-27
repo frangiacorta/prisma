@@ -1,13 +1,13 @@
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=5298b13e4def';
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=5298b13e4def';
-import {normalizeAudioClip} from './audio-recording.js?v=5298b13e4def';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=5298b13e4def';
-import {normalizeAudio} from './audio-model.js?v=5298b13e4def';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles} from './particle-model.js?v=5298b13e4def';
-import {normalizeForcePaths} from './particle-paths.js?v=5298b13e4def';
-import {normalizeForcePoints} from './particle-forces.js?v=5298b13e4def';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=5298b13e4def';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=5298b13e4def';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=127aa74b1cae';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=127aa74b1cae';
+import {normalizeAudioClip} from './audio-recording.js?v=127aa74b1cae';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=127aa74b1cae';
+import {normalizeAudio} from './audio-model.js?v=127aa74b1cae';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles} from './particle-model.js?v=127aa74b1cae';
+import {normalizeForcePaths} from './particle-paths.js?v=127aa74b1cae';
+import {normalizeForcePoints} from './particle-forces.js?v=127aa74b1cae';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=127aa74b1cae';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=127aa74b1cae';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}

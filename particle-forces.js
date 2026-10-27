@@ -3,15 +3,15 @@ export const MAX_FORCE_POINTS=8;
 // The upper end of repulsion becomes an exclusion volume. Lower forces retain
 // the existing soft field; increasing force grows the protected core smoothly.
 export const forceBarrierGLSL=`
-uniform highp int uForceCount;uniform vec4 uForcePoints[11];uniform vec2 uForceOptions[11];
+uniform highp int uForceCount,uForcePasses;uniform vec4 uForcePoints[11];uniform vec2 uForceOptions[11];
 float forceCore(int i){return uForceOptions[i].x*smoothstep(1.2,3.,-uForcePoints[i].w);}
 bool insideForceCore(vec3 p){
- for(int i=0;i<11;i++){if(i>=uForceCount)break;float r=forceCore(i);if(r>0.&&distance(p,uForcePoints[i].xyz)<r*.99999)return true;}return false;
+ for(int i=0;i<uForceCount;i++){float r=forceCore(i);if(r>0.&&distance(p,uForcePoints[i].xyz)<r*.99999)return true;}return false;
 }
 vec3 excludeForceCores(vec3 p){
- for(int pass=0;pass<3;pass++){
+ for(int pass=0;pass<uForcePasses;pass++){
   bool moved=false;
-  for(int i=0;i<11;i++){if(i>=uForceCount)break;float r=forceCore(i);if(r<=0.)continue;
+  for(int i=0;i<uForceCount;i++){float r=forceCore(i);if(r<=0.)continue;
    vec3 d=p-uForcePoints[i].xyz;float len=length(d);
    if(len<r){vec3 n=len>1e-7?d/len:normalize(vec3(.73,.51,.45));p=uForcePoints[i].xyz+n*(r+max(.00001,r*.00001));moved=true;}
   }if(!moved)return p;
@@ -20,7 +20,7 @@ vec3 excludeForceCores(vec3 p){
  // beyond every intersected sphere, including ones not containing its origin.
  if(insideForceCore(p)){
   vec3 ray=normalize(vec3(.73,.51,.45));float travel=0.;
-  for(int i=0;i<11;i++){if(i>=uForceCount)break;float r=forceCore(i);if(r<=0.)continue;
+  for(int i=0;i<uForceCount;i++){float r=forceCore(i);if(r<=0.)continue;
    vec3 d=p-uForcePoints[i].xyz;float b=dot(d,ray),disc=b*b-dot(d,d)+r*r;
    if(disc>=0.)travel=max(travel,-b+sqrt(disc)+max(.00001,r*.00001));
   }p+=ray*travel;
@@ -31,7 +31,7 @@ export function excludeForcePositions(positions,forces){
  if(!cores.length)return positions;
  const ray=[.73,.51,.45],norm=Math.hypot(...ray);for(let k=0;k<3;k++)ray[k]/=norm;
  for(let j=0;j<positions.length;j+=3){let p=Array.from(positions.subarray(j,j+3));
-  for(let pass=0;pass<3;pass++){let moved=false;for(const f of cores){const d=[p[0]-f.x,p[1]-f.y,p[2]-f.z],len=Math.hypot(...d);if(len<f.core){const r=f.core+Math.max(.00001,f.core*.00001);p=[f.x,f.y,f.z].map((v,k)=>v+r*(len>1e-7?d[k]/len:ray[k]));moved=true;}}if(!moved)break;}
+  for(let pass=0;pass<uForcePasses;pass++){let moved=false;for(const f of cores){const d=[p[0]-f.x,p[1]-f.y,p[2]-f.z],len=Math.hypot(...d);if(len<f.core){const r=f.core+Math.max(.00001,f.core*.00001);p=[f.x,f.y,f.z].map((v,k)=>v+r*(len>1e-7?d[k]/len:ray[k]));moved=true;}}if(!moved)break;}
   if(cores.some(f=>Math.hypot(p[0]-f.x,p[1]-f.y,p[2]-f.z)<f.core*.99999)){let travel=0;for(const f of cores){const d=[p[0]-f.x,p[1]-f.y,p[2]-f.z],b=d.reduce((a,v,k)=>a+v*ray[k],0),disc=b*b-d.reduce((a,v)=>a+v*v,0)+f.core*f.core;if(disc>=0)travel=Math.max(travel,-b+Math.sqrt(disc)+Math.max(.00001,f.core*.00001));}p=p.map((v,k)=>v+ray[k]*travel);}
   positions.set(p,j);
  }return positions;

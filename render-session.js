@@ -1,7 +1,16 @@
-// A failed startup never forces the same saved scene straight back onto the GPU.
-// The creation and gallery use their existing keys and are never cleared here.
+// Recovery belongs to this tab. A compiling tab must not block another tab,
+// and leaving the page normally is not a graphics failure.
 export class RenderSession{
- constructor(storage){this.storage=storage;this.key='prisma-render-pending-v1';this.generation='roots-cache-1';this.pending=false;try{const previous=JSON.parse(storage.getItem(this.key)||'null');this.blocked=!!previous?.pending&&previous.generation===this.generation;}catch{this.blocked=false;}}
- begin(){if(this.pending)return;this.pending=true;try{this.storage.setItem(this.key,JSON.stringify({pending:true,generation:this.generation,date:Date.now()}));}catch{}}
- complete(){if(!this.pending)return;this.pending=false;this.blocked=false;try{this.storage.removeItem(this.key);}catch{}}
+ constructor(legacyStorage,tabStorage){
+  this.key='prisma-render-tab-v2';this.generation='startup-66';this.pending=false;this.blocked=false;this.attempts=0;
+  try{legacyStorage?.removeItem('prisma-render-pending-v1');}catch{}
+  try{this.storage=tabStorage??globalThis.sessionStorage;const previous=JSON.parse(this.storage?.getItem(this.key)||'null');
+   if(previous?.generation===this.generation){this.blocked=!!previous.failed||!!previous.pending&&previous.attempts>=1;this.attempts=previous.pending?(previous.attempts||0)+1:0;}
+  }catch{}
+ }
+ write(failed=false){try{this.storage?.setItem(this.key,JSON.stringify({pending:true,failed,attempts:this.attempts,generation:this.generation,date:Date.now()}));}catch{}}
+ begin(){if(this.pending)return;this.pending=true;this.write();}
+ fail(){this.pending=true;this.blocked=true;this.write(true);}
+ restart(){this.pending=false;this.blocked=false;this.attempts=0;this.begin();}
+ complete(){this.pending=false;this.blocked=false;this.attempts=0;try{this.storage?.removeItem(this.key);}catch{}}
 }

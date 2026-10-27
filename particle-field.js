@@ -1,7 +1,7 @@
-import {DYNAMICS_GLSL} from './dynamics.js?v=5298b13e4def';
+import {DYNAMICS_GLSL} from './dynamics.js?v=127aa74b1cae';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=5298b13e4def';
-import {forceBarrierGLSL} from './particle-forces.js?v=5298b13e4def';
+import {guideGLSL} from './particle-path-field.js?v=127aa74b1cae';
+import {forceBarrierGLSL} from './particle-forces.js?v=127aa74b1cae';
 export const fieldGLSL=`
 ${DYNAMICS_GLSL}
 ${guideGLSL}
@@ -60,10 +60,10 @@ vec3 sceneBarriers(vec3 p,vec4 r,float phase){
  p=excludeForceCores(excludeGuideCores(p,r,phase));
  if(insideGuideCore(p,r,phase)){
   float upper=p.z,lower=p.z;
-  for(int i=0;i<4;i++){if(i>=uGuideCount)break;float core=guideCore(i,r,phase),xy=guideClearance(i,p.xy);if(core<=0.||xy>=core)continue;
+  for(int i=0;i<uGuideCount;i++){float core=guideCore(i,r,phase),xy=guideClearance(i,p.xy);if(core<=0.||xy>=core)continue;
    float dz=sqrt(max(0.,core*core-xy*xy))+.00002;upper=max(upper,uGuideA[i].w+dz);lower=min(lower,uGuideA[i].w-dz);
   }
-  for(int i=0;i<11;i++){if(i>=uForceCount)break;float core=forceCore(i),xy=distance(p.xy,uForcePoints[i].xy);if(core<=0.||xy>=core)continue;
+  for(int i=0;i<uForceCount;i++){float core=forceCore(i),xy=distance(p.xy,uForcePoints[i].xy);if(core<=0.||xy>=core)continue;
    float dz=sqrt(max(0.,core*core-xy*xy))+.00002;upper=max(upper,uForcePoints[i].z+dz);lower=min(lower,uForcePoints[i].z-dz);
   }p.z=upper-p.z<=p.z-lower?upper:lower;
  }return containGuidePosition(p,r,phase);
@@ -133,7 +133,7 @@ vec3 positionUnconstrained(vec4 r,float phase){
  p*=uFrame.x;p.xy+=uFrame.yz;
  // Static scene-space fields preserve periodicity and work equally on points and tails.
  vec3 pull=vec3(0.);float influence=0.;
- for(int i=0;i<11;i++){if(i>=uForceCount)break;vec3 d=uForcePoints[i].xyz-p;
+ for(int i=0;i<uForceCount;i++){vec3 d=uForcePoints[i].xyz-p;
   float radius=uForceOptions[i].x,weight=exp(-dot(d,d)/(2.*radius*radius));
   float strength=uForcePoints[i].w,gain=1.-exp(-abs(strength));
   pull+=(sign(strength)*d*gain+cross(vec3(0.,0.,1.),d)*uForceOptions[i].y*.5)*weight;

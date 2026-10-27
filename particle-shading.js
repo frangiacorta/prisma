@@ -1,5 +1,5 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=5298b13e4def';
-import {opticalGLSL} from './particle-optics.js?v=5298b13e4def';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=127aa74b1cae';
+import {opticalGLSL} from './particle-optics.js?v=127aa74b1cae';
 // Particle shading uses Prisma's parameter names. It does not trace solid glass.
 export const prismaShadingGLSL=`
 ${FILM_PATTERN_GLSL}
@@ -125,8 +125,7 @@ vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
  }
  vec3 lit=base*(uFinish.x+(1.-metal)*uEnvironment.z*.22)*uFinish.z+reflection*fresnel*gloss;
  float shininess=mix(180.,2.,rough*rough);
- for(int i=0;i<8;i++){
-   if(i>=uLightCount)break;
+ for(int i=0;i<uLightCount;i++){
    vec3 delta=uLights[i].xyz-p;float distance2=max(.01,dot(delta,delta));vec3 l=normalize(delta);
    float spread=uLightSizes[i]/sqrt(distance2);
    float diffuse=clamp((dot(n,l)+spread)/(1.+spread),0.,1.);
