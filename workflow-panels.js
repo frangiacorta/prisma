@@ -1,5 +1,5 @@
-import {clockStatus} from './animation-clock.js?v=4dc6c236c2ac';
-import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=4dc6c236c2ac';
+import {clockStatus} from './animation-clock.js?v=f039984e2a8a';
+import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=f039984e2a8a';
 export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['library','Libreria']];
 const html=s=>{const d=document.createElement('div');d.innerHTML=s;return d;};
 const section=(title,id)=>{const d=document.createElement('details');d.className='control-details';if(id)d.id=id;const h=document.createElement('summary');h.textContent=title;d.append(h);return d;};
@@ -77,7 +77,7 @@ export function composePanel(id,raw,state){
  // The editor is created on demand; no animation form is hidden in the panel DOM.
  for(const e of [...root.querySelectorAll('[data-path-check$=".enabled"]')]){const path=e.dataset.pathCheck.replace(/\.enabled$/,'');if(!/\.(orbit|pulse)$/.test(path))continue;const d=e.closest('details'),b=document.createElement('button');b.type='button';b.className='animation-link';b.dataset.animatePath=path;b.textContent=d.querySelector('summary').textContent;d.replaceWith(b);}
  nameControls(root);if(id==='shape'&&isParticle(state))particleLayers(root,state);
- if(id==='material'&&isParticle(state))for(const d of root.querySelectorAll('details')){const h=d.querySelector(':scope > summary');if(h?.textContent==='Superficie')h.textContent='Superficie comune';if(h?.textContent==='Riflessi delle fibre')h.textContent='Scie · riflessi';}
+ if(id==='material'&&isParticle(state))for(const d of root.querySelectorAll('details')){const h=d.querySelector(':scope > summary');if(h?.textContent==='Riflessi delle fibre')h.textContent='Fibre · riflessi';}
  for(const e of root.querySelectorAll('[data-param]')){const key=e.dataset.param,path='motions.'+key;if(!tracks.has(path))continue;const t=state.motions?.[key],b=document.createElement('button');b.type='button';b.className='animate-toggle';b.dataset.animatePath=path;b.dataset.animateOpen=key;b.dataset.animationLabel=rowFor(e).querySelector('label').textContent;b.textContent=t?.enabled?'∿ '+t.cycles+'×':'∿';b.setAttribute('aria-label','Anima '+b.dataset.animationLabel);b.setAttribute('aria-pressed',String(!!t?.enabled));rowFor(e).querySelector('.param-line').append(b);}
  stripEmpty(root);return root.innerHTML;
 }
@@ -90,11 +90,11 @@ export function refinePanel(root,level='simple',{state={},baseline={},tab='shape
   const keep=level==='expert'||(level==='complete'&&!expert)||(level==='simple'&&essential.has(e.dataset.param||suffix)&&!expert);
   if(!keep){root.omittedControls.push({key,label:row.querySelector('label')?.textContent||key,html:row.outerHTML,changed:!!changed,expert});row.remove();}
  }
- if(level!=='expert')for(const e of root.querySelectorAll('input.number,input.hex-input'))e.remove();
+ // Detail levels choose parameters, never remove precision or help from a visible one.
  if(level==='simple'){
   root.querySelector('.finish-order')?.remove();
   for(const e of [...root.querySelectorAll('input[data-check],select')]){const key=e.dataset.check||e.dataset.particleSelect||e.dataset.finishSelect||e.id;if(!(e.matches('select')?ESSENTIAL_FIELDS.has(key)||key==='add-animation':ESSENTIAL_FLAGS.has(key)))rowFor(e).remove();}
-  for(const e of [...root.querySelectorAll('button')])if(!e.matches(ESSENTIAL_BUTTONS)&&!e.closest('.base-form-grid,.light-list'))e.remove();
+  for(const e of [...root.querySelectorAll('button')])if(!e.matches(ESSENTIAL_BUTTONS+',.parameter-info,[data-help-text],[data-color-move],[data-color-remove]')&&!e.closest('.base-form-grid,.light-list'))e.remove();
  }
  if(level==='simple')for(const layer of root.querySelectorAll('[data-particle-layer]'))for(const d of [...layer.querySelectorAll('details')].reverse()){d.querySelector(':scope > summary')?.remove();for(const p of d.querySelectorAll(':scope > .help'))p.remove();d.replaceWith(...d.childNodes);}
  if(level==='simple')for(const [i,keys]of [['pOpening','pFill','pThickness','pOrganic'],['pCount','pSize','pSprite','pOpacity'],['pLinks','pLinkNodes','pLinkWidth','pLinkReach'],['pTrailLength','pTrailWidth','pTrailCount'],['pSkin','pFoldDepth','pPores']].entries()){const layer=root.querySelector('[data-particle-layer="'+i+'"]');if(!layer)continue;let anchor=layer.querySelector('summary');for(const key of keys){const input=layer.querySelector('[data-param="'+key+'"],[data-particle-select="'+key+'"]');if(input){const row=rowFor(input);anchor.after(row);anchor=row;}}}

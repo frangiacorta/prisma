@@ -1,5 +1,5 @@
-import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=4dc6c236c2ac';
-import {BodyCamera} from './body-camera.js?v=4dc6c236c2ac';
+import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=f039984e2a8a';
+import {BodyCamera} from './body-camera.js?v=f039984e2a8a';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountBodyTracking({board,getState,remember,mark,renderControls,showTab,toast,invalidate}){
  const runtime=new BodyTrackingState(),overlay=document.createElement('div');
@@ -48,8 +48,8 @@ export function mountBodyTracking({board,getState,remember,mark,renderControls,s
    <button class="outline full" data-body-action="freeze">Congela questa influenza nel preset</button><p class="help">Le impostazioni si salvano nel preset. I gesti sono live: per esportare la posa attuale, congelala. La registrazione animata dei gesti non è ancora disponibile.</p></details>`;
  }
  const controls=document.querySelector('#controls');
- controls.addEventListener('input',e=>{const el=e.target,path=el.dataset.bodyParam||el.dataset.bodyNumber||el.dataset.bodyCheck||el.dataset.bodySelect;if(!path)return;if(!el.dataset.bodyEditing){remember();el.dataset.bodyEditing='1';}const c=settings(),keys=path.split('.');let obj=c;for(const key of keys.slice(0,-1))obj=obj[key];obj[keys.at(-1)]=el.hasAttribute('data-body-check')?el.checked:el.hasAttribute('data-body-select')?el.value:Number(el.value);getState().bodyTracking=normalizeBodyTracking(c);mark();const v=keys.reduce((a,k)=>a[k],getState().bodyTracking);for(const other of controls.querySelectorAll('[data-body-param],[data-body-number]'))if((other.dataset.bodyParam||other.dataset.bodyNumber)===path){other.value=v;if(other.type==='range')other.style.setProperty('--fill',(v-other.min)/(other.max-other.min)*100+'%');}});
- controls.addEventListener('change',e=>{delete e.target.dataset.bodyEditing;if(e.target.dataset.bodySelect==='target')renderControls();});
+ controls.addEventListener('input',e=>{const el=e.target,path=el.dataset.bodyParam||el.dataset.bodyNumber||el.dataset.bodyCheck||el.dataset.bodySelect;if(!path||(el.type==='number'&&(el.value===''||!Number.isFinite(el.valueAsNumber))))return;if(!el.dataset.bodyEditing){remember();el.dataset.bodyEditing='1';}const c=settings(),keys=path.split('.');let obj=c;for(const key of keys.slice(0,-1))obj=obj[key];obj[keys.at(-1)]=el.hasAttribute('data-body-check')?el.checked:el.hasAttribute('data-body-select')?el.value:Number(el.value);getState().bodyTracking=normalizeBodyTracking(c);mark();const v=keys.reduce((a,k)=>a[k],getState().bodyTracking);for(const other of controls.querySelectorAll('[data-body-param],[data-body-number]'))if((other.dataset.bodyParam||other.dataset.bodyNumber)===path){if(other!==document.activeElement)other.value=v;if(other.type==='range')other.style.setProperty('--fill',(v-other.min)/(other.max-other.min)*100+'%');}});
+ controls.addEventListener('change',e=>{delete e.target.dataset.bodyEditing;if(e.target.dataset.bodyNumber)e.target.value=e.target.dataset.bodyNumber.split('.').reduce((o,k)=>o[k],settings());if(e.target.dataset.bodySelect==='target')renderControls();});
  controls.addEventListener('click',e=>{
   const action=e.target.closest('[data-body-action]')?.dataset.bodyAction;if(!action)return;
   if(action==='connect'){stop();mode='camera';camera.start();}

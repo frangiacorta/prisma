@@ -242,3 +242,17 @@ body.preview-expanded{overflow:hidden}
 
 /* The seed enters the toolbar only at Expert level. */
 .random-bar .seed{display:flex}
+
+/* Precision and help remain available at every detail level. */
+.controls input.number,.controls[data-level] input.number{width:76px;min-height:30px;flex:0 0 76px;font-size:13px;font-variant-numeric:tabular-nums;padding:4px 5px}
+.controls .parameter-info{width:26px;height:26px;min-width:26px;flex-shrink:0}
+@media(max-width:600px){.controls input.number,.controls[data-level] input.number{font-size:16px;min-height:34px}.controls .param-line{row-gap:6px}.controls .parameter-info{width:28px;height:28px;min-width:28px}.controls .control-with-help>.field,.controls .control-with-help>.check,.controls .control-with-help>.color-field{padding-right:34px}}
+
+.workflow-menu:not([open])>.workflow-menu-body{display:none}
+
+.overview-actions:not([open])>:not(summary),.overview-active:not([open])>:not(summary){display:none}
+.overview-actions>.quiet{display:block;width:100%;white-space:normal;text-align:left}
+
+@media(max-width:380px){.viewport .canvas-tools,.viewport:fullscreen .canvas-tools{flex-wrap:wrap;justify-content:center;row-gap:2px}}
+
+.small-dialog .param-line,.creative-dialog .param-line{display:flex;align-items:center}.small-dialog .param-line label,.creative-dialog .param-line label{flex:1}.small-dialog input.number,.creative-dialog input.number{width:76px;min-height:32px;font-size:16px}

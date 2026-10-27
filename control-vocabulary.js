@@ -3,12 +3,12 @@ export const CONTROL_NAMES={
  hollow:'Svuotamento degli elementi',wallThickness:'Spessore della parete',scattering:'Diffusione interna',translucency:'Luce in controluce',thinFilm:'Intensità della pellicola',coat:'Vernice trasparente',coatRoughness:'Rugosità della vernice',
  volume:'Profondità della forma',deform:'Irregolarità della forma',scale:'Dimensione della figura',positionX:'Posizione orizzontale',positionY:'Posizione verticale',
  structShell:'Svuotamento',structThickness:'Spessore del guscio',structWeave:'Intreccio della trama',petalWeave:'Intreccio delle appendici',filLength:'Lunghezza dei filamenti',petalLength:'Lunghezza delle appendici',
- pTrailLength:'Lunghezza della scia',pBundles:'Fasci di fibre',pBranches:'Rami esterni',filmThickness:'Spessore ottico (nm)',
+ pFilm:'Intensità della pellicola',pTrailLength:'Lunghezza della scia',pBundles:'Fasci di fibre',pBranches:'Rami esterni',filmThickness:'Spessore ottico (nm)',
  subsurface:'Luce sotto la superficie',sssRadius:'Profondità della diffusione',textureDepth:'Intensità del rilievo',growthFeed:'Alimentazione',growthKill:'Rimozione',growthAge:'Iterazioni',
  finishScanMix:'Quantità',finishWarpMix:'Quantità',finishGlassMix:'Quantità',finishGlyphMix:'Quantità',finishEdgeMix:'Quantità',finishGlitchMix:'Quantità',finishMosaicMix:'Quantità',finishRgbMix:'Quantità',
  finishWarpSeed:'Variante',finishGlyphSeed:'Variante',finishGlitchSeed:'Variante',textureSeed:'Variante',growthSeed:'Variante',pMotionSeed:'Variante del movimento'
 };
-export const SECTION_NAMES={'Materia':'Superficie','Materia e riflessi':'Superficie','Pellicola':'Iridescenza','Interferenza di pellicola':'Iridescenza','Bump procedurale':'Rilievo di superficie','Ritmo':'Andamento','Composizione':'Inquadratura','Distorsione ricorsiva 2D':'Distorsione ricorsiva','Rifrazione 2D':'Vetro ottico','ASCII e segni':'Segni e caratteri','Separazione RGB':'Separazione dei colori','Campi sferici 3d':'Campi sferici 3D','Struttura':'Costruzione','Petali e radici':'Appendici: petali e radici','Trasparenza e diffusione':'Trasparenza e luce interna','Proprietà':'Composizione della struttura'};
+export const SECTION_NAMES={'Ombra e caustica':'Ombre e caustiche','Materia':'Superficie','Materia e riflessi':'Superficie','Pellicola':'Iridescenza','Interferenza di pellicola':'Iridescenza','Bump procedurale':'Rilievo di superficie','Ritmo':'Andamento','Composizione':'Inquadratura','Distorsione ricorsiva 2D':'Distorsione ricorsiva','Rifrazione 2D':'Vetro ottico','ASCII e segni':'Segni e caratteri','Separazione RGB':'Separazione dei colori','Campi sferici 3d':'Campi sferici 3D','Struttura':'Costruzione','Petali e radici':'Appendici: petali e radici','Trasparenza e diffusione':'Trasparenza e luce interna','Proprietà':'Composizione della struttura'};
 export const FILTER_NAMES={scan:'Linee modulate',warp:'Distorsione ricorsiva',glass:'Vetro ottico',glyph:'Segni e caratteri',rgb:'Separazione dei colori',edge:'Contorni',mosaic:'Mosaico',glitch:'Glitch'};
 export function nameControls(root){
  for(const el of root.querySelectorAll('[data-param]')){const name=CONTROL_NAMES[el.dataset.param];if(!name)continue;const row=el.closest('.param'),label=row?.querySelector('label');if(label){el.dataset.searchAliases=label.textContent;label.textContent=name;row.querySelector('.number')?.setAttribute('aria-label',name+': valore');}}
@@ -42,8 +42,11 @@ export const ESSENTIALS={
  }
 };
 export const EXPERT_KEYS=new Set(['seed','textureSeed','growthSeed','growthFeed','growthKill','growthDiffusion','growthAge','pMotionSeed','finishWarpSeed','finishGlyphSeed','finishGlitchSeed','petalCollision','petalSphereCollision','petalContactPasses','petalContactGap','petalContactDamping','petalContactFriction','pTrailQuality']);
-export const ESSENTIAL_FLAGS=new Set(['keepMotionSpeed','finishGlitchFlash','perfectLoop','thinShellMode','environmentRotate','finishScan','finishScanOnly','finishScanSource','finishScanAnimate','finishEnabled','finishWarp','finishGlass','finishGlyph','finishEdge','finishGlitch','finishGlitchAnimate','finishMosaic','finishRgb']);
+export const ESSENTIAL_FLAGS=new Set(['animateRotation','animateShape','animateColor','animateLight','keepMotionSpeed','finishGlitchFlash','perfectLoop','thinShellMode','environmentRotate','finishScan','finishScanOnly','finishScanSource','finishScanAnimate','finishEnabled','finishWarp','finishGlass','finishGlyph','finishEdge','finishGlitch','finishGlitchAnimate','finishMosaic','finishRgb']);
 export const ESSENTIAL_FIELDS=new Set(['dynObstacle','bg-mode','environment','glyph-characters','pSprite','pColorMode','pDirection','pShadowLight','finishGlitchShape']);
 export const ESSENTIAL_BUTTONS='[data-dynamics-reset],[data-base-form],#particle-sphere,#add-color,[data-remove-color],#add-light,[data-light-select],#show-lights,[data-remove-light],[data-animate-open],[data-animate-path],[data-animation-group],[data-parameter-jump],[data-open-library],[data-motion-preset],[data-jump-tab],#add-animation';
-export function essentialKeys(engine,tab){return new Set(Object.values(ESSENTIALS[engine==='particles'?'particles':'solid']?.[tab]||{}).flat());}
+export function essentialKeys(engine,tab){
+ const engines=tab==='shape'?[engine==='particles'?'particles':'solid']:['solid','particles'];
+ return new Set(engines.flatMap(e=>Object.values(ESSENTIALS[e]?.[tab]||{}).flat()));
+}
 

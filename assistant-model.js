@@ -1,8 +1,8 @@
-import {META} from './model.js?v=4dc6c236c2ac';
-import {PARTICLE_META} from './particle-model.js?v=4dc6c236c2ac';
-import {PATH_META} from './particle-paths.js?v=4dc6c236c2ac';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=4dc6c236c2ac';
-import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=4dc6c236c2ac';
+import {META} from './model.js?v=f039984e2a8a';
+import {PARTICLE_META} from './particle-model.js?v=f039984e2a8a';
+import {PATH_META} from './particle-paths.js?v=f039984e2a8a';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=f039984e2a8a';
+import {descriptionCatalog,applyDescriptionPlan} from './description.js?v=f039984e2a8a';
 
 // Shared by the local assistant and browser. Generated text can only propose these controls.
 const sharedParticleKeys='volume stretchX stretchY stretchZ deform twist waves waveScale scale positionX positionY rotateX rotateY rotateZ duration speed motion metal roughness gloss iridescence transparency emission glow environmentPower environmentAngle environmentCycles gradientAngle gradientScale gradientOffset colorSoftness colorWaveAmount colorWaveBands colorWavePhase colorWaveHeight colorWaveRadius colorWaveSwirl colorWaveWarp bgAngle bgHeight bgSoftness bgWash exposure brightness contrast saturation grain temperature photoTint gamma blacks highlights vignette lensDistortion'.split(' ');

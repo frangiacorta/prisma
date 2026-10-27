@@ -1,6 +1,6 @@
-import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=4dc6c236c2ac';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=4dc6c236c2ac';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=4dc6c236c2ac';
+import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=f039984e2a8a';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=f039984e2a8a';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=f039984e2a8a';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};

@@ -1,13 +1,13 @@
-import {Dynamics,disposeDynamics} from './dynamics.js?v=4dc6c236c2ac';
-import {motionPeriod} from './animation-clock.js?v=4dc6c236c2ac';
-import {animationPhase} from './animation-clock.js?v=4dc6c236c2ac';
-import {ScanlinePass} from './finish-scanlines.js?v=4dc6c236c2ac';
-import {FilamentPass} from './filament-renderer.js?v=4dc6c236c2ac';
-import {VeilTransition} from './veil-transition.js?v=4dc6c236c2ac';
-import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=4dc6c236c2ac';
-import {ParticleRenderer} from './particle-renderer.js?v=4dc6c236c2ac';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FINISH_DEFAULTS,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=4dc6c236c2ac';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=4dc6c236c2ac';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=f039984e2a8a';
+import {motionPeriod} from './animation-clock.js?v=f039984e2a8a';
+import {animationPhase} from './animation-clock.js?v=f039984e2a8a';
+import {ScanlinePass} from './finish-scanlines.js?v=f039984e2a8a';
+import {FilamentPass} from './filament-renderer.js?v=f039984e2a8a';
+import {VeilTransition} from './veil-transition.js?v=f039984e2a8a';
+import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=f039984e2a8a';
+import {ParticleRenderer} from './particle-renderer.js?v=f039984e2a8a';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FINISH_DEFAULTS,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=f039984e2a8a';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=f039984e2a8a';
 // One editor and export contract; the saved creation chooses its renderer.
 export class Renderer{
  constructor(canvas){this.dynamics=new Dynamics(sampleFrame);this.canvas=canvas;this.context=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!this.context)throw Error('WebGL 2 non disponibile.');this.frameTimer=this.context.getExtension('EXT_disjoint_timer_query_webgl2');this.frameQueries=[];this.frameGpuSample=0;this.frameGpuMs=null;}

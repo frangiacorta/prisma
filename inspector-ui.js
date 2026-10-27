@@ -1,5 +1,5 @@
-import {organizeSections} from './inspector-navigation.js?v=4dc6c236c2ac';
-import {controlHelp} from './control-help.js?v=4dc6c236c2ac';
+import {organizeSections} from './inspector-navigation.js?v=f039984e2a8a';
+import {controlHelp} from './control-help.js?v=f039984e2a8a';
 const STORE='prisma-interface-v2';
 let preferences={};try{preferences=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(preferences));}catch{}};
@@ -8,6 +8,7 @@ let tip,owner,pinned=false,serial=0;
 function hideTip(){if(tip)tip.hidden=true;owner=null;pinned=false;}
 function showTip(button,pin=false){
  if(!tip){tip=document.createElement('div');tip.id='parameter-tooltip';tip.className='parameter-tooltip';tip.setAttribute('role','tooltip');document.body.append(tip);}
+ const surface=button.closest('dialog[open]')||document.body;if(tip.parentElement!==surface)surface.append(tip);
  owner=button;pinned=pin;tip.replaceChildren();const title=document.createElement('strong');title.textContent=button.dataset.helpLabel;const body=document.createElement('span');body.textContent=button.dataset.helpText;tip.append(title,body);tip.hidden=false;
  const r=button.getBoundingClientRect(),box=tip.getBoundingClientRect();
  tip.style.left=Math.max(10,Math.min(innerWidth-box.width-10,r.right-box.width))+'px';
@@ -19,12 +20,13 @@ document.addEventListener('focusin',e=>{const b=e.target.closest('[data-help-tex
 document.addEventListener('click',e=>{const b=e.target.closest('[data-help-text]');if(b){e.preventDefault();if(pinned&&owner===b)hideTip();else showTip(b,true);}else hideTip();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&owner){e.preventDefault();e.stopImmediatePropagation();hideTip();}});
 window.addEventListener('resize',hideTip);document.addEventListener('scroll',hideTip,true);
-function keyFor(el){const d=el.dataset;return (d.audioSetting?'audio.'+d.audioSetting:null)||(d.audioMap?'audio.'+d.audioMap:null)||(d.bodyParam?'body.'+d.bodyParam:null)||(d.bodyCheck?'body.'+d.bodyCheck:null)||(d.bodySelect?'body.'+d.bodySelect:null)||d.param||d.path||d.color||d.check||d.pathColor||d.pathCheck||d.pathSelect||d.particleSelect||(d.palette!==undefined?'palette.'+d.palette:null)||(d.forceParam?'force.'+d.forceParam:null)||(d.forceEnabled!==undefined?'force.enabled':null)||(d.guideParam?'guide.'+d.guideParam:null)||(d.guideFlag?'guide.'+d.guideFlag:null)||(d.guideSelect?'guide.'+d.guideSelect:null)||el.id;}
-function addHelp(root){
+function keyFor(el){const d=el.dataset;return (d.audioSetting?'audio.'+d.audioSetting:null)||(d.audioMap?'audio.'+d.audioMap:null)||(d.bodyParam?'body.'+d.bodyParam:null)||(d.bodyCheck?'body.'+d.bodyCheck:null)||(d.bodySelect?'body.'+d.bodySelect:null)||d.param||d.path||d.color||d.check||d.pathColor||d.pathCheck||d.pathSelect||d.particleSelect||d.finishSelect||(d.palette!==undefined?'palette.'+d.palette:null)||(d.forceParam?'force.'+d.forceParam:null)||(d.forceEnabled!==undefined?'force.enabled':null)||(d.guideParam?'guide.'+d.guideParam:null)||(d.guideFlag?'guide.'+d.guideFlag:null)||(d.guideSelect?'guide.'+d.guideSelect:null)||el.id;}
+export function addHelp(root){
  for(const el of root.querySelectorAll('input:not(.number):not(.hex-input),select')){
-  const key=keyFor(el),text=controlHelp(key||'');if(!text)continue;
+  const key=keyFor(el),engine=root.dataset.inspectorEngine||root.closest('[data-inspector-engine]')?.dataset.inspectorEngine,text=controlHelp(key||'',engine);if(!text)continue;
   const host=el.closest('.param,.field,.color-field,.check,.palette-item');if(!host||host.querySelector('[data-help-text]'))continue;
-  const label=host.querySelector('label')?.textContent.trim()||el.getAttribute('aria-label')||[...host.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim()||key;
+  const labelNode=host.querySelector('label')?.cloneNode(true);labelNode?.querySelectorAll('output,[hidden],button,.sr-only').forEach(e=>e.remove());
+  const label=labelNode?.textContent.trim()||el.getAttribute('aria-label')||[...host.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim()||key;
   const button=document.createElement('button');button.type='button';button.className='parameter-info';button.textContent='i';button.dataset.helpText=text;button.dataset.helpLabel=label;button.dataset.helpKey=key;button.setAttribute('aria-label','Informazioni: '+label);
   const desc=document.createElement('span');desc.id='parameter-help-'+(++serial);desc.className='sr-only';desc.textContent=text;button.setAttribute('aria-describedby',desc.id);
   for(const input of host.querySelectorAll('input,select'))input.setAttribute('aria-describedby',desc.id);
@@ -35,6 +37,7 @@ function addHelp(root){
 export function captureInspector(root){for(const d of root.querySelectorAll('details[data-disclosure-key]'))preferences[d.dataset.disclosureKey]=d.open;save();}
 export function prepareInspector(root,scope){
  hideTip();
+ root.dataset.inspectorEngine=scope.split('/')[0];
  // Legacy scene tools use sections; keep their IDs and delegate handlers intact.
  for(const section of root.querySelectorAll('section.control-section')){const d=document.createElement('details');d.className='control-details';d.id=section.id;const heading=section.querySelector(':scope > h2'),summary=document.createElement('summary');const text=heading?.textContent||'';summary.textContent=text===text.toLocaleUpperCase('it')?text.charAt(0)+text.slice(1).toLocaleLowerCase('it'):text;heading?.remove();d.append(summary,...section.childNodes);section.replaceWith(d);}
  organizeSections(root,scope);
@@ -48,6 +51,16 @@ export function prepareInspector(root,scope){
  addHelp(root);
 }
 export function mountStudioLayout(){
+ // Randomisation dialogs follow the same precision rule as the main inspector.
+ for(const id of ['variation','similar-intensity']){
+  const range=document.getElementById(id),label=range.closest('label')||document.querySelector('label[for="'+id+'"]');
+  const row=document.createElement('div');row.className='param';const line=document.createElement('div');line.className='param-line';label.before(row);label.classList.remove('field');label.htmlFor=id;for(const output of label.querySelectorAll('output'))output.hidden=true;
+  const number=document.createElement('input');number.type='number';number.className='number';number.id=id+'-number';number.setAttribute('aria-label',label.firstChild.textContent.trim()+' : percentuale');for(const attr of ['min','max','step'])number.setAttribute(attr,range.getAttribute(attr)||'1');number.value=range.value;
+  line.append(label,number);row.append(line,range);
+  const sync=()=>{if(document.activeElement!==number)number.value=range.value;};range.addEventListener('input',sync);range.addEventListener('change',sync);
+  number.addEventListener('input',()=>{if(number.value===''||!Number.isFinite(number.valueAsNumber))return;range.value=number.value;range.dispatchEvent(new Event('input',{bubbles:true}));});
+  number.addEventListener('change',()=>{number.value=range.value;range.dispatchEvent(new Event('change',{bubbles:true}));});addHelp(row);
+ }
  const restart=document.getElementById('reset');restart.className='quiet new-creation';document.querySelector('.random-bar').prepend(restart);
  // Keep scene actions short; infrequent options stay in their own dialog.
  const randomBody=document.querySelector('#random-dialog .dialog-body');

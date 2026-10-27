@@ -1,7 +1,8 @@
-import {newCreation,material} from './creative-model.js?v=4dc6c236c2ac';
-import {MOODS} from './model.js?v=4dc6c236c2ac';
-import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=4dc6c236c2ac';
-import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=4dc6c236c2ac';
+import {newCreation,material} from './creative-model.js?v=f039984e2a8a';
+import {addHelp} from './inspector-ui.js?v=f039984e2a8a';
+import {MOODS} from './model.js?v=f039984e2a8a';
+import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=f039984e2a8a';
+import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=f039984e2a8a';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){
@@ -51,7 +52,8 @@ export function mountWorkflowTools(api){
   }else if(request.group!==undefined){const group=motionGroups(raw)[request.group];if(!group)return;title.textContent=group.querySelector('summary').textContent;group.querySelector('summary').remove();body.append(...group.childNodes);for(const details of body.querySelectorAll('details'))details.open=false;
   }else if(request.omitted){title.textContent='Altri parametri modificati';for(const item of root.omittedControls||[])if(item.changed){const b=button('',item.label,()=>openEditor({key:item.key,expert:item.expert,label:item.label,markup:item.html}));b.className='animation-link';body.append(b);}
   }else{title.textContent=request.label||'Parametro';const current=document.createElement('div');current.innerHTML=composePanel(api.getTab(),raw,getState());const value=request.key?current.querySelector('[data-param="'+request.key+'"]'):null;body.innerHTML=value?.closest('.param')?.outerHTML||request.markup||'';const note=document.createElement('p');note.className='help';note.textContent='Questo controllo appartiene ai livelli avanzati. Il valore resta nel preset anche in Essenziali.';body.prepend(note);const higher=button('','Mostra in '+(request.expert?'Esperto':'Avanzati'),()=>{closeEditor();mode.value=request.expert?'expert':'complete';mode.dispatchEvent(new Event('change'));const el=root.querySelector('[data-param="'+request.key+'"]');if(el){let d=el.closest('details');while(d){d.open=true;d=d.parentElement.closest('details');}el.scrollIntoView({block:'center'});}});body.append(higher);}
-  if(level!=='expert'){for(const number of body.querySelectorAll('input.number'))number.remove();if(request.group!==undefined)for(const e of body.querySelectorAll('[data-param]'))if(EXPERT_KEYS.has(e.dataset.param)||/Seed$|Contact|Collision|Octaves/.test(e.dataset.param))e.closest('.param')?.remove();}
+  if(level!=='expert'&&request.group!==undefined)for(const e of body.querySelectorAll('[data-param]'))if(EXPERT_KEYS.has(e.dataset.param)||/Seed$|Contact|Collision|Octaves/.test(e.dataset.param))e.closest('.param')?.remove();
+  addHelp(body);
   root.append(d);popup=d;d.addEventListener('cancel',()=>{popupRequest=null;popupAdvanced=false;});d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeEditor();}});d.showModal();
  }
  function revealControl(entry){

@@ -1,4 +1,4 @@
-import {SECTION_NAMES} from './control-vocabulary.js?v=4dc6c236c2ac';
+import {SECTION_NAMES} from './control-vocabulary.js?v=f039984e2a8a';
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
  {id:'shape',label:'Forma',tabs:[['shape','Forma','shape']]},
@@ -21,6 +21,11 @@ export function renderNavigation(root,engine,tab,icon){
 }
 export function organizeSections(root,scope){
  if(scope.endsWith('/library'))return;
+ // Shared tasks have the same location in both engines; engine-specific controls
+ // retain their own sections instead of displacing the common workflow.
+ const order=scope.endsWith('/material')?['Superficie','Trasparenza e luce interna','Iridescenza','Rivestimento','Rilievo di superficie','Reazione-diffusione','Fibre · riflessi','Satinatura ed emissione','Scorrimento del materiale']:
+  scope.endsWith('/light')?['Ambiente','Luci','Luce selezionata','Posizione','Sorgente','Riflessi ambiente','Illuminazione','Animazione','Rotazione dei riflessi']:null;
+ if(order){const sections=[...root.children].filter(e=>e.matches('details'));const rank=e=>{let name=e.querySelector(':scope > summary')?.textContent;if(/^LUCE \d+$/i.test(name))name='Luce selezionata';const i=order.indexOf(name);return i<0?order.length:i;};for(const e of sections.sort((a,b)=>rank(a)-rank(b)))root.append(e);}
  // Deep shape controls belong under their parent instead of a long flat list.
  function group(label,id,titles){
   const nodes=[...root.children].filter(d=>titles.includes(d.querySelector(':scope > summary')?.textContent));if(!nodes.length)return;
