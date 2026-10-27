@@ -31,7 +31,7 @@ export function excludeForcePositions(positions,forces){
  if(!cores.length)return positions;
  const ray=[.73,.51,.45],norm=Math.hypot(...ray);for(let k=0;k<3;k++)ray[k]/=norm;
  for(let j=0;j<positions.length;j+=3){let p=Array.from(positions.subarray(j,j+3));
-  for(let pass=0;pass<uForcePasses;pass++){let moved=false;for(const f of cores){const d=[p[0]-f.x,p[1]-f.y,p[2]-f.z],len=Math.hypot(...d);if(len<f.core){const r=f.core+Math.max(.00001,f.core*.00001);p=[f.x,f.y,f.z].map((v,k)=>v+r*(len>1e-7?d[k]/len:ray[k]));moved=true;}}if(!moved)break;}
+  for(let pass=0;pass<16;pass++){let moved=false;for(const f of cores){const d=[p[0]-f.x,p[1]-f.y,p[2]-f.z],len=Math.hypot(...d);if(len<f.core){const r=f.core+Math.max(.00001,f.core*.00001);p=[f.x,f.y,f.z].map((v,k)=>v+r*(len>1e-7?d[k]/len:ray[k]));moved=true;}}if(!moved)break;}
   if(cores.some(f=>Math.hypot(p[0]-f.x,p[1]-f.y,p[2]-f.z)<f.core*.99999)){let travel=0;for(const f of cores){const d=[p[0]-f.x,p[1]-f.y,p[2]-f.z],b=d.reduce((a,v,k)=>a+v*ray[k],0),disc=b*b-d.reduce((a,v)=>a+v*v,0)+f.core*f.core;if(disc>=0)travel=Math.max(travel,-b+Math.sqrt(disc)+Math.max(.00001,f.core*.00001));}p=p.map((v,k)=>v+ray[k]*travel);}
   positions.set(p,j);
  }return positions;

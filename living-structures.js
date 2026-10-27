@@ -1,14 +1,14 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=127aa74b1cae';
-import {excludeForcePositions} from './particle-forces.js?v=127aa74b1cae';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=9fa7ff517902';
+import {excludeForcePositions} from './particle-forces.js?v=9fa7ff517902';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;
-uniform float uBundleAmount;uniform vec3 uLivingMotion;`;
+uniform float uBundleAmount;uniform vec3 uLivingMotion,uSkinFit;uniform int uSkinSamples;`;
 export class LivingStructures{
  constructor(owner,common){
   this.owner=owner;this.gl=owner.gl;this.key='';this.builds=0;
   const gl=this.gl;
   this.capture=owner.program(`#version 300 es
-precision highp float;precision highp int;layout(location=0) in vec4 aRandom;
+precision highp float;precision highp int;layout(location=0) in vec4 aRandom;layout(location=1) in vec4 aAnchor;
 ${common}
 ${controls}
 out vec3 targetPosition;
@@ -17,7 +17,8 @@ void main(){
  if(uBundleAmount>0.){float groups=uLivingShape.x;float band=floor(r.x*groups);float grouped=(band+.5+(fract(r.x*groups)-.5)*uLivingShape.y)/groups;r.x=mix(r.x,grouped,uBundleAmount);}
  r.y=mix(uLivingShape.z*.48,1.,aRandom.y);if(r.y<.00001||r.y>.99999)r.x=.5;
  float delay=uLivingMotion.x*sin(r.x*TAU);
- vec3 p=positionRaw(r,uPhase-delay),origin=vec3(uFrame.yz,0.);
+ vec3 anchors[2];for(int i=0;i<uSkinSamples;i++)anchors[i]=positionRaw(i==0?r:aAnchor,uPhase-(i==0?delay:0.));
+ vec3 p=anchors[0],origin=vec3(uFrame.yz,0.);
  vec3 radial=normalize(p-origin+vec3(.00001));
  float clock=(uPhase-delay)*TAU;
  float envelope=sin(aRandom.y*3.14159265);
@@ -31,6 +32,8 @@ void main(){
  float inwardRoom=max(.0001,length(p-origin)*.7);
  if(offset<0.)offset=inwardRoom*tanh(offset/inwardRoom);
  p+=radial*offset;
+ if(uSkinFit.y>0.)p=mix(p,anchors[1],uSkinFit.y);
+ p=origin+(p-origin)*uSkinFit.x;
  targetPosition=p;gl_Position=vec4(0.,0.,0.,1.);
 }`,`#version 300 es
 precision highp float;precision highp int;out vec4 color;void main(){color=vec4(0.);}`,['targetPosition']);
@@ -58,8 +61,8 @@ precision highp float;precision highp int;precision highp sampler2D;
 layout(location=0) in vec4 aRandom;
 ${common}
 ${sampling}
-out vec3 vPosition,vNormal,vCoord;
-void main(){vec2 vUV=aRandom.xy;vCoord=vec3(cos(vUV.x*TAU),sin(vUV.x*TAU),vUV.y);vPosition=at(ivec2(gl_VertexID%uLivingSize.x,gl_VertexID/uLivingSize.x));vNormal=surfaceNormal(vUV);gl_Position=project(vPosition);}
+out vec3 vPosition,vNormal,vCoord;uniform float uSkinThickness;
+void main(){vec2 vUV=aRandom.xy;vCoord=vec3(cos(vUV.x*TAU),sin(vUV.x*TAU),vUV.y);vPosition=at(ivec2(gl_VertexID%uLivingSize.x,gl_VertexID/uLivingSize.x));vNormal=surfaceNormal(vUV);if(uSkinThickness>0.){float side=gl_InstanceID==0?1.:-1.;vPosition=dynamicsContact(sceneBarriers(vPosition+vNormal*(side*uSkinThickness*.5*uFrame.x),aRandom,uPhase));vNormal*=side;}gl_Position=project(vPosition);}
 `,`#version 300 es
 precision highp float;precision highp int;
 ${common}
@@ -103,12 +106,13 @@ in vec3 vPosition,vNormal,vTangent;in vec2 vUV;in float vSide,vAlpha;out vec4 co
 void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vec4(vUV,.5,.5),uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vec4(vUV,.5,.5),uPhase))discard;float a=vAlpha*(1.-smoothstep(.25,1.,abs(vSide)));if(a<.003)discard;
  vec3 lit=shadeFibre(particleColor(vec4(vUV,.5,.5),vPosition),vPosition,normalize(vNormal),vTangent);
  color=vec4(lit*a,a);}`);
-  this.feedback=gl.createTransformFeedback();this.captureBuffer=gl.createBuffer();this.seedBuffer=gl.createBuffer();this.indices=gl.createBuffer();this.vao=gl.createVertexArray();this.texture=gl.createTexture();
-  gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.seedBuffer);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,4,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indices);gl.bindVertexArray(null);
+  this.feedback=gl.createTransformFeedback();this.captureBuffer=gl.createBuffer();this.seedBuffer=gl.createBuffer();this.anchorBuffer=gl.createBuffer();this.indices=gl.createBuffer();this.vao=gl.createVertexArray();this.texture=gl.createTexture();
+  gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.seedBuffer);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,4,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ARRAY_BUFFER,this.anchorBuffer);gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,4,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indices);gl.bindVertexArray(null);
  }
  capturePositions(s,phase,constrain=false){
   const o=this.owner,gl=this.gl,p=constrain?this.constrain:this.capture,t=this.topology;o.settings(p,s,phase);
   if(constrain){o.tex(p,'uConstraintPositions',this.texture,6);gl.uniform1i(o.loc(p,'uConstraintColumns'),t.columns);}
+  o.u(p,'uSkinFit',s.pSkinScale??1,s.pCount>0?s.pSkinFollow||0:0,0);gl.uniform1i(o.loc(p,'uSkinSamples'),s.pSkinFollow>0&&s.pCount>0?2:1);
   o.u(p,'uBundleAmount',s.pBundleAmount??(s.pLiving===1?1:0));o.u(p,'uLivingMode',s.pLiving);o.u(p,'uLivingMotion',s.pBundleDelay,s.pFray,0);o.u(p,'uLivingShape',s.pBundles,s.pBundleSpread,s.pSkinOpening,s.pSkinOffset);o.u(p,'uLivingFold',s.pFoldCount,s.pFoldDepth,s.pInflate,s.pContract);
   gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,null);gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK,this.feedback);gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER,0,this.captureBuffer);gl.enable(gl.RASTERIZER_DISCARD);
   gl.beginTransformFeedback(gl.POINTS);gl.drawArrays(gl.POINTS,0,t.columns*t.rows);gl.endTransformFeedback();gl.disable(gl.RASTERIZER_DISCARD);gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER,0,null);gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK,null);
@@ -125,9 +129,22 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
    gl.activeTexture(gl.TEXTURE6);gl.bindTexture(gl.TEXTURE_2D,this.texture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,t.columns,t.rows,0,gl.RGBA,gl.FLOAT,null);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.NEAREST);
    this.topologyKey=topologyKey;this.key='';this.builds++;
   }
+  this.prepareAnchors(s);
   // Rest geometry changes only when its controls change, never with elapsed time.
   const key=JSON.stringify(Object.entries(s).filter(([k])=>k.startsWith('p')||['seed','volume','stretchX','stretchY','stretchZ','deform','twist','waves','waveScale','scale','rotateX','rotateY','rotateZ'].includes(k)));
   if(key!==this.key){const paths=this.owner.guides.paths;this.owner.guides.paths=[];try{setLivingRest(this.topology,this.capturePositions({...s,forcePoints:[],bodyForces:[],forcePaths:[],dynAmount:0,_dynamics:null},0));}finally{this.owner.guides.paths=paths;}this.key=key;}
+ }
+ prepareAnchors(s){
+  const t=this.topology,random=this.owner.random,n=Math.max(0,Math.min(300000,Math.round(s.pCount))),key=s.seed+':'+n;
+  if(this.anchorKey===key)return;
+  // Stable material-coordinate anchors, chosen from the actual visible grains.
+  // Prefer outer grains within each patch; never rebuild the binding with time.
+  const count=t.columns*t.rows,ids=new Int32Array(count).fill(-1),scores=new Float32Array(count).fill(Infinity),data=new Float32Array(t.seeds);
+  const score=(i,u,v)=>{let dx=Math.abs(random[i*4]-u);dx=Math.min(dx,1-dx);return dx*dx+(random[i*4+1]-v)**2+.002*(1-random[i*4+2])**2;};
+  if(random&&n){for(let i=0;i<n;i++){const x=Math.round(random[i*4]*t.columns)%t.columns,y=Math.round(random[i*4+1]*(t.rows-1)),id=y*t.columns+x,d=score(i,x/t.columns,y/(t.rows-1));if(d<scores[id]){scores[id]=d;ids[id]=i;}}
+   for(let id=0;id<count;id++){if(ids[id]<0){let best=Infinity;for(let i=0;i<Math.min(n,4096);i++){const d=score(i,t.seeds[id*4],t.seeds[id*4+1]);if(d<best){best=d;ids[id]=i;}}}data.set(random.subarray(ids[id]*4,ids[id]*4+4),id*4);}
+  }
+  this.anchorIds=ids;this.anchorKey=key;const gl=this.gl;gl.bindBuffer(gl.ARRAY_BUFFER,this.anchorBuffer);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);
  }
  sample(s,phase){
   this.prepare(s);const gl=this.gl,o=this.owner,t=this.topology;
@@ -149,9 +166,9 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   const setup=p=>{o.settings(p,s,phase);o.tex(p,'uLivingPositions',this.texture,6);gl.uniform2i(o.loc(p,'uLivingSize'),t.columns,t.rows);};
   if(o.shadowPass)gl.disable(gl.DEPTH_TEST);else gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
   if(s.pSkin>0){
-   setup(this.skin);o.u(this.skin,'uLivingSurface',s.pSkin,s.pPores,s.pPoreCount,0);gl.bindVertexArray(this.vao);
+   setup(this.skin);o.u(this.skin,'uLivingSurface',s.pSkin,s.pPores,s.pPoreCount,0);o.u(this.skin,'uSkinThickness',s.pSkinThickness||0);gl.bindVertexArray(this.vao);const layers=s.pSkinThickness>0?2:1;
    // Nearest-surface prepass avoids accumulating the back of translucent folds.
-   if(!o.shadowPass){gl.depthMask(true);gl.colorMask(false,false,false,false);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);gl.drawElements(gl.TRIANGLES,t.triangles.length,gl.UNSIGNED_INT,0);gl.disable(gl.POLYGON_OFFSET_FILL);gl.colorMask(true,true,true,true);}gl.depthMask(false);o.opticalDrawState?.();gl.drawElements(gl.TRIANGLES,t.triangles.length,gl.UNSIGNED_INT,0);
+   if(!o.shadowPass){gl.depthMask(true);gl.colorMask(false,false,false,false);gl.enable(gl.POLYGON_OFFSET_FILL);gl.polygonOffset(1,1);gl.drawElementsInstanced(gl.TRIANGLES,t.triangles.length,gl.UNSIGNED_INT,0,layers);gl.disable(gl.POLYGON_OFFSET_FILL);gl.colorMask(true,true,true,true);}gl.depthMask(false);o.opticalDrawState?.();gl.drawElementsInstanced(gl.TRIANGLES,t.triangles.length,gl.UNSIGNED_INT,0,layers);
   }
   if(s.pThreadOpacity>0){
    setup(this.fibres);gl.bindVertexArray(o.empty);gl.depthMask(s.pSkin===0);
@@ -160,7 +177,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   }
   gl.depthMask(true);gl.disable(gl.DEPTH_TEST);gl.blendFunc(gl.ONE,o.shadowPass?gl.ONE_MINUS_SRC_ALPHA:gl.ONE);this.milliseconds=performance.now()-start;
  }
- dispose(){const gl=this.gl;for(const p of [this.capture,this.constrain,this.skin,this.fibres])gl.deleteProgram(p.program);for(const b of [this.captureBuffer,this.seedBuffer,this.indices])gl.deleteBuffer(b);gl.deleteTransformFeedback(this.feedback);gl.deleteVertexArray(this.vao);gl.deleteTexture(this.texture);}
+ dispose(){const gl=this.gl;for(const p of [this.capture,this.constrain,this.skin,this.fibres])gl.deleteProgram(p.program);for(const b of [this.captureBuffer,this.seedBuffer,this.anchorBuffer,this.indices])gl.deleteBuffer(b);gl.deleteTransformFeedback(this.feedback);gl.deleteVertexArray(this.vao);gl.deleteTexture(this.texture);}
 }
 
 

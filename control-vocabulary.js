@@ -32,7 +32,7 @@ export const ESSENTIALS={
   motion:{time:['duration','speed','motion'],dynamics:['dynAmount','dynStiffness','dynDamping','dynGravity','dynWind','dynPin','dynFloor','dynFloorY','dynObstacle','dynObstacleX','dynObstacleY','dynObstacleZ','dynObstacleSize']}
  },
  particles:{
-  shape:{core:['pOpening','pFill','pThickness','pOrganic'],grains:['pCount','pSize','pOpacity','pGrainSpacing','pGroupSpacing','pDistributionCells'],links:['pLinks','pLinkNodes','pLinkNodeSize','pLinkWidth','pLinkReach'],trails:['pTrailLength','pTrailWidth','pTrailCount'],skin:['pSkin','pFoldDepth','pPores']},
+  shape:{core:['pOpening','pFill','pThickness','pOrganic'],grains:['pLargeCount','pLargeSize','pCount','pSize','pOpacity','pGrainSpacing','pGroupSpacing','pDistributionCells'],links:['pLinks','pLinkNodes','pLinkNodeSize','pLinkWidth','pLinkReach','pLinkNeighbors','pLinkMinReach','pLinkSurface','pLinkTurns'],trails:['pTrailLength','pTrailWidth','pTrailCount'],skin:['pSkin','pSkinScale','pSkinThickness','pSkinFollow','pFoldDepth','pPores']},
   material:{surface:['metal','roughness','gloss'],trails:['pFiberSheen','pFiberSpread'],film:['pFilm','filmThickness'],opacity:['transparency','refraction','emission']},
   color:{core:['structCoreDark','structCoreRadius'],gradient:['gradientAngle','gradientScale'],particles:['pColorScatter'],layers:['colorLayers','colorLayerScale','colorLayerShift','colorLayerMix'],glow:['glow']},
   light:{environment:['environmentPower'],source:['power','size'],particles:['pLighting']},

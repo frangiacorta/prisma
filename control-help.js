@@ -1,7 +1,22 @@
-import {AUDIO_HELP} from './audio-model.js?v=127aa74b1cae';
-import {EXTRA_HELP} from './control-help-extra.js?v=127aa74b1cae';
+import {AUDIO_HELP} from './audio-model.js?v=9fa7ff517902';
+import {EXTRA_HELP} from './control-help-extra.js?v=9fa7ff517902';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
+ pSizeSpread:'Allarga in modo logaritmico le dimensioni intorno al diametro impostato. A 4 va da 1/16 a 16 volte, con limite finale di 1024 px a 1080p. A 0 conserva il preset precedente. Vale anche per i nodi.',
+ pSizeBias:'Con Escursione sopra zero: valori negativi danno più granelli grandi; positivi favoriscono molti piccoli e pochi grandi. Cambia la distribuzione, non il numero totale.',
+ pLargeCount:'Numero dei granelli esistenti che ricevono un diametro maggiore. Non aggiunge particelle: non può superare il numero totale visibile. Consente pochi grani grandi sopra una nuvola di polvere fine.',
+ pLargeSize:'Diametro dei granelli grandi a 1080p. È indipendente dal fondo. I nodi con diametro dedicato mantengono la priorità: imposta Diametro nodi a 0 per usare queste dimensioni anche sui nodi.',
+
+ pSkinScale:'Ingrandisce la pelle e il suo reticolo rispetto al centro della figura, senza cambiare la distribuzione dei granelli. 1 conserva la scala originale.',
+ pSkinFollow:'0 conserva la pelle indipendente. 1 porta i suoi vertici su un campione stabile dei granelli reali e ne segue il moto. Non ricostruisce una superficie attorno a ogni singola particella. Richiede particelle presenti; Dimensione pelle 1 mantiene la scala degli ancoraggi.',
+ pSkinThickness:'Distanza 3D tra le due facce della pelle. Zero mantiene la superficie sottile originale. Richiede Visibilità della pelle sopra zero.',
+ pLinkSurface:'0 mantiene i collegamenti diretti e la loro curvatura. 1 fa percorrere ai fili la stessa distribuzione procedurale dei granelli, mantenendo i nodi iniziali e finali.',
+ pLinkTurns:'Giri completi aggiuntivi lungo la distribuzione. Richiede Percorso sulla distribuzione sopra zero. Valori negativi invertono il verso; fino a tre giri oltre il collegamento iniziale.',
+ pLinkMinReach:'Esclude i nodi più vicini di questa distanza dalla costruzione della rete. Se supera la distanza massima non nasce alcun collegamento.',
+ finishGlitchAttack:'Durata della comparsa: 0 è istantanea, 1 occupa la metà iniziale dell’impulso. Indipendente dalla scomparsa; richiede Anima glitch.',
+ finishGlitchRelease:'Durata della scomparsa: 0 è istantanea, 1 occupa la metà finale dell’impulso. Indipendente dalla comparsa; richiede Anima glitch.',
+ finishGlitchHorizontal:'Intensità delle bande orizzontali quando sovrapponi entrambe le direzioni. Zero lascia soltanto quelle verticali.',
+
  finishScanSmooth:'Legge una versione più morbida del chiaroscuro senza sfocare l’immagine originale. Aumentala per collegare le linee fra i granelli; zero conserva i dettagli più fini.',finishScanMix:'Miscela il trattamento a linee con la scena. Zero conserva esattamente il risultato precedente.',finishScanSpacing:'Distanza fra le linee a 1080 px sul lato corto. Valori piccoli producono una trama più fitta.',finishScanWidth:'Spessore delle linee. Il filtro attenua le frequenze troppo fitte per evitare sfarfallii.',finishScanDepth:'La luminosità sposta la fase delle linee: zero le lascia dritte; valori negativi invertono rilievi e avvallamenti.',finishScanAngle:'Ruota insieme trama e direzione delle onde. Zero produce linee orizzontali.',finishScanThreshold:'Nasconde le linee nelle zone più scure. Abbassala se scompaiono dettagli del soggetto.',finishScanWave:'Aggiunge ondulazioni lungo le linee, più marcate nelle zone luminose.',finishScanFrequency:'Numero di onde lungo una distanza pari al lato corto della scena. Richiede Ondulazione sopra zero.',finishScanCycles:'Scorrimenti completi durante il loop. Il segno cambia il verso; zero ferma il filtro. Attiva Anima le linee e premi Riproduci.',
 
  growthAmount:'Miscela gradualmente la crescita con la materia esistente. A zero la superficie resta quella originale. Colori, trasparenza, forma e luci continuano a funzionare.',
@@ -117,8 +132,8 @@ const HELP={
  pBundles:'Divide le fibre in gruppi che piegano insieme. Agisce in modalità Fasci di fibre.',
  pBundleSpread:'Allarga ogni fascio fino a formare un velo. Agisce in modalità Fasci di fibre.',
  pStrands:'Numero di fili collegati sulla struttura: più fili rendono il tessuto fitto. Indipendente dal numero di particelle.',
- pThreadWidth:'Spessore dei fili connessi a 1080p, con controllo anche sotto un pixel.',
- pThreadOpacity:'Visibilità dei fili connessi. A zero puoi vedere solo la membrana.',
+ pThreadWidth:'Spessore del reticolo della pelle a 1080p, con controllo anche sotto un pixel.',
+ pThreadOpacity:'Visibilità del reticolo della pelle. A zero puoi vedere solo la membrana.',
  pWeft:'Aggiunge la trama trasversale ai fili longitudinali, sulla stessa superficie deformata.',
  pElastic:'Resiste allo stiramento dei legami. In compressione lascia richiudere la trama senza spingere le pieghe verso l’esterno.',
  pBend:'Distribuisce la trazione anche tra punti più lontani del filo. Riduce gli stiramenti localizzati e lascia libere le pieghe in compressione.',
@@ -132,10 +147,10 @@ const HELP={
  pPores:'Ritaglia aperture nella membrana lasciando collegati i bordi. A zero la superficie è continua.',
  pPoreCount:'Quanti pori distribuire sulla superficie; agisce con Apertura dei pori sopra zero.',
  pLinks:'Visibilità dei fili che collegano particelle vicine. A zero le connessioni sono spente.',
- pGrainSpacing:'Dispersione dei granelli attorno al centro del loro gruppo. 1 conserva la distribuzione originale; non garantisce collisioni o una distanza minima durante il moto.',pGroupSpacing:'Allontana o avvicina i centri dei gruppi senza cambiare la dispersione interna.',pDistributionCells:'Suddivisione della distribuzione iniziale. Cambia i gruppi quando dispersione o distanza sono diverse da 1.',pLinkNodeSize:'Diametro dei granelli usati come nodi dei legami, da 0 a 128 px a 1080p. 0 usa il diametro comune. Richiede granelli visibili e connessioni attive.',
+ pGrainSpacing:'Dispersione dei granelli attorno al centro del loro gruppo. 1 conserva la distribuzione originale; non garantisce collisioni o una distanza minima durante il moto.',pGroupSpacing:'Allontana o avvicina i centri dei gruppi senza cambiare la dispersione interna.',pDistributionCells:'Suddivisione della distribuzione iniziale. Cambia i gruppi quando dispersione o distanza sono diverse da 1.',pLinkNodeSize:'Diametro dei granelli usati come nodi dei legami, da 0 a 256 px a 1080p. 0 usa il diametro comune. Richiede granelli visibili e connessioni attive.',
  pLinkNodes:'Da 50 a 4000 punti usati per la trama, indipendenti dai granelli visibili. Più nodi creano una rete più fitta.',
  pLinkReach:'Distanza massima fra i punti nel nucleo iniziale, prima del movimento. Cambiarla ricostruisce i legami.',
- pLinkNeighbors:'Ogni nodo sceglie da 1 a 5 vicini. Può ricevere altri legami dai nodi che lo scelgono.',
+ pLinkNeighbors:'Ogni nodo sceglie da 1 a 12 vicini. Può ricevere altri legami dai nodi che lo scelgono.',
  pLinkWidth:'Spessore dei fili a 1080p. Valori sotto 1 producono connessioni sottili; scala precisa sulle piccole dimensioni.',
  pLinkCurve:'Incurva i fili mantenendo le estremità attaccate alle particelle. A zero i collegamenti sono rettilinei.',
  pLinkStretch:'Allungamento rispetto alla distanza iniziale: i fili sfumano avvicinandosi a questo limite e riappaiono quando si accorciano.',

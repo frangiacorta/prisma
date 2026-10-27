@@ -1,12 +1,12 @@
-import {DYNAMICS_GLSL} from './dynamics.js?v=127aa74b1cae';
-import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=127aa74b1cae';
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=127aa74b1cae';
-import {guideGLSL} from './particle-path-field.js?v=127aa74b1cae';
-import {forceBarrierGLSL} from './particle-forces.js?v=127aa74b1cae';
+import {DYNAMICS_GLSL} from './dynamics.js?v=9fa7ff517902';
+import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=9fa7ff517902';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=9fa7ff517902';
+import {guideGLSL} from './particle-path-field.js?v=9fa7ff517902';
+import {forceBarrierGLSL} from './particle-forces.js?v=9fa7ff517902';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.
-const GRAPH_KEYS=['pGrainSpacing','pGroupSpacing','pDistributionCells','seed','pLinkNodes','pLinkReach','pLinkNeighbors','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pNeural','pNodes','pConnect','stretchX','stretchY','stretchZ','volume'];
+const GRAPH_KEYS=['pGrainSpacing','pGroupSpacing','pDistributionCells','seed','pLinkNodes','pLinkReach','pLinkMinReach','pLinkNeighbors','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pNeural','pNodes','pConnect','stretchX','stretchY','stretchZ','volume'];
 export class ParticleLinks {
  constructor(owner,common){
   this.owner=owner;this.gl=owner.gl;this.count=0;this.builds=0;this.key='';
@@ -22,7 +22,7 @@ precision highp float;precision highp sampler2D;
 layout(location=0) in vec3 aPair;
 ${common}
 ${livingAttachmentGLSL}
-uniform sampler2D uSeeds;uniform int uLinkEndpoints;uniform float uLinkSegments;uniform vec4 uLinks;uniform vec3 uShadeOrigin;
+uniform sampler2D uSeeds;uniform int uLinkEndpoints;uniform float uLinkSegments;uniform vec4 uLinks;uniform vec2 uLinkPath;uniform vec3 uShadeOrigin;
 out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity,vSide;
 vec4 seedAt(int i){return texelFetch(uSeeds,ivec2(i%1024,i/1024),0);}
 void main(){
@@ -32,14 +32,22 @@ void main(){
  float t=(float(segment)+(endPoint?1.:0.))/uLinkSegments;
  float side=(triangle==0||triangle==1||triangle==3)?-1.:1.;
  vec4 ra=seedAt(int(aPair.x)),rb=seedAt(int(aPair.y));
- vec3 endpoints[2];for(int k=0;k<uLinkEndpoints;k++)endpoints[k]=attachedPosition(k==0?ra:rb,uPhase);
+ // One field call site: endpoints plus three samples of the material path.
+ // Integer turns preserve both exact endpoint identities, including at the seam.
+ vec3 endpoints[5];for(int k=0;k<uLinkEndpoints;k++){
+  vec4 seed=k==0?ra:rb;
+  if(k>=2){float q=clamp(t+(k==3?.001:k==4?-.001:0.),0.,1.);seed=mix(ra,rb,q);float dx=rb.x-ra.x;dx-=floor(dx+.5);seed.x=fract(ra.x+(dx+uLinkPath.y)*q);}
+  endpoints[k]=attachedPosition(seed,uPhase);
+ }
  vec3 a=endpoints[0],b=endpoints[1],delta=b-a;
  float len=length(delta),reference=max(.001,aPair.z*uFrame.x);
  vec3 outward=(a+b)*.5-uShadeOrigin;
  vec3 bend=outward-delta*dot(outward,delta)/max(.000001,dot(delta,delta));
  bend=normalize(bend+vec3(.00001))*len*uLinks.z;
- vec3 p=dynamicsContact(sceneBarriers(mix(a,b,t)+bend*(4.*t*(1.-t)),ra,uPhase));vPosition=p;vForceSeed=ra;
+ vec3 p=mix(a,b,t)+bend*(4.*t*(1.-t));
  vec3 tangent=delta+bend*(4.-8.*t);
+ if(uLinkPath.x>0.){p=mix(p,endpoints[2],uLinkPath.x);tangent=mix(tangent,(endpoints[3]-endpoints[4])/max(.001,min(1.,t+.001)-max(0.,t-.001)),uLinkPath.x);}
+ p=dynamicsContact(sceneBarriers(p,ra,uPhase));vPosition=p;vForceSeed=ra;
  vec4 clip=project(p);vec2 line=(project(p+tangent*.01).xy-project(p-tangent*.01).xy)*uResolution;
  vec2 normal=vec2(-line.y,line.x)/max(.00001,length(line));
  float width=uLinks.y*uResolution.y/1080.;
@@ -60,7 +68,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   this.buffer=gl.createBuffer();this.vao=gl.createVertexArray();
   gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);
   gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,0,0);gl.vertexAttribDivisor(0,1);gl.bindVertexArray(null);
-  this.links=makeLinkBuffers(20000);
+  this.links=makeLinkBuffers(48000);
  }
  prepare(s){
   s=this.owner.linkRestState||s;
@@ -75,7 +83,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   const xyz=new Float32Array(n*3);gl.bindBuffer(gl.ARRAY_BUFFER,this.captureBuffer);gl.getBufferSubData(gl.ARRAY_BUFFER,0,xyz);
   const x=new Float32Array(n),y=new Float32Array(n),z=new Float32Array(n);
   for(let i=0;i<n;i++){x[i]=xyz[i*3];y[i]=xyz[i*3+1];z[i]=xyz[i*3+2];}
-  buildLinks3D(x,y,z,n,s.pLinkReach,s.pLinkNeighbors,this.links);
+  buildLinks3D(x,y,z,n,s.pLinkReach,s.pLinkNeighbors,this.links,s.pLinkMinReach||0);
   const pairs=new Float32Array(this.links.m*3);
   for(let i=0;i<this.links.m;i++)pairs.set([this.links.pairs[i*2],this.links.pairs[i*2+1],this.links.dists[i]],i*3);
   gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.bufferData(gl.ARRAY_BUFFER,pairs,gl.STATIC_DRAW);gl.bindVertexArray(null);
@@ -85,7 +93,8 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   if(!(s.pLinks>0))return;
   this.prepare(s);if(!this.count)return;
   const o=this.owner,gl=this.gl,p=this.program;o.settings(p,s,phase);o.tex(p,'uSeeds',o.seedTexture,2);
-  gl.uniform1i(o.loc(p,'uLinkEndpoints'),2);o.u(p,'uLinks',s.pLinks,s.pLinkWidth,s.pLinkCurve,s.pLinkStretch);const segments=Math.max(2,Math.round(8*Math.sqrt(o.geometryBudget??1)));o.u(p,'uLinkSegments',segments);
+  const surface=s.pLinkSurface||0,turns=Math.round(s.pLinkTurns||0);
+  gl.uniform1i(o.loc(p,'uLinkEndpoints'),surface>0?5:2);o.u(p,'uLinkPath',surface,turns);o.u(p,'uLinks',s.pLinks,s.pLinkWidth,s.pLinkCurve,s.pLinkStretch);const resolution=surface>0?Math.min(192,48*(1+Math.abs(turns))):8,segments=Math.max(2,Math.round(resolution*Math.sqrt(o.geometryBudget??1)));o.u(p,'uLinkSegments',segments);
   gl.bindVertexArray(this.vao);o.opticalDrawState?.();gl.drawArraysInstanced(gl.TRIANGLES,0,segments*6,this.count);
  }
  dispose(){const gl=this.gl;gl.deleteProgram(this.program.program);gl.deleteProgram(this.capture.program);gl.deleteTransformFeedback(this.feedback);gl.deleteBuffer(this.captureBuffer);gl.deleteBuffer(this.buffer);gl.deleteVertexArray(this.vao);}

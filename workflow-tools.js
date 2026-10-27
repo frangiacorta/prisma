@@ -1,8 +1,8 @@
-import {newCreation,material} from './creative-model.js?v=127aa74b1cae';
-import {addHelp} from './inspector-ui.js?v=127aa74b1cae';
-import {MOODS} from './model.js?v=127aa74b1cae';
-import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=127aa74b1cae';
-import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=127aa74b1cae';
+import {newCreation,material} from './creative-model.js?v=9fa7ff517902';
+import {addHelp} from './inspector-ui.js?v=9fa7ff517902';
+import {MOODS} from './model.js?v=9fa7ff517902';
+import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=9fa7ff517902';
+import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=9fa7ff517902';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){
@@ -11,7 +11,7 @@ export function mountWorkflowTools(api){
  const sectionHome=document.querySelector('.inspector-tools'),sectionButtons=[document.getElementById('sections-open'),document.getElementById('sections-close')];
  const presets=document.getElementById('presets'),presetHome=presets.parentElement;let thumbnailObserver=null;const materialThumbs=new Map();document.body.classList.add('unified-library');
  let popup=null,popupRequest=null,popupAdvanced=false;
- let level=get('prisma-control-level','simple'),lastAction='Modifica',comparison=null;
+ let level='expert',lastAction='Modifica',comparison=null;
  const mode=document.createElement('select');mode.id='control-level';mode.setAttribute('aria-label','Livello dei controlli');mode.innerHTML='<option value="simple">Essenziali</option><option value="complete">Avanzati</option><option value="expert">Esperto</option>';mode.value=level;head.append(mode);mode.onchange=()=>{level=mode.value;put('prisma-control-level',level);renderControls();};
  const status=document.createElement('span');status.id='session-save-status';status.setAttribute('role','status');status.textContent='Sessione locale';document.querySelector('.inspector-footer').replaceChildren(status);
  const button=(id,label,fn)=>{const b=document.createElement('button');b.type='button';b.id=id;b.className='quiet';b.textContent=label;b.onclick=()=>{tools.open=false;return fn();};return b;};

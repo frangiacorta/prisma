@@ -14,8 +14,8 @@ export function normalizeFinishOrder(raw){const valid=Array.isArray(raw)?raw.fil
 FINISH_DEFAULTS.finishOrder=[...FINISH_ORDER];
 export const EDGE_DEFAULTS={finishEdge:false,finishEdgeWidth:2,finishEdgeThreshold:.08,finishEdgeSoftness:.15,finishEdgeColor:'#d7ff91',finishEdgeSource:false,finishEdgeOnly:false,finishEdgeMix:1,finishRegionEdge:true};
 export const GLITCH_DEFAULTS={finishGlitch:false,finishGlitchAmount:65,finishGlitchBand:48,finishGlitchCoverage:.6,finishGlitchSplit:10,finishGlitchMix:1,finishGlitchAnimate:true,finishGlitchCycles:4,finishGlitchDuty:.6,finishGlitchSoftness:.35,finishGlitchSeed:42,finishRegionGlitch:true};
-Object.assign(GLITCH_DEFAULTS,{finishGlitchShape:0,finishGlitchWidth:180,finishGlitchSizeRandom:0,finishGlitchRhythm:0,finishGlitchScatter:0,finishGlitchRenew:0,finishGlitchAngle:0,finishGlitchDirectionRandom:0,finishGlitchCross:1,finishGlitchFlash:false,finishGlitchFlashMs:30});
-Object.assign(FINISH_META,{finishGlitchFlashMs:['Durata flash · ms',5,500,1],finishGlitchDirectionRandom:['Variazione direzione',0,1,.01],finishGlitchCross:['Intensità verticale',0,1,.01],finishGlitchShape:['Struttura glitch',0,3,1],finishGlitchWidth:['Larghezza blocchi',8,1080,1],finishGlitchSizeRandom:['Variazione dimensioni',0,1,.01],finishGlitchRhythm:['Irregolarità del ritmo',0,1,.01],finishGlitchScatter:['Sfasamento tra zone',0,1,.01],finishGlitchRenew:['Rinnovo a ogni impulso',0,1,.01],finishGlitchAngle:['Direzione delle zone',-180,180,1]});
+Object.assign(GLITCH_DEFAULTS,{finishGlitchAttack:.35,finishGlitchRelease:.35,finishGlitchHorizontal:1,finishGlitchShape:0,finishGlitchWidth:180,finishGlitchSizeRandom:0,finishGlitchRhythm:0,finishGlitchScatter:0,finishGlitchRenew:0,finishGlitchAngle:0,finishGlitchDirectionRandom:0,finishGlitchCross:1,finishGlitchFlash:false,finishGlitchFlashMs:30});
+Object.assign(FINISH_META,{finishGlitchAttack:['Entrata del glitch',0,1,.01],finishGlitchRelease:['Uscita del glitch',0,1,.01],finishGlitchHorizontal:['Intensità orizzontale',0,1,.01],finishGlitchFlashMs:['Durata flash · ms',5,500,1],finishGlitchDirectionRandom:['Variazione direzione',0,1,.01],finishGlitchCross:['Intensità verticale',0,1,.01],finishGlitchShape:['Struttura glitch',0,3,1],finishGlitchWidth:['Larghezza blocchi',8,1080,1],finishGlitchSizeRandom:['Variazione dimensioni',0,1,.01],finishGlitchRhythm:['Irregolarità del ritmo',0,1,.01],finishGlitchScatter:['Sfasamento tra zone',0,1,.01],finishGlitchRenew:['Rinnovo a ogni impulso',0,1,.01],finishGlitchAngle:['Direzione delle zone',-180,180,1]});
 Object.assign(FINISH_DEFAULTS,EDGE_DEFAULTS,GLITCH_DEFAULTS);
 Object.assign(FINISH_META,{finishEdgeWidth:['Spessore contorni',.5,12,.1],finishEdgeThreshold:['Soglia dei dettagli',.01,1,.01],finishEdgeSoftness:['Morbidezza contorni',.01,.6,.01],finishEdgeMix:['Mix contorni',0,1,.01],finishGlitchAmount:['Spostamento bande',0,180,1],finishGlitchBand:['Altezza bande',4,240,1],finishGlitchCoverage:['Quantità di bande',0,1,.01],finishGlitchSplit:['Separazione colori',0,60,1],finishGlitchMix:['Mix glitch',0,1,.01],finishGlitchCycles:['Impulsi nel loop',1,24,1],finishGlitchDuty:['Durata relativa dell’impulso',.001,1,.001],finishGlitchSoftness:['Entrata e uscita morbide',0,1,.01],finishGlitchSeed:['Variante delle bande',1,9999,1]});
 /*
@@ -158,7 +158,7 @@ const DETAIL_FRAGMENT=`#version 300 es
 precision highp float;
 uniform sampler2D uImage;uniform vec2 uSize;uniform int uKind;uniform float uMix,uTransparent;
 uniform float uWidth,uThreshold,uSoftness,uOnly,uSource;uniform vec3 uInk;
-uniform float uAmount,uBand,uCoverage,uSplit,uPhase,uDuty,uPulseSoft,uSeed,uAnimate;
+uniform float uAmount,uBand,uCoverage,uSplit,uPhase,uDuty,uPulseSoft,uSeed,uAnimate;uniform vec2 uGlitchEnvelope;uniform float uHorizontal;
 uniform vec4 uRects[8];uniform int uRectCount;uniform float uUseMask,uFeather,uInvert;
 out vec4 color;
 vec4 samplePM(vec2 uv){vec4 c=texture(uImage,clamp(uv,.5/uSize,1.-.5/uSize));return vec4(c.rgb*c.a,c.a);}
@@ -172,7 +172,8 @@ vec3 glitchBand(float id){
  float key=id+event*177.*uRandom.w;
  float selected=step(hashBand(key),uCoverage)*step(.0001,uCoverage);
  float dist=abs(fract(clock+.5)-.5)*2.;
- float pulse=1.-smoothstep(max(0.,uDuty-max(.002,uPulseSoft*uDuty)),uDuty,dist);
+ float softness=fract(clock+.5)<.5?uGlitchEnvelope.x:uGlitchEnvelope.y;
+ float pulse=1.-smoothstep(max(0.,uDuty-max(.002,softness*uDuty)),uDuty,dist);
  pulse=mix(1.,pulse,uAnimate);float motion=mix(1.,cos(uPhase+r*6.28318530718),uAnimate);
  float shift=(hashBand(key+53.)*2.-1.)*uAmount*motion*selected*pulse;
  float split=uSplit*selected*pulse;
@@ -201,7 +202,8 @@ if(uKind==0){
  float id=row+(uShape>.5&&uShape<1.5?column*97.:0.);
  vec3 horizontal=glitchBand(id);vec2 axis=vec2(ca,-sa);if(uShape>1.5&&uShape<2.5)axis=vec2(sa,ca);
  axis=glitchAxis(axis,horizontal.z);
- vec2 displacement=axis*horizontal.x,chromatic=axis*horizontal.y;
+ float hGain=uShape>2.5?uHorizontal:1.;
+ vec2 displacement=axis*horizontal.x*hGain,chromatic=axis*horizontal.y*hGain;
  if(uShape>2.5){
   float verticalRow=floor(local.x/uBlockWidth+uRandom.x*.8*sin(local.x/uBlockWidth*.63+uSeed+37.));
   vec3 vertical=glitchBand(verticalRow+8192.);
@@ -214,14 +216,14 @@ if(uKind==0){
 }
 vec4 c=mix(base,effect,amount);color=vec4(c.a>0.000001?c.rgb/c.a:vec3(0.),c.a);}`;
 export class DetailPass extends FinishingPass{
- constructor(gl){super(gl,DETAIL_FRAGMENT,['uImage','uSize','uKind','uMix','uTransparent','uWidth','uThreshold','uSoftness','uOnly','uSource','uInk','uRandom','uDirectionRandom','uCross','uBlockWidth','uShape','uAngle','uCycles','uAmount','uBand','uCoverage','uSplit','uPhase','uDuty','uPulseSoft','uSeed','uAnimate','uRects[0]','uRectCount','uUseMask','uFeather','uInvert']);}
+ constructor(gl){super(gl,DETAIL_FRAGMENT,['uImage','uSize','uKind','uMix','uTransparent','uWidth','uThreshold','uSoftness','uOnly','uSource','uInk','uRandom','uDirectionRandom','uCross','uBlockWidth','uShape','uAngle','uCycles','uAmount','uBand','uCoverage','uSplit','uPhase','uDuty','uPulseSoft','uGlitchEnvelope','uHorizontal','uSeed','uAnimate','uRects[0]','uRectCount','uUseMask','uFeather','uInvert']);}
  draw(s,w,h,phase=0,kind=0){const g=this.gl,u=this.uniforms,scale=Math.min(w,h)/1080;g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE0);
   if(!this.texture){this.texture=g.createTexture();g.bindTexture(g.TEXTURE_2D,this.texture);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);}else g.bindTexture(g.TEXTURE_2D,this.texture);
   if(this.width!==w||this.height!==h){g.texImage2D(g.TEXTURE_2D,0,g.RGBA8,w,h,0,g.RGBA,g.UNSIGNED_BYTE,null);this.width=w;this.height=h;}
   g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.CULL_FACE);g.disable(g.SCISSOR_TEST);g.colorMask(true,true,true,true);g.viewport(0,0,w,h);g.bindVertexArray(this.vao);g.useProgram(this.program);
   g.uniform1i(u.uImage,0);g.uniform2f(u.uSize,w,h);g.uniform1i(u.uKind,kind);g.uniform1f(u.uMix,kind?s.finishGlitchMix:s.finishEdgeMix);g.uniform1f(u.uTransparent,s.bgMode==='transparent'?1:0);
   g.uniform1f(u.uWidth,Math.max(.5,s.finishEdgeWidth*scale));g.uniform1f(u.uThreshold,s.finishEdgeThreshold);g.uniform1f(u.uSoftness,s.finishEdgeSoftness);g.uniform1f(u.uOnly,s.finishEdgeOnly?1:0);g.uniform1f(u.uSource,s.finishEdgeSource?1:0);const hex=/^#[0-9a-f]{6}$/i.test(s.finishEdgeColor)?s.finishEdgeColor:'#d7ff91';g.uniform3f(u.uInk,...[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255));
-  g.uniform1f(u.uDirectionRandom,s.finishGlitchDirectionRandom||0);g.uniform1f(u.uCross,s.finishGlitchCross??1);g.uniform4f(u.uRandom,s.finishGlitchSizeRandom||0,s.finishGlitchRhythm||0,s.finishGlitchScatter||0,s.finishGlitchRenew||0);g.uniform1f(u.uShape,s.finishGlitchShape||0);g.uniform1f(u.uBlockWidth,Math.max(1,(s.finishGlitchWidth||180)*scale));g.uniform1f(u.uAngle,(s.finishGlitchAngle||0)*Math.PI/180);g.uniform1f(u.uCycles,s.finishGlitchCycles);g.uniform1f(u.uAmount,s.finishGlitchAmount*scale);g.uniform1f(u.uBand,Math.max(1,s.finishGlitchBand*scale));g.uniform1f(u.uCoverage,s.finishGlitchCoverage);g.uniform1f(u.uSplit,s.finishGlitchSplit*scale);g.uniform1f(u.uPhase,(((phase%(Math.PI*2))+Math.PI*2)%(Math.PI*2))*Math.round(s.finishGlitchCycles));const period=s.keepMotionSpeed!==false&&s.motionPeriod>0?s.motionPeriod:(s.duration||12);const duty=s.finishGlitchFlash?Math.min(1,(s.finishGlitchFlashMs??30)/1000*(s.speed||1)*s.finishGlitchCycles/period):s.finishGlitchDuty;g.uniform1f(u.uDuty,Math.max(.00001,duty));g.uniform1f(u.uPulseSoft,s.finishGlitchSoftness);g.uniform1f(u.uSeed,Math.round(s.finishGlitchSeed));g.uniform1f(u.uAnimate,s.finishGlitchAnimate?1:0);
+  g.uniform1f(u.uDirectionRandom,s.finishGlitchDirectionRandom||0);g.uniform1f(u.uCross,s.finishGlitchCross??1);g.uniform4f(u.uRandom,s.finishGlitchSizeRandom||0,s.finishGlitchRhythm||0,s.finishGlitchScatter||0,s.finishGlitchRenew||0);g.uniform1f(u.uShape,s.finishGlitchShape||0);g.uniform1f(u.uBlockWidth,Math.max(1,(s.finishGlitchWidth||180)*scale));g.uniform1f(u.uAngle,(s.finishGlitchAngle||0)*Math.PI/180);g.uniform1f(u.uCycles,s.finishGlitchCycles);g.uniform1f(u.uAmount,s.finishGlitchAmount*scale);g.uniform1f(u.uBand,Math.max(1,s.finishGlitchBand*scale));g.uniform1f(u.uCoverage,s.finishGlitchCoverage);g.uniform1f(u.uSplit,s.finishGlitchSplit*scale);g.uniform1f(u.uPhase,(((phase%(Math.PI*2))+Math.PI*2)%(Math.PI*2))*Math.round(s.finishGlitchCycles));const period=s.keepMotionSpeed!==false&&s.motionPeriod>0?s.motionPeriod:(s.duration||12);const duty=s.finishGlitchFlash?Math.min(1,(s.finishGlitchFlashMs??30)/1000*(s.speed||1)*s.finishGlitchCycles/period):s.finishGlitchDuty;g.uniform1f(u.uDuty,Math.max(.00001,duty));g.uniform1f(u.uPulseSoft,s.finishGlitchSoftness);g.uniform2f(u.uGlitchEnvelope,s.finishGlitchAttack??s.finishGlitchSoftness,s.finishGlitchRelease??s.finishGlitchSoftness);g.uniform1f(u.uHorizontal,s.finishGlitchHorizontal??1);g.uniform1f(u.uSeed,Math.round(s.finishGlitchSeed));g.uniform1f(u.uAnimate,s.finishGlitchAnimate?1:0);
   const regions=normalizeFinishRegions(s.finishRegions),rects=new Float32Array(32);regions.forEach((r,i)=>rects.set([r.x/100,r.y/100,r.w/100,r.h/100],i*4));g.uniform4fv(u['uRects[0]'],rects);g.uniform1i(u.uRectCount,regions.length);g.uniform1f(u.uUseMask,s.finishRegionsEnabled&&(kind?s.finishRegionGlitch:s.finishRegionEdge)?1:0);g.uniform1f(u.uFeather,(s.finishFeather||0)/100);g.uniform1f(u.uInvert,s.finishRegionInvert?1:0);g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);
  }
 }

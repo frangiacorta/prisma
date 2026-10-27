@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/gl-transitions/gl-transitions",
+  "revision": "0efa1651dfdbc0cdbd57f4cda55f12d8b3dbc0c5",
+  "checked": "2026-10-27",
+  "files": [
+    "transitions/Fade.glsl",
+    "transitions/DirectionalWipe.glsl",
+    "transitions/LumaWipe.glsl"
+  ],
+  "author": "gre",
+  "license": "MIT",
+  "scope": "Fade and DirectionalWipe adapted in playground-mixer.js. LumaWipe kept as reference; production uses a smooth brightness mask from live scene B.",
+  "adapter": "WebGL2, premultiplied alpha over black, exact endpoints, four cardinal wipe directions, aspect-preserving letterboxing."
+}

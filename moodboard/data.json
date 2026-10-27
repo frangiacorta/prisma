@@ -13783,7 +13783,7 @@
     },
     {
       "id": "roadmap-preset-morphing",
-      "name": "Playground · morph e mix A/B",
+      "name": "Playground · mix A/B e macro",
       "kind": "project",
       "related": [
         "s09-05",
@@ -13793,13 +13793,14 @@
         "img-tdxmorph",
         "img-s18-form-vision"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
       "summary": "TDXMorph include già PresetManager MIT gratuito con A/B e motore multitraccia. Valutare uso diretto sul PC o port selettivo per Prisma web; salvataggio/import/export Prisma esistenti restano la base.",
       "sources": [
         "https://github.com/DarienBrito/TDXMorph",
-        "https://frangiacorta.github.io/prisma/previews/playground-ricerca/"
+        "https://frangiacorta.github.io/prisma/previews/playground-ricerca/",
+        "https://frangiacorta.github.io/prisma/?v=67&playground=1"
       ],
       "sections": [
         {
@@ -13917,6 +13918,19 @@
               ]
             }
           ]
+        },
+        {
+          "title": "Playground integrato · versione 67",
+          "fields": [
+            {
+              "label": "Disponibile",
+              "value": "Integrato in Prisma 67: due scene GPU vive e indipendenti, Forma/Forma, Particelle/Particelle e coppie miste; mix, dissolvenza, tendina, luminanza e somma. Durata in secondi o battiti, curve, lancio quantizzato, macro a più parametri, pad XY, tastiera, joystick e MIDI Learn. Scene e assegnazioni nel progetto JSON. Test GPU e controller simulati verificati."
+            },
+            {
+              "label": "Limiti della verifica",
+              "value": "Tastiera e mouse provati; messaggi MIDI e assi joystick simulati, nessun hardware musicale collegato. Export progetto disponibile; registrazione video del mix non inclusa."
+            }
+          ]
         }
       ],
       "families": [
@@ -13927,7 +13941,7 @@
       "result": "",
       "where": "",
       "platform": "",
-      "next": "Banco A/B con trasformazione e mix distinti, macro e clock indipendente. Il laboratorio di transizioni è verificato; la performance con due scene vive resta da completare.",
+      "next": "Completare il morph automatico fra valori dei preset, sequenze multitraccia e uscita separata su secondo schermo. Il mix di due scene vive e le macro sono disponibili.",
       "keep": "",
       "avoid": "",
       "detailsSource": [

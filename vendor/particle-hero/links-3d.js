@@ -8,7 +8,7 @@
 // All scratch lives in LinkBuffers so a 60fps caller allocates nothing per
 // frame: arrays are reused (grown on demand), the dedupe Set is cleared.
 
-const MAX_PER_DOT = 5;
+const MAX_PER_DOT = 12;
 
                            
                                                         
@@ -50,7 +50,7 @@ export function makeLinkBuffers(cap        )              {
 
 /**
  * Fill `out` with up to `perDot` links per dot between dots closer than
- * `reach` (same units/space as `x`/`y`). `perDot` is silently clamped to 5
+ * `reach` (same units/space as `x`/`y`). `perDot` is silently clamped to 12
  * so a hand-written embed config can't blow up the per-frame cost.
  */
 export function buildLinks3D(x, y, z,
@@ -58,6 +58,7 @@ export function buildLinks3D(x, y, z,
   reach        ,
   perDot        ,
   out             ,
+  minReach = 0,
 )       {
   out.m = 0;
   if (n < 2 || reach <= 0 || perDot < 1) return;
@@ -127,8 +128,8 @@ export function buildLinks3D(x, y, z,
           const dy = y[j] - y[i];
           const dz = z[j]-z[i];
           const dSq = dx * dx + dy * dy + dz * dz;
-          if (dSq > reachSq) continue;
-          // keep the k nearest via insertion (k ≤ 5)
+          if (dSq > reachSq || dSq < minReach * minReach) continue;
+          // keep the k nearest via insertion (k ≤ 12)
           let p        ;
           if (found < k) p = found++;
           else if (dSq < nbrD[k - 1]) p = k - 1;
