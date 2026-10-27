@@ -1,17 +1,17 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=13c4abb4756d';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=13c4abb4756d';
-import {ParticleOptics} from './particle-optics.js?v=13c4abb4756d';
-import {shadowLight} from './particle-shadow.js?v=13c4abb4756d';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=13c4abb4756d';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=13c4abb4756d';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=13c4abb4756d';
-import {ParticleLinks} from './particle-links.js?v=13c4abb4756d';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=13c4abb4756d';
-import {LayeredVeils} from './layered-veils.js?v=13c4abb4756d';
-import {LivingStructures} from './living-structures.js?v=13c4abb4756d';
-import {fieldGLSL} from './particle-field.js?v=13c4abb4756d';
-import {forceBarrierGLSL} from './particle-forces.js?v=13c4abb4756d';
-import {prismaShadingGLSL} from './particle-shading.js?v=13c4abb4756d';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=5298b13e4def';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=5298b13e4def';
+import {ParticleOptics} from './particle-optics.js?v=5298b13e4def';
+import {shadowLight} from './particle-shadow.js?v=5298b13e4def';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=5298b13e4def';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=5298b13e4def';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=5298b13e4def';
+import {ParticleLinks} from './particle-links.js?v=5298b13e4def';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=5298b13e4def';
+import {LayeredVeils} from './layered-veils.js?v=5298b13e4def';
+import {LivingStructures} from './living-structures.js?v=5298b13e4def';
+import {fieldGLSL} from './particle-field.js?v=5298b13e4def';
+import {forceBarrierGLSL} from './particle-forces.js?v=5298b13e4def';
+import {prismaShadingGLSL} from './particle-shading.js?v=5298b13e4def';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -231,6 +231,7 @@ export class ParticleRenderer{
   const gl=this.gl;if(gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');if(options.preview&&!this.prepare(source,phase))return false;
   phase=((phase/(Math.PI*2))%1+1)%1;const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase*Math.PI*2)};
   if(s.pLiving===4){s.pCount=0;s.pTrailCount=0;s.pLinks=0;s.pLivingBlend=1;}
+  this.geometryBudget=options.preview&&options.quality==='fast'?Math.max(1/16,Math.min(1,options.geometryBudget??1)):1;this.previewCounts={};this.linkRestState={...s};for(const k of ['volume','stretchX','stretchY','stretchZ'])this.linkRestState[k]=source[k]??s[k];
   const weights=livingWeights(s);s.pOpacity*=weights.core;s.pTrailOpacity*=weights.core;s.pLinks*=weights.core;s.pSkin*=weights.structure;s.pThreadOpacity*=weights.structure;this.occlusion=0;
   if(this.seed!==s.seed)this.geometry(s.seed);this.resize(w,h);this.guides.update(s);this.pollGpuTime();const query=options.trackTiming!==false&&this.timerExtension&&this.queries.length<3?gl.createQuery():null;
   if(query)gl.beginQuery(this.timerExtension.TIME_ELAPSED_EXT,query);
@@ -269,8 +270,8 @@ export class ParticleRenderer{
   }
   gl.disable(gl.DEPTH_TEST);gl.depthMask(false);
   if(s.pTrailCount>0&&s.pTrailLength>0&&s.pTrailOpacity>0){
-   const total=Math.round(s.pTrailCount),count=options.preview?Math.min(total,8000):total,segments=Math.round(options.preview?Math.min(s.pTrailQuality,96):s.pTrailQuality);
-   this.trailGeometry(segments);this.previewTrailCount=count;
+   const total=Math.round(s.pTrailCount),count=options.preview&&options.quality==='fast'?Math.min(total,Math.max(128,Math.round(8000*this.geometryBudget))):total,segments=Math.round(options.preview&&options.quality==='fast'?Math.min(s.pTrailQuality,Math.max(24,Math.round(96*Math.sqrt(this.geometryBudget)/8)*8)):s.pTrailQuality);
+   this.trailGeometry(segments);this.previewTrailCount=count;this.previewCounts.trails=count;
    const setup=p=>{this.settings(p,s,phase*s.pDirection);this.tex(p,'uSeeds',this.seedTexture,2);gl.uniform1i(this.loc(p,'uSegments'),segments);};
    for(let start=0;start<count;start+=1024){const batch=Math.min(1024,count-start);
     if(this.pathProgram){gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);this.bind(this.pathTarget);gl.viewport(0,0,segments+3,batch);gl.bindVertexArray(this.empty);setup(this.pathProgram);gl.uniform1i(this.loc(this.pathProgram,'uBatchStart'),start);gl.drawArrays(gl.TRIANGLES,0,3);}
@@ -282,10 +283,10 @@ export class ParticleRenderer{
   }else this.previewTrailCount=0;
   if(s.pLinks>0){this.connections??=new ParticleLinks(this,common);this.connections.draw(s,phase*s.pDirection);}
   if(s.pCount>0&&s.pOpacity>0){
-   this.settings(this.points,s,phase*s.pDirection);
+   const count=Math.min(Math.round(s.pCount),Math.max(s.pLinks>0?s.pLinkNodes:256,Math.round(s.pCount*this.geometryBudget)));this.previewCounts.points=count;this.settings(this.points,{...s,pOpacity:s.pOpacity*Math.min(16,s.pCount/count)},phase*s.pDirection);
    const size=Math.max(s.pSize,s.pLinks>0?s.pLinkNodeSize||0:0),quad=size*(1+s.pSizeVar*.85)*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
    this.u(this.points,'uPointQuad',quad?1:0);gl.bindVertexArray(quad?this.quadVAO:this.pointVAO);this.opticalDrawState();
-   if(quad)gl.drawArraysInstanced(gl.TRIANGLES,0,6,Math.round(s.pCount));else gl.drawArrays(gl.POINTS,0,Math.round(s.pCount));
+   if(quad)gl.drawArraysInstanced(gl.TRIANGLES,0,6,count);else gl.drawArrays(gl.POINTS,0,count);
   }
  }
  opticalDrawState(){if(this.shadowPass?.mode===2){const g=this.gl;g.enable(g.DEPTH_TEST);g.depthFunc(g.LEQUAL);g.depthMask(true);g.disable(g.BLEND);}}

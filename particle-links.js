@@ -1,8 +1,8 @@
-import {DYNAMICS_GLSL} from './dynamics.js?v=13c4abb4756d';
-import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=13c4abb4756d';
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=13c4abb4756d';
-import {guideGLSL} from './particle-path-field.js?v=13c4abb4756d';
-import {forceBarrierGLSL} from './particle-forces.js?v=13c4abb4756d';
+import {DYNAMICS_GLSL} from './dynamics.js?v=5298b13e4def';
+import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=5298b13e4def';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=5298b13e4def';
+import {guideGLSL} from './particle-path-field.js?v=5298b13e4def';
+import {forceBarrierGLSL} from './particle-forces.js?v=5298b13e4def';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.
@@ -22,14 +22,14 @@ precision highp float;precision highp sampler2D;
 layout(location=0) in vec3 aPair;
 ${common}
 ${livingAttachmentGLSL}
-uniform sampler2D uSeeds;uniform vec4 uLinks;uniform vec3 uShadeOrigin;
+uniform sampler2D uSeeds;uniform float uLinkSegments;uniform vec4 uLinks;uniform vec3 uShadeOrigin;
 out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity,vSide;
 vec4 seedAt(int i){return texelFetch(uSeeds,ivec2(i%1024,i/1024),0);}
 void main(){
  // Eight short ribbons per connection, with endpoints exactly on the particles.
  int triangle=gl_VertexID%6,segment=gl_VertexID/6;
  bool endPoint=triangle==1||triangle==2||triangle==4;
- float t=(float(segment)+(endPoint?1.:0.))/8.;
+ float t=(float(segment)+(endPoint?1.:0.))/uLinkSegments;
  float side=(triangle==0||triangle==1||triangle==3)?-1.:1.;
  vec4 ra=seedAt(int(aPair.x)),rb=seedAt(int(aPair.y));
  vec3 a=attachedPosition(ra,uPhase),b=attachedPosition(rb,uPhase),delta=b-a;
@@ -62,6 +62,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   this.links=makeLinkBuffers(20000);
  }
  prepare(s){
+  s=this.owner.linkRestState||s;
   const key=JSON.stringify(GRAPH_KEYS.map(k=>s[k]));if(key===this.key)return;
   const start=performance.now(),o=this.owner,gl=this.gl,n=Math.max(2,Math.min(4000,Math.round(s.pLinkNodes)));
   o.settings(this.capture,{...s,dynAmount:0,_dynamics:null},0);
@@ -83,8 +84,8 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   if(!(s.pLinks>0))return;
   this.prepare(s);if(!this.count)return;
   const o=this.owner,gl=this.gl,p=this.program;o.settings(p,s,phase);o.tex(p,'uSeeds',o.seedTexture,2);
-  o.u(p,'uLinks',s.pLinks,s.pLinkWidth,s.pLinkCurve,s.pLinkStretch);
-  gl.bindVertexArray(this.vao);o.opticalDrawState?.();gl.drawArraysInstanced(gl.TRIANGLES,0,48,this.count);
+  o.u(p,'uLinks',s.pLinks,s.pLinkWidth,s.pLinkCurve,s.pLinkStretch);const segments=Math.max(2,Math.round(8*Math.sqrt(o.geometryBudget??1)));o.u(p,'uLinkSegments',segments);
+  gl.bindVertexArray(this.vao);o.opticalDrawState?.();gl.drawArraysInstanced(gl.TRIANGLES,0,segments*6,this.count);
  }
  dispose(){const gl=this.gl;gl.deleteProgram(this.program.program);gl.deleteProgram(this.capture.program);gl.deleteTransformFeedback(this.feedback);gl.deleteBuffer(this.captureBuffer);gl.deleteBuffer(this.buffer);gl.deleteVertexArray(this.vao);}
 }
