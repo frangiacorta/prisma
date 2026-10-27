@@ -1,3 +1,4 @@
+import {controlCondition} from './control-help.js?v=dbc2871327ae';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
@@ -83,6 +84,14 @@ export function decorateInspector({root,state,baseline,tab,edit}){
  }
  const empty=document.createElement('p');empty.className='help changed-empty';empty.textContent='Nessun parametro modificato rispetto ai valori iniziali.';root.append(empty);
  function refresh(){
+  for(const info of root.querySelectorAll('[data-help-key]')){
+   const condition=controlCondition(state,info.dataset.helpKey);
+   info.dataset.baseHelp??=info.dataset.helpText;
+   info.dataset.helpText=info.dataset.baseHelp+(condition?' Ora: '+condition:'');
+   info.classList.toggle('condition-unmet',!!condition);
+   info.title=condition||'';
+   const description=document.getElementById(info.getAttribute('aria-describedby'));if(description)description.textContent=info.dataset.helpText;
+  }
   for(const {host,el,key,base,reset} of rangeRows){const changed=!equal(at(state,key),base);host.classList.toggle('is-changed',changed);reset.disabled=!changed;reset.hidden=!changed;}
   for(const r of flags)r.host.classList.toggle('is-changed',!equal(at(state,r.key),at(baseline,r.key)));
   for(const d of root.querySelectorAll('details')){

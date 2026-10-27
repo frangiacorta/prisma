@@ -1,7 +1,7 @@
-import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=f039984e2a8a';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=f039984e2a8a';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=f039984e2a8a';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=f039984e2a8a';
+import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=dbc2871327ae';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=dbc2871327ae';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=dbc2871327ae';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=dbc2871327ae';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -1441,7 +1441,8 @@ export function rootGeometry(s,storage){
    const ax=Math.sin(lat)*Math.cos(lon),ay=Math.cos(lat),az=Math.sin(lat)*Math.sin(lon),tx=Math.cos(lat)*Math.cos(lon),ty=-Math.sin(lat),tz=Math.cos(lat)*Math.sin(lon),bx=-Math.sin(lon),bz=Math.cos(lon);
    const len=(s.petalLength??1.05)*(1+noise(0)*random*.32),thickness=rootRadius*(1+noise(1)*random*.18),seedPhase=noise(6)*Math.PI;
    const localGrowth=Math.max(0,Math.min(1,growth*(1+noise(7)*disorder*.35*(1-growth))))*participation;
-   const bend=(s.petalCurl||0)*.65+noise(2)*random*.18,turn=coil*4.6*(1+noise(3)*disorder*.25)+reentry*(1.35+len*.55),sideTurn=noise(8)*disorder*.7+(s.petalDirectionSpread||0)*(noise(9)*Math.PI+((row+column)%2)*Math.PI);
+   const directionTurn=(s.petalDirectionSpread||0)*(noise(9)*Math.PI+((row+column)%2)*Math.PI),directionCos=Math.cos(directionTurn),directionSin=Math.sin(directionTurn);
+   const bend=(s.petalCurl||0)*.65+noise(2)*random*.18,turn=coil*4.6*(1+noise(3)*disorder*.25)+reentry*(1.35+len*.55),sideTurn=noise(8)*disorder*.7+directionTurn;
    const base=core-thickness*1.1-blend*.4,bodyScale=ring?flat:1;
    let prevX=0,prevY=0,prevZ=0,prevR=0;
    for(let j=0;j<=ROOT_SEGMENTS;j++){
@@ -1450,7 +1451,10 @@ export function rootGeometry(s,storage){
     const weave=(s.petalWeave||0)*len*.28*Math.sin(u*TAU*(s.petalWeaveTurns||2)+((row+column)%2)*Math.PI)*Math.sin(Math.PI*t);
     const radial=base+rise+weave,ca=Math.cos(angle),sa=Math.sin(angle),sweepX=tx*Math.cos(sideTurn)+bx*Math.sin(sideTurn),sweepY=ty*Math.cos(sideTurn),sweepZ=tz*Math.cos(sideTurn)+bz*Math.sin(sideTurn);
     const meander=wander*len*.19*u*(1-reentry*u)*(Math.sin(u*TAU*1.4+seedPhase)-Math.sin(seedPhase)),meander2=wander*len*.14*u*(1-reentry*u)*Math.sin(u*TAU+seedPhase);
-    const curl=bend*len*u*u*(1-reentry*u),dx=(ax*ca+sweepX*sa)*radial+tx*(meander+curl)+bx*meander2,dy=((ay*ca+sweepY*sa)*radial+ty*(meander+curl))*bodyScale,dz=(az*ca+sweepZ*sa)*radial+tz*(meander+curl)+bz*meander2;
+    // Direction spread also orients bending and wandering, even without coil.
+    // Zero preserves the previous tangent frame and existing straight presets.
+    const curl=bend*len*u*u*(1-reentry*u),along=(meander+curl)*directionCos-meander2*directionSin,across=(meander+curl)*directionSin+meander2*directionCos;
+    const dx=(ax*ca+sweepX*sa)*radial+tx*along+bx*across,dy=((ay*ca+sweepY*sa)*radial+ty*along)*bodyScale,dz=(az*ca+sweepZ*sa)*radial+tz*along+bz*across;
     // The small, phase-shifted swellings disturb the tube itself instead of
     // faking roughness in the lighting; silhouettes and SSS follow them.
     const flow=(s.petalFlow||0)*.4*Math.sin(u*TAU*2-(s.petalFlowPhase||0)*TAU+seedPhase)*Math.sin(Math.PI*t);

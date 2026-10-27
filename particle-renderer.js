@@ -1,17 +1,17 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=f039984e2a8a';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=f039984e2a8a';
-import {ParticleOptics} from './particle-optics.js?v=f039984e2a8a';
-import {shadowLight} from './particle-shadow.js?v=f039984e2a8a';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=f039984e2a8a';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=f039984e2a8a';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=f039984e2a8a';
-import {ParticleLinks} from './particle-links.js?v=f039984e2a8a';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=f039984e2a8a';
-import {LayeredVeils} from './layered-veils.js?v=f039984e2a8a';
-import {LivingStructures} from './living-structures.js?v=f039984e2a8a';
-import {fieldGLSL} from './particle-field.js?v=f039984e2a8a';
-import {forceBarrierGLSL} from './particle-forces.js?v=f039984e2a8a';
-import {prismaShadingGLSL} from './particle-shading.js?v=f039984e2a8a';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=dbc2871327ae';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=dbc2871327ae';
+import {ParticleOptics} from './particle-optics.js?v=dbc2871327ae';
+import {shadowLight} from './particle-shadow.js?v=dbc2871327ae';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=dbc2871327ae';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=dbc2871327ae';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=dbc2871327ae';
+import {ParticleLinks} from './particle-links.js?v=dbc2871327ae';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=dbc2871327ae';
+import {LayeredVeils} from './layered-veils.js?v=dbc2871327ae';
+import {LivingStructures} from './living-structures.js?v=dbc2871327ae';
+import {fieldGLSL} from './particle-field.js?v=dbc2871327ae';
+import {forceBarrierGLSL} from './particle-forces.js?v=dbc2871327ae';
+import {prismaShadingGLSL} from './particle-shading.js?v=dbc2871327ae';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -102,6 +102,7 @@ void main(){vec4 c=texture(uImage,uv)*.227027;c+=texture(uImage,uv+uStep*1.38461
 const composeFrag=`#version 300 es
 precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage,uBloom,uShadow,uCausticMap;uniform float uCausticOn,uShadowStrength;uniform float uGlow,uBgMode,uPhotoAll,uVeilCompose;
 uniform vec4 uGrade,uPhoto,uTone,uLens,uBg;uniform vec3 uBackground,uBackground2;
+uniform float uBgShade;uniform vec2 uOutputSize;
 vec3 grade(vec3 c){c=(c*exp2(uGrade.x)+uGrade.y-.5)*uGrade.z+.5;float grey=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(grey),c,uGrade.w);c*=vec3(1.+uPhoto.x*.25,1.+uPhoto.y*.2,1.-uPhoto.x*.25);c+=uTone.x*pow(1.-clamp(c,0.,1.),vec3(2.))+uTone.y*pow(clamp(c,0.,1.),vec3(2.));return pow(max(c,0.),vec3(1./max(.1,uPhoto.z)));}
 void main(){vec2 p=uv-.5,q=.5+p*(1.+uLens.x*dot(p,p));vec4 src=texture(uImage,q),bloom=texture(uBloom,q);
  // Compress accumulated light with a shared scale: channel-by-channel clipping
@@ -114,6 +115,9 @@ void main(){vec2 p=uv-.5,q=.5+p*(1.+uLens.x*dot(p,p));vec4 src=texture(uImage,q)
  if(uBgMode>1.5)bgT=smoothstep(-uBg.z,uBg.z,(uv.y-.5)*2.+uBg.y);
  vec3 bg=uBgMode<.5?uBackground:mix(uBackground,uBackground2,clamp(bgT,0.,1.));
  if(uBgMode>1.5)bg*=1.+uBg.w*exp(-dot(p,p)*5.);
+ // Same world-space edge falloff as the solid backdrop; shade only the
+ // studio background before compositing particles, shadows and caustics.
+ if(uBgMode>1.5&&uBgMode<2.5){vec2 world=p*uOutputSize/min(uOutputSize.x,uOutputSize.y)*3.4;bg*=1.-uBgShade*smoothstep(.8,3.2,length(world/vec2(1.,1.3)));}
  float alpha=clamp(1.-exp(-(src.a+bloom.a*uGlow)),0.,1.);
  if(uVeilCompose>.5){alpha=clamp(src.a,0.,1.);c*=alpha;}
  float shadow=clamp(texture(uShadow,q).a*uShadowStrength,0.,1.);
@@ -233,6 +237,7 @@ export class ParticleRenderer{
   this.bind(null);const c=this.compose;gl.useProgram(c.program);this.tex(c,'uImage',scene.texture,0);this.tex(c,'uBloom',a.texture,1);this.tex(c,'uShadow',shadowTexture||scene.texture,4);this.u(c,'uShadowStrength',shadowTexture?this.shadow.strength:0);this.tex(c,'uCausticMap',causticTexture||scene.texture,5);this.u(c,'uCausticOn',causticTexture?1:0);this.u(c,'uGlow',s.glow);this.u(c,'uVeilCompose',s.pLiving===4?1:0);
   this.u(c,'uGrade',s.exposure,s.brightness,s.contrast,s.saturation);this.u(c,'uPhoto',s.temperature,s.photoTint,s.gamma,s.vignette);this.u(c,'uTone',s.blacks,s.highlights,0,0);this.u(c,'uLens',s.lensDistortion,s.grain,s.grainSize,0);this.u(c,'uPhotoAll',+s.photoAll);
   this.u(c,'uBackground',...rgb(s.background));this.u(c,'uBackground2',...rgb(s.background2));this.u(c,'uBgMode',['solid','gradient','studio','transparent'].indexOf(s.bgMode));this.u(c,'uBg',s.bgAngle*rad,s.bgHeight,s.bgSoftness,s.bgWash);
+  this.u(c,'uBgShade',s.bgShade??.06);this.u(c,'uOutputSize',w,h);
   gl.drawArrays(gl.TRIANGLES,0,3);gl.bindVertexArray(null);
   if(query){gl.endQuery(this.timerExtension.TIME_ELAPSED_EXT);this.queries.push(query);}
   if(!options.deferCompletion){if(this.completionSync)gl.deleteSync(this.completionSync);this.completionSync=gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE,0);gl.flush();}return true;

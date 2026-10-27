@@ -1,5 +1,5 @@
-import {DYNAMICS_GLSL,bindDynamics} from './dynamics.js?v=f039984e2a8a';
-import {samplePath} from './particle-paths.js?v=f039984e2a8a';
+import {DYNAMICS_GLSL,bindDynamics} from './dynamics.js?v=dbc2871327ae';
+import {samplePath} from './particle-paths.js?v=dbc2871327ae';
 // Manual sculpting fields live in scene space, independently of the object transform.
 // The inverse map keeps the original material, topology and animation composable.
 export const hasSolidForces=s=>(s.dynAmount||0)>0||(s.forcePoints||[]).some(p=>p.enabled&&(Math.abs(p.strength)>1e-6||Math.abs(p.swirl)>1e-6))||(s.forcePaths||[]).some(p=>p.enabled&&p.mode!=='contain'&&p.strength>1e-6);
