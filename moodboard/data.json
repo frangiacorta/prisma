@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-26",
+  "updated": "2026-10-27",
   "items": [
     {
       "id": "s01-01",
@@ -15186,10 +15186,10 @@
         "roadmap-tissue",
         "roadmap-membrane"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
-      "summary": "Estensioni successive alle tre strutture guidate completate: crescita, collisioni, colonie e materiali multistrato.",
+      "summary": "Dinamica elastica condivisa da Forme e Particelle: inerzia, gravità, vento, ancoraggio e contatti con piano e ostacoli. Restano da sviluppare le collisioni fra singoli elementi e le altre estensioni.",
       "sources": [],
       "sections": [
         {
@@ -15197,7 +15197,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Conservare le reference e i criteri originali nei progetti. Queste estensioni non sono dichiarate realizzate dalla versione guidata."
+              "value": "Volume elastico ridotto di 343 nodi, con integrazione a passi fissi e vincoli XPBD. Il campo di spostamento guida solidi arbitrari, granelli, collegamenti, scie, filamenti, fibre, tessuti, membrane e veli. Parametri combinabili con la creazione esistente; nessuna modalità separata. Vincoli di distanza riusati da PositionBasedDynamics (MIT)."
             }
           ]
         },
@@ -15205,9 +15205,13 @@
           "title": "Realizzato e da fare",
           "fields": [
             {
+              "label": "implemented",
+              "value": "Inerzia e deformazione del volume, vento, gravità, massa, smorzamento, ancoraggio, piano e ostacolo sfera/scatola/capsula. Guide visibili nell’editor, preset ed export coerenti."
+            },
+            {
               "label": "remaining",
               "value": [
-                "Collisioni e inerzia della stoffa; solver dinamico e metodo di raccordo del loop",
+                "Auto-collisioni e collisioni fra fili/granelli; solver specifici per stoffa e corpi rigidi; raccordo del loop dinamico",
                 "Aderenza a modelli figurativi importati, ramificazione DLAF, noduli alle giunzioni e crescita localizzata",
                 "Granuli ancorati alla pelle con distacco controllato; varianti ferrofluido, steli/corolle e colonie indipendenti",
                 "Trasparenza e rifrazione multistrato, ombre reciproche e fuoco fisico"
@@ -15222,10 +15226,10 @@
         "film"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "",
-      "where": "",
+      "result": "Dinamica elastica del volume condivisa",
+      "where": "Forme e Particelle → Movimento → Dinamica. Influenza fisica attiva la simulazione; Forze e risposta, Contatti e Calcolo raccolgono gli altri controlli.",
       "platform": "",
-      "next": "Collisioni e inerzia della stoffa; solver dinamico e metodo di raccordo del loop · Aderenza a modelli figurativi importati, ramificazione DLAF, noduli alle giunzioni e crescita localizzata · Granuli ancorati alla pelle con distacco controllato; varianti ferrofluido, steli/corolle e colonie indipendenti · Trasparenza e rifrazione multistrato, ombre reciproche e fuoco fisico",
+      "next": "Auto-collisioni e collisioni fra fili/granelli; solver specifici per stoffa e corpi rigidi; raccordo del loop dinamico · Aderenza a modelli figurativi importati, ramificazione DLAF, noduli alle giunzioni e crescita localizzata · Granuli ancorati alla pelle con distacco controllato; varianti ferrofluido, steli/corolle e colonie indipendenti · Trasparenza e rifrazione multistrato, ombre reciproche e fuoco fisico",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -15253,7 +15257,8 @@
         "fibres",
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "resultUrl": "../previews/dinamica.html"
     },
     {
       "id": "roadmap-filament-planets",

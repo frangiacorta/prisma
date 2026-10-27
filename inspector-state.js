@@ -1,7 +1,7 @@
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
-export const MOTION_ZERO=['growthFlow','filmFlow','filmSwirl','pTravel','pVortex','pReentry','pLife','pSignal','pBreath','pRandom','pJitter','pWander','pSpaceWarp','pOrbitPrecession','pOrbitDrift','pTentacleWave','pInflate','pContract','finishWarpMotion','finishGlassMotion','finishGlyphVariation'];
+export const MOTION_ZERO=['dynAmount','growthFlow','filmFlow','filmSwirl','pTravel','pVortex','pReentry','pLife','pSignal','pBreath','pRandom','pJitter','pWander','pSpaceWarp','pOrbitPrecession','pOrbitDrift','pTentacleWave','pInflate','pContract','finishWarpMotion','finishGlassMotion','finishGlyphVariation'];
 export function simplifyShape(state,amount=0){
  const keys=[...SHAPE_ZERO,...(state.engine==='particles'?PARTICLE_ZERO:[])];
  for(const k of keys)if(Number.isFinite(state[k]))state[k]*=amount;
@@ -24,6 +24,7 @@ export function simplifyMotion(state,amount=0){
 // An effect is on only when its enabling amount/checkbox is on. Subparameters
 // such as density or frequency do not falsely make an inactive effect active.
 const EFFECTS=[
+ ['dynAmount','Dinamica'],
  ['loopAmount','Curve toroidali e nodi'],['structShell','Guscio e spessore'],['structFibres','Reticolo di fibre'],['structRadial','Suddivisione radiale e strati','structSlices','structLayers'],
  ['filLength','Filamenti su superficie'],['petalAmount','Petali e radici'],['stemAmount','Gambo'],['hole','Foro'],['cut','Ritaglio'],['lobeAmount','Lobi e onde','waves'],
  ['structCoreDark','Nucleo scuro'],['colorLayers','Strati di colore'],['textureDepth','Rilievo di superficie'],['growthAmount','Reazione-diffusione'],['iridescence','Iridescenza'],['colorWaveAmount','Onde di colore'],

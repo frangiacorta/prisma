@@ -1,0 +1,12 @@
+import {forceToScreen} from './particle-forces.js?v=4dc6c236c2ac';
+export function mountDynamicsOverlay({board,getState,getTab}){
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.id='dynamics-guides';svg.setAttribute('aria-hidden','true');svg.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;overflow:hidden;stroke:none';board.append(svg);let previous='';
+ return {sync(){const s=getState(),w=board.clientWidth,h=board.clientHeight,on=getTab()==='motion'&&s.dynAmount>0&&(s.dynFloor||s.dynObstacle);svg.style.display=on?'block':'none';if(!on)return;const keys=['dynFloor','dynFloorY','dynObstacle','dynObstacleX','dynObstacleY','dynObstacleZ','dynObstacleSize','dynObstacleAspect','engine','pLiving','lensDistortion'],key=JSON.stringify([w,h,...keys.map(k=>s[k])]);if(previous===key)return;previous=key;svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  const project=p=>{const q=forceToScreen({x:p[0],y:p[1],z:p[2],radius:0},w/h,s);return [q.x*w,q.y*h];},path=points=>points.map((p,i)=>(i?'L':'M')+project(p).map(x=>x.toFixed(2)).join(' ')).join('');let lines='';
+  if(s.dynFloor)for(let x=-3;x<=3;x+=.5){lines+=path([[x,s.dynFloorY,-3],[x,s.dynFloorY,3]]);lines+=path([[-3,s.dynFloorY,x],[3,s.dynFloorY,x]]);}
+  const center=[s.dynObstacleX,s.dynObstacleY,s.dynObstacleZ],r=s.dynObstacleSize,aspect=s.dynObstacleAspect,world=v=>v.map((x,i)=>x+center[i]);
+  if(s.dynObstacle===2){const corners=Array.from({length:8},(_,i)=>[(i&1?1:-1)*r,(i&2?1:-1)*r*aspect,(i&4?1:-1)*r]);for(let i=0;i<8;i++)for(const mask of [1,2,4])if(!(i&mask))lines+=path([world(corners[i]),world(corners[i|mask])]);}
+  if(s.dynObstacle===1||s.dynObstacle===3){for(let axis=0;axis<3;axis++)for(const shift of s.dynObstacle===3?[-r*aspect,r*aspect]:[0]){const points=Array.from({length:65},(_,i)=>{const t=i/64*Math.PI*2,v=[0,shift,0];v[(axis+1)%3]+=r*Math.cos(t);v[(axis+2)%3]+=r*Math.sin(t);return world(v);});lines+=path(points);}if(s.dynObstacle===3)for(const angle of [0,Math.PI/2,Math.PI,Math.PI*1.5])lines+=path([world([r*Math.cos(angle),-r*aspect,r*Math.sin(angle)]),world([r*Math.cos(angle),r*aspect,r*Math.sin(angle)])]);}
+  svg.innerHTML=`<path d="${lines}" fill="none" stroke="#8ed9d0" stroke-width="1" stroke-opacity=".65"/><rect x="8" y="8" width="188" height="25" rx="5" fill="#10191de6"/><text x="16" y="25" fill="#bce9e2" font-size="12" font-family="system-ui">Ostacoli · guide non esportate</text>`;
+ }};
+}

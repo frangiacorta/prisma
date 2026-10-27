@@ -1,16 +1,17 @@
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=9d7adea7a5ff';
-import {ParticleOptics} from './particle-optics.js?v=9d7adea7a5ff';
-import {shadowLight} from './particle-shadow.js?v=9d7adea7a5ff';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=9d7adea7a5ff';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=9d7adea7a5ff';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=9d7adea7a5ff';
-import {ParticleLinks} from './particle-links.js?v=9d7adea7a5ff';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=9d7adea7a5ff';
-import {LayeredVeils} from './layered-veils.js?v=9d7adea7a5ff';
-import {LivingStructures} from './living-structures.js?v=9d7adea7a5ff';
-import {fieldGLSL} from './particle-field.js?v=9d7adea7a5ff';
-import {forceBarrierGLSL} from './particle-forces.js?v=9d7adea7a5ff';
-import {prismaShadingGLSL} from './particle-shading.js?v=9d7adea7a5ff';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=4dc6c236c2ac';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=4dc6c236c2ac';
+import {ParticleOptics} from './particle-optics.js?v=4dc6c236c2ac';
+import {shadowLight} from './particle-shadow.js?v=4dc6c236c2ac';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=4dc6c236c2ac';
+import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=4dc6c236c2ac';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=4dc6c236c2ac';
+import {ParticleLinks} from './particle-links.js?v=4dc6c236c2ac';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=4dc6c236c2ac';
+import {LayeredVeils} from './layered-veils.js?v=4dc6c236c2ac';
+import {LivingStructures} from './living-structures.js?v=4dc6c236c2ac';
+import {fieldGLSL} from './particle-field.js?v=4dc6c236c2ac';
+import {forceBarrierGLSL} from './particle-forces.js?v=4dc6c236c2ac';
+import {prismaShadingGLSL} from './particle-shading.js?v=4dc6c236c2ac';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -44,10 +45,11 @@ in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vOpacity;in vec2 vSpri
 ${prismaShadingGLSL}
 ${forceBarrierGLSL}
 ${guideGLSL}
+${DYNAMICS_GLSL}
 uniform float uPhase;
 ${livingOcclusionGLSL}
 uniform vec4 uPoints;uniform float uSprite;uniform vec3 uShadeOrigin;
-void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;vec2 xy=(uPointQuad>.5?vSpriteUV:gl_PointCoord)*2.-1.;float d=length(xy),aa=max(fwidth(d),.04);
+void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;vec2 xy=(uPointQuad>.5?vSpriteUV:gl_PointCoord)*2.-1.;float d=length(xy),aa=max(fwidth(d),.04);
  float coverage=1.-smoothstep(1.-aa,1.,d);
  if(uSprite>1.5&&uSprite<2.5)coverage*=smoothstep(.35,.55,d);
  if(uSprite>2.5)coverage*=exp(-min(abs(xy.x),abs(xy.y))*12.);
@@ -82,8 +84,9 @@ const trailFrag=`#version 300 es
 precision highp float;in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vForcePhase;in float vOpacity,vSide;out vec4 color;uniform vec4 uFiber;
 ${forceBarrierGLSL}
 ${guideGLSL}
+${DYNAMICS_GLSL}
 ${livingOcclusionGLSL}
-void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,vForcePhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,vForcePhase))discard;float a=livingVisibility()*vOpacity*(1.-smoothstep(mix(.85,.05,uFiber.y),1.,abs(vSide)));color=vec4(vColor*a,a);}`;
+void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,vForcePhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,vForcePhase))discard;float a=livingVisibility()*vOpacity*(1.-smoothstep(mix(.85,.05,uFiber.y),1.,abs(vSide)));color=vec4(vColor*a,a);}`;
 const screenVert=`#version 300 es
 precision highp float;out vec2 uv;void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);uv=p;gl_Position=vec4(p*2.-1.,0.,1.);}`;
 // Bake each trajectory sample once, in bounded batches. Triangle vertices reuse the samples.
@@ -165,7 +168,7 @@ export class ParticleRenderer{
  resize(w,h){if(this.width===w&&this.height===h){if(this.canvas.width!==w)this.canvas.width=w;if(this.canvas.height!==h)this.canvas.height=h;return;}this.releaseSurface();this.width=w;this.height=h;this.canvas.width=w;this.canvas.height=h;this.targets=[this.target(w,h),this.target(Math.ceil(w/4),Math.ceil(h/4)),this.target(Math.ceil(w/4),Math.ceil(h/4))];}
  bind(t){const gl=this.gl;gl.bindFramebuffer(gl.FRAMEBUFFER,t?.fbo||null);gl.viewport(0,0,t?.w||this.width,t?.h||this.height);}
  tex(p,key,texture,unit){const gl=this.gl;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(this.loc(p,key),unit);}
- settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);this.guides.bind(p);
+ settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);bindDynamics(gl,p.program,s);this.guides.bind(p);
   this.u(p,'uShadowPass',this.shadowPass?(this.shadowPass.mode||1):0);if(this.optics)this.optics.uniforms(p,s);else{this.u(p,'uOpticalShadow',0,0,0,0);this.tex(p,'uOpticalMap',this.seedTexture,8);}this.u(p,'uShadowHeight',s.pShadowHeight??-1.6);this.u(p,'uShadowOpacity',p.materialAlpha?1:Math.max(0,1-s.transparency));if(this.shadowPass)this.u(p,'uShadowLight',this.shadowPass.light.x,this.shadowPass.light.y,this.shadowPass.light.z);
   this.u(p,'uLivingOcclusion',this.occlusion||0);this.u(p,'uLivingDepthSize',this.width,this.height);this.tex(p,'uLivingDepth',this.depthCopy?.texture||this.seedTexture,7);
   this.u(p,'uSurfaceBind',s.pLiving>0&&s.pLiving!==4&&this.living?.texture?s.pSurfaceBind:0);this.tex(p,'uAttachedSurface',s.pLiving>0&&s.pLiving!==4&&this.living?.topology?this.living.texture:this.seedTexture,6);if(s.pLiving>0&&s.pLiving!==4&&this.living?.topology)gl.uniform2i(this.loc(p,'uAttachedSize'),this.living.topology.columns,this.living.topology.rows);

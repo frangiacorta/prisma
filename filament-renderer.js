@@ -1,8 +1,8 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=9d7adea7a5ff';
-import {BASE_FORM_GLSL} from './base-forms.js?v=9d7adea7a5ff';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=9d7adea7a5ff';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=9d7adea7a5ff';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=9d7adea7a5ff';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=4dc6c236c2ac';
+import {BASE_FORM_GLSL} from './base-forms.js?v=4dc6c236c2ac';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=4dc6c236c2ac';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=4dc6c236c2ac';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=4dc6c236c2ac';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -21,10 +21,10 @@ vec4 project(vec3 p){vec2 xy=vec2(dot(p,uCameraX),dot(p,uCameraY));
  if(abs(uLens)>.00001){vec2 target=xy;float r=length(target),x=r;for(int i=0;i<8;i++)x=max(0.,x-(x*(1.+uLens*x*x*.18)-r)/max(.1,1.+uLens*x*x*.54));xy*=x/max(.00001,r);}
  return vec4(xy/uCameraSize.xy,-dot(p,uCameraZ)/12.,1.);}
 ${SOLID_FORCES_GLSL}
-vec3 deformWorld(vec3 p){if(!sculptActive())return p;vec3 q=p;float barrier;for(int i=0;i<5;i++)q+=clamp(p-sculptMap(q,barrier),vec3(-.15),vec3(.15));
+vec3 deformWorld(vec3 p){if(!sculptActive())return p;p=dynamicsForward(p);vec3 q=p;float barrier;for(int i=0;i<5;i++)q+=clamp(p-sculptMap(q,barrier),vec3(-.15),vec3(.15));
  for(int i=0;i<uSculptPointCount;i++){vec3 v=q-uSculptPoints[i].xyz;float d=length(v),r=uSculptPointOptions[i].x*smoothstep(1.2,3.,-uSculptPoints[i].w);if(d<r)q=uSculptPoints[i].xyz+v/max(.00001,d)*r;}
  for(int i=0;i<uSculptPathCount;i++){vec3 center=sculptClosest(q,i,uSculptPaths[i].w>.5),v=q-center;float d=length(v),r=uSculptPaths[i].y*smoothstep(1.2,3.,-uSculptPaths[i].x);if(d<r)q=center+v/max(.00001,d)*r;}
- return q;}
+ return dynamicsContact(q);}
 `;
 const FIELD=`
 ${BASE_FORM_GLSL}
@@ -42,7 +42,7 @@ float localField(vec3 p){if(uPrimitive>.5)return baseFormField(p);
  vec3 q=clamp(p,uFieldMin,uFieldMax),index=(q-uFieldMin)/(uFieldMax-uFieldMin)*(uAtlas.x-1.);
  float z=floor(index.z);vec2 d=mix(slice(index.xy,z),slice(index.xy,min(z+1.,uAtlas.x-1.)),fract(index.z));
  return (uDeferred>.5?max(d.x,d.y):d.x)+length(p-q);}
-float worldField(vec3 p){float barrier;vec3 q=sculptMap(p,barrier);return max(localField(toLocal(q))*min(min(uAxes.x,uAxes.y),uAxes.z)*uFrame.x*.5,barrier*.5);}
+float worldField(vec3 p){float barrier;vec3 q=sculptMap(p,barrier);return max(localField(toLocal(dynamicsInverse(q)))*min(min(uAxes.x,uAxes.y),uAxes.z)*uFrame.x*.5,max(barrier,dynamicsBarrier(p))*.5);}
 `;
 const ROOT=HEADER+SPACE+FIELD+`
 uniform float uCount,uSeed,uClumps,uHairScatter;
@@ -177,7 +177,7 @@ vec4 strandMaterial(vec3 base,vec3 local,vec3 p,vec3 normal,vec3 tangent,float r
 }
 
 vec3 photoHair(vec3 c){c=max(vec3(0),c*exp2(uPhoto1.x));c=mat3(.59719,.076,.0284,.35458,.90834,.13383,.04823,.01566,.83777)*c;c=(c*(c+.0245786)-.000090537)/(c*(.983729*c+.432951)+.238081);c=clamp(mat3(1.60475,-.10208,-.00327,-.53108,1.10813,-.07276,-.07367,-.00605,1.07602)*c,0.,1.);c=mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(vec3(.0031308),c));c+=uPhoto1.y;float lum=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(lum),c,uPhoto1.w);c=(c-.5)*uPhoto1.z+.5;c+=uPhoto3.x*pow(max(0.,1.-lum),2.)+uPhoto3.y*pow(max(0.,lum),2.);c*=vec3(1.+uPhoto2.x*.18+uPhoto2.y*.08,1.-uPhoto2.y*.14,1.-uPhoto2.x*.18+uPhoto2.y*.08);return pow(max(c,vec3(0)),vec3(1./uPhoto4.x))*(1.-uPhoto2.z*smoothstep(.3,2.4,length(vWorld.xy)));}
-void main(){gl_FragDepth=gl_FragCoord.z;float barrier;sculptMap(vWorld,barrier);if(barrier>.0001)discard;float edge=1.-smoothstep(.7,1.,abs(vAcross.x)),baseAlpha=edge*vCoverage,alpha=1.-pow(max(.0001,1.-baseAlpha),uRepOpacity);
+void main(){gl_FragDepth=gl_FragCoord.z;float barrier;sculptMap(vWorld,barrier);if(max(barrier,dynamicsBarrier(vWorld))>.0001)discard;float edge=1.-smoothstep(.7,1.,abs(vAcross.x)),baseAlpha=edge*vCoverage,alpha=1.-pow(max(.0001,1.-baseAlpha),uRepOpacity);
  if(alpha<.001)discard;if(uOpaquePass>.5&&(uHairColor.w>0.||vCoverage<.999))discard;if(uOpaquePass<.5&&uShadowPass<.5&&uHairColor.w<=0.&&vCoverage>=.999)discard;if(uShadowPass>.5){if(alpha*(1.-uHairColor.w)<.5)discard;color=vec4(1);return;}
  vec3 view=vec3(0,0,1),right=normalize(cross(vTangent,view)+vec3(.000001,0,0)),radial=normalize(view-vTangent*dot(view,vTangent)+vec3(0,.000001,0));
  vec3 n=uTube>.5?normalize(vNormal):normalize(radial*sqrt(max(0.,1.-vAcross.x*vAcross.x))+right*vAcross.x);
@@ -208,7 +208,7 @@ export class FilamentPass{
  if(w*h<=4194304&&floatSamples.includes(samples)&&samples>1){this.oitMs={fbo:g.createFramebuffer(),buffers:[]};g.bindFramebuffer(g.FRAMEBUFFER,this.oitMs.fbo);for(const [format,attachment]of [[g.RGBA16F,g.COLOR_ATTACHMENT0],[g.RGBA16F,g.COLOR_ATTACHMENT1]]){const buffer=g.createRenderbuffer();this.oitMs.buffers.push(buffer);g.bindRenderbuffer(g.RENDERBUFFER,buffer);g.renderbufferStorageMultisample(g.RENDERBUFFER,samples,format,w,h);g.framebufferRenderbuffer(g.FRAMEBUFFER,attachment,g.RENDERBUFFER,buffer);}g.framebufferRenderbuffer(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.RENDERBUFFER,this.depth);g.drawBuffers([g.COLOR_ATTACHMENT0,g.COLOR_ATTACHMENT1]);if(g.checkFramebufferStatus(g.FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE)throw Error('Antialias trasparenza incompleto');}
  g.bindFramebuffer(g.FRAMEBUFFER,null);}
  field(p,s,solid){this.tex(p,'uField',solid.fieldTexture,3);this.u(p,'uAtlas',...solid.fieldAtlas);this.u(p,'uFieldMin',...solid.fieldMin);this.u(p,'uFieldMax',...solid.fieldMax);this.u(p,'uFieldWarp',...(solid.fieldWarp||[0,0]));this.u(p,'uPrimitive',+solid.cachedBasePrimitive);this.u(p,'uFloat',+solid.fieldHalfFloat);this.u(p,'uDeferred',+solid.deferredStructure);this.u(p,'uBaseForm',s.baseForm||0);}
- common(p,s,camera,w,h){const g=this.gl;g.useProgram(p.program);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uAxes',s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ),0);this.u(p,'uAngles',s.rotateX*Math.PI/180,s.rotateY*Math.PI/180,s.rotateZ*Math.PI/180,0);this.u(p,'uCameraX',...camera.x);this.u(p,'uCameraY',...camera.y);this.u(p,'uCameraZ',...camera.z);this.u(p,'uCameraSize',camera.ex,camera.ey,w,h);this.u(p,'uLens',camera.shadow?0:s.lensDistortion||0);this.u(p,'uShadowPass',+!!camera.shadow);this.u(p,'uSeed',(s.seed%997)*.013);this.u(p,'uHairScatter',s.filScatter);this.locations=p.locations;uploadSolidForces(this,s);}
+ common(p,s,camera,w,h){const g=this.gl;g.useProgram(p.program);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uAxes',s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ),0);this.u(p,'uAngles',s.rotateX*Math.PI/180,s.rotateY*Math.PI/180,s.rotateZ*Math.PI/180,0);this.u(p,'uCameraX',...camera.x);this.u(p,'uCameraY',...camera.y);this.u(p,'uCameraZ',...camera.z);this.u(p,'uCameraSize',camera.ex,camera.ey,w,h);this.u(p,'uLens',camera.shadow?0:s.lensDistortion||0);this.u(p,'uShadowPass',+!!camera.shadow);this.u(p,'uSeed',(s.seed%997)*.013);this.u(p,'uHairScatter',s.filScatter);this.locations=p.locations;this.program=p.program;uploadSolidForces(this,s);}
  hair(s,camera,w,h,phase){const physical=Math.max(0,Math.min(1,(s.filWidth-.006)/.006)),projected=camera.shadow?0:Math.max(0,Math.min(1,(s.filWidth*.5*s.scale*h/(2*camera.ey)-.6)/.8)),x=Math.max(physical,projected),mix=x*x*(3-2*x);if(s.transparency===0){this.hairPart(s,camera,w,h,phase,mix>0,1,mix);return;}if(mix<1)this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)this.hairPart(s,camera,w,h,phase,true,mix);}
  hairPart(s,camera,w,h,phase,tube,opacity,tubeDepth=1){const g=this.gl,p=this.hairProgram;this.common(p,s,camera,w,h);this.tex(p,'uRoots',this.roots.textures[0],0);this.tex(p,'uNormals',this.roots.textures[1],1);this.tex(p,'uShadow',camera.shadow?this.roots.textures[0]:this.shadow.depth,2);
  bindGrowth(g,p.program,s,phase);
@@ -229,7 +229,7 @@ export class FilamentPass{
  // The solid renderer owns the cached field; no second independent shape.
  solid.ensurePreviewField(s,options,s);this.resize(w,h);g.bindVertexArray(this.vao);g.disable(g.SCISSOR_TEST);g.disable(g.BLEND);g.disable(g.CULL_FACE);g.disable(g.DEPTH_TEST);g.depthMask(true);g.colorMask(true,true,true,true);
  const main={x:[1,0,0],y:[0,1,0],z:[0,0,1],ex:1.7*w/Math.min(w,h),ey:1.7*h/Math.min(w,h)};
- const light=s.lights.find(l=>l.enabled),z=norm(light?[light.x-s.positionX,light.y-s.positionY,light.z]:[-2,3,4]),x=norm(cross(Math.abs(z[1])>.95?[1,0,0]:[0,1,0],z)),y=cross(z,x),extent=Math.max(3,Math.max(...solid.fieldMax.map(Math.abs))*(Math.max(s.stretchX,s.stretchY,s.volume*s.stretchZ)+s.filLength)*s.scale+Math.hypot(s.positionX,s.positionY));this.lightCamera={x,y,z,ex:extent,ey:extent,shadow:true};
+ const light=s.lights.find(l=>l.enabled),z=norm(light?[light.x-s.positionX,light.y-s.positionY,light.z]:[-2,3,4]),x=norm(cross(Math.abs(z[1])>.95?[1,0,0]:[0,1,0],z)),y=cross(z,x),extent=Math.max(3,Math.max(...solid.fieldMax.map(Math.abs))*(Math.max(s.stretchX,s.stretchY,s.volume*s.stretchZ)+s.filLength)*s.scale+Math.hypot(s.positionX,s.positionY)+(s._dynamics?.max||0)*2);this.lightCamera={x,y,z,ex:extent,ey:extent,shadow:true};
  const key=JSON.stringify([solid.cachedBasePrimitive?s.baseForm:solid.fieldKey,solid.fieldWarp,s.filCount,s.seed,s.filClumps,s.filScatter]);if(key!==this.rootKey){g.bindFramebuffer(g.FRAMEBUFFER,this.roots.fbo);g.viewport(0,0,256,235);this.common(this.rootProgram,s,main,256,235);this.field(this.rootProgram,s,solid);this.u(this.rootProgram,'uCount',s.filCount);this.u(this.rootProgram,'uClumps',s.filClumps);g.drawArrays(g.TRIANGLES,0,3);this.rootKey=key;this.rootBuilds++;}
  // Capture only after the root pass; it never touches the default framebuffer.
  g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE5);g.bindTexture(g.TEXTURE_2D,this.scene);g.copyTexImage2D(g.TEXTURE_2D,0,g.RGBA,0,0,w,h,0);for(const k of [g.TEXTURE_MIN_FILTER,g.TEXTURE_MAG_FILTER])g.texParameteri(g.TEXTURE_2D,k,g.NEAREST);for(const k of [g.TEXTURE_WRAP_S,g.TEXTURE_WRAP_T])g.texParameteri(g.TEXTURE_2D,k,g.CLAMP_TO_EDGE);

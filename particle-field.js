@@ -1,7 +1,9 @@
+import {DYNAMICS_GLSL} from './dynamics.js?v=4dc6c236c2ac';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=9d7adea7a5ff';
-import {forceBarrierGLSL} from './particle-forces.js?v=9d7adea7a5ff';
+import {guideGLSL} from './particle-path-field.js?v=4dc6c236c2ac';
+import {forceBarrierGLSL} from './particle-forces.js?v=4dc6c236c2ac';
 export const fieldGLSL=`
+${DYNAMICS_GLSL}
 ${guideGLSL}
 ${forceBarrierGLSL}
 const float TAU=6.28318530718;
@@ -66,7 +68,7 @@ vec3 sceneBarriers(vec3 p,vec4 r,float phase){
   }p.z=upper-p.z<=p.z-lower?upper:lower;
  }return containGuidePosition(p,r,phase);
 }
-vec3 position(vec4 r,float phase){
+vec3 positionRaw(vec4 r,float phase){
  float global=clockAt(phase*uClock.x),c=1.+floor(r.z*3.)*step(1.-uClock.w,r.w);
  float seedPhase=(uMotionSeed-417.)*.013;
  float t=global*c+(r.w-.5)*uFlow.y*TAU+seedPhase+uOrbit.w*r.z*TAU-uMotionQuality.y*r.x*2.;
@@ -139,6 +141,7 @@ vec3 position(vec4 r,float phase){
  }
  p+=pull/max(1.,influence);return sceneBarriers(guidePosition(p,r,phase),r,phase);
 }
+vec3 position(vec4 r,float phase){return dynamicsForward(positionRaw(r,phase));}
 vec4 project(vec3 p){float depth=max(2.,7.5-p.z);return vec4(p.xy*vec2(uResolution.y/uResolution.x,1.)*2.6/depth,(depth-3.)/12.,1.);}
 vec3 particleColor(vec4 r,vec3 p){
  vec3 rest=restPoint(r),coord=uColor.x<.5?rest:uColor.x<1.5?vec3((r.z-.5)*4.5,0.,0.):uColor.x<2.5?vec3((floor(r.x*uOuter.z)/uOuter.z-.5)*4.5,0.,0.):p;

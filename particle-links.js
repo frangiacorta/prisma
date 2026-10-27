@@ -1,7 +1,8 @@
-import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=9d7adea7a5ff';
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=9d7adea7a5ff';
-import {guideGLSL} from './particle-path-field.js?v=9d7adea7a5ff';
-import {forceBarrierGLSL} from './particle-forces.js?v=9d7adea7a5ff';
+import {DYNAMICS_GLSL} from './dynamics.js?v=4dc6c236c2ac';
+import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=4dc6c236c2ac';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=4dc6c236c2ac';
+import {guideGLSL} from './particle-path-field.js?v=4dc6c236c2ac';
+import {forceBarrierGLSL} from './particle-forces.js?v=4dc6c236c2ac';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.
@@ -36,7 +37,7 @@ void main(){
  vec3 outward=(a+b)*.5-uShadeOrigin;
  vec3 bend=outward-delta*dot(outward,delta)/max(.000001,dot(delta,delta));
  bend=normalize(bend+vec3(.00001))*len*uLinks.z;
- vec3 p=sceneBarriers(mix(a,b,t)+bend*(4.*t*(1.-t)),ra,uPhase);vPosition=p;vForceSeed=ra;
+ vec3 p=dynamicsContact(sceneBarriers(mix(a,b,t)+bend*(4.*t*(1.-t)),ra,uPhase));vPosition=p;vForceSeed=ra;
  vec3 tangent=delta+bend*(4.-8.*t);
  vec4 clip=project(p);vec2 line=(project(p+tangent*.01).xy-project(p-tangent*.01).xy)*uResolution;
  vec2 normal=vec2(-line.y,line.x)/max(.00001,length(line));
@@ -50,9 +51,10 @@ void main(){
 precision highp float;in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vOpacity,vSide;out vec4 color;
 ${forceBarrierGLSL}
 ${guideGLSL}
+${DYNAMICS_GLSL}
 uniform float uPhase;
 ${livingOcclusionGLSL}
-void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;float a=livingVisibility()*vOpacity*(1.-smoothstep(.1,1.,abs(vSide)));color=vec4(vColor*a,a);}`);
+void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;float a=livingVisibility()*vOpacity*(1.-smoothstep(.1,1.,abs(vSide)));color=vec4(vColor*a,a);}`);
   this.feedback=gl.createTransformFeedback();this.captureBuffer=gl.createBuffer();
   this.buffer=gl.createBuffer();this.vao=gl.createVertexArray();
   gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);
@@ -62,7 +64,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(i
  prepare(s){
   const key=JSON.stringify(GRAPH_KEYS.map(k=>s[k]));if(key===this.key)return;
   const start=performance.now(),o=this.owner,gl=this.gl,n=Math.max(2,Math.min(4000,Math.round(s.pLinkNodes)));
-  o.settings(this.capture,s,0);
+  o.settings(this.capture,{...s,dynAmount:0,_dynamics:null},0);
   gl.bindVertexArray(o.pointVAO);gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK,this.feedback);
   gl.bindBuffer(gl.TRANSFORM_FEEDBACK_BUFFER,this.captureBuffer);gl.bufferData(gl.TRANSFORM_FEEDBACK_BUFFER,n*12,gl.DYNAMIC_READ);
   gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER,0,this.captureBuffer);gl.enable(gl.RASTERIZER_DISCARD);

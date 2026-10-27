@@ -10,5 +10,5 @@ export function setDuration(s,value){
 export function clockStatus(s){
  const period=motionPeriod(s),repeats=s.duration/period,closed=s.perfectLoop!==false&&Math.abs(repeats-Math.round(repeats))<1e-6;
  const seconds=(period/(s.speed||1)).toFixed(2);
- return (s.keepMotionSpeed!==false?`Cadenza conservata: ciclo base di ${seconds} s. `:'Il movimento si adatta alla durata. ')+(closed?'La durata contiene cicli completi.':'La fine del video può interrompere il movimento: per chiuderlo usa un multiplo del ciclo base.');
+ return (s.dynAmount>0?'Dinamica libera: la chiusura del ciclo non è garantita. ':'')+(s.keepMotionSpeed!==false?`Cadenza conservata: ciclo base di ${seconds} s. `:'Il movimento si adatta alla durata. ')+(closed?'La durata contiene cicli completi.':'La fine del video può interrompere il movimento: per chiuderlo usa un multiplo del ciclo base.');
 }

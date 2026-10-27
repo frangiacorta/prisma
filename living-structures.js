@@ -1,5 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=9d7adea7a5ff';
-import {excludeForcePositions} from './particle-forces.js?v=9d7adea7a5ff';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume} from './living-topology.js?v=4dc6c236c2ac';
+import {excludeForcePositions} from './particle-forces.js?v=4dc6c236c2ac';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;
 uniform float uBundleAmount;uniform vec3 uLivingMotion;`;
@@ -17,7 +17,7 @@ void main(){
  if(uBundleAmount>0.){float groups=uLivingShape.x;float band=floor(r.x*groups);float grouped=(band+.5+(fract(r.x*groups)-.5)*uLivingShape.y)/groups;r.x=mix(r.x,grouped,uBundleAmount);}
  r.y=mix(uLivingShape.z*.48,1.,aRandom.y);if(r.y<.00001||r.y>.99999)r.x=.5;
  float delay=uLivingMotion.x*sin(r.x*TAU);
- vec3 p=position(r,uPhase-delay),origin=vec3(uFrame.yz,0.);
+ vec3 p=positionRaw(r,uPhase-delay),origin=vec3(uFrame.yz,0.);
  vec3 radial=normalize(p-origin+vec3(.00001));
  float clock=(uPhase-delay)*TAU;
  float envelope=sin(aRandom.y*3.14159265);
@@ -44,14 +44,14 @@ void main(){
  r.y=mix(uLivingShape.z*.48,1.,aRandom.y);if(r.y<.00001||r.y>.99999)r.x=.5;
  float phase=uPhase-uLivingMotion.x*sin(r.x*TAU);
  vec3 p=texelFetch(uConstraintPositions,ivec2(gl_VertexID%uConstraintColumns,gl_VertexID/uConstraintColumns),0).xyz;
- targetPosition=sceneBarriers(lockGuidePosition(p,r,phase),r,phase);gl_Position=vec4(0.,0.,0.,1.);
+ targetPosition=dynamicsForward(sceneBarriers(lockGuidePosition(p,r,phase),r,phase));gl_Position=vec4(0.,0.,0.,1.);
 }`,`#version 300 es
 precision highp float;out vec4 color;void main(){color=vec4(0.);}`,['targetPosition']);
   const sampling=`uniform sampler2D uLivingPositions;uniform ivec2 uLivingSize;
 vec3 at(ivec2 q){q.x=(q.x+uLivingSize.x)%uLivingSize.x;q.y=clamp(q.y,0,uLivingSize.y-1);return texelFetch(uLivingPositions,q,0).xyz;}
 vec3 curve(vec3 a,vec3 b,vec3 c,vec3 d,float t){return .5*((2.*b)+(-a+c)*t+(2.*a-5.*b+4.*c-d)*t*t+(-a+3.*b-3.*c+d)*t*t*t);}
 vec3 column(ivec2 i,float t){return curve(at(i-ivec2(0,1)),at(i),at(i+ivec2(0,1)),at(i+ivec2(0,2)),t);}
-vec3 surface(vec2 uv){vec2 q=uv*vec2(uLivingSize-ivec2(0,1));ivec2 i=ivec2(floor(q));vec2 t=fract(q);return sceneBarriers(mix(column(i,t.y),column(i+ivec2(1,0),t.y),t.x),vec4(uv,.5,.5),uPhase);}
+vec3 surface(vec2 uv){vec2 q=uv*vec2(uLivingSize-ivec2(0,1));ivec2 i=ivec2(floor(q));vec2 t=fract(q);return dynamicsContact(sceneBarriers(mix(column(i,t.y),column(i+ivec2(1,0),t.y),t.x),vec4(uv,.5,.5),uPhase));}
 vec3 surfaceNormal(vec2 uv){vec2 e=1./vec2(uLivingSize);return normalize(cross(surface(uv+vec2(e.x,0))-surface(uv-vec2(e.x,0)),surface(uv+vec2(0,e.y))-surface(uv-vec2(0,e.y)))+vec3(.000001));}`;
   this.skin=owner.program(`#version 300 es
 precision highp float;precision highp int;precision highp sampler2D;
@@ -67,7 +67,7 @@ in vec3 vPosition,vNormal,vCoord;out vec4 color;
 uniform vec4 uLivingSurface;
 void main(){
  vec2 vUV=vec2(fract(atan(vCoord.y,vCoord.x)/TAU),vCoord.z);
- vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vec4(vUV,.5,.5),uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vec4(vUV,.5,.5),uPhase))discard;
+ vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vec4(vUV,.5,.5),uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vec4(vUV,.5,.5),uPhase))discard;
  float hole=length((fract(vUV*vec2(uLivingSurface.z,uLivingSurface.z*.65))-.5)*2.);
  float coverage=uLivingSurface.y<=0.?1.:1.-smoothstep(hole-fwidth(hole),hole+fwidth(hole),uLivingSurface.y);
  if(coverage<.05)discard;
@@ -100,7 +100,7 @@ void main(){
 precision highp float;precision highp int;
 ${common}
 in vec3 vPosition,vNormal,vTangent;in vec2 vUV;in float vSide,vAlpha;out vec4 color;
-void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vec4(vUV,.5,.5),uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vec4(vUV,.5,.5),uPhase))discard;float a=vAlpha*(1.-smoothstep(.25,1.,abs(vSide)));if(a<.003)discard;
+void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vec4(vUV,.5,.5),uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vec4(vUV,.5,.5),uPhase))discard;float a=vAlpha*(1.-smoothstep(.25,1.,abs(vSide)));if(a<.003)discard;
  vec3 lit=shadeFibre(particleColor(vec4(vUV,.5,.5),vPosition),vPosition,normalize(vNormal),vTangent);
  color=vec4(lit*a,a);}`);
   this.feedback=gl.createTransformFeedback();this.captureBuffer=gl.createBuffer();this.seedBuffer=gl.createBuffer();this.indices=gl.createBuffer();this.vao=gl.createVertexArray();this.texture=gl.createTexture();
@@ -127,7 +127,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(i
   }
   // Rest geometry changes only when its controls change, never with elapsed time.
   const key=JSON.stringify(Object.entries(s).filter(([k])=>k.startsWith('p')||['seed','volume','stretchX','stretchY','stretchZ','deform','twist','waves','waveScale','scale','rotateX','rotateY','rotateZ'].includes(k)));
-  if(key!==this.key){const paths=this.owner.guides.paths;this.owner.guides.paths=[];try{setLivingRest(this.topology,this.capturePositions({...s,forcePoints:[],bodyForces:[],forcePaths:[]},0));}finally{this.owner.guides.paths=paths;}this.key=key;}
+  if(key!==this.key){const paths=this.owner.guides.paths;this.owner.guides.paths=[];try{setLivingRest(this.topology,this.capturePositions({...s,forcePoints:[],bodyForces:[],forcePaths:[],dynAmount:0,_dynamics:null},0));}finally{this.owner.guides.paths=paths;}this.key=key;}
  }
  sample(s,phase){
   this.prepare(s);const gl=this.gl,o=this.owner,t=this.topology;
@@ -138,7 +138,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(i
   excludeForcePositions(this.positions,[...(s.forcePoints||[]).filter(f=>f.enabled).slice(0,8),...(s.bodyForces||[]).filter(f=>f.enabled).slice(0,3)]);
   for(let i=0;i<this.positions.length/3;i++)this.pixels.set(this.positions.subarray(i*3,i*3+3),i*4);
   gl.activeTexture(gl.TEXTURE6);gl.bindTexture(gl.TEXTURE_2D,this.texture);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,t.columns,t.rows,gl.RGBA,gl.FLOAT,this.pixels);
-  if((s.forcePaths||[]).some(p=>p.enabled&&(p.mode==='avoid'?p.strength>1.2:p.strength>=2.99999))){
+  if(s.dynAmount>0||(s.forcePaths||[]).some(p=>p.enabled&&(p.mode==='avoid'?p.strength>1.2:p.strength>=2.99999))){
    this.positions.set(this.capturePositions(s,phase,true));
    for(let i=0;i<this.positions.length/3;i++)this.pixels.set(this.positions.subarray(i*3,i*3+3),i*4);
    gl.activeTexture(gl.TEXTURE6);gl.bindTexture(gl.TEXTURE_2D,this.texture);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,t.columns,t.rows,gl.RGBA,gl.FLOAT,this.pixels);
