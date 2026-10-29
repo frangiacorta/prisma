@@ -1,4 +1,4 @@
-import {controlCondition} from './control-help.js?v=9fa7ff517902';
+import {controlCondition} from './control-help.js?v=38e810dd65ce';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
@@ -64,7 +64,7 @@ export function decorateInspector({root,state,baseline,tab,edit}){
  const actions=toolbar.querySelector('.simplify-actions'),help=[...toolbar.querySelectorAll(':scope > .help')];
  const activeMenu=document.createElement('details');activeMenu.className='overview-active';const activeSummary=document.createElement('summary');activeSummary.textContent='In uso';activeMenu.append(activeSummary,activeList);
  const more=document.createElement('details');more.className='overview-actions';more.innerHTML='<summary aria-label="Azioni della scheda">⋯</summary>';more.append(select);if(actions)more.append(actions);for(const p of help)more.append(p);
- heading.replaceChildren(activeMenu,toggle,more);toolbar.replaceChildren(heading);
+ heading.replaceChildren(activeMenu,toggle,more);toolbar.replaceChildren(heading,select);if(actions)toolbar.append(actions);
  root.prepend(toolbar);
  const records=[];
  const motionEffects=tab==='motion'?[['pTravel','Orbite delle particelle'],['pVortex','Vorticità'],['pReentry','Rientro'],['pLife','Pulsazione'],['pBreath','Dilatazione'],['pRandom','Irregolarità del moto'],['pJitter','Microfluttuazioni'],['pWander','Deriva'],['pSpaceWarp','Distorsione spaziale'],['growthFlow','Scorrimento della trama'],['filmFlow','Scorrimento della pellicola'],['filmSwirl','Rotazione della pellicola'],['environmentRotate','Rotazione dei riflessi']]:[];

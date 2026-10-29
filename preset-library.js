@@ -1,0 +1,31 @@
+// Browsing only: selection keeps the existing preset handlers and undo history.
+const clean=value=>String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const memory={library:{query:'',category:''},saved:{query:'',engine:'',sort:'recent'}};
+let savedController;
+function field(label,control){const row=document.createElement('label');row.className='field';row.append(label,control);control.setAttribute('aria-label',label);return row;}
+function select(label,options,value){const el=document.createElement('select');for(const [key,name] of options){const o=document.createElement('option');o.value=key;o.textContent=name;el.append(o);}el.value=value;return [field(label,el),el];}
+function search(value){const input=document.createElement('input');input.type='search';input.placeholder='Cerca per nome';input.value=value;return [field('Cerca preset o esempio',input),input];}
+function bar(root,id){root.querySelector('#'+id)?.remove();const el=document.createElement('div');el.id=id;el.className='preset-browser';return el;}
+export function mountPresetLibrary(root,categories){
+ const prefs=memory.library,toolbar=bar(root,'preset-browser'),[queryRow,query]=search(prefs.query),[categoryRow,category]=select('Mostra',[['','Tutti'],['complete','Scene complete'],...categories.filter(([id])=>id!=='library').map(([id,label])=>[id,'Solo '+label.toLowerCase()])],prefs.category);
+ const count=document.createElement('p');count.className='preset-results';count.setAttribute('role','status');const clear=document.createElement('button');clear.type='button';clear.className='quiet';clear.textContent='Azzera ricerca';toolbar.append(queryRow,categoryRow,clear,count);root.prepend(toolbar);
+ const groups=[...root.querySelectorAll('[data-library-category]')];
+ const cards=[...root.querySelectorAll('[data-library-category] button:not(.parameter-info),[data-library-category] select')];
+ const homes=new Map(cards.map(card=>[card,card.closest('[data-library-category]')]));
+ for(const card of cards){card.dataset.libraryItem='true';if(card.tagName==='BUTTON')card.classList.add('library-item');card.title=(homes.get(card).dataset.libraryCategory==='complete'?'Sostituisce la scena completa':'Applica solo '+homes.get(card).querySelector('summary').textContent.toLowerCase())+' · '+card.textContent.trim();}
+ const disclosures=[...root.querySelectorAll('[data-library-category] details')];const originalOpen=new Map([...groups,...disclosures].map(d=>[d,d.open]));
+ function filter(){
+  prefs.query=query.value;prefs.category=category.value;const words=clean(query.value).trim().split(/\s+/).filter(Boolean);let shown=0;
+  for(const card of cards){const group=homes.get(card),haystack=clean(card.textContent+' '+group.querySelector('summary').textContent+' '+(card.closest('[data-library-subgroup]')?.dataset.librarySubgroup||''));const match=(!category.value||group.dataset.libraryCategory===category.value)&&words.every(word=>haystack.includes(word));card.hidden=!match;if(match)shown++;}
+  for(const d of [...disclosures].reverse()){d.hidden=![...d.querySelectorAll('[data-library-item]')].some(c=>!c.hidden);d.open=(words.length||category.value)?!d.hidden:originalOpen.get(d);}
+  for(const group of groups){group.hidden=!cards.some(c=>homes.get(c)===group&&!c.hidden);group.open=(words.length||category.value)?!group.hidden:originalOpen.get(group);}
+  count.textContent=shown?`${shown} risultati · ${category.value==='complete'?'sostituiscono la scena':'le categorie modificano solo la parte indicata'}`:'Nessun risultato. Prova un altro nome o categoria.';clear.hidden=!query.value&&!category.value;
+ }
+ query.addEventListener('input',filter);category.addEventListener('change',filter);clear.onclick=()=>{query.value='';category.value='';filter();query.focus();};filter();
+}
+export function mountSavedPresets(grid){
+ savedController?.abort();savedController=new AbortController();
+ const root=grid.parentElement,prefs=memory.saved,toolbar=bar(root,'saved-preset-browser'),[queryRow,query]=search(prefs.query),[engineRow,engine]=select('Motore',[['','Entrambi'],['solid','Forma'],['particles','Particelle']],prefs.engine),[sortRow,sort]=select('Ordina',[['recent','Più recenti'],['name','Nome A–Z']],prefs.sort),count=document.createElement('p');count.className='preset-results';count.setAttribute('role','status');toolbar.append(queryRow,engineRow,sortRow,count);grid.before(toolbar);
+ function filter(){prefs.query=query.value;prefs.engine=engine.value;prefs.sort=sort.value;const cards=[...grid.children];cards.sort((a,b)=>sort.value==='name'?a.querySelector('input').value.localeCompare(b.querySelector('input').value,'it'):Number(b.dataset.date)-Number(a.dataset.date));let shown=0;for(const card of cards){card.hidden=!!engine.value&&engine.value!==card.dataset.engine||!clean(card.querySelector('input').value).includes(clean(query.value).trim());if(!card.hidden)shown++;grid.append(card);}count.textContent=shown?`${shown} preset salvati`:'Nessun preset corrispondente';}
+ query.addEventListener('input',filter);engine.addEventListener('change',filter);sort.addEventListener('change',filter);grid.addEventListener('change',filter,{signal:savedController.signal});filter();
+}

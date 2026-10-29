@@ -1,6 +1,6 @@
-import {clockStatus} from './animation-clock.js?v=9fa7ff517902';
-import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=9fa7ff517902';
-export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['library','Libreria']];
+import {clockStatus} from './animation-clock.js?v=38e810dd65ce';
+import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=38e810dd65ce';
+export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['library','Preset']];
 const html=s=>{const d=document.createElement('div');d.innerHTML=s;return d;};
 const section=(title,id)=>{const d=document.createElement('details');d.className='control-details';if(id)d.id=id;const h=document.createElement('summary');h.textContent=title;d.append(h);return d;};
 const exampleSelector='#load-bloom-example,[data-sculpt],[data-material],#material-picker,[data-legacy-material],[data-film-look],[data-film-light],[data-texture-style],[data-motion-preset],[data-mood],#light-rig,[data-light-source],[data-backdrop],[data-audio-preset],[data-growth-study],[data-particle-material],[data-particle-film],[data-fiber-style],[data-link-style],[data-living-style],[data-veil-look]';
@@ -36,7 +36,7 @@ function baseMarkup(id,raw,state){
 function particleLayers(root,state){
  const layers=[section('Nucleo','layer-core'),section('Granelli','layer-grains'),section('Fili','layer-links'),section('Scie','layer-trails'),section('Pelle','layer-skin')];
  const skin=/^p(?:Skin|Thread|Weft|Strands|Bundle|Bundles|Fray|Fold|Pore|Living|SurfaceBind)/;
- const classify=k=>/^pLink/.test(k)?2:/^pTrail/.test(k)?3:skin.test(k)?4:['pLargeCount','pLargeSize','pSizeSpread','pSizeBias','pCount','pSize','pOpacity','pSoftness','pSizeVar','pSprite','pGrainSpacing','pGroupSpacing','pDistributionCells'].includes(k)?1:0;
+ const classify=k=>/^pLink/.test(k)||k==='pNodeRatio'?2:/^pTrail/.test(k)?3:skin.test(k)?4:['pSizeRatio','pLargeCount','pSizeSpread','pSizeBias','pCount','pSize','pOpacity','pSoftness','pSizeVar','pSprite','pGrainSpacing','pGroupSpacing','pDistributionCells'].includes(k)?1:0;
  for(const node of [...root.children]){
   if(!node.matches('details')){layers[0].append(node);continue;}
   const e=node.querySelector('[data-param],[data-particle-select],[data-living-enabled]');const k=e?.dataset.param||e?.dataset.particleSelect||(e?.hasAttribute('data-living-enabled')?'pLiving':'');
@@ -47,7 +47,7 @@ function particleLayers(root,state){
  const defs=[null,null,['links','pLinks'],['trails','pTrailCount'],['skin','pLiving']];
  layers.forEach((d,i)=>{d.dataset.particleLayer=String(i);if(defs[i]){const [kind,key]=defs[i],on=Number(state[key])>0;d.dataset.layerOff=String(!on);const toggle=document.createElement('input');toggle.type='checkbox';toggle.dataset.layerToggle=kind;toggle.checked=on;toggle.defaultChecked=on;toggle.setAttribute('aria-label','Attiva '+d.querySelector('summary').textContent);d.querySelector('summary').prepend(toggle);}else d.dataset.defaultOpen='true';});
  root.replaceChildren(...layers);
- const names={pOpening:'Sfera ↔ anello',pFill:'Riempimento',pThickness:'Spessore del nucleo',pOrganic:'Irregolarità',pCount:'Quantità',pSize:'Dimensione',pOpacity:'Opacità',pLinks:'Intensità',pLinkNodes:'Nodi',pLinkWidth:'Spessore',pLinkReach:'Distanza',pTrailLength:'Lunghezza',pTrailWidth:'Spessore',pTrailCount:'Quantità',pSkin:'Visibilità della pelle',pFoldDepth:'Pieghe',pPores:'Pori'};
+ const names={pOpening:'Sfera ↔ anello',pFill:'Riempimento',pThickness:'Spessore del nucleo',pOrganic:'Irregolarità',pCount:'Quantità',pSize:'Diametro comune · px',pOpacity:'Opacità',pLinks:'Intensità',pLinkNodes:'Nodi',pLinkWidth:'Spessore',pLinkReach:'Distanza',pTrailLength:'Lunghezza',pTrailWidth:'Spessore',pTrailCount:'Quantità',pSkin:'Visibilità della pelle',pFoldDepth:'Pieghe',pPores:'Pori'};
  for(const e of root.querySelectorAll('[data-param]'))if(names[e.dataset.param]){const label=rowFor(e).querySelector('label');e.dataset.searchAliases=label.textContent;label.textContent=names[e.dataset.param];}
  const sprite=root.querySelector('[data-particle-select=pSprite]');if(sprite)for(const n of sprite.closest('label').childNodes)if(n.nodeType===3)n.textContent='Sagoma';
 }
@@ -57,10 +57,10 @@ export function composePanel(id,raw,state){
  if(id==='fields')return raw(id);
  const tracks=trackMap(raw);
  if(id==='library'){
-  const root=html('<p class="help">Preset completi: sostituiscono la creazione. Esempi per categoria: modificano solo quella parte.</p><button type="button" id="library-saved" class="outline full">I miei preset · importa ed esporta</button><details class="control-details" data-library-category="complete"><summary>Preset completi</summary><div id="complete-presets-slot"></div></details>');
-  const seen=new Set();for(const [tab,label]of WORK_TABS.filter(([t])=>t!=='library')){const source=baseMarkup(tab,raw,state),group=section(label);group.dataset.libraryCategory=tab;
-   for(const e of [...source.querySelectorAll(exampleSelector)]){if(seen.has(e.outerHTML))continue;seen.add(e.outerHTML);if(e.id==='material-picker'){for(const o of e.options)if(o.value!==''){const b=document.createElement('button');b.type='button';b.className='outline library-card';b.dataset.material=o.value;b.textContent=o.textContent;group.append(b);}continue;}group.append(e.matches('select')?rowFor(e):e);}
-   const cards=[...group.querySelectorAll('[data-material],[data-mood]')];if(cards.length){const grid=document.createElement('div');grid.className='library-card-grid';cards[0].before(grid);for(const c of cards)c.classList.add('library-card');grid.append(...cards);}if(group.querySelector('button,select'))root.append(group);
+  const root=html('<p class="help">Preset completi: sostituiscono la creazione. Esempi per categoria: modificano solo quella parte.</p><button type="button" id="library-saved" class="outline full">I miei preset · importa ed esporta</button><details class="control-details" data-default-open="true" data-library-category="complete"><summary>Scene complete</summary><div id="complete-presets-slot"></div></details>');
+  const seen=new Set();for(const [tab,label]of WORK_TABS.filter(([t])=>t!=='library')){const source=baseMarkup(tab,raw,state),group=section(label),subgroups=new Map();group.dataset.libraryCategory=tab;
+   for(const e of [...source.querySelectorAll(exampleSelector)]){if(seen.has(e.outerHTML))continue;seen.add(e.outerHTML);if(e.id==='material-picker'){for(const o of e.options)if(o.value!==''){const b=document.createElement('button');b.type='button';b.className='outline library-card';b.dataset.material=o.value;b.textContent=o.textContent;group.append(b);}continue;}const title=e.closest('details')?.querySelector(':scope > summary')?.textContent||label;let target=subgroups.get(title);if(!target){target=section(title);target.dataset.librarySubgroup=title;subgroups.set(title,target);group.append(target);}target.append(e.matches('select')?rowFor(e):e);}
+   const cards=[...group.querySelectorAll(':scope > [data-material],:scope > [data-mood]')];if(cards.length){const grid=document.createElement('div');grid.className='library-card-grid';cards[0].before(grid);for(const c of cards)c.classList.add('library-card');grid.append(...cards);}if(group.querySelector('button,select'))root.append(group);
   }return root.innerHTML;
  }
  if(id==='motion'){

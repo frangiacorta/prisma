@@ -1,11 +1,11 @@
-import {closeLivingSkin} from './living-panel.js?v=9fa7ff517902';
-import {PlaygroundEngine} from './playground-engine.js?v=9fa7ff517902';
-import {PlaygroundInputs} from './playground-inputs.js?v=9fa7ff517902';
-import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=9fa7ff517902';
-import {particleCreation} from './particle-model.js?v=9fa7ff517902';
-import {readPreset} from './preset-files.js?v=9fa7ff517902';
-import {controlHelp,controlCondition} from './control-help.js?v=9fa7ff517902';
-import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=9fa7ff517902';
+import {closeLivingSkin} from './living-panel.js?v=38e810dd65ce';
+import {PlaygroundEngine} from './playground-engine.js?v=38e810dd65ce';
+import {PlaygroundInputs} from './playground-inputs.js?v=38e810dd65ce';
+import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=38e810dd65ce';
+import {particleCreation} from './particle-model.js?v=38e810dd65ce';
+import {readPreset} from './preset-files.js?v=38e810dd65ce';
+import {controlHelp,controlCondition} from './control-help.js?v=38e810dd65ce';
+import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=38e810dd65ce';
 
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
 const button=(text,fn,cls='outline')=>{const b=el('button',cls,text);b.type='button';b.onclick=fn;return b;};
@@ -29,7 +29,7 @@ export function mountPlayground(api){
  function persist(){if(!active||!engine)return;clearTimeout(saveTimer);api.save(engine.snapshot());}
  function changed(){clearTimeout(saveTimer);saveTimer=setTimeout(persist,350);sync();}
  function touch(key,value){inputs?.manual(key);target(key)?.set(value);}
- function parameterTarget(key){const m=/^param:([AB]):(.+)$/.exec(key);if(!m)return null;const d=engine?.decks[m[1]],p=d?.catalog.find(x=>x.path===m[2]);if(!p||p.kind==='color')return null;return {kind:'value',get:()=>{const v=readParameter(d.state,p.path);return p.kind==='boolean'?Number(v):p.kind==='enum'?p.values.indexOf(v)/(p.values.length-1):clamp((v-p.min)/(p.max-p.min));},set:v=>{engine.setParameter(m[1],p.path,parameterFromUnit(p,v));changed();}};}
+ function parameterTarget(key){const m=/^param:([AB]):(.+)$/.exec(key);if(!m)return null;const d=engine?.decks[m[1]],p=d?.catalog.find(x=>x.path===m[2]);if(!p||p.kind==='color')return null;const range=config.bindings[key]?.range,entry=range&&p.kind==='number'?{...p,min:range[0],max:range[1]}:p;return {kind:'value',get:()=>{const v=readParameter(d.state,p.path);return p.kind==='boolean'?Number(v):p.kind==='enum'?p.values.indexOf(v)/(p.values.length-1):clamp((v-entry.min)/(entry.max-entry.min));},set:v=>{engine.setParameter(m[1],p.path,parameterFromUnit(entry,v));changed();}};}
  function target(key){
   if(!engine)return null;if(key.startsWith('param:'))return parameterTarget(key);
   const value=(get,set)=>({kind:'value',get,set:v=>{set(clamp(v));changed();}}),action=fn=>({kind:'action',get:()=>0,set:v=>{if(v>.5)fn();changed();}});

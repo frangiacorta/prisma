@@ -1,8 +1,9 @@
-import {newCreation,material} from './creative-model.js?v=9fa7ff517902';
-import {addHelp} from './inspector-ui.js?v=9fa7ff517902';
-import {MOODS} from './model.js?v=9fa7ff517902';
-import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=9fa7ff517902';
-import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=9fa7ff517902';
+import {mountPresetLibrary} from './preset-library.js?v=38e810dd65ce';
+import {newCreation,material} from './creative-model.js?v=38e810dd65ce';
+import {addHelp} from './inspector-ui.js?v=38e810dd65ce';
+import {MOODS} from './model.js?v=38e810dd65ce';
+import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=38e810dd65ce';
+import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=38e810dd65ce';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){
@@ -82,7 +83,7 @@ export function mountWorkflowTools(api){
   if(api.getTab()==='library'){
    panel.querySelector('#complete-presets-slot')?.append(presets);
    thumbnailObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting)continue;const card=entry.target;thumbnailObserver?.unobserve(card);const id=(card.dataset.material!==undefined?'material:':'palette:')+(card.dataset.material??card.dataset.mood);const img=document.createElement('img');img.className='library-thumb';img.alt='';card.prepend(img);if(materialThumbs.has(id)){img.src=materialThumbs.get(id);continue;}const state=newCreation();if(card.dataset.material!==undefined)material(state,Number(card.dataset.material));else state.palette=[...MOODS[Number(card.dataset.mood)].colors];api.thumbnail(state,0,1,()=>!card.isConnected).then(url=>{if(url&&card.isConnected){materialThumbs.set(id,url);img.src=url;}else img.remove();}).catch(()=>img.remove());}},{root:panel});for(const card of panel.querySelectorAll('button[data-material],button[data-mood]'))thumbnailObserver.observe(card);
-   const select=document.createElement('select');select.setAttribute('aria-label','Categoria della libreria');select.innerHTML='<option value="">Tutte le categorie</option><option value="complete">Preset completi</option>'+WORK_TABS.map(([id,label])=>`<option value="${id}">${label}</option>`).join('');panel.prepend(select);select.onchange=()=>{for(const d of panel.querySelectorAll('[data-library-category]')){d.hidden=!!select.value&&d.dataset.libraryCategory!==select.value;if(!d.hidden&&select.value)d.open=true;}};
+   mountPresetLibrary(panel,WORK_TABS);
   }
   
   if(api.getTab()==='background'){

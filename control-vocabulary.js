@@ -32,7 +32,7 @@ export const ESSENTIALS={
   motion:{time:['duration','speed','motion'],dynamics:['dynAmount','dynStiffness','dynDamping','dynGravity','dynWind','dynPin','dynFloor','dynFloorY','dynObstacle','dynObstacleX','dynObstacleY','dynObstacleZ','dynObstacleSize']}
  },
  particles:{
-  shape:{core:['pOpening','pFill','pThickness','pOrganic'],grains:['pLargeCount','pLargeSize','pCount','pSize','pOpacity','pGrainSpacing','pGroupSpacing','pDistributionCells'],links:['pLinks','pLinkNodes','pLinkNodeSize','pLinkWidth','pLinkReach','pLinkNeighbors','pLinkMinReach','pLinkSurface','pLinkTurns'],trails:['pTrailLength','pTrailWidth','pTrailCount'],skin:['pSkin','pSkinScale','pSkinThickness','pSkinFollow','pFoldDepth','pPores']},
+  shape:{core:['pOpening','pFill','pThickness','pOrganic'],grains:['pSizeRatio','pNodeRatio','pLargeCount','pSizeVar','pCount','pSize','pOpacity','pGrainSpacing','pGroupSpacing','pDistributionCells'],links:['pLinks','pLinkNodes','pLinkWidth','pLinkReach','pLinkNeighbors','pLinkMinReach','pLinkSurface','pLinkTurns'],trails:['pTrailLength','pTrailWidth','pTrailCount'],skin:['pSkin','pSkinScale','pSkinThickness','pSkinFollow','pFoldDepth','pPores']},
   material:{surface:['metal','roughness','gloss'],trails:['pFiberSheen','pFiberSpread'],film:['pFilm','filmThickness'],opacity:['transparency','refraction','emission']},
   color:{core:['structCoreDark','structCoreRadius'],gradient:['gradientAngle','gradientScale'],particles:['pColorScatter'],layers:['colorLayers','colorLayerScale','colorLayerShift','colorLayerMix'],glow:['glow']},
   light:{environment:['environmentPower'],source:['power','size'],particles:['pLighting']},
@@ -44,7 +44,7 @@ export const ESSENTIALS={
 export const EXPERT_KEYS=new Set(['seed','textureSeed','growthSeed','growthFeed','growthKill','growthDiffusion','growthAge','pMotionSeed','finishWarpSeed','finishGlyphSeed','finishGlitchSeed','petalCollision','petalSphereCollision','petalContactPasses','petalContactGap','petalContactDamping','petalContactFriction','pTrailQuality']);
 export const ESSENTIAL_FLAGS=new Set(['animateRotation','animateShape','animateColor','animateLight','keepMotionSpeed','finishGlitchFlash','perfectLoop','thinShellMode','environmentRotate','finishScan','finishScanOnly','finishScanSource','finishScanAnimate','finishEnabled','finishWarp','finishGlass','finishGlyph','finishEdge','finishGlitch','finishGlitchAnimate','finishMosaic','finishRgb']);
 export const ESSENTIAL_FIELDS=new Set(['dynObstacle','bg-mode','environment','glyph-characters','pSprite','pColorMode','pDirection','pShadowLight','finishGlitchShape']);
-export const ESSENTIAL_BUTTONS='[data-dynamics-reset],[data-base-form],#particle-sphere,#add-color,[data-remove-color],#add-light,[data-light-select],#show-lights,[data-remove-light],[data-animate-open],[data-animate-path],[data-animation-group],[data-parameter-jump],[data-open-library],[data-motion-preset],[data-jump-tab],#add-animation';
+export const ESSENTIAL_BUTTONS='[data-uniform-grains],[data-dynamics-reset],[data-base-form],#particle-sphere,#add-color,[data-remove-color],#add-light,[data-light-select],#show-lights,[data-remove-light],[data-animate-open],[data-animate-path],[data-animation-group],[data-parameter-jump],[data-open-library],[data-motion-preset],[data-jump-tab],#add-animation';
 export function essentialKeys(engine,tab){
  const engines=tab==='shape'?[engine==='particles'?'particles':'solid']:['solid','particles'];
  return new Set(engines.flatMap(e=>Object.values(ESSENTIALS[e]?.[tab]||{}).flat()));

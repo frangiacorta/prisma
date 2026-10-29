@@ -1,17 +1,17 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=9fa7ff517902';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=9fa7ff517902';
-import {ParticleOptics} from './particle-optics.js?v=9fa7ff517902';
-import {shadowLight} from './particle-shadow.js?v=9fa7ff517902';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=9fa7ff517902';
-import {PARTICLE_DEFAULTS,rng} from './particle-model.js?v=9fa7ff517902';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=9fa7ff517902';
-import {ParticleLinks} from './particle-links.js?v=9fa7ff517902';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=9fa7ff517902';
-import {LayeredVeils} from './layered-veils.js?v=9fa7ff517902';
-import {LivingStructures} from './living-structures.js?v=9fa7ff517902';
-import {fieldGLSL} from './particle-field.js?v=9fa7ff517902';
-import {forceBarrierGLSL} from './particle-forces.js?v=9fa7ff517902';
-import {prismaShadingGLSL} from './particle-shading.js?v=9fa7ff517902';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=38e810dd65ce';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=38e810dd65ce';
+import {ParticleOptics} from './particle-optics.js?v=38e810dd65ce';
+import {shadowLight} from './particle-shadow.js?v=38e810dd65ce';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=38e810dd65ce';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=38e810dd65ce';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=38e810dd65ce';
+import {ParticleLinks} from './particle-links.js?v=38e810dd65ce';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=38e810dd65ce';
+import {LayeredVeils} from './layered-veils.js?v=38e810dd65ce';
+import {LivingStructures} from './living-structures.js?v=38e810dd65ce';
+import {fieldGLSL} from './particle-field.js?v=38e810dd65ce';
+import {forceBarrierGLSL} from './particle-forces.js?v=38e810dd65ce';
+import {prismaShadingGLSL} from './particle-shading.js?v=38e810dd65ce';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -186,7 +186,7 @@ export class ParticleRenderer{
   this.u(p,'uNoise',s.pOrganic,s.pFrequency,s.pDetail,s.pWarp);this.u(p,'uFlow',s.pCohesion,s.pRandom,s.pJitter,s.pRough);
   this.u(p,'uDynamics',s.pVortex,s.pReentry,s.pTravel,s.pMorph);this.u(p,'uPoles',s.pAttract,s.pRepel,s.pMagnet,s.pPoles);this.u(p,'uPoleRadius',s.pRadius);this.u(p,'uPoleField',s.pField);this.u(p,'uBreath',s.pBreath);
   this.u(p,'uOuter',s.pOuter,s.pReach,s.pBranches,0);this.u(p,'uClock',s.pCycles,s.pRhythm,s.pPause,s.pSpeedSpread);
-  this.u(p,'uSpacing',s.pGrainSpacing??1,s.pGroupSpacing??1,s.pDistributionCells??4);this.u(p,'uPoints',s.pSize,s.pSizeVar,s.pOpacity,s.pSoftness);this.u(p,'uSprite',s.pSprite);this.u(p,'uLargeGrains',s.pLargeCount||0,s.pLargeSize||24);this.u(p,'uGrainDistribution',s.pSizeSpread||0,s.pSizeBias||0);this.u(p,'uNodeStyle',s.pLinks>0?s.pLinkNodes:0,s.pLinkNodeSize||0);
+  this.u(p,'uSpacing',s.pGrainSpacing??1,s.pGroupSpacing??1,s.pDistributionCells??4);this.u(p,'uPoints',s.pSize,s.pSizeVar,s.pOpacity,s.pSoftness);this.u(p,'uSprite',s.pSprite);this.u(p,'uLargeGrains',s.pLargeCount||0,grainDiameters(s).large);this.u(p,'uGrainDistribution',s.pSizeSpread||0,s.pSizeBias||0);this.u(p,'uNodeStyle',s.pLinks>0?s.pLinkNodes:0,grainDiameters(s).node);
   this.u(p,'uTrails',s.pTrailLength*s.pDirection,s.pTrailWidth,s.pTrailOpacity,0);this.u(p,'uTail',s.pTrailFade,s.pTrailTaper,0,s.pTrailScatter);
   this.u(p,'uFiber',s.pTrailPersistence,s.pTrailSoftness,s.pTrailCoherence,fiberGain(s));
   this.u(p,'uFiberLight',s.pFiberSheen,s.pFiberSpread);
@@ -223,7 +223,7 @@ export class ParticleRenderer{
  }
  prepare(source,phase=0){
   if(this.gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');
-  const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};this.ensureTrails(s);
+  const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};migrateGrainSizes(s,source);this.ensureTrails(s);
   // Queue optional geometry programs before drawing, without blocking the UI
   // on LINK_STATUS while the driver is still compiling them.
   if(s.pLiving===4)this.veils??=new LayeredVeils(this,common);
@@ -239,7 +239,7 @@ export class ParticleRenderer{
  async prepareAsync(s,p,o={}){let slow=false;const start=performance.now();o.onStage?.('preparing');while(!o.cancelled?.()){if(this.prepare(s,p)){o.onStage?.('rendering');return true;}if(!slow&&performance.now()-start>30000){slow=true;o.onStage?.('preparing-slow');}await new Promise(r=>setTimeout(r,16));}return false;}
  draw(source,phase=0,w=this.canvas.width,h=this.canvas.height,options={}){
   const gl=this.gl;if(gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');if(options.preview&&!this.prepare(source,phase))return false;
-  phase=((phase/(Math.PI*2))%1+1)%1;const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase*Math.PI*2)};this.ensureTrails(s);
+  phase=((phase/(Math.PI*2))%1+1)%1;const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase*Math.PI*2)};migrateGrainSizes(s,source);this.ensureTrails(s);
   if(s.pLiving===4){s.pCount=0;s.pTrailCount=0;s.pLinks=0;s.pLivingBlend=1;}
   this.geometryBudget=options.preview&&options.quality==='fast'?Math.max(1/16,Math.min(1,options.geometryBudget??1)):1;this.previewCounts={};this.linkRestState={...s};for(const k of ['volume','stretchX','stretchY','stretchZ'])this.linkRestState[k]=source[k]??s[k];
   const weights=livingWeights(s);s.pOpacity*=weights.core;s.pTrailOpacity*=weights.core;s.pLinks*=weights.core;s.pSkin*=weights.structure;s.pThreadOpacity*=weights.structure;this.occlusion=0;
@@ -294,7 +294,7 @@ export class ParticleRenderer{
   if(s.pLinks>0){this.connections??=new ParticleLinks(this,common);this.connections.draw(s,phase*s.pDirection);}
   if(s.pCount>0&&s.pOpacity>0){
    const count=Math.min(Math.round(s.pCount),Math.max(s.pLinks>0?s.pLinkNodes:256,Math.round(s.pCount*this.geometryBudget)));this.previewCounts.points=count;this.settings(this.points,{...s,pOpacity:s.pOpacity*Math.min(16,s.pCount/count)},phase*s.pDirection);
-   const size=Math.max(s.pSize,s.pLargeCount>0?s.pLargeSize||24:0,s.pLinks>0?s.pLinkNodeSize||0:0),quad=Math.min(1024,size*(1+s.pSizeVar*.85)*Math.pow(2,s.pSizeSpread||0))*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
+   const size=Math.max(s.pSize,s.pLargeCount>0?grainDiameters(s).large:0,s.pLinks>0?grainDiameters(s).node:0),quad=Math.min(1024,size*(1+s.pSizeVar*.85)*Math.pow(2,s.pSizeSpread||0))*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
    this.u(this.points,'uPointQuad',quad?1:0);gl.bindVertexArray(quad?this.quadVAO:this.pointVAO);this.opticalDrawState();
    if(quad)gl.drawArraysInstanced(gl.TRIANGLES,0,6,count);else gl.drawArrays(gl.POINTS,0,count);
   }

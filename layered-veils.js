@@ -1,6 +1,6 @@
-import {LivingStructures} from './living-structures.js?v=9fa7ff517902';
-import {VEIL_SOURCE_KEYS,extractVeilSource,makeSourceVeilMesh,updateSourceVeilMesh,sampleLivingVeilSource} from './veil-source.js?v=9fa7ff517902';
-import {makeVeilMesh,updateVeilMesh} from './veil-geometry.js?v=9fa7ff517902';
+import {LivingStructures} from './living-structures.js?v=38e810dd65ce';
+import {VEIL_SOURCE_KEYS,extractVeilSource,makeSourceVeilMesh,updateSourceVeilMesh,sampleLivingVeilSource} from './veil-source.js?v=38e810dd65ce';
+import {makeVeilMesh,updateVeilMesh} from './veil-geometry.js?v=38e810dd65ce';
 export class LayeredVeils{
  constructor(owner,common){this.common=common;this.owner=owner;const gl=this.gl=owner.gl;this.program=owner.program(`#version 300 es
 precision highp float;precision highp int;

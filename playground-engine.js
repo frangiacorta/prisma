@@ -1,7 +1,7 @@
-import {Renderer} from './renderer.js?v=9fa7ff517902';
-import {PlaygroundMixer} from './playground-mixer.js?v=9fa7ff517902';
-import {normalizeCreation} from './creative-model.js?v=9fa7ff517902';
-import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=9fa7ff517902';
+import {Renderer} from './renderer.js?v=38e810dd65ce';
+import {PlaygroundMixer} from './playground-mixer.js?v=38e810dd65ce';
+import {normalizeCreation} from './creative-model.js?v=38e810dd65ce';
+import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=38e810dd65ce';
 
 export class PlaygroundEngine{
  constructor(canvas,config,notify=()=>{}){

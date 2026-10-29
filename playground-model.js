@@ -1,9 +1,9 @@
 // Project-only data: never retain devices, canvases or a nested performance.
-import {META,GROUPS} from './model.js?v=9fa7ff517902';
-import {PARTICLE_META} from './particle-model.js?v=9fa7ff517902';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=9fa7ff517902';
-import {FORCE_META} from './particle-forces.js?v=9fa7ff517902';
-import {PATH_META} from './particle-paths.js?v=9fa7ff517902';
+import {META,GROUPS} from './model.js?v=38e810dd65ce';
+import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=38e810dd65ce';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=38e810dd65ce';
+import {FORCE_META} from './particle-forces.js?v=38e810dd65ce';
+import {PATH_META} from './particle-paths.js?v=38e810dd65ce';
 export const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const number=(x,f,a,b)=>Number.isFinite(x)?clamp(x,a,b):f;
 const label=(x,f='',n=80)=>typeof x==='string'?x.replace(/[\x00-\x1f<>]/g,'').slice(0,n):f;
@@ -25,6 +25,16 @@ export function normalizePlayground(raw){
  c.ratio=number(raw.ratio,16/9,.1,10);const old=Array.isArray(raw.slots)?raw.slots:[];
  c.macros=Array.from({length:8},(_,i)=>{const v=raw.macros?.[i]||old[i]||{};return {name:label(v.name||v.label,'Macro '+(i+1),40),value:number(v.value,0,0,1),routes:(Array.isArray(v.routes)?v.routes:old[i]?[{deck:'A',path:v.param,min:v.min,max:v.max}]:[]).slice(0,16).map(route)};});
  for(const [k,v]of Object.entries(raw.bindings||{}).slice(0,400)){if(forbidden.has(k)||k.length>160)continue;const b=normalizeBinding(v?.input);if(b)c.bindings[k]={input:b,mode:['hold','toggle','step'].includes(v.mode)?v.mode:'toggle',invert:!!v.invert,pickup:v.pickup!==false};}
+ // Old absolute grain sizes become ratios in the same macro, without dropping
+ // its input assignment or changing the stored scene's starting appearance.
+ for(const d of Object.values(c.decks))migrateGrainSizes(d.state,d.state);
+ for(const macro of c.macros)for(const r of macro.routes){const next={pLargeSize:'pSizeRatio',pLinkNodeSize:'pNodeRatio'}[r.path];if(next){const base=Math.max(.08,c.decks[r.deck].state.pSize||1.1);r.path=next;r.min/=base;r.max/=base;}}
+ for(const [key,b] of Object.entries(c.bindings)){
+  const previous=raw.bindings?.[key]?.range;if(Array.isArray(previous)&&previous.length===2&&previous.every(x=>Number.isFinite(x)&&Math.abs(x)<=1e6))b.range=[...previous];
+  const match=/^param:([AB]):(pLargeSize|pLinkNodeSize)$/.exec(key);if(!match)continue;
+  const base=Math.max(.08,c.decks[match[1]].state.pSize||1.1),next=`param:${match[1]}:${match[2]==='pLargeSize'?'pSizeRatio':'pNodeRatio'}`;
+  if(!c.bindings[next])c.bindings[next]={...b,range:[(match[2]==='pLargeSize'?.08:0)/base,256/base]};delete c.bindings[key];
+ }
  return c;
 }
 export function defaultPlayground(snapshot){
