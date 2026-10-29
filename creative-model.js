@@ -1,14 +1,14 @@
-import {normalizePlayground} from './playground-model.js?v=baf523d18ae1';
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=baf523d18ae1';
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=baf523d18ae1';
-import {normalizeAudioClip} from './audio-recording.js?v=baf523d18ae1';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=baf523d18ae1';
-import {normalizeAudio} from './audio-model.js?v=baf523d18ae1';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=baf523d18ae1';
-import {normalizeForcePaths} from './particle-paths.js?v=baf523d18ae1';
-import {normalizeForcePoints} from './particle-forces.js?v=baf523d18ae1';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=baf523d18ae1';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=baf523d18ae1';
+import {normalizePlayground} from './playground-model.js?v=5b48561291a2';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=5b48561291a2';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=5b48561291a2';
+import {normalizeAudioClip} from './audio-recording.js?v=5b48561291a2';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=5b48561291a2';
+import {normalizeAudio} from './audio-model.js?v=5b48561291a2';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=5b48561291a2';
+import {normalizeForcePaths} from './particle-paths.js?v=5b48561291a2';
+import {normalizeForcePoints} from './particle-forces.js?v=5b48561291a2';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=5b48561291a2';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=5b48561291a2';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}

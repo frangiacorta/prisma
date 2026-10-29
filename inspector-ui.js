@@ -1,5 +1,5 @@
-import {organizeSections} from './inspector-navigation.js?v=baf523d18ae1';
-import {controlHelp} from './control-help.js?v=baf523d18ae1';
+import {organizeSections} from './inspector-navigation.js?v=5b48561291a2';
+import {controlHelp} from './control-help.js?v=5b48561291a2';
 const STORE='prisma-interface-v2';
 let preferences={};try{preferences=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(preferences));}catch{}};
@@ -77,7 +77,7 @@ export function mountStudioLayout(){
  choices.addEventListener('click',e=>{if(e.target.closest('button'))menu.open=false;});
  document.addEventListener('pointerdown',e=>{if(!menu.contains(e.target))menu.open=false;});
  menu.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.open=false;summary.focus();}});
- for(const [id,open] of [['sections-open',true],['sections-close',false]])document.getElementById(id).addEventListener('click',()=>{hideTip();const root=document.getElementById('controls');for(const section of root.querySelectorAll('details'))section.open=open;root.scrollTop=0;});
+ for(const [id,open] of [['sections-open',true],['sections-close',false]])document.getElementById(id).addEventListener('click',()=>{hideTip();const root=document.getElementById('controls');for(const section of root.querySelectorAll('details'))if(!section.closest('.inspector-overview'))section.open=open;root.scrollTop=0;});
  const button=document.querySelector('#expand-preview');
  let expanded=false,scroll=0;
  const expand=value=>{if(value===expanded)return;expanded=value;if(value)scroll=window.scrollY;document.body.classList.toggle('preview-expanded',value);button.setAttribute('aria-pressed',String(value));button.querySelector('.expand-label').textContent=value?'Torna ai controlli':'Amplia anteprima';button.title=value?'Torna ai controlli (Esc)':'Amplia anteprima';for(const el of document.querySelectorAll('.preset-rail,.inspector,.topbar,.description-bar,.random-bar'))el.inert=value;if(!value){window.scrollTo(0,scroll);button.focus();}hideTip();};

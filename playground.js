@@ -1,13 +1,13 @@
-import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=baf523d18ae1';
-import {familyName,presetFamily} from './preset-families.js?v=baf523d18ae1';
-import {closeLivingSkin} from './living-panel.js?v=baf523d18ae1';
-import {PlaygroundEngine} from './playground-engine.js?v=baf523d18ae1';
-import {PlaygroundInputs} from './playground-inputs.js?v=baf523d18ae1';
-import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=baf523d18ae1';
-import {particleCreation} from './particle-model.js?v=baf523d18ae1';
-import {readPreset} from './preset-files.js?v=baf523d18ae1';
-import {controlHelp,controlCondition} from './control-help.js?v=baf523d18ae1';
-import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=baf523d18ae1';
+import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=5b48561291a2';
+import {familyName,presetFamily} from './preset-families.js?v=5b48561291a2';
+import {closeLivingSkin} from './living-panel.js?v=5b48561291a2';
+import {PlaygroundEngine} from './playground-engine.js?v=5b48561291a2';
+import {PlaygroundInputs} from './playground-inputs.js?v=5b48561291a2';
+import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=5b48561291a2';
+import {particleCreation} from './particle-model.js?v=5b48561291a2';
+import {readPreset} from './preset-files.js?v=5b48561291a2';
+import {controlHelp,controlCondition} from './control-help.js?v=5b48561291a2';
+import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=5b48561291a2';
 
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
 const button=(text,fn,cls='outline')=>{const b=el('button',cls,text);b.type='button';b.onclick=fn;return b;};
@@ -26,7 +26,7 @@ export function mountPlayground(api){
  const mapDialog=el('dialog','pg-dialog'),macroDialog=el('dialog','pg-dialog'),parameterDialog=el('dialog','pg-dialog');
  const fullscreen=async()=>{try{if(document.fullscreenElement===shell)await document.exitFullscreen();else await shell.requestFullscreen();}catch{message('Schermo intero non disponibile in questo browser.');}};
  const flowMode=button('Flow',()=>{engine.flow.start();render();changed();}),manualMode=button('Manuale',()=>{engine.flow.stop();render();changed();});flowMode.dataset.pgMode='flow';manualMode.dataset.pgMode='manual';
- header.append(title,manualMode,flowMode,button('Salva progetto',()=>{persist();api.exportProject();}),button('Assegnazioni',()=>openMapping('mix')),button('Schermo intero',fullscreen),button('Solo scena',()=>shell.classList.toggle('pg-clean')),button('Editor',()=>close()));
+ header.append(title,manualMode,flowMode,button('Salva progetto',()=>{persist();api.exportProject();}),button('Collega controlli',()=>openMapping(config.flow.enabled?'flow.speed':'mix')),button('Schermo intero',fullscreen),button('Solo scena',()=>shell.classList.toggle('pg-clean')),button('Torna all’editor',()=>close()));
  stage.append(canvas,button('Controlli',()=>shell.classList.remove('pg-clean'),'pg-reveal'));shell.append(header,stage,status,consolePanel,mapDialog,macroDialog,parameterDialog);consolePanel.append(top,mixPanel,macrosPanel,details);document.body.append(shell);
  const opener=button('Playground',()=>open(),'outline');opener.id='playground-open';document.querySelector('.header-actions')?.prepend(opener);
  function message(text){status.textContent=text;}
@@ -130,7 +130,7 @@ export function mountPlayground(api){
  function openMacroBody(){openMacro(activeMacro);}
  macroDialog.addEventListener('close',()=>{render();changed();});
  function mappingCatalog(){const fixed=[['flow.enabled','Modalità Flow'],['flow.mood','Flow · mood'],['flow.colors','Flow · palette'],['flow.speed','Flow · velocità'],['flow.intensity','Flow · intensità'],['flow.variety','Flow · varietà'],['flow.engines','Flow · scene'],['flow.paused','Flow · mantieni scena'],['flow.next','Flow · prossima scena'],['mix','Mix A/B'],['take.A','Transizione verso A'],['take.B','Transizione verso B'],['cut.A','A subito'],['cut.B','B subito'],['transition','Tipo transizione'],['direction','Direzione tendina'],['curve','Andamento'],['duration','Durata'],['unit','Secondi / battiti'],['bpm','BPM'],['quantize','Partenza sul battito'],['master','Livello uscita'],['blackout','Nero'],['close.A','Chiudi pelle A'],['close.B','Chiudi pelle B'],['play:A','Riproduzione A'],['play:B','Riproduzione B'],...config.macros.map((m,i)=>['macro:'+i,'Macro · '+m.name])];for(const id of ['A','B'])for(const [p,n]of catalogOptions(id,false))fixed.push([`param:${id}:${p}`,id+' · '+n]);return fixed;}
- function openMapping(key){targetKey=key;dialogHead(mapDialog,'Assegna un controllo');const catalog=mappingCatalog(),search=el('input');search.type='search';search.placeholder='Cerca un controllo…';search.setAttribute('aria-label','Cerca controllo da assegnare');const choose=select(catalog,key,v=>{targetKey=v;openMapping(v);});search.oninput=()=>options(choose,catalog.filter(([,n])=>n.toLowerCase().includes(search.value.toLowerCase())),targetKey);const existing=config.bindings[key],mode=select([['toggle','Alterna minimo / massimo'],['hold','Attivo mentre premi'],['step','Avanza a passi del 10%']],existing?.mode||'toggle',()=>{}),invert=el('input'),pickup=el('input');invert.type=pickup.type='checkbox';invert.checked=existing?.invert||false;pickup.checked=existing?.pickup!==false;
+ function openMapping(key){targetKey=key;dialogHead(mapDialog,'Assegna un controllo');const catalog=mappingCatalog().filter(([id])=>config.flow.enabled?id.startsWith('flow.')||['master','blackout'].includes(id):true),search=el('input');search.type='search';search.placeholder='Cerca un controllo…';search.setAttribute('aria-label','Cerca controllo da assegnare');const choose=select(catalog,key,v=>{targetKey=v;openMapping(v);});search.oninput=()=>options(choose,catalog.filter(([,n])=>n.toLowerCase().includes(search.value.toLowerCase())),targetKey);const existing=config.bindings[key],mode=select([['toggle','Alterna minimo / massimo'],['hold','Attivo mentre premi'],['step','Avanza a passi del 10%']],existing?.mode||'toggle',()=>{}),invert=el('input'),pickup=el('input');invert.type=pickup.type='checkbox';invert.checked=existing?.invert||false;pickup.checked=existing?.pickup!==false;
   const info=el('p','pg-help');info.textContent=existing?'Collegato a '+bindingName(existing.input):'Nessuna assegnazione';mapDialog.append(search,field('Controllo',choose),field('Tasti e pulsanti',mode),field('Inverti',invert),field('Aggancia quando raggiungi il valore attuale',pickup),info,button('Impara assegnazione',()=>inputs.learn(targetKey,mode.value,invert.checked,pickup.checked)),button('Collega MIDI',()=>inputs.connectMidi()),button('Rimuovi assegnazione',()=>{delete config.bindings[targetKey];inputs.release();changed();openMapping(targetKey);}),el('p','pg-help','Tastiera, joystick e MIDI CC / note. Gli assi sono continui; una zona morta evita tremolii al centro. I controlli fisici agganciano il valore senza saltare. Il pad XY e i fader funzionano anche con mouse e touch.'));
   const all=el('details');all.append(el('summary','',Object.keys(config.bindings).length+' assegnazioni salvate'));for(const [k,v]of Object.entries(config.bindings)){const n=catalog.find(x=>x[0]===k)?.[1]||k;all.append(button(n+' ← '+bindingName(v.input),()=>openMapping(k),'quiet'));}mapDialog.append(all);if(!mapDialog.open)mapDialog.showModal();
  }

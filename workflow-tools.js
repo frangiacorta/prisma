@@ -1,9 +1,10 @@
-import {mountPresetLibrary} from './preset-library.js?v=baf523d18ae1';
-import {newCreation,material} from './creative-model.js?v=baf523d18ae1';
-import {addHelp} from './inspector-ui.js?v=baf523d18ae1';
-import {MOODS} from './model.js?v=baf523d18ae1';
-import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=baf523d18ae1';
-import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=baf523d18ae1';
+import {organizeWorkspace} from './workspace-layout.js?v=5b48561291a2';
+import {mountPresetLibrary} from './preset-library.js?v=5b48561291a2';
+import {newCreation,material} from './creative-model.js?v=5b48561291a2';
+import {addHelp} from './inspector-ui.js?v=5b48561291a2';
+import {MOODS} from './model.js?v=5b48561291a2';
+import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=5b48561291a2';
+import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=5b48561291a2';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){
@@ -33,7 +34,8 @@ export function mountWorkflowTools(api){
  document.querySelector('#similar-dialog h2')?.replaceChildren(document.createTextNode('Varianti della creazione'));
  document.getElementById('expand-preview').hidden=true;document.getElementById('fullscreen').className='quiet';document.getElementById('fullscreen').textContent='Schermo intero';
  document.querySelector('.canvas-tools .scene-interactions > summary').textContent='Interazione';
- document.addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea')||document.querySelector('dialog[open]')||e.ctrlKey||e.metaKey||e.altKey)return;const k=e.key.toLowerCase();if(/^[1-8]$/.test(k)){e.preventDefault();showTab(WORK_TABS[Number(k)-1][0]);}else if(k==='r')document.getElementById('randomize').click();else if(k==='v')document.getElementById('random-settings').click();else if(k==='f')document.getElementById('fullscreen').click();else if(k==='?')keyboard.d.showModal();});
+ document.addEventListener('keydown',e=>{if(document.body.classList.contains('pg-open'))return;if(e.target.matches('input,select,textarea')||document.querySelector('dialog[open]')||e.ctrlKey||e.metaKey||e.altKey)return;const k=e.key.toLowerCase();if(/^[1-8]$/.test(k)){e.preventDefault();showTab(WORK_TABS[Number(k)-1][0]);}else if(k==='r')document.getElementById('randomize').click();else if(k==='v')document.getElementById('random-settings').click();else if(k==='f')document.getElementById('fullscreen').click();else if(k==='?')keyboard.d.showModal();});
+ organizeWorkspace();
  function closeEditor(){popupRequest=null;popupAdvanced=false;popup?.close();popup?.remove();popup=null;}
  function openEditor(request){
   popup?.remove();popup=null;popupRequest=request;
@@ -73,8 +75,8 @@ export function mountWorkflowTools(api){
  document.getElementById('random-settings').addEventListener('click',()=>{const box=document.getElementById('parameter-locks')||document.createElement('details');box.id='parameter-locks';box.innerHTML='<summary>Valori da conservare</summary>';const seen=new Set();for(const [tab] of WORK_TABS.filter(([t])=>t!=='library')){const d=document.createElement('div');d.innerHTML=composePanel(tab,api.rawPanelMarkup,getState());for(const input of d.querySelectorAll('[data-param]')){const key=input.dataset.param;if(seen.has(key))continue;seen.add(key);const label=document.createElement('label');label.className='check';const check=document.createElement('input');check.type='checkbox';check.checked=(getState().controlLocks||[]).includes(key);label.append(check,input.closest('.param').querySelector('label').textContent);check.onchange=()=>{remember(undefined,'Blocco parametro');const keys=new Set(getState().controlLocks||[]);check.checked?keys.add(key):keys.delete(key);getState().controlLocks=[...keys];mark(false);};box.append(label);}}document.querySelector('#random-dialog .dialog-body').append(box);});
  document.addEventListener('pointerdown',e=>{const target=e.target.closest('.param,.check,.field,button');if(target)lastAction=(target.querySelector('label')?.textContent||target.getAttribute('aria-label')||target.textContent||'Modifica').replace(/\s+/g,' ').trim().slice(0,90);},true);
  function decorate(panel){
-  const seed=document.querySelector('.seed');(level==='expert'?document.querySelector('.random-bar'):document.querySelector('#random-dialog .dialog-body')).append(seed);
-  const actions=panel.querySelector('.overview-actions');if(actions)actions.append(...sectionButtons);
+  const seed=document.querySelector('.seed');(document.getElementById('workspace-variants')||document.querySelector('#random-dialog .dialog-body')).append(seed);
+  const actions=panel.querySelector('.section-visibility');if(actions)actions.append(...sectionButtons);
   for(const input of panel.querySelectorAll('input[data-param]')){
    const key=input.dataset.param,row=input.closest('.param'),line=row.querySelector('.param-line'),locked=(getState().controlLocks||[]).includes(key);
    const b=button('',locked?'Bloccato':'Blocca',()=>{remember(undefined,'Blocco del parametro');const keys=new Set(getState().controlLocks||[]);keys.has(key)?keys.delete(key):keys.add(key);getState().controlLocks=[...keys];mark(false);renderControls();});b.textContent=locked?'Bloccato':'Blocca';b.className='parameter-lock';b.dataset.lockParameter=key;b.setAttribute('aria-pressed',String(locked));b.title='Conserva questo valore durante la variazione casuale';line.append(b);
