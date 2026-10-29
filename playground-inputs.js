@@ -1,4 +1,4 @@
-import {axisValue,catchesValue,normalizeBinding} from './playground-model.js?v=5b48561291a2';
+import {axisValue,catchesValue,normalizeBinding} from './playground-model.js?v=02b214873299';
 export class PlaygroundInputs{
  constructor(config,targets,notify=()=>{}){this.config=config;this.targets=targets;this.notify=notify;this.previous=new Map();this.picked=new Set();this.held=new Map();this.padBaseline=new Map();this.learning=null;this.closed=false;this.controller=new AbortController();const signal=this.controller.signal;
   window.addEventListener('keydown',e=>this.key(e,true),{capture:true,signal});window.addEventListener('keyup',e=>this.key(e,false),{capture:true,signal});window.addEventListener('blur',()=>this.release(),{signal});document.addEventListener('visibilitychange',()=>{if(document.hidden)this.release();},{signal});window.addEventListener('gamepaddisconnected',()=>{this.release();this.notify('Joystick scollegato');},{signal});this.poll=this.poll.bind(this);this.raf=requestAnimationFrame(this.poll);

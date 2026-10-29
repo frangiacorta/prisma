@@ -286,3 +286,4 @@ body.pg-open>.workspace,body.pg-open>.topbar{display:none!important}
 @media(max-width:900px){html,body{overflow-x:clip}.random-bar[data-organized]{flex-wrap:wrap}.workspace-action-group{flex-shrink:0}}
 
 .inspector-overview [hidden]{display:none!important}
+.random-bar[data-organized]{display:flex;height:auto;min-height:44px}.workspace-action-group{min-width:max-content}
