@@ -1,11 +1,13 @@
-import {closeLivingSkin} from './living-panel.js?v=38e810dd65ce';
-import {PlaygroundEngine} from './playground-engine.js?v=38e810dd65ce';
-import {PlaygroundInputs} from './playground-inputs.js?v=38e810dd65ce';
-import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=38e810dd65ce';
-import {particleCreation} from './particle-model.js?v=38e810dd65ce';
-import {readPreset} from './preset-files.js?v=38e810dd65ce';
-import {controlHelp,controlCondition} from './control-help.js?v=38e810dd65ce';
-import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=38e810dd65ce';
+import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=baf523d18ae1';
+import {familyName,presetFamily} from './preset-families.js?v=baf523d18ae1';
+import {closeLivingSkin} from './living-panel.js?v=baf523d18ae1';
+import {PlaygroundEngine} from './playground-engine.js?v=baf523d18ae1';
+import {PlaygroundInputs} from './playground-inputs.js?v=baf523d18ae1';
+import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=baf523d18ae1';
+import {particleCreation} from './particle-model.js?v=baf523d18ae1';
+import {readPreset} from './preset-files.js?v=baf523d18ae1';
+import {controlHelp,controlCondition} from './control-help.js?v=baf523d18ae1';
+import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=baf523d18ae1';
 
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
 const button=(text,fn,cls='outline')=>{const b=el('button',cls,text);b.type='button';b.onclick=fn;return b;};
@@ -20,9 +22,11 @@ export function mountPlayground(api){
  const shell=el('section','pg-shell');shell.id='playground';shell.hidden=true;shell.setAttribute('aria-label','Playground · due scene vive');
  const header=el('header','pg-header'),title=el('strong','','Playground'),status=el('p','pg-status',''),stage=el('div','pg-stage');let canvas=el('canvas');canvas.id='playground-output';canvas.setAttribute('aria-label','Mix delle scene A e B');
  const consolePanel=el('div','pg-console'),top=el('div','pg-decks'),mixPanel=el('section','pg-mix'),macrosPanel=el('section','pg-macros'),details=el('div','pg-details');
+ const flowPanel=el('section','pg-flow-panel');consolePanel.prepend(flowPanel);
  const mapDialog=el('dialog','pg-dialog'),macroDialog=el('dialog','pg-dialog'),parameterDialog=el('dialog','pg-dialog');
  const fullscreen=async()=>{try{if(document.fullscreenElement===shell)await document.exitFullscreen();else await shell.requestFullscreen();}catch{message('Schermo intero non disponibile in questo browser.');}};
- header.append(title,button('Salva progetto',()=>{persist();api.exportProject();}),button('Assegnazioni',()=>openMapping('mix')),button('Schermo intero',fullscreen),button('Solo scena',()=>shell.classList.toggle('pg-clean')),button('Editor',()=>close()));
+ const flowMode=button('Flow',()=>{engine.flow.start();render();changed();}),manualMode=button('Manuale',()=>{engine.flow.stop();render();changed();});flowMode.dataset.pgMode='flow';manualMode.dataset.pgMode='manual';
+ header.append(title,manualMode,flowMode,button('Salva progetto',()=>{persist();api.exportProject();}),button('Assegnazioni',()=>openMapping('mix')),button('Schermo intero',fullscreen),button('Solo scena',()=>shell.classList.toggle('pg-clean')),button('Editor',()=>close()));
  stage.append(canvas,button('Controlli',()=>shell.classList.remove('pg-clean'),'pg-reveal'));shell.append(header,stage,status,consolePanel,mapDialog,macroDialog,parameterDialog);consolePanel.append(top,mixPanel,macrosPanel,details);document.body.append(shell);
  const opener=button('Playground',()=>open(),'outline');opener.id='playground-open';document.querySelector('.header-actions')?.prepend(opener);
  function message(text){status.textContent=text;}
@@ -31,7 +35,17 @@ export function mountPlayground(api){
  function touch(key,value){inputs?.manual(key);target(key)?.set(value);}
  function parameterTarget(key){const m=/^param:([AB]):(.+)$/.exec(key);if(!m)return null;const d=engine?.decks[m[1]],p=d?.catalog.find(x=>x.path===m[2]);if(!p||p.kind==='color')return null;const range=config.bindings[key]?.range,entry=range&&p.kind==='number'?{...p,min:range[0],max:range[1]}:p;return {kind:'value',get:()=>{const v=readParameter(d.state,p.path);return p.kind==='boolean'?Number(v):p.kind==='enum'?p.values.indexOf(v)/(p.values.length-1):clamp((v-entry.min)/(entry.max-entry.min));},set:v=>{engine.setParameter(m[1],p.path,parameterFromUnit(entry,v));changed();}};}
  function target(key){
-  if(!engine)return null;if(key.startsWith('param:'))return parameterTarget(key);
+  if(!engine)return null;
+  if(key==='flow.enabled')return {kind:'value',get:()=>+config.flow.enabled,set:v=>{v>=.5?engine.flow.start():engine.flow.stop();render();changed();}};
+  if(key.startsWith('flow.')){const k=key.slice(5),f=config.flow;
+   if(k==='next')return {kind:'action',get:()=>0,set:v=>{if(v>.5)engine.flow.next();changed();}};
+   if(k==='paused')return {kind:'value',get:()=>+f.paused,set:v=>{f.paused=v>=.5;changed();}};
+   const choices={mood:FLOW_MOODS.map(x=>x[0]),colors:FLOW_COLORS.map(x=>x[0]),engines:['both','solid','particles']};
+   if(choices[k]){const list=choices[k];return {kind:'value',get:()=>list.indexOf(f[k])/(list.length-1),set:v=>{f[k]=list[Math.round(clamp(v)*(list.length-1))];changed();}};}
+   if(['speed','intensity','variety'].includes(k)){const min=k==='speed'?.25:0,max=k==='speed'?3:1;return {kind:'value',get:()=>(f[k]-min)/(max-min),set:v=>{f[k]=min+clamp(v)*(max-min);changed();}};}
+  }
+  if(config.flow.enabled&&!['blackout','master'].includes(key))return null;
+  if(key.startsWith('param:'))return parameterTarget(key);
   const value=(get,set)=>({kind:'value',get,set:v=>{set(clamp(v));changed();}}),action=fn=>({kind:'action',get:()=>0,set:v=>{if(v>.5)fn();changed();}});
   if(key==='mix')return value(()=>config.mix,v=>engine.mix(v));
   if(key==='blackout')return value(()=>+config.blackout,v=>config.blackout=v>=.5);
@@ -53,8 +67,16 @@ export function mountPlayground(api){
  }
  function choice(name,key,list){const row=el('div','pg-choice'),s=select(list,config[key],v=>touch(key,list.findIndex(x=>String(x[0])===v)/(list.length-1)));s.dataset.control=key;row.append(field(name,s),learnButton(key));controlNodes.set(key,{select:s});return row;}
  function actionButton(name,key){const row=el('span','pg-action'),b=button(name,()=>touch(key,1));b.dataset.action=key;row.append(b,learnButton(key));return row;}
+ function renderFlow(){
+  flowPanel.replaceChildren(el('h2','','Flow'));const f=config.flow;
+  const description=el('p','pg-help','Scene e mix automatici. La prossima scena viene preparata prima del passaggio. Manuale conserva il mix che stai vedendo.');flowPanel.append(description);
+  const choices=el('div','pg-grid');for(const [key,name,list]of [['mood','Mood',FLOW_MOODS],['colors','Palette',FLOW_COLORS],['engines','Scene',[['both','Forma e particelle'],['solid','Solo forma'],['particles','Solo particelle']]]]){const s=select(list,f[key],v=>{f[key]=v;changed();});s.dataset.control='flow.'+key;controlNodes.set('flow.'+key,{select:s});const box=el('div','pg-choice');box.append(field(name,s),learnButton('flow.'+key));choices.append(box);}flowPanel.append(choices);
+  const colors=el('div','pg-flow-colors');for(let i=0;i<3;i++){const c=el('input');c.type='color';c.dataset.flowColor=String(i);c.setAttribute('aria-label','Colore Flow '+(i+1));c.oninput=()=>{const previous=flowPalette(f);f.palette=Array.from({length:3},(_,j)=>previous[j%previous.length]||'#ffffff');f.palette[i]=c.value;f.colors='custom';changed();};colors.append(c);}flowPanel.append(colors);
+  flowPanel.append(slider('Velocità','flow.speed',.25,3,.05,v=>.25+v*2.75,v=>(v-.25)/2.75),slider('Intensità','flow.intensity'),slider('Varietà','flow.variety'));
+  flowPanel.append(el('p','pg-help','Velocità regola movimento e durata dei passaggi. Intensità cambia deformazione e luminosità. Varietà amplia le famiglie di forme successive.'));const actions=el('div','pg-row'),pause=button('Mantieni scena',()=>{f.paused=!f.paused;if(!f.paused&&engine.flow.phase==='error')engine.flow.next();changed();});pause.dataset.flowPause='';const pauseGroup=el('span','pg-action');pauseGroup.append(pause,learnButton('flow.paused'));actions.append(pauseGroup,actionButton('Prossima scena','flow.next'));flowPanel.append(actions);const progress=el('p','pg-flow-status');progress.setAttribute('role','status');flowPanel.append(progress);
+ }
  function render(){
-  controlNodes.clear();top.replaceChildren();
+  controlNodes.clear();renderFlow();top.replaceChildren();
   for(const id of ['A','B']){
    const d=engine.decks[id],card=el('section','pg-deck'),head=el('div','pg-deck-head'),name=el('input'),state=el('small');name.type='text';name.maxLength=80;name.value=d?.name||config.decks[id].name;name.setAttribute('aria-label','Nome scena '+id);name.onchange=()=>{if(engine.decks[id])engine.decks[id].name=name.value;config.decks[id].name=name.value;changed();};head.append(el('strong','pg-letter',id),name,state);card.append(head);
    const preview=deckNodes[id]?.preview||el('canvas','pg-preview');if(preview.width!==320||preview.height!==180){preview.width=320;preview.height=180;}preview.setAttribute('aria-label','Anteprima scena '+id);card.append(preview);deckNodes[id]={card,state,preview,name};
@@ -63,7 +85,7 @@ export function mountPlayground(api){
    const sources=el('details','pg-source'),summary=el('summary','','Carica scena');sources.append(summary);
    sources.append(button('Scena dell’editor',()=>loadScene(id,entry)),button('Copia '+(id==='A'?'B':'A'),()=>{const other=engine.decks[id==='A'?'B':'A'];if(other)loadScene(id,{...other,state:sceneOnly(other.state)});}),button('Sfera semplice',()=>loadScene(id,{state:newCreation(),name:'Sfera semplice',phase:0})),button('Particelle',()=>loadScene(id,{state:particleCreation(newCreation()),name:'Particelle',phase:0})));
    const file=el('input');file.type='file';file.accept='.json,application/json';file.hidden=true;file.onchange=async()=>{const f=file.files[0];if(!f)return;try{if(f.size>2e6)throw Error('Il progetto deve essere inferiore a 2 MB.');const q=readPreset(await f.text(),f.name);await loadScene(id,q);}catch(e){message(e.message);}file.value='';};sources.append(button('Importa progetto JSON',()=>file.click()),file);
-   const saved=api.favorites?.()||[];if(saved.length){const s=select([['','Dai preset salvati…'],...saved.map((x,i)=>[String(i),x.name||'Preset '+(i+1)])],'',v=>{if(v!=='')loadScene(id,saved[+v]);});sources.append(s);}card.append(sources);top.append(card);
+   const saved=[...(api.favorites?.()||[])].sort((a,b)=>(familyName(presetFamily(a.state))+' '+a.name).localeCompare(familyName(presetFamily(b.state))+' '+b.name,'it'));if(saved.length){const s=select([['','Dai preset salvati…'],...saved.map((x,i)=>[String(i),familyName(presetFamily(x.state))+' · '+(x.name||'Preset '+(i+1))])],'',v=>{if(v!=='')loadScene(id,saved[+v]);});sources.append(s);}card.append(sources);top.append(card);
   }
   mixPanel.replaceChildren(el('h2','','Mix A / B'));mixPanel.append(slider('Mix · A ← → B','mix',0,1,.001));
   const actions=el('div','pg-row');actions.append(actionButton('A subito','cut.A'),actionButton('Transizione verso A','take.A'),actionButton('Transizione verso B','take.B'),actionButton('B subito','cut.B'));mixPanel.append(actions);
@@ -77,8 +99,11 @@ export function mountPlayground(api){
  }
  let taps=[];function tap(){const now=performance.now();if(now-(taps.at(-1)||0)>2200)taps=[];taps.push(now);taps=taps.slice(-5);if(taps.length>1){config.bpm=clamp(60000/((now-taps[0])/(taps.length-1)),30,300);changed();}}
  function drawPreview(id){const d=engine?.decks[id],n=deckNodes[id];if(!d||!n||d.renderer.completionSync||d.frames===n.frames)return;const now=performance.now();if(n.frames!==undefined&&now-(n.previewAt||0)<150)return;const ctx=n.preview.getContext('2d'),fit=Math.min(320/d.canvas.width,180/d.canvas.height),w=d.canvas.width*fit,h=d.canvas.height*fit;ctx.fillStyle='#000';ctx.fillRect(0,0,320,180);ctx.drawImage(d.canvas,(320-w)/2,(180-h)/2,w,h);n.frames=d.frames;n.previewAt=now;}
- function sync(){if(!active||!engine)return;for(const [key,n]of controlNodes){const t=target(key);if(!t)continue;if(n.range){const v=n.read(t.get());n.range.value=v;if(document.activeElement!==n.num)n.num.value=Number(v.toFixed(3));}if(n.select)n.select.value=String(config[key]);if(n.check)n.check.checked=!!config[key];}
+ function sync(){if(!active||!engine)return;for(const [key,n]of controlNodes){const t=target(key);if(!t)continue;if(n.range){const v=n.read(t.get());n.range.value=v;if(document.activeElement!==n.num)n.num.value=Number(v.toFixed(3));}if(n.select)n.select.value=String(key.startsWith('flow.')?config.flow[key.slice(5)]:config[key]);if(n.check)n.check.checked=!!config[key];}
   for(const id of ['A','B']){const d=engine.decks[id],n=deckNodes[id];if(!n)continue;n.state.textContent=engine.pending[id]?'Preparo…':d?`${d.state.engine==='particles'?'Particelle':'Forma'} · ${d.playing?'in movimento':'in pausa'}`:'In attesa';const b=n.card.querySelector('[data-play]');if(b)b.textContent=d?.playing?'Pausa':'Riproduci';drawPreview(id);}
+  shell.classList.toggle('pg-flow',config.flow.enabled);flowPanel.hidden=!config.flow.enabled;flowMode.setAttribute('aria-pressed',String(config.flow.enabled));manualMode.setAttribute('aria-pressed',String(!config.flow.enabled));
+  const f=config.flow,fs=engine.flow.status(),visibleDeck=engine.decks[config.mix<.5?'A':'B'];const note=flowPanel.querySelector('.pg-flow-status');if(note)note.textContent=fs.error||`${visibleDeck?.name||'Preparo le scene'} · ${f.paused?'cambi in pausa':({settle:'avvio',loading:'preparo la prossima',ready:'prossimo mix fra '+Math.ceil((1-fs.progress)*flowTiming(f).hold)+' s',transition:'mix in corso',hold:'nuova scena',idle:'manuale'})[fs.phase]||''}`;
+  const pause=flowPanel.querySelector('[data-flow-pause]');if(pause){pause.textContent=f.paused?'Riprendi cambi':'Mantieni scena';pause.setAttribute('aria-pressed',String(f.paused));}const palette=flowPalette(f);for(const c of flowPanel.querySelectorAll('[data-flow-color]'))if(document.activeElement!==c)c.value=palette[Number(c.dataset.flowColor)%palette.length]||'#ffffff';
   shell.querySelector('[data-blackout]')?.classList.toggle('active',config.blackout);for(const b of shell.querySelectorAll('[data-map]')){const assigned=config.bindings[b.dataset.map];b.textContent=assigned?bindingName(assigned.input):'Assegna';b.classList.toggle('assigned',!!assigned);}
  }
  function dialogHead(dialog,title){dialog.replaceChildren();const head=el('header','pg-dialog-head');head.append(el('h2','',title),button('Chiudi',()=>dialog.close()));dialog.append(head);}
@@ -104,14 +129,14 @@ export function mountPlayground(api){
  }
  function openMacroBody(){openMacro(activeMacro);}
  macroDialog.addEventListener('close',()=>{render();changed();});
- function mappingCatalog(){const fixed=[['mix','Mix A/B'],['take.A','Transizione verso A'],['take.B','Transizione verso B'],['cut.A','A subito'],['cut.B','B subito'],['transition','Tipo transizione'],['direction','Direzione tendina'],['curve','Andamento'],['duration','Durata'],['unit','Secondi / battiti'],['bpm','BPM'],['quantize','Partenza sul battito'],['master','Livello uscita'],['blackout','Nero'],['close.A','Chiudi pelle A'],['close.B','Chiudi pelle B'],['play:A','Riproduzione A'],['play:B','Riproduzione B'],...config.macros.map((m,i)=>['macro:'+i,'Macro · '+m.name])];for(const id of ['A','B'])for(const [p,n]of catalogOptions(id,false))fixed.push([`param:${id}:${p}`,id+' · '+n]);return fixed;}
+ function mappingCatalog(){const fixed=[['flow.enabled','Modalità Flow'],['flow.mood','Flow · mood'],['flow.colors','Flow · palette'],['flow.speed','Flow · velocità'],['flow.intensity','Flow · intensità'],['flow.variety','Flow · varietà'],['flow.engines','Flow · scene'],['flow.paused','Flow · mantieni scena'],['flow.next','Flow · prossima scena'],['mix','Mix A/B'],['take.A','Transizione verso A'],['take.B','Transizione verso B'],['cut.A','A subito'],['cut.B','B subito'],['transition','Tipo transizione'],['direction','Direzione tendina'],['curve','Andamento'],['duration','Durata'],['unit','Secondi / battiti'],['bpm','BPM'],['quantize','Partenza sul battito'],['master','Livello uscita'],['blackout','Nero'],['close.A','Chiudi pelle A'],['close.B','Chiudi pelle B'],['play:A','Riproduzione A'],['play:B','Riproduzione B'],...config.macros.map((m,i)=>['macro:'+i,'Macro · '+m.name])];for(const id of ['A','B'])for(const [p,n]of catalogOptions(id,false))fixed.push([`param:${id}:${p}`,id+' · '+n]);return fixed;}
  function openMapping(key){targetKey=key;dialogHead(mapDialog,'Assegna un controllo');const catalog=mappingCatalog(),search=el('input');search.type='search';search.placeholder='Cerca un controllo…';search.setAttribute('aria-label','Cerca controllo da assegnare');const choose=select(catalog,key,v=>{targetKey=v;openMapping(v);});search.oninput=()=>options(choose,catalog.filter(([,n])=>n.toLowerCase().includes(search.value.toLowerCase())),targetKey);const existing=config.bindings[key],mode=select([['toggle','Alterna minimo / massimo'],['hold','Attivo mentre premi'],['step','Avanza a passi del 10%']],existing?.mode||'toggle',()=>{}),invert=el('input'),pickup=el('input');invert.type=pickup.type='checkbox';invert.checked=existing?.invert||false;pickup.checked=existing?.pickup!==false;
   const info=el('p','pg-help');info.textContent=existing?'Collegato a '+bindingName(existing.input):'Nessuna assegnazione';mapDialog.append(search,field('Controllo',choose),field('Tasti e pulsanti',mode),field('Inverti',invert),field('Aggancia quando raggiungi il valore attuale',pickup),info,button('Impara assegnazione',()=>inputs.learn(targetKey,mode.value,invert.checked,pickup.checked)),button('Collega MIDI',()=>inputs.connectMidi()),button('Rimuovi assegnazione',()=>{delete config.bindings[targetKey];inputs.release();changed();openMapping(targetKey);}),el('p','pg-help','Tastiera, joystick e MIDI CC / note. Gli assi sono continui; una zona morta evita tremolii al centro. I controlli fisici agganciano il valore senza saltare. Il pad XY e i fader funzionano anche con mouse e touch.'));
   const all=el('details');all.append(el('summary','',Object.keys(config.bindings).length+' assegnazioni salvate'));for(const [k,v]of Object.entries(config.bindings)){const n=catalog.find(x=>x[0]===k)?.[1]||k;all.append(button(n+' ← '+bindingName(v.input),()=>openMapping(k),'quiet'));}mapDialog.append(all);if(!mapDialog.open)mapDialog.showModal();
  }
  mapDialog.addEventListener('close',()=>{if(inputs)inputs.learning=null;});
  async function loadScene(id,snapshot){if(!active)return false;message('Preparo la scena '+id+'. Il mix attuale resta visibile.');const ok=await engine.load(id,{...snapshot,state:sceneOnly(snapshot.state)});if(ok){render();changed();message('Scena '+id+' pronta · '+engine.decks[id].name);}return ok;}
- function notify(kind,id,detail){if(!active)return;if(kind==='frame'){drawPreview(id);return;}if(kind==='error'||kind==='notice')message(detail);else if(kind==='ready'){render();changed();}else if(kind==='loading')sync();else if(kind==='transition-end'){changed();message('Transizione completata.');}else if(kind==='stats'){const d=engine.decks;message(`A ${d.A?.frames||0} fotogrammi · B ${d.B?.frames||0} fotogrammi · uscita ${engine.mixer.canvas.width} × ${engine.mixer.canvas.height}${engine.scale<1||engine.workload<1?' · qualità adattiva':''}${engine.job?' · transizione in corso':''}`);}}
+ function notify(kind,id,detail){if(!active)return;if(kind==='frame'){drawPreview(id);return;}if(kind==='error'||kind==='notice')message(detail);else if(kind==='flow'){changed();}else if(kind==='ready'){render();changed();}else if(kind==='loading')sync();else if(kind==='transition-end'){changed();message('Transizione completata.');}else if(kind==='stats'){const d=engine.decks;message(`A ${d.A?.frames||0} fotogrammi · B ${d.B?.frames||0} fotogrammi · uscita ${engine.mixer.canvas.width} × ${engine.mixer.canvas.height}${engine.scale<1||engine.workload<1?' · qualità adattiva':''}${engine.job?' · transizione in corso':''}`);}}
  async function open(){if(active||opening)return;opening=true;opener.disabled=true;try{
    await api.suspend();entry=api.getSnapshot();config=normalizePlayground(entry.state.playground)||defaultPlayground(entry);for(const id of ['A','B'])if(!Number.isFinite(config.decks[id].state.volume))config.decks[id]={name:entry.name,state:sceneOnly(entry.state),phase:entry.phase,playing:true};
    active=true;shell.hidden=false;document.body.classList.add('pg-open');for(const node of document.querySelectorAll('body > .topbar,body > .workspace'))node.inert=true;
@@ -121,5 +146,5 @@ export function mountPlayground(api){
  function close(){if(!active)return;inputs?.dispose();persist();active=false;clearTimeout(saveTimer);clearInterval(syncTimer);for(const dialog of [mapDialog,macroDialog,parameterDialog])if(dialog.open)dialog.close();engine?.dispose();engine=null;inputs=null;shell.hidden=true;document.body.classList.remove('pg-open');for(const node of document.querySelectorAll('body > .topbar,body > .workspace'))node.inert=false;if(document.fullscreenElement===shell)document.exitFullscreen().catch(()=>{});api.resume();opener.focus();}
  function editDeck(id){const d=engine.decks[id];if(!d)return;const snapshot={state:sceneOnly(d.state),name:d.name,phase:d.phase,ratio:d.ratio},p=engine.snapshot();close();snapshot.state.playground=p;api.adopt(snapshot);api.toast('Modifica la scena; nel Playground usa “Carica scena → Scena dell’editor” per portarla in A o B.');}
  window.addEventListener('pagehide',()=>{if(active)persist();});
- return {open,close,get active(){return active;},get engine(){return engine;},getSnapshot:()=>engine?.snapshot()||null,loadScene,setControl:touch,getStatus:()=>engine?{pending:{...engine.pending},decks:Object.fromEntries(Object.entries(engine.decks).map(([id,d])=>[id,d?{engine:d.state.engine,frames:d.frames,phase:d.phase,playing:d.playing}:null])),mix:config.mix,transitioning:!!engine.job,stats:engine.stats}:null};
+ return {open,close,get active(){return active;},get engine(){return engine;},getSnapshot:()=>engine?.snapshot()||null,loadScene,setControl:touch,getStatus:()=>engine?{pending:{...engine.pending},decks:Object.fromEntries(Object.entries(engine.decks).map(([id,d])=>[id,d?{engine:d.state.engine,frames:d.frames,phase:d.phase,playing:d.playing}:null])),mix:config.mix,transitioning:!!engine.job,stats:engine.stats,flow:engine.flow.status(),flowSettings:{...config.flow}}:null};
 }

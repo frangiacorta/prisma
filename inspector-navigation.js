@@ -1,4 +1,4 @@
-import {SECTION_NAMES} from './control-vocabulary.js?v=38e810dd65ce';
+import {SECTION_NAMES} from './control-vocabulary.js?v=baf523d18ae1';
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
  {id:'shape',label:'Forma',tabs:[['shape','Forma','shape']]},

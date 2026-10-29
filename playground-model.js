@@ -1,9 +1,10 @@
 // Project-only data: never retain devices, canvases or a nested performance.
-import {META,GROUPS} from './model.js?v=38e810dd65ce';
-import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=38e810dd65ce';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=38e810dd65ce';
-import {FORCE_META} from './particle-forces.js?v=38e810dd65ce';
-import {PATH_META} from './particle-paths.js?v=38e810dd65ce';
+import {META,GROUPS} from './model.js?v=baf523d18ae1';
+import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=baf523d18ae1';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=baf523d18ae1';
+import {FORCE_META} from './particle-forces.js?v=baf523d18ae1';
+import {PATH_META} from './particle-paths.js?v=baf523d18ae1';
+import {normalizeFlow} from './flow-model.js?v=baf523d18ae1';
 export const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const number=(x,f,a,b)=>Number.isFinite(x)?clamp(x,a,b):f;
 const label=(x,f='',n=80)=>typeof x==='string'?x.replace(/[\x00-\x1f<>]/g,'').slice(0,n):f;
@@ -23,6 +24,7 @@ export function normalizePlayground(raw){
  const deck=d=>({name:label(d?.name,'Scena'),state:sceneOnly(d?.state),phase:number(d?.phase,0,0,1e9),ratio:number(d?.ratio,number(raw.ratio,16/9,.1,10),.1,10),playing:d?.playing!==false});
  const c={version:2,decks:{A:deck(raw.decks?.A),B:deck(raw.decks?.B)},mix:number(raw.mix,0,0,1),transition:['fade','wipe','luma','add'].includes(raw.transition)?raw.transition:'fade',direction:number(raw.direction,0,0,3)|0,duration:number(raw.duration,2,.05,64),unit:raw.unit==='beats'?'beats':'seconds',bpm:number(raw.bpm,120,30,300),curve:['linear','smooth','in','out'].includes(raw.curve)?raw.curve:'smooth',quantize:!!raw.quantize,master:number(raw.master,1,0,1),blackout:false,resolution:[360,540,720,1080].includes(raw.resolution)?raw.resolution:540,autoQuality:raw.autoQuality!==false,macros:[],bindings:{},xyX:number(raw.xyX,0,0,7)|0,xyY:number(raw.xyY,1,0,7)|0};
  c.ratio=number(raw.ratio,16/9,.1,10);const old=Array.isArray(raw.slots)?raw.slots:[];
+ c.flow=normalizeFlow(raw.flow);
  c.macros=Array.from({length:8},(_,i)=>{const v=raw.macros?.[i]||old[i]||{};return {name:label(v.name||v.label,'Macro '+(i+1),40),value:number(v.value,0,0,1),routes:(Array.isArray(v.routes)?v.routes:old[i]?[{deck:'A',path:v.param,min:v.min,max:v.max}]:[]).slice(0,16).map(route)};});
  for(const [k,v]of Object.entries(raw.bindings||{}).slice(0,400)){if(forbidden.has(k)||k.length>160)continue;const b=normalizeBinding(v?.input);if(b)c.bindings[k]={input:b,mode:['hold','toggle','step'].includes(v.mode)?v.mode:'toggle',invert:!!v.invert,pickup:v.pickup!==false};}
  // Old absolute grain sizes become ratios in the same macro, without dropping

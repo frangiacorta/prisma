@@ -1,11 +1,12 @@
-import {Renderer} from './renderer.js?v=38e810dd65ce';
-import {PlaygroundMixer} from './playground-mixer.js?v=38e810dd65ce';
-import {normalizeCreation} from './creative-model.js?v=38e810dd65ce';
-import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=38e810dd65ce';
+import {Renderer} from './renderer.js?v=baf523d18ae1';
+import {FlowDirector} from './playground-flow.js?v=baf523d18ae1';
+import {PlaygroundMixer} from './playground-mixer.js?v=baf523d18ae1';
+import {normalizeCreation} from './creative-model.js?v=baf523d18ae1';
+import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=baf523d18ae1';
 
 export class PlaygroundEngine{
  constructor(canvas,config,notify=()=>{}){
-  this.config=config;this.notify=notify;this.mixer=new PlaygroundMixer(canvas);this.decks={A:null,B:null};this.generation={A:0,B:0};this.pending={A:false,B:false};this.closed=false;this.clock=0;this.job=null;this.ratio=config.ratio||16/9;this.height=config.resolution;this.scale=1;this.workload=1;this.last=0;this.lastAdapt=0;this.stats={frames:0,fps:0,ms:0};this.tick=this.tick.bind(this);this.raf=requestAnimationFrame(this.tick);
+  this.config=config;this.notify=notify;this.mixer=new PlaygroundMixer(canvas);this.decks={A:null,B:null};this.generation={A:0,B:0};this.pending={A:false,B:false};this.closed=false;this.clock=0;this.job=null;this.ratio=config.ratio||16/9;this.height=config.resolution;this.scale=1;this.workload=1;this.last=0;this.lastAdapt=0;this.stats={frames:0,fps:0,ms:0};this.flow=new FlowDirector(this);this.tick=this.tick.bind(this);this.raf=requestAnimationFrame(this.tick);
  }
  async load(id,definition){
   if(this.closed)return false;const token=++this.generation[id];this.pending[id]=true;this.notify('loading',id);
@@ -36,6 +37,7 @@ export class PlaygroundEngine{
   if(this.closed)return;this.raf=requestAnimationFrame(this.tick);if(!this.last)this.last=time;const dt=Math.max(0,(time-this.last)/1000);this.last=time;
   if(document.hidden){for(const d of Object.values(this.decks))if(d)d.lastTime=this.clock;return;}
   this.clock+=Math.min(dt,.25);const start=performance.now();
+  this.flow.tick(Math.min(dt,.25));
   if(this.job){this.config.mix=transitionValue(this.job,this.clock);if(this.clock>=this.job.start+this.job.seconds){this.config.mix=this.job.to;this.job=null;this.notify('transition-end');}}
   let completed=0;
   try{

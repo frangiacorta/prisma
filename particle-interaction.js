@@ -1,6 +1,6 @@
-import {sphereOverlay} from './force-sphere-overlay.js?v=38e810dd65ce';
-import {supportsManualFields as usesParticleSurface} from './living-composition.js?v=38e810dd65ce';
-import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=38e810dd65ce';
+import {sphereOverlay} from './force-sphere-overlay.js?v=baf523d18ae1';
+import {supportsManualFields as usesParticleSurface} from './living-composition.js?v=baf523d18ae1';
+import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=baf523d18ae1';
 
 
 
