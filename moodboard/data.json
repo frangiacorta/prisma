@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-27",
+  "updated": "2026-10-30",
   "items": [
     {
       "id": "s01-01",
@@ -22190,6 +22190,100 @@
         "description": "Simulazione di reazione-diffusione; il campo cambia colore, rugosità e normali. Non modifica la silhouette. Il moto trasporta il campo già calcolato.",
         "verification": "code-reviewed"
       }
+    },
+    {
+      "id": "roadmap-playground-touch",
+      "kind": "project",
+      "state": "proposed",
+      "name": "Playground · gesti sulla scena",
+      "author": "Prisma",
+      "summary": "Toccare e trascinare direttamente la scena da cellulare per tirare, deformare e dare impulsi alla materia, in dialogo con Flow. Stessi parametri di Forma e Particelle.",
+      "families": [
+        "interaction",
+        "motion"
+      ],
+      "where": "Previsto: Playground → scena a schermo intero, su mobile e desktop.",
+      "keep": "Risposta immediata, leggibile e coerente con il gesto; improvvisazione reversibile.",
+      "avoid": "Un altro pannello pieno di slider, effetti casuali scollegati dal gesto, una modalità grafica separata o perdita dei parametri esistenti.",
+      "priority": false,
+      "related": [
+        "roadmap-preset-morphing"
+      ],
+      "sources": [],
+      "sections": [
+        {
+          "title": "Gesti proposti",
+          "fields": [
+            {
+              "label": "controls",
+              "value": [
+                "Un dito trascina localmente forma, fili e particelle",
+                "Tocco breve: impulso locale con decadimento",
+                "Due dita: scala e torsione, senza salto quando si aggiunge o solleva un dito",
+                "Velocità del gesto e durata del contatto guidano intensità e raggio",
+                "Al rilascio rientro morbido; conservazione della variazione attraverso i salvataggi esistenti"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Integrazione con Prisma e Flow",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Collegare i gesti alle macro e ai campi già presenti in Prisma. La posizione sul canvas individua un punto o un piano di interazione nella scena; definire e verificare profondità e raggio senza fingere una pressione del dito disponibile su ogni telefono. Separare lo stato di base dal contributo temporaneo del gesto: Flow cede i parametri interessati mentre si tocca e riprende con un raccordo al rilascio. In un mix A/B applicare il gesto in coordinate coerenti alle due scene visibili."
+            },
+            {
+              "label": "limits",
+              "value": "Proposta da implementare e verificare. Il pad XY già presente non equivale alla manipolazione diretta della scena. Registrazione dei gesti e replay sono estensioni successive, non incluse nella prima prova."
+            }
+          ]
+        },
+        {
+          "title": "Verifica prevista",
+          "fields": [
+            {
+              "label": "acceptance",
+              "value": [
+                "Risposta riconoscibile sul punto toccato, su Forma e Particelle, inclusi fili e pelle quando presenti",
+                "Nessuna perdita della creazione e nessuna discontinuità al rilascio, cambio di dito o interruzione del contatto",
+                "Scorrimento pagina e zoom del browser restano disponibili fuori dalla scena; gesto di camera distinto dalla deformazione",
+                "Nessun conflitto con Flow, macro o transizione A/B; niente ricostruzioni pesanti a ogni evento touch",
+                "Verifica su un telefono reale iOS e Android, oltre alla simulazione; misurare latenza e fluidità",
+                "Assegnazioni e limiti salvati nel progetto; gesti mouse/tastiera equivalenti dove sensato"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Origine",
+          "fields": [
+            {
+              "label": "source",
+              "value": "Richiesta utente del 30 ottobre 2026: Playground divertente e interattivo, touch direttamente sull’immagine da cellulare."
+            }
+          ]
+        }
+      ],
+      "next": "Primo prototipo: trascinamento locale e impulso con rientro morbido, su entrambi i motori. Poi gesti a due dita e coordinamento nel mix A/B.",
+      "platform": "Browser · mobile e desktop",
+      "result": "",
+      "media": [],
+      "assets": [],
+      "completedProjects": [],
+      "aliases": [
+        "Touch",
+        "Multitouch",
+        "Manipolazione diretta"
+      ],
+      "topics": [
+        "gestures"
+      ],
+      "category": "interaction",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "clipNote": "Proposta originale per Prisma · nessuna demo ancora implementata"
     }
   ],
   "families": [
@@ -22406,11 +22500,11 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 189,
+    "records": 191,
     "videos": 61,
     "images": 23,
     "tools": 73,
-    "projects": 29,
+    "projects": 31,
     "attachments": 132,
     "clips": 61,
     "missing": 10
@@ -22552,6 +22646,12 @@
       "category": "workflow",
       "description": "Applicazioni, librerie e raccolte trasversali. La disponibilità di una repo non equivale a integrazione.",
       "cover": "method-living-moodboard"
+    },
+    {
+      "id": "gestures",
+      "name": "Gesti e controllo diretto",
+      "category": "interaction",
+      "description": "Manipolazione della scena con mouse e touch: gesto, risposta della materia e raccordo con Flow."
     }
   ],
   "organizationVersion": 2
