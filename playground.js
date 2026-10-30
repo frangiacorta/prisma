@@ -1,13 +1,13 @@
-import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=f6d2e36bd5d0';
-import {familyName,presetFamily} from './preset-families.js?v=f6d2e36bd5d0';
-import {closeLivingSkin} from './living-panel.js?v=f6d2e36bd5d0';
-import {PlaygroundEngine} from './playground-engine.js?v=f6d2e36bd5d0';
-import {PlaygroundInputs} from './playground-inputs.js?v=f6d2e36bd5d0';
-import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=f6d2e36bd5d0';
-import {particleCreation} from './particle-model.js?v=f6d2e36bd5d0';
-import {readPreset} from './preset-files.js?v=f6d2e36bd5d0';
-import {controlHelp,controlCondition} from './control-help.js?v=f6d2e36bd5d0';
-import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=f6d2e36bd5d0';
+import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=448bee33b8b9';
+import {familyName,presetFamily} from './preset-families.js?v=448bee33b8b9';
+import {closeLivingSkin} from './living-panel.js?v=448bee33b8b9';
+import {PlaygroundEngine} from './playground-engine.js?v=448bee33b8b9';
+import {PlaygroundInputs} from './playground-inputs.js?v=448bee33b8b9';
+import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=448bee33b8b9';
+import {particleCreation} from './particle-model.js?v=448bee33b8b9';
+import {readPreset} from './preset-files.js?v=448bee33b8b9';
+import {controlHelp,controlCondition} from './control-help.js?v=448bee33b8b9';
+import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=448bee33b8b9';
 
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
 const button=(text,fn,cls='outline')=>{const b=el('button',cls,text);b.type='button';b.onclick=fn;return b;};
@@ -71,9 +71,9 @@ export function mountPlayground(api){
   flowPanel.replaceChildren(el('h2','','Flow'));const f=config.flow;
   const description=el('p','pg-help','Scene e mix automatici. La prossima scena viene preparata prima del passaggio. Manuale conserva il mix che stai vedendo.');flowPanel.append(description);
   const choices=el('div','pg-grid');for(const [key,name,list]of [['mood','Mood',FLOW_MOODS],['colors','Palette',FLOW_COLORS],['engines','Scene',[['both','Forma e particelle'],['solid','Solo forma'],['particles','Solo particelle']]]]){const s=select(list,f[key],v=>{f[key]=v;changed();});s.dataset.control='flow.'+key;controlNodes.set('flow.'+key,{select:s});const box=el('div','pg-choice');box.append(field(name,s),learnButton('flow.'+key));choices.append(box);}flowPanel.append(choices);
-  const colors=el('div','pg-flow-colors');for(let i=0;i<3;i++){const c=el('input');c.type='color';c.dataset.flowColor=String(i);c.setAttribute('aria-label','Colore Flow '+(i+1));c.oninput=()=>{const previous=flowPalette(f);f.palette=Array.from({length:3},(_,j)=>previous[j%previous.length]||'#ffffff');f.palette[i]=c.value;f.colors='custom';changed();};colors.append(c);}flowPanel.append(colors);
+  const colors=el('div','pg-flow-colors');for(let i=0;i<3;i++){const c=el('input');c.type='color';c.dataset.flowColor=String(i);c.setAttribute('aria-label','Colore Flow '+(i+1));c.oninput=()=>{const previous=f.colors==='auto'?(engine.decks[config.mix<.5?'A':'B']?.state.palette||flowPalette(f)):flowPalette(f);f.palette=Array.from({length:3},(_,j)=>previous[j%previous.length]||'#ffffff');f.palette[i]=c.value;f.colors='custom';changed();};colors.append(c);}flowPanel.append(colors);
   flowPanel.append(slider('Velocità','flow.speed',.25,3,.05,v=>.25+v*2.75,v=>(v-.25)/2.75),slider('Intensità','flow.intensity'),slider('Varietà','flow.variety'));
-  flowPanel.append(el('p','pg-help','Velocità regola movimento e durata dei passaggi. Intensità cambia deformazione e luminosità. Varietà amplia le famiglie di forme successive.'));const actions=el('div','pg-row'),pause=button('Mantieni scena',()=>{f.paused=!f.paused;if(!f.paused&&engine.flow.phase==='error')engine.flow.next();changed();});pause.dataset.flowPause='';const pauseGroup=el('span','pg-action');pauseGroup.append(pause,learnButton('flow.paused'));actions.append(pauseGroup,actionButton('Prossima scena','flow.next'));flowPanel.append(actions);const progress=el('p','pg-flow-status');progress.setAttribute('role','status');flowPanel.append(progress);
+  flowPanel.append(el('p','pg-help','Velocità regola movimento e durata dei passaggi. Intensità cambia deformazione e luminosità. Varietà cambia forme, materia e coreografie. Colori in evoluzione alterna le palette; le altre scelte mantengono i tuoi colori.'));const actions=el('div','pg-row'),pause=button('Mantieni scena',()=>{f.paused=!f.paused;if(!f.paused&&engine.flow.phase==='error')engine.flow.next();changed();});pause.dataset.flowPause='';const pauseGroup=el('span','pg-action');pauseGroup.append(pause,learnButton('flow.paused'));actions.append(pauseGroup,actionButton('Prossima scena','flow.next'));flowPanel.append(actions);const progress=el('p','pg-flow-status');progress.setAttribute('role','status');flowPanel.append(progress);
  }
  function render(){
   controlNodes.clear();renderFlow();top.replaceChildren();
@@ -103,7 +103,7 @@ export function mountPlayground(api){
   for(const id of ['A','B']){const d=engine.decks[id],n=deckNodes[id];if(!n)continue;n.state.textContent=engine.pending[id]?'Preparo…':d?`${d.state.engine==='particles'?'Particelle':'Forma'} · ${d.playing?'in movimento':'in pausa'}`:'In attesa';const b=n.card.querySelector('[data-play]');if(b)b.textContent=d?.playing?'Pausa':'Riproduci';drawPreview(id);}
   shell.classList.toggle('pg-flow',config.flow.enabled);flowPanel.hidden=!config.flow.enabled;flowMode.setAttribute('aria-pressed',String(config.flow.enabled));manualMode.setAttribute('aria-pressed',String(!config.flow.enabled));
   const f=config.flow,fs=engine.flow.status(),visibleDeck=engine.decks[config.mix<.5?'A':'B'];const note=flowPanel.querySelector('.pg-flow-status');if(note)note.textContent=fs.error||`${visibleDeck?.name||'Preparo le scene'} · ${f.paused?'cambi in pausa':({settle:'avvio',loading:'preparo la prossima',ready:'prossimo mix fra '+Math.ceil((1-fs.progress)*flowTiming(f).hold)+' s',transition:'mix in corso',hold:'nuova scena',idle:'manuale'})[fs.phase]||''}`;
-  const pause=flowPanel.querySelector('[data-flow-pause]');if(pause){pause.textContent=f.paused?'Riprendi cambi':'Mantieni scena';pause.setAttribute('aria-pressed',String(f.paused));}const palette=flowPalette(f);for(const c of flowPanel.querySelectorAll('[data-flow-color]'))if(document.activeElement!==c)c.value=palette[Number(c.dataset.flowColor)%palette.length]||'#ffffff';
+  const pause=flowPanel.querySelector('[data-flow-pause]');if(pause){pause.textContent=f.paused?'Riprendi cambi':'Mantieni scena';pause.setAttribute('aria-pressed',String(f.paused));}const palette=f.colors==='auto'?(engine.decks[config.mix<.5?'A':'B']?.state.palette||flowPalette(f)):flowPalette(f);for(const c of flowPanel.querySelectorAll('[data-flow-color]'))if(document.activeElement!==c)c.value=palette[Number(c.dataset.flowColor)%palette.length]||'#ffffff';
   shell.querySelector('[data-blackout]')?.classList.toggle('active',config.blackout);for(const b of shell.querySelectorAll('[data-map]')){const assigned=config.bindings[b.dataset.map];b.textContent=assigned?bindingName(assigned.input):'Assegna';b.classList.toggle('assigned',!!assigned);}
  }
  function dialogHead(dialog,title){dialog.replaceChildren();const head=el('header','pg-dialog-head');head.append(el('h2','',title),button('Chiudi',()=>dialog.close()));dialog.append(head);}

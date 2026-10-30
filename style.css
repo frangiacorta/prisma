@@ -287,3 +287,4 @@ body.pg-open>.workspace,body.pg-open>.topbar{display:none!important}
 
 .inspector-overview [hidden]{display:none!important}
 .random-bar[data-organized]{display:flex;height:auto;min-height:44px}.workspace-action-group{min-width:max-content}
+.pg-header button[aria-pressed=true]:hover{background:#c8f0df;color:#09170f;border-color:#b8e8d0}

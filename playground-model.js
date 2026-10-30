@@ -1,10 +1,10 @@
 // Project-only data: never retain devices, canvases or a nested performance.
-import {META,GROUPS} from './model.js?v=f6d2e36bd5d0';
-import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=f6d2e36bd5d0';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=f6d2e36bd5d0';
-import {FORCE_META} from './particle-forces.js?v=f6d2e36bd5d0';
-import {PATH_META} from './particle-paths.js?v=f6d2e36bd5d0';
-import {normalizeFlow} from './flow-model.js?v=f6d2e36bd5d0';
+import {META,GROUPS} from './model.js?v=448bee33b8b9';
+import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=448bee33b8b9';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=448bee33b8b9';
+import {FORCE_META} from './particle-forces.js?v=448bee33b8b9';
+import {PATH_META} from './particle-paths.js?v=448bee33b8b9';
+import {normalizeFlow} from './flow-model.js?v=448bee33b8b9';
 export const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const number=(x,f,a,b)=>Number.isFinite(x)?clamp(x,a,b):f;
 const label=(x,f='',n=80)=>typeof x==='string'?x.replace(/[\x00-\x1f<>]/g,'').slice(0,n):f;
