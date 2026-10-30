@@ -1,5 +1,5 @@
-import {AUDIO_HELP} from './audio-model.js?v=02b214873299';
-import {EXTRA_HELP} from './control-help-extra.js?v=02b214873299';
+import {AUDIO_HELP} from './audio-model.js?v=f6d2e36bd5d0';
+import {EXTRA_HELP} from './control-help-extra.js?v=f6d2e36bd5d0';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',
