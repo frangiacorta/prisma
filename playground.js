@@ -1,13 +1,14 @@
-import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=448bee33b8b9';
-import {familyName,presetFamily} from './preset-families.js?v=448bee33b8b9';
-import {closeLivingSkin} from './living-panel.js?v=448bee33b8b9';
-import {PlaygroundEngine} from './playground-engine.js?v=448bee33b8b9';
-import {PlaygroundInputs} from './playground-inputs.js?v=448bee33b8b9';
-import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=448bee33b8b9';
-import {particleCreation} from './particle-model.js?v=448bee33b8b9';
-import {readPreset} from './preset-files.js?v=448bee33b8b9';
-import {controlHelp,controlCondition} from './control-help.js?v=448bee33b8b9';
-import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=448bee33b8b9';
+import {PlaygroundDirector} from './playground-director.js?v=83423be56ba5';
+import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=83423be56ba5';
+import {familyName,presetFamily} from './preset-families.js?v=83423be56ba5';
+import {closeLivingSkin} from './living-panel.js?v=83423be56ba5';
+import {PlaygroundEngine} from './playground-engine.js?v=83423be56ba5';
+import {PlaygroundInputs} from './playground-inputs.js?v=83423be56ba5';
+import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=83423be56ba5';
+import {particleCreation} from './particle-model.js?v=83423be56ba5';
+import {readPreset} from './preset-files.js?v=83423be56ba5';
+import {controlHelp,controlCondition} from './control-help.js?v=83423be56ba5';
+import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=83423be56ba5';
 
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
 const button=(text,fn,cls='outline')=>{const b=el('button',cls,text);b.type='button';b.onclick=fn;return b;};
@@ -17,7 +18,7 @@ const numeric=(value,min,max,step,fn)=>{const n=el('input');n.type='number';n.mi
 const select=(list,value,fn)=>{const s=options(el('select'),list,value);s.onchange=()=>fn(s.value);return s;};
 
 export function mountPlayground(api){
- let active=false,opening=false,config,engine,inputs,saveTimer,syncTimer,entry,activeMacro=0,targetKey='mix',focusedDeck='A';
+ let active=false,opening=false,config,engine,inputs,director,saveTimer,syncTimer,entry,activeMacro=0,targetKey='mix',focusedDeck='A';
  const controlNodes=new Map(),deckNodes={};
  const shell=el('section','pg-shell');shell.id='playground';shell.hidden=true;shell.setAttribute('aria-label','Playground · due scene vive');
  const header=el('header','pg-header'),title=el('strong','','Playground'),status=el('p','pg-status',''),stage=el('div','pg-stage');let canvas=el('canvas');canvas.id='playground-output';canvas.setAttribute('aria-label','Mix delle scene A e B');
@@ -25,16 +26,27 @@ export function mountPlayground(api){
  const flowPanel=el('section','pg-flow-panel');consolePanel.prepend(flowPanel);
  const mapDialog=el('dialog','pg-dialog'),macroDialog=el('dialog','pg-dialog'),parameterDialog=el('dialog','pg-dialog');
  const fullscreen=async()=>{try{if(document.fullscreenElement===shell)await document.exitFullscreen();else await shell.requestFullscreen();}catch{message('Schermo intero non disponibile in questo browser.');}};
- const flowMode=button('Flow',()=>{engine.flow.start();render();changed();}),manualMode=button('Manuale',()=>{engine.flow.stop();render();changed();});flowMode.dataset.pgMode='flow';manualMode.dataset.pgMode='manual';
- header.append(title,manualMode,flowMode,button('Salva progetto',()=>{persist();api.exportProject();}),button('Collega controlli',()=>openMapping(config.flow.enabled?'flow.speed':'mix')),button('Schermo intero',fullscreen),button('Solo scena',()=>shell.classList.toggle('pg-clean')),button('Torna all’editor',()=>close()));
+ const flowMode=button('Flow',()=>{director?.stop();engine.flow.start();render();changed();}),manualMode=button('Manuale',()=>{director?.stop();engine.flow.stop();render();changed();});flowMode.dataset.pgMode='flow';manualMode.dataset.pgMode='manual';
+ const directorButton=button('Regia AI',()=>{directorPanel.hidden=false;if(director?.running)director.stop();else director?.start();});directorButton.id='director-toggle';
+ header.append(title,manualMode,flowMode,directorButton,button('Salva progetto',()=>{persist();api.exportProject();}),button('Collega controlli',()=>openMapping(config.flow.enabled?'flow.speed':'mix')),button('Schermo intero',fullscreen),button('Solo scena',()=>shell.classList.toggle('pg-clean')),button('Torna all’editor',()=>close()));
  stage.append(canvas,button('Controlli',()=>shell.classList.remove('pg-clean'),'pg-reveal'));shell.append(header,stage,status,consolePanel,mapDialog,macroDialog,parameterDialog);consolePanel.append(top,mixPanel,macrosPanel,details);document.body.append(shell);
+ const directorPanel=el('section','pg-director-panel');directorPanel.hidden=true;consolePanel.prepend(directorPanel);
+ const directorText=el('p','pg-help','Premi Regia AI per affidare le scene a Codex. Puoi riprendere il controllo in ogni momento.'),brief=el('textarea'),directorLog=el('details');directorText.setAttribute('role','status');brief.rows=3;brief.maxLength=4000;brief.placeholder='Carta bianca, oppure una direzione: più liquido, resta su questi colori…';brief.setAttribute('aria-label','Direzione della regia AI');brief.oninput=()=>{if(config){config.director.brief=brief.value;changed();}};
+ const steer=button('Invia direzione',()=>{if(director?.running)director.stop('Cambio direzione…');director?.start();});
+ const pc=button('Apri questa sessione sul PC',()=>{const snapshot=api.getSnapshot();snapshot.state={...snapshot.state,playground:engine.snapshot()};const data=JSON.stringify(snapshot);if(data.length>350000)return message('Salva il progetto e importalo in Prisma sul PC: questa sessione è troppo grande per il trasferimento diretto.');window.open('http://127.0.0.1:8242/?playground=1&engine='+snapshot.state.engine+'#prisma-assistant='+encodeURIComponent(data),'_blank','noopener');});pc.hidden=['localhost','127.0.0.1','[::1]'].includes(location.hostname);
+ const privacy=el('p','pg-help','Usa il tuo accesso Codex e i relativi limiti. Invia soltanto immagini della scena e parametri, senza webcam o audio. Le decisioni richiedono alcuni secondi; il movimento continua durante l’attesa. Sul PC avvia PRISMA-CREATIVO.cmd.');
+ directorPanel.append(el('h2','','Regia AI'),directorText,brief,steer,pc,privacy,directorLog);
+ const takeover=button('Riprendi il controllo',()=>director?.stop(),'pg-director-takeover');takeover.hidden=true;stage.append(takeover);
+ function directorUI(){if(!director)return;directorText.textContent=director.text||'Regia pronta';directorButton.textContent=director.running?'Riprendi il controllo':'Regia AI';directorButton.setAttribute('aria-pressed',String(director.running));takeover.hidden=!director.running;shell.classList.toggle('pg-directed',director.running);directorLog.replaceChildren(el('summary','','Scelte della sessione'));for(const h of config?.director.history||[])directorLog.append(el('p','pg-help',h.intent));sync();}
+ document.addEventListener('visibilitychange',()=>{if(document.hidden&&director?.running)director.stop('Regia sospesa: la scheda non è visibile. Premi Regia AI per riprendere.');});
  const opener=button('Playground',()=>open(),'outline');opener.id='playground-open';document.querySelector('.header-actions')?.prepend(opener);
  function message(text){status.textContent=text;}
  function persist(){if(!active||!engine)return;clearTimeout(saveTimer);api.save(engine.snapshot());}
  function changed(){clearTimeout(saveTimer);saveTimer=setTimeout(persist,350);sync();}
  function touch(key,value){inputs?.manual(key);target(key)?.set(value);}
  function parameterTarget(key){const m=/^param:([AB]):(.+)$/.exec(key);if(!m)return null;const d=engine?.decks[m[1]],p=d?.catalog.find(x=>x.path===m[2]);if(!p||p.kind==='color')return null;const range=config.bindings[key]?.range,entry=range&&p.kind==='number'?{...p,min:range[0],max:range[1]}:p;return {kind:'value',get:()=>{const v=readParameter(d.state,p.path);return p.kind==='boolean'?Number(v):p.kind==='enum'?p.values.indexOf(v)/(p.values.length-1):clamp((v-entry.min)/(entry.max-entry.min));},set:v=>{engine.setParameter(m[1],p.path,parameterFromUnit(entry,v));changed();}};}
- function target(key){
+ function target(key){const t=rawTarget(key);if(!t)return t;return {...t,set:v=>{if(director?.running&&!['master','blackout'].includes(key))director.stop();t.set(v);}};}
+ function rawTarget(key){
   if(!engine)return null;
   if(key==='flow.enabled')return {kind:'value',get:()=>+config.flow.enabled,set:v=>{v>=.5?engine.flow.start():engine.flow.stop();render();changed();}};
   if(key.startsWith('flow.')){const k=key.slice(5),f=config.flow;
@@ -101,7 +113,7 @@ export function mountPlayground(api){
  function drawPreview(id){const d=engine?.decks[id],n=deckNodes[id];if(!d||!n||d.renderer.completionSync||d.frames===n.frames)return;const now=performance.now();if(n.frames!==undefined&&now-(n.previewAt||0)<150)return;const ctx=n.preview.getContext('2d'),fit=Math.min(320/d.canvas.width,180/d.canvas.height),w=d.canvas.width*fit,h=d.canvas.height*fit;ctx.fillStyle='#000';ctx.fillRect(0,0,320,180);ctx.drawImage(d.canvas,(320-w)/2,(180-h)/2,w,h);n.frames=d.frames;n.previewAt=now;}
  function sync(){if(!active||!engine)return;for(const [key,n]of controlNodes){const t=target(key);if(!t)continue;if(n.range){const v=n.read(t.get());n.range.value=v;if(document.activeElement!==n.num)n.num.value=Number(v.toFixed(3));}if(n.select)n.select.value=String(key.startsWith('flow.')?config.flow[key.slice(5)]:config[key]);if(n.check)n.check.checked=!!config[key];}
   for(const id of ['A','B']){const d=engine.decks[id],n=deckNodes[id];if(!n)continue;n.state.textContent=engine.pending[id]?'Preparo…':d?`${d.state.engine==='particles'?'Particelle':'Forma'} · ${d.playing?'in movimento':'in pausa'}`:'In attesa';const b=n.card.querySelector('[data-play]');if(b)b.textContent=d?.playing?'Pausa':'Riproduci';drawPreview(id);}
-  shell.classList.toggle('pg-flow',config.flow.enabled);flowPanel.hidden=!config.flow.enabled;flowMode.setAttribute('aria-pressed',String(config.flow.enabled));manualMode.setAttribute('aria-pressed',String(!config.flow.enabled));
+  shell.classList.toggle('pg-flow',config.flow.enabled);flowPanel.hidden=!config.flow.enabled;flowMode.setAttribute('aria-pressed',String(config.flow.enabled));manualMode.setAttribute('aria-pressed',String(!config.flow.enabled&&!director?.running));
   const f=config.flow,fs=engine.flow.status(),visibleDeck=engine.decks[config.mix<.5?'A':'B'];const note=flowPanel.querySelector('.pg-flow-status');if(note)note.textContent=fs.error||`${visibleDeck?.name||'Preparo le scene'} · ${f.paused?'cambi in pausa':({settle:'avvio',loading:'preparo la prossima',ready:'prossimo mix fra '+Math.ceil((1-fs.progress)*flowTiming(f).hold)+' s',transition:'mix in corso',hold:'nuova scena',idle:'manuale'})[fs.phase]||''}`;
   const pause=flowPanel.querySelector('[data-flow-pause]');if(pause){pause.textContent=f.paused?'Riprendi cambi':'Mantieni scena';pause.setAttribute('aria-pressed',String(f.paused));}const palette=f.colors==='auto'?(engine.decks[config.mix<.5?'A':'B']?.state.palette||flowPalette(f)):flowPalette(f);for(const c of flowPanel.querySelectorAll('[data-flow-color]'))if(document.activeElement!==c)c.value=palette[Number(c.dataset.flowColor)%palette.length]||'#ffffff';
   shell.querySelector('[data-blackout]')?.classList.toggle('active',config.blackout);for(const b of shell.querySelectorAll('[data-map]')){const assigned=config.bindings[b.dataset.map];b.textContent=assigned?bindingName(assigned.input):'Assegna';b.classList.toggle('assigned',!!assigned);}
@@ -135,16 +147,17 @@ export function mountPlayground(api){
   const all=el('details');all.append(el('summary','',Object.keys(config.bindings).length+' assegnazioni salvate'));for(const [k,v]of Object.entries(config.bindings)){const n=catalog.find(x=>x[0]===k)?.[1]||k;all.append(button(n+' ← '+bindingName(v.input),()=>openMapping(k),'quiet'));}mapDialog.append(all);if(!mapDialog.open)mapDialog.showModal();
  }
  mapDialog.addEventListener('close',()=>{if(inputs)inputs.learning=null;});
- async function loadScene(id,snapshot){if(!active)return false;message('Preparo la scena '+id+'. Il mix attuale resta visibile.');const ok=await engine.load(id,{...snapshot,state:sceneOnly(snapshot.state)});if(ok){render();changed();message('Scena '+id+' pronta · '+engine.decks[id].name);}return ok;}
+ async function loadScene(id,snapshot){if(!active)return false;if(director?.running)director.stop();message('Preparo la scena '+id+'. Il mix attuale resta visibile.');const ok=await engine.load(id,{...snapshot,state:sceneOnly(snapshot.state)});if(ok){render();changed();message('Scena '+id+' pronta · '+engine.decks[id].name);}return ok;}
  function notify(kind,id,detail){if(!active)return;if(kind==='frame'){drawPreview(id);return;}if(kind==='error'||kind==='notice')message(detail);else if(kind==='flow'){changed();}else if(kind==='ready'){render();changed();}else if(kind==='loading')sync();else if(kind==='transition-end'){changed();message('Transizione completata.');}else if(kind==='stats'){const d=engine.decks;message(`A ${d.A?.frames||0} fotogrammi · B ${d.B?.frames||0} fotogrammi · uscita ${engine.mixer.canvas.width} × ${engine.mixer.canvas.height}${engine.scale<1||engine.workload<1?' · qualità adattiva':''}${engine.job?' · transizione in corso':''}`);}}
  async function open(){if(active||opening)return;opening=true;opener.disabled=true;try{
    await api.suspend();entry=api.getSnapshot();config=normalizePlayground(entry.state.playground)||defaultPlayground(entry);for(const id of ['A','B'])if(!Number.isFinite(config.decks[id].state.volume))config.decks[id]={name:entry.name,state:sceneOnly(entry.state),phase:entry.phase,playing:true};
    active=true;shell.hidden=false;document.body.classList.add('pg-open');for(const node of document.querySelectorAll('body > .topbar,body > .workspace'))node.inert=true;
-   const fresh=canvas.cloneNode();canvas.replaceWith(fresh);canvas=fresh;engine=new PlaygroundEngine(canvas,config,notify);stage.style.aspectRatio=String(engine.ratio);inputs=new PlaygroundInputs(config,target,(text,id)=>{if(text==='assigned'){changed();message('Assegnazione salvata nel progetto.');if(mapDialog.open)openMapping(id);}else message(text);});render();message('Preparo le due scene vive…');syncTimer=setInterval(sync,150);
+   const fresh=canvas.cloneNode();canvas.replaceWith(fresh);canvas=fresh;engine=new PlaygroundEngine(canvas,config,notify);director=new PlaygroundDirector(engine,{notify:directorUI,save:persist});brief.value=config.director.brief;directorUI();stage.style.aspectRatio=String(engine.ratio);inputs=new PlaygroundInputs(config,target,(text,id)=>{if(text==='assigned'){changed();message('Assegnazione salvata nel progetto.');if(mapDialog.open)openMapping(id);}else message(text);});render();message('Preparo le due scene vive…');syncTimer=setInterval(sync,150);
    await loadScene('A',config.decks.A);if(active)await loadScene('B',config.decks.B);
   }catch(e){message(e.message);api.toast(e.message);if(active)close();else api.resume();}finally{opening=false;opener.disabled=false;}}
- function close(){if(!active)return;inputs?.dispose();persist();active=false;clearTimeout(saveTimer);clearInterval(syncTimer);for(const dialog of [mapDialog,macroDialog,parameterDialog])if(dialog.open)dialog.close();engine?.dispose();engine=null;inputs=null;shell.hidden=true;document.body.classList.remove('pg-open');for(const node of document.querySelectorAll('body > .topbar,body > .workspace'))node.inert=false;if(document.fullscreenElement===shell)document.exitFullscreen().catch(()=>{});api.resume();opener.focus();}
+ function close(){if(!active)return;director?.stop();director=null;inputs?.dispose();persist();active=false;clearTimeout(saveTimer);clearInterval(syncTimer);for(const dialog of [mapDialog,macroDialog,parameterDialog])if(dialog.open)dialog.close();engine?.dispose();engine=null;inputs=null;shell.hidden=true;document.body.classList.remove('pg-open');for(const node of document.querySelectorAll('body > .topbar,body > .workspace'))node.inert=false;if(document.fullscreenElement===shell)document.exitFullscreen().catch(()=>{});api.resume();opener.focus();}
  function editDeck(id){const d=engine.decks[id];if(!d)return;const snapshot={state:sceneOnly(d.state),name:d.name,phase:d.phase,ratio:d.ratio},p=engine.snapshot();close();snapshot.state.playground=p;api.adopt(snapshot);api.toast('Modifica la scena; nel Playground usa “Carica scena → Scena dell’editor” per portarla in A o B.');}
- window.addEventListener('pagehide',()=>{if(active)persist();});
- return {open,close,get active(){return active;},get engine(){return engine;},getSnapshot:()=>engine?.snapshot()||null,loadScene,setControl:touch,getStatus:()=>engine?{pending:{...engine.pending},decks:Object.fromEntries(Object.entries(engine.decks).map(([id,d])=>[id,d?{engine:d.state.engine,frames:d.frames,phase:d.phase,playing:d.playing}:null])),mix:config.mix,transitioning:!!engine.job,stats:engine.stats,flow:engine.flow.status(),flowSettings:{...config.flow}}:null};
+ window.addEventListener('pagehide',()=>{director?.stop();if(active)persist();});
+ shell.addEventListener('input',event=>{if(director?.running&&!directorPanel.contains(event.target))director.stop();},true);
+ return {open,close,get active(){return active;},get engine(){return engine;},get director(){return director;},getSnapshot:()=>engine?.snapshot()||null,loadScene,setControl:touch,getStatus:()=>engine?{pending:{...engine.pending},decks:Object.fromEntries(Object.entries(engine.decks).map(([id,d])=>[id,d?{engine:d.state.engine,frames:d.frames,phase:d.phase,playing:d.playing}:null])),mix:config.mix,transitioning:!!engine.job,stats:engine.stats,flow:engine.flow.status(),flowSettings:{...config.flow}}:null};
 }

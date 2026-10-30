@@ -1,4 +1,4 @@
-import {controlCondition} from './control-help.js?v=448bee33b8b9';
+import {controlCondition} from './control-help.js?v=83423be56ba5';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];

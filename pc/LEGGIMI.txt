@@ -1,0 +1,14 @@
+PRISMA · REGIA AI
+
+Scarica ed estrai l'intera repository, non soltanto questa cartella.
+Requisiti: Node.js 22 o successivo; Codex installato e con accesso effettuato.
+Windows: apri pc/AVVIA-PRISMA.cmd. Altri sistemi: dalla cartella principale esegui npm start.
+Apri Playground → Regia AI. Avvio sempre esplicito; salvare un progetto non avvia chiamate AI.
+Per interrompere usa Riprendi il controllo, anche in Solo scena. Cambiare scheda sospende la regia.
+Puoi scrivere una direzione e premere Invia direzione; la memoria delle scelte resta nel progetto.
+
+La regia usa Codex collegato al PC e i limiti del suo account. Non è attiva direttamente su GitHub Pages o sul telefono: dal sito usa Apri questa sessione sul PC sul computer dove gira il servizio. Non inoltra accessi o token al sito pubblico.
+Ogni decisione invia due fotogrammi della sola scena, parametri, indicazione e memoria; nessuna webcam/audio. Le immagini temporanee vengono eliminate al termine della richiesta. I token restano locali. Non sono abilitati shell, browser, plugin o strumenti per l'agente creativo.
+Le decisioni richiedono normalmente decine di secondi, mentre il render continua. Due immagini permettono osservazione campionata, non analisi continua del video. Errori e limiti fermano la regia senza sostituirla con Flow automatico.
+Non è questa chat riattivata: è un agente Codex con la direzione creativa e la memoria salvate in Prisma.
+Il servizio ascolta solo sul PC. Non esporre la porta su Internet. Non pubblicare pc/local.
