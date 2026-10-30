@@ -1,4 +1,5 @@
-import {sameAssistantSource} from './assistant-model.js?v=83423be56ba5';
+import {onlineDirector} from './director-connection.js?v=35455dbed4a0';
+import {sameAssistantSource} from './assistant-model.js?v=35455dbed4a0';
 const local=()=>['127.0.0.1','localhost','[::1]'].includes(location.hostname);
 export function mountCreativeAssistant({getState,applyPlan,quickCommand,setPlaying,importCreation,getSnapshot}){
  const $=id=>document.getElementById(id),status=$('description-status'),mode=$('description-engine'),submit=$('description-apply'),cancel=$('assistant-cancel'),connect=$('assistant-retry'),pc=$('assistant-open-pc');
@@ -34,8 +35,8 @@ export function mountCreativeAssistant({getState,applyPlan,quickCommand,setPlayi
  $('description-form').onsubmit=submitDescription;
  cancel.onclick=()=>controller?.abort();connect.onclick=()=>connection();mode.onchange=()=>{readyUI();$('description-help').textContent=mode.value==='quick'?'Comandi rapidi senza AI: usa nomi dei controlli e valori precisi. Le parti non riconosciute vengono segnalate.':'Descrivi liberamente quello che vuoi, anche per immagini e sensazioni. Codex legge questa scena e le ultime richieste scritte qui. Ogni modifica si può annullare.';};
  pc.onclick=()=>{const snapshot={...getSnapshot(),prompt:$('creation-description').value};const url='http://127.0.0.1:8242/?engine='+getState().engine+'#prisma-assistant='+encodeURIComponent(JSON.stringify(snapshot));window.open(url,'_blank','noopener');message('Sul PC si apre la stessa creazione con il testo pronto. Il servizio deve essere avviato con PRISMA-CREATIVO.cmd.');};
- if(local()&&location.hash.startsWith('#prisma-assistant=')){
-  try{const data=JSON.parse(decodeURIComponent(location.hash.slice('#prisma-assistant='.length)));if(location.hash.length>1050000)throw Error('Trasferimento troppo grande');importCreation(data);$('creation-description').value=String(data.prompt||'').slice(0,4000);message('Creazione trasferita. Premi Interpreta e applica per inviare la richiesta a Codex.');}
+ if((local()||onlineDirector())&&location.hash.startsWith('#prisma-assistant=')){
+  try{const data=JSON.parse(decodeURIComponent(location.hash.slice('#prisma-assistant='.length)));if(location.hash.length>1050000)throw Error('Trasferimento troppo grande');importCreation(data);$('creation-description').value=String(data.prompt||'').slice(0,4000);message(onlineDirector()?'Creazione trasferita. Premi Regia AI nel Playground per iniziare.':'Creazione trasferita. Premi Interpreta e applica per inviare la richiesta a Codex.');}
   catch{message('Trasferimento non valido: la creazione precedente è conservata.','error');}
   window.history.replaceState(null,'',location.pathname+location.search);
  }

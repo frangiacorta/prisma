@@ -1,5 +1,5 @@
-import {projectDistance} from './vendor/xpbd/distance.js?v=83423be56ba5';
-import {samplePath} from './particle-paths.js?v=83423be56ba5';
+import {projectDistance} from './vendor/xpbd/distance.js?v=35455dbed4a0';
+import {samplePath} from './particle-paths.js?v=35455dbed4a0';
 // A deformable simulation cage, shared by implicit surfaces and explicit geometry.
 // The cage carries inertia; it is not per-grain or strand/strand self-collision.
 export const DYNAMICS_DEFAULTS={dynAmount:0,dynMass:1,dynStiffness:.5,dynDamping:.45,dynCoupling:.6,dynGravity:.35,dynWind:.7,dynWindAngle:0,dynGust:.5,dynFrequency:.6,dynTurbulence:.45,dynPin:0,dynExtent:2.4,dynFields:0,dynFloor:0,dynFloorY:-1.4,dynBounce:.15,dynFriction:.3,dynObstacle:0,dynObstacleX:.8,dynObstacleY:0,dynObstacleZ:0,dynObstacleSize:.55,dynObstacleAspect:1,dynMargin:.02};

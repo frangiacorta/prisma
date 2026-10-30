@@ -1,0 +1,1 @@
+ALTER TABLE `director_days` ADD `lease_owner` text DEFAULT '' NOT NULL;

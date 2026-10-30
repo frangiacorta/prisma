@@ -1,0 +1,1 @@
+ALTER TABLE `director_days` ADD `lease` integer DEFAULT 0 NOT NULL;

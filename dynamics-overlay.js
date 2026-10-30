@@ -1,4 +1,4 @@
-import {forceToScreen} from './particle-forces.js?v=83423be56ba5';
+import {forceToScreen} from './particle-forces.js?v=35455dbed4a0';
 export function mountDynamicsOverlay({board,getState,getTab}){
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.id='dynamics-guides';svg.setAttribute('aria-hidden','true');svg.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;overflow:hidden;stroke:none';board.append(svg);let previous='';
  return {sync(){const s=getState(),w=board.clientWidth,h=board.clientHeight,on=getTab()==='motion'&&s.dynAmount>0&&(s.dynFloor||s.dynObstacle);svg.style.display=on?'block':'none';if(!on)return;const keys=['dynFloor','dynFloorY','dynObstacle','dynObstacleX','dynObstacleY','dynObstacleZ','dynObstacleSize','dynObstacleAspect','engine','pLiving','lensDistortion'],key=JSON.stringify([w,h,...keys.map(k=>s[k])]);if(previous===key)return;previous=key;svg.setAttribute('viewBox',`0 0 ${w} ${h}`);

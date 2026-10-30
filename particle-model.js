@@ -1,4 +1,4 @@
-import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=83423be56ba5';
+import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=35455dbed4a0';
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
 export const PARTICLE_VERSION=14;
 export function grainDiameters(s){

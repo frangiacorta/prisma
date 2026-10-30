@@ -1,14 +1,15 @@
-import {PlaygroundDirector} from './playground-director.js?v=83423be56ba5';
-import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=83423be56ba5';
-import {familyName,presetFamily} from './preset-families.js?v=83423be56ba5';
-import {closeLivingSkin} from './living-panel.js?v=83423be56ba5';
-import {PlaygroundEngine} from './playground-engine.js?v=83423be56ba5';
-import {PlaygroundInputs} from './playground-inputs.js?v=83423be56ba5';
-import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=83423be56ba5';
-import {particleCreation} from './particle-model.js?v=83423be56ba5';
-import {readPreset} from './preset-files.js?v=83423be56ba5';
-import {controlHelp,controlCondition} from './control-help.js?v=83423be56ba5';
-import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=83423be56ba5';
+import {onlineDirector,DIRECTOR_ONLINE_URL} from './director-connection.js?v=35455dbed4a0';
+import {PlaygroundDirector} from './playground-director.js?v=35455dbed4a0';
+import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=35455dbed4a0';
+import {familyName,presetFamily} from './preset-families.js?v=35455dbed4a0';
+import {closeLivingSkin} from './living-panel.js?v=35455dbed4a0';
+import {PlaygroundEngine} from './playground-engine.js?v=35455dbed4a0';
+import {PlaygroundInputs} from './playground-inputs.js?v=35455dbed4a0';
+import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=35455dbed4a0';
+import {particleCreation} from './particle-model.js?v=35455dbed4a0';
+import {readPreset} from './preset-files.js?v=35455dbed4a0';
+import {controlHelp,controlCondition} from './control-help.js?v=35455dbed4a0';
+import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=35455dbed4a0';
 
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
 const button=(text,fn,cls='outline')=>{const b=el('button',cls,text);b.type='button';b.onclick=fn;return b;};
@@ -33,11 +34,14 @@ export function mountPlayground(api){
  const directorPanel=el('section','pg-director-panel');directorPanel.hidden=true;consolePanel.prepend(directorPanel);
  const directorText=el('p','pg-help','Premi Regia AI per affidare le scene a Codex. Puoi riprendere il controllo in ogni momento.'),brief=el('textarea'),directorLog=el('details');directorText.setAttribute('role','status');brief.rows=3;brief.maxLength=4000;brief.placeholder='Carta bianca, oppure una direzione: più liquido, resta su questi colori…';brief.setAttribute('aria-label','Direzione della regia AI');brief.oninput=()=>{if(config){config.director.brief=brief.value;changed();}};
  const steer=button('Invia direzione',()=>{if(director?.running)director.stop('Cambio direzione…');director?.start();});
- const pc=button('Apri questa sessione sul PC',()=>{const snapshot=api.getSnapshot();snapshot.state={...snapshot.state,playground:engine.snapshot()};const data=JSON.stringify(snapshot);if(data.length>350000)return message('Salva il progetto e importalo in Prisma sul PC: questa sessione è troppo grande per il trasferimento diretto.');window.open('http://127.0.0.1:8242/?playground=1&engine='+snapshot.state.engine+'#prisma-assistant='+encodeURIComponent(data),'_blank','noopener');});pc.hidden=['localhost','127.0.0.1','[::1]'].includes(location.hostname);
+ const cloud=button('Apri questa sessione online',()=>{const snapshot=api.getSnapshot();snapshot.state={...snapshot.state,playground:engine.snapshot()};const data=JSON.stringify(snapshot);if(data.length>350000)return message('Salva il progetto e importalo nella Regia online: la sessione è troppo grande per il trasferimento diretto.');window.open(DIRECTOR_ONLINE_URL+'studio/index.html?playground=1&engine='+snapshot.state.engine+'#prisma-assistant='+encodeURIComponent(data),'_blank','noopener');});cloud.hidden=onlineDirector();
+ const consumption=el('p','pg-help');consumption.setAttribute('role','status');
+ const pc=button('Apri questa sessione sul PC',()=>{const snapshot=api.getSnapshot();snapshot.state={...snapshot.state,playground:engine.snapshot()};const data=JSON.stringify(snapshot);if(data.length>350000)return message('Salva il progetto e importalo in Prisma sul PC: questa sessione è troppo grande per il trasferimento diretto.');window.open('http://127.0.0.1:8242/?playground=1&engine='+snapshot.state.engine+'#prisma-assistant='+encodeURIComponent(data),'_blank','noopener');});pc.hidden=onlineDirector()||['localhost','127.0.0.1','[::1]'].includes(location.hostname);
  const privacy=el('p','pg-help','Usa il tuo accesso Codex e i relativi limiti. Invia soltanto immagini della scena e parametri, senza webcam o audio. Le decisioni richiedono alcuni secondi; il movimento continua durante l’attesa. Sul PC avvia PRISMA-CREATIVO.cmd.');
- directorPanel.append(el('h2','','Regia AI'),directorText,brief,steer,pc,privacy,directorLog);
+ if(onlineDirector())privacy.textContent='Regia online personale: massimo 12 decisioni per avvio e 60 al giorno. L’uso API consuma credito. Invia solo immagini della scena e parametri, senza webcam o audio. Il movimento continua durante l’attesa.';
+ directorPanel.append(el('h2','','Regia AI'),directorText,brief,steer,cloud,pc,privacy,consumption,directorLog);
  const takeover=button('Riprendi il controllo',()=>director?.stop(),'pg-director-takeover');takeover.hidden=true;stage.append(takeover);
- function directorUI(){if(!director)return;directorText.textContent=director.text||'Regia pronta';directorButton.textContent=director.running?'Riprendi il controllo':'Regia AI';directorButton.setAttribute('aria-pressed',String(director.running));takeover.hidden=!director.running;shell.classList.toggle('pg-directed',director.running);directorLog.replaceChildren(el('summary','','Scelte della sessione'));for(const h of config?.director.history||[])directorLog.append(el('p','pg-help',h.intent));sync();}
+ function directorUI(){if(!director)return;directorText.textContent=director.text||'Regia pronta';const u=director.usage;consumption.textContent=u?`${u.attempts}/${u.limit} decisioni · ${u.dayUsed}/${u.dayLimit} oggi · ${(u.inputTokens||0)+(u.outputTokens||0)} token`:'';directorButton.textContent=director.running?'Riprendi il controllo':'Regia AI';directorButton.setAttribute('aria-pressed',String(director.running));takeover.hidden=!director.running;shell.classList.toggle('pg-directed',director.running);directorLog.replaceChildren(el('summary','','Scelte della sessione'));for(const h of config?.director.history||[])directorLog.append(el('p','pg-help',h.intent));sync();}
  document.addEventListener('visibilitychange',()=>{if(document.hidden&&director?.running)director.stop('Regia sospesa: la scheda non è visibile. Premi Regia AI per riprendere.');});
  const opener=button('Playground',()=>open(),'outline');opener.id='playground-open';document.querySelector('.header-actions')?.prepend(opener);
  function message(text){status.textContent=text;}

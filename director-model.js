@@ -1,11 +1,11 @@
-import {newCreation,normalizeCreation} from './creative-model.js?v=83423be56ba5';
-import {particleCreation} from './particle-model.js?v=83423be56ba5';
-import {parameterCatalog,readParameter,writeParameter,sceneOnly,clamp} from './playground-model.js?v=83423be56ba5';
+import {newCreation,normalizeCreation} from './creative-model.js?v=35455dbed4a0';
+import {particleCreation} from './particle-model.js?v=35455dbed4a0';
+import {parameterCatalog,readParameter,writeParameter,sceneOnly,clamp} from './playground-model.js?v=35455dbed4a0';
 
 export const DIRECTOR_BRIEF='Esplora liberamente forma e particelle, materia, luce, colore e movimento. Sviluppa idee riconoscibili, cambia ritmo e scala, alterna dettagli e insieme. Usa sovrapposizioni intenzionali, non alternare meccanicamente i due motori. Parti dalla scena presente e valuta visivamente ogni risultato. Sfondo nero, composizioni leggibili, niente lampeggi rapidi.';
 const obj=properties=>({type:'object',properties,required:Object.keys(properties),additionalProperties:false});
 const str={type:'string'},num={type:'number'};
-export const DIRECTOR_SCHEMA=obj({observation:str,intent:str,memory:str,action:{enum:['hold','evolve']},source:{enum:['A','B','sphere','particles']},name:str,changes:{type:'array',items:obj({path:str,value:{anyOf:[num,str,{type:'boolean'}]}})},palette:{type:'array',items:str},transition:{enum:['fade','wipe','luma','add']},direction:{type:'integer',minimum:0,maximum:3},curve:{enum:['linear','smooth','in','out']},seconds:{type:'number',minimum:2,maximum:24},blend:{type:'number',minimum:.15,maximum:1},holdSeconds:{type:'number',minimum:8,maximum:45}});
+export const DIRECTOR_SCHEMA=obj({observation:str,intent:str,memory:str,action:{type:'string',enum:['hold','evolve']},source:{type:'string',enum:['A','B','sphere','particles']},name:str,changes:{type:'array',items:obj({path:str,value:{anyOf:[num,str,{type:'boolean'}]}})},palette:{type:'array',items:str},transition:{type:'string',enum:['fade','wipe','luma','add']},direction:{type:'integer',minimum:0,maximum:3},curve:{type:'string',enum:['linear','smooth','in','out']},seconds:{type:'number',minimum:2,maximum:24},blend:{type:'number',minimum:.15,maximum:1},holdSeconds:{type:'number',minimum:8,maximum:45}});
 export function directorBase(source,decks){
  if(source==='sphere')return newCreation();
  if(source==='particles')return particleCreation(newCreation(),0);
