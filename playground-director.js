@@ -1,5 +1,5 @@
-import {onlineDirector} from './director-connection.js?v=bbf6be37c32f';
-import {DIRECTOR_BRIEF,validateDirectorPlan} from './director-model.js?v=bbf6be37c32f';
+import {onlineDirector} from './director-connection.js?v=2db6d7f39c07';
+import {DIRECTOR_BRIEF,validateDirectorPlan} from './director-model.js?v=2db6d7f39c07';
 
 const wait=(ms,signal)=>new Promise((resolve,reject)=>{if(signal.aborted)return reject(new DOMException('Interrotto','AbortError'));const done=()=>{signal.removeEventListener('abort',abort);resolve();},timer=setTimeout(done,ms),abort=()=>{clearTimeout(timer);signal.removeEventListener('abort',abort);reject(new DOMException('Interrotto','AbortError'));};signal.addEventListener('abort',abort,{once:true});});
 export class PlaygroundDirector{

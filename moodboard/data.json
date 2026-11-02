@@ -22340,6 +22340,63 @@
       "category": "workflow",
       "detailsSource": [],
       "clipNote": "Proposta utente del 2 novembre 2026; non implementata."
+    },
+    {
+      "id": "roadmap-github-single-entry",
+      "kind": "project",
+      "state": "proposed",
+      "name": "Pubblicazione · accesso unico da GitHub",
+      "author": "Prisma",
+      "summary": "Tornare a utilizzare Prisma dal solo sito GitHub, mantenendo disponibili Regia AI, memoria, autenticazione e tutte le funzioni oggi ospitate su Sites.",
+      "families": [
+        "interaction",
+        "motion"
+      ],
+      "where": "Futuro: Prisma su GitHub. Per ora GitHub e Sites vanno aggiornati insieme.",
+      "keep": "Parità funzionale, progetti compatibili, accesso personale e chiavi custodite sul server.",
+      "avoid": "Abbandonare Sites prima di aver sostituito e verificato tutte le sue funzioni; inserire chiavi nel browser o in repository pubbliche.",
+      "priority": false,
+      "related": [
+        "roadmap-director-artistic-direction"
+      ],
+      "sources": [],
+      "sections": [
+        {
+          "title": "Architettura da valutare",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Obiettivo: un solo indirizzo GitHub per l’utente e dismissione di Sites. GitHub Pages è statico: valutare separatamente dove eseguire le inferenze, autenticare gli accessi e conservare memoria e contatori. Il codice e il rilascio dovranno essere gestibili da GitHub; non assumere che Pages possa eseguire un server API."
+            },
+            {
+              "label": "acceptance",
+              "value": [
+                "Inventario completo delle funzioni di Sites e sostituzione verificata",
+                "Regia visiva reale, stop e limiti persistenti anche dal telefono",
+                "Trasferimento sicuro di memoria, progetti e configurazione senza esporre segreti",
+                "Stesso comportamento di editor, Playground e Flow; nessuna perdita dei preset",
+                "Passaggio reversibile, poi dismissione di Sites solo dopo verifica e nuova richiesta"
+              ]
+            }
+          ]
+        }
+      ],
+      "next": "Progettare la migrazione su nuova richiesta. Nel frattempo aggiornare e verificare entrambe le pubblicazioni a ogni modifica.",
+      "platform": "Browser · mobile e desktop",
+      "result": "",
+      "media": [],
+      "assets": [],
+      "completedProjects": [],
+      "aliases": [
+        "Dismissione Sites",
+        "GitHub unico accesso"
+      ],
+      "topics": [
+        "presets"
+      ],
+      "category": "workflow",
+      "detailsSource": [],
+      "clipNote": "Roadmap richiesta il 2 novembre 2026; migrazione non iniziata."
     }
   ],
   "families": [

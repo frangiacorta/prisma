@@ -1,4 +1,4 @@
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=bbf6be37c32f';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=2db6d7f39c07';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,

@@ -1,7 +1,7 @@
-import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=bbf6be37c32f';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=bbf6be37c32f';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=bbf6be37c32f';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=bbf6be37c32f';
+import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=2db6d7f39c07';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=2db6d7f39c07';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=2db6d7f39c07';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=2db6d7f39c07';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.

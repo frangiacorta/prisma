@@ -1,5 +1,12 @@
 # Prisma · Regia online
 
+GitHub e Sites vanno aggiornati, verificati e committati insieme a ogni modifica
+di Prisma, come autorizzato dall'utente il 2 novembre 2026. Gli aggiornamenti a Flow
+non estendono automaticamente il comportamento della Regia AI.
+La roadmap prevede un futuro accesso unico da GitHub e la dismissione di Sites,
+dopo la sostituzione verificata delle sue funzioni server. L'architettura è da
+valutare; fino ad allora mantenere entrambe le pubblicazioni allineate.
+
 Site privato, accessibile al proprietario tramite l'accesso gestito da Sites.
 Il Playground è lo stesso codice pubblicato su GitHub: il renderer resta nel browser.
 Il collegamento dal sito pubblico trasferisce il progetto nel frammento URL; non avvia chiamate AI.
