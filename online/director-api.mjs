@@ -22,6 +22,7 @@ export async function handleDirector(request,env,{fetcher=fetch,now=()=>Date.now
  if(route==='/api/assistant/status'&&request.method==='GET')return json({available:configured(env),director:true,cloud:true,token:'same-origin',model:MODEL,sessionLimit:SESSION_LIMIT,dayLimit:DAY_LIMIT,message:configured(env)?'Regia online pronta.':'Regia online predisposta. Manca il collegamento dell’account API; Forma, Particelle e Flow sono disponibili.'});
  if(request.method!=='POST')return json({error:'Metodo non disponibile.'},405);
  if(request.headers.get('x-prisma-assistant')!=='same-origin'||request.headers.get('origin')!==url.origin)return json({error:'Collegamento non valido.'},403);
+ let trackedSession=null,trackedDay=null;
  try{
   if(!env.DB)throw fail('Archivio della regia non disponibile.',503);
   const body=await readBody(request),time=now();
@@ -42,7 +43,8 @@ export async function handleDirector(request,env,{fetcher=fetch,now=()=>Date.now
   if(typeof body.session!=='string'||body.session.length>80)throw fail('Sessione non valida.');
   let session=await env.DB.prepare('SELECT * FROM director_sessions WHERE id=? AND owner=?').bind(body.session,owner).first();
   if(!session)throw fail('Sessione non trovata.',404);
-  if(route==='/api/director/stop'){await env.DB.prepare('UPDATE director_sessions SET stopped=1 WHERE id=? AND owner=?').bind(body.session,owner).run();return json({stopped:true});}
+  trackedSession=session.id;trackedDay=new Date(time).toISOString().slice(0,10);
+  if(route==='/api/director/stop'){await env.DB.prepare('UPDATE director_sessions SET stopped=1 WHERE id=? AND owner=?').bind(body.session,owner).run();const daily=await env.DB.prepare('SELECT attempts FROM director_days WHERE owner=? AND day=?').bind(owner,trackedDay).first();return json({stopped:true,usage:{...usage(session),dayUsed:daily?.attempts||0,dayLimit:DAY_LIMIT}});}
   if(!configured(env))throw fail('Account API non collegato.',503);
   if(session.stopped||session.expires<time)throw fail('Sessione conclusa. Premi Regia AI per ricominciare.',410);
   const prepared=prepareDirector({...body,memory:session.attempts?session.memory:body.memory,history:session.attempts?JSON.parse(session.history):body.history});
@@ -69,11 +71,19 @@ export async function handleDirector(request,env,{fetcher=fetch,now=()=>Date.now
    if(result.status!=='completed')throw fail('La decisione AI è incompleta. Nessuna modifica applicata.',502);
    const texts=(result.output||[]).filter(x=>x.type==='message').flatMap(x=>x.content||[]).filter(x=>x.type==='output_text').map(x=>x.text);
    if(texts.length!==1)throw fail('La regia non ha restituito una decisione valida.',502);
-   let plan;try{plan=validateDirectorPlan(JSON.parse(texts[0]),prepared.decks);}catch{throw fail('La proposta AI contiene controlli non validi. La scena è conservata.',502);}
+   let plan;try{plan=validateDirectorPlan(JSON.parse(texts[0]),prepared.decks);}catch(error){console.warn('Prisma director plan rejected',{reason:error.message});throw fail('La proposta AI contiene controlli non validi. La scena è conservata.',502);}
    const history=[...(session.attempts>1?JSON.parse(session.history):(Array.isArray(body.history)?body.history:[])),{at:new Date(time).toISOString(),observation:plan.observation,intent:plan.intent,name:plan.name,source:plan.source}].slice(-8).map(h=>Object.fromEntries(['at','observation','intent','name','source'].map(k=>[k,String(h?.[k]||'').slice(0,1000)])));
    const saved=await env.DB.prepare('UPDATE director_sessions SET memory=?,history=? WHERE id=? AND owner=? AND stopped=0 AND lease=? RETURNING *').bind(plan.memory,JSON.stringify(history),body.session,owner,lease).first();
    if(!saved)throw fail('Regia interrotta. La risposta non verrà applicata.',410);
    return json({...plan,usage:{...usage(saved),dayUsed:quota.attempts,dayLimit:DAY_LIMIT}});
   }finally{await env.DB.prepare('UPDATE director_sessions SET lease=0 WHERE id=? AND owner=? AND lease=?').bind(body.session,owner,lease).run();await env.DB.prepare('UPDATE director_days SET lease=0,lease_owner=\'\' WHERE owner=? AND day=? AND lease_owner=?').bind(owner,day,leaseOwner).run();}
- }catch(error){return json({error:error.name==='AbortError'||error.name==='TimeoutError'?'Regia interrotta o tempo di attesa superato.':error.status?error.message:'La regia non ha completato la richiesta. Nessuna modifica applicata.'},error.status||503);}
+ }catch(error){
+  let consumed;
+  if(trackedSession)try{
+   const row=await env.DB.prepare('SELECT * FROM director_sessions WHERE id=? AND owner=?').bind(trackedSession,owner).first();
+   const daily=await env.DB.prepare('SELECT attempts FROM director_days WHERE owner=? AND day=?').bind(owner,trackedDay).first();
+   if(row)consumed={...usage(row),dayUsed:daily?.attempts||0,dayLimit:DAY_LIMIT};
+  }catch{}
+  return json({error:error.name==='AbortError'||error.name==='TimeoutError'?'Regia interrotta o tempo di attesa superato.':error.status?error.message:'La regia non ha completato la richiesta. Nessuna modifica applicata.',...(consumed?{usage:consumed}:{})},error.status||503);
+ }
 }

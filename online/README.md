@@ -12,16 +12,19 @@ la revisione dell'ambiente. Senza chiave la regia segnala il collegamento mancan
 resta disattivata; editor, Manuale e Flow funzionano.
 
 Modello iniziale: gpt-5.4-mini. Responses API, immagini e output JSON strutturato,
-nessuno strumento o codice eseguibile generato. La qualità dell'inferenza online va
-verificata con chiamate reali dopo il collegamento dell'account.
+nessuno strumento o codice eseguibile generato. La regia osserva due fotogrammi consecutivi dell'uscita reale e usa memoria e diario
+per scegliere il prossimo intervento. Ogni proposta viene validata prima di essere applicata.
 
 ## Limiti e memoria
 
 12 tentativi per sessione di un'ora, 60 al giorno UTC, una richiesta alla volta.
 I tentativi falliti o interrotti consumano il limite in modo conservativo.
-Massimo 4096 token di output per richiesta; prompt e immagini hanno limiti di dimensione.
+Massimo 4096 token di output, 100 modifiche e 8 colori per proposta; questi limiti
+sono dichiarati anche nello schema strutturato inviato al modello. Prompt e immagini
+hanno limiti di dimensione.
 Questi sono limiti di utilizzo, non una promessa di prezzo o un tetto in euro.
-Il contatore mostra i token restituiti dal fornitore; richieste interrotte senza risposta
+Il contatore include i tentativi falliti e lo stop, e i token restituiti dal fornitore
+anche quando la proposta viene rifiutata; richieste interrotte senza risposta
 possono essere fatturate senza poter essere contabilizzate nei token visualizzati.
 
 D1 conserva proprietario, memoria e ultime 8 scelte della sessione, contatori e scadenza.
@@ -42,3 +45,16 @@ Conservare il project_id esistente. Le migrazioni D1 sono in drizzle/.
 Non copiare reference private, credenziali o file di sessione nella pubblicazione.
 
 Questa cartella conserva il nucleo del server e le migrazioni per revisione. Il servizio completo è distribuito nel Site privato; GitHub Pages non esegue questo modulo. handleDirector richiede identità verificate dal gateway Sites: non pubblicarlo dietro un server che accetta intestazioni identità arbitrarie dai visitatori.
+
+## Test di regressione
+
+Con Node.js 25 (SQLite integrato), dalla radice della repository:
+
+```sh
+node --test online/tests/director-api.test.mjs
+```
+
+Copertura: espansione della palette, consumi di proposte rifiutate e stop, memoria
+persistente, risposta tardiva dopo lo stop, isolamento del proprietario e limiti 12/60.
+I test di regressione simulano il provider; la verifica visiva richiede inferenze reali
+nel Site privato e non inserisce credenziali nei file pubblicati.
