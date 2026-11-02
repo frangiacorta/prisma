@@ -12,6 +12,9 @@ vec4 getToColor(vec2 p){p=fit(p,aspects.y);if(outside(p))return vec4(0);vec4 c=t
 void main(){vec4 a=getFromColor(uv),b=getToColor(uv);float m=progress;
  if(progress>0.&&progress<1.){
   if(kind==1){vec2 d=direction==0?vec2(1,0):direction==1?vec2(0,1):direction==2?vec2(-1,0):vec2(0,-1);vec2 v=normalize(d);v/=abs(v.x)+abs(v.y);float center=dot(v,vec2(.5));m=1.-smoothstep(-.12,0.,dot(v,uv)-(center-.5+progress*1.12));}
+  if(kind==4){float radius=length((uv-.5)*vec2(aspects.x,1.))/(.5*length(vec2(aspects.x,1.)));float edge=direction>1?1.-radius:radius;m=smoothstep(edge-.08,edge+.08,progress*1.16-.08);}
+  if(kind==5){float bell=sin(progress*3.14159265),spin=(direction>1?-1.:1.)*bell*.42;mat2 rot=mat2(cos(spin),-sin(spin),sin(spin),cos(spin));a=getFromColor(rot*(uv-.5)*(1.+bell*.12)+.5);b=getToColor(transpose(rot)*(uv-.5)*(1.+bell*.12)+.5);m=smoothstep(0.,1.,progress);}
+  if(kind==6){float bell=sin(progress*3.14159265);a=getFromColor((uv-.5)*(1.-bell*.12)+.5);b=getToColor((uv-.5)*(1.+(1.-progress)*.18)+.5);m=smoothstep(0.,1.,progress);}
   if(kind==2){float lum=dot(b.rgb,vec3(.2126,.7152,.0722));m=smoothstep(1.-progress-.08,1.-progress+.08,lum);}
  }
  vec3 c=mix(a.rgb,b.rgb,m);if(kind==3&&progress>0.&&progress<1.)c=min(vec3(1),a.rgb*(1.-progress)+b.rgb*progress+min(a.rgb,b.rgb)*sin(progress*3.14159265));
@@ -26,6 +29,6 @@ export class PlaygroundMixer{
   this.u=Object.fromEntries(['sceneA','sceneB','progress','kind','direction','master','aspects'].map(k=>[k,g.getUniformLocation(p,k)]));this.frames=0;this.aspects=[1,1];
  }
  upload(index,canvas){const g=this.gl;g.activeTexture(g.TEXTURE0+index);g.bindTexture(g.TEXTURE_2D,this.textures[index]);g.pixelStorei(g.UNPACK_FLIP_Y_WEBGL,true);g.pixelStorei(g.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,g.RGBA,g.UNSIGNED_BYTE,canvas);}
- draw(c,w,h){const g=this.gl;if(g.isContextLost())throw Error('La GPU ha interrotto il mix. Chiudi e riapri il Playground.');if(this.canvas.width!==w||this.canvas.height!==h){this.canvas.width=w;this.canvas.height=h;}g.viewport(0,0,w,h);g.useProgram(this.program);g.bindVertexArray(this.vao);this.textures.forEach((t,i)=>{g.activeTexture(g.TEXTURE0+i);g.bindTexture(g.TEXTURE_2D,t);});g.uniform1i(this.u.sceneA,0);g.uniform1i(this.u.sceneB,1);g.uniform2f(this.u.aspects,this.aspects[0],this.aspects[1]);g.uniform1f(this.u.progress,c.mix);g.uniform1i(this.u.kind,['fade','wipe','luma','add'].indexOf(c.transition));g.uniform1i(this.u.direction,c.direction);g.uniform1f(this.u.master,c.blackout?0:c.master);g.drawArrays(g.TRIANGLES,0,3);this.frames++;}
+ draw(c,w,h){const g=this.gl;if(g.isContextLost())throw Error('La GPU ha interrotto il mix. Chiudi e riapri il Playground.');if(this.canvas.width!==w||this.canvas.height!==h){this.canvas.width=w;this.canvas.height=h;}g.viewport(0,0,w,h);g.useProgram(this.program);g.bindVertexArray(this.vao);this.textures.forEach((t,i)=>{g.activeTexture(g.TEXTURE0+i);g.bindTexture(g.TEXTURE_2D,t);});g.uniform1i(this.u.sceneA,0);g.uniform1i(this.u.sceneB,1);g.uniform2f(this.u.aspects,this.aspects[0],this.aspects[1]);g.uniform1f(this.u.progress,c.mix);g.uniform1i(this.u.kind,['fade','wipe','luma','add','iris','swirl','zoom'].indexOf(c.transition));g.uniform1i(this.u.direction,c.direction);g.uniform1f(this.u.master,c.blackout?0:c.master);g.drawArrays(g.TRIANGLES,0,3);this.frames++;}
  dispose(){const g=this.gl;this.textures.forEach(t=>g.deleteTexture(t));g.deleteProgram(this.program);g.deleteVertexArray(this.vao);g.getExtension('WEBGL_lose_context')?.loseContext();}
 }

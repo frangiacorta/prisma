@@ -1,15 +1,15 @@
-import {onlineDirector,DIRECTOR_ONLINE_URL} from './director-connection.js?v=35455dbed4a0';
-import {PlaygroundDirector} from './playground-director.js?v=regia-online-75';
-import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=35455dbed4a0';
-import {familyName,presetFamily} from './preset-families.js?v=35455dbed4a0';
-import {closeLivingSkin} from './living-panel.js?v=35455dbed4a0';
-import {PlaygroundEngine} from './playground-engine.js?v=35455dbed4a0';
-import {PlaygroundInputs} from './playground-inputs.js?v=35455dbed4a0';
-import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=35455dbed4a0';
-import {particleCreation} from './particle-model.js?v=35455dbed4a0';
-import {readPreset} from './preset-files.js?v=35455dbed4a0';
-import {controlHelp,controlCondition} from './control-help.js?v=35455dbed4a0';
-import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=35455dbed4a0';
+import {onlineDirector,DIRECTOR_ONLINE_URL} from './director-connection.js?v=bbf6be37c32f';
+import {PlaygroundDirector} from './playground-director.js?v=bbf6be37c32f';
+import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=bbf6be37c32f';
+import {familyName,presetFamily} from './preset-families.js?v=bbf6be37c32f';
+import {closeLivingSkin} from './living-panel.js?v=bbf6be37c32f';
+import {PlaygroundEngine} from './playground-engine.js?v=bbf6be37c32f';
+import {PlaygroundInputs} from './playground-inputs.js?v=bbf6be37c32f';
+import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=bbf6be37c32f';
+import {particleCreation} from './particle-model.js?v=bbf6be37c32f';
+import {readPreset} from './preset-files.js?v=bbf6be37c32f';
+import {controlHelp,controlCondition} from './control-help.js?v=bbf6be37c32f';
+import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=bbf6be37c32f';
 
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
 const button=(text,fn,cls='outline')=>{const b=el('button',cls,text);b.type='button';b.onclick=fn;return b;};
@@ -68,7 +68,7 @@ export function mountPlayground(api){
   if(key==='master')return value(()=>config.master,v=>config.master=v);
   if(key==='duration')return value(()=>(config.duration-.05)/63.95,v=>config.duration=.05+v*63.95);
   if(key==='bpm')return value(()=>(config.bpm-30)/270,v=>config.bpm=30+v*270);
-  for(const [k,list]of [['transition',['fade','wipe','luma','add']],['curve',['linear','smooth','in','out']],['direction',[0,1,2,3]],['unit',['seconds','beats']]])if(key===k)return value(()=>list.indexOf(config[k])/(list.length-1),v=>config[k]=list[Math.round(v*(list.length-1))]);
+  for(const [k,list]of [['transition',['fade','wipe','luma','add','iris','swirl','zoom']],['curve',['linear','smooth','in','out']],['direction',[0,1,2,3]],['unit',['seconds','beats']]])if(key===k)return value(()=>list.indexOf(config[k])/(list.length-1),v=>config[k]=list[Math.round(v*(list.length-1))]);
   if(key==='quantize')return value(()=>+config.quantize,v=>config.quantize=v>=.5);
   if(key==='take.A'||key==='take.B')return action(()=>engine.take(key.endsWith('A')?0:1));
   if(key==='close.A'||key==='close.B')return action(()=>{const id=key.at(-1),d=engine.decks[id];if(d){closeLivingSkin(d.state);d.catalog=parameterCatalog(d.state);engine.refresh(id);}});
@@ -85,7 +85,7 @@ export function mountPlayground(api){
  function actionButton(name,key){const row=el('span','pg-action'),b=button(name,()=>touch(key,1));b.dataset.action=key;row.append(b,learnButton(key));return row;}
  function renderFlow(){
   flowPanel.replaceChildren(el('h2','','Flow'));const f=config.flow;
-  const description=el('p','pg-help','Scene e mix automatici. La prossima scena viene preparata prima del passaggio. Manuale conserva il mix che stai vedendo.');flowPanel.append(description);
+  const description=el('p','pg-help','Forme, materiali e movimenti in evoluzione. Colori collegati tra le scene e passaggi radiali, torsioni o zoom. Varietà amplia le combinazioni; Manuale conserva il mix attuale.');flowPanel.append(description);
   const choices=el('div','pg-grid');for(const [key,name,list]of [['mood','Mood',FLOW_MOODS],['colors','Palette',FLOW_COLORS],['engines','Scene',[['both','Forma e particelle'],['solid','Solo forma'],['particles','Solo particelle']]]]){const s=select(list,f[key],v=>{f[key]=v;changed();});s.dataset.control='flow.'+key;controlNodes.set('flow.'+key,{select:s});const box=el('div','pg-choice');box.append(field(name,s),learnButton('flow.'+key));choices.append(box);}flowPanel.append(choices);
   const colors=el('div','pg-flow-colors');for(let i=0;i<3;i++){const c=el('input');c.type='color';c.dataset.flowColor=String(i);c.setAttribute('aria-label','Colore Flow '+(i+1));c.oninput=()=>{const previous=f.colors==='auto'?(engine.decks[config.mix<.5?'A':'B']?.state.palette||flowPalette(f)):flowPalette(f);f.palette=Array.from({length:3},(_,j)=>previous[j%previous.length]||'#ffffff');f.palette[i]=c.value;f.colors='custom';changed();};colors.append(c);}flowPanel.append(colors);
   flowPanel.append(slider('Velocità','flow.speed',.25,3,.05,v=>.25+v*2.75,v=>(v-.25)/2.75),slider('Intensità','flow.intensity'),slider('Varietà','flow.variety'));
@@ -105,7 +105,7 @@ export function mountPlayground(api){
   }
   mixPanel.replaceChildren(el('h2','','Mix A / B'));mixPanel.append(slider('Mix · A ← → B','mix',0,1,.001));
   const actions=el('div','pg-row');actions.append(actionButton('A subito','cut.A'),actionButton('Transizione verso A','take.A'),actionButton('Transizione verso B','take.B'),actionButton('B subito','cut.B'));mixPanel.append(actions);
-  const choices=el('div','pg-grid');choices.append(choice('Transizione','transition',[['fade','Dissolvenza'],['wipe','Tendina'],['luma','Luminanza di B'],['add','Somma luminosa']]),choice('Direzione tendina','direction',[[0,'Da sinistra'],[1,'Dal basso'],[2,'Da destra'],[3,'Dall’alto']]),choice('Andamento','curve',[['linear','Lineare'],['smooth','Morbido'],['in','Accelera'],['out','Rallenta']]),choice('Durata in','unit',[['seconds','Secondi'],['beats','Battiti']]));mixPanel.append(choices,slider('Durata transizione','duration',.05,64,.05,v=>.05+v*63.95,v=>(v-.05)/63.95),slider('Tempo · BPM','bpm',30,300,1,v=>30+v*270,v=>(v-30)/270));
+  const choices=el('div','pg-grid');choices.append(choice('Transizione','transition',[['fade','Dissolvenza'],['wipe','Tendina'],['luma','Luminanza di B'],['add','Somma luminosa'],['iris','Apertura radiale'],['swirl','Torsione'],['zoom','Zoom']]),choice('Direzione tendina','direction',[[0,'Da sinistra'],[1,'Dal basso'],[2,'Da destra'],[3,'Dall’alto']]),choice('Andamento','curve',[['linear','Lineare'],['smooth','Morbido'],['in','Accelera'],['out','Rallenta']]),choice('Durata in','unit',[['seconds','Secondi'],['beats','Battiti']]));mixPanel.append(choices,slider('Durata transizione','duration',.05,64,.05,v=>.05+v*63.95,v=>(v-.05)/63.95),slider('Tempo · BPM','bpm',30,300,1,v=>30+v*270,v=>(v-30)/270));
   const quant=el('div','pg-row'),q=el('input');q.type='checkbox';q.onchange=()=>touch('quantize',+q.checked);controlNodes.set('quantize',{check:q});quant.append(field('Avvia sul prossimo battito',q),learnButton('quantize'),button('Tap tempo',tap));mixPanel.append(quant,slider('Livello uscita','master'));
   const black=button('Nero',()=>touch('blackout',config.blackout?0:1));black.dataset.blackout='';mixPanel.append(black,learnButton('blackout'),el('p','pg-help','La velocità delle scene è indipendente dalla transizione. Puoi invertire il passaggio o riprendere il mix a mano senza saltare. La luminanza segue le zone chiare della scena B.'));
   macrosPanel.replaceChildren(el('h2','','Macro'));const grid=el('div','pg-macro-grid');config.macros.forEach((m,i)=>{const c=el('section','pg-macro');c.append(slider(m.name,'macro:'+i),button(m.routes.length+' parametri · configura',()=>openMacro(i),'quiet'));grid.append(c);});macrosPanel.append(grid);

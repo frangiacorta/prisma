@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-30",
+  "updated": "2026-11-02",
   "items": [
     {
       "id": "s01-01",
@@ -22284,6 +22284,62 @@
         "reference/moodboard-additions.json"
       ],
       "clipNote": "Proposta originale per Prisma · nessuna demo ancora implementata"
+    },
+    {
+      "id": "roadmap-director-artistic-direction",
+      "kind": "project",
+      "state": "proposed",
+      "name": "Regia AI · direzione artistica",
+      "author": "Prisma",
+      "summary": "Ampliare la libertà compositiva della Regia: esplorazione di forme, materia, colori, coreografie e transizioni coerenti, con sviluppo di idee e valutazione visiva dei risultati.",
+      "families": [
+        "interaction",
+        "motion"
+      ],
+      "where": "Previsto: Playground → Regia AI. Implementazione soltanto dopo una nuova richiesta esplicita.",
+      "keep": "Intento espressivo, improvvisazione, curiosità, contrasti e continuità tra le scene. Interpretare creatività e sentimenti come direzione artistica e tono delle scelte, senza dichiarare esperienze soggettive reali.",
+      "avoid": "Applicazione automatica dei miglioramenti di Flow alla Regia, playlist prefissata, cambi casuali senza memoria e modifiche a modelli, limiti o costi senza necessità.",
+      "priority": false,
+      "related": [
+        "roadmap-playground-touch"
+      ],
+      "sources": [],
+      "sections": [
+        {
+          "title": "Da sviluppare su richiesta",
+          "fields": [
+            {
+              "label": "method",
+              "value": [
+                "Osservare il risultato e scegliere cosa conservare, variare o rompere intenzionalmente",
+                "Esplorare composizioni, vuoti, scala, materiali, luce e ritmo senza alternanza obbligata Forma/Particelle",
+                "Costruire passaggi e frasi visive con memoria delle scelte",
+                "Esporre una breve motivazione artistica, lasciare spazio alla sorpresa e alla ripresa manuale"
+              ]
+            },
+            {
+              "label": "limits",
+              "value": "Solo roadmap: comportamento e prompt della Regia attuale invariati. Nessuna inferenza API richiesta per questa modifica a Flow."
+            }
+          ]
+        }
+      ],
+      "next": "Attendere una nuova richiesta esplicita dell’utente prima dell’implementazione.",
+      "platform": "Browser · mobile e desktop",
+      "result": "",
+      "media": [],
+      "assets": [],
+      "completedProjects": [],
+      "aliases": [
+        "Regia d’autore",
+        "Libertà creativa"
+      ],
+      "topics": [
+        "presets"
+      ],
+      "category": "workflow",
+      "detailsSource": [],
+      "clipNote": "Proposta utente del 2 novembre 2026; non implementata."
     }
   ],
   "families": [

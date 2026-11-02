@@ -1,24 +1,34 @@
-import {newCreation,motionPreset} from './creative-model.js?v=35455dbed4a0';
-import {particleCreation} from './particle-model.js?v=35455dbed4a0';
-import {FLOW_PALETTES,flowTiming,flowChoice,normalizeFlow,flowPalette,flowProfile} from './flow-model.js?v=35455dbed4a0';
+import {newCreation,motionPreset} from './creative-model.js?v=bbf6be37c32f';
+import {particleCreation} from './particle-model.js?v=bbf6be37c32f';
+import {FLOW_PALETTES,flowTiming,flowChoice,normalizeFlow,flowPalette,flowProfile,flowTransition} from './flow-model.js?v=bbf6be37c32f';
 
-const names={volume:'Volume',ring:'Anello',layers:'Strati',fibres:'Fili',branches:'Ramificazioni'};
+const names={volume:'Volume',ring:'Anello',layers:'Strati',fibres:'Fili',branches:'Ramificazioni',disc:'Disco',polyhedron:'Poliedro',ribbon:'Nastro',cells:'Cellule',shell:'Gusci'};
 export function flowScene(flow,ratio=16/9){
  const {family,engine}=flowChoice(flow),s=engine==='solid'?newCreation():particleCreation(newCreation(),3),i=flow.intensity,seed=(flow.seed+flow.step*113)>>>0,score=flowProfile(seed,flow.mood,flow.variety);
  const noise=(offset)=>{const x=Math.sin((flow.seed+flow.step*73+offset)*12.9898)*43758.5453;return x-Math.floor(x);};
- Object.assign(s,{engine,seed:(flow.seed+flow.step*113)>>>0,duration:16+noise(40)*12,motionPeriod:16+noise(40)*12,speed:1,bgMode:'solid',background:'#000000',background2:'#000000',scale:engine==='solid'?.85:1.15,rotateX:12+noise(2)*20,rotateY:noise(3)*70,metal:flow.mood==='electric'?.65:.2,roughness:flow.mood==='calm'?.4:.28,gloss:.7,emission:engine==='particles'?.35:.04,glow:flow.mood==='electric'?.22:.06,transparency:0,environmentPower:.65,palette:[...(flowPalette(flow).length?flowPalette(flow):FLOW_PALETTES.pearl)]});
+ Object.assign(s,{engine,seed:(flow.seed+flow.step*113)>>>0,duration:16+noise(40)*12,motionPeriod:16+noise(40)*12,speed:1,bgMode:'solid',background:'#000000',background2:'#000000',scale:(engine==='solid'?.72:1.05)*(.8+noise(72)*.5),rotateX:12+noise(2)*20,rotateY:noise(3)*70,metal:flow.mood==='electric'?.65:.2,roughness:flow.mood==='calm'?.4:.28,gloss:.7,emission:engine==='particles'?.35:.04,glow:flow.mood==='electric'?.22:.06,transparency:0,environmentPower:.65,palette:[...(flowPalette(flow).length?flowPalette(flow):FLOW_PALETTES.pearl)]});
  if(engine==='solid'){
   Object.assign(s,{deform:.12+i*.22,twist:noise(5)*.4,filCount:2400,structShell:0});
   if(family==='ring')Object.assign(s,{loopAmount:.9,loopRadius:.75,loopTube:.22,loopKnot:.35+noise(4)*.3,deform:.08});
   if(family==='layers')Object.assign(s,{structLayers:.62,structLayerCount:4,structLayerWidth:.25,structRadial:.35,structPetalCount:9,structPetalWidth:.55,structCurl:.22});
   if(family==='fibres')Object.assign(s,{filLength:.22+i*.22,filWidth:.002,filWind:.08,filBend:.35,filCurl:.2,filClump:.35});
   if(family==='branches')Object.assign(s,{petalAmount:.6,petalCoverage:1,petalCount:9,petalRows:3,petalLength:.5,petalWidth:.08,petalCurl:.35,petalDisorder:.25});
+  if(family==='disc')Object.assign(s,{baseForm:1,deform:.03,twist:.15,stretchX:1.25,stretchY:.85,rotateX:45});
+  if(family==='polyhedron')Object.assign(s,{baseForm:2+Math.floor(noise(74)*5),deform:.015,twist:.06,roundness:.08});
+  if(family==='ribbon')Object.assign(s,{loopAmount:1,loopFlat:.82,loopRadius:.85,loopTube:.17,loopTwist:(noise(75)-.5)*2.5,loopKnot:.3,deform:.03});
+  if(family==='cells')Object.assign(s,{growthAmount:.65,growthScale:2,structShell:.25,lobeAmount:.4,lobes:5,deform:.12,waves:.16});
+  if(family==='shell')Object.assign(s,{structShell:.88,structThickness:.08,structLayers:.75,structLayerCount:3,structLayerWidth:.4,structCurl:.25,structSlices:.25,structSliceCount:5,deform:.06});
  }else{
   Object.assign(s,{pCount:22000,pSize:1.1,pOpening:0,pFill:.55,pOrganic:.3,pLinks:0,pTrailCount:0,pLiving:0,pAttract:0,pRepel:0,pMagnet:0,pTravel:.25,pLife:.15,pRandom:.08,pMotionSoftness:.8,pSizeRatio:4,pLargeCount:0});
   if(family==='ring')Object.assign(s,{pOpening:.72,pFill:.2,pTravel:.5,pVortex:.45});
   if(family==='layers')Object.assign(s,{pOpening:.25,pFill:.1,pTrailCount:450,pTrailLength:.12,pTrailWidth:.6,pTrailOpacity:.4});
   if(family==='fibres')Object.assign(s,{pCount:8000,pLinks:.6,pLinkNodes:500,pLinkNeighbors:3,pLinkReach:.35,pLinkWidth:.7,pNodeRatio:2,pTravel:.2});
   if(family==='branches')Object.assign(s,{pTentacle:.65,pTentacleCount:6,pTentacleLength:1.4,pTentacleCurl:.5,pTentacleWave:.3,pTrailCount:300,pTrailOpacity:.3});
+  if(family==='disc')Object.assign(s,{pOpening:.18,pFill:.25,stretchY:.48,pOrbitTilt:65,pVortex:.5,pTravel:.35});
+  if(family==='polyhedron')Object.assign(s,{pCount:9500,pSize:2.7,pSizeSpread:.8,pClumps:.65,pLobes:6,pLobeDepth:.5,pOrganic:.08,pSprite:1,pOpacity:.85});
+  if(family==='ribbon')Object.assign(s,{pOpening:.78,pThickness:.18,pFill:.05,pTrailCount:600,pTrailLength:.26,pTrailWidth:1.1,pTrailOpacity:.7,pVortex:.7});
+  if(family==='cells')Object.assign(s,{pCount:12000,pSize:3.8,pSizeSpread:.9,pClumps:.85,pLobes:9,pLobeDepth:.5,pLinks:.4,pLinkNodes:180,pLinkNeighbors:3,pLinkWidth:.5,pTravel:.12});
+  if(family==='shell')Object.assign(s,{pCount:14000,pOpening:.45,pFill:.05,pThickness:.28,pTrailCount:500,pTrailLength:.2,pTrailWidth:.4,pOpacity:.8,pSize:.8});
  }
  // Choreography uses the same editable tracks as the editor. Geometry stays
  // fixed while a deck is visible; only shader values and tracks evolve live.
@@ -30,16 +40,22 @@ export function flowScene(flow,ratio=16/9){
  if(score.motion===3){move('scale',.025+i*.07);move('twist',.12+i*.24);move('rotateY',35);}
  if(score.motion===4){move('rotateX',130,'wave',1);move('rotateY',360,'cycle',2);move('positionY',.07);}
  if(score.motion===5){move('deform',.035+i*.08);move('rotateZ',25,'wave',2);move('scale',.04,'wave',1);}
- const materials=[{metal:.05,roughness:.48,coat:.65,thinFilm:0,iridescence:.08},{metal:.92,roughness:.13,coat:.25,thinFilm:0,iridescence:.2},{metal:.3,roughness:.22,coat:.7,thinFilm:.75,iridescence:.65},{metal:.05,roughness:.72,coat:.12,thinFilm:0,iridescence:0},{metal:.65,roughness:.3,coat:.45,thinFilm:.3,iridescence:.45}];
+ if(score.motion===6){move('volume',.08+i*.1);move('deform',.05,'wave',1,score.phase+90);move('rotateZ',30);}
+ if(score.motion===7){move('positionX',.12+i*.15);move('scale',.05+i*.06,'wave',1,score.phase+180);move('rotateY',90);}
+ if(score.motion===8){move('twist',.3+i*.4);move('rotateZ',360,'cycle',1);move('positionX',.09,'wave',2);}
+ if(score.motion===9){move('positionY',.14);move('rotateX',80,'wave',2);move('waves',.05+i*.06);move('scale',.06);}
+ const materials=[{metal:.05,roughness:.48,coat:.65,thinFilm:0,iridescence:.08},{metal:.92,roughness:.13,coat:.25,thinFilm:0,iridescence:.2},{metal:.3,roughness:.22,coat:.7,thinFilm:.75,iridescence:.65},{metal:.05,roughness:.72,coat:.12,thinFilm:0,iridescence:0},{metal:.65,roughness:.3,coat:.45,thinFilm:.3,iridescence:.45},{metal:0,roughness:.14,coat:.7,thinFilm:.2,iridescence:.2,transparency:.34,refraction:1.35,thickness:.18},{metal:.08,roughness:.65,coat:.2,thinFilm:0,iridescence:.1,scattering:.5,subsurface:.35},{metal:.8,roughness:.45,coat:.55,thinFilm:.4,iridescence:.3},{metal:.1,roughness:.25,coat:.7,thinFilm:.45,iridescence:.8,emission:.18}];
  Object.assign(s,materials[score.material],{gradientAngle:-120+noise(41)*240,gradientScale:.7+noise(42)*1.2,colorWaveAmount:.25+i*.55,colorWaveHeight:noise(43)*1.5,colorWaveRadius:.4+noise(44),colorWaveSwirl:(noise(45)-.5)*1.4,colorWaveBands:.5+noise(46)*1.7,colorSoftness:.65+noise(47)*.8,environmentRotate:true,filmFlow:score.material===2?.25+i*.6:0,filmSwirl:score.material===2?.3:0,filmThickness:220+noise(48)*430});
  move('colorWavePhase',1,'cycle',score.cycles);move('gradientOffset',.12+i*.2,'wave',1,score.phase+90);move('roughness',.04+i*.08,'wave',1);if(score.material===2||score.material===4)move('iridescence',.12+i*.18,'wave',2);
  if(engine==='particles')Object.assign(s,{pDirection:score.direction,pRhythm:score.rhythm,pCycles:score.cycles,pSpeedSpread:.12+noise(49)*.4,pMotionSeed:seed%10000,pOrbitTilt:noise(50)*60,pOrbitPrecession:.08+noise(51)*.3,pWander:score.motion===1?.15:0,pBreath:score.motion===3?.12:0,pTravel:s.pTravel*(.5+noise(52)),pColorScatter:.05+noise(53)*.15});
+ if(engine==='particles'){s.pLighting=.55+score.material*.045;s.pFiberSheen=score.material===6?.85:.35;s.pFilm=score.material===2||score.material===8?.65:.12;s.pOpacity=score.material===5?.35:.65;s.pSize*=.7+noise(73)*1.6;}
+ if(s.lights[1]){s.lights[1].enabled=true;s.lights[1].power=.35+noise(76)*.7;s.lights[1].color=s.palette[1];}
  if(s.lights[0]){const l=s.lights[0];l.enabled=true;l.power=.9+noise(64)*1.1;l.x=-1.8+noise(65)*3.6;l.y=1+noise(66);l.orbit={...l.orbit,enabled:true,amplitude:18+noise(67)*30,cycles:1,axis:score.motion%2?'z':'y',phase:score.phase,pace:score.rhythm};l.pulse={...l.pulse,enabled:score.motion===3||flow.mood==='electric',amplitude:.08+i*.12,cycles:score.cycles,phase:score.phase};}
  // Change dimensions within a family too, without increasing the live budget.
  if(engine==='solid'){s.twist*=.65+noise(54);if(family==='ring'){s.loopTube=.14+noise(55)*.2;s.loopKnot=.15+noise(56)*.6;}if(family==='layers'){s.structPetalCount=6+Math.floor(noise(57)*8);s.structCurl=.1+noise(58)*.45;}if(family==='fibres'){s.filLength*=.7+noise(59)*.8;s.filCurl=noise(60)*.5;}if(family==='branches'){s.petalLength=.3+noise(61)*.45;s.petalCurl=noise(62)*.7;}}
 
- if(engine==='solid'){const key={volume:'twist',ring:'loopPhase',layers:'structCurl',fibres:'filPhase',branches:'petalCurl'}[family];s.motions[key]={...s.motions[key],enabled:true,amplitude:['loopPhase','filPhase'].includes(key)?1:.08+i*.12,mode:['loopPhase','filPhase'].includes(key)?'cycle':'wave',curve:flow.mood==='electric'?'soft':'sine',pace:score.rhythm,pacePhase:score.phase,cycles:score.cycles,direction:score.direction,phase:score.phase};}
- return {name:'Flow · '+names[family],state:s,ratio,phase:noise(9)*Math.PI*2,playing:true};
+ if(engine==='solid'){const key={volume:'twist',ring:'loopPhase',layers:'structCurl',fibres:'filPhase',branches:'petalCurl',disc:'waves',polyhedron:'twist',ribbon:'loopPhase',cells:'deform',shell:'structCurl'}[family];s.motions[key]={...s.motions[key],enabled:true,amplitude:['loopPhase','filPhase'].includes(key)?1:.08+i*.12,mode:['loopPhase','filPhase'].includes(key)?'cycle':'wave',curve:flow.mood==='electric'?'soft':'sine',pace:score.rhythm,pacePhase:score.phase,cycles:score.cycles,direction:score.direction,phase:score.phase};}
+ return {name:'Flow · '+(engine==='particles'&&family==='polyhedron'?'Aggregati':names[family]),state:s,ratio,phase:noise(9)*Math.PI*2,playing:true};
 }
 const scenePlan=f=>JSON.stringify({...flowChoice(f),seed:f.seed,mood:f.mood,variety:f.variety});
 const mixColor=(a,b,t)=>'#'+[1,3,5].map(k=>Math.round(parseInt(a.slice(k,k+2),16)*(1-t)+parseInt(b.slice(k,k+2),16)*t).toString(16).padStart(2,'0')).join('');
@@ -86,7 +102,7 @@ export class FlowDirector{
   if(['hold','loading','ready'].includes(this.phase))this.progress+=dt/flowTiming(f).hold;
   if(this.phase==='hold'){const id=e.config.mix<.5?'B':'A';this.prepare(id);return;}
   if(this.phase==='ready'&&(this.progress>=1||this.nextRequested)){
-   const styles=f.mood==='calm'?['fade']:f.mood==='electric'?['fade','wipe','luma']:['fade','luma'];e.config.transition=styles[f.step%styles.length];e.config.direction=(f.step+f.seed)%4;e.config.curve=f.mood==='calm'?'smooth':['smooth','linear','in'][(f.step+f.seed)%3];e.config.unit='seconds';e.config.duration=flowTiming(f).transition;e.config.quantize=false;
+   Object.assign(e.config,flowTransition(f));e.config.unit='seconds';e.config.duration=flowTiming(f).transition;e.config.quantize=false;
    if(e.take(this.destination==='B'?1:0)){this.phase='transition';this.nextRequested=false;}
   }else if(this.phase==='transition'&&!e.job){f.step++;this.cycles++;this.progress=0;this.phase='hold';e.notify('flow');}
  }

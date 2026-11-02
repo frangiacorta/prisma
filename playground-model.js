@@ -1,10 +1,10 @@
 // Project-only data: never retain devices, canvases or a nested performance.
-import {META,GROUPS} from './model.js?v=35455dbed4a0';
-import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=35455dbed4a0';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=35455dbed4a0';
-import {FORCE_META} from './particle-forces.js?v=35455dbed4a0';
-import {PATH_META} from './particle-paths.js?v=35455dbed4a0';
-import {normalizeFlow} from './flow-model.js?v=35455dbed4a0';
+import {META,GROUPS} from './model.js?v=bbf6be37c32f';
+import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=bbf6be37c32f';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=bbf6be37c32f';
+import {FORCE_META} from './particle-forces.js?v=bbf6be37c32f';
+import {PATH_META} from './particle-paths.js?v=bbf6be37c32f';
+import {normalizeFlow} from './flow-model.js?v=bbf6be37c32f';
 export const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const number=(x,f,a,b)=>Number.isFinite(x)?clamp(x,a,b):f;
 const label=(x,f='',n=80)=>typeof x==='string'?x.replace(/[\x00-\x1f<>]/g,'').slice(0,n):f;
@@ -22,7 +22,7 @@ function route(v){return {deck:v?.deck==='B'?'B':'A',path:label(v?.path,'scale',
 export function normalizePlayground(raw){
  if(!raw||typeof raw!=='object')return null;
  const deck=d=>({name:label(d?.name,'Scena'),state:sceneOnly(d?.state),phase:number(d?.phase,0,0,1e9),ratio:number(d?.ratio,number(raw.ratio,16/9,.1,10),.1,10),playing:d?.playing!==false});
- const c={version:2,decks:{A:deck(raw.decks?.A),B:deck(raw.decks?.B)},mix:number(raw.mix,0,0,1),transition:['fade','wipe','luma','add'].includes(raw.transition)?raw.transition:'fade',direction:number(raw.direction,0,0,3)|0,duration:number(raw.duration,2,.05,64),unit:raw.unit==='beats'?'beats':'seconds',bpm:number(raw.bpm,120,30,300),curve:['linear','smooth','in','out'].includes(raw.curve)?raw.curve:'smooth',quantize:!!raw.quantize,master:number(raw.master,1,0,1),blackout:false,resolution:[360,540,720,1080].includes(raw.resolution)?raw.resolution:540,autoQuality:raw.autoQuality!==false,macros:[],bindings:{},xyX:number(raw.xyX,0,0,7)|0,xyY:number(raw.xyY,1,0,7)|0};
+ const c={version:2,decks:{A:deck(raw.decks?.A),B:deck(raw.decks?.B)},mix:number(raw.mix,0,0,1),transition:['fade','wipe','luma','add','iris','swirl','zoom'].includes(raw.transition)?raw.transition:'fade',direction:number(raw.direction,0,0,3)|0,duration:number(raw.duration,2,.05,64),unit:raw.unit==='beats'?'beats':'seconds',bpm:number(raw.bpm,120,30,300),curve:['linear','smooth','in','out'].includes(raw.curve)?raw.curve:'smooth',quantize:!!raw.quantize,master:number(raw.master,1,0,1),blackout:false,resolution:[360,540,720,1080].includes(raw.resolution)?raw.resolution:540,autoQuality:raw.autoQuality!==false,macros:[],bindings:{},xyX:number(raw.xyX,0,0,7)|0,xyY:number(raw.xyY,1,0,7)|0};
  c.ratio=number(raw.ratio,16/9,.1,10);const old=Array.isArray(raw.slots)?raw.slots:[];
  c.flow=normalizeFlow(raw.flow);
  c.director={brief:typeof raw.director?.brief==='string'?raw.director.brief.slice(0,4000):'',memory:typeof raw.director?.memory==='string'?raw.director.memory.slice(0,3000):'',history:Array.isArray(raw.director?.history)?raw.director.history.slice(-8).map(h=>({at:label(h.at,'',40),observation:label(h.observation,'',1000),intent:label(h.intent,'',1000),name:label(h.name),source:label(h.source,'',20)})):[]};
