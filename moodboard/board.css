@@ -14,3 +14,12 @@
 .location{border:1px solid var(--line);border-radius:9px;padding:14px;margin:20px 0;font-size:12px;line-height:1.65}.detail-body .location h3{margin:0 0 10px}.location small{color:var(--muted)}.text-link{padding:0;border:0;background:none;color:var(--accent);text-decoration:underline;text-align:left}.tags button.tag{cursor:pointer;min-height:36px}.related{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:visible}.related button{max-width:none;min-width:0;overflow-wrap:anywhere}.family-intro>button{min-height:44px;margin-top:10px}.intro h1{font-family:inherit;font-size:34px;letter-spacing:-1px}
 @media(min-width:700px){.filter-row{grid-template-columns:repeat(4,minmax(0,1fr))}.grid.overview{grid-template-columns:repeat(3,minmax(0,1fr))}.collection-visual{height:170px}.intro h1{font-size:46px}.intro p{position:static;text-align:left}.related{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(min-width:1100px){.grid.overview{grid-template-columns:repeat(4,minmax(0,1fr))}.collection-visual{height:190px}}
+
+.date-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0;margin:14px 0 0;padding:0;border:0}
+.date-filters legend{padding:0;margin-bottom:6px;color:var(--muted);font-size:12px}
+.date-filters label{min-width:0;font-size:11px;color:var(--muted)}
+.date-filters select,.date-filters input{display:block;width:100%;min-width:0;min-height:44px;margin-top:4px;padding:8px 10px;font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;color-scheme:dark}
+.date-filters .sort-field,.date-filters p{grid-column:1/-1}
+.date-filters p{margin:0;font-size:12px;color:var(--accent)}
+.card-date{display:block;margin-top:4px}
+@media(min-width:600px){.date-filters{grid-template-columns:repeat(3,minmax(0,1fr));max-width:650px}.date-filters .sort-field{grid-column:auto}}

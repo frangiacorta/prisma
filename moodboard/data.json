@@ -180,7 +180,8 @@
       "category": "filters",
       "resultUrl": "../previews/linee-modulate.html",
       "resultVideo": "../previews/linee-modulate.mp4",
-      "resultImage": "../previews/linee-modulate.png"
+      "resultImage": "../previews/linee-modulate.png",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s01-02",
@@ -333,7 +334,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s01-03",
@@ -487,7 +489,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s01-04",
@@ -635,7 +638,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s01-05",
@@ -789,7 +793,8 @@
       "topics": [
         "growth"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s01-06",
@@ -937,7 +942,8 @@
       "topics": [
         "gradients"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s01-07",
@@ -1085,7 +1091,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s01-08",
@@ -1214,7 +1221,8 @@
       "topics": [
         "materials"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s02-01",
@@ -1409,7 +1417,8 @@
         "points",
         "fibres"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s02-02",
@@ -1575,7 +1584,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s02-03",
@@ -1750,7 +1760,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s02-04",
@@ -1907,7 +1918,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s03-01",
@@ -2064,7 +2076,8 @@
       "topics": [
         "fibres"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s03-02",
@@ -2215,7 +2228,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s03-03",
@@ -2364,7 +2378,8 @@
       "topics": [
         "electric"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s03-04",
@@ -2523,7 +2538,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s04-01",
@@ -2685,7 +2701,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s04-02",
@@ -2842,7 +2859,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s04-03",
@@ -2994,7 +3012,8 @@
       "topics": [
         "fibres"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s05-01",
@@ -3149,7 +3168,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s05-02",
@@ -3309,7 +3329,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s05-03",
@@ -3474,7 +3495,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s06-01",
@@ -3634,7 +3656,8 @@
       "topics": [
         "fibres"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s06-02",
@@ -3790,7 +3813,8 @@
       "topics": [
         "fibres"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s06-03",
@@ -3945,7 +3969,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s07-01",
@@ -4094,7 +4119,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s07-02",
@@ -4245,7 +4271,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s07-03",
@@ -4403,7 +4430,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s07-04",
@@ -4553,7 +4581,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s07-05",
@@ -4713,7 +4742,8 @@
       "topics": [
         "fibres"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s07-06",
@@ -4866,7 +4896,8 @@
       "topics": [
         "fibres"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s08-01",
@@ -5027,7 +5058,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s11-01",
@@ -5200,7 +5232,8 @@
       "topics": [
         "materials"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s12-01",
@@ -5377,7 +5410,8 @@
       "topics": [
         "fractals"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-01",
@@ -5510,7 +5544,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-03",
@@ -5599,7 +5634,8 @@
       "topics": [
         "tracking"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-04",
@@ -5717,7 +5753,8 @@
       "topics": [
         "tracking"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-05",
@@ -5800,7 +5837,8 @@
       "topics": [
         "tracking"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-06",
@@ -5888,7 +5926,8 @@
       "topics": [
         "tracking"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-07",
@@ -5971,7 +6010,8 @@
       "topics": [
         "materials"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-08",
@@ -6054,7 +6094,8 @@
       "topics": [
         "materials"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-09",
@@ -6137,7 +6178,8 @@
       "topics": [
         "materials"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-10",
@@ -6220,7 +6262,8 @@
       "topics": [
         "materials"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-20261010-01",
@@ -6329,7 +6372,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-20261010-02",
@@ -6445,7 +6489,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-20261010-03",
@@ -6576,7 +6621,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-20261010-04",
@@ -6689,7 +6735,8 @@
         "materials",
         "strands"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-01",
@@ -6794,7 +6841,8 @@
       "topics": [
         "fractals"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-02",
@@ -6954,7 +7002,8 @@
       "topics": [
         "growth"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-03",
@@ -7050,7 +7099,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-04",
@@ -7147,7 +7197,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-05",
@@ -7238,7 +7289,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-06",
@@ -7334,7 +7386,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-07",
@@ -7428,7 +7481,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-08",
@@ -7523,7 +7577,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-09",
@@ -7614,7 +7669,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-10",
@@ -7758,7 +7814,8 @@
       "topics": [
         "fluids"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-11",
@@ -7853,7 +7910,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-12",
@@ -7998,7 +8056,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-13",
@@ -8157,7 +8216,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-14",
@@ -8248,7 +8308,8 @@
       "topics": [
         "gradients"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-15",
@@ -8343,7 +8404,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-16",
@@ -8438,7 +8500,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-17",
@@ -8543,7 +8606,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-18",
@@ -8638,7 +8702,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-19",
@@ -8744,7 +8809,8 @@
       "topics": [
         "gradients"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-20",
@@ -8839,7 +8905,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-21",
@@ -8936,7 +9003,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s09-01",
@@ -9045,7 +9113,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s09-02",
@@ -9162,7 +9231,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s09-03",
@@ -9284,7 +9354,8 @@
         "fluids",
         "points"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s09-04",
@@ -9397,7 +9468,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s09-05",
@@ -9513,7 +9585,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s13-01",
@@ -9661,7 +9734,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s13-02",
@@ -9809,7 +9883,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s13-03",
@@ -9982,7 +10057,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s14-01",
@@ -10142,7 +10218,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s14-02",
@@ -10327,7 +10404,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s14-03",
@@ -10486,7 +10564,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s14-04",
@@ -10651,7 +10730,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s14-05",
@@ -10821,7 +10901,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s14-06",
@@ -10991,7 +11072,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s15-01",
@@ -11180,7 +11262,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s15-02",
@@ -11370,7 +11453,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s16-01",
@@ -11540,7 +11624,8 @@
       "topics": [
         "materials"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s16-02",
@@ -11710,7 +11795,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s16-03",
@@ -11879,7 +11965,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s17-01",
@@ -12044,7 +12131,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s17-02",
@@ -12211,7 +12299,8 @@
         "points",
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s17-03",
@@ -12377,7 +12466,8 @@
         "surfaces",
         "materials"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "s18-01",
@@ -12550,7 +12640,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-13"
     },
     {
       "id": "s18-02",
@@ -12719,7 +12810,8 @@
       "topics": [
         "electric"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-13"
     },
     {
       "id": "s18-03",
@@ -12890,7 +12982,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-13"
     },
     {
       "id": "s18-04",
@@ -13062,7 +13155,8 @@
         "surfaces",
         "materials"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-13"
     },
     {
       "id": "s18-05",
@@ -13235,7 +13329,8 @@
       "topics": [
         "electric"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-13"
     },
     {
       "id": "roadmap-fractals",
@@ -13325,7 +13420,8 @@
       "topics": [
         "fractals"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-particles",
@@ -13413,7 +13509,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-body-interaction",
@@ -13525,7 +13622,8 @@
       "topics": [
         "tracking"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-audio-interaction",
@@ -13779,7 +13877,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-preset-morphing",
@@ -13966,7 +14065,8 @@
       "topics": [
         "presets"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-particle-volume",
@@ -14128,7 +14228,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-membrane",
@@ -14299,7 +14400,8 @@
         "name": "Campo di distanza e guscio",
         "description": "La forma implicita viene svuotata conservando una parete. Non è una simulazione di membrana.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-fibre-motion",
@@ -14469,7 +14571,8 @@
         "name": "Posa periodica e vincoli",
         "description": "La posa viene deformata periodicamente; le strutture connesse delle particelle possono essere rilassate con vincoli di distanza e flessione. Non è vento fisico libero.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-tissue",
@@ -14627,7 +14730,8 @@
         "name": "Reticolo sulla superficie",
         "description": "In Forme il campo geometrico separa fili longitudinali e trasversali; in Particelle una superficie connessa usa vincoli di distanza.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-4d",
@@ -14719,7 +14823,8 @@
       "topics": [
         "tracking"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-cellular",
@@ -14816,7 +14921,8 @@
       "topics": [
         "growth"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-recursive-warp",
@@ -14910,7 +15016,8 @@
         "name": "Ricampionamento iterato 2D",
         "description": "La distorsione viene ripetuta nello stesso fotogramma. La parte di feedback con memoria dei fotogrammi è ancora da sviluppare.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-liquid-painting",
@@ -15003,7 +15110,8 @@
       "topics": [
         "fluids"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-lumen-print",
@@ -15094,7 +15202,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-note-events",
@@ -15193,7 +15302,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "project-living-extensions",
@@ -15301,7 +15411,8 @@
         "surfaces"
       ],
       "category": "form",
-      "resultUrl": "../previews/dinamica.html"
+      "resultUrl": "../previews/dinamica.html",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-filament-planets",
@@ -15566,7 +15677,8 @@
         "name": "Distribuzione e deformazione dei filamenti",
         "description": "Fili ancorati alla superficie, con curvatura, ciuffi e oscillazione. La forma di base resta modificabile.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-soft-knots",
@@ -15675,7 +15787,8 @@
         "name": "Percorsi chiusi e sezione variabile",
         "description": "Curve toroidali e nodi con sezione tubolare o appiattita; torsione e fase modificano il risultato.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-image-treatments",
@@ -15821,7 +15934,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-layered-veils",
@@ -15997,7 +16111,8 @@
         "name": "Suddivisione del campo geometrico",
         "description": "Intervalli radiali, sezioni e strati concentrici si combinano con piegatura e trasparenza.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-luminous-vortex",
@@ -16110,7 +16225,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-13"
     },
     {
       "id": "roadmap-electric-filaments",
@@ -16239,7 +16355,8 @@
       "topics": [
         "electric"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-13"
     },
     {
       "id": "method-living-moodboard",
@@ -16333,7 +16450,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-tdxmorph",
@@ -16396,7 +16514,8 @@
       "topics": [
         "presets"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "project-trama-viva",
@@ -16487,7 +16606,8 @@
         "name": "Connessioni per vicinanza",
         "description": "Legami fra punti vicini, con identità persistente. Non sono molle fisiche.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-10"
     },
     {
       "id": "project-cobalto-oro",
@@ -16573,7 +16693,8 @@
         "name": "Interferenza di film sottile",
         "description": "Spessore e variazione della pellicola controllano i riflessi cromatici. Cobalto e oro resta un esempio.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-10"
     },
     {
       "id": "project-fibre-setose",
@@ -16661,7 +16782,8 @@
         "name": "Riflesso orientato lungo il filo",
         "description": "La direzione del filo orienta il riflesso; larghezza e intensità restano regolabili.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-10"
     },
     {
       "id": "project-pellicola-viva",
@@ -16742,7 +16864,8 @@
       "topics": [
         "materials"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "project-moodboard",
@@ -16814,7 +16937,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "archive-calibration-20261009",
@@ -16937,7 +17061,8 @@
       "topics": [
         "tracking"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-three-filament-lines",
@@ -17017,7 +17142,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-s14-07",
@@ -17135,7 +17261,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-s14-08-09",
@@ -17270,7 +17397,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-s14-10",
@@ -17389,7 +17517,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-blender-procedural-groom",
@@ -17493,7 +17622,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-td-organic-fur",
@@ -17596,7 +17726,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-td-hairy-banana",
@@ -17698,7 +17829,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-frostbitten-hair",
@@ -17810,7 +17942,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-tressfx-strands",
@@ -17901,7 +18034,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-hairtool-groom",
@@ -17988,7 +18122,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "research-hair-alternatives",
@@ -18057,7 +18192,8 @@
       "topics": [
         "strands"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-s16-rootstock",
@@ -18172,7 +18308,8 @@
       "topics": [
         "presets"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-s16-displace",
@@ -18275,7 +18412,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-s16-mosaic",
@@ -18380,7 +18518,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-s16-rgb",
@@ -18487,7 +18626,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "project-finishing",
@@ -18652,7 +18792,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "img-s18-form-vision",
@@ -18768,7 +18909,8 @@
         "presets",
         "paths"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-13"
     },
     {
       "id": "tool-s18-noise",
@@ -18835,7 +18977,8 @@
       "topics": [
         "electric"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-13"
     },
     {
       "id": "tool-s18-bloom",
@@ -18903,7 +19046,8 @@
       "topics": [
         "electric"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-13"
     },
     {
       "id": "reuse-tdxmorph",
@@ -19005,7 +19149,8 @@
       "topics": [
         "presets"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-pcr",
@@ -19108,7 +19253,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-inkfield",
@@ -19189,7 +19335,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-brush",
@@ -19276,7 +19423,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-xpbd",
@@ -19383,7 +19531,8 @@
       "topics": [
         "fibres"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-three-attractors",
@@ -19484,7 +19633,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-sound-to-light",
@@ -19568,7 +19718,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-sndviz",
@@ -19652,7 +19803,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "reuse-meyda",
@@ -19749,7 +19901,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-ascii",
@@ -19795,7 +19948,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-feralui-gradient-builder",
@@ -19843,7 +19997,8 @@
       "topics": [
         "gradients"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-incrprl-dsgn-primary-fear-e-lumen-chamber",
@@ -19900,7 +20055,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-holotx-compute-agenti-top-to-pop",
@@ -19949,7 +20105,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-forside-art-membrane-fibre-e-tessuti",
@@ -19993,7 +20150,8 @@
       "topics": [
         "surfaces"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-palette-audioanalysis",
@@ -20046,7 +20204,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-audioanalysis-extended",
@@ -20099,7 +20258,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-tdableton",
@@ -20153,7 +20313,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-td-demucs",
@@ -20206,7 +20367,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "basic-pitch",
@@ -20302,7 +20464,8 @@
       "topics": [
         "audio"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "dense-cloud",
@@ -20426,7 +20589,8 @@
       "topics": [
         "points"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "liquid-painting",
@@ -20519,7 +20683,8 @@
       "topics": [
         "fluids"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "lumen-print",
@@ -20611,7 +20776,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "cellular-instancing",
@@ -20705,7 +20871,8 @@
       "topics": [
         "growth"
       ],
-      "category": "form"
+      "category": "form",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "recursive-displace",
@@ -20807,7 +20974,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "soleil",
@@ -20914,7 +21082,8 @@
       "topics": [
         "materials"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-github-com-dannystuart-3d-shape-generator",
@@ -20979,7 +21148,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-github-com-dannystuart-code-garden",
@@ -21036,7 +21206,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-github-com-dannystuart-dannystuartcreator",
@@ -21092,7 +21263,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-dannystuart-substack-com-p-animated-background-prompts",
@@ -21139,7 +21311,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-www-dannystuart-com",
@@ -21186,7 +21359,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-www-newlayer-co",
@@ -21233,7 +21407,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-vanta-supply",
@@ -21280,7 +21455,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-www-threads-net-dannystuart",
@@ -21327,7 +21503,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-github-com-mrdoob-three-js-blob-dev-examples-webgpu-tsl-compute-attractors-particles-",
@@ -21395,7 +21572,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-github-com-mrdoob-three-js-blob-dev-examples-webgpu-tsl-vfx-linkedparticles-html",
@@ -21452,7 +21630,8 @@
       "topics": [
         "paths"
       ],
-      "category": "movement"
+      "category": "movement",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-glsl-compute-shader-agent-simulation-part-1",
@@ -21500,7 +21679,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "tool-glsl-top-to-pop",
@@ -21556,7 +21736,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "prisma-window-depth",
@@ -21640,7 +21821,8 @@
       "topics": [
         "tracking"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "prisma-light-play",
@@ -21703,7 +21885,8 @@
       "topics": [
         "materials"
       ],
-      "category": "appearance"
+      "category": "appearance",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "prisma-contour-frequency",
@@ -21789,7 +21972,8 @@
       "category": "filters",
       "resultUrl": "../previews/linee-modulate.html",
       "resultVideo": "../previews/linee-modulate.mp4",
-      "resultImage": "../previews/linee-modulate.png"
+      "resultImage": "../previews/linee-modulate.png",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "prisma-image-particles",
@@ -21864,7 +22048,8 @@
       "topics": [
         "post"
       ],
-      "category": "filters"
+      "category": "filters",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "prisma-portal-reference",
@@ -21927,7 +22112,8 @@
       "topics": [
         "tracking"
       ],
-      "category": "interaction"
+      "category": "interaction",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "archive-144a5817f0f6b4e5",
@@ -21956,7 +22142,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "archive-3c2f1ef232ccfa7f",
@@ -21985,7 +22172,8 @@
       "topics": [
         "tools"
       ],
-      "category": "workflow"
+      "category": "workflow",
+      "addedOn": "2026-10-10"
     },
     {
       "id": "roadmap-optical-glass",
@@ -22079,7 +22267,8 @@
         "name": "Ricampionamento e separazione cromatica",
         "description": "Filtro ottico sull’immagine finale, distinto dalla rifrazione del materiale 3D.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-21"
     },
     {
       "id": "roadmap-organic-growth",
@@ -22189,7 +22378,8 @@
         "name": "Gray–Scott 3D + bump",
         "description": "Simulazione di reazione-diffusione; il campo cambia colore, rugosità e normali. Non modifica la silhouette. Il moto trasporta il campo già calcolato.",
         "verification": "code-reviewed"
-      }
+      },
+      "addedOn": "2026-10-21"
     },
     {
       "id": "roadmap-playground-touch",
@@ -22283,7 +22473,8 @@
       "detailsSource": [
         "reference/moodboard-additions.json"
       ],
-      "clipNote": "Proposta originale per Prisma · nessuna demo ancora implementata"
+      "clipNote": "Proposta originale per Prisma · nessuna demo ancora implementata",
+      "addedOn": "2026-10-30"
     },
     {
       "id": "roadmap-director-artistic-direction",
@@ -22339,7 +22530,8 @@
       ],
       "category": "workflow",
       "detailsSource": [],
-      "clipNote": "Proposta utente del 2 novembre 2026; non implementata."
+      "clipNote": "Proposta utente del 2 novembre 2026; non implementata.",
+      "addedOn": "2026-11-02"
     },
     {
       "id": "roadmap-github-single-entry",
@@ -22396,7 +22588,8 @@
       ],
       "category": "workflow",
       "detailsSource": [],
-      "clipNote": "Roadmap richiesta il 2 novembre 2026; migrazione non iniziata."
+      "clipNote": "Roadmap richiesta il 2 novembre 2026; migrazione non iniziata.",
+      "addedOn": "2026-11-02"
     }
   ],
   "families": [
