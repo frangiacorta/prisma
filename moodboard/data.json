@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-11-02",
+  "updated": "2026-11-13",
   "items": [
     {
       "id": "s01-01",
@@ -2549,7 +2549,8 @@
         "roadmap-membrane",
         "roadmap-fibre-motion",
         "project-living-extensions",
-        "project-pellicola-viva"
+        "project-pellicola-viva",
+        "project-cellular-nacre"
       ],
       "state": "reference",
       "priority": false,
@@ -2695,7 +2696,8 @@
       "completedProjects": [
         "roadmap-membrane",
         "roadmap-fibre-motion",
-        "project-pellicola-viva"
+        "project-pellicola-viva",
+        "project-cellular-nacre"
       ],
       "aliases": [],
       "topics": [
@@ -22590,6 +22592,84 @@
       "detailsSource": [],
       "clipNote": "Roadmap richiesta il 2 novembre 2026; migrazione non iniziata.",
       "addedOn": "2026-11-02"
+    },
+    {
+      "id": "project-cellular-nacre",
+      "name": "Cellule madreperlacee",
+      "kind": "project",
+      "related": [
+        "s04-01"
+      ],
+      "state": "implemented",
+      "priority": false,
+      "author": "Prisma",
+      "summary": "Cellule ellissoidali, spine rastremate e pellicola iridescente crescono sulla forma di base. Parametri indipendenti per profilo, colore, trasparenza e movimento.",
+      "sources": [],
+      "sections": [
+        {
+          "title": "Come lo portiamo in Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Il campo tridimensionale fonde il nucleo con volumi ellissoidali e spine curve, distribuiti con una variante ripetibile. Lo sviluppo controlla insieme la crescita e la variazione del nucleo. I riflessi cambiano con lo spessore ottico e l’angolo di osservazione. La trasparenza mostra anche i contorni delle cellule attraversate dal raggio."
+            }
+          ]
+        },
+        {
+          "title": "Realizzato e da fare",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Trasformazione continua dalla sfera, regolabile anche a metà",
+                "Crescita indipendente di cellule e spine, da corona a distribuzione sferica",
+                "Controlli di dimensione, curvatura, affusolamento, fusione e variazione",
+                "Respiro e flessione con fasi e ritmi indipendenti",
+                "Materiale combinabile con palette e illuminazione della scena"
+              ]
+            },
+            {
+              "label": "limits",
+              "value": "Il riflesso madreperlaceo usa una pellicola procedurale e la diffusione interna è approssimata. Il risultato riprende il grappolo con spine della reference."
+            }
+          ]
+        }
+      ],
+      "families": [
+        "growth",
+        "film",
+        "motion"
+      ],
+      "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
+      "result": "cellule-madreperlacee",
+      "where": "Forma → Cellule e spine · Materiale → Madreperla delle cellule · Movimento → Cellule e spine",
+      "platform": "",
+      "next": "",
+      "keep": "",
+      "avoid": "",
+      "detailsSource": [
+        "reference/moodboard-additions.json"
+      ],
+      "media": [
+        {
+          "src": "media/c8beb9655eb06d79.webp",
+          "width": 512,
+          "height": 288
+        }
+      ],
+      "assets": [],
+      "resultImage": "media/c8beb9655eb06d79.webp",
+      "resultVideo": "../previews/cellule-madreperlacee-6s.mp4?v=76",
+      "resultUrl": "../previews/cellule-madreperlacee.html?v=76",
+      "completedProjects": [],
+      "addedOn": "2026-11-13",
+      "aliases": [],
+      "topics": [
+        "surfaces",
+        "growth"
+      ],
+      "category": "form",
+      "engine": "solid"
     }
   ],
   "families": [
@@ -22806,11 +22886,11 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 191,
+    "records": 194,
     "videos": 61,
     "images": 23,
     "tools": 73,
-    "projects": 31,
+    "projects": 34,
     "attachments": 132,
     "clips": 61,
     "missing": 10

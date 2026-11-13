@@ -1,13 +1,13 @@
-import {Dynamics,disposeDynamics} from './dynamics.js?v=2db6d7f39c07';
-import {motionPeriod} from './animation-clock.js?v=2db6d7f39c07';
-import {animationPhase} from './animation-clock.js?v=2db6d7f39c07';
-import {ScanlinePass} from './finish-scanlines.js?v=2db6d7f39c07';
-import {FilamentPass} from './filament-renderer.js?v=2db6d7f39c07';
-import {VeilTransition} from './veil-transition.js?v=2db6d7f39c07';
-import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=2db6d7f39c07';
-import {ParticleRenderer} from './particle-renderer.js?v=2db6d7f39c07';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FINISH_DEFAULTS,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=2db6d7f39c07';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=2db6d7f39c07';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=7a71606554e8';
+import {motionPeriod} from './animation-clock.js?v=7a71606554e8';
+import {animationPhase} from './animation-clock.js?v=7a71606554e8';
+import {ScanlinePass} from './finish-scanlines.js?v=7a71606554e8';
+import {FilamentPass} from './filament-renderer.js?v=7a71606554e8';
+import {VeilTransition} from './veil-transition.js?v=7a71606554e8';
+import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=7a71606554e8';
+import {ParticleRenderer} from './particle-renderer.js?v=7a71606554e8';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FINISH_DEFAULTS,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=7a71606554e8';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=7a71606554e8';
 // One editor and export contract; the saved creation chooses its renderer.
 export class Renderer{
  constructor(canvas){this.dynamics=new Dynamics(sampleFrame);this.liveDynamics=new Dynamics(sampleFrame,true);this.canvas=canvas;this.context=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!this.context)throw Error('WebGL 2 non disponibile.');this.frameTimer=this.context.getExtension('EXT_disjoint_timer_query_webgl2');this.frameQueries=[];this.frameGpuSample=0;this.frameGpuMs=null;}

@@ -23,8 +23,8 @@ export function nameControls(root){
 // Explicit editorial selections. Arrays are deliberately curated, never positional.
 export const ESSENTIALS={
  solid:{
-  shape:{base:['volume','deform'],profile:['twist','hole','cut'],shell:['structShell','structThickness'],fibre:['structFibres','structWeft'],layers:['structRadial','structLayers'],folds:['structCurl','structFold'],appendices:['petalAmount','petalLength','petalOpen'],filaments:['filLength','filWidth'],curves:['loopAmount','loopRadius']},
-  material:{surface:['metal','roughness','gloss'],glass:['transparency','refraction'],film:['iridescence','filmThickness'],relief:['textureDepth','textureScale'],growth:['growthAmount','growthScale'],emission:['emission']},
+  shape:{base:['volume','deform'],profile:['twist','hole','cut'],shell:['structShell','structThickness'],fibre:['structFibres','structWeft'],layers:['structRadial','structLayers'],folds:['structCurl','structFold'],appendices:['petalAmount','petalLength','petalOpen'],filaments:['filLength','filWidth'],curves:['loopAmount','loopRadius'],cells:['cellMorph','cellBubbles','cellSize','cellSpines','cellSpineLength']},
+  material:{surface:['metal','roughness','gloss'],glass:['transparency','refraction'],film:['iridescence','filmThickness'],relief:['textureDepth','textureScale'],growth:['growthAmount','growthScale'],emission:['emission'],cells:['cellPearl','cellClarity']},
   color:{core:['structCoreDark','structCoreRadius'],gradient:['gradientAngle','gradientScale'],layers:['colorLayers'],waves:['colorWaveAmount'],glow:['glow']},
   light:{environment:['environmentPower'],source:['power','size'],motion:['environmentCycles']},
   background:{frame:['scale','positionX','positionY','rotateY'],tone:['exposure','saturation','contrast'],shadow:['grounding']},

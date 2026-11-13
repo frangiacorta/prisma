@@ -1,10 +1,10 @@
-import {controlCondition} from './control-help.js?v=2db6d7f39c07';
+import {controlCondition} from './control-help.js?v=7a71606554e8';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
 export const MOTION_ZERO=['dynAmount','growthFlow','filmFlow','filmSwirl','pTravel','pVortex','pReentry','pLife','pSignal','pBreath','pRandom','pJitter','pWander','pSpaceWarp','pOrbitPrecession','pOrbitDrift','pTentacleWave','pInflate','pContract','finishWarpMotion','finishGlassMotion','finishGlyphVariation'];
 export function simplifyShape(state,amount=0){
- const keys=[...SHAPE_ZERO,...(state.engine==='particles'?PARTICLE_ZERO:[])];
+ const keys=[...SHAPE_ZERO,'cellMorph',...(state.engine==='particles'?PARTICLE_ZERO:[])];
  for(const k of keys)if(Number.isFinite(state[k]))state[k]*=amount;
  for(const k of ['volume','stretchX','stretchY','stretchZ',...(state.engine==='particles'?['pGrainSpacing','pGroupSpacing']:[])])if(Number.isFinite(state[k]))state[k]=1+(state[k]-1)*amount;
  if(amount===0){state.pLiving=0;state.pLivingBlend=0;state.pSurfaceBind=0;}
@@ -28,7 +28,7 @@ const EFFECTS=[
  ['deform','Irregolarità'],['asymmetry','Asimmetria'],['twist','Torsione'],['bendX','Curvatura','bendY'],['taper','Rastremazione'],
  ['transparency','Trasparenza'],['thinFilm','Pellicola ottica'],['coat','Rivestimento'],['subsurface','Diffusione interna'],['emission','Emissione'],
  ['pOrganic','Deformazione delle particelle'],['pClumps','Addensamenti'],['pWarp','Distorsione delle particelle'],
- ['dynAmount','Dinamica'],
+ ['dynAmount','Dinamica'],['cellMorph','Cellule e spine'],
  ['loopAmount','Curve toroidali e nodi'],['structShell','Guscio e spessore'],['structFibres','Reticolo di fibre'],['structRadial','Suddivisione radiale e strati','structSlices','structLayers'],
  ['filLength','Filamenti su superficie'],['petalAmount','Petali e radici'],['stemAmount','Gambo'],['hole','Foro'],['cut','Ritaglio'],['lobeAmount','Lobi e onde','waves'],
  ['structCoreDark','Nucleo scuro'],['colorLayers','Strati di colore'],['textureDepth','Rilievo di superficie'],['growthAmount','Reazione-diffusione'],['iridescence','Iridescenza'],['colorWaveAmount','Onde di colore'],

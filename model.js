@@ -1,10 +1,11 @@
-import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=2db6d7f39c07';
-import {GROWTH_DEFAULTS} from './growth-material.js?v=2db6d7f39c07';
-import {FINISH_DEFAULTS} from './finishing.js?v=2db6d7f39c07';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=2db6d7f39c07';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=2db6d7f39c07';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=2db6d7f39c07';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=2db6d7f39c07';
+import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=7a71606554e8';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=7a71606554e8';
+import {FINISH_DEFAULTS} from './finishing.js?v=7a71606554e8';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=7a71606554e8';
+import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=7a71606554e8';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=7a71606554e8';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=7a71606554e8';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=7a71606554e8';
 export const BASE = {
  ...DYNAMICS_DEFAULTS,...PARTICLE_DEFAULTS,engine:'solid',keepMotionSpeed:true,motionPeriod:0,
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -79,6 +80,8 @@ export const GROUPS={
 };
 GROUPS.shape.push('petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemAmount','stemRadius','stemBend');
 GROUPS.shape.push('rotateX','rotateY','rotateZ');
+GROUPS.shape.push(...Object.keys(CELLULAR_SHAPE));
+GROUPS.material.push(...Object.keys(CELLULAR_MATERIAL));
 GROUPS.color.push('colorWaveAmount','colorWaveHeight','colorWaveRadius','colorWaveSwirl','colorWaveBands','colorWaveWarp','colorWavePhase');
 GROUPS.background.push('grounding','groundShadow','groundCaustic');
 GROUPS.photo.push('photoAll','finishEnabled','finishTone','finishRgb','finishMosaic','finishRgbR','finishRgbG','finishRgbB','finishRgbAngle','finishRgbMix','finishCellX','finishCellY','finishMosaicMix');
@@ -102,6 +105,7 @@ GROUPS.photo.push('finishEdge','finishEdgeWidth','finishEdgeThreshold','finishEd
 GROUPS.photo.push('finishOrder');
 
 GROUPS.motion.push(...STRUCTURE_GROUPS.motion);
+GROUPS.motion.push(...Object.keys(CELLULAR_POSE));
 
 GROUPS.material.push('textureRandomness','textureWarp','textureLink','texturePatch','textureSeed');
 GROUPS.color.push('colorLayers','colorLayerScale','colorLayerShift','colorLayerMix');

@@ -1,14 +1,15 @@
-import {normalizePlayground} from './playground-model.js?v=2db6d7f39c07';
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=2db6d7f39c07';
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=2db6d7f39c07';
-import {normalizeAudioClip} from './audio-recording.js?v=2db6d7f39c07';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=2db6d7f39c07';
-import {normalizeAudio} from './audio-model.js?v=2db6d7f39c07';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=2db6d7f39c07';
-import {normalizeForcePaths} from './particle-paths.js?v=2db6d7f39c07';
-import {normalizeForcePoints} from './particle-forces.js?v=2db6d7f39c07';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=2db6d7f39c07';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=2db6d7f39c07';
+import {normalizePlayground} from './playground-model.js?v=7a71606554e8';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=7a71606554e8';
+import {CELLULAR_META} from './cellular-form.js?v=7a71606554e8';
+import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=7a71606554e8';
+import {normalizeAudioClip} from './audio-recording.js?v=7a71606554e8';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=7a71606554e8';
+import {normalizeAudio} from './audio-model.js?v=7a71606554e8';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=7a71606554e8';
+import {normalizeForcePaths} from './particle-paths.js?v=7a71606554e8';
+import {normalizeForcePoints} from './particle-forces.js?v=7a71606554e8';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=7a71606554e8';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=7a71606554e8';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -147,6 +148,7 @@ export function normalizeCreation(raw){
  // Existing v33 veil creations gain the editable source bridge on reopen.
  if(s.pLiving===4&&raw.pVeilFromForm===undefined){s.pVeilFromForm=1;s.pVeilMorph=1;s.pVeilSourceKind=0;s.pVeilMemory=0;}
  for(const [k,m] of Object.entries(STRUCTURE_META))if(m[3]>=1)s[k]=Math.round(s[k]);
+ for(const [k,m] of Object.entries(CELLULAR_META))if(m[3]===1)s[k]=Math.round(s[k]);
  if(raw.structureOriginal&&typeof raw.structureOriginal==='object'&&!Array.isArray(raw.structureOriginal)){s.structureOriginal=structuredClone(raw.structureOriginal);delete s.structureOriginal.structureOriginal;}
  if(raw.pBundleAmount===undefined)s.pBundleAmount=raw.pLiving===1?1:0;
  if(!s.structureOriginal&&(s.engine==='solid'&&s.pLiving>0||s.pLiving===4)){s.structureOriginal=structuredClone(raw);delete s.structureOriginal.structureOriginal;}

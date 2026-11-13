@@ -1,10 +1,10 @@
 // Project-only data: never retain devices, canvases or a nested performance.
-import {META,GROUPS} from './model.js?v=2db6d7f39c07';
-import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=2db6d7f39c07';
-import {LIGHT_META,TRACK_META} from './studio-model.js?v=2db6d7f39c07';
-import {FORCE_META} from './particle-forces.js?v=2db6d7f39c07';
-import {PATH_META} from './particle-paths.js?v=2db6d7f39c07';
-import {normalizeFlow} from './flow-model.js?v=2db6d7f39c07';
+import {META,GROUPS} from './model.js?v=7a71606554e8';
+import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=7a71606554e8';
+import {LIGHT_META,TRACK_META} from './studio-model.js?v=7a71606554e8';
+import {FORCE_META} from './particle-forces.js?v=7a71606554e8';
+import {PATH_META} from './particle-paths.js?v=7a71606554e8';
+import {normalizeFlow} from './flow-model.js?v=7a71606554e8';
 export const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const number=(x,f,a,b)=>Number.isFinite(x)?clamp(x,a,b):f;
 const label=(x,f='',n=80)=>typeof x==='string'?x.replace(/[\x00-\x1f<>]/g,'').slice(0,n):f;
