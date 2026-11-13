@@ -1,12 +1,12 @@
-import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=7a71606554e8';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=7a71606554e8';
-import {CELLULAR_DEFAULTS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=7a71606554e8';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=7a71606554e8';
+import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=ea2ba1524502';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=ea2ba1524502';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=ea2ba1524502';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=ea2ba1524502';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
 export function track(amplitude=1,enabled=false,mode='wave'){return{enabled,amplitude,cycles:1,phase:0,direction:1,curve:'sine',pace:0,pacePhase:0,hold:0,mode}}
-export const SHAPE_TRACKS=[...Object.keys(STRUCTURE_TRACKS),'petalFlowPhase','petalOrbitPhase','petalWeave','volume','deform','twist','waves','hole','cut','petalOpen','petalCurl','petalInflate','petalSharp','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemBend'];
+export const SHAPE_TRACKS=[...Object.keys(STRUCTURE_TRACKS),...CELLULAR_FIELD_KEYS.filter(key=>CELLULAR_TRACKS[key]),'petalFlowPhase','petalOrbitPhase','petalWeave','volume','deform','twist','waves','hole','cut','petalOpen','petalCurl','petalInflate','petalSharp','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemBend'];
 export const TRACK_META={
  ...STRUCTURE_TRACKS,
  ...CELLULAR_TRACKS,

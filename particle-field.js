@@ -1,7 +1,7 @@
-import {DYNAMICS_GLSL} from './dynamics.js?v=7a71606554e8';
+import {DYNAMICS_GLSL} from './dynamics.js?v=ea2ba1524502';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=7a71606554e8';
-import {forceBarrierGLSL} from './particle-forces.js?v=7a71606554e8';
+import {guideGLSL} from './particle-path-field.js?v=ea2ba1524502';
+import {forceBarrierGLSL} from './particle-forces.js?v=ea2ba1524502';
 export const fieldGLSL=`
 ${DYNAMICS_GLSL}
 ${guideGLSL}
