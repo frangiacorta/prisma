@@ -1,7 +1,7 @@
-import {AUDIO_HELP} from './audio-model.js?v=0973f90f1da8';
-import {EXTRA_HELP} from './control-help-extra.js?v=0973f90f1da8';
-import {FRACTAL_HELP} from './fractal-form.js?v=0973f90f1da8';
-import {CELLULAR_HELP} from './cellular-form.js?v=0973f90f1da8';
+import {AUDIO_HELP} from './audio-model.js?v=f383f844aaa9';
+import {EXTRA_HELP} from './control-help-extra.js?v=f383f844aaa9';
+import {FRACTAL_HELP} from './fractal-form.js?v=f383f844aaa9';
+import {CELLULAR_HELP} from './cellular-form.js?v=f383f844aaa9';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',
@@ -234,6 +234,10 @@ export function controlCondition(s,key){
  const need=(k,text)=>positive(k)?'':text;
  if(key.startsWith('finishFeedback')&&key!=='finishFeedback'&&!s.finishFeedback)return 'Attiva la persistenza dei fotogrammi in Filtri.';
  if(key==='pCloudCore'&&!s.pFill)return 'Aumenta il riempimento per distribuire i granelli dentro il nucleo.';
+ if((key==='pTrailPulse'||key==='pTrailPulseWidth')&&!s.pTrailCount)return 'Attiva le scie in Forma → Scie.';
+ if(/^filPulse/.test(key)&&!s.filLength)return 'Aumenta Lunghezza in Forma → Filamenti su superficie.';
+ if(key==='pVeilCrease'&&!s.pVeilRipple)return 'Aumenta Ondulazione dei bordi.';
+ if(key==='loopBandCount'&&!s.loopBands)return 'Aumenta Fasce lungo il percorso.';
  if(key==='pCloudRadius'&&!s.pCloudHalo)return 'Aumenta Particelle nell’alone.';
  if(/^pCell(Density|Size|Variation)$/.test(key)&&!s.pCellAmount)return 'Attiva Raggruppamento in cellule.';
  if(Object.hasOwn(FRACTAL_HELP,key)&&key!=='fractalAmount'&&!positive('fractalAmount'))return 'Aumenta Intensità del frattale in Forma.';

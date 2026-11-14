@@ -1,9 +1,9 @@
-import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=0973f90f1da8';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=0973f90f1da8';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=0973f90f1da8';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=0973f90f1da8';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=0973f90f1da8';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=0973f90f1da8';
+import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=f383f844aaa9';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=f383f844aaa9';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=f383f844aaa9';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=f383f844aaa9';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=f383f844aaa9';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=f383f844aaa9';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.

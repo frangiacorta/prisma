@@ -1,5 +1,5 @@
-import {clockStatus} from './animation-clock.js?v=0973f90f1da8';
-import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=0973f90f1da8';
+import {clockStatus} from './animation-clock.js?v=f383f844aaa9';
+import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=f383f844aaa9';
 export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['library','Preset']];
 const html=s=>{const d=document.createElement('div');d.innerHTML=s;return d;};
 const section=(title,id)=>{const d=document.createElement('details');d.className='control-details';if(id)d.id=id;const h=document.createElement('summary');h.textContent=title;d.append(h);return d;};
@@ -10,7 +10,7 @@ export function stripEmpty(root){for(const d of [...root.querySelectorAll('detai
 const isParticle=s=>s.engine==='particles'||s.pLiving>0;
 const labelFor=(key,fallback)=>CONTROL_NAMES[key]||fallback||key;
 function moveRows(source,target,keys){for(const k of keys){const el=source.querySelector(`[data-param="${k}"]`);if(el&&!target.querySelector(`[data-param="${k}"]`))target.append(rowFor(el));}}
-function motionOrigin(key){if(['duration','speed','motion','pCycles','pDirection','perfectLoop'].includes(key))return 'motion';if(/^environment/.test(key))return 'light';if(/^(film|growth)/.test(key))return 'material';if(/^(struct|fil|petal|stem|loop)/.test(key))return 'shape';return 'motion';}
+function motionOrigin(key){if(['duration','speed','motion','pCycles','pDirection','perfectLoop'].includes(key))return 'motion';if(/^environment/.test(key))return 'light';if(/^filPulse/.test(key))return 'motion';if(/^(film|growth)/.test(key))return 'material';if(/^(struct|fil|petal|stem|loop)/.test(key))return 'shape';return 'motion';}
 function trackMap(raw){const root=html(raw('motion')),map=new Map();for(const el of root.querySelectorAll('[data-path-check$=".enabled"]')){const path=el.dataset.pathCheck.replace(/\.enabled$/,'');if(!map.has(path))map.set(path,el.closest('details'));}return map;}
 export function animationMarkup(path,raw){const d=trackMap(raw).get(path);return d?.outerHTML||'';}
 export function motionGroups(raw){const root=html(raw('motion'));root.querySelector('[data-dynamics-panel]')?.remove();for(const e of [...root.querySelectorAll('[data-path-check$=".enabled"]')])e.closest('details').remove();for(const e of [...root.querySelectorAll('[data-param]')])if(motionOrigin(e.dataset.param)!=='motion'||['duration','speed','motion','pCycles'].includes(e.dataset.param))rowFor(e).remove();for(const e of root.querySelectorAll('[data-check],[data-particle-select]'))rowFor(e).remove();stripEmpty(root);return [...root.children].filter(d=>d.matches('details')&&d.querySelector('[data-param]'));}
