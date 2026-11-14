@@ -1,17 +1,17 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=733682a38c35';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=733682a38c35';
-import {ParticleOptics} from './particle-optics.js?v=733682a38c35';
-import {shadowLight} from './particle-shadow.js?v=733682a38c35';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=733682a38c35';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=733682a38c35';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=733682a38c35';
-import {ParticleLinks} from './particle-links.js?v=733682a38c35';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=733682a38c35';
-import {LayeredVeils} from './layered-veils.js?v=733682a38c35';
-import {LivingStructures} from './living-structures.js?v=733682a38c35';
-import {fieldGLSL} from './particle-field.js?v=733682a38c35';
-import {forceBarrierGLSL} from './particle-forces.js?v=733682a38c35';
-import {prismaShadingGLSL} from './particle-shading.js?v=733682a38c35';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=0973f90f1da8';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=0973f90f1da8';
+import {ParticleOptics} from './particle-optics.js?v=0973f90f1da8';
+import {shadowLight} from './particle-shadow.js?v=0973f90f1da8';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=0973f90f1da8';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=0973f90f1da8';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=0973f90f1da8';
+import {ParticleLinks} from './particle-links.js?v=0973f90f1da8';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=0973f90f1da8';
+import {LayeredVeils} from './layered-veils.js?v=0973f90f1da8';
+import {LivingStructures} from './living-structures.js?v=0973f90f1da8';
+import {fieldGLSL} from './particle-field.js?v=0973f90f1da8';
+import {forceBarrierGLSL} from './particle-forces.js?v=0973f90f1da8';
+import {prismaShadingGLSL} from './particle-shading.js?v=0973f90f1da8';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -69,6 +69,7 @@ ${common}
 ${trailSampling}
 uniform sampler2D uPaths;uniform bool uBaked;uniform vec3 uShadeOrigin;
 out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vForcePhase;out float vOpacity,vSide;
+uniform vec2 uTrailPulse;
 vec3 pathAt(int j,vec4 r){return uBaked?texelFetch(uPaths,ivec2(j+1,gl_InstanceID),0).xyz:position(r,uPhase-float(j)/float(uSegments)*uTrails.x);}
 void main(){
  int j=gl_VertexID/2;float side=gl_VertexID%2==0?-1.:1.,age=float(j)/float(uSegments);
@@ -81,6 +82,11 @@ void main(){
  gl_Position=clip;vSide=side;vPosition=p;vForceSeed=r;vForcePhase=uPhase-age*uTrails.x;
  vec3 strand=next-prev;if(dot(strand,strand)<1e-12)strand=next-p;
  vColor=shadeFibre(particleColor(original,p),p,normalize(p-uShadeOrigin+vec3(0.,0.,.0001)),strand);
+ if(uTrailPulse.x>0.){
+  float fraction=clockAt(uPhase*uClock.x)*uLife.y/TAU-original.x*uLife.w;
+  float pulse=1.-smoothstep(0.,uTrailPulse.y,abs(fract(age-fraction+.5)-.5));
+  vColor+=particleColor(original,p)*uTrailPulse.x*pulse;
+ }
  vOpacity=uTrails.z*mix(pow(max(0.,1.-age),uTail.x),1.,uFiber.x)*min(1.,width)*uFiber.w;
 }`;
 const trailFrag=`#version 300 es
@@ -183,6 +189,8 @@ export class ParticleRenderer{
   this.u(p,'uAttachedBundles',0); // One continuous material surface, including grouped fibres.
   this.u(p,'uGuideScreenSize',this.shadowPass?.width||this.width,this.shadowPass?.height||this.height);this.u(p,'uGuideDrawPass',this.shadowPass?(this.shadowPass.mode||1):0);this.u(p,'uPhase',phase);this.u(p,'uSeed',(s.seed%997)*.013);this.u(p,'uResolution',this.shadowPass?.width||this.width,this.shadowPass?.height||this.height);
   this.u(p,'uShape',s.pFamily,s.pTarget,s.pOpening,s.pThickness);this.u(p,'uStructure',s.pFill,s.pLobes,s.pLobeDepth,s.pClumps);
+  this.u(p,'uCloudShape',s.pCloudCore,s.pCloudHalo,s.pCloudRadius,0);
+  this.u(p,'uCloudCells',s.pCellAmount,s.pCellDensity,s.pCellSize,s.pCellVariation);this.u(p,'uCounterflow',s.pCounterflow);
   this.u(p,'uNoise',s.pOrganic,s.pFrequency,s.pDetail,s.pWarp);this.u(p,'uFlow',s.pCohesion,s.pRandom,s.pJitter,s.pRough);
   this.u(p,'uDynamics',s.pVortex,s.pReentry,s.pTravel,s.pMorph);this.u(p,'uPoles',s.pAttract,s.pRepel,s.pMagnet,s.pPoles);this.u(p,'uPoleRadius',s.pRadius);this.u(p,'uPoleField',s.pField);this.u(p,'uBreath',s.pBreath);
   this.u(p,'uOuter',s.pOuter,s.pReach,s.pBranches,0);this.u(p,'uClock',s.pCycles,s.pRhythm,s.pPause,s.pSpeedSpread);
@@ -192,7 +200,7 @@ export class ParticleRenderer{
   this.u(p,'uFiberLight',s.pFiberSheen,s.pFiberSpread);
   const forces=[...(s.forcePoints||[]).filter(f=>f.enabled).slice(0,8),...(s.bodyForces||[]).filter(f=>f.enabled).slice(0,3)];gl.uniform1i(this.loc(p,'uForcePasses'),3);gl.uniform1i(this.loc(p,'uForceCount'),forces.length);if(forces.length){gl.uniform4fv(this.loc(p,'uForcePoints'),forces.flatMap(f=>[f.x,f.y,f.z,f.strength]));gl.uniform2fv(this.loc(p,'uForceOptions'),forces.flatMap(f=>[f.radius,f.swirl]));}
   this.u(p,'uColor',s.pColorMode,s.pColorScatter,s.pLumaVar,s.pDepthFade);
-  this.u(p,'uLife',s.pLife,s.pPulse,s.pSignal,s.pPropagation);this.u(p,'uNetwork',s.pNeural,s.pNodes,s.pConnect,0);this.u(p,'uSymmetry',s.pSymmetry);
+  this.u(p,'uLife',s.pLife,s.pPulse,s.pSignal,s.pPropagation);this.u(p,'uTrailPulse',s.pTrailPulse,s.pTrailPulseWidth);this.u(p,'uNetwork',s.pNeural,s.pNodes,s.pConnect,0);this.u(p,'uSymmetry',s.pSymmetry);
   this.u(p,'uMotionQuality',s.pMotionSoftness,s.pFollow);this.u(p,'uMotionSeed',s.pMotionSeed);
   this.u(p,'uOrbit',s.pOrbitOval,s.pOrbitTilt*rad,s.pOrbitPrecession,s.pOrbitSpread);this.u(p,'uDrift',s.pOrbitDrift,0,0,0);
   this.u(p,'uWander',s.pWander,s.pWanderScale,s.pWanderCycles,s.pFlowBalance);

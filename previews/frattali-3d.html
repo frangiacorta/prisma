@@ -14,7 +14,7 @@ figcaption{margin:5px 0}p{max-width:64ch}
  <h1>Frattali 3D</h1>
  <video controls autoplay muted loop playsinline poster="frattali-3d.png" src="frattali-3d-4s.mp4" aria-label="Mandelbulb con rotazione e variazione periodica dei lobi"></video>
  <nav>
-  <a href="../?engine=solid&v=77">Apri in Prisma</a>
+  <a href="../?engine=solid&v=78">Apri in Prisma</a>
   <a href="frattali-3d.prisma.json" download>Scarica il preset Mandelbulb</a>
   <a href="../moodboard/?view=board#s12-01">Reference</a>
  </nav>
@@ -23,6 +23,15 @@ figcaption{margin:5px 0}p{max-width:64ch}
   <figure><img src="frattali-menger.png" alt="Cubo Menger con tunnel ripetuti a più scale" width="480" height="320"><figcaption>Menger</figcaption></figure>
   <figure><img src="frattali-mandelbox.png" alt="Mandelbox con pieghe tridimensionali e dettagli ricorsivi" width="480" height="320"><figcaption>Mandelbox</figcaption></figure>
  </div>
- <p>In <strong>Movimento</strong> puoi animare intensità, potenza e pieghe. Questa prova viene renderizzata in Prisma. Il collegamento ai progetti e ai keyframe di Mandelbulber è previsto nella roadmap.</p>
+ <p>In <strong>Movimento</strong> puoi animare intensità, potenza e pieghe. Questa prova viene renderizzata in Prisma. </p>
+ <section>
+  <h2>Rendering locale con Mandelbulber</h2>
+  <p>La versione portatile ufficiale per Windows apre i preset <code>.fract</code>. Il comando locale salva un PNG o una sequenza PNG e una copia del preset nella cartella <code>exports/mandelbulber</code>. Il formato resta modificabile in Mandelbulber.</p>
+  <figure><img src="mandelbulber-render.webp" alt="Frattale tridimensionale renderizzato direttamente da un preset Mandelbulber" width="480" height="320"><figcaption>Render da file .fract</figcaption></figure>
+  <p>Salva lo script nella cartella di Prisma. Estrai il pacchetto in <code>local/mandelbulber/2.34.1/</code>. In PowerShell, dalla cartella di Prisma e con Node.js disponibile, esegui uno dei comandi.</p>
+  <pre style="white-space:pre-wrap"><code>node mandelbulber-render.mjs scena.fract --size 480x320
+node mandelbulber-render.mjs scena.fract --keyframes --start 2 --end 14 --size 256x144</code></pre>
+  <nav><a href="../tools/mandelbulber-render.mjs" download>Scarica lo script per Windows</a><a href="https://sourceforge.net/projects/mandelbulber/files/Mandelbulber%20v2/win64%20build/mandelbulber2-win64-2.34.1-standalone.zip/download">Pacchetto ufficiale portatile</a></nav>
+ </section>
 </main>
 </html>

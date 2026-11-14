@@ -1,7 +1,7 @@
-import {AUDIO_HELP} from './audio-model.js?v=733682a38c35';
-import {EXTRA_HELP} from './control-help-extra.js?v=733682a38c35';
-import {FRACTAL_HELP} from './fractal-form.js?v=733682a38c35';
-import {CELLULAR_HELP} from './cellular-form.js?v=733682a38c35';
+import {AUDIO_HELP} from './audio-model.js?v=0973f90f1da8';
+import {EXTRA_HELP} from './control-help-extra.js?v=0973f90f1da8';
+import {FRACTAL_HELP} from './fractal-form.js?v=0973f90f1da8';
+import {CELLULAR_HELP} from './cellular-form.js?v=0973f90f1da8';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',
@@ -129,6 +129,11 @@ const HELP={
  finishRgbB:'Sposta il canale blu indipendentemente da rosso e verde.',
  finishRgbAngle:'Ruota la direzione dello spostamento dei tre canali; zero è orizzontale.',
  finishRgbMix:'Mescola la separazione RGB con l’immagine precedente; zero conserva i colori allineati.',
+ pSelfContact:'Separa le pieghe quando vertici distanti del reticolo si avvicinano durante il movimento.',
+ pCounterflow:'Fa ruotare nucleo e guscio in direzioni opposte in fasi diverse del loop.',
+ pVeilCrease:'Estende l’ondulazione dei bordi verso il centro. Regola prima Ondulazione dei bordi.',
+ loopBands:'Mescola la palette lungo il percorso toroidale. Usa Apertura ad anello per farlo emergere.',
+ filRibbon:'Appiattisce la sezione dei filamenti. Aumenta lo spessore per vederla da lontano.',
  pVolumeHold:'Mantiene il volume di riferimento mentre la struttura si deforma. Per misurarlo considera chiusa l’apertura della pelle; valori alti contrastano il respiro.',
  pBundleDelay:'Sfasa progressivamente il movimento delle zone della struttura, mantenendo pieghe collegate e un loop chiuso.',
  pFray:'Aggiunge piccole ondulazioni ai fasci conservando l’identità dei fili. A zero i bordi sono più regolari.',
@@ -227,6 +232,10 @@ Object.assign(HELP,{
 export function controlCondition(s,key){
  const positive=k=>Math.abs(Number(s[k])||0)>1e-6||s.motions?.[k]?.enabled&&Math.abs(s.motions[k].amplitude||0)>1e-6;
  const need=(k,text)=>positive(k)?'':text;
+ if(key.startsWith('finishFeedback')&&key!=='finishFeedback'&&!s.finishFeedback)return 'Attiva la persistenza dei fotogrammi in Filtri.';
+ if(key==='pCloudCore'&&!s.pFill)return 'Aumenta il riempimento per distribuire i granelli dentro il nucleo.';
+ if(key==='pCloudRadius'&&!s.pCloudHalo)return 'Aumenta Particelle nell’alone.';
+ if(/^pCell(Density|Size|Variation)$/.test(key)&&!s.pCellAmount)return 'Attiva Raggruppamento in cellule.';
  if(Object.hasOwn(FRACTAL_HELP,key)&&key!=='fractalAmount'&&!positive('fractalAmount'))return 'Aumenta Intensità del frattale in Forma.';
  if(key==='fractalPower'&&s.fractalKind!==0)return 'La potenza si applica alla formula Mandelbulb.';
  if(key==='fractalFold'&&s.fractalKind===0)return 'Le pieghe si applicano a Menger e Mandelbox.';

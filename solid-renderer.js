@@ -1,9 +1,9 @@
-import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=733682a38c35';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=733682a38c35';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=733682a38c35';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=733682a38c35';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=733682a38c35';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=733682a38c35';
+import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=0973f90f1da8';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=0973f90f1da8';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=0973f90f1da8';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=0973f90f1da8';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=0973f90f1da8';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=0973f90f1da8';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -846,7 +846,7 @@ MODERN_FRAG=MODERN_FRAG.replace('vec4 shade(',`vec4 structureBehind(vec3 first,v
   vec3 local=transform(hit),n=boundaryNormal(hit);if(dot(n,rd)>0.)n=-n;
   float facing=max(.08,dot(n,-rd));
   float pos=dot(local,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z;
-  vec3 tint=surfacePalette(local,palette(pos))*(1.-uStructureColor.x*(1.-smoothstep(0.,uStructureColor.y,length(local.xy/axes().xy))));
+  float band=.5+.5*cos(atan(local.y,local.x)*uLoopColor.y-uLoopB.w*6.2831853);vec3 tint=mix(surfacePalette(local,palette(pos)),palette(band),uLoopA.x*uLoopColor.x)*(1.-uStructureColor.x*(1.-smoothstep(0.,uStructureColor.y,length(local.xy/axes().xy))));
   vec3 light=environment(n,hit,1.)*.14;
   for(int j=0;j<uLightCount;j++){vec3 off=uLights[j].xyz-hit;light+=uLightColors[j]*max(dot(n,normalize(off)),0.)*uLights[j].w*.35/(1.+dot(off,off)*.08);}
   vec3 beta=exp(-absorptionCoefficient(tint)*max(.003,uStructureA.y)*4./facing);
@@ -883,7 +883,7 @@ MODERN_FRAG=specializeAnalytic(MODERN_FRAG,'surfaceGradient',`vec3 size=vec3(uSh
 MODERN_FRAG=specializeAnalytic(MODERN_FRAG,'traceBoundary',`float t=firstRoot(ellipsoidRoots(origin,direction,1.));if(!outerOnly&&hasCavity())t=min(t,firstRoot(ellipsoidRoots(origin,direction,uInterior.x*(1.-uInterior.y))));travel=t;point=origin+direction*t;return t<maximum;`);
 MODERN_FRAG=MODERN_FRAG.replace('if(uModern.x>.999||!hit){glass=straight;}else{', '#if THIN_SHELL_ENABLED\n glass=straight;\n#else\n if(uModern.x>.999||!hit){glass=straight;}else{');
 MODERN_FRAG=MODERN_FRAG.replace('glass=mix(glass,straight,clamp(uModern.x,0.,1.));\n  }','glass=mix(glass,straight,clamp(uModern.x,0.,1.));\n  }\n#endif');
-MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos)*', 'vec3 base=surfacePalette(local,palette(pos))*');
+MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos)*', 'float band=.5+.5*cos(atan(local.y,local.x)*uLoopColor.y-uLoopB.w*6.2831853); vec3 base=mix(surfacePalette(local,palette(pos)),palette(band),uLoopA.x*uLoopColor.x)*');
 // Preview budgets are normalized independently: changing sample counts never
 // changes optical density or scattering strength. Full exports retain 16/4.
 MODERN_FRAG=MODERN_FRAG.replace('for(int j=0;j<int(uRuntime.w)*14;j++){','for(int j=0;j<TRACE_STEPS;j++){if(j>=int(uBudget.x))break;');

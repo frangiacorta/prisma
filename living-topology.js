@@ -1,4 +1,4 @@
-import {projectTension} from './vendor/xpbd/distance.js?v=733682a38c35';
+import {projectTension} from './vendor/xpbd/distance.js?v=0973f90f1da8';
 
 // Persistent material coordinates: every fibre, pore and triangle keeps its identity.
 export function makeLivingTopology(columns=64,rows=49,mode=1,bundles=8){
@@ -18,8 +18,35 @@ export function makeLivingTopology(columns=64,rows=49,mode=1,bundles=8){
  return {columns,rows,seeds,edges,triangles:new Uint32Array(triangles),lambda:new Float32Array(edges.length),rest:new Float32Array(edges.length)};
 }
 export function setLivingRest(topology,p){
+ topology.restPositions=new Float32Array(p);
  topology.edges.forEach(([a,b],i)=>{a*=3;b*=3;topology.rest[i]=Math.hypot(p[a]-p[b],p[a+1]-p[b+1],p[a+2]-p[b+2]);});
  topology.volume=livingVolume(topology,p);
+}
+export function separateLivingContacts(topology,positions,amount){
+ if(!(amount>0))return;
+ const {columns,rows,rest,restPositions}=topology,buckets=new Map();
+ const cell=Math.max(.0001,rest.reduce((sum,value)=>sum+value,0)/rest.length*1.3);
+ const key=(x,y,z)=>`${x},${y},${z}`;
+ // The polar rings are welded. Only separate folds that were distinct in the rest shape.
+ for(let i=columns;i<(rows-1)*columns;i++){
+  const a=i*3,x=Math.floor(positions[a]/cell),y=Math.floor(positions[a+1]/cell),z=Math.floor(positions[a+2]/cell);
+  for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)for(let dz=-1;dz<=1;dz++){
+   const bucket=buckets.get(key(x+dx,y+dy,z+dz));if(!bucket)continue;
+   for(const j of bucket){
+    const u=Math.abs(i%columns-j%columns),v=Math.abs(Math.floor(i/columns)-Math.floor(j/columns));
+    if(Math.min(u,columns-u)<=2&&v<=2)continue;
+    const b=j*3,rx=restPositions[a]-restPositions[b],ry=restPositions[a+1]-restPositions[b+1],rz=restPositions[a+2]-restPositions[b+2];
+    const original=Math.hypot(rx,ry,rz),minimum=Math.min(cell,original*.55);
+    if(minimum<1e-6)continue;
+    const px=positions[a]-positions[b],py=positions[a+1]-positions[b+1],pz=positions[a+2]-positions[b+2],distance=Math.hypot(px,py,pz);
+    if(distance>=minimum)continue;
+    const correction=(minimum-distance)*amount*.5,normal=distance>1e-6?[px/distance,py/distance,pz/distance]:[rx/original,ry/original,rz/original];
+    for(let k=0;k<3;k++){const move=normal[k]*correction;positions[a+k]+=move;positions[b+k]-=move;}
+   }
+  }
+  const id=key(x,y,z),bucket=buckets.get(id);
+  if(!bucket)buckets.set(id,[i]);else if(bucket.length<12)bucket.push(i);
+ }
 }
 // Signed tetrahedra around the centroid, with virtual end caps for open skins.
 export function livingVolume(t,p){

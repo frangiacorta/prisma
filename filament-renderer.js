@@ -1,8 +1,8 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=733682a38c35';
-import {BASE_FORM_GLSL} from './base-forms.js?v=733682a38c35';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=733682a38c35';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=733682a38c35';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=733682a38c35';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=0973f90f1da8';
+import {BASE_FORM_GLSL} from './base-forms.js?v=0973f90f1da8';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=0973f90f1da8';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=0973f90f1da8';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=0973f90f1da8';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -113,9 +113,9 @@ void main(){int id=int((uint(gl_InstanceID)*uint(uRootOrder.y))%uint(uRootOrder.
   // Transport a fixed root frame to the tangent instead of switching axes mid-curve.
   vec3 rn=normalWorld(nr.xyz),axis=abs(nr.y)<.95?vec3(0,1,0):vec3(1,0,0),rb=normalWorld(normalize(cross(nr.xyz,axis))),v=cross(rn,tangent);
   vec3 bx=rb+cross(v,rb)+cross(v,cross(v,rb))/max(.02,1.+dot(rn,tangent));bx=normalize(bx-tangent*dot(bx,tangent));vec3 by=cross(tangent,bx);
-  float angle=(float(facet)+(side>0.?1.:0.))*6.2831853/uSides;vec3 radial=bx*cos(angle)+by*sin(angle);
+  float angle=(float(facet)+(side>0.?1.:0.))*6.2831853/uSides;float thin=1.-.88*uHairD.z;vec3 radial=bx*cos(angle)+by*sin(angle)*thin;
   float lo=max(0.,t-.001),hi=min(1.,t+.001),slope=(strandRadius(hi,len)-strandRadius(lo,len))/max(.00001,(hi-lo)*len);
-  vNormal=normalize(radial-tangent*slope);vec3 front=normalize(cross(right,tangent));vec3 offset=radial*radius;offset-=front*dot(offset,front)*(1.-uTubeDepth);vWorld=p+offset;vAcross=vec2(0.,radius);vCoverage=1.;gl_Position=project(vWorld);
+  vNormal=normalize(bx*cos(angle)+by*sin(angle)/thin-tangent*slope);vec3 front=normalize(cross(right,tangent));vec3 offset=radial*radius;offset-=front*dot(offset,front)*(1.-uTubeDepth);vWorld=p+offset;vAcross=vec2(0.,radius);vCoverage=1.;gl_Position=project(vWorld);
  }else gl_Position=project(p+right*side*aa);}
 `;
 const HAIR_FRAG=HEADER+`
@@ -124,7 +124,7 @@ uniform sampler2D uCoreDepth;uniform vec2 uViewSize;
 uniform sampler2D uShadow;
 uniform vec3 uShadowX,uShadowY,uShadowZ;
 uniform float uShadowExtent,uShadowPass,uOpaquePass;
-uniform vec4 uHairColor,uPhoto1,uPhoto2,uPhoto3,uPhoto4;uniform float uRootCore;
+uniform vec4 uHairColor,uHairPulse,uPhoto1,uPhoto2,uPhoto3,uPhoto4;uniform float uRootCore;
 ${SPACE}
 layout(location=0)out vec4 color;layout(location=1)out vec4 extinction;
 float hairShadow(vec3 p){vec2 uv=vec2(dot(p,uShadowX),dot(p,uShadowY))/uShadowExtent*.5+.5;float texel=uShadowExtent*2./2048.,bias=max(.001,texel*1.4)+(uTube>.5?0.:vAcross.y);float depth=.5-(dot(p,uShadowZ)+bias)/24.;
@@ -189,6 +189,10 @@ void main(){gl_FragDepth=gl_FragCoord.z;float barrier;sculptMap(vWorld,barrier);
  float visibility=gl_FragCoord.z>texture(uCoreDepth,gl_FragCoord.xy/uViewSize).r+.00004?1.-uRootCore:1.;
  alpha=1.-pow(max(.0001,1.-baseAlpha*material.a*visibility),uRepOpacity);if(alpha<.0001)discard;
  vec3 lit=material.rgb;
+ if(uHairPulse.x>0.){
+  float distanceToPulse=abs(fract(vAlong-uHairPulse.y+vRandom*.1+.5)-.5);
+  lit+=along*uHairPulse.x*(1.-smoothstep(0.,uHairPulse.z,distanceToPulse));
+ }
  // The attachment is shaded as geometry, so opaque roots also occlude the core.
  vec3 shaded=photoHair(lit);
  if(uOpaquePass>.5){gl_FragDepth=gl_FragCoord.z-(uTube>.5?0.:sqrt(max(0.,1.-vAcross.x*vAcross.x))*vAcross.y/24.);color=vec4(shaded,alpha);extinction=vec4(0);return;}alpha=min(.98,alpha);float weight=clamp(pow(1.-gl_FragCoord.z,12.)*5000.,.02,100.);color=vec4(shaded*alpha*weight,alpha*weight);extinction=vec4(-log(max(.001,1.-alpha)),0,0,0);}
@@ -213,14 +217,14 @@ export class FilamentPass{
  g.bindFramebuffer(g.FRAMEBUFFER,null);}
  field(p,s,solid){this.tex(p,'uField',solid.fieldTexture,3);this.u(p,'uAtlas',...solid.fieldAtlas);this.u(p,'uFieldMin',...solid.fieldMin);this.u(p,'uFieldMax',...solid.fieldMax);this.u(p,'uFieldWarp',...(solid.fieldWarp||[0,0]));this.u(p,'uPrimitive',+solid.cachedBasePrimitive);this.u(p,'uFloat',+solid.fieldHalfFloat);this.u(p,'uDeferred',+solid.deferredStructure);this.u(p,'uBaseForm',s.baseForm||0);}
  common(p,s,camera,w,h){const g=this.gl;g.useProgram(p.program);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uAxes',s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ),0);this.u(p,'uAngles',s.rotateX*Math.PI/180,s.rotateY*Math.PI/180,s.rotateZ*Math.PI/180,0);this.u(p,'uCameraX',...camera.x);this.u(p,'uCameraY',...camera.y);this.u(p,'uCameraZ',...camera.z);this.u(p,'uCameraSize',camera.ex,camera.ey,w,h);this.u(p,'uLens',camera.shadow?0:s.lensDistortion||0);this.u(p,'uShadowPass',+!!camera.shadow);this.u(p,'uSeed',(s.seed%997)*.013);this.u(p,'uHairScatter',s.filScatter);this.locations=p.locations;this.program=p.program;uploadSolidForces(this,s);}
- hair(s,camera,w,h,phase){const physical=this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth-.006)/.006)),projected=camera.shadow&&!this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth*.5*s.scale*h/(2*camera.ey)-.6)/.8)),x=Math.max(physical,projected),mix=x*x*(3-2*x);if(s.transparency===0){this.hairPart(s,camera,w,h,phase,mix>0,1,mix);return;}if(mix<1)this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)this.hairPart(s,camera,w,h,phase,true,mix);}
+ hair(s,camera,w,h,phase){const physical=this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth-.006)/.006)),projected=camera.shadow&&!this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth*.5*s.scale*h/(2*camera.ey)-.6)/.8)),x=Math.max(physical,projected,s.filRibbon>0?projected>.05?Math.min(1,s.filRibbon+projected):0:0),mix=x*x*(3-2*x);if(s.transparency===0){this.hairPart(s,camera,w,h,phase,mix>0,1,mix);return;}if(mix<1)this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)this.hairPart(s,camera,w,h,phase,true,mix);}
  hairPart(s,camera,w,h,phase,tube,opacity,tubeDepth=1){const g=this.gl,p=this.hairProgram;this.common(p,s,camera,w,h);this.tex(p,'uRoots',this.roots.textures[0],0);this.tex(p,'uNormals',this.roots.textures[1],1);this.tex(p,'uShadow',camera.shadow?this.roots.textures[0]:this.shadow.depth,2);
  bindGrowth(g,p.program,s,phase);
  const pixelsPerUnit=s.scale*h/(2*camera.ey),radiusPixels=s.filWidth*.5*pixelsPerUnit;
  const sides=Math.max(12,Math.min(32,Math.ceil(Math.PI*Math.sqrt(Math.max(1,radiusPixels*(1+s.filBaseWidth))/.12)/2)*2));
  const curvature=.08+Math.abs(s.filBend)*.3+Math.abs(s.filComb)*.25+s.filClump*.5+s.filCurl*4+s.filFrizz*6+s.filWind;
  const segments=Math.max(24,Math.min(112,Math.ceil(Math.sqrt(s.filLength*pixelsPerUnit*curvature)*2.2/4)*4));
- this.tex(p,'uCoreDepth',this.coreDepth.depth,6);this.u(p,'uViewSize',w,h);this.u(p,'uRootCore',s.filCore*(1-s.transparency));this.u(p,'uHairBase',s.filBaseWidth,s.filBaseHeight,s.filBaseCurve,s.filBaseBlend);this.u(p,'uRepOpacity',opacity);this.u(p,'uTube',+tube);this.u(p,'uTubeDepth',tubeDepth);this.u(p,'uSides',sides);this.u(p,'uOpaquePass',camera.opaque?1:0);this.u(p,'uSegments',segments);g.uniform2i(p.locations.uRootOrder,this.rootCount,this.rootStride);this.u(p,'uHairA',s.filLength,s.filWidth,s.filTaper,0);this.u(p,'uHairB',s.filVariation,s.filBend,s.filComb,s.filCurl);this.u(p,'uHairC',s.filClump,s.filClumps,s.filSpread,s.filFrizz);this.u(p,'uHairD',s.filPhase,s.filWind,0,0);this.u(p,'uHairColor',s.filColor,s.filColorScatter,s.filRootShade,s.transparency);this.u(p,'uShadowX',...this.lightCamera.x);this.u(p,'uShadowY',...this.lightCamera.y);this.u(p,'uShadowZ',...this.lightCamera.z);this.u(p,'uShadowExtent',this.lightCamera.ex);
+ this.tex(p,'uCoreDepth',this.coreDepth.depth,6);this.u(p,'uViewSize',w,h);this.u(p,'uRootCore',s.filCore*(1-s.transparency));this.u(p,'uHairBase',s.filBaseWidth,s.filBaseHeight,s.filBaseCurve,s.filBaseBlend);this.u(p,'uRepOpacity',opacity);this.u(p,'uTube',+tube);this.u(p,'uTubeDepth',tubeDepth);this.u(p,'uSides',sides);this.u(p,'uOpaquePass',camera.opaque?1:0);this.u(p,'uSegments',segments);g.uniform2i(p.locations.uRootOrder,this.rootCount,this.rootStride);this.u(p,'uHairA',s.filLength,s.filWidth,s.filTaper,0);this.u(p,'uHairB',s.filVariation,s.filBend,s.filComb,s.filCurl);this.u(p,'uHairC',s.filClump,s.filClumps,s.filSpread,s.filFrizz);this.u(p,'uHairD',s.filPhase,s.filWind,s.filRibbon,0);this.u(p,'uHairColor',s.filColor,s.filColorScatter,s.filRootShade,s.transparency);this.u(p,'uHairPulse',s.filPulse,phase*Math.round(s.filPulseCycles)/(2*Math.PI),s.filPulseWidth,0);this.u(p,'uShadowX',...this.lightCamera.x);this.u(p,'uShadowY',...this.lightCamera.y);this.u(p,'uShadowZ',...this.lightCamera.z);this.u(p,'uShadowExtent',this.lightCamera.ex);
  const rad=Math.PI/180;this.u(p,'uMat',s.transparency,s.refraction,s.metal,Math.min(1,s.roughness+(1-s.gloss)*.35));this.u(p,'uSurface',s.iridescence,s.thickness,s.gloss,s.emission);this.u(p,'uCoat',s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0);this.u(p,'uOptics',s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15);this.u(p,'uTexture',s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0);this.u(p,'uScatter',s.scatterDirection??.25,0,s.thinFilm||0,s.filmThickness??420);this.u(p,'uModern',s.thinShell||0,0,0,0);
  this.u(p,'uResolution',w,h);this.u(p,'uOther',s.rotateY*rad,s.rotateX*rad,0,0);this.u(p,'uExtraShape3',0,0,s.rotateZ*rad,0);this.u(p,'uRuntime',0,0,0,16);this.u(p,'uMaterialDetail',s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad);this.u(p,'uMaterialLayers',s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0);this.u(p,'uOrganicDetail',s.textureRandomness||0,s.textureWarp||0,s.textureLink||0,s.texturePatch||0);this.u(p,'uTextureSeed',s.textureSeed||0);this.u(p,'uSurfaceSeed',(s.seed%1000)*.013);
  this.u(p,'uTransport',s.subsurface||0,s.sssRadius??.35,0,0);this.u(p,'uSssColor',...rgb(s.sssColor||'#ffc49b'));this.u(p,'uInternalColor',...rgb(s.internalColor||'#e6f5ff'));

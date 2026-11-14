@@ -1,6 +1,6 @@
-import {migratePathfinder} from './particle-model.js?v=733682a38c35';
-import {newCreation} from './creative-model.js?v=733682a38c35';
-import {normalizeCreation} from './creative-model.js?v=733682a38c35';
+import {migratePathfinder} from './particle-model.js?v=0973f90f1da8';
+import {newCreation} from './creative-model.js?v=0973f90f1da8';
+import {normalizeCreation} from './creative-model.js?v=0973f90f1da8';
 
 let downloadSerial=0;
 export function cleanPresetName(value,fallback='La tua creazione'){

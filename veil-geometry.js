@@ -16,7 +16,8 @@ export function veilPoint(s,u,v,layer,phase){
   if(s.pVeilStyle===1){
    const angle=u*TAU+s.pVeilTwist*v*1.8+shift*.12;
    const r=v*(.62+open*.72)*(1-l/Math.max(1,s.pVeilLayers)*.34)*(1+s.pVeilAsymmetry*(.2*Math.sin(angle+shift)+.1*Math.sin(3*angle-shift)));
-   const ripple=s.pVeilRipple*Math.sin(angle*s.pVeilFolds+lag+v*4.)*v*v;
+   const crease=s.pVeilCrease||0;
+   const ripple=s.pVeilRipple*Math.sin(angle*s.pVeilFolds+lag+v*4.)*(v*v+crease*Math.sin(Math.PI*v)*(1-v));
    x=r*Math.cos(angle);y=r*Math.sin(angle);z=(l-(s.pVeilLayers-1)/2)*s.pVeilSpacing*v+.16*Math.sin(v*Math.PI)+ripple+wave*.1*v;
    z+=s.pVeilAsymmetry*.2*Math.sin(angle+shift)*v;
   }else{
@@ -27,7 +28,7 @@ export function veilPoint(s,u,v,layer,phase){
    const taper=Math.pow(Math.max(0,Math.cos((u-.5)*Math.PI)),.8);
    const r=radius*(.25+.75*taper)*(1+s.pVeilRipple*.5* Math.sin(a*s.pVeilFolds-lag)*v*v);
    x=r*Math.cos(angle);y=r*Math.sin(angle);
-   z=(1-open)*v*v*.7+(l-(s.pVeilLayers-1)/2)*s.pVeilSpacing*.35*v+s.pVeilRipple*rib*v*v+.25*Math.sin(v*Math.PI+shift)*v+wave*.14*v;
+   z=(1-open)*v*v*.7+(l-(s.pVeilLayers-1)/2)*s.pVeilSpacing*.35*v+s.pVeilRipple*rib*(v*v+(s.pVeilCrease||0)*Math.sin(Math.PI*v)*(1-v))+.25*Math.sin(v*Math.PI+shift)*v+wave*.14*v;
    z+=s.pVeilTwist*.16*Math.sin(a)*v;
   }
  }

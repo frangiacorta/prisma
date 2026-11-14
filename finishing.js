@@ -1,6 +1,12 @@
 // One final image pass, after the complete frame (including tiled/accumulated exports).
 export const FINISH_DEFAULTS={finishEnabled:true,finishTone:true,finishRgb:false,finishMosaic:false,finishCompare:false,finishRgbR:8,finishRgbG:0,finishRgbB:-8,finishRgbAngle:0,finishRgbMix:1,finishCellX:12,finishCellY:12,finishMosaicMix:1};
 export const FINISH_META={finishRgbR:['Spostamento rosso',-60,60,.1],finishRgbG:['Spostamento verde',-60,60,.1],finishRgbB:['Spostamento blu',-60,60,.1],finishRgbAngle:['Direzione RGB',-180,180,1],finishRgbMix:['Intensità RGB',0,1,.01],finishCellX:['Larghezza celle',1,160,1],finishCellY:['Altezza celle',1,160,1],finishMosaicMix:['Intensità mosaico',0,1,.01]};
+Object.assign(FINISH_DEFAULTS,{finishFeedback:false,finishFeedbackMix:1,finishFeedbackMemory:.7,finishFeedbackZoom:.03,finishFeedbackAngle:3,finishFeedbackThreshold:.28,finishFeedbackInk:0,finishFeedbackLumen:0});
+Object.assign(FINISH_META,{
+ finishFeedbackMix:['Mix persistenza',0,1,.01],finishFeedbackMemory:['Persistenza dei fotogrammi',0,.98,.01],
+ finishFeedbackZoom:['Zoom a ogni passaggio',-.15,.15,.001],finishFeedbackAngle:['Rotazione a ogni passaggio',-25,25,.1],
+ finishFeedbackThreshold:['Soglia delle impronte',0,1,.01],finishFeedbackInk:['Diffusione liquida',0,1,.01],finishFeedbackLumen:['Impronte luminose',0,1,.01],
+});
 export const OPTICAL_DEFAULTS={finishWarp:false,finishWarpMix:1,finishWarpAmount:38,finishWarpScale:2,finishWarpLayers:3,finishWarpDecay:.65,finishWarpImage:.4,finishWarpMotion:.3,finishWarpCycles:1,finishWarpSeed:42,finishRegionWarp:true,finishGlass:false,finishGlassMix:1,finishGlassAmount:24,finishGlassSize:90,finishGlassAngle:0,finishGlassShape:0,finishGlassRipple:.2,finishGlassBlur:0,finishGlassDispersion:3,finishGlassShine:.15,finishGlassMotion:0,finishGlassCycles:1,finishRegionGlass:true};
 Object.assign(FINISH_DEFAULTS,OPTICAL_DEFAULTS);
 Object.assign(FINISH_META,{finishWarpMix:['Mix warp',0,1,.01],finishWarpAmount:['Ampiezza deformazione',0,180,1],finishWarpScale:['Scala del campo',.2,8,.01],finishWarpLayers:['Passaggi ricorsivi',1,6,1],finishWarpDecay:['Persistenza tra passaggi',0,1,.01],finishWarpImage:['Influenza dei colori della scena',0,1,.01],finishWarpMotion:['Movimento del campo',0,1,.01],finishWarpCycles:['Cicli warp',1,8,1],finishWarpSeed:['Seed warp',1,9999,1],finishGlassMix:['Mix vetro',0,1,.01],finishGlassAmount:['Rifrazione',0,80,.5],finishGlassSize:['Passo delle scanalature',8,300,1],finishGlassAngle:['Angolo del vetro',-180,180,1],finishGlassShape:['Profilo vetro',0,2,1],finishGlassRipple:['Ondulazione',0,1,.01],finishGlassBlur:['Sfocatura vetro',0,12,.1],finishGlassDispersion:['Dispersione',0,15,.1],finishGlassShine:['Riflesso scanalature',0,1,.01],finishGlassMotion:['Scorrimento vetro',0,1,.01],finishGlassCycles:['Cicli vetro',1,8,1]});
@@ -8,7 +14,7 @@ export const SCAN_DEFAULTS={finishScan:false,finishScanMix:1,finishScanSpacing:1
 Object.assign(FINISH_DEFAULTS,SCAN_DEFAULTS);
 Object.assign(FINISH_META,{finishScanMix:['Mix linee',0,1,.01],finishScanSpacing:['Distanza tra le linee',4,80,.5],finishScanWidth:['Spessore delle linee',.3,12,.1],finishScanSmooth:['Morbidezza del chiaroscuro',0,64,1],finishScanDepth:['Rilievo dalla luminosità',-300,300,1],finishScanAngle:['Direzione delle linee',-180,180,1],finishScanThreshold:['Soglia del soggetto',0,.8,.005],finishScanWave:['Ondulazione',0,3,.01],finishScanFrequency:['Frequenza delle onde',1,80,1],finishScanCycles:['Scorrimenti nel loop',-12,12,1]});
 export const MAX_FINISH_REGIONS=8;
-export const FINISH_FILTERS=Object.freeze({mosaic:{name:'Mosaico',enabled:'finishMosaic',mix:'finishMosaicMix'},rgb:{name:'Separazione dei colori',enabled:'finishRgb',mix:'finishRgbMix'},edge:{name:'Contorni',enabled:'finishEdge',mix:'finishEdgeMix'},glyph:{name:'Segni e caratteri',enabled:'finishGlyph',mix:'finishGlyphMix'},glitch:{name:'Glitch',enabled:'finishGlitch',mix:'finishGlitchMix'},warp:{name:'Distorsione ricorsiva',enabled:'finishWarp',mix:'finishWarpMix'},glass:{name:'Vetro ottico',enabled:'finishGlass',mix:'finishGlassMix'},scan:{name:'Linee modulate',enabled:'finishScan',mix:'finishScanMix'}});
+export const FINISH_FILTERS=Object.freeze({mosaic:{name:'Mosaico',enabled:'finishMosaic',mix:'finishMosaicMix'},rgb:{name:'Separazione dei colori',enabled:'finishRgb',mix:'finishRgbMix'},edge:{name:'Contorni',enabled:'finishEdge',mix:'finishEdgeMix'},glyph:{name:'Segni e caratteri',enabled:'finishGlyph',mix:'finishGlyphMix'},glitch:{name:'Glitch',enabled:'finishGlitch',mix:'finishGlitchMix'},warp:{name:'Distorsione ricorsiva',enabled:'finishWarp',mix:'finishWarpMix'},glass:{name:'Vetro ottico',enabled:'finishGlass',mix:'finishGlassMix'},feedback:{name:'Persistenza',enabled:'finishFeedback',mix:'finishFeedbackMix'},scan:{name:'Linee modulate',enabled:'finishScan',mix:'finishScanMix'}});
 export const FINISH_ORDER=Object.freeze(Object.keys(FINISH_FILTERS));
 export function normalizeFinishOrder(raw){const valid=Array.isArray(raw)?raw.filter(k=>typeof k==='string'&&Object.hasOwn(FINISH_FILTERS,k)):[];return [...new Set([...valid,...FINISH_ORDER])];}
 FINISH_DEFAULTS.finishOrder=[...FINISH_ORDER];
@@ -286,5 +292,94 @@ export class OpticalPass extends FinishingPass{
  if(this.width!==w||this.height!==h){g.texImage2D(g.TEXTURE_2D,0,g.RGBA8,w,h,0,g.RGBA,g.UNSIGNED_BYTE,null);this.width=w;this.height=h;}g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.CULL_FACE);g.disable(g.SCISSOR_TEST);g.colorMask(true,true,true,true);g.viewport(0,0,w,h);g.bindVertexArray(this.vao);g.useProgram(this.program);g.uniform1i(u.uImage,0);g.uniform2f(u.uSize,w,h);g.uniform1i(u.uKind,kind);g.uniform1f(u.uMix,kind?s.finishGlassMix:s.finishWarpMix);
  if(kind){g.uniform4f(u.uA,s.finishGlassAmount,s.finishGlassSize,s.finishGlassAngle*Math.PI/180,s.finishGlassRipple);g.uniform4f(u.uB,s.finishGlassBlur,s.finishGlassDispersion,s.finishGlassShine,0);g.uniform4f(u.uC,s.finishGlassMotion,s.finishGlassShape,0,0);}else{g.uniform4f(u.uA,s.finishWarpAmount,s.finishWarpScale,Math.round(s.finishWarpLayers),s.finishWarpDecay);g.uniform4f(u.uB,s.finishWarpImage,s.finishWarpMotion,s.finishWarpSeed,0);g.uniform4f(u.uC,0,0,0,0);}
  g.uniform1f(u.uPhase,((phase%(Math.PI*2)+Math.PI*2)%(Math.PI*2))*Math.round(kind?s.finishGlassCycles:s.finishWarpCycles));const regions=normalizeFinishRegions(s.finishRegions),rects=new Float32Array(32);regions.forEach((r,i)=>rects.set([r.x/100,r.y/100,r.w/100,r.h/100],i*4));g.uniform4fv(u['uRects[0]'],rects);g.uniform1i(u.uRectCount,regions.length);g.uniform1f(u.uUseMask,s.finishRegionsEnabled&&(kind?s.finishRegionGlass:s.finishRegionWarp)?1:0);g.uniform1f(u.uFeather,(s.finishFeather||0)/100);g.uniform1f(u.uInvert,s.finishRegionInvert?1:0);g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);
+ }
+}
+
+const FEEDBACK_FRAGMENT=`#version 300 es
+precision highp float;
+uniform sampler2D uImage,uHistory;
+uniform vec2 uSize;
+uniform vec4 uFeedback;
+uniform vec3 uInk;
+uniform bool uOutput;
+out vec4 color;
+vec4 sampleAt(sampler2D image,vec2 p){
+ if(any(lessThan(p,vec2(0)))||any(greaterThan(p,vec2(1))))return vec4(0);
+ return texture(image,p);
+}
+void main(){
+ vec2 uv=gl_FragCoord.xy/uSize;
+ vec4 current=sampleAt(uImage,uv);
+ if(uOutput){
+  current.rgb*=current.a;
+  vec4 result=mix(current,sampleAt(uHistory,uv),uFeedback.w);
+  color=vec4(result.rgb/max(.00001,result.a),result.a);
+  return;
+ }
+ float angle=uFeedback.z,c=cos(angle),s=sin(angle);
+ vec2 axes=vec2(uSize.x/uSize.y,1.);
+ vec2 p=mat2(c,-s,s,c)*((uv-.5)*axes)/axes/(1.+uFeedback.y)+.5;
+ p+=uInk.x*.004*vec2(sin(p.y*18.+p.x*5.),cos(p.x*20.-p.y*7.));
+ vec2 pixel=vec2(1.)/uSize;
+ vec4 previous=sampleAt(uHistory,p);
+ if(uInk.x>0.){
+  vec4 diffusion=sampleAt(uHistory,p+pixel)+sampleAt(uHistory,p-pixel)
+   +sampleAt(uHistory,p+vec2(pixel.x,-pixel.y))+sampleAt(uHistory,p+vec2(-pixel.x,pixel.y));
+  previous=mix(previous,diffusion*.25,uInk.x*.85);
+ }
+ current.rgb*=current.a;
+ float luma=dot(current.rgb,vec3(.2126,.7152,.0722));
+ float key=smoothstep(max(0.,uInk.z-.07),uInk.z+.08,luma);
+ vec3 stamp=current.rgb*(1.+uInk.y*key*.45);
+ vec3 trail=previous.rgb*uFeedback.x*(1.-luma*.55);
+ trail*=mix(1.,smoothstep(max(0.,uInk.z-.09),uInk.z+.08,dot(previous.rgb,vec3(.2126,.7152,.0722))),uInk.y);
+ color=vec4(max(stamp,trail),max(current.a,previous.a*uFeedback.x));
+}`;
+
+export class FeedbackPass extends FinishingPass{
+ constructor(gl){super(gl,FEEDBACK_FRAGMENT,['uImage','uHistory','uSize','uFeedback','uInk','uOutput']);}
+ draw(values,w,h,phase,enabled){
+  const gl=this.gl,u=this.uniforms,gap=this.phase===undefined?1:Math.abs(Math.atan2(Math.sin(phase-this.phase),Math.cos(phase-this.phase)));
+  if(this.width!==w||this.height!==h||(enabled&&gap>.7))this.release();
+  if(!this.texture){
+   this.width=w;this.height=h;
+   const texture=()=>{
+    const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);
+    gl.texStorage2D(gl.TEXTURE_2D,1,gl.RGBA8,w,h);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    return t;
+   };
+   gl.activeTexture(gl.TEXTURE0);
+   this.texture=texture();this.previous=texture();this.next=texture();
+   this.framebuffer=gl.createFramebuffer();
+  }
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+  gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,this.texture);
+  gl.copyTexSubImage2D(gl.TEXTURE_2D,0,0,0,0,0,w,h);
+  gl.disable(gl.BLEND);gl.disable(gl.SCISSOR_TEST);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
+  gl.colorMask(true,true,true,true);gl.viewport(0,0,w,h);gl.bindVertexArray(this.vao);gl.useProgram(this.program);
+  gl.uniform1i(u.uImage,0);gl.uniform1i(u.uHistory,1);gl.uniform2f(u.uSize,w,h);
+  const memory=enabled&&this.phase!==undefined?values.finishFeedbackMemory:0;
+  gl.uniform4f(u.uFeedback,memory,values.finishFeedbackZoom,values.finishFeedbackAngle*Math.PI/180,values.finishFeedbackMix);
+  gl.uniform3f(u.uInk,values.finishFeedbackInk,values.finishFeedbackLumen,values.finishFeedbackThreshold);
+  gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,this.previous);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,this.framebuffer);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,this.next,0);
+  gl.uniform1i(u.uOutput,0);gl.drawArrays(gl.TRIANGLES,0,3);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.bindTexture(gl.TEXTURE_2D,this.next);
+  gl.uniform1i(u.uOutput,1);gl.drawArrays(gl.TRIANGLES,0,3);
+  [this.previous,this.next]=[this.next,this.previous];
+  this.phase=enabled?phase:undefined;gl.bindVertexArray(null);gl.activeTexture(gl.TEXTURE0);
+ }
+ release(){
+  const gl=this.gl;
+  if(this.previous)gl.deleteTexture(this.previous);
+  if(this.next)gl.deleteTexture(this.next);
+  if(this.framebuffer)gl.deleteFramebuffer(this.framebuffer);
+  this.previous=this.next=this.framebuffer=null;this.phase=undefined;
+  super.release();
  }
 }

@@ -13341,7 +13341,7 @@
       "related": [
         "s12-01"
       ],
-      "state": "partial",
+      "state": "implemented",
       "priority": false,
       "author": "",
       "summary": "Mandelbulb, Menger e Mandelbox procedurali, con trasformazione dalla figura di base, dettagli modificabili e animazione.",
@@ -13349,6 +13349,23 @@
         "https://github.com/buddhi1980/mandelbulber2"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Mandelbulb, Menger e Mandelbox in Forma. Rendering locale di un preset .fract e di 12 fotogrammi a keyframe verificati in Mandelbulber portatile."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "I file .fract si aprono in Mandelbulber. Prisma salva e anima le sue formule nel proprio formato."
+              ]
+            }
+          ]
+        },
         {
           "title": "Integrazione in Prisma",
           "fields": [
@@ -13406,7 +13423,7 @@
       "result": "frattali-3d",
       "where": "Forma → Frattali 3D · Movimento → Aggiungi animazione",
       "platform": "Browser · WebGL 2",
-      "next": "Collegare i file .fract e i keyframe di Mandelbulber per il render locale. La pagina mostra il loop già esportato da Prisma.",
+      "next": "I file .fract si aprono in Mandelbulber. Prisma salva e anima le sue formule nel proprio formato.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -13443,7 +13460,7 @@
       ],
       "limits": "Il renderer WebGL di Prisma usa formule proprie. Il collegamento a Mandelbulber, ai suoi preset .fract e ai suoi keyframe resta da verificare.",
       "resultImage": "media/roadmap-fractals-prisma.webp",
-      "resultUrl": "../previews/frattali-3d.html?v=77",
+      "resultUrl": "../previews/frattali-3d.html?v=78",
       "resultVideo": "../previews/frattali-3d-4s.mp4?v=77"
     },
     {
@@ -14107,7 +14124,7 @@
         "roadmap-electric-filaments",
         "dense-cloud"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
       "summary": "Il nucleo Particelle già fornisce distribuzioni, lobi e campi. Per la resa densa è stata trovata una pista concreta in PCR/TouchDesigner; riuso locale, compatibilità e ombre dei cinque video ancora da provare.",
@@ -14115,6 +14132,23 @@
         "https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-39-volume-rendering-techniques"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Nucleo, alone e raggio dell’alone indipendenti. I granelli mantengono il seme e seguono moto e campi della scena."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Verificare le alte densità su telefono e misurare la qualità delle ombre su nubi più fitte."
+              ]
+            }
+          ]
+        },
         {
           "title": "Come lo portiamo in Prisma",
           "fields": [
@@ -14227,15 +14261,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Particelle → Forma → Distribuzione → Volume e alone",
       "platform": "",
-      "next": "Studio nube luminosa s17-02: respiro radiale, centro pieno, densità e luce separate, granuli minuti e alone controllato",
+      "next": "Verificare le alte densità su telefono e misurare la qualità delle ombre su nubi più fitte.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v78-volume.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/7155052ac74f03fd.webp",
           "width": 296,
@@ -14252,7 +14291,10 @@
         "points"
       ],
       "category": "form",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "engine": "particles",
+      "resultImage": "media/v78-volume.webp",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
     },
     {
       "id": "roadmap-membrane",
@@ -14857,7 +14899,7 @@
         "img-20261010-03",
         "cellular-instancing"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
       "summary": "Cellule organiche sul nucleo Particelle. Tutorial verificato; progetto non ancora provato.",
@@ -14866,6 +14908,23 @@
         "https://derivative.ca/community-post/tutorial/cellular-noise-instancing/62657"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Cellule di granelli stabili nel loop. La stessa distribuzione può passare gradualmente dalla nube continua ai gruppi. Densità, raggio e irregolarità indipendenti."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Provare gradienti di luce fra le cellule e forme cellulari non sferiche."
+              ]
+            }
+          ]
+        },
         {
           "title": "Come lo portiamo in Prisma",
           "fields": [
@@ -14920,15 +14979,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Particelle → Forma → Distribuzione → Cellule instanziate",
       "platform": "",
-      "next": "",
+      "next": "Provare gradienti di luce fra le cellule e forme cellulari non sferiche.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v78-cellule.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/2fc5039f9a8f2a5f.webp",
           "width": 276,
@@ -14945,7 +15009,10 @@
         "growth"
       ],
       "category": "form",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "engine": "particles",
+      "resultImage": "media/v78-cellule.webp",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
     },
     {
       "id": "roadmap-recursive-warp",
@@ -14958,7 +15025,7 @@
         "recursive-displace",
         "roadmap-luminous-vortex"
       ],
-      "state": "partial",
+      "state": "implemented",
       "priority": false,
       "author": "",
       "summary": "Warp ricorsivo integrato come filtro modulabile sulla scena. Feedback temporale ancora da sviluppare.",
@@ -14967,6 +15034,23 @@
         "https://derivative.ca/UserGuide/Displace_TOP"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Persiste l’immagine dei fotogrammi precedenti. Mix, durata delle tracce, zoom e rotazione si regolano separatamente dalla distorsione ricorsiva."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Misurare il raccordo dei loop brevi con persistenza molto alta."
+              ]
+            }
+          ]
+        },
         {
           "title": "Implementazione",
           "fields": [
@@ -15009,15 +15093,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "Deformazione iterativa per fotogramma, combinabile con tutti i filtri.",
-      "where": "Filtri → Distorsione ricorsiva; feedback temporale ancora da sviluppare",
+      "where": "Filtri → Persistenza e Distorsione ricorsiva",
       "platform": "",
-      "next": "Feedback temporale, zoom e rotazione con memoria dei fotogrammi; confronto dedicato con la reference PAKETA12.",
+      "next": "Misurare il raccordo dei loop brevi con persistenza molto alta.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v78-persistenza.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/2fc5039f9a8f2a5f.webp",
           "width": 276,
@@ -15040,7 +15129,10 @@
         "description": "La distorsione viene ripetuta nello stesso fotogramma. La parte di feedback con memoria dei fotogrammi è ancora da sviluppare.",
         "verification": "code-reviewed"
       },
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "engine": "solid",
+      "resultImage": "media/v78-persistenza.webp",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
     },
     {
       "id": "roadmap-liquid-painting",
@@ -15050,7 +15142,7 @@
         "img-20261010-03",
         "liquid-painting"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
       "summary": "Tratti fluidi interattivi. Originale individuato; accesso e licenza da verificare.",
@@ -15060,6 +15152,23 @@
         "https://www.patreon.com/pppanik/posts/touchdesigner-42634498"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Diffusione liquida sulla scena Prisma, con advezione e attenuazione dei fotogrammi precedenti."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Manca il pennello interattivo della reference con controllo locale di pressione e direzione."
+              ]
+            }
+          ]
+        },
         {
           "title": "Come lo portiamo in Prisma",
           "fields": [
@@ -15111,15 +15220,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Filtri → Persistenza → Diffusione liquida",
       "platform": "",
-      "next": "",
+      "next": "Manca il pennello interattivo della reference con controllo locale di pressione e direzione.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v78-persistenza.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/2fc5039f9a8f2a5f.webp",
           "width": 276,
@@ -15134,7 +15248,10 @@
         "fluids"
       ],
       "category": "movement",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "engine": "solid",
+      "resultImage": "media/v78-persistenza.webp",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
     },
     {
       "id": "roadmap-lumen-print",
@@ -15144,7 +15261,7 @@
         "img-20261010-03",
         "lumen-print"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
       "summary": "Trattamento visivo da confrontare col tutorial. File TD a pagamento; beat opzionale.",
@@ -15153,6 +15270,23 @@
         "https://www.patreon.com/pppanik/posts/project-files-86241043"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Impronte guidate dalla luminanza della scena con soglia ed estinzione regolabili."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Confrontare l’accumulo e le sovrapposizioni con la reference. La modulazione audio è sospesa."
+              ]
+            }
+          ]
+        },
         {
           "title": "Come lo portiamo in Prisma",
           "fields": [
@@ -15203,15 +15337,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Filtri → Persistenza → Impronte luminose",
       "platform": "",
-      "next": "",
+      "next": "Confrontare l’accumulo e le sovrapposizioni con la reference. La modulazione audio è sospesa.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v78-persistenza.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/2fc5039f9a8f2a5f.webp",
           "width": 276,
@@ -15226,7 +15365,10 @@
         "post"
       ],
       "category": "filters",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "engine": "solid",
+      "resultImage": "media/v78-persistenza.webp",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
     },
     {
       "id": "roadmap-note-events",
@@ -15369,6 +15511,23 @@
       "sources": [],
       "sections": [
         {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Il reticolo di fibre, tessuto e pelle separa pieghe con vertici distanti nella topologia. Il vincolo è regolabile e precede i campi di repulsione."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Restano le collisioni complete tra triangoli, le collisioni fra granelli o fili e il distacco dalla pelle."
+              ]
+            }
+          ]
+        },
+        {
           "title": "Come lo portiamo in Prisma",
           "fields": [
             {
@@ -15403,9 +15562,9 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "Dinamica elastica del volume condivisa",
-      "where": "Forme e Particelle → Movimento → Dinamica. Influenza fisica attiva la simulazione; Forze e risposta, Contatti e Calcolo raccolgono gli altri controlli.",
+      "where": "Movimento → Vincoli di distanza e flessione → Contatto tra pieghe",
       "platform": "",
-      "next": "Auto-collisioni e collisioni fra fili/granelli; solver specifici per stoffa e corpi rigidi; raccordo del loop dinamico · Aderenza a modelli figurativi importati, ramificazione DLAF, noduli alle giunzioni e crescita localizzata · Granuli ancorati alla pelle con distacco controllato; varianti ferrofluido, steli/corolle e colonie indipendenti · Trasparenza e rifrazione multistrato, ombre reciproche e fuoco fisico",
+      "next": "Restano le collisioni complete tra triangoli, le collisioni fra granelli o fili e il distacco dalla pelle.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -15435,7 +15594,8 @@
       ],
       "category": "form",
       "resultUrl": "../previews/dinamica.html",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "engine": "particles"
     },
     {
       "id": "roadmap-filament-planets",
@@ -15489,6 +15649,23 @@
         "https://frangiacorta.github.io/prisma/moodboard/research-filaments.html"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Sezione appiattibile sullo stesso filo, combinabile con lunghezza, svasatura, movimento e ombreggiatura del materiale."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Confrontare i fasci appiattiti in macro su un telefono reale."
+              ]
+            }
+          ]
+        },
         {
           "title": "Disponibile in Prisma",
           "fields": [
@@ -15639,15 +15816,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "../?engine=solid&v=49",
-      "where": "Forma → Filamenti su superficie; Forma → Filamenti su superficie → Anima",
+      "where": "Forma → Filamenti su superficie → Appiattimento del filamento",
       "platform": "",
-      "next": "Raffinare profondità e luce nelle macro, appendici lunghe e fasci appiattiti; misura su telefono reale.",
+      "next": "Confrontare i fasci appiattiti in macro su un telefono reale.",
       "keep": "Volume pieno e controllabile, passaggio dal globo al dettaglio, filamenti persistenti e palette sulla singola fibra.",
       "avoid": "Anello fisso al centro, scie dipendenti dagli FPS usate come finto pelo, migliaia di tubi pesanti, colore sovrapposto allo schermo.",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v78-filamenti.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "../previews/filamenti-basi.webp",
           "width": 1280,
@@ -15684,10 +15866,10 @@
         "roadmap-fibre-motion",
         "project-fibre-setose"
       ],
-      "resultImage": "../previews/filamenti-qualita.webp",
+      "resultImage": "media/v78-filamenti.webp",
       "resultVideo": "../previews/filamenti-movimento.mp4",
       "engine": "solid",
-      "resultUrl": "../?engine=solid&v=49",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78",
       "aliases": [
         "Pianeti di filamenti",
         "Filamenti e spine"
@@ -15735,6 +15917,23 @@
       ],
       "sections": [
         {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Fasce di colore lungo il percorso toroidale. Quantità, numero di fasce e scorrimento modificabili sulla stessa forma."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Rifinire il materiale laccato e confrontare la luce con i riferimenti."
+              ]
+            }
+          ]
+        },
+        {
           "title": "Come lo portiamo in Prisma",
           "fields": [
             {
@@ -15779,15 +15978,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "Forma → Anelli e nodi: apertura continua dalla sfera, raggio, spessore, intreccio, appiattimento, torsione e variazione di spessore. Movimento → Anelli e nodi: scorrimento ciclico e tracce indipendenti. Materia, colori, membrane e campi restano combinabili.",
-      "where": "Forma → Curve toroidali e nodi; Forma → Curve toroidali e nodi → Anima",
+      "where": "Colori → Colore lungo l’anello",
       "platform": "",
-      "next": "Aggiungere bande che seguano la coordinata del percorso e confrontare i materiali laccati con le reference. La geometria di base è integrata; il progetto completo delle reference resta in corso.",
+      "next": "Rifinire il materiale laccato e confrontare la luce con i riferimenti.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v78-nodo.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/01252cf2a0cbf64c.webp",
           "width": 296,
@@ -15811,7 +16015,9 @@
         "description": "Curve toroidali e nodi con sezione tubolare o appiattita; torsione e fase modificano il risultato.",
         "verification": "code-reviewed"
       },
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "resultImage": "media/v78-nodo.webp",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
     },
     {
       "id": "roadmap-image-treatments",
@@ -15831,7 +16037,7 @@
         "s01-01",
         "prisma-contour-frequency"
       ],
-      "state": "partial",
+      "state": "implemented",
       "priority": false,
       "author": "",
       "summary": "Trattamenti finali combinabili su Forme e Particelle: mosaico, RGB, ASCII, contorni, glitch, warp, vetro e linee modulate. Regolazioni colore separate.",
@@ -15842,6 +16048,23 @@
         "https://github.com/mrdoob/three.js/tree/286e2d8cba7088982eb9068d4bb8f68e42c3bf67/examples/jsm/shaders"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Il preset dei soli filtri salva ordine, aree, attivazioni, valori e correzione immagine. Puoi caricarlo su una forma o sulle particelle."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Verificare un confronto più esteso dei trattamenti con le reference."
+              ]
+            }
+          ]
+        },
         {
           "title": "Come lo portiamo in Prisma",
           "fields": [
@@ -15931,9 +16154,9 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Filtri → Linee modulate, Segni e caratteri, Contorni, Glitch, Distorsione ricorsiva e Vetro ottico",
+      "where": "Filtri → Preset filtri",
       "platform": "",
-      "next": "Preset di soli filtri: salvare una combinazione e applicarla ad altre creazioni Prisma mantenendo forma, materiali e movimento.",
+      "next": "Verificare un confronto più esteso dei trattamenti con le reference.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -15958,7 +16181,9 @@
         "post"
       ],
       "category": "filters",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "engine": "solid",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
     },
     {
       "id": "roadmap-layered-veils",
@@ -15981,6 +16206,23 @@
         "https://www.fooh.com/blog/lindsay-kokoska-interview"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Le pieghe possono proseguire dai bordi verso il centro; apertura, trasparenza e moto restano combinabili durante la trasformazione dalla forma corrente."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Confrontare bordi e trasparenza in movimento con le reference e provare strati fitti su telefono reale."
+              ]
+            }
+          ]
+        },
         {
           "title": "Integrazione comune · versione 36",
           "fields": [
@@ -16043,15 +16285,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "veli-aureole",
-      "where": "Forma → Costruzione → Suddivisione radiale e strati; Materiale per la trasparenza",
+      "where": "Forma → Veli → Disposizione degli strati → Bordi e asimmetria",
       "platform": "",
-      "next": "Confrontare le nuove pieghe in movimento con le reference; verificare le combinazioni fitte sul telefono.",
+      "next": "Confrontare bordi e trasparenza in movimento con le reference e provare strati fitti su telefono reale.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v78-lamine.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/d70d08d7f1b50cdc.webp",
           "width": 296,
@@ -16064,9 +16311,9 @@
         "roadmap-membrane",
         "project-pellicola-viva"
       ],
-      "resultImage": "../presets/petals-quality.webp",
+      "resultImage": "media/v78-lamine.webp",
       "resultVideo": "../previews/petals-veils-4s.mp4?v=37",
-      "resultUrl": "../?engine=solid&v=37",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78",
       "method": "In Forme le proprietà sono operazioni sul campo geometrico comune: svuotamento, separazione in fibre, trama trasversale, tagli planari e radiali, strati concentrici e deformazioni. Non selezionano un renderer o una forma di arrivo. In Particelle pelle, fili, trama e raggruppamento sono quantità simultanee sulla superficie connessa esistente.",
       "reuse": "Riutilizzati campo geometrico delle forme, solver delle strutture vive, palette, luci, tracce animate, filtri, preset ed esportatore Prisma. Nessun codice originale degli artisti attribuito a questa implementazione.",
       "implemented": [
@@ -16148,7 +16395,7 @@
         "tool-s18-noise",
         "tool-s18-bloom"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
       "summary": "Stessa spirale modulabile in resa luminosa o grafica, con cavità facoltativa e pennacchi coerenti.",
@@ -16157,6 +16404,23 @@
         "https://www.patreon.com/posts/touchdesigner-113546237"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "La rotazione differenziale sposta guscio e interno in versi opposti durante il ciclo. Forma, luce, palette e scie restano modulabili."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Restano flare indipendente e confronto dei lembi luminosi in movimento con le reference."
+              ]
+            }
+          ]
+        },
         {
           "title": "Come lo portiamo in Prisma",
           "fields": [
@@ -16223,15 +16487,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Particelle → Movimento → Orbite → Rotazione e ricircolo",
       "platform": "",
-      "next": "Identificare il file esatto Rembagram e termini di adattamento · Prototipo del campo vorticoso · Bagliore selettivo e flare separati · Confronto con entrambe le reference e raccordo del loop",
+      "next": "Restano flare indipendente e confronto dei lembi luminosi in movimento con le reference.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v78-vortice.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/903ee8779fc5914d.webp",
           "width": 296,
@@ -16249,7 +16518,10 @@
         "paths"
       ],
       "category": "movement",
-      "addedOn": "2026-10-13"
+      "addedOn": "2026-10-13",
+      "engine": "particles",
+      "resultImage": "media/v78-vortice.webp",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
     },
     {
       "id": "roadmap-electric-filaments",
@@ -16264,7 +16536,7 @@
         "tool-s18-bloom",
         "s03-03"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
       "summary": "Dai pochi fili di Endless Edge alla rete densa di Nebula: un controllo continuo di densità, coesione e luce.",
@@ -16273,6 +16545,23 @@
         "https://boosty.to/incrprl/posts/65f922ff-fa2e-41b1-b302-90c8718007e3"
       ],
       "sections": [
+        {
+          "title": "Verifica v78",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Impulsi a emissione regolabile percorrono i filamenti di Forma e le scie di Particelle, con estensione e frequenza modificabili."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Restano ramificazione locale e confronto in movimento di rete, scintille e bagliore."
+              ]
+            }
+          ]
+        },
         {
           "title": "Come lo portiamo in Prisma",
           "fields": [
@@ -16351,15 +16640,25 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Movimento → Impulsi sui filamenti o Segnali lungo le fibre",
       "platform": "",
-      "next": "Valutare file TD originali e termini · Prova fili sottili con identità persistente · Impulsi localizzati e bloom a più scale · Espansione/raccolta continua dal nucleo alla rete · Confronto in movimento e prestazioni",
+      "next": "Restano ramificazione locale e confronto in movimento di rete, scintille e bagliore.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v78-impulsi.webp",
+          "width": 480,
+          "height": 320
+        },
+        {
+          "src": "media/v78-scie.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/5e170397f7d8664d.webp",
           "width": 296,
@@ -16379,7 +16678,10 @@
         "electric"
       ],
       "category": "movement",
-      "addedOn": "2026-10-13"
+      "addedOn": "2026-10-13",
+      "engine": "solid",
+      "resultImage": "media/v78-impulsi.webp",
+      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
     },
     {
       "id": "method-living-moodboard",

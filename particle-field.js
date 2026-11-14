@@ -1,7 +1,7 @@
-import {DYNAMICS_GLSL} from './dynamics.js?v=733682a38c35';
+import {DYNAMICS_GLSL} from './dynamics.js?v=0973f90f1da8';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=733682a38c35';
-import {forceBarrierGLSL} from './particle-forces.js?v=733682a38c35';
+import {guideGLSL} from './particle-path-field.js?v=0973f90f1da8';
+import {forceBarrierGLSL} from './particle-forces.js?v=0973f90f1da8';
 export const fieldGLSL=`
 ${DYNAMICS_GLSL}
 ${guideGLSL}
@@ -9,6 +9,8 @@ ${forceBarrierGLSL}
 const float TAU=6.28318530718;
 uniform float uPhase,uSeed,uBreath,uPoleRadius,uPoleField;
 uniform vec2 uResolution;uniform vec3 uSpacing;
+uniform vec4 uCloudShape,uCloudCells;
+uniform float uCounterflow;
 uniform vec4 uShape,uStructure,uNoise,uFlow,uDynamics,uPoles,uOuter,uClock,uPoints,uTrails,uTail,uColor;
 uniform vec4 uForm,uWarp,uFrame,uRotation;
 uniform vec4 uLife,uNetwork;uniform float uSymmetry;
@@ -34,13 +36,19 @@ vec3 shapeBase(vec4 r,float t,float family){
  vec3 ring=vec3(radius*cos(a),th*sin(b),radius*sin(a));
  // Equal-area sphere sampling; cube-root radius gives uniform volume at Fill = 1.
  float latitude=1.-2.*r.y,parallel=sqrt(max(0.,1.-latitude*latitude));
- float shell=mix(1.,pow(r.z,1./3.),uStructure.x);
+ float radial=pow(r.z,1./3.);
+ if(abs(uCloudShape.x)>.00001)radial=pow(r.z,exp2(2.*uCloudShape.x)/3.);
+ float shell=mix(1.,radial,uStructure.x);
  vec3 sphere=vec3(parallel*cos(a),latitude,parallel*sin(a))*(uShape.w*2.+lobe)*shell;
  sphere.yz=rot(t+uNetwork.x*uNetwork.z*sin(a*3.+t))*sphere.yz;
  vec3 p=mix(sphere,ring,smoothstep(0.,.45,uShape.z));
  // Density concentrates around lobes without changing the kernel into a different effect.
  float cluster=.6+.4*cos(a*uStructure.y+t)*cos(b*2.-t);
  p*=mix(1.,cluster,uStructure.w*.6);
+ if(uCloudShape.y>0.){
+  float haze=step(1.-uCloudShape.y,r.w);
+  p*=1.+haze*uCloudShape.z*(.35+.65*r.z);
+ }
  return p;
 }
 vec3 shape(vec4 r,float t,float family){
@@ -50,6 +58,18 @@ vec3 shape(vec4 r,float t,float family){
   vec4 anchor=vec4((floor(r.xyz*cells)+.5)/cells,r.w);
   vec3 center=shapeBase(anchor,t,family);
   p=center*uSpacing.y+(p-center)*uSpacing.x;
+ }
+ if(uCloudCells.x>0.){
+  float cells=uCloudCells.y;
+  vec3 index=floor(r.xyz*cells);
+  float seed=fract(dot(index,vec3(.1739,.2738,.3272)));
+  vec3 offset=fract(seed*vec3(2.514,4.942,7.146))-.5;
+  vec3 anchor=(index+.5+offset*.65*uCloudCells.w)/cells;
+  vec3 center=shapeBase(vec4(anchor,.5),t,family);
+  float z=1.-2.*fract(r.x*cells),angle=TAU*fract(r.y*cells),circle=sqrt(max(0.,1.-z*z));
+  float breath=1.+.15*sin(t+seed*TAU)*uCloudCells.w;
+  vec3 sphere=vec3(circle*cos(angle),z,circle*sin(angle))*uCloudCells.z*breath*pow(fract(r.z*cells),.333333);
+  p=mix(p,center+sphere,uCloudCells.x);
  }
  return p;
 }
@@ -108,6 +128,11 @@ vec3 positionUnconstrained(vec4 r,float phase){
  p+=uSpaceWarp.x*.38*curl(p*uSpaceWarp.y+seedPhase,st);
  p.xz=rot(uSpaceWarp.x*uSpaceWarp.w*sin(p.y*uSpaceWarp.y+st))*p.xz;
  p.xz=rot(uDynamics.x*p.y+uDynamics.x*sin(global)*.3)*p.xz;
+ if(abs(uCounterflow)>.00001){
+  float shell=2.*smoothstep(.18,.82,r.z)-1.;
+  float twist=sin(global)*shell+.35*cos(global)*sin(2.*p.y);
+  p.xz=rot(uCounterflow*twist)*p.xz;
+ }
  p*=1.-uDynamics.y*(.5+.5*sin(t+r.y*TAU))*.78;
  p*=1.+uBreath*.35*sin(global+uSeed);
  float pulse=global*uLife.y-r.x*TAU*uLife.w;

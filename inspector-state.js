@@ -1,7 +1,7 @@
-import {controlCondition} from './control-help.js?v=733682a38c35';
+import {controlCondition} from './control-help.js?v=0973f90f1da8';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
-const PARTICLE_ZERO=['pOpening','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
+const PARTICLE_ZERO=['pOpening','pCloudCore','pCloudHalo','pCellAmount','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
 export const MOTION_ZERO=['dynAmount','growthFlow','filmFlow','filmSwirl','pTravel','pVortex','pReentry','pLife','pSignal','pBreath','pRandom','pJitter','pWander','pSpaceWarp','pOrbitPrecession','pOrbitDrift','pTentacleWave','pInflate','pContract','finishWarpMotion','finishGlassMotion','finishGlyphVariation'];
 export function simplifyShape(state,amount=0){
  const keys=[...SHAPE_ZERO,'cellMorph','fractalAmount',...(state.engine==='particles'?PARTICLE_ZERO:[])];
@@ -27,12 +27,12 @@ export function simplifyMotion(state,amount=0){
 const EFFECTS=[
  ['deform','Irregolarità'],['asymmetry','Asimmetria'],['twist','Torsione'],['bendX','Curvatura','bendY'],['taper','Rastremazione'],
  ['transparency','Trasparenza'],['thinFilm','Pellicola ottica'],['coat','Rivestimento'],['subsurface','Diffusione interna'],['emission','Emissione'],
- ['pOrganic','Deformazione delle particelle'],['pClumps','Addensamenti'],['pWarp','Distorsione delle particelle'],
+ ['pCloudCore','Concentrazione del nucleo'],['pCloudHalo','Alone'],['pCellAmount','Cellule instanziate'],['pOrganic','Deformazione delle particelle'],['pClumps','Addensamenti'],['pWarp','Distorsione delle particelle'],
  ['dynAmount','Dinamica'],['cellMorph','Cellule e spine'],['fractalAmount','Frattali 3D'],
  ['loopAmount','Curve toroidali e nodi'],['structShell','Guscio e spessore'],['structFibres','Reticolo di fibre'],['structRadial','Suddivisione radiale e strati','structSlices','structLayers'],
  ['filLength','Filamenti su superficie'],['petalAmount','Petali e radici'],['stemAmount','Gambo'],['hole','Foro'],['cut','Ritaglio'],['lobeAmount','Lobi e onde','waves'],
  ['structCoreDark','Nucleo scuro'],['colorLayers','Strati di colore'],['textureDepth','Rilievo di superficie'],['growthAmount','Reazione-diffusione'],['iridescence','Iridescenza'],['colorWaveAmount','Onde di colore'],
- ['finishScan','Linee modulate'],['finishWarp','Distorsione ricorsiva'],['finishGlass','Vetro ottico'],['finishGlitch','Glitch'],['finishGlyph','Segni e caratteri'],['finishEdge','Contorni'],['finishMosaic','Mosaico'],['finishRgb','Separazione dei colori'],
+ ['finishFeedback','Persistenza'],['finishScan','Linee modulate'],['finishWarp','Distorsione ricorsiva'],['finishGlass','Vetro ottico'],['finishGlitch','Glitch'],['finishGlyph','Segni e caratteri'],['finishEdge','Contorni'],['finishMosaic','Mosaico'],['finishRgb','Separazione dei colori'],
  ['pSelfShadow','Ombre reciproche'],['pCaustic','Caustica'],['pShadow','Ombra sul piano'],['pLiving','Pelle'],['pLinks','Fili'],['pTrailCount','Scie'],['pTentacle','Tentacoli del nucleo'],['pOuter','Fasci esterni']
 ];
 const active=v=>typeof v==='boolean'?v:typeof v==='number'&&Math.abs(v)>1e-7;
@@ -63,7 +63,7 @@ export function decorateInspector({root,state,baseline,tab,edit}){
  heading.replaceChildren(activeMenu,toggle);toolbar.replaceChildren(heading,select,visibility);if(['fields','body','audio'].includes(tab)){heading.hidden=true;showActive.hidden=true;}
  root.prepend(toolbar);
  const records=[];
- const motionEffects=tab==='motion'?[['pTravel','Orbite delle particelle'],['pVortex','Vorticità'],['pReentry','Rientro'],['pLife','Pulsazione'],['pBreath','Dilatazione'],['pRandom','Irregolarità del moto'],['pJitter','Microfluttuazioni'],['pWander','Deriva'],['pSpaceWarp','Distorsione spaziale'],['growthFlow','Scorrimento della trama'],['filmFlow','Scorrimento della pellicola'],['filmSwirl','Rotazione della pellicola'],['environmentRotate','Rotazione dei riflessi']]:[];
+ const motionEffects=tab==='motion'?[['pTravel','Orbite delle particelle'],['pVortex','Vorticità'],['pCounterflow','Rotazione differenziale'],['pReentry','Rientro'],['pLife','Pulsazione'],['pBreath','Dilatazione'],['pRandom','Irregolarità del moto'],['pJitter','Microfluttuazioni'],['pWander','Deriva'],['pSpaceWarp','Distorsione spaziale'],['growthFlow','Scorrimento della trama'],['filmFlow','Scorrimento della pellicola'],['filmSwirl','Rotazione della pellicola'],['environmentRotate','Rotazione dei riflessi']]:[];
  for(const [key,label,...extra] of [...EFFECTS,...motionEffects]){
   const keys=[key,...extra],el=keys.map(k=>root.querySelector(`[data-param="${k}"],[data-check="${k}"],[data-particle-select="${k}"]`)).find(Boolean);if(!el)continue;
   const d=el.closest('details');if(!d)continue;
