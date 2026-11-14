@@ -1,5 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume,separateLivingContacts} from './living-topology.js?v=f383f844aaa9';
-import {excludeForcePositions} from './particle-forces.js?v=f383f844aaa9';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume,separateLivingContacts,separateLivingFaces} from './living-topology.js?v=12f2ff4e0842';
+import {excludeForcePositions} from './particle-forces.js?v=12f2ff4e0842';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;
 uniform float uBundleAmount;uniform vec3 uLivingMotion,uSkinFit;uniform int uSkinSamples;`;
@@ -37,7 +37,7 @@ void main(){
  targetPosition=p;gl_Position=vec4(0.,0.,0.,1.);
 }`,`#version 300 es
 precision highp float;precision highp int;out vec4 color;void main(){color=vec4(0.);}`,['targetPosition']);
-  this.constrain=owner.program(`#version 300 es
+  this.makeConstraint=()=>owner.program(`#version 300 es
 precision highp float;precision highp int;precision highp sampler2D;layout(location=0) in vec4 aRandom;
 ${common}
 ${controls}
@@ -54,9 +54,10 @@ precision highp float;out vec4 color;void main(){color=vec4(0.);}`,['targetPosit
 vec3 at(ivec2 q){q.x=(q.x+uLivingSize.x)%uLivingSize.x;q.y=clamp(q.y,0,uLivingSize.y-1);return texelFetch(uLivingPositions,q,0).xyz;}
 vec3 curve(vec3 a,vec3 b,vec3 c,vec3 d,float t){return .5*((2.*b)+(-a+c)*t+(2.*a-5.*b+4.*c-d)*t*t+(-a+3.*b-3.*c+d)*t*t*t);}
 vec3 column(ivec2 i,float t){return curve(at(i-ivec2(0,1)),at(i),at(i+ivec2(0,1)),at(i+ivec2(0,2)),t);}
-vec3 surface(vec2 uv){vec2 q=uv*vec2(uLivingSize-ivec2(0,1));ivec2 i=ivec2(floor(q));vec2 t=fract(q);return dynamicsContact(sceneBarriers(mix(column(i,t.y),column(i+ivec2(1,0),t.y),t.x),vec4(uv,.5,.5),uPhase));}
-vec3 surfaceNormal(vec2 uv){vec2 e=1./vec2(uLivingSize);return normalize(cross(surface(uv+vec2(e.x,0))-surface(uv-vec2(e.x,0)),surface(uv+vec2(0,e.y))-surface(uv-vec2(0,e.y)))+vec3(.000001));}`;
-  this.skin=owner.program(`#version 300 es
+vec3 surfaceGeometry(vec2 uv){vec2 q=uv*vec2(uLivingSize-ivec2(0,1));ivec2 i=ivec2(floor(q));vec2 t=fract(q);return mix(column(i,t.y),column(i+ivec2(1,0),t.y),t.x);}
+vec3 surface(vec2 uv){return dynamicsContact(sceneBarriers(surfaceGeometry(uv),vec4(uv,.5,.5),uPhase));}
+vec3 surfaceNormal(vec2 uv){vec2 e=1./vec2(uLivingSize);return normalize(cross(surfaceGeometry(uv+vec2(e.x,0))-surfaceGeometry(uv-vec2(e.x,0)),surfaceGeometry(uv+vec2(0,e.y))-surfaceGeometry(uv-vec2(0,e.y)))+vec3(.000001));}`;
+  this.makeSkin=()=>owner.program(`#version 300 es
 precision highp float;precision highp int;precision highp sampler2D;
 layout(location=0) in vec4 aRandom;
 ${common}
@@ -80,7 +81,7 @@ void main(){
  vec3 lit=shadeParticle(base,vPosition,n);
  color=vec4(lit*a,a);
 }`,null,true);
-  this.fibres=owner.program(`#version 300 es
+  this.makeFibres=()=>owner.program(`#version 300 es
 precision highp float;precision highp int;precision highp sampler2D;
 ${common}
 ${sampling}
@@ -93,7 +94,7 @@ void main(){
 
  vec2 uv=uWeft>.5?vec2(row/float(uLivingSize.x*3),u):vec2(u,row/float((uLivingSize.y-1)*3));
  vec2 e=uWeft>.5?vec2(.002,0):vec2(0,.002);
- vec3 p=surface(uv),tangent=surface(uv+e)-surface(uv-e);
+ vec3 p=surface(uv),tangent=surfaceGeometry(uv+e)-surfaceGeometry(uv-e);
  vec4 clip=project(p);vec2 line=(project(p+tangent).xy-project(p-tangent).xy)*uResolution;
  vec2 normal=vec2(-line.y,line.x)/max(.00001,length(line));
  float width=uLivingThread.y*uResolution.y/1080.;
@@ -108,6 +109,14 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
  color=vec4(lit*a,a);}`);
   this.feedback=gl.createTransformFeedback();this.captureBuffer=gl.createBuffer();this.seedBuffer=gl.createBuffer();this.anchorBuffer=gl.createBuffer();this.indices=gl.createBuffer();this.vao=gl.createVertexArray();this.texture=gl.createTexture();
   gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.seedBuffer);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,4,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ARRAY_BUFFER,this.anchorBuffer);gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,4,gl.FLOAT,false,0,0);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indices);gl.bindVertexArray(null);
+ }
+ needsConstraint(s){return s.dynAmount>0||(s.forcePaths||[]).some(p=>p.enabled&&(p.mode==='avoid'?p.strength>1.2:p.strength>=2.99999));}
+ programs(s){
+  const required=[this.capture];
+  if(this.needsConstraint(s))required.push(this.constrain??=this.makeConstraint());
+  if(s.pSkin>0)required.push(this.skin??=this.makeSkin());
+  if(s.pThreadOpacity>0)required.push(this.fibres??=this.makeFibres());
+  return required;
  }
  capturePositions(s,phase,constrain=false){
   const o=this.owner,gl=this.gl,p=constrain?this.constrain:this.capture,t=this.topology;o.settings(p,s,phase);
@@ -131,7 +140,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   }
   this.prepareAnchors(s);
   // Rest geometry changes only when its controls change, never with elapsed time.
-  const key=JSON.stringify(Object.entries(s).filter(([k])=>k.startsWith('p')||['seed','volume','stretchX','stretchY','stretchZ','deform','twist','waves','waveScale','scale','rotateX','rotateY','rotateZ'].includes(k)));
+  const key=JSON.stringify(Object.entries(s).filter(([k])=>k.startsWith('p')&&!['pSelfContact','pContactClearance','pTrailFork','pTrailForkSpread'].includes(k)||['seed','volume','stretchX','stretchY','stretchZ','deform','twist','waves','waveScale','scale','rotateX','rotateY','rotateZ'].includes(k)));
   if(key!==this.key){const paths=this.owner.guides.paths;this.owner.guides.paths=[];try{setLivingRest(this.topology,this.capturePositions({...s,forcePoints:[],bodyForces:[],forcePaths:[],dynAmount:0,_dynamics:null},0));}finally{this.owner.guides.paths=paths;}this.key=key;}
  }
  prepareAnchors(s){
@@ -150,20 +159,21 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   this.prepare(s);const gl=this.gl,o=this.owner,t=this.topology;
   this.positions=relaxLiving(t,this.capturePositions(s,phase),s.pElastic,s.pBend);
   separateLivingContacts(t,this.positions,s.pSelfContact);
+  if(s.pLiving!==1||s.pSkin>0)separateLivingFaces(t,this.positions,s.pSelfContact,s.pContactClearance);
   // Weld the polar vertices after relaxation: a closed end must stay closed.
   for(const row of (s.pSkinOpening===0?[0,t.rows-1]:[t.rows-1])){const mean=[0,0,0];for(let x=0;x<t.columns;x++)for(let k=0;k<3;k++)mean[k]+=this.positions[(row*t.columns+x)*3+k]/t.columns;for(let x=0;x<t.columns;x++)this.positions.set(mean,(row*t.columns+x)*3);}
   preserveLivingVolume(t,this.positions,s.pVolumeHold);
   excludeForcePositions(this.positions,[...(s.forcePoints||[]).filter(f=>f.enabled).slice(0,8),...(s.bodyForces||[]).filter(f=>f.enabled).slice(0,3)]);
   for(let i=0;i<this.positions.length/3;i++)this.pixels.set(this.positions.subarray(i*3,i*3+3),i*4);
   gl.activeTexture(gl.TEXTURE6);gl.bindTexture(gl.TEXTURE_2D,this.texture);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,t.columns,t.rows,gl.RGBA,gl.FLOAT,this.pixels);
-  if(s.dynAmount>0||(s.forcePaths||[]).some(p=>p.enabled&&(p.mode==='avoid'?p.strength>1.2:p.strength>=2.99999))){
+  if(this.needsConstraint(s)){
    this.positions.set(this.capturePositions(s,phase,true));
    for(let i=0;i<this.positions.length/3;i++)this.pixels.set(this.positions.subarray(i*3,i*3+3),i*4);
    gl.activeTexture(gl.TEXTURE6);gl.bindTexture(gl.TEXTURE_2D,this.texture);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,t.columns,t.rows,gl.RGBA,gl.FLOAT,this.pixels);
   }
   return this.positions;
  }
- draw(s,phase){const start=performance.now();if(!this.owner.shadowPass&&!this.owner.reuseGeometry)this.sample(s,phase);const gl=this.gl,o=this.owner,t=this.topology;
+ draw(s,phase){const start=performance.now();this.programs(s);if(!this.owner.shadowPass&&!this.owner.reuseGeometry)this.sample(s,phase);const gl=this.gl,o=this.owner,t=this.topology;
   const setup=p=>{o.settings(p,s,phase);o.tex(p,'uLivingPositions',this.texture,6);gl.uniform2i(o.loc(p,'uLivingSize'),t.columns,t.rows);};
   if(o.shadowPass)gl.disable(gl.DEPTH_TEST);else gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);
   if(s.pSkin>0){
@@ -178,7 +188,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   }
   gl.depthMask(true);gl.disable(gl.DEPTH_TEST);gl.blendFunc(gl.ONE,o.shadowPass?gl.ONE_MINUS_SRC_ALPHA:gl.ONE);this.milliseconds=performance.now()-start;
  }
- dispose(){const gl=this.gl;for(const p of [this.capture,this.constrain,this.skin,this.fibres])gl.deleteProgram(p.program);for(const b of [this.captureBuffer,this.seedBuffer,this.anchorBuffer,this.indices])gl.deleteBuffer(b);gl.deleteTransformFeedback(this.feedback);gl.deleteVertexArray(this.vao);gl.deleteTexture(this.texture);}
+ dispose(){const gl=this.gl;for(const p of [this.capture,this.constrain,this.skin,this.fibres])if(p){this.owner.pendingPrograms.delete(p);gl.deleteProgram(p.program);}for(const b of [this.captureBuffer,this.seedBuffer,this.anchorBuffer,this.indices])gl.deleteBuffer(b);gl.deleteTransformFeedback(this.feedback);gl.deleteVertexArray(this.vao);gl.deleteTexture(this.texture);}
 }
 
 

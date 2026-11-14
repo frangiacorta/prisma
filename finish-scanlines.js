@@ -1,4 +1,4 @@
-import {FinishingPass,normalizeFinishRegions} from './finishing.js?v=f383f844aaa9';
+import {FinishingPass,normalizeFinishRegions} from './finishing.js?v=12f2ff4e0842';
 
 // Luminance-modulated carrier contours, evaluated from the composed frame.
 // Original shader: no code from the referenced TouchDesigner component.

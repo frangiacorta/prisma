@@ -1,17 +1,17 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=f383f844aaa9';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=f383f844aaa9';
-import {ParticleOptics} from './particle-optics.js?v=f383f844aaa9';
-import {shadowLight} from './particle-shadow.js?v=f383f844aaa9';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=f383f844aaa9';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=f383f844aaa9';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=f383f844aaa9';
-import {ParticleLinks} from './particle-links.js?v=f383f844aaa9';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=f383f844aaa9';
-import {LayeredVeils} from './layered-veils.js?v=f383f844aaa9';
-import {LivingStructures} from './living-structures.js?v=f383f844aaa9';
-import {fieldGLSL} from './particle-field.js?v=f383f844aaa9';
-import {forceBarrierGLSL} from './particle-forces.js?v=f383f844aaa9';
-import {prismaShadingGLSL} from './particle-shading.js?v=f383f844aaa9';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=12f2ff4e0842';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=12f2ff4e0842';
+import {ParticleOptics} from './particle-optics.js?v=12f2ff4e0842';
+import {shadowLight} from './particle-shadow.js?v=12f2ff4e0842';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=12f2ff4e0842';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=12f2ff4e0842';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=12f2ff4e0842';
+import {ParticleLinks} from './particle-links.js?v=12f2ff4e0842';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=12f2ff4e0842';
+import {LayeredVeils} from './layered-veils.js?v=12f2ff4e0842';
+import {LivingStructures} from './living-structures.js?v=12f2ff4e0842';
+import {fieldGLSL} from './particle-field.js?v=12f2ff4e0842';
+import {forceBarrierGLSL} from './particle-forces.js?v=12f2ff4e0842';
+import {prismaShadingGLSL} from './particle-shading.js?v=12f2ff4e0842';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -70,24 +70,44 @@ ${trailSampling}
 uniform sampler2D uPaths;uniform bool uBaked;uniform vec3 uShadeOrigin;
 out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vForcePhase;out float vOpacity,vSide;
 uniform vec2 uTrailPulse;
-vec3 pathAt(int j,vec4 r){return uBaked?texelFetch(uPaths,ivec2(j+1,gl_InstanceID),0).xyz:position(r,uPhase-float(j)/float(uSegments)*uTrails.x);}
+uniform vec2 uTrailFork;
+uniform ivec2 uForkOrder;
+vec3 pathAt(int j,vec4 r,int row){return uBaked?texelFetch(uPaths,ivec2(j+1,row),0).xyz:position(r,uPhase-float(j)/float(uSegments)*uTrails.x);}
+vec3 forkPoint(float t,float split,float gain,vec4 seed,vec4 r,int row){
+ float at=mix(split,1.,t*.8*gain)*float(uSegments);
+ int index=int(floor(at));
+ vec3 previous=pathAt(index,r,row),next=pathAt(index+1,r,row);
+ vec3 tangent=next-previous;
+ vec3 normal=cross(tangent,vec3(cos(seed.x*TAU),sin(seed.x*TAU),.4));
+ return mix(previous,next,fract(at))+normal/max(.0003,length(normal))*t*t*gain*uTrailFork.y*.26*uFrame.x;
+}
 void main(){
  int j=gl_VertexID/2;float side=gl_VertexID%2==0?-1.:1.,age=float(j)/float(uSegments);
- vec4 original=seedAt(gl_InstanceID+uBatchStart),r=fiberSeed(original);
- vec3 p=pathAt(j,r),next=pathAt(j+1,r),prev=pathAt(j-1,r);
+ bool fork=uTrailFork.x>=0.;
+ int row=fork?(gl_InstanceID*uForkOrder.y)%uForkOrder.x:gl_InstanceID;
+ vec4 original=seedAt(row+uBatchStart),r=fiberSeed(original);
+ vec3 p,next,prev;
+ float forkWidth=1.,materialAge=age;
+ if(fork){
+  float gain=clamp(uTrailFork.x-float(gl_InstanceID),.001,1.),split=mix(.22,.55,original.z),step=1./float(uSegments);
+  p=forkPoint(age,split,gain,original,r,row);
+  next=forkPoint(min(1.,age+step),split,gain,original,r,row);
+  prev=forkPoint(max(0.,age-step),split,gain,original,r,row);
+  forkWidth=.64*gain*mix(1.,.1,age);materialAge=mix(split,1.,age*.8*gain);
+ }else{p=pathAt(j,r,row);next=pathAt(j+1,r,row);prev=pathAt(j-1,r,row);}
  vec4 clip=project(p);vec2 tangent=(project(next).xy-project(prev).xy)*uResolution;
  vec2 normal=vec2(-tangent.y,tangent.x)/max(.00001,length(tangent));
- float width=uTrails.y*mix(1.,pow(max(.001,1.-age),.7),uTail.y)*uResolution.y/1080.;
+ float width=uTrails.y*mix(1.,pow(max(.001,1.-materialAge),.7),uTail.y)*uResolution.y/1080.*forkWidth;
  clip.xy+=normal*side*max(1.,width)/uResolution;
- gl_Position=clip;vSide=side;vPosition=p;vForceSeed=r;vForcePhase=uPhase-age*uTrails.x;
+ gl_Position=clip;vSide=side;vPosition=p;vForceSeed=r;vForcePhase=uPhase-materialAge*uTrails.x;
  vec3 strand=next-prev;if(dot(strand,strand)<1e-12)strand=next-p;
  vColor=shadeFibre(particleColor(original,p),p,normalize(p-uShadeOrigin+vec3(0.,0.,.0001)),strand);
  if(uTrailPulse.x>0.){
   float fraction=clockAt(uPhase*uClock.x)*uLife.y/TAU-original.x*uLife.w;
-  float pulse=1.-smoothstep(0.,uTrailPulse.y,abs(fract(age-fraction+.5)-.5));
+  float pulse=1.-smoothstep(0.,uTrailPulse.y,abs(fract(materialAge-fraction+.5)-.5));
   vColor+=particleColor(original,p)*uTrailPulse.x*pulse;
  }
- vOpacity=uTrails.z*mix(pow(max(0.,1.-age),uTail.x),1.,uFiber.x)*min(1.,width)*uFiber.w;
+ vOpacity=uTrails.z*mix(pow(max(0.,1.-materialAge),uTail.x),1.,uFiber.x)*min(1.,width)*uFiber.w;
 }`;
 const trailFrag=`#version 300 es
 precision highp float;in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vForcePhase;in float vOpacity,vSide;out vec4 color;uniform vec4 uFiber;
@@ -226,7 +246,7 @@ export class ParticleRenderer{
   if(!(s.pTrailCount>0&&s.pTrailLength>0))return;
   // Float trajectories are always baked before drawing: do not compile a second
   // copy of the full simulation into each of the three ribbon samples.
-  this.lines??=this.program(this.float?trailVert.replace('uBaked?texelFetch(uPaths,ivec2(j+1,gl_InstanceID),0).xyz:position(r,uPhase-float(j)/float(uSegments)*uTrails.x)','texelFetch(uPaths,ivec2(j+1,gl_InstanceID),0).xyz'):trailVert,trailFrag);
+  this.lines??=this.program(this.float?trailVert.replace('uBaked?texelFetch(uPaths,ivec2(j+1,row),0).xyz:position(r,uPhase-float(j)/float(uSegments)*uTrails.x)','texelFetch(uPaths,ivec2(j+1,row),0).xyz'):trailVert,trailFrag);
   if(this.float)this.pathProgram??=this.program(screenVert,pathFrag);
  }
  prepare(source,phase=0){
@@ -240,7 +260,8 @@ export class ParticleRenderer{
   const required=new Set([this.points,this.blur,this.compose]);
   if(s.pTrailCount>0&&s.pTrailLength>0){required.add(this.lines);if(this.pathProgram)required.add(this.pathProgram);}
   if(this.guides.program&&s.forcePaths?.some(p=>p.enabled&&p.points?.length>=2))required.add(this.guides.program);
-  for(const effect of [s.pLiving===4?this.veils:s.pLiving>0?this.living:null,s.pLinks>0&&s.pLiving!==4?this.connections:null])if(effect)for(const p of Object.values(effect))if(p?.uniforms instanceof Map)required.add(p);
+  if(s.pLiving>0&&s.pLiving!==4)for(const p of this.living.programs(s))required.add(p);
+  for(const effect of [s.pLiving===4?this.veils:null,s.pLinks>0&&s.pLiving!==4?this.connections:null])if(effect)for(const p of Object.values(effect))if(p?.uniforms instanceof Map)required.add(p);
   // An effect switched off while it compiles must not hold up the active scene.
   let ready=true;for(const p of required){if(p.ready)continue;if(this.parallelExtension&&!this.gl.getProgramParameter(p.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}this.finishProgram(p);}return ready;
  }
@@ -296,7 +317,16 @@ export class ParticleRenderer{
     this.bind(scene);gl.disable(gl.DEPTH_TEST);gl.enable(gl.BLEND);setup(this.lines);gl.uniform1i(this.loc(this.lines,'uBatchStart'),start);gl.uniform1i(this.loc(this.lines,'uBaked'),this.float?1:0);this.tex(this.lines,'uPaths',this.pathTarget?.texture||this.seedTexture,3);
     // Preview uses a representative subset; compensate coverage so density remains readable.
     this.u(this.lines,'uFiber',s.pTrailPersistence,s.pTrailSoftness,s.pTrailCoherence,fiberGain(s)*total/count);
-    gl.bindVertexArray(this.lineVAO);this.opticalDrawState();gl.drawElementsInstanced(gl.TRIANGLES,segments*6,gl.UNSIGNED_SHORT,0,batch);
+    gl.bindVertexArray(this.lineVAO);this.opticalDrawState();
+    this.u(this.lines,'uTrailFork',-1,s.pTrailForkSpread);
+    gl.drawElementsInstanced(gl.TRIANGLES,segments*6,gl.UNSIGNED_SHORT,0,batch);
+    const forks=batch*s.pTrailFork;
+    if(forks>0){
+     const gcd=(a,b)=>b?gcd(b,a%b):a;
+     let stride=Math.max(1,Math.floor(batch*.618));while(gcd(batch,stride)!==1)stride++;
+     gl.uniform2i(this.loc(this.lines,'uForkOrder'),batch,stride);this.u(this.lines,'uTrailFork',forks,s.pTrailForkSpread);
+     gl.drawElementsInstanced(gl.TRIANGLES,segments*6,gl.UNSIGNED_SHORT,0,Math.ceil(forks));
+    }
    }
   }else this.previewTrailCount=0;
   if(s.pLinks>0){this.connections??=new ParticleLinks(this,common);this.connections.draw(s,phase*s.pDirection);}

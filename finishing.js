@@ -1,11 +1,12 @@
 // One final image pass, after the complete frame (including tiled/accumulated exports).
 export const FINISH_DEFAULTS={finishEnabled:true,finishTone:true,finishRgb:false,finishMosaic:false,finishCompare:false,finishRgbR:8,finishRgbG:0,finishRgbB:-8,finishRgbAngle:0,finishRgbMix:1,finishCellX:12,finishCellY:12,finishMosaicMix:1};
 export const FINISH_META={finishRgbR:['Spostamento rosso',-60,60,.1],finishRgbG:['Spostamento verde',-60,60,.1],finishRgbB:['Spostamento blu',-60,60,.1],finishRgbAngle:['Direzione RGB',-180,180,1],finishRgbMix:['Intensità RGB',0,1,.01],finishCellX:['Larghezza celle',1,160,1],finishCellY:['Altezza celle',1,160,1],finishMosaicMix:['Intensità mosaico',0,1,.01]};
-Object.assign(FINISH_DEFAULTS,{finishFeedback:false,finishFeedbackMix:1,finishFeedbackMemory:.7,finishFeedbackZoom:.03,finishFeedbackAngle:3,finishFeedbackThreshold:.28,finishFeedbackInk:0,finishFeedbackLumen:0});
+Object.assign(FINISH_DEFAULTS,{finishFeedback:false,finishFeedbackMix:1,finishFeedbackMemory:.7,finishFeedbackZoom:.03,finishFeedbackAngle:3,finishFeedbackThreshold:.28,finishFeedbackInk:0,finishFeedbackLumen:0,finishBrushRadius:.11,finishBrushStrength:.65,finishBrushStrokes:[]});
 Object.assign(FINISH_META,{
  finishFeedbackMix:['Mix persistenza',0,1,.01],finishFeedbackMemory:['Persistenza dei fotogrammi',0,.98,.01],
  finishFeedbackZoom:['Zoom a ogni passaggio',-.15,.15,.001],finishFeedbackAngle:['Rotazione a ogni passaggio',-25,25,.1],
  finishFeedbackThreshold:['Soglia delle impronte',0,1,.01],finishFeedbackInk:['Diffusione liquida',0,1,.01],finishFeedbackLumen:['Impronte luminose',0,1,.01],
+ finishBrushRadius:['Raggio del pennello',.02,.38,.005],finishBrushStrength:['Forza del pennello',0,1,.01],
 });
 export const OPTICAL_DEFAULTS={finishWarp:false,finishWarpMix:1,finishWarpAmount:38,finishWarpScale:2,finishWarpLayers:3,finishWarpDecay:.65,finishWarpImage:.4,finishWarpMotion:.3,finishWarpCycles:1,finishWarpSeed:42,finishRegionWarp:true,finishGlass:false,finishGlassMix:1,finishGlassAmount:24,finishGlassSize:90,finishGlassAngle:0,finishGlassShape:0,finishGlassRipple:.2,finishGlassBlur:0,finishGlassDispersion:3,finishGlassShine:.15,finishGlassMotion:0,finishGlassCycles:1,finishRegionGlass:true};
 Object.assign(FINISH_DEFAULTS,OPTICAL_DEFAULTS);
@@ -14,6 +15,15 @@ export const SCAN_DEFAULTS={finishScan:false,finishScanMix:1,finishScanSpacing:1
 Object.assign(FINISH_DEFAULTS,SCAN_DEFAULTS);
 Object.assign(FINISH_META,{finishScanMix:['Mix linee',0,1,.01],finishScanSpacing:['Distanza tra le linee',4,80,.5],finishScanWidth:['Spessore delle linee',.3,12,.1],finishScanSmooth:['Morbidezza del chiaroscuro',0,64,1],finishScanDepth:['Rilievo dalla luminosità',-300,300,1],finishScanAngle:['Direzione delle linee',-180,180,1],finishScanThreshold:['Soglia del soggetto',0,.8,.005],finishScanWave:['Ondulazione',0,3,.01],finishScanFrequency:['Frequenza delle onde',1,80,1],finishScanCycles:['Scorrimenti nel loop',-12,12,1]});
 export const MAX_FINISH_REGIONS=8;
+export const MAX_BRUSH_STROKES=32, MAX_BRUSH_POINTS=120;
+export function normalizeBrushStrokes(raw){
+ const unit=n=>Math.min(1,Math.max(0,n));
+ return (Array.isArray(raw)?raw:[]).slice(0,MAX_BRUSH_STROKES).flatMap(stroke=>{
+  if(!Number.isFinite(stroke?.radius)||!Number.isFinite(stroke?.strength)||!Array.isArray(stroke.points))return [];
+  const points=stroke.points.slice(0,MAX_BRUSH_POINTS).filter(p=>Array.isArray(p)&&p.length===3&&p.every(Number.isFinite)).map(p=>p.map(unit));
+  return points.length>1?[{radius:Math.max(.02,Math.min(.38,stroke.radius)),strength:unit(stroke.strength),points}]:[];
+ });
+}
 export const FINISH_FILTERS=Object.freeze({mosaic:{name:'Mosaico',enabled:'finishMosaic',mix:'finishMosaicMix'},rgb:{name:'Separazione dei colori',enabled:'finishRgb',mix:'finishRgbMix'},edge:{name:'Contorni',enabled:'finishEdge',mix:'finishEdgeMix'},glyph:{name:'Segni e caratteri',enabled:'finishGlyph',mix:'finishGlyphMix'},glitch:{name:'Glitch',enabled:'finishGlitch',mix:'finishGlitchMix'},warp:{name:'Distorsione ricorsiva',enabled:'finishWarp',mix:'finishWarpMix'},glass:{name:'Vetro ottico',enabled:'finishGlass',mix:'finishGlassMix'},feedback:{name:'Persistenza',enabled:'finishFeedback',mix:'finishFeedbackMix'},scan:{name:'Linee modulate',enabled:'finishScan',mix:'finishScanMix'}});
 export const FINISH_ORDER=Object.freeze(Object.keys(FINISH_FILTERS));
 export function normalizeFinishOrder(raw){const valid=Array.isArray(raw)?raw.filter(k=>typeof k==='string'&&Object.hasOwn(FINISH_FILTERS,k)):[];return [...new Set([...valid,...FINISH_ORDER])];}
@@ -297,11 +307,12 @@ export class OpticalPass extends FinishingPass{
 
 const FEEDBACK_FRAGMENT=`#version 300 es
 precision highp float;
-uniform sampler2D uImage,uHistory;
+uniform sampler2D uImage,uHistory,uBrush;
 uniform vec2 uSize;
 uniform vec4 uFeedback;
 uniform vec3 uInk;
 uniform bool uOutput;
+uniform bool uBrushActive;
 out vec4 color;
 vec4 sampleAt(sampler2D image,vec2 p){
  if(any(lessThan(p,vec2(0)))||any(greaterThan(p,vec2(1))))return vec4(0);
@@ -316,10 +327,16 @@ void main(){
   color=vec4(result.rgb/max(.00001,result.a),result.a);
   return;
  }
+ vec2 brush=vec2(0.);
+ if(uBrushActive){
+  vec4 field=texture(uBrush,uv);
+  brush=(field.rg*2.-1.)*field.a*min(uSize.x,uSize.y)/uSize;
+  current=sampleAt(uImage,uv-brush*.18);
+ }
  float angle=uFeedback.z,c=cos(angle),s=sin(angle);
  vec2 axes=vec2(uSize.x/uSize.y,1.);
  vec2 p=mat2(c,-s,s,c)*((uv-.5)*axes)/axes/(1.+uFeedback.y)+.5;
- p+=uInk.x*.004*vec2(sin(p.y*18.+p.x*5.),cos(p.x*20.-p.y*7.));
+ p+=uInk.x*.004*vec2(sin(p.y*18.+p.x*5.),cos(p.x*20.-p.y*7.))-brush*.055;
  vec2 pixel=vec2(1.)/uSize;
  vec4 previous=sampleAt(uHistory,p);
  if(uInk.x>0.){
@@ -337,7 +354,43 @@ void main(){
 }`;
 
 export class FeedbackPass extends FinishingPass{
- constructor(gl){super(gl,FEEDBACK_FRAGMENT,['uImage','uHistory','uSize','uFeedback','uInk','uOutput']);}
+ constructor(gl){super(gl,FEEDBACK_FRAGMENT,['uImage','uHistory','uBrush','uBrushActive','uSize','uFeedback','uInk','uOutput']);}
+ updateBrush(strokes,w,h){
+  const gl=this.gl;
+  if(!strokes?.length){this.brushSource=null;return false;}
+  if(this.brushSource===strokes&&this.brushWidth===w&&this.brushHeight===h)return true;
+  const canvas=this.brushCanvas??=document.createElement('canvas'),scale=Math.min(1,512/Math.max(w,h));
+  canvas.width=Math.max(1,Math.round(w*scale));canvas.height=Math.max(1,Math.round(h*scale));
+  const ctx=canvas.getContext('2d'),short=Math.min(canvas.width,canvas.height);
+  const segments=strokes.reduce((sum,{points})=>sum+points.length-1,0),steps=Math.max(1,Math.min(40,Math.floor(24000/Math.max(1,segments))));
+  for(const {points,radius,strength} of strokes){
+   if(!strength)continue;
+   for(let i=1;i<points.length;i++){
+    const a=points[i-1],b=points[i],ax=a[0]*canvas.width,ay=a[1]*canvas.height;
+    const dx=b[0]*canvas.width-ax,dy=b[1]*canvas.height-ay,length=Math.hypot(dx,dy);
+    if(length<.001)continue;
+    const rgb=`${Math.round(127.5*(1+dx/length))} ${Math.round(127.5*(1-dy/length))} 127`;
+    const count=Math.min(steps,Math.ceil(length/Math.max(1,radius*short*.42)));
+    for(let j=0;j<count;j++){
+     const t=(j+.5)/count,x=ax+dx*t,y=ay+dy*t,pressure=a[2]+(b[2]-a[2])*t;
+     const r=radius*short*(.45+.55*pressure),alpha=strength*(.3+.7*pressure);
+     const gradient=ctx.createRadialGradient(x,y,0,x,y,r);
+     gradient.addColorStop(0,`rgb(${rgb} / ${alpha})`);gradient.addColorStop(1,`rgb(${rgb} / 0)`);
+     ctx.fillStyle=gradient;ctx.fillRect(x-r,y-r,2*r,2*r);
+    }
+   }
+  }
+  gl.activeTexture(gl.TEXTURE2);
+  this.brushTexture??=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,this.brushTexture);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  const flip=gl.getParameter(gl.UNPACK_FLIP_Y_WEBGL);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,canvas);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,flip);
+  this.brushSource=strokes;this.brushWidth=w;this.brushHeight=h;
+  return true;
+ }
  draw(values,w,h,phase,enabled){
   const gl=this.gl,u=this.uniforms,gap=this.phase===undefined?1:Math.abs(Math.atan2(Math.sin(phase-this.phase),Math.cos(phase-this.phase)));
   if(this.width!==w||this.height!==h||(enabled&&gap>.7))this.release();
@@ -362,6 +415,8 @@ export class FeedbackPass extends FinishingPass{
   gl.disable(gl.BLEND);gl.disable(gl.SCISSOR_TEST);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);
   gl.colorMask(true,true,true,true);gl.viewport(0,0,w,h);gl.bindVertexArray(this.vao);gl.useProgram(this.program);
   gl.uniform1i(u.uImage,0);gl.uniform1i(u.uHistory,1);gl.uniform2f(u.uSize,w,h);
+  const painted=this.updateBrush(values.finishBrushStrokes,w,h);
+  gl.uniform1i(u.uBrush,painted?2:0);gl.uniform1i(u.uBrushActive,Number(painted));
   const memory=enabled&&this.phase!==undefined?values.finishFeedbackMemory:0;
   gl.uniform4f(u.uFeedback,memory,values.finishFeedbackZoom,values.finishFeedbackAngle*Math.PI/180,values.finishFeedbackMix);
   gl.uniform3f(u.uInk,values.finishFeedbackInk,values.finishFeedbackLumen,values.finishFeedbackThreshold);
@@ -379,6 +434,8 @@ export class FeedbackPass extends FinishingPass{
   if(this.previous)gl.deleteTexture(this.previous);
   if(this.next)gl.deleteTexture(this.next);
   if(this.framebuffer)gl.deleteFramebuffer(this.framebuffer);
+  if(this.brushTexture)gl.deleteTexture(this.brushTexture);
+  this.brushTexture=this.brushSource=null;
   this.previous=this.next=this.framebuffer=null;this.phase=undefined;
   super.release();
  }

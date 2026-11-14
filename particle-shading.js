@@ -1,5 +1,5 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=f383f844aaa9';
-import {opticalGLSL} from './particle-optics.js?v=f383f844aaa9';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=12f2ff4e0842';
+import {opticalGLSL} from './particle-optics.js?v=12f2ff4e0842';
 // Particle shading uses Prisma's parameter names. It does not trace solid glass.
 export const prismaShadingGLSL=`
 ${FILM_PATTERN_GLSL}

@@ -1,8 +1,8 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=f383f844aaa9';
-import {BASE_FORM_GLSL} from './base-forms.js?v=f383f844aaa9';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=f383f844aaa9';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=f383f844aaa9';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=f383f844aaa9';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=12f2ff4e0842';
+import {BASE_FORM_GLSL} from './base-forms.js?v=12f2ff4e0842';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=12f2ff4e0842';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=12f2ff4e0842';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=12f2ff4e0842';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -68,7 +68,7 @@ void main(){vec2 uv=(gl_FragCoord.xy/uCameraSize.zw*2.-1.)*uCameraSize.xy;uv*=1.
 `;
 const GROOM=`
 uniform sampler2D uRoots,uNormals;
-uniform vec4 uHairA,uHairB,uHairC,uHairD,uHairBase;
+uniform vec4 uHairA,uHairB,uHairC,uHairD,uHairBase,uHairBranch;
 uniform float uSeed,uSegments,uHairScatter,uTube,uSides,uRootCore,uTubeDepth;uniform ivec2 uRootOrder;
 float rnd(float x){return fract(sin(x*127.1+uSeed)*43758.5453);}
 vec3 guide(float id,float count){float z=1.-2.*(id+.5)/count,a=id*2.39996323+uSeed;return normalize(vec3(cos(a)*sqrt(max(0.,1.-z*z)),sin(a)*sqrt(max(0.,1.-z*z)),z)+uHairScatter/sqrt(count)*vec3(rnd(id+41.)-.5,rnd(id+71.)-.5,rnd(id+91.)-.5)*2.);}
@@ -92,7 +92,20 @@ vec3 strand(vec3 root,vec3 n,float id,float clusterId,float t){
  p+=uHairB.w*len*t*(b*(cos(t*12.56637+az)-cos(az))+c*(sin(t*12.56637+az)-sin(az)))*.18;
  p+=uHairC.w*len*t*(b*sin(t*21.+az)*.1+c*sin(t*17.+az*2.)*.1);
  p+=uHairD.y*len*t*t*(b*sin(phase+dot(root,vec3(2,3,4))-t*4.)+c*cos(phase+root.y*4.-t*3.));
- return deformWorld(toWorld(p));}
+ return p;
+}
+vec3 hairPoint(vec3 root,vec3 normal,float id,float cluster,float t,float split,float extent){
+ vec3 p=strand(root,normal,id,cluster,mix(t,mix(split,1.,t),extent>0.?1.:0.));
+ if(extent>0.){
+  vec3 axis=abs(normal.y)<.95?vec3(0,1,0):vec3(1,0,0);
+  vec3 u=normalize(cross(normal,axis)),v=cross(normal,u);
+  float angle=rnd(id+31.)*6.2831853;
+  vec3 direction=u*cos(angle)+v*sin(angle);
+  vec3 joint=strand(root,normal,id,cluster,split);
+  p=mix(joint,p,extent)+direction*strandLength(id,cluster)*uHairBranch.z*extent*t*t*.55;
+ }
+ return deformWorld(toWorld(p));
+}
 `;
 const HAIR_VERT=HEADER+SPACE+GROOM+`
 out vec3 vWorld,vTangent,vNormal,vRootLocal,vRootNormal;out vec2 vAcross;out float vAlong,vRandom,vCoverage,vJoin;
@@ -101,20 +114,26 @@ void main(){int id=int((uint(gl_InstanceID)*uint(uRootOrder.y))%uint(uRootOrder.
  ivec2 at=ivec2(id%256,id/256);vec4 root=texelFetch(uRoots,at,0),nr=texelFetch(uNormals,at,0);
  if(root.w<.5){gl_Position=vec4(2,2,2,1);vCoverage=0.;return;}
  float len=strandLength(float(id),nr.w);
- if(uTube>.5){float foot=min(.45,(min(uHairA.y*.65,len*.08)+baseHeight(len,uHairA.y*.5))/max(.00001,len));float focused=t<.3?foot*pow(t/.3,1.4):mix(foot,1.,(t-.3)/.7);t=mix(t*t,focused,smoothstep(0.,.15,uHairBase.x));}
- vec3 p=strand(root.xyz,nr.xyz,float(id),nr.w,t),next=strand(root.xyz,nr.xyz,float(id),nr.w,min(1.,t+.002)),prev=strand(root.xyz,nr.xyz,float(id),nr.w,max(0.,t-.002));
+ bool branch=uHairBranch.w>=0.;
+ float gain=branch?clamp(uHairBranch.w-float(gl_InstanceID),0.,1.):1.;
+ float split=.32+.32*rnd(float(id)+47.),extent=branch?max(.001,gain*uHairBranch.y):0.;
+ if(uTube>.5&&!branch){float foot=min(.45,(min(uHairA.y*.65,len*.08)+baseHeight(len,uHairA.y*.5))/max(.00001,len));float focused=t<.3?foot*pow(t/.3,1.4):mix(foot,1.,(t-.3)/.7);t=mix(t*t,focused,smoothstep(0.,.15,uHairBase.x));}
+ vec3 p=hairPoint(root.xyz,nr.xyz,float(id),nr.w,t,split,extent),next=hairPoint(root.xyz,nr.xyz,float(id),nr.w,min(1.,t+.002),split,extent),prev=hairPoint(root.xyz,nr.xyz,float(id),nr.w,max(0.,t-.002),split,extent);
  vec3 tangent=normalize(next-prev),right=cross(tangent,uCameraZ);right=length(right)<.00001?uCameraX:normalize(right);
- float radius=strandRadius(t,len)*uFrame.x;
+ float materialT=branch?mix(split,1.,t*extent):t;
+ float branchTaper=branch?.56*gain*mix(1.,.05,t):1.;
+ float radius=strandRadius(materialT,len)*uFrame.x*branchTaper;
  float rootRadius=uHairA.y*.5*min(1.,uHairA.x/.025),height=len*t-min(uHairA.y*.65,len*.08)*(1.-smoothstep(0.,.3,t));
  vJoin=uRootCore*uHairBase.w*smoothstep(0.,.15,uHairBase.x)*(1.-smoothstep(0.,max(.00001,baseHeight(len,rootRadius)),height));
  float pixel=2.*uCameraSize.y/uCameraSize.w,aa=max(radius,pixel*.55),coverage=min(1.,radius/(pixel*.55));
- vRootNormal=normalWorld(nr.xyz);vRootLocal=root.xyz*uAxes.xyz;vNormal=vec3(0);vWorld=p;vTangent=tangent;vAcross=vec2(side,radius);vAlong=t;vRandom=rnd(float(id)+4.);vCoverage=coverage;
+ vRootNormal=normalWorld(nr.xyz);vRootLocal=root.xyz*uAxes.xyz;vNormal=vec3(0);vWorld=p;vTangent=tangent;vAcross=vec2(side,radius);vAlong=materialT;vRandom=rnd(float(id)+4.);vCoverage=coverage;
+ if(branch)vJoin=0.;
  if(uTube>.5){
   // Transport a fixed root frame to the tangent instead of switching axes mid-curve.
   vec3 rn=normalWorld(nr.xyz),axis=abs(nr.y)<.95?vec3(0,1,0):vec3(1,0,0),rb=normalWorld(normalize(cross(nr.xyz,axis))),v=cross(rn,tangent);
   vec3 bx=rb+cross(v,rb)+cross(v,cross(v,rb))/max(.02,1.+dot(rn,tangent));bx=normalize(bx-tangent*dot(bx,tangent));vec3 by=cross(tangent,bx);
   float angle=(float(facet)+(side>0.?1.:0.))*6.2831853/uSides;float thin=1.-.88*uHairD.z;vec3 radial=bx*cos(angle)+by*sin(angle)*thin;
-  float lo=max(0.,t-.001),hi=min(1.,t+.001),slope=(strandRadius(hi,len)-strandRadius(lo,len))/max(.00001,(hi-lo)*len);
+  float lo=max(0.,materialT-.001),hi=min(1.,materialT+.001),slope=(strandRadius(hi,len)-strandRadius(lo,len))*branchTaper/max(.00001,(hi-lo)*len);
   vNormal=normalize(bx*cos(angle)+by*sin(angle)/thin-tangent*slope);vec3 front=normalize(cross(right,tangent));vec3 offset=radial*radius;offset-=front*dot(offset,front)*(1.-uTubeDepth);vWorld=p+offset;vAcross=vec2(0.,radius);vCoverage=1.;gl_Position=project(vWorld);
  }else gl_Position=project(p+right*side*aa);}
 `;
@@ -232,13 +251,24 @@ export class FilamentPass{
  this.u(p,'uEnvironment',['studio','sunset','neon','sky','aquarium','aurora','city'].indexOf(s.environment),s.environmentAngle*rad,s.environmentPower,0);this.u(p,'uGradient',s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness);this.u(p,'uColorWave',s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1);this.u(p,'uColorAxis',s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0);this.u(p,'uColorLayers',s.colorLayers||0,s.colorLayerScale??1,s.colorLayerShift||0,s.colorLayerMix??.5);
  g.uniform1i(p.locations.uPaletteCount,s.palette.length);g.uniform3fv(p.locations.uPalette,s.palette.flatMap(rgb));this.u(p,'uPaletteMean',...s.palette.map(rgb).reduce((sum,c)=>sum.map((v,i)=>v+c[i]/s.palette.length),[0,0,0]));
  const lights=s.lights.filter(l=>l.enabled).slice(0,8),types={circle:0,bar:1,spot:2,diffuser:3,grid:4,ring:5,orb:6};g.uniform1i(p.locations.uLightCount,lights.length);if(lights.length){g.uniform4fv(p.locations.uLights,lights.flatMap(l=>[l.x,l.y,l.z,l.power]));g.uniform3fv(p.locations.uLightColors,lights.flatMap(l=>rgb(l.color)));g.uniform4fv(p.locations.uLightProps,lights.flatMap(l=>[l.size,l.length,l.roll*rad,types[l.type]??0]));g.uniform4fv(p.locations.uLightExtra,lights.flatMap(l=>[l.softness,Math.tan(l.cone*rad),l.grid,+!!l.visible]));}
- this.u(p,'uPhoto1',s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1);this.u(p,'uPhoto2',s.temperature||0,s.photoTint||0,s.vignette||0,0);this.u(p,'uPhoto3',s.blacks||0,s.highlights||0,0,0);this.u(p,'uPhoto4',s.gamma||1,0,0,0);g.drawArraysInstanced(g.TRIANGLES,0,segments*6*(tube?sides:1),this.drawCount);}
+ this.u(p,'uPhoto1',s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1);this.u(p,'uPhoto2',s.temperature||0,s.photoTint||0,s.vignette||0,0);this.u(p,'uPhoto3',s.blacks||0,s.highlights||0,0,0);this.u(p,'uPhoto4',s.gamma||1,0,0,0);this.u(p,'uHairBranch',0,s.filBranchLength,s.filBranchSpread,-1);
+ const verticesPerSegment=6*(tube?sides:1);
+ g.drawArraysInstanced(g.TRIANGLES,0,segments*verticesPerSegment,this.drawCount);
+ const branches=s.filBranchAmount*this.drawCount;
+ if(branches>0){
+  const branchSegments=Math.max(12,Math.ceil(segments*.55));
+  this.u(p,'uSegments',branchSegments);g.uniform2i(p.locations.uRootOrder,this.rootCount,this.branchStride);
+  this.u(p,'uHairBranch',0,s.filBranchLength,s.filBranchSpread,branches);
+  g.drawArraysInstanced(g.TRIANGLES,0,branchSegments*verticesPerSegment,Math.ceil(branches));
+ }
+ }
  draw(frame,phase,w,h,solid,options={}){const s={...FILAMENT_DEFAULTS,...frame};if(s.filLength<=.000001)return;const g=this.gl;
  this.previewGeometry=!!options.preview&&options.quality==='fast';const budget=this.previewGeometry?Math.max(1/16,Math.min(1,options.geometryBudget??1)):1;
  this.rootCount=Math.round(s.filCount);this.drawCount=Math.min(this.rootCount,Math.max(100,Math.round(this.rootCount*budget)));this.rootStride=1;
  // A nested, evenly distributed subset: taking the first Fibonacci roots
  // would leave only one polar cap. Export keeps the original complete order.
- if(this.drawCount<this.rootCount){let step=Math.max(1,Math.floor(this.rootCount*.61803398875)),gcd=(a,b)=>b?gcd(b,a%b):a;while(gcd(step,this.rootCount)!==1)step++;this.rootStride=step;}
+ this.branchStride=1;
+ if(this.drawCount<this.rootCount||s.filBranchAmount>0){let step=Math.max(1,Math.floor(this.rootCount*.61803398875)),gcd=(a,b)=>b?gcd(b,a%b):a;while(gcd(step,this.rootCount)!==1)step++;this.branchStride=step;if(this.drawCount<this.rootCount)this.rootStride=step;}
  this.previewCounts={filaments:this.drawCount};const shadowSize=this.previewGeometry?512:2048;
  if(this.shadow.w!==shadowSize){g.deleteFramebuffer(this.shadow.fbo);g.deleteTexture(this.shadow.depth);this.shadow=this.target(shadowSize,shadowSize,false,true);}
 

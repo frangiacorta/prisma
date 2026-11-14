@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-11-14",
+  "updated": "2026-11-15",
   "items": [
     {
       "id": "s01-01",
@@ -15142,7 +15142,7 @@
         "img-20261010-03",
         "liquid-painting"
       ],
-      "state": "partial",
+      "state": "implemented",
       "priority": false,
       "author": "",
       "summary": "Tratti fluidi interattivi. Originale individuato; accesso e licenza da verificare.",
@@ -15152,6 +15152,17 @@
         "https://www.patreon.com/pppanik/posts/touchdesigner-42634498"
       ],
       "sections": [
+        {
+          "title": "Verifica v79",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Pennello direzionale su Forma e Particelle con raggio, forza e pressione della penna. I tratti si salvano nei preset, si possono annullare e compaiono nell’export."
+              ]
+            }
+          ]
+        },
         {
           "title": "Verifica v78",
           "fields": [
@@ -15220,15 +15231,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Filtri → Persistenza → Diffusione liquida",
+      "where": "Filtri → Persistenza → Pennello liquido",
       "platform": "",
-      "next": "Manca il pennello interattivo della reference con controllo locale di pressione e direzione.",
+      "next": "",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v79-pennello.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/v78-persistenza.webp",
           "width": 480,
@@ -15250,8 +15266,8 @@
       "category": "movement",
       "addedOn": "2026-10-10",
       "engine": "solid",
-      "resultImage": "media/v78-persistenza.webp",
-      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
+      "resultImage": "media/v79-pennello.webp",
+      "resultUrl": "../previews/pennello-e-rami.html?v=79"
     },
     {
       "id": "roadmap-lumen-print",
@@ -15511,6 +15527,23 @@
       "sources": [],
       "sections": [
         {
+          "title": "Verifica v79",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Contatto vertice-faccia tra pieghe non adiacenti della pelle e del tessuto. Margine regolabile; contatti tra vertici sui fasci privi di pelle."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Restano il contatto tra spigoli, i contatti tra fili o granelli e il distacco dalla pelle."
+              ]
+            }
+          ]
+        },
+        {
           "title": "Verifica v78",
           "fields": [
             {
@@ -15564,13 +15597,18 @@
       "result": "Dinamica elastica del volume condivisa",
       "where": "Movimento → Vincoli di distanza e flessione → Contatto tra pieghe",
       "platform": "",
-      "next": "Restano le collisioni complete tra triangoli, le collisioni fra granelli o fili e il distacco dalla pelle.",
+      "next": "Restano il contatto tra spigoli, i contatti tra fili o granelli e il distacco dalla pelle.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v79-contatti.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/946116c47a8db1b0.webp",
           "width": 296,
@@ -15593,9 +15631,10 @@
         "surfaces"
       ],
       "category": "form",
-      "resultUrl": "../previews/dinamica.html",
+      "resultUrl": "../previews/pennello-e-rami.html?v=79",
       "addedOn": "2026-10-10",
-      "engine": "particles"
+      "engine": "particles",
+      "resultImage": "media/v79-contatti.webp"
     },
     {
       "id": "roadmap-filament-planets",
@@ -15649,6 +15688,23 @@
         "https://frangiacorta.github.io/prisma/moodboard/research-filaments.html"
       ],
       "sections": [
+        {
+          "title": "Verifica v79",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "I filamenti su qualunque forma possono emettere rami. Lunghezza e apertura si combinano con appiattimento, ciuffi e moto."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Confrontare macro e prestazioni su un telefono reale."
+              ]
+            }
+          ]
+        },
         {
           "title": "Verifica v78",
           "fields": [
@@ -15816,15 +15872,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "../?engine=solid&v=49",
-      "where": "Forma → Filamenti su superficie → Appiattimento del filamento",
+      "where": "Forma → Filamenti su superficie → Ramificazione",
       "platform": "",
-      "next": "Confrontare i fasci appiattiti in macro su un telefono reale.",
+      "next": "Confrontare macro e prestazioni su un telefono reale.",
       "keep": "Volume pieno e controllabile, passaggio dal globo al dettaglio, filamenti persistenti e palette sulla singola fibra.",
       "avoid": "Anello fisso al centro, scie dipendenti dagli FPS usate come finto pelo, migliaia di tubi pesanti, colore sovrapposto allo schermo.",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v79-filamenti-ramificati.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/v78-filamenti.webp",
           "width": 480,
@@ -15866,10 +15927,10 @@
         "roadmap-fibre-motion",
         "project-fibre-setose"
       ],
-      "resultImage": "media/v78-filamenti.webp",
+      "resultImage": "media/v79-filamenti-ramificati.webp",
       "resultVideo": "../previews/filamenti-movimento.mp4",
       "engine": "solid",
-      "resultUrl": "../previews/sviluppo-visivo.html?v=78",
+      "resultUrl": "../previews/pennello-e-rami.html?v=79",
       "aliases": [
         "Pianeti di filamenti",
         "Filamenti e spine"
@@ -16546,6 +16607,23 @@
       ],
       "sections": [
         {
+          "title": "Verifica v79",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Rami con attacco stabile, quota e apertura regolabili. In Forma si regola anche la lunghezza. Gli impulsi luminosi si propagano lungo il filo e nei rami."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Approfondire le diramazioni di secondo ordine e il bagliore localizzato degli impulsi."
+              ]
+            }
+          ]
+        },
+        {
           "title": "Verifica v78",
           "fields": [
             {
@@ -16640,15 +16718,25 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Movimento → Impulsi sui filamenti o Segnali lungo le fibre",
+      "where": "Forma → Filamenti su superficie → Ramificazione · Particelle → Forma → Scie",
       "platform": "",
-      "next": "Restano ramificazione locale e confronto in movimento di rete, scintille e bagliore.",
+      "next": "Approfondire le diramazioni di secondo ordine e il bagliore localizzato degli impulsi.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v79-filamenti-ramificati.webp",
+          "width": 480,
+          "height": 320
+        },
+        {
+          "src": "media/v79-scie-ramificate.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/v78-impulsi.webp",
           "width": 480,
@@ -16680,8 +16768,8 @@
       "category": "movement",
       "addedOn": "2026-10-13",
       "engine": "solid",
-      "resultImage": "media/v78-impulsi.webp",
-      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
+      "resultImage": "media/v79-filamenti-ramificati.webp",
+      "resultUrl": "../previews/pennello-e-rami.html?v=79"
     },
     {
       "id": "method-living-moodboard",

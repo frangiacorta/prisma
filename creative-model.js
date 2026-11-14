@@ -1,16 +1,16 @@
-import {normalizePlayground} from './playground-model.js?v=f383f844aaa9';
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=f383f844aaa9';
-import {FRACTAL_META} from './fractal-form.js?v=f383f844aaa9';
-import {CELLULAR_META} from './cellular-form.js?v=f383f844aaa9';
-import {normalizeFinishRegions,normalizeFinishOrder} from './finishing.js?v=f383f844aaa9';
-import {normalizeAudioClip} from './audio-recording.js?v=f383f844aaa9';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=f383f844aaa9';
-import {normalizeAudio} from './audio-model.js?v=f383f844aaa9';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=f383f844aaa9';
-import {normalizeForcePaths} from './particle-paths.js?v=f383f844aaa9';
-import {normalizeForcePoints} from './particle-forces.js?v=f383f844aaa9';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=f383f844aaa9';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=f383f844aaa9';
+import {normalizePlayground} from './playground-model.js?v=12f2ff4e0842';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=12f2ff4e0842';
+import {FRACTAL_META} from './fractal-form.js?v=12f2ff4e0842';
+import {CELLULAR_META} from './cellular-form.js?v=12f2ff4e0842';
+import {normalizeFinishRegions,normalizeFinishOrder,normalizeBrushStrokes} from './finishing.js?v=12f2ff4e0842';
+import {normalizeAudioClip} from './audio-recording.js?v=12f2ff4e0842';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=12f2ff4e0842';
+import {normalizeAudio} from './audio-model.js?v=12f2ff4e0842';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=12f2ff4e0842';
+import {normalizeForcePaths} from './particle-paths.js?v=12f2ff4e0842';
+import {normalizeForcePoints} from './particle-forces.js?v=12f2ff4e0842';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=12f2ff4e0842';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=12f2ff4e0842';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -144,7 +144,7 @@ export function normalizeCreation(raw){
  for(const k of ['finishGlitchFlash','finishScan','finishScanSource','finishScanAnimate','finishRgb','finishMosaic','finishGlyph','finishGlitch','finishEdge','finishEdgeSource','finishEdgeOnly','finishWarp','finishGlass','finishFeedback'])s[k]=raw[k]===true;
  for(const k of ['finishScanOnly','finishRegionScan','finishGlitchAnimate','finishRegionEdge','finishRegionGlitch','finishRegionWarp','finishRegionGlass'])s[k]=raw[k]!==false;for(const k of ['finishGlitchCycles','finishGlitchSeed'])s[k]=Math.round(s[k]);
  for(const k of ['finishScanCycles','finishGlyphFont','finishGlyphSet','finishGlyphSeed','finishGlitchShape','finishWarpLayers','finishWarpCycles','finishWarpSeed','finishGlassShape','finishGlassCycles'])s[k]=Math.round(s[k]);s.finishGlyphChars=typeof raw.finishGlyphChars==='string'?Array.from(raw.finishGlyphChars.replace(/[\x00-\x1f\x7f]/g,'')).slice(0,64).join('')||' .:-=+*#%@':' .:-=+*#%@';
- s.finishOrder=normalizeFinishOrder(raw.finishOrder);s.finishGlyphStyle=Math.round(s.finishGlyphStyle);s.finishGlyphCycles=Math.round(s.finishGlyphCycles);s.finishGlyphSource=raw.finishGlyphSource!==false;s.finishRegionGlyph=raw.finishRegionGlyph!==false;s.finishCompare=false;s.finishRegions=normalizeFinishRegions(raw.finishRegions);s.finishRegionMosaic=raw.finishRegionMosaic!==false;for(const k of ['finishRegionsEnabled','finishRegionRgb','finishRegionInvert'])s[k]=raw[k]===true;
+ s.finishOrder=normalizeFinishOrder(raw.finishOrder);s.finishGlyphStyle=Math.round(s.finishGlyphStyle);s.finishGlyphCycles=Math.round(s.finishGlyphCycles);s.finishGlyphSource=raw.finishGlyphSource!==false;s.finishRegionGlyph=raw.finishRegionGlyph!==false;s.finishCompare=false;s.finishRegions=normalizeFinishRegions(raw.finishRegions);s.finishBrushStrokes=normalizeBrushStrokes(raw.finishBrushStrokes);s.finishRegionMosaic=raw.finishRegionMosaic!==false;for(const k of ['finishRegionsEnabled','finishRegionRgb','finishRegionInvert'])s[k]=raw[k]===true;
  if(s.perfectLoop)for(const k of ['environmentCycles','filmCycles'])s[k]=Math.max(1,Math.round(s[k]||1));
  // Existing v33 veil creations gain the editable source bridge on reopen.
  if(s.pLiving===4&&raw.pVeilFromForm===undefined){s.pVeilFromForm=1;s.pVeilMorph=1;s.pVeilSourceKind=0;s.pVeilMemory=0;}

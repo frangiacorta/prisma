@@ -1,14 +1,22 @@
-import {MAX_FINISH_REGIONS} from './finishing.js?v=f383f844aaa9';
+import {MAX_FINISH_REGIONS,MAX_BRUSH_POINTS,MAX_BRUSH_STROKES} from './finishing.js?v=12f2ff4e0842';
 
 // Editor handles are DOM-only; exported pixels contain the effect, never its handles.
 export function mountFinishingAreas({board,getState,getTab,remember,mark,renderControls,toast}){
- let editing=false,drawing=false,selected=null,drag=null;
+ let editing=false,drawing=false,selected=null,drag=null,painting=false,stroke=null;
  const overlay=document.createElement('div');overlay.id='finish-areas';overlay.hidden=true;overlay.setAttribute('aria-label','Riquadri dei filtri');board.append(overlay);
+ const brush=document.createElement('div');brush.id='finish-brush-board';brush.hidden=true;
+ brush.innerHTML='<span class="finish-brush-cursor" aria-hidden="true" hidden></span><button type="button" class="finish-area-done">Fine pennello</button>';
+ board.append(brush);
+ const cursor=brush.firstElementChild;
  const controls=document.querySelector('#controls');
  const regions=()=>getState().finishRegions||[];
  const current=()=>regions().find(r=>r.id===selected);
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
  const nextId=()=>Math.max(0,...regions().map(r=>r.id))+1;
+ const strokes=()=>getState().finishBrushStrokes||[];
+ function brushPanel(){
+  return `<div class="finish-area-actions"><button type="button" id="finish-brush-edit" class="outline" aria-pressed="${painting}" ${strokes().length>=MAX_BRUSH_STROKES?'disabled':''}>${painting?'Chiudi pennello':'Dipingi sulla scena'}</button><button type="button" id="finish-brush-clear" class="quiet" ${strokes().length?'':'disabled'}>Cancella tratti</button></div><p class="help">Trascina per spostare l’immagine localmente. Raggio e forza valgono per il prossimo tratto. Con una penna, la pressione cambia raggio e forza. I tratti seguono l’inquadratura e si salvano con i filtri. Usa Annulla per rimuovere l’ultimo tratto.</p>`;
+ }
  function panel(){
   if(!current())selected=regions()[0]?.id??null;
   const r=current();
@@ -16,6 +24,8 @@ export function mountFinishingAreas({board,getState,getTab,remember,mark,renderC
  }
  function sync(){
   if(!current())selected=regions()[0]?.id??null;
+  if(getTab()!=='photo')painting=false;
+  brush.hidden=!painting;
   overlay.hidden=!(editing&&getTab()==='photo'&&getState().finishRegionsEnabled);
   overlay.classList.toggle('drawing',drawing);
   const focused=document.activeElement?.dataset?.region;
@@ -26,6 +36,13 @@ export function mountFinishingAreas({board,getState,getTab,remember,mark,renderC
  function activate(){const s=getState();s.finishRegionsEnabled=true;s.finishEnabled=true;editing=true;}
  controls.addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
+  if(b.id==='finish-brush-edit'){
+   painting=!painting;editing=drawing=false;renderControls();
+   if(painting){board.scrollIntoView({block:'center',behavior:'smooth'});brush.querySelector('button').focus({preventScroll:true});}
+   return;
+  }
+  if(b.id==='finish-brush-clear'){remember(getState(),'Cancella tratti');getState().finishBrushStrokes=[];mark();renderControls();return;}
+  if(b.dataset.regionSelect||b.id.startsWith('finish-area-'))painting=false;
   if(b.dataset.regionSelect){selected=+b.dataset.regionSelect;editing=true;drawing=false;renderControls();return;}
   if(b.id==='finish-area-add'){
    if(regions().length>=MAX_FINISH_REGIONS)return;remember();activate();const s=getState();selected=nextId();s.finishRegions=[...regions(),{id:selected,x:25,y:25,w:40,h:40}];if(s.finishRegionMosaic&&!s.finishGlyph&&!s.finishEdge&&!s.finishGlitch&&!s.finishRgb)s.finishMosaic=true;drawing=false;mark();renderControls();
@@ -54,5 +71,49 @@ export function mountFinishingAreas({board,getState,getTab,remember,mark,renderC
  function end(e,cancel=false){if(!drag||drag.pointer!==e.pointerId)return;if(cancel){getState().finishRegions=drag.before.finishRegions;getState().finishMosaic=drag.before.finishMosaic;}else remember(drag.before);drag=null;drawing=false;if(overlay.hasPointerCapture(e.pointerId))overlay.releasePointerCapture(e.pointerId);mark();renderControls();}
  overlay.addEventListener('pointerup',e=>end(e));overlay.addEventListener('pointercancel',e=>end(e,true));
  overlay.addEventListener('keydown',e=>{if(e.key==='Escape'){if(drag)end({pointerId:drag.pointer},true);editing=false;drawing=false;renderControls();}if(e.target.dataset.region)selected=+e.target.dataset.region;const r=current();if(!r||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();remember();const step=e.shiftKey?5:1;r.x=clamp(r.x+(e.key==='ArrowLeft'?-step:e.key==='ArrowRight'?step:0),0,100-r.w);r.y=clamp(r.y+(e.key==='ArrowUp'?-step:e.key==='ArrowDown'?step:0),0,100-r.h);mark();});
- return {panel,sync};
+ function brushPoint(event){
+  const rect=brush.getBoundingClientRect(),x=clamp((event.clientX-rect.left)/rect.width,0,1),y=clamp((event.clientY-rect.top)/rect.height,0,1);
+  const pressure=event.pointerType==='pen'?event.pressure:1;
+  const diameter=2*Math.min(rect.width,rect.height)*getState().finishBrushRadius*(.45+.55*pressure);
+  Object.assign(cursor.style,{width:`${diameter}px`,height:`${diameter}px`,left:`${100*x}%`,top:`${100*y}%`});
+  cursor.hidden=false;return [x,y,pressure];
+ }
+ brush.addEventListener('pointerdown',event=>{
+  if(event.button!==0||event.target.closest('button')||stroke||strokes().length>=MAX_BRUSH_STROKES)return;
+  event.preventDefault();const state=getState();brush.setPointerCapture(event.pointerId);
+  stroke={pointer:event.pointerId,state,before:structuredClone(state),id:strokes().length,points:[brushPoint(event)]};
+ });
+ brush.addEventListener('pointermove',event=>{
+  if(event.target.closest('button')){cursor.hidden=true;return;}
+  const next=brushPoint(event);
+  if(event.pointerId!==stroke?.pointer||stroke.state!==getState())return;
+  const last=stroke.points.at(-1);
+  if(Math.hypot(next[0]-last[0],next[1]-last[1])<.0025)return;
+  if(stroke.points.length>=MAX_BRUSH_POINTS){
+   const first=stroke.points[0];stroke.points=[first,...stroke.points.filter((_,i)=>i%2===1)];
+  }
+  stroke.points.push(next);
+  const s=stroke.state;
+  s.finishFeedback=true;s.finishEnabled=true;s.finishCompare=false;
+  s.finishBrushStrokes=[...strokes().slice(0,stroke.id),{radius:s.finishBrushRadius,strength:s.finishBrushStrength,points:stroke.points.slice()}];
+  mark(false);
+ });
+ function endStroke(pointer,cancel=false){
+  if(stroke?.pointer!==pointer)return;
+  const finished=stroke;stroke=null;cursor.hidden=true;
+  if(brush.hasPointerCapture(pointer))brush.releasePointerCapture(pointer);
+  if(finished.state!==getState()||strokes().length===finished.id)return;
+  if(cancel){const {finishFeedback,finishEnabled,finishCompare,finishBrushStrokes}=finished.before;Object.assign(finished.state,{finishFeedback,finishEnabled,finishCompare,finishBrushStrokes});}
+  else remember(finished.before,'Pennello liquido');
+  if(strokes().length>=MAX_BRUSH_STROKES)painting=false;
+  mark(!cancel);renderControls();
+ }
+ brush.addEventListener('pointerup',event=>endStroke(event.pointerId));
+ brush.addEventListener('pointercancel',event=>endStroke(event.pointerId,true));
+ brush.addEventListener('lostpointercapture',event=>endStroke(event.pointerId,true));
+ brush.addEventListener('pointerleave',()=>{cursor.hidden=true;});
+ function closeBrush(){if(stroke)endStroke(stroke.pointer,true);painting=false;cursor.hidden=true;renderControls();controls.querySelector('#finish-brush-edit')?.focus({preventScroll:true});}
+ brush.querySelector('button').addEventListener('click',closeBrush);
+ document.addEventListener('keydown',event=>{if(painting&&event.key==='Escape')closeBrush();});
+ return {panel,brushPanel,sync};
 }
