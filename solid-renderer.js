@@ -1,8 +1,9 @@
-import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=ea2ba1524502';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=ea2ba1524502';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=ea2ba1524502';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=ea2ba1524502';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=ea2ba1524502';
+import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=733682a38c35';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=733682a38c35';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=733682a38c35';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=733682a38c35';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=733682a38c35';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=733682a38c35';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -43,7 +44,7 @@ vec3 coatingContrast(vec3 film){
 `;
 const TAU=Math.PI*2;
 const CELLULAR_LIMITS=Object.fromEntries(Object.entries(CELLULAR_META).map(([key,m])=>[key,m.slice(1,3)]));
-const MOTION_LIMITS={...Object.fromEntries(Object.entries(STRUCTURE_META).map(([k,v])=>[k,v.slice(1,3)])),pVeilStyle:[0,2],pVeilMorph:[0,1],pVeilSpread:[0,1],volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWeave:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
+const MOTION_LIMITS={...Object.fromEntries(Object.entries(FRACTAL_META).map(([key,m])=>[key,m.slice(1,3)])),...Object.fromEntries(Object.entries(STRUCTURE_META).map(([k,v])=>[k,v.slice(1,3)])),pVeilStyle:[0,2],pVeilMorph:[0,1],pVeilSpread:[0,1],volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:[.35,1.7],positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWeave:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
 function motionCycles(value,source){const n=Math.max(.1,Number(value)||1);return source?.perfectLoop===false?n:Math.max(1,Math.round(n));}
 export function motionClock(t,phase,source){
  const raw=phase/TAU*motionCycles(t.cycles,source)+(t.phase||0)/360*(t.direction||1),whole=Math.floor(raw);let u=raw-whole;
@@ -811,16 +812,16 @@ MODERN_FRAG=MODERN_FRAG.replace('vec3 reflectTint=mix(vec3(1.),max(vec3(.15),iri
 MODERN_FRAG=MODERN_FRAG.replace('coverage=endScene.a;radiance+=beta*endScene.rgb;}','coverage=endScene.a;radiance+=beta*environment(direction,origin,uMat.w);}') ;
 MODERN_FRAG=MODERN_FRAG.replace('(gl_FragCoord.xy-.5*uResolution)','(gl_FragCoord.xy+uSampling.xy-.5*uResolution)');
 MODERN_FRAG=MODERN_FRAG.replace('float unused;vec4 back=sceneRay',`float pixel=3.4/min(uResolution.x,uResolution.y),silhouette=hit?-pow(max(0.,dot(normal,-direction)),2.)*min(min(uShape.y,uShape.z),uShape.x*uShape.w)*uFrame.x*.25:closest;
- float aa=!hit&&uCellMorph>0.?0.:1.-smoothstep(-pixel*.6,pixel*.6,silhouette);coverage=uCut.w<.002?aa:max(aa,coverage);float unused;vec4 back=sceneRay`);
+ float aa=!hit&&(uCellMorph>0.||uFractal.x>0.)?0.:1.-smoothstep(-pixel*.6,pixel*.6,silhouette);coverage=uCut.w<.002?aa:max(aa,coverage);float unused;vec4 back=sceneRay`);
 MODERN_FRAG=MODERN_FRAG.replace('photo(surface.rgb,originalUV),coverage)', '(photo(surface.rgb,originalUV)+(toSRGB(back.rgb)-photo(back.rgb,originalUV))*(1.-surface.a)),coverage)');
 MODERN_FRAG=MODERN_FRAG.replace('vec3 target=clamp(photo(mix(back.rgb,surface.rgb,coverage),originalUV),0.,1.);', 'vec3 target=mix(back.rgb,surface.rgb,coverage);');
 MODERN_FRAG=MODERN_FRAG.replace('bodyAlpha=max(bodyAlpha,1.-min(min(target.r,target.g),target.b));','');
 MODERN_FRAG=MODERN_FRAG.replace('fragColor=vec4(clamp(premultiplied/max(alpha,.000001)+grain,0.,1.),alpha);','fragColor=vec4(clamp(photo(premultiplied/max(alpha,.000001),originalUV)+grain,0.,1.),alpha);');
 // Accumulate premultiplied samples in float precision, so transparent edges have no colored fringe.
 MODERN_FRAG=MODERN_FRAG.replace(/\n}\n$/, '\n if(uSampling.z>.5){if(transparentExport())fragColor.rgb*=fragColor.a;else fragColor.a=clamp(coverage*surface.a+halo,0.,1.);fragColor*=uSampling.w;}\n}\n');
-MODERN_FRAG=MODERN_FRAG.replace('vec3 fieldParts(vec3 world){',BASE_FORM_GLSL+'\n'+STRUCTURE_GLSL+'\n'+CELLULAR_GLSL+'\nvec3 fieldParts(vec3 world){');
+MODERN_FRAG=MODERN_FRAG.replace('vec3 fieldParts(vec3 world){',BASE_FORM_GLSL+'\n'+STRUCTURE_GLSL+'\n'+CELLULAR_GLSL+'\n'+FRACTAL_GLSL+'\nvec3 fieldParts(vec3 world){');
 MODERN_FRAG=MODERN_FRAG.replace('p/=vec3(uShape.y,uShape.z,volume);','p/=vec3(uShape.y,uShape.z,volume);p=structureWarp(p);');
-MODERN_FRAG=MODERN_FRAG.replace('float hole=-10000.,cut=-10000.;','d=cellularField(loopBlend(d,p),p);d=structureField(d,p);float hole=-10000.,cut=-10000.;');
+MODERN_FRAG=MODERN_FRAG.replace('float hole=-10000.,cut=-10000.;','d=cellularField(loopBlend(fractalField(d,p),p),p);d=structureField(d,p);float hole=-10000.,cut=-10000.;');
 MODERN_FRAG=MODERN_FRAG.replace('float d=norm-1.-uWarp.x*w-uOther.z*ripple*.17-lobe;', 'float d=(uBaseForm>.5?baseFormField(p)+norm-length(p):norm-1.)-uWarp.x*w-uOther.z*ripple*.17-lobe;');
 MODERN_FRAG=MODERN_FRAG.replace('float sx=sin(p.x*3.4+uSeed)', 'if(uBaseForm>.5)gradient+=baseFormGradient(p)-p/max(length(p),.000001);float sx=sin(p.x*3.4+uSeed)');
 MODERN_FRAG=MODERN_FRAG.replace('vec3 parts=vec3(norm-1.-uWarp.x*sx', 'vec3 parts=vec3((uBaseForm>.5?baseFormField(p)+norm-length(p):norm-1.)-uWarp.x*sx');
@@ -938,6 +939,7 @@ const ATLAS_FLAGS=`#define ANALYTIC_SHAPE 0
 #define STEM_ENABLED 1
 #define ROOTS_ENABLED 1
 #define CELLULAR_GEOMETRY 1
+#define FRACTAL_ENABLED 1
 `;
 let BAKE_FRAG=MODERN_FRAG.slice(0,MODERN_FRAG.indexOf('// Shared solid/cavity field.'));
 BAKE_FRAG=BAKE_FRAG.replace('#version 300 es','#version 300 es\n'+ATLAS_FLAGS);
@@ -1199,7 +1201,7 @@ MODERN_FRAG=MODERN_FRAG.replace('vec3 n=surfaceNormal(p);float d=field(p);return
 const SCULPT_ENABLED=1048576;
 const LOOP_ENABLED=2097152,SIMPLE_LOOP_STRUCTURE=4194304,SIMPLE_LOOP_FIELD=8388608;
 const LOOP_STRUCTURE_MODIFIERS=['structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structFibres','structSlices','structRadial','structLayers'];
-const LOOP_BASE_MODIFIERS=['baseForm','cellMorph','deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'];
+const LOOP_BASE_MODIFIERS=['fractalAmount','baseForm','cellMorph','deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'];
 function loopVariant(source){
  if(!(source.loopAmount>0||source.motions?.loopAmount?.enabled))return 0;
  const complex=LOOP_STRUCTURE_MODIFIERS.some(k=>Math.abs(source[k]||0)>.000001||source.motions?.[k]?.enabled);
@@ -1208,8 +1210,8 @@ function loopVariant(source){
 }
 const SCULPT_FRAG=withSolidForces(MODERN_FRAG);
 const SCULPT_PREVIEW_FRAG=withSolidForces(PREVIEW_FRAG);
-const FIELD_KEYS=['baseForm',...STRUCTURE_FIELD_KEYS,...CELLULAR_FIELD_KEYS,'deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','petalAmount','petalCoverage','stemAmount','stemRadius','stemBend'];
-function analyticShape(s){return !(s.baseForm>0)&&!(s.cellMorph>0)&&!hasStructure(s)&&!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);}
+const FIELD_KEYS=['baseForm',...STRUCTURE_FIELD_KEYS,...CELLULAR_FIELD_KEYS,...FRACTAL_KEYS,'deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','petalAmount','petalCoverage','stemAmount','stemRadius','stemBend'];
+function analyticShape(s){return !(s.baseForm>0)&&!(s.cellMorph>0)&&!(s.fractalAmount>0)&&!hasStructure(s)&&!['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','petalAmount','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001);}
 function atlasBounds(s,growthRadius){
  // Twist preserves radius. Deformation, ripples and lobes only add their
  // bounded amplitudes; they must not expand every volume to a nine-unit box.
@@ -1230,8 +1232,9 @@ function previewPlan(source){
  const cellular=cellularMayChange(source),moving=keys.filter(k=>(cellular||!CELLULAR_FIELD_KEYS.includes(k))&&source.motions?.[k]?.enabled&&((source.motions[k].amplitude||0)>0||CELLULAR_PHASES.includes(k)&&source.motions[k].mode==='cycle')),dynamic=moving.length>0;
  const cullSafe=!(source.edge>0||source.glow>0||motionInterval(source,'volume')[0]<.2);
  const descriptor=keys.map(k=>[source[k]??0,source.motions?.[k]?.enabled?JSON.stringify(source.motions[k]):'off'].join(':')).join('|')+'|'+(source.motion??.3)+'|'+rotateCrown+'|'+cullSafe+'|'+(source.perfectLoop!==false);
- const roots=rootWeight(source)>.000001||ROOT_KEYS.some(k=>source.motions?.[k]?.enabled);const sharp=motionInterval(source,'petalSharp'),fine=structureMayChange(source)||roots||(source.petalAmount||0)>.25&&(sharp[1]>.75||(source.petalWidth??.24)<.12);
- const fineResolution=cellular?dynamic?88:144:structureMayChange(source)?128:roots?(dynamic?((source.petalWidth??.24)<.08?80:64):80):!dynamic?112:(source.petalWidth??.24)<.12?128:moving.every(k=>k==='petalSharp')?80:112;
+ const fractal=fractalMayChange(source);
+ const roots=rootWeight(source)>.000001||ROOT_KEYS.some(k=>source.motions?.[k]?.enabled);const sharp=motionInterval(source,'petalSharp'),fine=fractal||structureMayChange(source)||roots||(source.petalAmount||0)>.25&&(sharp[1]>.75||(source.petalWidth??.24)<.12);
+ const fineResolution=fractal?(dynamic?72:128):cellular?dynamic?88:144:structureMayChange(source)?128:roots?(dynamic?((source.petalWidth??.24)<.08?80:64):80):!dynamic?112:(source.petalWidth??.24)<.12?128:moving.every(k=>k==='petalSharp')?80:112;
  return {descriptor,dynamic,rotateCrown,reuseTwist,fine,fineResolution,cullSafe};
 }
 function animatedBounds(source){
@@ -1268,7 +1271,7 @@ export function fieldAt(s,point){
  const lobe=Math.sin(Math.atan2(p[1],p[0])*(s.lobes||5))*(s.lobeAmount||0)*(1-Math.min(1,Math.abs(p[2]))*.65);
  let d=(s.baseForm>0?baseFormField(p,s.baseForm)+norm-Math.hypot(...p):norm-1)-s.deform*wave-s.waves*ripple*.17-lobe;
  if(s.renderVersion>=2){if((s.petalAmount||0)>.000001)d=d*(1-s.petalAmount)+(crownAt(s,p)-s.deform*wave*.35-s.waves*ripple*.08)*s.petalAmount;if((s.stemAmount||0)>.000001)d=softMin(d,stemAt(s,p),.08*Math.min(1,s.stemAmount*8));}
- if(s.renderVersion>=2)d=structureField(s,cellularField(s,loopBlend(s,d,p),p),p);
+ if(s.renderVersion>=2)d=structureField(s,cellularField(s,loopBlend(s,fractalField(s,d,p),p),p),p);
  const pow=2+s.holeShape*5;
  const hole=s.hole>.001?s.hole-Math.pow(Math.pow(Math.abs((p[0]-s.holeX)/(s.holeAspect||1)),pow)+Math.pow(Math.abs(p[1]-s.holeY),pow),1/pow):-10000;
  const cut=s.cut>.001?s.cut-Math.hypot((p[0]-s.cutX)/(s.cutAspect||1),p[1]-s.cutY):-10000;
@@ -1538,12 +1541,13 @@ export function geometryRadius(s,growthRadius=0){
  const flower=.17+(s.petalOpen??.65)*.25+length+width+.15,hedge=.62+(s.petalOpen??.65)*.14+length+width+.2;
  let radius=1.;if((s.petalAmount||0)>.000001){if(rootWeight(s)>.999999)radius=Math.max(radius,growthRadius);else{if((s.petalCoverage||0)<.9999)radius=Math.max(radius,flower);if((s.petalCoverage||0)>.0001)radius=Math.max(radius,hedge,growthRadius);if(rootWeight(s)>0)radius=Math.max(radius,growthRadius);}}
  if((s.stemAmount||0)>.000001)radius=Math.max(radius,s.stemAmount*3+Math.abs(s.stemBend||0)*.55+(s.stemRadius??.09)+.25);
- return Math.max(radius+.02,cellularBounds(s))*structureBounds(s);
+ return Math.max(radius+.02,cellularBounds(s),fractalBounds(s))*structureBounds(s);
 }
-const CELLULAR_ENABLED=16777216;
+const CELLULAR_ENABLED=16777216,FRACTAL_ENABLED=33554432;
+function fractalMayChange(s){return (s.fractalAmount||0)>0||!!(s.motions?.fractalAmount?.enabled&&s.motions.fractalAmount.amplitude>0);}
 function rendererVariant(s,options={},source=s){
- const modern=s.renderVersion>=2,cellular=modern&&cellularMayChange(source),analytic=!hasSolidForces(s)&&!cellular&&analyticShape(s)&&!structureMayChange(source);
- const transmission=modern?s.transparency:s.transparency+(1-s.transparency)*(s.translucency||0),crown=modern&&(cellular||structureMayChange(source)||(s.petalAmount||0)+(s.stemAmount||0)>.000001);
+ const modern=s.renderVersion>=2,cellular=modern&&cellularMayChange(source),fractal=modern&&fractalMayChange(source),analytic=!hasSolidForces(s)&&!cellular&&!fractal&&analyticShape(s)&&!structureMayChange(source);
+ const transmission=modern?s.transparency:s.transparency+(1-s.transparency)*(s.translucency||0),crown=modern&&(fractal||cellular||structureMayChange(source)||(s.petalAmount||0)+(s.stemAmount||0)>.000001);
  const amount=Math.min(1,((s.petalBlend||0)+(s.petalRoot||0)+(s.petalRandom||0))*20),spread=s.petalCoverage||0,petals=crown&&(s.petalAmount||0)>.000001;
  const volume=(s.scattering||0)+(s.translucency||0)+(s.subsurface||0)>.0001&&(!modern||transmission>.0001&&s.thinShell<.999);
  // A ribbon thinner than the field grid can disappear during interpolation.
@@ -1561,12 +1565,12 @@ function rendererVariant(s,options={},source=s){
  }
  const originalPetals=petals&&rootWeight(s)<.999999;
  return (modern?8+loopVariant(source):0)+(modern&&s.thinShell>=.999?16:0)+(modern&&analytic?32:0)+(crown?64:0)+ +volume+((s.subsurface||0)>.0001&&(!modern?transmission<.999:true)?2:0)+((s.dispersion||0)>.005?4:0)
-  +(originalPetals&&spread<=.9999?128:0)+(originalPetals&&spread>=.0001&&amount<.999999?256:0)+(originalPetals&&spread>=.0001&&amount>.000001?512:0)+(crown&&(s.stemAmount||0)>.000001?1024:0)+(modern&&transmission>.0001?2048:0)+(modern&&options.preview&&options.quality!=='full'?4096:0)+(petals&&rootWeight(s)>.000001?32768:0)+(modern&&structureMayChange(source)?65536:0)+(modern?Math.round(s.baseForm||0)*131072:0)+(modern&&hasSolidForces(s)?SCULPT_ENABLED:0)+(cellular?CELLULAR_ENABLED:0);
+  +(originalPetals&&spread<=.9999?128:0)+(originalPetals&&spread>=.0001&&amount<.999999?256:0)+(originalPetals&&spread>=.0001&&amount>.000001?512:0)+(crown&&(s.stemAmount||0)>.000001?1024:0)+(modern&&transmission>.0001?2048:0)+(modern&&options.preview&&options.quality!=='full'?4096:0)+(petals&&rootWeight(s)>.000001?32768:0)+(modern&&structureMayChange(source)?65536:0)+(modern?Math.round(s.baseForm||0)*131072:0)+(modern&&hasSolidForces(s)?SCULPT_ENABLED:0)+(cellular?CELLULAR_ENABLED:0)+(fractal?FRACTAL_ENABLED:0);
 }
 function variantSource(key,floatAtlas=false){
  if(key===ATLAS_BAKE)return BAKE_FRAG;
  const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4,ROOTS_ENABLED:32768,STRUCTURE_ENABLED:65536};
- let defines='#define FLOAT_ATLAS '+ +floatAtlas+'\n#define CELLULAR_GEOMETRY '+ +(!!(key&CELLULAR_ENABLED))+'\n#define BASE_FORM_KIND '+(key&ATLAS_PREVIEW?-1:(Math.floor(key/131072)&7))+'\n'+Object.entries(flags).map(([name,bit])=>'#define '+name+' '+ +!!(key&bit)).join('\n');
+ let defines='#define FLOAT_ATLAS '+ +floatAtlas+'\n#define FRACTAL_ENABLED '+ +!!(key&FRACTAL_ENABLED)+'\n#define CELLULAR_GEOMETRY '+ +(!!(key&CELLULAR_ENABLED))+'\n#define BASE_FORM_KIND '+(key&ATLAS_PREVIEW?-1:(Math.floor(key/131072)&7))+'\n'+Object.entries(flags).map(([name,bit])=>'#define '+name+' '+ +!!(key&bit)).join('\n');
  if(key&8)defines+='\n#define TRACE_STEPS '+(key&ATLAS_PREVIEW?128:key&4096?128:224)+'\n#define INTERFACE_STEPS '+(key&ATLAS_PREVIEW?4:key&4096?8:32)+'\n#define LENGTH_SAMPLES '+(key&4096?8:16)+'\n#define SCATTER_SAMPLES '+(key&4096?2:4)+'\n#define SPECTRAL_SAMPLES '+(key&4096?3:5);
  let source=key&ATLAS_PREVIEW?(key&SCULPT_ENABLED?SCULPT_PREVIEW_FRAG:PREVIEW_FRAG):key&8?(key&SCULPT_ENABLED?SCULPT_FRAG:MODERN_FRAG):FRAG;
  if(key&8&&!(key&ATLAS_PREVIEW)){
@@ -1663,7 +1667,7 @@ export class Renderer{
   const target=g.getParameter(g.DRAW_FRAMEBUFFER_BINDING),viewport=g.getParameter(g.VIEWPORT),scissorBox=g.getParameter(g.SCISSOR_BOX),scissor=g.isEnabled(g.SCISSOR_TEST),blend=g.isEnabled(g.BLEND),dither=g.isEnabled(g.DITHER);
   try{
    this.useVariant(ATLAS_BAKE);this.uploadGrowth(s);this.uploadRoots(s);
-   const bounds=s.cellMorph>0?atlasBounds(s,this.growthRadius):this.motionBounds||atlasBounds(s,this.growthRadius),tiles=Math.ceil(Math.sqrt(resolution)),size=tiles*(resolution+2);
+   const bounds=s.cellMorph>0||s.fractalAmount>0?atlasBounds(s,this.growthRadius):this.motionBounds||atlasBounds(s,this.growthRadius),tiles=Math.ceil(Math.sqrt(resolution)),size=tiles*(resolution+2);
    this.fieldAtlas=[resolution,tiles,size,bounds.range];this.fieldMin=bounds.min;this.fieldMax=bounds.max;
    if(this.fieldSize!==size){this.fieldAllocations=(this.fieldAllocations||0)+1;g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fieldTexture);g.texImage2D(g.TEXTURE_2D,0,this.fieldHalfFloat?g.RG16F:g.RGBA8,size,size,0,this.fieldHalfFloat?g.RG:g.RGBA,this.fieldHalfFloat?g.HALF_FLOAT:g.UNSIGNED_BYTE,null);this.fieldSize=size;}
    if(!this.fieldFramebuffer)this.fieldFramebuffer=g.createFramebuffer();
@@ -1674,7 +1678,7 @@ export class Renderer{
    // only and without changing texture dimensions or its sample format.
    if(warmup){g.enable(g.SCISSOR_TEST);g.scissor(0,0,2,2);}
    const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v);
-   uploadCellular(s,g,this.locations,true);
+   uploadCellular(s,g,this.locations,true);uploadFractal(s,u);
    f('uBakeShell',frame.structShell||0);baseFormUniforms(s,g,this.locations);structureUniforms(s,u);u('uRuntime',[0,0,2,0]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uOther',[0,0,s.waves,0]);
    u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);
    u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,0,0]);
@@ -1693,7 +1697,7 @@ export class Renderer{
  pollCompletion(){const g=this.gl;if(this.completionSync&&!g.isContextLost()){const status=g.clientWaitSync(this.completionSync,0,0);if(status===g.ALREADY_SIGNALED||status===g.CONDITION_SATISFIED){g.deleteSync(this.completionSync);this.completionSync=null;this.completedFrames++;return true;}}return false;}
  async waitForGpu(options={}){const start=Date.now();let polls=0;while(this.completionSync){this.assertAvailable();if(this.pollCompletion())break;if(options.cancelled?.())return false;if(Date.now()-start>120000)throw new Error('Il calcolo richiede troppo tempo. La creazione è conservata.');if(polls++<4&&globalThis.scheduler?.yield)await globalThis.scheduler.yield();else await new Promise(r=>setTimeout(r,4));}return !options.cancelled?.();}
  draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=rendererVariant(s,options,source),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(c.width!==width||c.height!==height){c.width=width;c.height=height}g.viewport(0,0,width,height);let analytic=!!(key&32)||analyticShape(s);const timer=options.preview&&options.trackTiming!==false?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW){this.ensurePreviewField(s,options,source);analytic=this.cachedShapeAnalytic;}this.useVariant(key);bindGrowth(g,this.program,s,phase);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(s.renderVersion>=2&&hasSolidForces(s)){uploadSolidForces(this,s);if(hasSolidForces(s))analytic=false;}if(key&512)this.uploadGrowth(s);if(key&32768)this.uploadRoots(s);const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
- if(s.renderVersion>=2){uploadCellular(s,g,this.locations,!!(key&CELLULAR_ENABLED));u('uBudget',key&ATLAS_PREVIEW?(options.quality==='fast'?[hasSolidForces(s)?384:structureMayChange(source)?512:this.fieldResolution>=96?128:96,3,4,1]:[hasSolidForces(s)?512:structureMayChange(source)?768:128,4,8,2]):key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
+ if(s.renderVersion>=2){uploadCellular(s,g,this.locations,!!(key&CELLULAR_ENABLED));uploadFractal(s,u);u('uBudget',key&ATLAS_PREVIEW?(options.quality==='fast'?[hasSolidForces(s)?384:structureMayChange(source)?512:this.fieldResolution>=96?128:96,3,4,1]:[hasSolidForces(s)?512:structureMayChange(source)?768:128,4,8,2]):key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
  if(s.renderVersion>=2){baseFormUniforms(s,g,this.locations);structureUniforms(s,u);u('uFilmPattern',[s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5]);u('uFilmAccent',[s.filmChroma||0,s.filmDuo||0]);u('uMaterialDetail',[s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad]);u('uMaterialLayers',[s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0]);u('uOrganicDetail',[s.textureRandomness||0,s.textureWarp||0,s.textureLink||0,s.texturePatch||0]);f('uTextureSeed',s.textureSeed||0);u('uColorLayers',[s.colorLayers||0,s.colorLayerScale??1,s.colorLayerShift||0,s.colorLayerMix??.5]);u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);f('uNormalSamples',6);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,24]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
  f('uFilCore',(s.filLength||0)>0?(s.filCore??1):1);u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);

@@ -1,15 +1,17 @@
-import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=ea2ba1524502';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=ea2ba1524502';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=ea2ba1524502';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=ea2ba1524502';
+import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=733682a38c35';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=733682a38c35';
+import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=733682a38c35';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=733682a38c35';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=733682a38c35';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
 export function track(amplitude=1,enabled=false,mode='wave'){return{enabled,amplitude,cycles:1,phase:0,direction:1,curve:'sine',pace:0,pacePhase:0,hold:0,mode}}
-export const SHAPE_TRACKS=[...Object.keys(STRUCTURE_TRACKS),...CELLULAR_FIELD_KEYS.filter(key=>CELLULAR_TRACKS[key]),'petalFlowPhase','petalOrbitPhase','petalWeave','volume','deform','twist','waves','hole','cut','petalOpen','petalCurl','petalInflate','petalSharp','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemBend'];
+export const SHAPE_TRACKS=[...Object.keys(STRUCTURE_TRACKS),...Object.keys(FRACTAL_TRACKS),...CELLULAR_FIELD_KEYS.filter(key=>CELLULAR_TRACKS[key]),'petalFlowPhase','petalOrbitPhase','petalWeave','volume','deform','twist','waves','hole','cut','petalOpen','petalCurl','petalInflate','petalSharp','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemBend'];
 export const TRACK_META={
  ...STRUCTURE_TRACKS,
  ...CELLULAR_TRACKS,
+ ...FRACTAL_TRACKS,
  pVeilStyle:['Petali / aureola / ventaglio',0,2,.01],pVeilMorph:['Trasformazione forma / veli',0,1,.01],pVeilSpread:['Apertura dei veli',0,1,.01],
  petalFlowPhase:['Scorrimento lungo le radici',0,1,.01],petalOrbitPhase:['Avanzamento continuo sulla sfera',0,1,.01],petalWeave:['Ampiezza intreccio',0,1,.01],
  petalGrowth:['Emersione delle radici',0,1,.01],petalWander:['Sinuosità delle radici',0,1,.01],petalCoil:['Avvolgimento intorno alla sfera',0,1,.01],petalReentry:['Rientro nella sfera',0,1,.01],petalKnots:['Nodosità delle radici',0,1,.01],petalRidges:['Nervature della superficie',0,1,.01],petalDisorder:['Disordine della crescita',0,1,.01],
@@ -20,6 +22,7 @@ export const EXTRA_BASE={
  baseForm:0,
  ...STRUCTURE_DEFAULTS,
  ...CELLULAR_DEFAULTS,
+ ...FRACTAL_DEFAULTS,
  ...FINISH_DEFAULTS,
  petalCollision:0,petalSphereCollision:0,petalContactGap:.006,petalContactStiffness:.65,petalContactPasses:16,
  petalDirectionSpread:0,petalWeave:0,petalWeaveTurns:2,petalFlow:0,petalFlowPhase:0,petalOrbitPhase:0,
@@ -54,6 +57,7 @@ export const EXTRA_META={
  baseForm:['Forma di base',0,6,1],
  ...STRUCTURE_META,
  ...CELLULAR_META,
+ ...FRACTAL_META,
  petalCollision:['Contatto fra radici',0,1,.01],petalSphereCollision:['Contatto con la sfera',0,1,.01],petalContactGap:['Spazio fra i fili',0,.06,.001],petalContactStiffness:['Rigidità dei fili',0,1,.01],petalContactPasses:['Precisione dei contatti',8,32,1],
  petalDirectionSpread:['Direzioni distribuite',0,1,.01],petalWeave:['Intreccio sopra / sotto',0,1,.01],petalWeaveTurns:['Incroci lungo il percorso',1,4,1],petalFlow:['Scorrimento della materia',0,1,.01],petalFlowPhase:['Posizione dello scorrimento',0,1,.001],petalOrbitPhase:['Avanzamento sulla sfera',0,1,.001],
  ...FINISH_META,

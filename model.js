@@ -1,11 +1,12 @@
-import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=ea2ba1524502';
-import {GROWTH_DEFAULTS} from './growth-material.js?v=ea2ba1524502';
-import {FINISH_DEFAULTS} from './finishing.js?v=ea2ba1524502';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=ea2ba1524502';
-import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=ea2ba1524502';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=ea2ba1524502';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=ea2ba1524502';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=ea2ba1524502';
+import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=733682a38c35';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=733682a38c35';
+import {FINISH_DEFAULTS} from './finishing.js?v=733682a38c35';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=733682a38c35';
+import {FRACTAL_KEYS} from './fractal-form.js?v=733682a38c35';
+import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=733682a38c35';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=733682a38c35';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=733682a38c35';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=733682a38c35';
 export const BASE = {
  ...DYNAMICS_DEFAULTS,...PARTICLE_DEFAULTS,engine:'solid',keepMotionSpeed:true,motionPeriod:0,
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -80,7 +81,7 @@ export const GROUPS={
 };
 GROUPS.shape.push('petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemAmount','stemRadius','stemBend');
 GROUPS.shape.push('rotateX','rotateY','rotateZ');
-GROUPS.shape.push(...Object.keys(CELLULAR_SHAPE));
+GROUPS.shape.push(...Object.keys(CELLULAR_SHAPE),...FRACTAL_KEYS);
 GROUPS.material.push(...Object.keys(CELLULAR_MATERIAL));
 GROUPS.color.push('colorWaveAmount','colorWaveHeight','colorWaveRadius','colorWaveSwirl','colorWaveBands','colorWaveWarp','colorWavePhase');
 GROUPS.background.push('grounding','groundShadow','groundCaustic');

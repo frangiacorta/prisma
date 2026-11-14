@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Frattali 3D · Prisma Studio</title>
+<style>
+:root{color-scheme:dark}body{margin:0;background:#111318;color:#eaeaf0;font:16px/1.55 system-ui}
+main{max-width:800px;margin:auto;padding:28px 18px}h1{font-size:clamp(1.55rem,5vw,2.4rem);margin:0 0 12px}
+video,img{display:block;width:100%;background:#000;border-radius:9px}nav,.formulas{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0}
+a{color:#d3f6a8}nav a{padding:9px 13px;border:1px solid #59664b;border-radius:8px}figure{margin:0;flex:1 1 220px}
+figcaption{margin:5px 0}p{max-width:64ch}
+</style>
+<main>
+ <h1>Frattali 3D</h1>
+ <video controls autoplay muted loop playsinline poster="frattali-3d.png" src="frattali-3d-4s.mp4" aria-label="Mandelbulb con rotazione e variazione periodica dei lobi"></video>
+ <nav>
+  <a href="../?engine=solid&v=77">Apri in Prisma</a>
+  <a href="frattali-3d.prisma.json" download>Scarica il preset Mandelbulb</a>
+  <a href="../moodboard/?view=board#s12-01">Reference</a>
+ </nav>
+ <p>In <strong>Forma → Frattali 3D</strong> scegli una formula e regola la trasformazione dalla figura di base. Potenza e pieghe cambiano la geometria. Colori, luce e materia usano i controlli dello Studio.</p>
+ <div class="formulas">
+  <figure><img src="frattali-menger.png" alt="Cubo Menger con tunnel ripetuti a più scale" width="480" height="320"><figcaption>Menger</figcaption></figure>
+  <figure><img src="frattali-mandelbox.png" alt="Mandelbox con pieghe tridimensionali e dettagli ricorsivi" width="480" height="320"><figcaption>Mandelbox</figcaption></figure>
+ </div>
+ <p>In <strong>Movimento</strong> puoi animare intensità, potenza e pieghe. Questa prova viene renderizzata in Prisma. Il collegamento ai progetti e ai keyframe di Mandelbulber è previsto nella roadmap.</p>
+</main>
+</html>

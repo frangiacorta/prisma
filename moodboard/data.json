@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-11-13",
+  "updated": "2026-11-14",
   "items": [
     {
       "id": "s01-01",
@@ -13341,29 +13341,37 @@
       "related": [
         "s12-01"
       ],
-      "state": "proposed",
+      "state": "partial",
       "priority": false,
       "author": "",
-      "summary": "Mandelbulber gratuito sul PC: riusare motore, esempi e animazioni; integrazione Prisma da realizzare.",
+      "summary": "Mandelbulb, Menger e Mandelbox procedurali, con trasformazione dalla figura di base, dettagli modificabili e animazione.",
       "sources": [
         "https://github.com/buddhi1980/mandelbulber2"
       ],
       "sections": [
         {
-          "title": "Come lo portiamo in Prisma",
+          "title": "Integrazione in Prisma",
           "fields": [
             {
               "label": "method",
-              "value": "Adattatore locale per preset .fract, keyframe e render; Pages riproduce i loop esportati."
-            }
-          ]
-        },
-        {
-          "title": "Repo, plugin e riuso",
-          "fields": [
+              "value": "Tre campi di distanza procedurali, combinati con la figura di partenza nello Studio. Materiali, colori, luci, rotazione e filtri usano gli stessi controlli di Forma."
+            },
             {
-              "label": "feasible",
-              "value": "Mandelbulber gratuito sul PC: riusare motore, esempi e animazioni; integrazione Prisma da realizzare."
+              "label": "implemented",
+              "value": [
+                "Mandelbulb, Menger e Mandelbox nel browser.",
+                "Trasformazione graduabile, potenza, iterazioni, pieghe e spessore dei dettagli.",
+                "Tracce per intensità, potenza e pieghe, salvataggio del preset ed export.",
+                "Loop Mandelbulb verificato in Chrome, insieme ai controlli desktop e mobile."
+              ]
+            },
+            {
+              "label": "checks",
+              "value": "Recupero esatto del campo di base a intensità zero. Ricarica del preset con tutti i parametri. Render delle tre formule. Raccordo del loop e controlli testati a larghezze di 1240 e 390 pixel."
+            },
+            {
+              "label": "limits",
+              "value": "Il renderer WebGL di Prisma usa formule proprie. Il collegamento a Mandelbulber, ai suoi preset .fract e ai suoi keyframe resta da verificare."
             }
           ]
         },
@@ -13373,13 +13381,9 @@
             {
               "label": "controls",
               "value": [
-                "Formula Mandelbulb / Menger / Mandelbox",
-                "Potenza, iterazioni e dettaglio",
-                "Pieghe, simmetria e variazione della forma",
-                "Scala, zoom e percorso camera",
-                "Velocità, durata, FPS e raccordo",
-                "Colori, materiale, riflessi, luci e ombre",
-                "Qualità anteprima / export"
+                "Formula, intensità, potenza, iterazioni, pieghe e spessore dei dettagli",
+                "Posizione, scala, materiale, palette e luci dello Studio",
+                "Tracce di intensità, potenza e pieghe"
               ]
             },
             {
@@ -13399,16 +13403,21 @@
         "growth"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "",
-      "where": "",
-      "platform": "PC · renderer esterno",
-      "next": "",
+      "result": "frattali-3d",
+      "where": "Forma → Frattali 3D · Movimento → Aggiungi animazione",
+      "platform": "Browser · WebGL 2",
+      "next": "Collegare i file .fract e i keyframe di Mandelbulber per il render locale. La pagina mostra il loop già esportato da Prisma.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/roadmap-fractals-prisma.webp",
+          "width": 480,
+          "height": 320
+        },
         {
           "src": "media/8ceeea3aba6ad38f.webp",
           "width": 296,
@@ -13423,7 +13432,19 @@
         "fractals"
       ],
       "category": "form",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "engine": "solid",
+      "method": "Tre campi di distanza procedurali, combinati con la figura di partenza nello Studio. Materiali, colori, luci, rotazione e filtri usano gli stessi controlli di Forma.",
+      "implemented": [
+        "Mandelbulb, Menger e Mandelbox nel browser.",
+        "Trasformazione graduabile, potenza, iterazioni, pieghe e spessore dei dettagli.",
+        "Tracce per intensità, potenza e pieghe, salvataggio del preset ed export.",
+        "Loop Mandelbulb verificato in Chrome, insieme ai controlli desktop e mobile."
+      ],
+      "limits": "Il renderer WebGL di Prisma usa formule proprie. Il collegamento a Mandelbulber, ai suoi preset .fract e ai suoi keyframe resta da verificare.",
+      "resultImage": "media/roadmap-fractals-prisma.webp",
+      "resultUrl": "../previews/frattali-3d.html?v=77",
+      "resultVideo": "../previews/frattali-3d-4s.mp4?v=77"
     },
     {
       "id": "roadmap-particles",

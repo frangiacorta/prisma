@@ -1,6 +1,7 @@
-import {AUDIO_HELP} from './audio-model.js?v=ea2ba1524502';
-import {EXTRA_HELP} from './control-help-extra.js?v=ea2ba1524502';
-import {CELLULAR_HELP} from './cellular-form.js?v=ea2ba1524502';
+import {AUDIO_HELP} from './audio-model.js?v=733682a38c35';
+import {EXTRA_HELP} from './control-help-extra.js?v=733682a38c35';
+import {FRACTAL_HELP} from './fractal-form.js?v=733682a38c35';
+import {CELLULAR_HELP} from './cellular-form.js?v=733682a38c35';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',
@@ -226,6 +227,9 @@ Object.assign(HELP,{
 export function controlCondition(s,key){
  const positive=k=>Math.abs(Number(s[k])||0)>1e-6||s.motions?.[k]?.enabled&&Math.abs(s.motions[k].amplitude||0)>1e-6;
  const need=(k,text)=>positive(k)?'':text;
+ if(Object.hasOwn(FRACTAL_HELP,key)&&key!=='fractalAmount'&&!positive('fractalAmount'))return 'Aumenta Intensità del frattale in Forma.';
+ if(key==='fractalPower'&&s.fractalKind!==0)return 'La potenza si applica alla formula Mandelbulb.';
+ if(key==='fractalFold'&&s.fractalKind===0)return 'Le pieghe si applicano a Menger e Mandelbox.';
  if(Object.hasOwn(CELLULAR_HELP,key)&&key!=='cellMorph'&&!positive('cellMorph'))return 'Aumenta Sviluppo cellulare in Forma.';
  if(/^lights\.\d+\./.test(key)){const l=s.lights?.find(l=>String(l.id)===key.split('.')[1]);if(l?.enabled===false&&!key.endsWith('.enabled'))return 'Attiva questa luce per vedere il risultato.';}
  if(key.startsWith('finish')&&!['finishEnabled','finishCompare'].includes(key)){
@@ -268,5 +272,5 @@ export function controlHelp(key,engine){
  if(key.startsWith('motions.')||/^lights\.\d+\.(orbit|pulse)\./.test(key))return TRACK[key.split('.').at(-1)];
  if(key.startsWith('lights.'))return LIGHT[key.split('.').at(-1)];
  if(key.startsWith('palette.'))return 'Colore di base della materia. Modifica la casella o inserisci un codice esadecimale; luci e riflessi si aggiungono a questa palette.';
- return CELLULAR_HELP[key]||HELP[key];
+ return FRACTAL_HELP[key]||CELLULAR_HELP[key]||HELP[key];
 }
