@@ -29,8 +29,8 @@ export function shadowProgram(vertex,fragment,varyings){
  return {vertex,fragment};
 }
 
-export function shadowLight(state){
- const lights=(state.lights||[]).filter(l=>l.enabled&&l.power>0&&l.y>state.pShadowHeight+.03);
+export function shadowLight(state,receiver=true){
+ const lights=(state.lights||[]).filter(l=>l.enabled&&l.power>0&&(!receiver||l.y>state.pShadowHeight+.03));
  if(state.pShadowLight>=0)return lights.find(l=>l.id===state.pShadowLight)||null;
  return lights.reduce((best,l)=>!best||l.power>best.power?l:best,null);
 }

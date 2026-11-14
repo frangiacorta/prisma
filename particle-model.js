@@ -1,4 +1,4 @@
-import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=12f2ff4e0842';
+import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=87a259ec8c3c';
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
 export const PARTICLE_VERSION=14;
 export function grainDiameters(s){
@@ -18,7 +18,7 @@ export const COLOR_MODES=['Solidale alla forma iniziale','Identità della partic
 export const PARTICLE_META={...VEIL_META,
  pCloudCore:['Concentrazione del nucleo',-1,1,.01],pCloudHalo:['Particelle nell’alone',0,1,.01],pCloudRadius:['Estensione dell’alone',0,2,.01],
  pCellAmount:['Raggruppamento in cellule',0,1,.01],pCellDensity:['Suddivisioni cellulari per asse',2,12,1],pCellSize:['Raggio delle cellule',.005,.45,.005],pCellVariation:['Irregolarità delle cellule',0,1,.01],
- pSelfShadow:['Ombre reciproche',0,1,.01],pSelfShadowSoftness:['Sfumatura reciproca',0,4,.1],pSelfShadowBias:['Distanza antiartefatti',.002,.1,.002],pCausticSoftness:['Sfumatura della caustica',0,20,.1],pCaustic:['Intensità della caustica',0,4,.01],pOpticalExtent:['Area della mappa luce',1,16,.1],
+ pSelfShadow:['Ombre reciproche',0,1,.01],pVolumeShadow:['Assorbimento della nube',0,1,.01],pSelfShadowSoftness:['Sfumatura reciproca',0,4,.1],pSelfShadowBias:['Distanza antiartefatti',.002,.1,.002],pCausticSoftness:['Sfumatura della caustica',0,20,.1],pCaustic:['Intensità della caustica',0,4,.01],pOpticalExtent:['Area della mappa luce',1,16,.1],
  pShadow:['Intensità dell’ombra',0,1,.01],pShadowHeight:['Altezza del piano',-4,2,.01],pShadowSoftness:['Morbidezza dell’ombra',0,40,.5],pShadowLight:['Luce dell’ombra',-1,1000000,1],
  pLivingBlend:['Passaggio particelle / struttura',0,1,.01],pSurfaceBind:['Adesione dei granelli alla struttura',0,1,.01],pLivingOcclusion:['Schermatura del nucleo',0,1,.01],
  pBundleAmount:['Raggruppamento in fasci',0,1,.01],pSelfContact:['Contatto tra pieghe',0,1,.01],pContactClearance:['Distanza di contatto',.1,1.35,.01],pVolumeHold:['Conservazione del volume',0,1,.01],pBundleDelay:['Ritardo tra i fasci',0,.35,.005],pFray:['Sfrangiatura dei fasci',0,1,.01],pLiving:['Struttura connessa',0,4,1],pBundles:['Numero di fasci',1,16,1],pBundleSpread:['Apertura dei fasci',.05,1,.01],pStrands:['Fili del reticolo',32,2048,16],pThreadWidth:['Spessore del reticolo · px',.015,32,.005],pThreadOpacity:['Visibilità del reticolo',0,1,.01],pWeft:['Intreccio trasversale',0,1,.01],
@@ -48,7 +48,7 @@ export const PARTICLE_META={...VEIL_META,
  pTrailPersistence:['Persistenza della coda',0,1,.01],pTrailSoftness:['Morbidezza delle fibre',0,1,.01],pTrailCoherence:['Coesione in tessuto',0,1,.01],pTrailDensity:['Compensazione luminosità',0,1,.01],pTrailQuality:['Definizione delle curve',24,192,8],
  pColorMode:['Colore sulle particelle',0,3,1],pColorScatter:['Variazione cromatica individuale',0,1,.01],pLumaVar:['Variazione luminosità individuale',0,1,.01],pDepthFade:['Attenuazione in profondità',0,1,.01],pLighting:['Risposta alle luci',0,1,.01],
 };
-export const PARTICLE_DEFAULTS={pSelfShadow:0,pSelfShadowSoftness:1.5,pSelfShadowBias:.02,pCaustic:0,pCausticSoftness:2.5,pOpticalExtent:4,pShadow:0,pShadowHeight:-1.6,pShadowSoftness:8,pShadowLight:-1,...VEIL_DEFAULTS,
+export const PARTICLE_DEFAULTS={pSelfShadow:0,pVolumeShadow:0,pSelfShadowSoftness:1.5,pSelfShadowBias:.02,pCaustic:0,pCausticSoftness:2.5,pOpticalExtent:4,pShadow:0,pShadowHeight:-1.6,pShadowSoftness:8,pShadowLight:-1,...VEIL_DEFAULTS,
  pCloudCore:0,pCloudHalo:0,pCloudRadius:.65,pCellAmount:0,pCellDensity:4,pCellSize:.09,pCellVariation:.45,
  pLivingBlend:.5,pSurfaceBind:0,pLivingOcclusion:1,
  pBundleAmount:0,pSelfContact:0,pContactClearance:.65,pVolumeHold:0,pBundleDelay:0,pFray:0,pLiving:0,pBundles:8,pBundleSpread:.65,pStrands:512,pThreadWidth:.45,pThreadOpacity:.8,pWeft:0,pElastic:.6,pBend:.3,pSkin:0,pSkinOffset:0,pSkinOpening:.15,pFoldCount:5,pFoldDepth:.12,pInflate:.06,pContract:.15,pPores:0,pPoreCount:24,
@@ -72,7 +72,7 @@ export const PARTICLE_DEFAULTS={pSelfShadow:0,pSelfShadowSoftness:1.5,pSelfShado
  pColorMode:0,pColorScatter:.06,pLumaVar:.25,pDepthFade:.25,pLighting:.65,
 };
 export const PARTICLE_GROUPS={
- background:['pShadow','pShadowHeight','pShadowSoftness','pSelfShadow','pSelfShadowSoftness','pSelfShadowBias','pCaustic','pCausticSoftness','pOpticalExtent'],
+ background:['pShadow','pShadowHeight','pShadowSoftness','pSelfShadow','pVolumeShadow','pSelfShadowSoftness','pSelfShadowBias','pCaustic','pCausticSoftness','pOpticalExtent'],
  shape:['pSizeRatio','pNodeRatio','pSizeSpread','pSizeBias','pLargeCount','pSkinScale','pSkinFollow','pSkinThickness','pLinkSurface','pLinkTurns','pLinkMinReach','pGrainSpacing','pGroupSpacing','pDistributionCells','pBundleAmount','pLivingBlend','pSurfaceBind','pLivingOcclusion','pLiving','pBundles','pBundleSpread','pStrands','pThreadWidth','pThreadOpacity','pWeft','pSkin','pSkinOffset','pSkinOpening','pPores','pPoreCount','pFoldCount','pFoldDepth','pLinks','pLinkNodes','pLinkReach','pLinkNeighbors','pLinkWidth','pLinkCurve','pLinkStretch','pCount','pSize','pSizeVar','pSprite','pOpacity','pSoftness','pTrailCount','pTrailLength','pTrailWidth','pTrailOpacity','pTrailFork','pTrailForkSpread','pTrailFade','pTrailTaper','pTrailScatter','pTrailPersistence','pTrailSoftness','pTrailCoherence','pTrailDensity','pTrailQuality','pOpening','pThickness','pFill','pClumps','pLobes','pLobeDepth','pOrganic','pFrequency','pDetail','pRough','pWarp','pOuter','pReach','pBranches','pNeural','pNodes','pConnect','pSymmetry','pTentacle','pTentacleCount','pTentacleLength','pTentacleTaper','pTentacleCurl'],
  material:['pFilm','pFilmScale','pFilmVariation','pFiberSheen','pFiberSpread'],
  color:['pColorMode','pColorScatter','pLumaVar'],light:['pLighting','pDepthFade'],

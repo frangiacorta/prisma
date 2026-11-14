@@ -1,13 +1,13 @@
-import {Dynamics,disposeDynamics} from './dynamics.js?v=12f2ff4e0842';
-import {motionPeriod} from './animation-clock.js?v=12f2ff4e0842';
-import {animationPhase} from './animation-clock.js?v=12f2ff4e0842';
-import {ScanlinePass} from './finish-scanlines.js?v=12f2ff4e0842';
-import {FilamentPass} from './filament-renderer.js?v=12f2ff4e0842';
-import {VeilTransition} from './veil-transition.js?v=12f2ff4e0842';
-import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=12f2ff4e0842';
-import {ParticleRenderer} from './particle-renderer.js?v=12f2ff4e0842';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FINISH_DEFAULTS,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=12f2ff4e0842';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=12f2ff4e0842';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=87a259ec8c3c';
+import {motionPeriod} from './animation-clock.js?v=87a259ec8c3c';
+import {animationPhase} from './animation-clock.js?v=87a259ec8c3c';
+import {ScanlinePass} from './finish-scanlines.js?v=87a259ec8c3c';
+import {FilamentPass} from './filament-renderer.js?v=87a259ec8c3c';
+import {VeilTransition} from './veil-transition.js?v=87a259ec8c3c';
+import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=87a259ec8c3c';
+import {ParticleRenderer} from './particle-renderer.js?v=87a259ec8c3c';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FINISH_DEFAULTS,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=87a259ec8c3c';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=87a259ec8c3c';
 // One editor and export contract; the saved creation chooses its renderer.
 export class Renderer{
  constructor(canvas){this.dynamics=new Dynamics(sampleFrame);this.liveDynamics=new Dynamics(sampleFrame,true);this.canvas=canvas;this.context=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!this.context)throw Error('WebGL 2 non disponibile.');this.frameTimer=this.context.getExtension('EXT_disjoint_timer_query_webgl2');this.frameQueries=[];this.frameGpuSample=0;this.frameGpuMs=null;}

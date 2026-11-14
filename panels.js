@@ -1,21 +1,21 @@
-import {dynamicsPanel} from './dynamics-panel.js?v=12f2ff4e0842';
-import {motionPeriod} from './animation-clock.js?v=12f2ff4e0842';
-import {GROWTH_STUDIES} from './growth-material.js?v=12f2ff4e0842';
-import {GLYPH_FONTS} from './finishing.js?v=12f2ff4e0842';
-import {BASE_FORMS} from './base-forms.js?v=12f2ff4e0842';
-import {structurePanel,STRUCTURE_TRACKS} from './structure-model.js?v=12f2ff4e0842';
-import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=12f2ff4e0842';
-import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=12f2ff4e0842';
-import {finishingOrderPanel} from './finishing-order.js?v=12f2ff4e0842';
-import {rootMotionSuspended} from './solid-renderer.js?v=12f2ff4e0842';
-import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=12f2ff4e0842';
-import {MOODS} from './model.js?v=12f2ff4e0842';
-import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=12f2ff4e0842';
+import {dynamicsPanel} from './dynamics-panel.js?v=87a259ec8c3c';
+import {motionPeriod} from './animation-clock.js?v=87a259ec8c3c';
+import {GROWTH_STUDIES} from './growth-material.js?v=87a259ec8c3c';
+import {GLYPH_FONTS} from './finishing.js?v=87a259ec8c3c';
+import {BASE_FORMS} from './base-forms.js?v=87a259ec8c3c';
+import {structurePanel,STRUCTURE_TRACKS} from './structure-model.js?v=87a259ec8c3c';
+import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=87a259ec8c3c';
+import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=87a259ec8c3c';
+import {finishingOrderPanel} from './finishing-order.js?v=87a259ec8c3c';
+import {rootMotionSuspended} from './solid-renderer.js?v=87a259ec8c3c';
+import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=87a259ec8c3c';
+import {MOODS} from './model.js?v=87a259ec8c3c';
+import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=87a259ec8c3c';
 export function pathValue(s,path){const parts=path.split('.');let value=s;for(let i=0;i<parts.length;i++){if(i===1&&parts[0]==='lights')value=value.find(l=>l.id===Number(parts[i]));else value=value?.[parts[i]];}return value}
 export function pathMeta(path,state){const parts=path.split('.'),last=parts.at(-1);if(last==='cycles')return state?.perfectLoop===false?['Ripetizioni nel ciclo',.1,8,.1]:['Ripetizioni nel loop',1,8,1];if(last==='pace')return['Accelerazione / decelerazione',0,.95,.01];if(last==='pacePhase')return['Punto di massima velocità',0,360,1];if(last==='hold')return['Pausa a ogni giro',0,.8,.01];if(last==='phase')return['Fase di partenza',0,360,1];if(last==='amplitude'){if(parts[0]==='motions'){const m=TRACK_META[parts[1]];return ['Ampiezza',m[1],m[2],m[3]]}return parts[2]==='orbit'?['Ampiezza orbita',0,180,1]:['Ampiezza pulsazione',0,1,.01]}return LIGHT_META[last]}
 export function writePath(s,path,value){const parts=path.split('.');let object=s;for(let i=0;i<parts.length-1;i++){if(i===1&&parts[0]==='lights')object=object.find(l=>l.id===Number(parts[i]));else object=object[parts[i]];}if(object)object[parts.at(-1)]=value}
-import {livingChooser} from './living-panel.js?v=12f2ff4e0842';
-import {particlePanel} from './particle-panel.js?v=12f2ff4e0842';
+import {livingChooser} from './living-panel.js?v=87a259ec8c3c';
+import {particlePanel} from './particle-panel.js?v=87a259ec8c3c';
 export function buildPanel(tab,s,h,selectedLight){const content=s.engine==='particles'||s.pLiving>0?particlePanel(tab,s,h,sharedPanel,selectedLight):sharedPanel(tab,s,h,selectedLight);return content+(tab==='motion'?dynamicsPanel(s,h):'');}
 export function sharedPanel(tab,s,h,selectedLight){
  const {slider,section,details,colorField,check,icon}=h;

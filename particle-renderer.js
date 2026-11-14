@@ -1,18 +1,19 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=12f2ff4e0842';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=12f2ff4e0842';
-import {ParticleOptics} from './particle-optics.js?v=12f2ff4e0842';
-import {shadowLight} from './particle-shadow.js?v=12f2ff4e0842';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=12f2ff4e0842';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=12f2ff4e0842';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=12f2ff4e0842';
-import {ParticleLinks} from './particle-links.js?v=12f2ff4e0842';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=12f2ff4e0842';
-import {LayeredVeils} from './layered-veils.js?v=12f2ff4e0842';
-import {LivingStructures} from './living-structures.js?v=12f2ff4e0842';
-import {fieldGLSL} from './particle-field.js?v=12f2ff4e0842';
-import {forceBarrierGLSL} from './particle-forces.js?v=12f2ff4e0842';
-import {prismaShadingGLSL} from './particle-shading.js?v=12f2ff4e0842';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=87a259ec8c3c';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=87a259ec8c3c';
+import {ParticleOptics} from './particle-optics.js?v=87a259ec8c3c';
+import {shadowLight} from './particle-shadow.js?v=87a259ec8c3c';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=87a259ec8c3c';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=87a259ec8c3c';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=87a259ec8c3c';
+import {ParticleLinks} from './particle-links.js?v=87a259ec8c3c';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=87a259ec8c3c';
+import {LayeredVeils} from './layered-veils.js?v=87a259ec8c3c';
+import {LivingStructures} from './living-structures.js?v=87a259ec8c3c';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=87a259ec8c3c';
+import {forceBarrierGLSL} from './particle-forces.js?v=87a259ec8c3c';
+import {prismaShadingGLSL} from './particle-shading.js?v=87a259ec8c3c';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
+const grainGLSL=`${common}\n${livingAttachmentGLSL}\n${grainSizingGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
 uniform vec4 uFiber;
@@ -22,16 +23,11 @@ vec4 fiberSeed(vec4 r){r.w=fract(r.w+uTail.w*.618);r.zw=mix(r.zw,vec2(.5),uFiber
 const pointVert=`#version 300 es
 precision highp float;
 layout(location=0) in vec4 aRandom;
-${common}
-${livingAttachmentGLSL}
-out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity;out vec2 vSpriteUV;uniform float uPointQuad;uniform vec2 uNodeStyle,uLargeGrains,uGrainDistribution;
+${grainGLSL}
+out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity;out vec2 vSpriteUV;uniform float uPointQuad;
 void main(){vec3 p=attachedPosition(aRandom,uPhase);gl_Position=project(p);
  int index=uPointQuad>.5?gl_InstanceID:gl_VertexID;
- float diameter=uNodeStyle.y>0.&&float(index)<uNodeStyle.x?uNodeStyle.y:float(index)<uLargeGrains.x?uLargeGrains.y:uPoints.x;
- float sizeRandom=fract(aRandom.w*73.17+aRandom.x*19.73);
- float distributed=pow(max(.00001,sizeRandom),exp2(uGrainDistribution.y*6.));
- float spread=exp2(mix(-uGrainDistribution.x,uGrainDistribution.x,distributed));
- float px=min(1024.,diameter*mix(1.,.15+aRandom.z*1.7,uPoints.y)*spread)*uResolution.y/1080.;
+ float px=grainDiameter(aRandom,index)*uResolution.y/1080.;
  vSpriteUV=vec2(0.);
  if(uPointQuad>.5){
   int vertex=gl_VertexID%6;
@@ -182,7 +178,10 @@ export class ParticleRenderer{
   this.timerExtension=gl.getExtension('EXT_disjoint_timer_query_webgl2');this.queries=[];
  }
  program(v,f,varyings=null,materialAlpha=false){const shaders=shadowProgram(v,f,varyings);v=shaders.vertex;f=shaders.fragment;const gl=this.gl,program=gl.createProgram();for(const [type,source]of [[gl.VERTEX_SHADER,v],[gl.FRAGMENT_SHADER,f]]){const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);gl.attachShader(program,shader);gl.deleteShader(shader);}if(varyings)gl.transformFeedbackVaryings(program,varyings,gl.INTERLEAVED_ATTRIBS);gl.linkProgram(program);const result={program,uniforms:new Map(),materialAlpha,ready:false};this.pendingPrograms.add(result);return result;}
- finishProgram(p){if(p.ready)return;if(!this.gl.getProgramParameter(p.program,this.gl.LINK_STATUS))throw Error(this.gl.getProgramInfoLog(p.program)||'Impossibile preparare le particelle.');p.ready=true;this.pendingPrograms.delete(p);}
+ finishProgram(p){if(p.ready)return;const gl=this.gl;if(!gl.getProgramParameter(p.program,gl.LINK_STATUS)){
+  const details=gl.getAttachedShaders(p.program)?.map(shader=>gl.getShaderInfoLog(shader)).filter(Boolean).join('\n');
+  throw Error(details||gl.getProgramInfoLog(p.program)||'Impossibile preparare le particelle.');
+ }p.ready=true;this.pendingPrograms.delete(p);}
  loc(p,k){this.finishProgram(p);if(!p.uniforms.has(k))p.uniforms.set(k,this.gl.getUniformLocation(p.program,k));return p.uniforms.get(k);}
  u(p,k,...v){const loc=this.loc(p,k);if(loc!==null)this.gl['uniform'+v.length+'f'](loc,...v);}
  geometry(seed){const gl=this.gl;if(this.buffer)gl.deleteBuffer(this.buffer);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pointVAO)gl.deleteVertexArray(this.pointVAO);if(this.quadVAO)gl.deleteVertexArray(this.quadVAO);
@@ -258,6 +257,10 @@ export class ParticleRenderer{
   else if(s.pLiving>0)this.living??=new LivingStructures(this,common);
   if(s.pLinks>0&&s.pLiving!==4)this.connections??=new ParticleLinks(this,common);
   const required=new Set([this.points,this.blur,this.compose]);
+  if(this.float&&s.pVolumeShadow>0&&s.pSelfShadow>0&&s.pCount>0&&s.pOpacity>0&&s.pLiving!==4&&shadowLight(s,false)){
+   this.optics??=new ParticleOptics(this);
+   required.add(this.optics.prepareVolume(s,grainGLSL));
+  }
   if(s.pTrailCount>0&&s.pTrailLength>0){required.add(this.lines);if(this.pathProgram)required.add(this.pathProgram);}
   if(this.guides.program&&s.forcePaths?.some(p=>p.enabled&&p.points?.length>=2))required.add(this.guides.program);
   if(s.pLiving>0&&s.pLiving!==4)for(const p of this.living.programs(s))required.add(p);
@@ -276,16 +279,24 @@ export class ParticleRenderer{
   if(query)gl.beginQuery(this.timerExtension.TIME_ELAPSED_EXT,query);
   const [scene,a,b]=this.targets;let sceneDrawn=false;
   const transmission=s.pLiving===4?1-s.pVeilOpacity:s.transparency;
-  const opticalLight=(s.pSelfShadow>0||(s.pCaustic>0&&transmission>0&&s.refraction>1&&s.metal<1))?shadowLight(s):null;
-  if(this.optics){this.optics.ready=false;this.optics.causticActive=false;}
-  // Prepare living geometry once. The light pass and shaded pass reuse it.
-  if(opticalLight){
+  const caustics=s.pCaustic>0&&transmission>0&&s.refraction>1&&s.metal<1;
+  const opticalLight=(s.pSelfShadow>0||caustics)?shadowLight(s)??(s.pSelfShadow>0&&s.pVolumeShadow>0?shadowLight(s,false):null):null;
+  if(this.optics){this.optics.ready=false;this.optics.volumeReady=false;this.optics.causticActive=false;}
+  try{if(opticalLight){
    this.optics??=new ParticleOptics(this);this.optics.configure(s,opticalLight);
-   if(s.pLiving>0){this.drawGeometry(scene,s,phase,options,weights);sceneDrawn=true;}
-   this.optics.capture(s,phase,options,weights);
-   this.reuseGeometry=true;
+   const volume=this.optics.usesVolume(s);
+   this.optics.surfaceShadow=s.pSelfShadow>0?(volume?1-s.pVolumeShadow:1):0;
+   const firstSurface=this.optics.surfaceShadow>0||caustics;
+   if(s.pLiving===4&&firstSurface){this.drawGeometry(scene,s,phase,options,weights);sceneDrawn=true;this.reuseGeometry=true;}
+   else if(s.pLiving>0&&s.pLiving!==4){
+    this.living??=new LivingStructures(this,common);
+    this.living.programs(s);this.living.sample(s,phase*s.pDirection);this.reuseGeometry=true;
+   }
+   if(firstSurface)this.optics.capture(s,phase,options,weights);
+   if(volume){this.optics.prepareVolume(s,grainGLSL);this.optics.captureVolume(s,phase,options);}
   }
-  try{if(!sceneDrawn||s.pSelfShadow>0)this.drawGeometry(scene,s,phase,options,weights);}finally{this.reuseGeometry=false;}
+  if(!sceneDrawn||s.pSelfShadow>0)this.drawGeometry(scene,s,phase,options,weights);
+  }finally{this.reuseGeometry=false;}
   const causticTexture=opticalLight?this.optics.drawCaustic(s):null;
   let shadowTexture=null;if(s.pShadow>0){this.shadow??=new ParticleShadow(this);shadowTexture=this.shadow.draw(s,phase,options,weights);}
   gl.depthMask(true);gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);gl.bindVertexArray(this.empty);gl.useProgram(this.blur.program);

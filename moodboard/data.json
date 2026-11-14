@@ -14127,11 +14127,34 @@
       "state": "partial",
       "priority": false,
       "author": "",
-      "summary": "Il nucleo Particelle già fornisce distribuzioni, lobi e campi. Per la resa densa è stata trovata una pista concreta in PCR/TouchDesigner; riuso locale, compatibilità e ombre dei cinque video ancora da provare.",
+      "summary": "Nubi dense con concentrazione del nucleo, alone e assorbimento in profondità. La luce mobile rivela come la massa dei granelli attenua l’illuminazione.",
       "sources": [
         "https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-39-volume-rendering-techniques"
       ],
       "sections": [
+        {
+          "title": "Verifica v80",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "La luce selezionata attraversa quattro strati di densità dei granelli. Nucleo, alone e luci restano regolabili; a zero riappare l’ombra della prima superficie."
+              ]
+            },
+            {
+              "label": "checks",
+              "value": [
+                "Confronto sulla stessa nube da 150.000 granelli, luce in orbita e luce sotto il piano. Export con tutti i 300.000 granelli; raccordo del loop verificato. Circa 17 ms per fotogramma a 640 × 360 dopo la preparazione, su NVIDIA RTX 5090 Laptop."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Verificare la qualità e le prestazioni su un telefono reale, soprattutto nelle nubi più fitte."
+              ]
+            }
+          ]
+        },
         {
           "title": "Verifica v78",
           "fields": [
@@ -14261,15 +14284,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Particelle → Forma → Nucleo → Volume particellare",
+      "where": "Particelle → Scena → Ombre e caustiche → Assorbimento della nube",
       "platform": "",
-      "next": "Verificare le alte densità su telefono e misurare la qualità delle ombre su nubi più fitte.",
+      "next": "Verificare la qualità e le prestazioni su un telefono reale, soprattutto nelle nubi più fitte.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v80-volumi-particelle.webp",
+          "width": 640,
+          "height": 384
+        },
         {
           "src": "media/v78-volume.webp",
           "width": 480,
@@ -14293,8 +14321,9 @@
       "category": "form",
       "addedOn": "2026-10-10",
       "engine": "particles",
-      "resultImage": "media/v78-volume.webp",
-      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
+      "resultImage": "media/v80-volumi-particelle.webp",
+      "resultUrl": "../previews/nube-luce.html?v=80",
+      "resultVideo": "../previews/nube-luce.mp4"
     },
     {
       "id": "roadmap-membrane",
