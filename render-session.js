@@ -2,7 +2,7 @@
 // and leaving the page normally is not a graphics failure.
 export class RenderSession{
  constructor(legacyStorage,tabStorage){
-  this.key='prisma-render-tab-v2';this.generation='startup-86';this.pending=false;this.blocked=false;this.attempts=0;
+  this.key='prisma-render-tab-v2';this.generation='startup-87';this.pending=false;this.blocked=false;this.attempts=0;
   try{legacyStorage?.removeItem('prisma-render-pending-v1');}catch{}
   try{this.storage=tabStorage??globalThis.sessionStorage;const previous=JSON.parse(this.storage?.getItem(this.key)||'null');
    if(previous?.generation===this.generation){this.blocked=!!previous.failed||!!previous.pending&&previous.attempts>=1;this.attempts=previous.pending?(previous.attempts||0)+1:0;}

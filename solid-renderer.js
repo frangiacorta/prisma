@@ -1,9 +1,9 @@
-import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=6a9e627b503d';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=6a9e627b503d';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=6a9e627b503d';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=6a9e627b503d';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=6a9e627b503d';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=6a9e627b503d';
+import {GROWTH_GLSL,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=0b52b3909b22';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=0b52b3909b22';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL} from './base-forms.js?v=0b52b3909b22';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=0b52b3909b22';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=0b52b3909b22';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=0b52b3909b22';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -1601,7 +1601,7 @@ export function geometryRadius(s,growthRadius=0){
  if((s.stemAmount||0)>.000001)radius=Math.max(radius,s.stemAmount*3+Math.abs(s.stemBend||0)*.55+(s.stemRadius??.09)+.25);
  return Math.max(radius+.02,cellularBounds(s),fractalBounds(s))*structureBounds(s);
 }
-const CELLULAR_ENABLED=16777216,FRACTAL_ENABLED=33554432,STUDIO_LAYERS=67108864,WEAVE_DETAIL=134217728,FOCUS_DEPTH=268435456;
+const CELLULAR_ENABLED=16777216,FRACTAL_ENABLED=33554432,STUDIO_LAYERS=67108864,WEAVE_DETAIL=134217728,FOCUS_DEPTH=268435456,SHELL_FIELD=536870912;
 function fractalMayChange(s){return (s.fractalAmount||0)>0||!!(s.motions?.fractalAmount?.enabled&&s.motions.fractalAmount.amplitude>0);}
 function rendererVariant(s,options={},source=s){
  const modern=s.renderVersion>=2,cellular=modern&&cellularMayChange(source),fractal=modern&&fractalMayChange(source),analytic=!hasSolidForces(s)&&!cellular&&!fractal&&analyticShape(s)&&!structureMayChange(source);
@@ -1625,10 +1625,14 @@ function rendererVariant(s,options={},source=s){
  return (modern?8+loopVariant(source):0)+(modern&&s.thinShell>=.999?16:0)+(modern&&analytic?32:0)+(crown?64:0)+ +volume+((s.subsurface||0)>.0001&&(!modern?transmission<.999:true)?2:0)+((s.dispersion||0)>.005?4:0)
   +(originalPetals&&spread<=.9999?128:0)+(originalPetals&&spread>=.0001&&amount<.999999?256:0)+(originalPetals&&spread>=.0001&&amount>.000001?512:0)+(crown&&(s.stemAmount||0)>.000001?1024:0)+(modern&&transmission>.0001?2048:0)+(modern&&options.preview&&options.quality!=='full'?4096:0)+(petals&&rootWeight(s)>.000001?32768:0)+(modern&&structureMayChange(source)?65536:0)+(modern?Math.round(s.baseForm||0)*131072:0)+(modern&&hasSolidForces(s)?SCULPT_ENABLED:0)+(cellular?CELLULAR_ENABLED:0)+(fractal?FRACTAL_ENABLED:0);
 }
-const renderKey=(s,o,source)=>rendererVariant(s,o,source)
- +(o.layers||o.layerOpacity!==undefined?STUDIO_LAYERS:0)
- +(o.focusDepthOnly?FOCUS_DEPTH:0)
- +(motionInterval(source,'structWeaveNodes')[1]>.000001&&motionInterval(source,'structWeaveVariation')[1]>.000001?WEAVE_DETAIL:0);
+const STRUCTURE_CUTS=['structFibres','structSlices','structRadial','structLayers'];
+function renderKey(s,o,source){
+ const geometry=rendererVariant(s,o,source);
+ const shell=!!(geometry&65536)&&!(geometry&(ATLAS_PREVIEW|SIMPLE_LOOP_STRUCTURE))&&o.compactStructure!==false&&
+  STRUCTURE_CUTS.every(k=>!(source[k]>0||source.motions?.[k]?.enabled));
+ return geometry+(o.layers||o.layerOpacity!==undefined?STUDIO_LAYERS:0)+(o.focusDepthOnly?FOCUS_DEPTH:0)+(shell?SHELL_FIELD:0)+
+  (motionInterval(source,'structWeaveNodes')[1]>.000001&&motionInterval(source,'structWeaveVariation')[1]>.000001?WEAVE_DETAIL:0);
+}
 function variantSource(key,floatAtlas=false){
  if(key===ATLAS_BAKE)return BAKE_FRAG.replace('#version 300 es','#version 300 es\n#define WEAVE_DETAIL 1');
  const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4,ROOTS_ENABLED:32768,STRUCTURE_ENABLED:65536};
@@ -1639,8 +1643,10 @@ function variantSource(key,floatAtlas=false){
   if(!(key&LOOP_ENABLED))source=shaderFunction(source,'loopBlend','float loopBlend(float d,vec3 p){return d;}');
   // Keep inactive operators out of the deeply nested refractive solver.
   // Any enabled geometry track selects the complete operator before playback.
-  if(key&SIMPLE_LOOP_STRUCTURE){
-   source=shaderFunction(source,'structureWarp','vec3 structureWarp(vec3 p){return p;}');
+  if(key&SIMPLE_LOOP_STRUCTURE)source=shaderFunction(source,'structureWarp','vec3 structureWarp(vec3 p){return p;}');
+  if(key&(SIMPLE_LOOP_STRUCTURE|SHELL_FIELD)){
+   // A folded or animated shell needs the same signed distance, minus the
+   // inactive lattice/cut operators in each internal optical march.
    source=shaderFunction(source,'structureField',`float structureField(float d,vec3 p){float thickness=uStructureA.y*(1.-uStructureH.x*.85*min(1.,length(p.xy)));return uStructureA.x>0.?max(d,-d-thickness-(1.-thickness)*(1.-uStructureA.x)):d;}`);
   }
   if(key&SIMPLE_LOOP_FIELD)source=shaderFunction(source,'fieldParts',`vec3 fieldParts(vec3 world){vec3 p=transform(world);float volume=max(.06,uShape.x*uShape.w);p/=vec3(uShape.y,uShape.z,volume);float d=structureField(loopBlend(length(p)-1.,p),p);return vec3(d,-10000.,-10000.)*min(min(uShape.y,uShape.z),volume)*uFrame.x*.5;}`);
@@ -1787,6 +1793,12 @@ export class Renderer{
   }
  }
  bindPreviewField(){const g=this.gl;g.activeTexture(g.TEXTURE2);g.bindTexture(g.TEXTURE_2D,this.fieldTexture);g.uniform1i(this.locations.uFieldTexture,2);g.uniform1f(this.locations.uBasePrimitive,+this.cachedBasePrimitive);g.uniform1f(this.locations.uDeferredStructure,+this.deferredStructure);g.uniform2fv(this.locations.uFieldWarp,this.fieldWarp||[0,0]);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);g.uniform1f(this.locations.uFieldEncoding,+this.fieldHalfFloat);g.uniform4fv(this.locations.uFieldAtlas,this.fieldAtlas);g.uniform3fv(this.locations.uFieldMin,this.fieldMin);g.uniform3fv(this.locations.uFieldMax,this.fieldMax);g.activeTexture(g.TEXTURE0);}
+ prepareBodyField(source,phase){
+  if(analyticShape(sampleFrame(source,phase)))return true;
+  const v=this.variant(ATLAS_BAKE);
+  if(!v.ready&&this.parallelExtension&&!this.gl.getProgramParameter(v.program,this.parallelExtension.COMPLETION_STATUS_KHR))return false;
+  this.finishVariant(v);return true;
+ }
  bodyField(source,phase,options){
   const frame=sampleFrame(source,phase),form=frame.baseForm||0;
   const inner=(frame.hollow||0)*(1-(frame.wallThickness??.08));
@@ -1882,7 +1894,7 @@ async drawTiled(source,phase,width,height,options={}){
    const batch=!options.forceTiled&&(!this.hardwareInfo().software)&&(key&32)&&!(key&2048)&&samples<=4&&width*height<=2400000;
    for(let n=0;n<samples;n++){
     if(options.cancelled?.())return false;
-    const settings={jitter:jitterSample(n),accumulate:true,weight:1/samples,preview:options.preview,alphaPreview:options.alphaPreview,quality:options.quality,cancelled:options.cancelled,tileSize:options.tileSize,forceTiled:options.forceTiled,trackTiming:options.trackTiming,adaptiveTiles:options.adaptiveTiles,conservativeAtlas:options.conservativeAtlas,layerOpacity:options.layerOpacity,tileProgress:f=>options.progress?.((n+f)/samples)};
+    const settings={jitter:jitterSample(n),accumulate:true,weight:1/samples,preview:options.preview,alphaPreview:options.alphaPreview,quality:options.quality,cancelled:options.cancelled,tileSize:options.tileSize,forceTiled:options.forceTiled,trackTiming:options.trackTiming,adaptiveTiles:options.adaptiveTiles,conservativeAtlas:options.conservativeAtlas,compactStructure:options.compactStructure,layerOpacity:options.layerOpacity,tileProgress:f=>options.progress?.((n+f)/samples)};
     const ok=batch?this.draw(stable,phase,width,height,{...settings,deferCompletion:true}):await this.drawTiled(stable,phase,width,height,settings);
     if(!ok)return false;
     options.progress?.((n+1)/samples);

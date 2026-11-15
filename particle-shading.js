@@ -1,11 +1,21 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=6a9e627b503d';
-import {opticalGLSL} from './particle-optics.js?v=6a9e627b503d';
-// Particle shading uses Prisma's parameter names. It does not trace solid glass.
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=0b52b3909b22';
+import {opticalGLSL} from './particle-optics.js?v=0b52b3909b22';
+export const materialCavity=s=>Math.max(0,Math.min(1,(s.hollow||0)*(1-(s.wallThickness??.08))));
+
+// The opacity of a hollow particle uses the visible material along the ray.
 export const prismaShadingGLSL=`
 ${FILM_PATTERN_GLSL}
 ${opticalGLSL}
 uniform vec4 uMaterial,uFinish,uEnvironment,uGradient;
-uniform vec3 uParticleOptical;
+uniform vec4 uParticleOptical;
+float particleWallCoverage(float radius){
+ float inner=uParticleOptical.w;
+ if(inner<=0.||radius>=inner)return 1.;
+ float r2=radius*radius;
+ float occupied=1.-sqrt(max(0.,inner*inner-r2)/max(.0001,1.-r2));
+ // Even a nearly empty shell retains a visible reflected surface.
+ return mix(1.,.22+.78*occupied,1.-uFinish.z);
+}
 uniform vec3 uPearl;uniform vec2 uFiberLight;
 uniform vec4 uFilmLayer,uParticleFilmMotion,uFilmObject;
 uniform vec3 uFilmRotation,uFilmResponse[24],uFilmWhite;
@@ -109,7 +119,7 @@ vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
  vec3 view=normalize(vec3(0.,0.,7.5)-p);if(dot(n,view)<0.)n=-n;
  float facing=clamp(dot(n,view),.001,1.);
  float crystal=1.-uFinish.z;
- vec3 spectrum=vec3(uParticleOptical.x)+uParticleOptical.z*vec3(-.026,0.,.035);
+ vec3 spectrum=max(vec3(1.001),vec3(uParticleOptical.x)+uParticleOptical.z*vec3(-.095,0.,.14));
  vec3 dielectric=pow((max(vec3(1.),spectrum)-1.)/(spectrum+1.),vec3(2.));
  vec3 f0=mix(mix(vec3(.04),dielectric,crystal),clamp(base,0.,1.),metal);
  vec3 reflection=reflectedEnvironment(reflect(-view,n),rough);
@@ -131,6 +141,15 @@ vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
  }
  vec3 pigment=base*mix(vec3(1.),exp(-max(0.,uParticleOptical.y-1.)*(1.-clamp(base,0.,1.))),crystal*.8);
  vec3 lit=pigment*(uFinish.x+(1.-metal)*uEnvironment.z*.22)*uFinish.z+reflection*fresnel*gloss;
+ // Sample transmitted light along the separate refraction angles. The green
+ // sample is the undispersed reference for this small contribution.
+ float dispersion=uParticleOptical.z*crystal*(1.-metal);
+ if(dispersion>0.&&uEnvironment.z>0.){
+   vec3 red=reflectedEnvironment(refract(-view,n,1./spectrum.r),rough);
+   vec3 neutral=reflectedEnvironment(refract(-view,n,1./spectrum.g),rough);
+   vec3 blue=reflectedEnvironment(refract(-view,n,1./spectrum.b),rough);
+   lit+=(vec3(red.r,neutral.g,blue.b)-neutral)*(1.-fresnel)*dispersion*.85;
+ }
  // Integrate an angular footprint for coatings on sub-pixel grains.
  if(uFinish.w>0.&&coating+irid>0.){
    vec3 spectral=coating>0.?film:pearlFresnel(vec3(.17),mix(.27,.74,facing),irid,rough);

@@ -14344,7 +14344,7 @@
       "resultImage": "../previews/volume-denso.webp",
       "resultUrl": "../previews/verifica-visiva.html#volume-denso",
       "resultVideo": "../previews/volume-denso.mp4",
-      "compareNote": "Il preset usa il volume dei granelli per dare spessore alle pieghe. Il lato chiaro e quello rosso si regolano dalla palette e dalle luci.",
+      "compareNote": "Il volume dei granelli forma una cavità centrale. Palette e luci distinguono il lato chiaro a sinistra dal rosso a destra. La trama resta più granulare della fonte.",
       "comparisonRef": "s09-01",
       "comparisonDate": "2026-11-15",
       "resultPreset": "previews/volume-denso.prisma.json",
@@ -16106,7 +16106,7 @@
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
-      "compareNote": "Inquadratura macro con filamenti avvolti sulla forma, fuoco selettivo e palette lungo i fili. La profondità della trama varia durante il movimento.",
+      "compareNote": "Filamenti avvolti sulla forma con spessore e lunghezza leggibili in macro. Il fuoco selettivo e la palette lungo i fili si regolano nel preset.",
       "comparisonRef": "s13-01",
       "comparisonDate": "2026-11-15",
       "resultPreset": "previews/filamenti-macro.prisma.json",

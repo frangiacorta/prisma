@@ -1,8 +1,8 @@
-import {DYNAMICS_GLSL} from './dynamics.js?v=6a9e627b503d';
-import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=6a9e627b503d';
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=6a9e627b503d';
-import {guideGLSL} from './particle-path-field.js?v=6a9e627b503d';
-import {forceBarrierGLSL} from './particle-forces.js?v=6a9e627b503d';
+import {DYNAMICS_GLSL} from './dynamics.js?v=0b52b3909b22';
+import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=0b52b3909b22';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=0b52b3909b22';
+import {guideGLSL} from './particle-path-field.js?v=0b52b3909b22';
+import {forceBarrierGLSL} from './particle-forces.js?v=0b52b3909b22';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.
@@ -76,7 +76,7 @@ void main(){
  vec3 base=mix(particleColor(ra,a),particleColor(rb,b),t);
  vColor=shadeFibre(base,p,normalize(p-uShadeOrigin+vec3(.00001)),tangent)*mix(cellLightFactor(ra),cellLightFactor(rb),t);
  float tension=1.-smoothstep(uLinks.w*.7,uLinks.w,len/reference);
- vOpacity=uLinks.x*min(1.,width)*tension;
+ vOpacity=uLinks.x*min(1.,width)*tension*particleWallCoverage(.35);
 }`,`#version 300 es
 precision highp float;in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vOpacity,vSide;out vec4 color;
 ${forceBarrierGLSL}

@@ -22,10 +22,11 @@ for(const turns of [3,5,7,9,11]){
  const node={loopKnot:1,loopTurns:turns,loopRadius:.76,loopTube:.18,loopFlat:.3};
  assert(Math.abs(loopField(node,[-.9,-1e-8,.2])-loopField(node,[-.9,1e-8,.2]))<1e-6);
 }
+const selected=process.argv.find(arg=>arg.startsWith('--only='))?.slice(7)||'';
 const server=await startCreativeServer(0),browser=await chromium.launch({channel:'chrome',headless:true});
 try{
- const page=await browser.newPage();await page.goto(server.url+'moodboard/');
- const measures=await page.evaluate(async base=>{
+ const page=await browser.newPage();page.on('console',entry=>{if(entry.type()==='log')console.log(entry.text());});await page.goto(server.url+'moodboard/');
+ const measures=await page.evaluate(async ({base,selected})=>{
   const {Renderer}=await import(base+'renderer.js'),{newCreation}=await import(base+'creative-model.js'),{particleCreation,SPHERE_FORM}=await import(base+'particle-model.js');
   const solid={...newCreation(),background:'#1a1b23',palette:['#cd531f','#2475be','#cfd5eb'],scale:1.12};
   const glass={...solid,transparency:.92,thinShell:1,absorption:.66,tintStrength:.49,environmentRefraction:.38,subsurface:0};
@@ -35,12 +36,23 @@ try{
   const trails={...p,pCount:0,pTrailCount:160,pTrailLength:.36,pTrailOpacity:1,pTrailFork:1,pTrailWidth:2,pTravel:1,pWander:.5};
   const link={...solid,sceneGrains:.9,pCount:3800,pSize:2,pOpacity:.19,pLinks:.69,pTrailCount:0,pLinkNodes:130,pLinkNeighbors:2,pLinkReach:1,pLinkCurve:.17,pLinkSurface:1,pLinkWidth:2};
   const glyph={...solid,finishGlyph:true,finishGlyphCell:18,finishGlyphMix:1,finishGlyphSource:true,finishGlyphSeed:334};
+  const cavity={...p,transparency:.86,thinShell:0,absorption:.63,tintStrength:.79,refraction:1.64,gloss:.9,wallThickness:.11,scattering:.27,pCount:6400,pSize:13,pOpacity:.36};
+  const denseTrails={...trails,pTrailCount:5500,pTrailLength:.62,pTrailPersistence:.79,pOpacity:.51};
   const cases=[
    ['Dispersione',glass,'dispersion',0,1],
    ['Spessore ottico',glass,'thickness',.05,3.8],
    ['Direzione diffusione',{...p,scattering:.85,translucency:.42},'scatterDirection',-.78,.78],
    ['Iridescenza su 1,1 px',{...p,pSize:1.1,pCount:72000},'iridescence',0,1],
    ['Rifrazione su 3 px',{...p,transparency:.78,pCaustic:0},'refraction',1.02,2.3],
+   ['Cavità della superficie',{...glass,thinShell:0,wallThickness:.08,refraction:1.64},'hollow',0,1],
+   ['Cavità dei granelli',cavity,'hollow',0,1],
+   ['Spessore ottico dei granelli',cavity,'thickness',.04,3.8],
+   ['Dispersione dei granelli',{...cavity,pCount:4400,pSize:19,scattering:.1,metal:0,gloss:1},'dispersion',0,1],
+   ['Rugosità del motivo',{...solid,growthAmount:1,growthDepth:.62,growthContrast:.86,growthCoverage:.92,growthRoughness:.2,roughness:.13,gloss:.95},'growthRoughness',0,1],
+   ['Parete dei granelli',{...cavity,hollow:1},'wallThickness',.04,.92],
+   ['Cavità dei granelli in scena mista',{...cavity,engine:'solid',sceneGrains:.68,grainSource:'body'},'hollow',0,1],
+   ['Densità delle scie',denseTrails,'pTrailDensity',0,1],
+   ['Percorso dei fili',{...link,pLinkTurns:1},'pLinkSurface',0,.95],
    ['Caustica su granelli',{...p,transparency:.75,refraction:1.65,pSize:1.6,pCount:62000},'pCaustic',0,4],
    ['Distanza delle ombre',{...p,pSelfShadow:1,pCount:36000,pSize:5.5,pOpacity:.8,pFill:.85},'pSelfShadowBias',.002,.1],
    ['Apertura rami',trails,'pTrailForkSpread',.1,1],
@@ -52,11 +64,12 @@ try{
   const r=new Renderer(document.createElement('canvas')),results=[];
   try{
    for(const [name,s,key,low,high] of cases){
+    if(selected&&!new RegExp(selected,'i').test(key))continue;
     console.log(name);
     const images=[];
     for(const value of [low,high]){
      const t=performance.now();
-     if(!await r.drawAccumulated({...s,[key]:value},.69,640,400,{samples:1,cancelled:()=>performance.now()-t>100000}))throw Error(name+' non completato');
+     if(!await r.drawAccumulated({...s,[key]:value},.69,640,400,{samples:1,cancelled:()=>performance.now()-t>150000}))throw Error(name+' non completato');
      const error=r.gl.getError();if(error)throw Error(name+' WebGL '+error);
      images.push(r.pixels());
     }
@@ -70,9 +83,10 @@ try{
    }
    return {results,hardware:r.hardwareInfo().name};
   }finally{r.dispose();}
- },server.url);
+ },{base:server.url,selected});
+ assert(measures.results.length>0,'Nessun caso selezionato');
  const dir='reports/unified-studio';await mkdir(dir,{recursive:true});
- await writeFile(dir+'/controls.json',JSON.stringify({iterations,...measures},null,2));
+ await writeFile(dir+(selected?'/controls-focused.json':'/controls.json'),JSON.stringify({iterations,...measures},null,2));
  console.log(JSON.stringify({iterations,...measures}));
  assert.deepEqual(measures.results.filter(r=>r.changedPercent<.2).map(r=>r.name),[]);
 }finally{await browser.close();server.server.closeAllConnections();await new Promise(resolve=>server.server.close(resolve));}

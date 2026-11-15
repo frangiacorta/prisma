@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {existsSync} from 'node:fs';
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
@@ -115,6 +116,24 @@ try{
  }
  assert.equal(report.video.width,322);assert.equal(report.video.height,182);assert.equal(report.video.seconds,2);
  assert(report.video.seam<2&&report.video.motion>3,JSON.stringify(report.video));
+ await page.locator('#export-dialog').evaluate(dialog=>dialog.close());
+ const wallpaper=presetDocument({state:{...newCreation(),sceneGrains:0,finishRgb:true,finishRgbMix:.6,focusBlur:.12},name:'Sfondo offline',ratio:16/9});
+ await page.locator('#project-file').setInputFiles({name:'wallpaper.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(wallpaper))});
+ await page.locator('#export-open').click();await page.locator('[data-export=wallpaper]').click();
+ const htmlDownload=page.waitForEvent('download',{timeout:20000});
+ await page.locator('#download').click();
+ const wallpaperFile=directory+'/wallpaper-verifica.html';await (await htmlDownload).saveAs(wallpaperFile);
+ const offline=await browser.newPage({viewport:{width:800,height:450},offline:true});
+ offline.on('pageerror',e=>errors.push(e.message));
+ await offline.goto(pathToFileURL(path.resolve(wallpaperFile)).href);
+ await offline.waitForFunction(()=>{
+  const canvas=document.getElementById('art'),status=canvas?.nextElementSibling;
+  if(!status?.hidden||canvas.width<100)return false;
+  const gl=canvas.getContext('webgl2'),rgb=new Uint8Array(4);
+  gl.readPixels(Math.floor(canvas.width/2),Math.floor(canvas.height/2),1,1,gl.RGBA,gl.UNSIGNED_BYTE,rgb);
+  return rgb[0]+rgb[1]+rgb[2]>30;
+ },null,{timeout:90000});
+ report.wallpaper={offline:true,visible:true};await offline.close();
  assert.deepEqual(errors,[]);
  await writeFile(directory+'/delivery.json',JSON.stringify(report,null,2));
  console.log('EXPORT PASS',JSON.stringify(report.video));

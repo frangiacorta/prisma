@@ -1,8 +1,9 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=6a9e627b503d';
-import {BASE_FORM_GLSL} from './base-forms.js?v=6a9e627b503d';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=6a9e627b503d';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=6a9e627b503d';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=6a9e627b503d';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=0b52b3909b22';
+import {BASE_FORM_GLSL} from './base-forms.js?v=0b52b3909b22';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=0b52b3909b22';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=0b52b3909b22';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=0b52b3909b22';
+import {materialCavity} from './particle-shading.js?v=0b52b3909b22';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -217,7 +218,7 @@ uniform vec3 uPalette[12],uPaletteMean,uLightColors[8],uInternalColor,uSssColor;
 uniform int uPaletteCount,uLightCount;
 uniform vec4 uGradient,uColorWave,uColorAxis,uColorLayers,uEnvironment,uLights[8],uLightProps[8],uLightExtra[8];
 uniform vec4 uMat,uSurface,uCoat,uOptics,uTexture,uScatter,uModern,uFilmMotion,uTransport,uMaterialDetail,uMaterialLayers,uOrganicDetail,uRuntime,uOther,uExtraShape3;
-uniform vec2 uResolution;uniform float uSeed,uTextureSeed,uSurfaceSeed;
+uniform vec2 uResolution;uniform float uSeed,uTextureSeed,uSurfaceSeed,uHairCavity;
 uniform vec3 uFilmResponse[24],uFilmWhite;
 mat2 rot(float a){return turn(a);}vec3 axes(){return uAxes.xyz;}
 ${FILM_PATTERN_GLSL}
@@ -243,7 +244,7 @@ vec4 strandMaterial(vec3 base,vec3 local,vec3 p,vec3 normal,vec3 tangent,float r
  for(int i=0;i<uLightCount;i++){vec3 off=uLights[i].xyz-p;float shadow=i==0?hairShadow(p):1.;diffuse+=uLightColors[i]*max(dot(n,normalize(off)),0.)*uLights[i].w*.35/(1.+dot(off,off)*.08)*shadow;}
  vec3 dielectric=fresnel(facing,1.,max(1.,uMat.y),local),sigma=absorptionCoefficient(base);
  // Optical thickness comes from the cylinder diameter, not a fixed alpha per strand.
- float path=2.*radius/max(.15,sqrt(max(0.,1.-pow(dot(tangent,view),2.))));
+ float path=2.*radius*(1.-uHairCavity)/max(.15,sqrt(max(0.,1.-pow(dot(tangent,view),2.))));
  vec3 transmittance=exp(-sigma*path*4.),absorb=vec3(1.)-transmittance;
  float transmission=uMat.x,alpha=(1.-transmission)+transmission*max(max(absorb.r,absorb.g),absorb.b);
  vec3 below=(vec3(1.)-dielectric)*base*diffuse*(1.-uMat.z*(1.-transmission))*(1.-transmission)+base*absorb*transmission;
@@ -375,7 +376,18 @@ export class FilamentPass{
  g.bindFramebuffer(g.FRAMEBUFFER,null);}
  field(p,s,solid){this.tex(p,'uField',solid.fieldTexture,3);this.u(p,'uAtlas',...solid.fieldAtlas);this.u(p,'uFieldMin',...solid.fieldMin);this.u(p,'uFieldMax',...solid.fieldMax);this.u(p,'uFieldWarp',...(solid.fieldWarp||[0,0]));this.u(p,'uPrimitive',+solid.cachedBasePrimitive);this.u(p,'uFloat',+solid.fieldHalfFloat);this.u(p,'uDeferred',+solid.deferredStructure);this.u(p,'uBaseForm',s.baseForm||0);}
  common(p,s,camera,w,h){const g=this.gl;g.useProgram(p.program);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uAxes',s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ),0);this.u(p,'uAngles',s.rotateX*Math.PI/180,s.rotateY*Math.PI/180,s.rotateZ*Math.PI/180,0);this.u(p,'uCameraX',...camera.x);this.u(p,'uCameraY',...camera.y);this.u(p,'uCameraZ',...camera.z);this.u(p,'uCameraSize',camera.ex,camera.ey,w,h);this.u(p,'uLens',camera.shadow?0:s.lensDistortion||0);this.u(p,'uShadowPass',+!!camera.shadow);this.u(p,'uSeed',(s.seed%997)*.013);this.u(p,'uHairScatter',s.filScatter);this.locations=p.locations;this.program=p.program;uploadSolidForces(this,s);}
- *hair(s,camera,w,h,phase){const physical=this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth-.006)/.006)),projected=camera.shadow&&!this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth*.5*s.scale*h/(2*camera.ey)-.6)/.8)),x=s.focusBlur>0&&!camera.shadow?0:Math.max(physical,projected,s.filRibbon>0?projected>.05?Math.min(1,s.filRibbon+projected):0:0),mix=x*x*(3-2*x);if(s.transparency===0){yield* this.hairPart(s,camera,w,h,phase,mix>0,1,mix);return;}if(mix<1)yield* this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)yield* this.hairPart(s,camera,w,h,phase,true,mix);}
+ tubeBlend(s,camera,h){
+  const physical=this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth-.006)/.006));
+  const projected=camera.shadow&&!this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth*.5*s.scale*h/(2*camera.ey)-.6)/.8));
+  const ribbon=s.filRibbon>0&&projected>.05?Math.min(1,s.filRibbon+projected):0;
+  const x=s.focusBlur>0&&!camera.shadow?0:Math.max(physical,projected,ribbon);
+  return x*x*(3-2*x);
+ }
+ *hair(s,camera,w,h,phase){const mix=this.tubeBlend(s,camera,h);if(s.transparency===0){const tube=mix>0;
+  // Opaque tubes have full coverage and are already in the multisample color pass.
+  if(tube&&!camera.shadow&&!camera.opaque)return;
+  yield* this.hairPart(s,camera,w,h,phase,tube,1,mix);return;
+ }if(mix<1)yield* this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)yield* this.hairPart(s,camera,w,h,phase,true,mix);}
  *hairPart(s,camera,w,h,phase,tube,opacity,tubeDepth=1){const g=this.gl;
  const p=this.useAxes?this.hairProgram:s.filWrap?(this.wrappedHairProgram??=this.createProgram(hairVertex(false,true),HAIR_FRAG)):this.axes?(this.fallbackProgram??=this.createProgram(hairVertex(false),HAIR_FRAG)):this.hairProgram;this.finishProgram(p);this.common(p,s,camera,w,h);this.tex(p,'uShadow',camera.shadow?this.roots.textures[0]:this.shadow.depth,2);
  bindGrowth(g,p.program,s,phase);
@@ -383,7 +395,7 @@ export class FilamentPass{
  const sides=Math.max(12,Math.min(32,Math.ceil(Math.PI*Math.sqrt(Math.max(1,radiusPixels*(1+s.filBaseWidth))/.12)/2)*2));
  const curvature=.08+Math.abs(s.filBend)*.3+Math.abs(s.filComb)*.25+Math.abs(s.filWrap)*3+s.filClump*.5+s.filCurl*4+s.filFrizz*6+s.filWind;
  const segments=Math.max(24,Math.min(112,Math.ceil(Math.sqrt(s.filLength*pixelsPerUnit*curvature)*2.2/4)*4));
- this.tex(p,'uCoreDepth',this.coreDepth.depth,6);this.u(p,'uViewSize',w,h);this.u(p,'uRootCore',s.filCore*(1-s.transparency));this.u(p,'uRepOpacity',opacity);this.u(p,'uTubeDepth',tubeDepth);this.u(p,'uSides',sides);this.u(p,'uOpaquePass',camera.opaque?1:0);this.u(p,'uHairColor',s.filColor,s.filColorScatter,s.filRootShade,s.transparency);this.u(p,'uHairPulse',s.filPulse,phase*Math.round(s.filPulseCycles)/(2*Math.PI),s.filPulseWidth,0);this.u(p,'uShadowX',...this.lightCamera.x);this.u(p,'uShadowY',...this.lightCamera.y);this.u(p,'uShadowZ',...this.lightCamera.z);this.u(p,'uShadowExtent',this.lightCamera.ex);
+ this.tex(p,'uCoreDepth',this.coreDepth.depth,6);this.u(p,'uViewSize',w,h);this.u(p,'uRootCore',s.filCore*(1-s.transparency));this.u(p,'uRepOpacity',opacity);this.u(p,'uTubeDepth',tubeDepth);this.u(p,'uSides',sides);this.u(p,'uOpaquePass',camera.opaque?1:0);this.u(p,'uHairColor',s.filColor,s.filColorScatter,s.filRootShade,s.transparency);this.u(p,'uHairCavity',materialCavity(s));this.u(p,'uHairPulse',s.filPulse,phase*Math.round(s.filPulseCycles)/(2*Math.PI),s.filPulseWidth,0);this.u(p,'uShadowX',...this.lightCamera.x);this.u(p,'uShadowY',...this.lightCamera.y);this.u(p,'uShadowZ',...this.lightCamera.z);this.u(p,'uShadowExtent',this.lightCamera.ex);
  const rad=Math.PI/180;this.u(p,'uMat',s.transparency,s.refraction,s.metal,Math.min(1,s.roughness+(1-s.gloss)*.35));this.u(p,'uSurface',s.iridescence,s.thickness,s.gloss,s.emission);this.u(p,'uCoat',s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0);this.u(p,'uOptics',s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15);this.u(p,'uTexture',s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0);this.u(p,'uScatter',s.scatterDirection??.25,0,s.thinFilm||0,s.filmThickness??420);this.u(p,'uModern',s.thinShell||0,0,0,0);
  this.u(p,'uResolution',w,h);this.u(p,'uOther',s.rotateY*rad,s.rotateX*rad,0,0);this.u(p,'uExtraShape3',0,0,s.rotateZ*rad,0);this.u(p,'uRuntime',0,0,0,16);this.u(p,'uMaterialDetail',s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad);this.u(p,'uMaterialLayers',s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0);this.u(p,'uOrganicDetail',s.textureRandomness||0,s.textureWarp||0,s.textureLink||0,s.texturePatch||0);this.u(p,'uTextureSeed',s.textureSeed||0);this.u(p,'uSurfaceSeed',(s.seed%1000)*.013);
  this.u(p,'uTransport',s.subsurface||0,s.sssRadius??.35,0,0);this.u(p,'uSssColor',...rgb(s.sssColor||'#ffc49b'));this.u(p,'uInternalColor',...rgb(s.internalColor||'#e6f5ff'));
@@ -456,7 +468,14 @@ export class FilamentPass{
  // Capture only after the root pass; it never touches the default framebuffer.
  g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE5);g.bindTexture(g.TEXTURE_2D,this.scene);g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);
  this.common(this.coreProgram,s,main,w,h);this.field(this.coreProgram,s,solid);this.tex(this.coreProgram,'uScene',this.scene,5);this.u(this.coreProgram,'uBound',extent);this.u(this.coreProgram,'uCore',s.filCore);this.u(this.coreProgram,'uDepthOnly',1);g.bindFramebuffer(g.FRAMEBUFFER,this.coreDepth.fbo);g.viewport(0,0,w,h);g.enable(g.DEPTH_TEST);g.depthFunc(g.ALWAYS);g.drawArrays(g.TRIANGLES,0,3);this.u(this.coreProgram,'uDepthOnly',0);
- for(const camera of light?[this.lightCamera,main]:[main]){const shadow=!!camera.shadow,cw=shadow?this.shadow.w:w,ch=shadow?this.shadow.h:h;g.bindFramebuffer(g.FRAMEBUFFER,shadow?this.shadow.fbo:this.fbo);g.viewport(0,0,cw,ch);g.enable(g.DEPTH_TEST);g.depthFunc(g.ALWAYS);g.clearDepth(1);g.clear(g.DEPTH_BUFFER_BIT);this.common(this.coreProgram,s,camera,cw,ch);this.field(this.coreProgram,s,solid);this.tex(this.coreProgram,'uScene',this.scene,5);this.u(this.coreProgram,'uBound',extent);this.u(this.coreProgram,'uCore',s.filCore*(1-s.transparency));g.drawArrays(g.TRIANGLES,0,3);g.depthFunc(g.LEQUAL);if(!shadow){if(s.transparency===0){g.enable(g.SAMPLE_ALPHA_TO_COVERAGE);yield* this.hair(s,{...camera,opaque:true},cw,ch,phase);g.disable(g.SAMPLE_ALPHA_TO_COVERAGE);}g.bindFramebuffer(g.READ_FRAMEBUFFER,this.fbo);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,this.oitMs?.fbo||this.oit.fbo);if(!this.oitMs)g.blitFramebuffer(0,0,w,h,0,0,w,h,g.DEPTH_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,null);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE5);g.bindTexture(g.TEXTURE_2D,this.scene);g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.bindFramebuffer(g.FRAMEBUFFER,this.oitMs?.fbo||this.oit.fbo);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);g.depthMask(false);g.enable(g.BLEND);g.blendEquation(g.FUNC_ADD);g.blendFunc(g.ONE,g.ONE);}yield* this.hair(s,camera,cw,ch,phase);g.disable(g.BLEND);g.depthMask(true);}
+ for(const camera of light?[this.lightCamera,main]:[main]){const shadow=!!camera.shadow,cw=shadow?this.shadow.w:w,ch=shadow?this.shadow.h:h;g.bindFramebuffer(g.FRAMEBUFFER,shadow?this.shadow.fbo:this.fbo);g.viewport(0,0,cw,ch);g.enable(g.DEPTH_TEST);g.depthFunc(g.ALWAYS);g.clearDepth(1);g.clear(g.DEPTH_BUFFER_BIT);this.common(this.coreProgram,s,camera,cw,ch);this.field(this.coreProgram,s,solid);this.tex(this.coreProgram,'uScene',this.scene,5);this.u(this.coreProgram,'uBound',extent);this.u(this.coreProgram,'uCore',s.filCore*(1-s.transparency));g.drawArrays(g.TRIANGLES,0,3);g.depthFunc(g.LEQUAL);if(!shadow){if(s.transparency===0){g.enable(g.SAMPLE_ALPHA_TO_COVERAGE);yield* this.hair(s,{...camera,opaque:true},cw,ch,phase);g.disable(g.SAMPLE_ALPHA_TO_COVERAGE);}
+  g.bindFramebuffer(g.READ_FRAMEBUFFER,this.fbo);
+  if(s.transparency===0&&s.bgMode!=='transparent'&&this.tubeBlend(s,camera,ch)>0){
+   // A fully covered opaque tube can resolve straight to the canvas.
+   g.bindFramebuffer(g.DRAW_FRAMEBUFFER,null);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);
+   g.bindFramebuffer(g.FRAMEBUFFER,null);g.disable(g.DEPTH_TEST);g.bindVertexArray(null);g.activeTexture(g.TEXTURE0);return;
+  }
+  g.bindFramebuffer(g.DRAW_FRAMEBUFFER,this.oitMs?.fbo||this.oit.fbo);if(!this.oitMs)g.blitFramebuffer(0,0,w,h,0,0,w,h,g.DEPTH_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,null);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE5);g.bindTexture(g.TEXTURE_2D,this.scene);g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.bindFramebuffer(g.FRAMEBUFFER,this.oitMs?.fbo||this.oit.fbo);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);g.depthMask(false);g.enable(g.BLEND);g.blendEquation(g.FUNC_ADD);g.blendFunc(g.ONE,g.ONE);}yield* this.hair(s,camera,cw,ch,phase);g.disable(g.BLEND);g.depthMask(true);}
  if(this.oitMs){g.bindFramebuffer(g.READ_FRAMEBUFFER,this.oitMs.fbo);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,this.oit.fbo);for(let i=0;i<2;i++){g.readBuffer(g.COLOR_ATTACHMENT0+i);g.drawBuffers(i?[g.NONE,g.COLOR_ATTACHMENT1]:[g.COLOR_ATTACHMENT0,g.NONE]);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);}g.drawBuffers([g.COLOR_ATTACHMENT0,g.COLOR_ATTACHMENT1]);}
  g.bindFramebuffer(g.FRAMEBUFFER,null);g.disable(g.DEPTH_TEST);g.useProgram(this.resolveProgram.program);this.tex(this.resolveProgram,'uScene',this.scene,0);this.tex(this.resolveProgram,'uAccum',this.oit.textures[0],1);this.tex(this.resolveProgram,'uExtinction',this.oit.textures[1],2);this.u(this.resolveProgram,'uSize',w,h);g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);g.activeTexture(g.TEXTURE0);
  }

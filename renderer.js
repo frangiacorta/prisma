@@ -1,16 +1,16 @@
-import {Dynamics,disposeDynamics} from './dynamics.js?v=6a9e627b503d';
-import {motionPeriod} from './animation-clock.js?v=6a9e627b503d';
-import {animationPhase} from './animation-clock.js?v=6a9e627b503d';
-import {ScanlinePass} from './finish-scanlines.js?v=6a9e627b503d';
-import {FilamentPass} from './filament-renderer.js?v=6a9e627b503d';
-import {VeilTransition} from './veil-transition.js?v=6a9e627b503d';
-import {BodySamples} from './body-samples.js?v=6a9e627b503d';
-import {BodyComposite} from './body-composite.js?v=6a9e627b503d';
-import {cloudBody,cloudToBody,grainMix} from './body-layers.js?v=6a9e627b503d';
-import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=6a9e627b503d';
-import {ParticleRenderer} from './particle-renderer.js?v=6a9e627b503d';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=6a9e627b503d';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=6a9e627b503d';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=0b52b3909b22';
+import {motionPeriod} from './animation-clock.js?v=0b52b3909b22';
+import {animationPhase} from './animation-clock.js?v=0b52b3909b22';
+import {ScanlinePass} from './finish-scanlines.js?v=0b52b3909b22';
+import {FilamentPass} from './filament-renderer.js?v=0b52b3909b22';
+import {VeilTransition} from './veil-transition.js?v=0b52b3909b22';
+import {BodySamples} from './body-samples.js?v=0b52b3909b22';
+import {BodyComposite} from './body-composite.js?v=0b52b3909b22';
+import {cloudBody,cloudToBody,grainMix} from './body-layers.js?v=0b52b3909b22';
+import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=0b52b3909b22';
+import {ParticleRenderer} from './particle-renderer.js?v=0b52b3909b22';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=0b52b3909b22';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=0b52b3909b22';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
@@ -41,6 +41,7 @@ export class Renderer{
   // Scale layer strengths after sampling the animation and before drawing.
   for(const k of ['pOpacity','pTrailOpacity','pLinks','pSkin','pThreadOpacity','pShadow','pCaustic'])
    grains[k]=frame[k]*mix;
+  if(mix>=1&&!this.needsFilaments(surface,p)&&!s.motions?.sceneGrains?.enabled)return {body:surface,grains,attach:true,mix,frame};
   return {surface,grains,attach:!cloud,mix,frame};
  }
  layerOptions(plan,o){
@@ -52,7 +53,7 @@ export class Renderer{
   if(plan.surface){
    surfaceReady=this.select(plan.surface).prepare(plan.surface,p,so);
    surfaceReady=this.prepareFilaments(plan.surface,p)&&surfaceReady;
-  }
+  }else if(plan.body)surfaceReady=this.select(plan.body).prepareBodyField(plan.body,p);
   if(plan.attach){this.bodySamples??=new BodySamples(this.gl);surfaceReady=this.bodySamples.ready()&&surfaceReady;}
   const grainsReady=!plan.grains||this.select(plan.grains).prepare(plan.grains,p,o);
   return surfaceReady&&grainsReady;
@@ -66,12 +67,17 @@ export class Renderer{
   }
   if(plan.attach){
    this.bodySamples??=new BodySamples(this.gl);
-   while(!this.bodySamples.ready()){
+   while(!this.bodySamples.ready()||(plan.body&&!this.select(plan.body).prepareBodyField(plan.body,p))){
     if(o.cancelled?.()||this.gl.isContextLost())return false;
     await new Promise(resolve=>setTimeout(resolve,12));
    }
   }
   return !plan.grains||this.select(plan.grains).prepareAsync(plan.grains,p,o);
+ }
+ grainOptions(plan,p,o){
+  if(!plan.body)return o;
+  const field=this.select(plan.body).bodyField(plan.body,p,o);
+  return {...o,studioLayer:{attachment:this.bodySamples.update(field,plan.frame,o)}};
  }
  compositeFrame(plan,p,w,h,o){
   const surface=finishingSource(plan.surface,o),solid=this.select(surface);
@@ -90,7 +96,10 @@ export class Renderer{
   return ok;
  }
  drawLayers(plan,p,w,h,o){
-  if(!plan.surface)return this.select(plan.grains).draw(finishingSource(plan.grains,o),p,w,h,o);
+  if(!plan.surface){
+   const options=this.grainOptions(plan,p,o);
+   return this.select(plan.grains).draw(finishingSource(plan.grains,o),p,w,h,options);
+  }
   if(!plan.grains){
    const surface=finishingSource(plan.surface,o),ok=this.select(surface).draw(surface,p,w,h,o);
    if(ok)this.filaments(surface,p,w,h,o);
@@ -102,7 +111,8 @@ export class Renderer{
  async drawLayerExport(plan,method,p,w,h,o){
   if(!(plan.surface&&plan.grains)){
    const frame=finishingSource(plan.surface||plan.grains,o);
-   const ok=await this.select(frame)[method](frame,p,w,h,o);
+   const options=this.grainOptions(plan,p,o);
+   const ok=await this.select(frame)[method](frame,p,w,h,options);
    return ok&&(!plan.surface||await this.filaments(frame,p,w,h,o,true));
   }
   const inner={...o,trackTiming:false,deferCompletion:true};
@@ -134,6 +144,7 @@ export class Renderer{
   this.focusDepthTarget??=new BodyComposite(this.gl);const layers=this.focusDepthTarget.target(width,height);
   solid.draw(source,p,width,height,{...focusOptions,layers});
   this.focusPass.draw(s,w,h,layers.depth);
+  return true;
  }
  prepare(s,p,o){p=animationPhase(s,p||0);s=this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o);if(!s)return false;const focusReady=this.prepareFocus(s,p,o);const plan=this.layerPlan(s,p);if(plan)return this.prepareLayers(plan,p,o||{})&&focusReady;s=this.endpoint(s,p);const ready=this.select(s).prepare(s,p,o),fil=this.prepareFilaments(s,p);return ready&&fil&&focusReady;}async prepareAsync(s,p,o){p=animationPhase(s,p||0);s=await this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o,true);if(!s||!await this.prepareFocus(s,p,o,true))return false;const plan=this.layerPlan(s,p);if(plan)return this.prepareLayersAsync(plan,p,o||{});s=this.endpoint(s,p);const ready=await this.select(s).prepareAsync(s,p,o);if(!ready)return false;this.prepareFilaments(s,p);return this.needsFilaments(s,p)?this.filamentPass.prepareAsync(o):true;}
  needsFilaments(s,p){s=this.endpoint(s,p);return !(s.engine==='particles'||s.pLiving>0)&&sampleFrame(s,p).filLength>0;}
@@ -149,12 +160,13 @@ export class Renderer{
   if(descriptor){const [key,Pass]=descriptor;this[key]??=new Pass(this.gl);}
  }
  finish(s,o={},phase=0,timeline=phase){
-  if(finishingOff(s,o)){this.feedbackFinishing?.release();return;}
+  if(finishingOff(s,o)){this.feedbackFinishing?.release();return false;}
   const values={...FINISH_DEFAULTS,...s},order=normalizeFinishOrder(s.finishOrder),w=this.canvas.width,h=this.canvas.height;
   const active={feedback:values.finishFeedback&&values.finishFeedbackMix>0,scan:values.finishScan&&values.finishScanMix>0,warp:values.finishWarp&&values.finishWarpMix>0,glass:values.finishGlass&&values.finishGlassMix>0,mosaic:values.finishMosaic&&values.finishMosaicMix>0,rgb:values.finishRgb&&values.finishRgbMix>0,edge:values.finishEdge&&values.finishEdgeMix>0,glyph:values.finishGlyph&&values.finishGlyphMix>0,glitch:values.finishGlitch&&values.finishGlitchMix>0&&values.finishGlitchCoverage>0&&(values.finishGlitchAmount>0||values.finishGlitchSplit>0)};
   if(!active.feedback)this.feedbackFinishing?.release();
+  let applied=false;
   for(let i=0;i<order.length;i++){
-   const kind=order[i];if(!active[kind])continue;this.prepareFilter(kind);
+   const kind=order[i];if(!active[kind])continue;applied=true;this.prepareFilter(kind);
    if(kind==='mosaic'||kind==='rgb'){
     // Preserve the legacy fused pass when the two active filters remain adjacent.
     const fused=kind==='mosaic'&&order[i+1]==='rgb'&&active.rgb;
@@ -165,6 +177,7 @@ export class Renderer{
    else if(kind==='glyph'){this.glyphFinishing.draw(values,w,h,phase);}
    else{this.detailFinishing.draw(values,w,h,phase,kind==='edge'?0:1,o.frameInterval);}
   }
+  return applied;
  }
 
  transitionAmount(s,p){if(s.pLiving!==4||!s.pVeilFromForm)return 1;const m=sampleFrame(s,p).pVeilMorph/.12;return m<=0?0:m>=1?1:m*m*(3-2*m);}
@@ -178,7 +191,37 @@ export class Renderer{
   try{const plan=this.layerPlan(s,p);if(!this.prepareFocus(s,p,o))return false;if(plan){if(!this.prepareLayers(plan,p,inner)||!this.drawLayers(plan,p,w,h,inner))return false;this.applyFocus(s,p,w,h,plan);this.finish(s,o,p,timeline);if(o.liveDynamics)this.lastPreviewDynamicsFrame=s._dynamics||null;completed=true;return true;}const mix=this.transitionAmount(s,p);if(mix>0&&mix<1){const base=this.sourceState(s);if(!this.select(base).draw(finishingSource(base,o),p,w,h,inner))return false;this.veilTransition??=new VeilTransition(this.gl);this.veilTransition.capture(0,w,h);}s=this.endpoint(s,p);const ok=this.select(s).draw(finishingSource(s,o),p,w,h,inner);if(ok){if(mix>0&&mix<1)this.veilTransition.draw(w,h,mix);this.filaments(s,p,w,h,o);this.applyFocus(s,p,w,h,null);this.finish(s,o,p,timeline);if(o.liveDynamics)this.lastPreviewDynamicsFrame=s._dynamics||null;completed=true;}return ok;}
   finally{if(q){g.endQuery(this.frameTimer.TIME_ELAPSED_EXT);this.frameQueries.push(q);}if(completed)this.fence();else if(q)g.flush();}
  }
- async drawWithTransition(method,s,p,w,h,o){const timeline=p;p=animationPhase(s,p);s=await this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o,true);if(!s)return false;o=printPreviewOptions(s,o);if(!await this.prepareFocus(s,p,o,true))return false;const plan=this.layerPlan(s,p);if(plan){if(!await this.prepareLayersAsync(plan,p,o)||o.cancelled?.())return false;const ok=await this.drawLayerExport(plan,method,p,w,h,o);if(!ok||o.cancelled?.())return false;this.applyFocus(s,p,w,h,plan);this.finish(s,o,p,timeline);this.fence();const complete=await this.waitForGpu(o);if(complete)o.progress?.(1);return complete;}this.prepareFilaments(s,p);if(this.needsFilaments(s,p)&&!await this.filamentPass.prepareAsync(o))return false;const mix=this.transitionAmount(s,p);if(mix>0&&mix<1){const base=this.sourceState(s);if(!await this.select(base)[method](finishingSource(base,o),p,w,h,o)||o.cancelled?.())return false;this.veilTransition??=new VeilTransition(this.gl);this.veilTransition.capture(0,w,h);}s=this.endpoint(s,p);const ok=await this.select(s)[method](finishingSource(s,o),p,w,h,o);if(!ok||o.cancelled?.())return false;if(mix>0&&mix<1)this.veilTransition.draw(w,h,mix);if(!await this.filaments(s,p,w,h,o,true))return false;this.applyFocus(s,p,w,h,null);this.finish(s,o,p,timeline);this.fence();return this.waitForGpu(o);}
+ async drawWithTransition(method,s,p,w,h,o){
+  const timeline=p;p=animationPhase(s,p);
+  s=await this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o,true);if(!s)return false;
+  o=printPreviewOptions(s,o);if(!await this.prepareFocus(s,p,o,true))return false;
+  const plan=this.layerPlan(s,p);
+  let drawsAfterBase=false;
+  if(plan){
+   if(!await this.prepareLayersAsync(plan,p,o)||o.cancelled?.())return false;
+   if(!await this.drawLayerExport(plan,method,p,w,h,o)||o.cancelled?.())return false;
+   drawsAfterBase=!!(plan.surface&&(plan.grains||this.needsFilaments(plan.surface,p)));
+  }else{
+   this.prepareFilaments(s,p);
+   const filaments=this.needsFilaments(s,p),mix=this.transitionAmount(s,p),transition=mix>0&&mix<1;
+   if(filaments&&!await this.filamentPass.prepareAsync(o))return false;
+   if(transition){
+    const source=this.sourceState(s);
+    if(!await this.select(source)[method](finishingSource(source,o),p,w,h,o)||o.cancelled?.())return false;
+    this.veilTransition??=new VeilTransition(this.gl);this.veilTransition.capture(0,w,h);
+   }
+   s=this.endpoint(s,p);
+   if(!await this.select(s)[method](finishingSource(s,o),p,w,h,o)||o.cancelled?.())return false;
+   if(transition)this.veilTransition.draw(w,h,mix);
+   if(filaments&&!await this.filaments(s,p,w,h,o,true))return false;
+   drawsAfterBase=filaments||transition;
+  }
+  const focus=this.applyFocus(s,p,w,h,plan),filters=this.finish(s,o,p,timeline);
+  // Base passes already wait for their frame. A second fence is necessary
+  // only when a later pass modified the canvas.
+  if(drawsAfterBase||focus||filters){this.fence();if(!await this.waitForGpu(o))return false;}
+  o.progress?.(1);return !o.cancelled?.();
+ }
  async drawAccumulated(s,p,w,h,o={}){return this.drawWithTransition('drawAccumulated',s,p,w,h,o);}
  async drawTiled(s,p,w,h,o={}){return this.drawWithTransition('drawTiled',s,p,w,h,o);}
  fence(){if(this.impl?.completionSync)this.gl.deleteSync(this.impl.completionSync);this.impl.completionSync=this.gl.fenceSync(this.gl.SYNC_GPU_COMMANDS_COMPLETE,0);this.gl.flush();}

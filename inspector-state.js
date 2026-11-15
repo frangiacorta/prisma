@@ -1,6 +1,6 @@
-import {controlCondition,conditionActivation} from './control-help.js?v=6a9e627b503d';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=6a9e627b503d';
-import {syncMaterialControl} from './studio-model.js?v=6a9e627b503d';
+import {controlCondition,conditionActivation} from './control-help.js?v=0b52b3909b22';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=0b52b3909b22';
+import {syncMaterialControl} from './studio-model.js?v=0b52b3909b22';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pCloudCore','pCloudHalo','pCellAmount','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
@@ -63,21 +63,28 @@ export function decorateInspector({root,state,baseline,tab,edit}){
  const hint=document.createElement('p');hint.className='help';hint.textContent='Modificati: valori diversi da quelli iniziali.';toolbar.append(hint);
  const sections=[...root.querySelectorAll(':scope > details')];
  const jumpBar=document.createElement('nav');jumpBar.className='section-jumps';jumpBar.setAttribute('aria-label','Sezioni della scheda');
+ const sectionRail=document.getElementById('inspector-section-rail');sectionRail.replaceChildren();
+ const anchorTop=()=>jumpBar.offsetHeight?jumpBar.getBoundingClientRect().bottom:root.getBoundingClientRect().top;
  const jumps=sections.map(section=>{
   const summary=section.querySelector(':scope > summary');
   if(!summary)return null;
   const jump=document.createElement('button');jump.type='button';
   jump.textContent=[...summary.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim()||summary.textContent;
-  jump.onclick=()=>{section.open=true;root.scrollTo({top:root.scrollTop+summary.getBoundingClientRect().top-jumpBar.getBoundingClientRect().bottom-5,behavior:'smooth'});};
-  jumpBar.append(jump);
-  return {jump,section,summary};
+  const desktopJump=jump.cloneNode(true);
+  const go=()=>{section.open=true;root.scrollTo({top:root.scrollTop+summary.getBoundingClientRect().top-anchorTop()-5,behavior:'smooth'});};
+  desktopJump.onclick=jump.onclick=go;jumpBar.append(jump);sectionRail.append(desktopJump);
+  return {jump,desktopJump,section,summary};
  }).filter(Boolean);
+ sectionRail.hidden=jumps.length<=2;
  function currentSection(){
-  const top=jumpBar.getBoundingClientRect().bottom+14;
+  const top=anchorTop()+14;
   const current=jumps.findLastIndex(r=>r.summary.getBoundingClientRect().top<=top);
-  jumps.forEach(({jump},i)=>jump.setAttribute('aria-current',i===Math.max(current,0)?'location':'false'));
+  jumps.forEach(({jump,desktopJump},i)=>{
+   const value=i===Math.max(current,0)?'location':'false';
+   jump.setAttribute('aria-current',value);desktopJump.setAttribute('aria-current',value);
+  });
  }
- root.onscroll=jumps.length?currentSection:null;
+ root.onscroll=jumps.length>2?currentSection:null;
  const activeList=document.createElement('div');activeList.className='active-effect-list';toolbar.append(activeList);
  const activeMenu=document.createElement('details');activeMenu.className='overview-active';const activeSummary=document.createElement('summary');activeSummary.textContent='Effetti attivi';activeMenu.append(activeSummary,activeList);
  const visibility=document.createElement('div');visibility.className='section-visibility';const showActive=document.createElement('button');showActive.type='button';showActive.className='quiet';showActive.textContent='Apri attivi';showActive.id='sections-active';showActive.onclick=()=>{for(const d of sections){d.open=!!d.querySelector('.effect-status[data-on=true]');if(d.open)for(const child of d.querySelectorAll('details'))child.open=!!child.querySelector('.effect-status[data-on=true]');}};visibility.append(showActive);
@@ -133,9 +140,12 @@ export function decorateInspector({root,state,baseline,tab,edit}){
   for(const r of omitted){const b=document.createElement('button');b.type='button';b.className='animation-link';b.dataset.revealOmitted=r.key;b.textContent=r.label+' · modificato';activeList.append(b);}
   if(!activeList.children.length){const empty=document.createElement('span');empty.className='help';empty.textContent='Nessun effetto con interruttore attivo in questa scheda.';activeList.append(empty);}
   for(const d of root.querySelectorAll('details')){const effects=records.filter(r=>d.contains(r.el));if(!effects.length)continue;let badge=d.querySelector(':scope > summary > .effect-status');if(!badge){badge=document.createElement('span');badge.className='effect-status';d.querySelector(':scope > summary').append(badge);}const on=effects.filter(r=>r.on).length;const onlyTracks=effects.every(r=>r.path);badge.textContent=on?(onlyTracks?(on+' animazioni'):(on===1?'Attivo':on+' attivi')):(onlyTracks?'':'Spento');badge.dataset.on=String(on>0);d.classList.toggle('effect-off',on===0);}
-  for(const {jump,section,summary} of jumps){
+  for(const {jump,desktopJump,section,summary} of jumps){
    const isOn=!!summary.querySelector('.effect-status[data-on=true]')||summary.querySelector('[data-layer-toggle]')?.checked;
-   jump.classList.toggle('section-on',!!isOn);
+   for(const button of [jump,desktopJump]){
+    button.classList.toggle('section-on',!!isOn);
+    button.setAttribute('aria-label',button.textContent+(isOn?' · Attivo':''));
+   }
    let hint=summary.querySelector('.section-values');
    if(!hint){hint=document.createElement('span');hint.className='section-values';summary.append(hint);}
    const changed=rangeRows.filter(r=>section.contains(r.host)&&!equal(at(state,r.key),r.base));
@@ -147,5 +157,5 @@ export function decorateInspector({root,state,baseline,tab,edit}){
   activeSummary.textContent='Attivi ('+records.filter(r=>r.on).length+')';empty.hidden=n>0;for(const r of sectionResets)r.button.disabled=!r.d.querySelector('.is-changed');
   activeList.hidden=false;if(!records.length&&!omitted.length){activeSummary.textContent='Effetti attivi (0)';activeList.hidden=true;}
  }
- refresh();return {refresh};
+ refresh();if(jumps.length>2)currentSection();return {refresh};
 }

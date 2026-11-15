@@ -93,6 +93,13 @@ try{
  await page.waitForFunction(()=>prismaPlayground.engine.decks.B.mutation?.position===1&&prismaPlayground.engine.mixer.variantMix[1]===1,null,{timeout:30000});
  assert.equal(await page.evaluate(()=>prismaPlayground.engine.decks.A.state.seed),otherScene);
  report.variantCrossfade=true;
+ await page.evaluate(()=>{
+  const e=prismaPlayground.engine;
+  if(e.decks.B.playing)e.toggle('B');
+  e.config.autoQuality=false;e.config.resolution=720;e.scale=1;
+ });
+ await page.waitForFunction(()=>prismaPlayground.engine.decks.B.canvas.height===720,null,{timeout:20000});
+ report.pausedDeckHeight=720;
  if(await page.evaluate(()=>!!prismaPlayground.engine.mixer.gl.getExtension('WEBGL_lose_context'))){
   await page.evaluate(()=>{const g=prismaPlayground.engine.mixer.gl,e=g.getExtension('WEBGL_lose_context');g.canvas.addEventListener('webglcontextlost',()=>setTimeout(()=>e.restoreContext(),90),{once:true});e.loseContext();});
   await page.waitForFunction(()=>prismaPlayground.getStatus()?.decks.B.frames>1&&!prismaPlayground.engine.mixer.gl.isContextLost(),null,{timeout:20000});

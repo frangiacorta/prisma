@@ -1,9 +1,9 @@
-import {Renderer} from './renderer.js?v=6a9e627b503d';
-import {FlowDirector} from './playground-flow.js?v=6a9e627b503d';
-import {PlaygroundMixer} from './playground-mixer.js?v=6a9e627b503d';
-import {normalizeCreation} from './creative-model.js?v=6a9e627b503d';
-import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=6a9e627b503d';
-import {filterOverlay,mutationBetween} from './playground-performance.js?v=6a9e627b503d';
+import {Renderer} from './renderer.js?v=0b52b3909b22';
+import {FlowDirector} from './playground-flow.js?v=0b52b3909b22';
+import {PlaygroundMixer} from './playground-mixer.js?v=0b52b3909b22';
+import {normalizeCreation} from './creative-model.js?v=0b52b3909b22';
+import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=0b52b3909b22';
+import {filterOverlay,mutationBetween} from './playground-performance.js?v=0b52b3909b22';
 
 export class PlaygroundEngine{
  constructor(canvas,config,notify=()=>{}){
@@ -49,7 +49,7 @@ export class PlaygroundEngine{
  nextBeat(){return this.clock+(1-this.beats%1)*60/this.config.bpm;}
  async startAudio(file,host){
   const token=this.audioRevision=(this.audioRevision||0)+1;
-  const {OrbAudioInput}=await import('./vendor/orb/orb-audio.js?v=6a9e627b503d');
+  const {OrbAudioInput}=await import('./vendor/orb/orb-audio.js?v=0b52b3909b22');
   if(this.closed||token!==this.audioRevision)return false;
   this.audio??=new OrbAudioInput();
   this.audio.attack=.055;this.audio.release=.2;
@@ -219,10 +219,11 @@ export class PlaygroundEngine{
     if(r.completionSync)continue;
     const modulated=this.modulatedDeck(id,d,mods),isModulated=modulated!==d.state||Object.keys(mods).some(key=>key.startsWith('fx.'+id+'.'));
     if(isModulated||d.wasModulated)d.dirty=true;d.wasModulated=isModulated;
-    if(!d.dirty)continue;
-    if(!onAir(id)&&d.revision===d.drawRevision)continue;
-    const scale=this.scale;
-    const h=Math.min(Math.max(144,Math.round(this.config.resolution*scale)),Math.floor(2048/Math.max(1,d.ratio))),w=Math.round(h*d.ratio),opts={preview:true,quality:'fast',liveDynamics:true,frameInterval:Math.min(deltaTime,.067),geometryBudget:this.workload};
+    const visible=onAir(id);
+    if(!visible&&d.revision===d.drawRevision)continue;
+    const h=Math.min(Math.max(144,Math.round(this.config.resolution*this.scale)),Math.floor(2048/Math.max(1,d.ratio))),w=Math.round(h*d.ratio);
+    if(!d.dirty&&d.canvas.width===w&&d.canvas.height===h)continue;
+    const opts={preview:true,quality:'fast',liveDynamics:true,frameInterval:Math.min(deltaTime,.067),geometryBudget:this.workload};
     const renderState={...modulated,...this.overlays(id,mods)};
     if(!r.prepare(renderState,d.phase,opts))continue;
     if(r.draw(renderState,d.phase,w,h,opts)){d.lastDraw=this.clock;d.submitted=true;d.dirty=false;d.drawRevision=d.revision;}

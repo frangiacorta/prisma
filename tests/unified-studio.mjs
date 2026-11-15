@@ -99,6 +99,18 @@ try{
  await page.locator('#controls [data-animate-open=sceneGrains]').click();
  assert.equal(await page.locator('#animation-editor.parameter-animation [data-path-check="motions.sceneGrains.enabled"]').isChecked(),true);
  await page.locator('#animation-editor button[aria-label="Chiudi editor"]').click();
+ await page.setViewportSize({width:1600,height:1000});
+ const sectionRail=page.locator('#inspector-section-rail');
+ await sectionRail.waitFor();
+ assert(await sectionRail.locator('button').count()>3);
+ const targetSection='Deformazioni e ritagli';
+ await sectionRail.getByRole('button',{name:targetSection,exact:true}).click();
+ await page.waitForFunction(name=>[...document.querySelectorAll('#controls>details[open]>summary')].some(s=>s.textContent.includes(name)),targetSection);
+ const desktop=await page.evaluate(()=>{
+  const boxes=['.studio','#inspector-section-rail','.inspector'].map(selector=>document.querySelector(selector).getBoundingClientRect());
+  const [scene,index,inspector]=boxes;return {scene:scene.width,rail:index.width,inspector:inspector.width,sameRow:scene.top===inspector.top&&scene.top===index.top,ordered:scene.right<=index.left&&index.right<=inspector.left};
+ });
+ assert(desktop.sameRow&&desktop.ordered&&desktop.rail<=150&&desktop.inspector>=320&&desktop.inspector<=560,JSON.stringify(desktop));
  await page.screenshot({path:directory+'/editor-desktop.png'});
  await page.locator('#control-level').selectOption('simple');
  await page.reload();
@@ -112,10 +124,12 @@ try{
   const parts=Object.fromEntries(['.studio','.stage-toolbar','.viewport','.scene-actions','.description-bar','.inspector','.inspector-search','#tabs','#controls'].map(selector=>{
    const z=document.querySelector(selector).getBoundingClientRect();return [selector,[Math.round(z.top),Math.round(z.height)]];
   }));
-  return {canvasTop:a.top,sliderTop:r.top,width:document.documentElement.scrollWidth,parts};
+  const tools=document.querySelector('.canvas-tools'),box=tools.getBoundingClientRect();
+  const toolsReachable=tools.contains(document.elementFromPoint(box.left+box.width/2,box.top+box.height/2));
+  return {canvasTop:a.top,sliderTop:r.top,width:document.documentElement.scrollWidth,toolsReachable,parts};
  });
  await page.screenshot({path:directory+'/editor-mobile.png'});
- assert(mobile.canvasTop<120&&mobile.sliderTop<844&&mobile.width<=390,JSON.stringify(mobile));
+ assert(mobile.canvasTop<120&&mobile.sliderTop<844&&mobile.width<=390&&mobile.toolsReachable,JSON.stringify(mobile));
  await page.locator('.header-actions .workflow-menu > summary').click();
  assert(await page.locator('#playground-open').isVisible());
  await page.locator('.header-actions .workflow-menu > summary').click();

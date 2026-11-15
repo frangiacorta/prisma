@@ -1,6 +1,11 @@
-import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=6a9e627b503d';
+import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=0b52b3909b22';
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
 export const PARTICLE_VERSION=14;
+// Normalize the light accumulated by long, persistent trails.
+export function trailLightCompensation(s){
+ const deposits=s.pTrailCount*Math.max(1,s.pTrailLength/.2)*(1+s.pTrailPersistence);
+ return Math.min(1,4000/Math.max(1,deposits));
+}
 export function grainDiameters(s){
  const base=s.pSize??1.1;
  return {base,large:Number.isFinite(s.pSizeRatio)?base*s.pSizeRatio:(s.pLargeSize??24),node:Number.isFinite(s.pNodeRatio)?base*s.pNodeRatio:(s.pLinkNodeSize??0)};

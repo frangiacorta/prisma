@@ -1,6 +1,7 @@
 // Deposit animated points into depth slices, then integrate extinction
 // from front to back. Density differences provide a local lighting normal.
-import {livingAttachmentGLSL} from './living-composition.js?v=6a9e627b503d';
+import {livingAttachmentGLSL} from './living-composition.js?v=0b52b3909b22';
+import {materialCavity} from './particle-shading.js?v=0b52b3909b22';
 
 export const volumeResolveGLSL=`
 uniform highp sampler2D uViewDensity;
@@ -97,8 +98,9 @@ export class ParticleVolume{
   const p=this.program,points=Math.max(1,Math.round(s.pCount)),count=Math.min(points,source.preview&&source.quality==='fast'?28000:100000);
   const pixel=Math.max(4,Math.min(34,(.032+.025*s.subsurface+.018*s.translucency)*height));
   o.settings(p,s,phase);o.tex(p,'uSeeds',o.seedTexture,2);o.u(p,'uTileSize',width,height);
-  o.u(p,'uVolumeMaterial',s.scatterDirection,s.absorption,s.translucency,s.thickness??1);
-  o.u(p,'uDeposit',pixel,Math.min(3,w*h/(count*pixel*pixel)*.46)*s.pOpacity,Math.max(2.8,s.scale*s.pOpticalExtent*2),0);
+  const material=1-Math.pow(materialCavity(s),3);
+  o.u(p,'uVolumeMaterial',s.scatterDirection,s.absorption,s.translucency,(s.thickness??1)*material);
+  o.u(p,'uDeposit',pixel,Math.min(3,w*h/(count*pixel*pixel)*.46)*s.pOpacity*material,Math.max(2.8,s.scale*s.pOpticalExtent*2),0);
   g.uniform2i(o.loc(p,'uCloudSamples'),points,count);
   g.drawArrays(g.POINTS,0,count*2);
   g.disable(g.BLEND);g.bindVertexArray(null);

@@ -1,18 +1,18 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=6a9e627b503d';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=6a9e627b503d';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=6a9e627b503d';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=6a9e627b503d';
-import {shadowLight} from './particle-shadow.js?v=6a9e627b503d';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=6a9e627b503d';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=6a9e627b503d';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=6a9e627b503d';
-import {ParticleLinks} from './particle-links.js?v=6a9e627b503d';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=6a9e627b503d';
-import {LayeredVeils} from './layered-veils.js?v=6a9e627b503d';
-import {LivingStructures} from './living-structures.js?v=6a9e627b503d';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=6a9e627b503d';
-import {forceBarrierGLSL} from './particle-forces.js?v=6a9e627b503d';
-import {prismaShadingGLSL} from './particle-shading.js?v=6a9e627b503d';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=0b52b3909b22';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=0b52b3909b22';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=0b52b3909b22';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=0b52b3909b22';
+import {shadowLight} from './particle-shadow.js?v=0b52b3909b22';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=0b52b3909b22';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=0b52b3909b22';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=0b52b3909b22';
+import {ParticleLinks} from './particle-links.js?v=0b52b3909b22';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=0b52b3909b22';
+import {LayeredVeils} from './layered-veils.js?v=0b52b3909b22';
+import {LivingStructures} from './living-structures.js?v=0b52b3909b22';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=0b52b3909b22';
+import {forceBarrierGLSL} from './particle-forces.js?v=0b52b3909b22';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=0b52b3909b22';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec2 uFocus;
 float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
@@ -58,7 +58,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
  if(uSprite>1.5&&uSprite<2.5)coverage*=smoothstep(.35,.55,d);
  if(uSprite>2.5)coverage*=exp(-min(abs(xy.x),abs(xy.y))*12.);
  float profile=uSprite<.5?exp(-d*d*mix(.2,3.,uPoints.w)):mix(1.,exp(-d*d*3.),uPoints.w);
- float a=coverage*profile*vOpacity*livingVisibility(vPosition.z);
+ float a=coverage*profile*vOpacity*livingVisibility(vPosition.z)*particleWallCoverage(d);
  vec3 micro=vec3(xy.x,-xy.y,sqrt(max(.01,1.-d*d)));
  vec3 n=normalize(normalize(vPosition-uShadeOrigin+vec3(0.,0.,.0001))+micro*.28);
  color=vec4(shadeParticle(vColor,vPosition,n)*(a*vCellLight),a);
@@ -111,7 +111,7 @@ void main(){
   vColor+=glow*uTrailPulse.x*pulse*(1.+crest*5.);
  }
  vColor*=cellLightFactor(original);
- vOpacity=uTrails.z*mix(pow(max(0.,1.-materialAge),uTail.x),1.,uFiber.x)*min(1.,width/max(1.,drawWidth))*uFiber.w;
+ vOpacity=uTrails.z*mix(pow(max(0.,1.-materialAge),uTail.x),1.,uFiber.x)*min(1.,width/max(1.,drawWidth))*uFiber.w*particleWallCoverage(.35);
 }`;
 const trailFrag=`#version 300 es
 precision highp float;in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vForcePhase;in float vOpacity,vSide;out vec4 color;uniform vec4 uFiber;
@@ -186,9 +186,6 @@ void main(){vec2 p=uv-.5,world=p*uOutputSize/min(uOutputSize.x,uOutputSize.y)*3.
 const rad=Math.PI/180,rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
 const linearRgb=hex=>rgb(hex).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));
 const environments=['studio','sunset','neon','sky','aquarium','aurora','city'];
-// A long persistent tail deposits much more light than a short fading trail.
-// Normalize coverage, including length and persistence, without changing thin raster widths.
-const fiberGain=s=>Math.pow(Math.min(1,4000/Math.max(1,s.pTrailCount*Math.max(1,s.pTrailLength/.2)*(1+s.pTrailPersistence))),s.pTrailDensity*.8);
 export class ParticleRenderer{
  constructor(canvas){
   this.canvas=canvas;const gl=this.gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});
@@ -246,7 +243,7 @@ export class ParticleRenderer{
   this.u(p,'uOuter',s.pOuter,s.pReach,s.pBranches,0);this.u(p,'uClock',repeat(s.pCycles),s.pRhythm,s.pPause,s.pSpeedSpread);
   this.u(p,'uSpacing',s.pGrainSpacing??1,s.pGroupSpacing??1,s.pDistributionCells??4);this.u(p,'uPoints',s.pSize,s.pSizeVar,s.pOpacity,s.pSoftness);this.u(p,'uSprite',s.pSprite);this.u(p,'uLargeGrains',s.pLargeCount||0,grainDiameters(s).large);this.u(p,'uGrainDistribution',s.pSizeSpread||0,s.pSizeBias||0);this.u(p,'uNodeStyle',s.pLinks>0?s.pLinkNodes:0,grainDiameters(s).node);
   this.u(p,'uTrails',s.pTrailLength*s.pDirection,s.pTrailWidth,s.pTrailOpacity,0);this.u(p,'uTail',s.pTrailFade,s.pTrailTaper,0,s.pTrailScatter);
-  this.u(p,'uFiber',s.pTrailPersistence,s.pTrailSoftness,s.pTrailCoherence,fiberGain(s));
+  this.u(p,'uFiber',s.pTrailPersistence,s.pTrailSoftness,s.pTrailCoherence,Math.pow(trailLightCompensation(s),s.pTrailDensity*.8));
   this.u(p,'uFiberLight',s.pFiberSheen,s.pFiberSpread);
   const forces=[...(s.forcePoints||[]).filter(f=>f.enabled).slice(0,8),...(s.bodyForces||[]).filter(f=>f.enabled).slice(0,3)];gl.uniform1i(this.loc(p,'uForcePasses'),3);gl.uniform1i(this.loc(p,'uForceCount'),forces.length);if(forces.length){gl.uniform4fv(this.loc(p,'uForcePoints'),forces.flatMap(f=>[f.x,f.y,f.z,f.strength]));gl.uniform2fv(this.loc(p,'uForceOptions'),forces.flatMap(f=>[f.radius,f.swirl]));}
   this.u(p,'uColor',s.pColorMode,s.pColorScatter,s.pLumaVar,s.pDepthFade);
@@ -258,7 +255,7 @@ export class ParticleRenderer{
   this.u(p,'uSpaceWarp',s.pSpaceWarp,s.pWarpScale,repeat(s.pWarpCycles),s.pWarpTwist);
   this.u(p,'uForm',s.stretchX,s.stretchY,s.stretchZ,s.volume);this.u(p,'uWarp',s.deform,s.twist,s.waves,s.waveScale);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uRotation',s.rotateX*rad,s.rotateY*rad,s.rotateZ*rad,0);
   this.u(p,'uMaterial',s.metal,s.roughness,s.gloss,s.iridescence);this.u(p,'uFinish',s.emission,s.pLighting,1-s.transparency,1.-Math.min(1,s.pSize/8));
-  this.u(p,'uParticleOptical',s.refraction??1.5,s.thickness??1,s.dispersion||0);
+  this.u(p,'uParticleOptical',s.refraction??1.5,s.thickness??1,s.dispersion||0,materialCavity(s));
   this.u(p,'uFilmPattern',s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5);this.u(p,'uFilmAccent',s.filmChroma||0,s.filmDuo||0);
   this.u(p,'uFilmLayer',s.pFilm,s.pFilmScale,s.pFilmVariation,0);
   const filmCycles=s.perfectLoop!==false?Math.max(1,Math.round(s.filmCycles||1)):(s.filmCycles||1);
@@ -366,7 +363,7 @@ export class ParticleRenderer{
     if(this.pathProgram){gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);this.bind(this.pathTarget);gl.viewport(0,0,segments+3,batch);gl.bindVertexArray(this.empty);setup(this.pathProgram);gl.uniform1i(this.loc(this.pathProgram,'uBatchStart'),start);gl.drawArrays(gl.TRIANGLES,0,3);}
     this.bind(scene);gl.disable(gl.DEPTH_TEST);gl.enable(gl.BLEND);setup(this.lines);gl.uniform1i(this.loc(this.lines,'uBatchStart'),start);gl.uniform1i(this.loc(this.lines,'uBaked'),this.float?1:0);this.tex(this.lines,'uPaths',this.pathTarget?.texture||this.seedTexture,3);
     // Preview uses a representative subset; compensate coverage so density remains readable.
-    this.u(this.lines,'uFiber',s.pTrailPersistence,s.pTrailSoftness,s.pTrailCoherence,fiberGain(s)*total/count);
+    this.u(this.lines,'uFiber',s.pTrailPersistence,s.pTrailSoftness,s.pTrailCoherence,Math.pow(trailLightCompensation(s),s.pTrailDensity*.8)*total/count);
     gl.bindVertexArray(this.lineVAO);this.opticalDrawState();
     this.u(this.lines,'uTrailFork',-1,s.pTrailForkSpread);
     gl.drawElementsInstanced(gl.TRIANGLES,segments*6,gl.UNSIGNED_SHORT,0,batch);
