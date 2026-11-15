@@ -1,17 +1,17 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=87a259ec8c3c';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=87a259ec8c3c';
-import {ParticleOptics} from './particle-optics.js?v=87a259ec8c3c';
-import {shadowLight} from './particle-shadow.js?v=87a259ec8c3c';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=87a259ec8c3c';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=87a259ec8c3c';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=87a259ec8c3c';
-import {ParticleLinks} from './particle-links.js?v=87a259ec8c3c';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=87a259ec8c3c';
-import {LayeredVeils} from './layered-veils.js?v=87a259ec8c3c';
-import {LivingStructures} from './living-structures.js?v=87a259ec8c3c';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=87a259ec8c3c';
-import {forceBarrierGLSL} from './particle-forces.js?v=87a259ec8c3c';
-import {prismaShadingGLSL} from './particle-shading.js?v=87a259ec8c3c';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=b6be3a2f372d';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=b6be3a2f372d';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=b6be3a2f372d';
+import {shadowLight} from './particle-shadow.js?v=b6be3a2f372d';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=b6be3a2f372d';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=b6be3a2f372d';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=b6be3a2f372d';
+import {ParticleLinks} from './particle-links.js?v=b6be3a2f372d';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=b6be3a2f372d';
+import {LayeredVeils} from './layered-veils.js?v=b6be3a2f372d';
+import {LivingStructures} from './living-structures.js?v=b6be3a2f372d';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=b6be3a2f372d';
+import {forceBarrierGLSL} from './particle-forces.js?v=b6be3a2f372d';
+import {prismaShadingGLSL} from './particle-shading.js?v=b6be3a2f372d';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
 const grainGLSL=`${common}\n${livingAttachmentGLSL}\n${grainSizingGLSL}`;
 const trailSampling=`
@@ -202,7 +202,7 @@ export class ParticleRenderer{
  bind(t){const gl=this.gl;gl.bindFramebuffer(gl.FRAMEBUFFER,t?.fbo||null);gl.viewport(0,0,t?.w||this.width,t?.h||this.height);}
  tex(p,key,texture,unit){const gl=this.gl;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(this.loc(p,key),unit);}
  settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);bindDynamics(gl,p.program,s);this.guides.bind(p);
-  this.u(p,'uShadowPass',this.shadowPass?(this.shadowPass.mode||1):0);if(this.optics)this.optics.uniforms(p,s);else{this.u(p,'uOpticalShadow',0,0,0,0);this.tex(p,'uOpticalMap',this.seedTexture,8);}this.u(p,'uShadowHeight',s.pShadowHeight??-1.6);this.u(p,'uShadowOpacity',p.materialAlpha?1:Math.max(0,1-s.transparency));if(this.shadowPass)this.u(p,'uShadowLight',this.shadowPass.light.x,this.shadowPass.light.y,this.shadowPass.light.z);
+  this.u(p,'uShadowPass',this.shadowPass?(this.shadowPass.mode||1):0);if(this.optics)this.optics.uniforms(p,s);else{this.u(p,'uOpticalShadow',0,0,0,0);this.tex(p,'uOpticalMap',this.seedTexture,8);this.tex(p,'uVolumeMap',this.seedTexture,9);}this.u(p,'uShadowHeight',s.pShadowHeight??-1.6);this.u(p,'uShadowOpacity',p.materialAlpha?1:Math.max(0,1-s.transparency));if(this.shadowPass)this.u(p,'uShadowLight',this.shadowPass.light.x,this.shadowPass.light.y,this.shadowPass.light.z);
   this.u(p,'uLivingOcclusion',this.occlusion||0);this.u(p,'uLivingDepthSize',this.width,this.height);this.tex(p,'uLivingDepth',this.depthCopy?.texture||this.seedTexture,7);
   this.u(p,'uSurfaceBind',s.pLiving>0&&s.pLiving!==4&&this.living?.texture?s.pSurfaceBind:0);this.tex(p,'uAttachedSurface',s.pLiving>0&&s.pLiving!==4&&this.living?.topology?this.living.texture:this.seedTexture,6);if(s.pLiving>0&&s.pLiving!==4&&this.living?.topology)gl.uniform2i(this.loc(p,'uAttachedSize'),this.living.topology.columns,this.living.topology.rows);
   this.u(p,'uAttachedBundles',0); // One continuous material surface, including grouped fibres.
@@ -257,9 +257,9 @@ export class ParticleRenderer{
   else if(s.pLiving>0)this.living??=new LivingStructures(this,common);
   if(s.pLinks>0&&s.pLiving!==4)this.connections??=new ParticleLinks(this,common);
   const required=new Set([this.points,this.blur,this.compose]);
-  if(this.float&&s.pVolumeShadow>0&&s.pSelfShadow>0&&s.pCount>0&&s.pOpacity>0&&s.pLiving!==4&&shadowLight(s,false)){
+  if(usesCloudAbsorption(s,this.float)&&shadowLight(s,false)){
    this.optics??=new ParticleOptics(this);
-   required.add(this.optics.prepareVolume(s,grainGLSL));
+   required.add(this.optics.prepareVolume(grainGLSL));
   }
   if(s.pTrailCount>0&&s.pTrailLength>0){required.add(this.lines);if(this.pathProgram)required.add(this.pathProgram);}
   if(this.guides.program&&s.forcePaths?.some(p=>p.enabled&&p.points?.length>=2))required.add(this.guides.program);
@@ -280,11 +280,11 @@ export class ParticleRenderer{
   const [scene,a,b]=this.targets;let sceneDrawn=false;
   const transmission=s.pLiving===4?1-s.pVeilOpacity:s.transparency;
   const caustics=s.pCaustic>0&&transmission>0&&s.refraction>1&&s.metal<1;
-  const opticalLight=(s.pSelfShadow>0||caustics)?shadowLight(s)??(s.pSelfShadow>0&&s.pVolumeShadow>0?shadowLight(s,false):null):null;
+  const volume=usesCloudAbsorption(s,this.float);
+  const opticalLight=(s.pSelfShadow>0||caustics)?shadowLight(s,!volume):null;
   if(this.optics){this.optics.ready=false;this.optics.volumeReady=false;this.optics.causticActive=false;}
   try{if(opticalLight){
    this.optics??=new ParticleOptics(this);this.optics.configure(s,opticalLight);
-   const volume=this.optics.usesVolume(s);
    this.optics.surfaceShadow=s.pSelfShadow>0?(volume?1-s.pVolumeShadow:1):0;
    const firstSurface=this.optics.surfaceShadow>0||caustics;
    if(s.pLiving===4&&firstSurface){this.drawGeometry(scene,s,phase,options,weights);sceneDrawn=true;this.reuseGeometry=true;}
@@ -293,7 +293,7 @@ export class ParticleRenderer{
     this.living.programs(s);this.living.sample(s,phase*s.pDirection);this.reuseGeometry=true;
    }
    if(firstSurface)this.optics.capture(s,phase,options,weights);
-   if(volume){this.optics.prepareVolume(s,grainGLSL);this.optics.captureVolume(s,phase,options);}
+   if(volume){this.optics.prepareVolume(grainGLSL);this.optics.captureVolume(s,phase,options);}
   }
   if(!sceneDrawn||s.pSelfShadow>0)this.drawGeometry(scene,s,phase,options,weights);
   }finally{this.reuseGeometry=false;}

@@ -102,6 +102,7 @@ void main(){float d=dot(gl_PointCoord*2.-1.,gl_PointCoord*2.-1.);if(d>=1.)discar
 const norm=v=>{const n=Math.hypot(...v)||1;return v.map(x=>x/n);};
 const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
 const rgb=h=>[1,3,5].map(i=>{const v=parseInt(h.slice(i,i+2),16)/255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;});
+export function usesCloudAbsorption(s,float){return float&&s.pLiving!==4&&s.pCount>0&&s.pOpacity>0&&s.pSelfShadow>0&&s.pVolumeShadow>0;}
 export class ParticleOptics{
  constructor(owner){this.owner=owner;this.width=this.height=768;this.softTargets=[];this.mode=2;this.frames=0;this.ready=false;this.volumeReady=false;}
  releaseTarget(t){if(!t)return;const g=this.owner.gl;g.deleteTexture(t.texture);g.deleteFramebuffer(t.fbo);if(t.depth)g.deleteRenderbuffer(t.depth);}
@@ -117,8 +118,7 @@ export class ParticleOptics{
   this.volumeNear=Math.max(0,distance-reach)/this.far;
   this.volumeRange=((distance+reach)/this.far)-this.volumeNear;
  }
- usesVolume(s){return this.owner.float&&s.pLiving!==4&&s.pCount>0&&s.pOpacity>0&&s.pSelfShadow>0&&s.pVolumeShadow>0;}
- prepareVolume(s,common){if(this.usesVolume(s))this.volumeProgram??=this.owner.program(volumeVertex(common),volumeFragment);return this.volumeProgram;}
+ prepareVolume(common){return this.volumeProgram??=this.owner.program(volumeVertex(common),volumeFragment);}
  uniforms(p,s){const o=this.owner,g=o.gl;const enabled=this.ready&&!o.shadowPass;
   o.tex(p,'uOpticalMap',enabled?this.map.texture:o.seedTexture,8);
   const volume=this.volumeReady&&!o.shadowPass;
