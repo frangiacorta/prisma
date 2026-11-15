@@ -1,7 +1,7 @@
 /* Streaming MP4 export. Raw frames never accumulate; encoded media is written
  * to OPFS when available. The software fallback restarts every second so its
  * WASM filesystem never contains the entire movie. */
-importScripts('./vendor/mp4-muxer.js?v=34287eff19e2');
+importScripts('./vendor/mp4-muxer.js?v=ddff107e99e1');
 const BLOCK=1024*1024, MEMORY_LIMIT=512*1024*1024;
 let encoder=null,muxer=null,sink=null,config=null,frameNumber=0,segmentFrames=0,segmentStart=0,encoderError=null,nativePending=0;
 let stats={};
@@ -32,7 +32,7 @@ class OutputSink{
 function closeEncoder(){if(!encoder)return;if(stats.backend==='native'){try{encoder.close()}catch{}}else{const fs=encoder.FS,name=encoder.outputFilename;try{encoder.delete()}catch{}try{fs.unlink(name)}catch{}}encoder=null;}
 function check(){if(encoderError)throw encoderError;}
 async function softwareEncoder(){
- if(!self.HME)importScripts('./vendor/h264-mp4-encoder.web.js?v=34287eff19e2');
+ if(!self.HME)importScripts('./vendor/h264-mp4-encoder.web.js?v=ddff107e99e1');
  encoder=await HME.createH264MP4Encoder();encoder.width=config.width;encoder.height=config.height;encoder.frameRate=config.fps;encoder.speed=8;encoder.quantizationParameter=20;encoder.groupOfPictures=config.fps;encoder.initialize();segmentFrames=0;segmentStart=frameNumber;
 }
 async function nativeEncoder(){
@@ -94,9 +94,12 @@ async function initialize(data){
 async function addFrame(data){
  check();if(!encoder)throw new Error('La codifica del video non è attiva.');
  if(frameNumber>=(config.totalFrames??config.maxFrames))throw new Error(config.legacy?'Il video supera un’ora. Riduci la durata del loop o aumenta la velocità.':'Sono arrivati più fotogrammi del previsto.');
- const pixels=data.pixels;if(!(pixels instanceof Uint8Array)||pixels.length!==config.width*config.height*4)throw new Error('Fotogramma video non valido.');
+ const pixels=data.pixels,videoFrame=data.videoFrame,fromCanvas=typeof VideoFrame!=='undefined'&&videoFrame instanceof VideoFrame;
+ if(fromCanvas){
+  if(stats.backend!=='native'||videoFrame.codedWidth!==config.width||videoFrame.codedHeight!==config.height){videoFrame.close();throw new Error('Dimensioni del fotogramma non valide.');}
+ }else if(!(pixels instanceof Uint8Array)||pixels.length!==config.width*config.height*4)throw new Error('Fotogramma video non valido.');
  if(stats.backend==='native'){
-  const timestamp=Math.round(frameNumber*1e6/config.fps),duration=Math.round((frameNumber+1)*1e6/config.fps)-timestamp,frame=new VideoFrame(pixels,{format:'RGBA',codedWidth:config.width,codedHeight:config.height,timestamp,duration});
+  const timestamp=Math.round(frameNumber*1e6/config.fps),duration=Math.round((frameNumber+1)*1e6/config.fps)-timestamp,frame=fromCanvas?videoFrame:new VideoFrame(pixels,{format:'RGBA',codedWidth:config.width,codedHeight:config.height,timestamp,duration});
   try{encoder.encode(frame,{keyFrame:frameNumber%(config.fps*2)===0});nativePending++;stats.maxPendingFrames=Math.max(stats.maxPendingFrames,nativePending);}finally{frame.close();}
   const queueLimit=Math.max(1,Math.min(8,Math.floor(64*1024*1024/(config.width*config.height*4))));
   if(nativePending>=queueLimit){await encoder.flush();check();}

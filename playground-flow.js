@@ -1,6 +1,6 @@
-import {newCreation,motionPreset} from './creative-model.js?v=34287eff19e2';
-import {particleCreation} from './particle-model.js?v=34287eff19e2';
-import {FLOW_PALETTES,flowTiming,flowChoice,normalizeFlow,flowPalette,flowProfile,flowTransition} from './flow-model.js?v=34287eff19e2';
+import {newCreation,motionPreset} from './creative-model.js?v=ddff107e99e1';
+import {particleCreation} from './particle-model.js?v=ddff107e99e1';
+import {FLOW_PALETTES,flowTiming,flowChoice,normalizeFlow,flowPalette,flowProfile,flowTransition} from './flow-model.js?v=ddff107e99e1';
 
 const names={volume:'Volume',ring:'Anello',layers:'Strati',fibres:'Fili',branches:'Ramificazioni',disc:'Disco',polyhedron:'Poliedro',ribbon:'Nastro',cells:'Cellule',shell:'Gusci'};
 export function flowScene(flow,ratio=16/9){
@@ -55,6 +55,22 @@ export function flowScene(flow,ratio=16/9){
  if(engine==='solid'){s.twist*=.65+noise(54);if(family==='ring'){s.loopTube=.14+noise(55)*.2;s.loopKnot=.15+noise(56)*.6;}if(family==='layers'){s.structPetalCount=6+Math.floor(noise(57)*8);s.structCurl=.1+noise(58)*.45;}if(family==='fibres'){s.filLength*=.7+noise(59)*.8;s.filCurl=noise(60)*.5;}if(family==='branches'){s.petalLength=.3+noise(61)*.45;s.petalCurl=noise(62)*.7;}}
 
  if(engine==='solid'){const key={volume:'twist',ring:'loopPhase',layers:'structCurl',fibres:'filPhase',branches:'petalCurl',disc:'waves',polyhedron:'twist',ribbon:'loopPhase',cells:'deform',shell:'structCurl'}[family];s.motions[key]={...s.motions[key],enabled:true,amplitude:['loopPhase','filPhase'].includes(key)?1:.08+i*.12,mode:['loopPhase','filPhase'].includes(key)?'cycle':'wave',curve:flow.mood==='electric'?'soft':'sine',pace:score.rhythm,pacePhase:score.phase,cycles:score.cycles,direction:score.direction,phase:score.phase};}
+ if(noise(81)<.18+.60*flow.variety){
+  s.bgMode=noise(82)>.35?'studio':'gradient';
+  s.background=mixColor('#030405',s.palette[0],.09+noise(83)*.24);
+  s.background2=mixColor('#010107',s.palette.at(-1),.04+noise(84)*.10);
+  s.bgAngle=(noise(85)-.5)*240;s.bgWash=.03;s.bgShade=.12;s.positionX+=(noise(86)-.5)*.6;s.positionY+=(noise(87)-.5)*.28;
+  s.saturation=.8+noise(89)*.5;s.exposure=(noise(90)-.5)*.44;
+ }
+ if(flow.variety>.35&&noise(88)<flow.variety*.43){
+  if(flow.mood==='electric')Object.assign(s,{finishRgb:true,finishRgbR:7,finishRgbB:-8,finishRgbMix:.35,finishGlitch:i>.65,finishGlitchMix:.22,finishGlitchCycles:3});
+  else if(flow.mood==='organic')Object.assign(s,{finishWarp:true,finishWarpMix:.24,finishWarpMotion:.45,finishWarpAmount:24});
+  else Object.assign(s,{finishGlass:true,finishGlassMix:.17,finishGlassAmount:20,finishGlassMotion:.2});
+ }
+ if(flow.engines==='both'&&engine==='solid'&&['ring','disc','polyhedron','cells','ribbon'].includes(family)&&noise(91)<flow.variety*.72){
+  Object.assign(s,{sceneGrains:.28+noise(92)*.32,pCount:20000,pTrailCount:0,pOpacity:.5,pSize:1.8+noise(93)*.9,pFill:.14,grainDispersal:.08});
+  move('sceneGrains',.18+i*.13,'wave',1);
+ }
  return {name:'Flow · '+(engine==='particles'&&family==='polyhedron'?'Aggregati':names[family]),state:s,ratio,phase:noise(9)*Math.PI*2,playing:true};
 }
 const scenePlan=f=>JSON.stringify({...flowChoice(f),seed:f.seed,mood:f.mood,variety:f.variety});
@@ -63,8 +79,8 @@ const mixColor=(a,b,t)=>'#'+[1,3,5].map(k=>Math.round(parseInt(a.slice(k,k+2),16
 export class FlowDirector{
  constructor(engine){this.engine=engine;engine.config.flow=normalizeFlow(engine.config.flow);this.phase='idle';this.token=0;this.nextRequested=false;this.models=new WeakMap();this.progress=0;this.cycles=0;this.error='';}
  get settings(){return this.engine.config.flow;}
- start(){if(this.phase!=='idle')return;this.settings.enabled=true;this.phase='settle';this.error='';this.progress=0;const d=this.engine.decks[this.engine.config.mix<.5?'A':'B'];if(!this.settings.sourcePalette.length&&d){this.settings.sourcePalette=[...d.state.palette];if(!this.settings.palette.length)this.settings.palette=[...d.state.palette];}}
- stop(){this.settings.enabled=false;this.token++;if(this.loading){this.engine.generation[this.loading]++;this.engine.pending[this.loading]=false;}this.loading=null;this.phase='idle';this.engine.job=null;this.nextRequested=false;}
+ start(){if(this.phase!=='idle'||this.engine.restoring)return;this.engine.captureManual?.();this.settings.enabled=true;this.phase='settle';this.error='';this.progress=0;const d=this.engine.decks[this.engine.config.mix<.5?'A':'B'];if(!this.settings.sourcePalette.length&&d){this.settings.sourcePalette=[...d.state.palette];if(!this.settings.palette.length)this.settings.palette=[...d.state.palette];}}
+ stop(){this.settings.enabled=false;this.token++;if(this.loading){this.engine.generation[this.loading]++;this.engine.pending[this.loading]=false;}this.loading=null;this.phase='idle';this.engine.job=null;this.nextRequested=false;this.engine.restoreManual?.();}
  next(){this.settings.paused=false;this.nextRequested=true;this.error='';if(this.phase==='error')this.phase='hold';}
  async prepare(id){
   const e=this.engine,token=++this.token;this.loading=id;this.phase='loading';this.destination=id;
@@ -90,7 +106,7 @@ export class FlowDirector{
  }
 
  tick(dt){
-  const e=this.engine,f=this.settings;if(!f.enabled){if(this.phase!=='idle')this.stop();return;}if(this.phase==='idle')this.start();this.modulate(dt);
+  const e=this.engine,f=this.settings;if(!f.enabled){if(this.phase!=='idle')this.stop();return;}if(this.phase==='idle')this.start();if(e.restoring)return;this.modulate(dt);
   if(f.paused){if(e.job)e.job.start+=dt;return;}
   if(['loading','ready'].includes(this.phase)&&this.plan!==scenePlan(f)){this.token++;if(this.loading){e.generation[this.loading]++;e.pending[this.loading]=false;}this.loading=null;this.phase='hold';}
   if(this.phase==='settle'){

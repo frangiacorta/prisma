@@ -1,15 +1,17 @@
-import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=34287eff19e2';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=34287eff19e2';
-import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=34287eff19e2';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=34287eff19e2';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=34287eff19e2';
-import {PARTICLE_CELL_TRACKS} from './particle-model.js?v=34287eff19e2';
+import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=ddff107e99e1';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=ddff107e99e1';
+import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=ddff107e99e1';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=ddff107e99e1';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=ddff107e99e1';
+import {PARTICLE_CELL_TRACKS} from './particle-model.js?v=ddff107e99e1';
+import {BODY_LAYER_META} from './body-layers.js?v=ddff107e99e1';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
 export function track(amplitude=1,enabled=false,mode='wave'){return{enabled,amplitude,cycles:1,phase:0,direction:1,curve:'sine',pace:0,pacePhase:0,hold:0,mode}}
 export const SHAPE_TRACKS=[...Object.keys(STRUCTURE_TRACKS),...Object.keys(FRACTAL_TRACKS),...CELLULAR_FIELD_KEYS.filter(key=>CELLULAR_TRACKS[key]),'petalFlowPhase','petalOrbitPhase','petalWeave','volume','deform','twist','waves','hole','cut','petalOpen','petalCurl','petalInflate','petalSharp','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemBend'];
 export const TRACK_META={
+ ...BODY_LAYER_META,
  ...STRUCTURE_TRACKS,
  ...CELLULAR_TRACKS,
  ...PARTICLE_CELL_TRACKS,
@@ -22,6 +24,7 @@ export const TRACK_META={
 };
 export const EXTRA_BASE={
  baseForm:0,
+ grainDispersal:0,
  ...STRUCTURE_DEFAULTS,
  ...CELLULAR_DEFAULTS,
  ...FRACTAL_DEFAULTS,
@@ -56,6 +59,7 @@ export const LIGHT_RIGS=[
 ];
 export function legacyLights(s){const build=(id,p)=>{const angle=s[p+'Angle']*Math.PI/180,height=s[p+'Height']*Math.PI/180;return{...newLight(id),visible:true,type:'bar',x:3.2*Math.sin(angle)*Math.cos(height),y:3.2*Math.sin(height),z:3.2*Math.cos(angle)*Math.cos(height),color:s[p+'Color'],power:s[p+'Power'],size:1.7,length:s[p+'Size']*.6,softness:s[p+'Size'],enabled:id===1||s.light2}};return[build(1,'light'),build(2,'light2')]}
 export const EXTRA_META={
+ ...BODY_LAYER_META,
  baseForm:['Forma di base',0,6,1],
  ...STRUCTURE_META,
  ...CELLULAR_META,
@@ -135,6 +139,15 @@ export const BACKDROPS=[
  {name:'Argento scuro',colors:['#35383e','#111216'],dark:true,wash:.015,shade:.1}
 ];
 export const MODERN_BASE={renderVersion:2,environment:'studio',environmentAngle:0,environmentPower:1,environmentRefraction:0,environmentRotate:false,environmentCycles:1,internalColor:'#e6f5ff',fullness:1,thinShell:0,filmFlow:0,filmSwirl:0,filmCycles:1,grounding:0};
+export function syncMaterialControl(s,key){
+ if(key==='fullness'){
+  const amount=s.fullness;
+  s.hollow=amount<.999?1:0;s.wallThickness=Math.max(.003,amount);
+  s.thinShell=1-Math.min(1,amount/.09);s.thickness=1;s.renderVersion=2;
+ }
+ if(key==='hollow'||key==='wallThickness')s.fullness=1-(s.hollow||0)*(1-(s.wallThickness??.08));
+ if(key==='thinFilm')s.pFilm=s.thinFilm;
+}
 const clear={...MODERN_BASE,metal:0,transparency:1,refraction:1.5,roughness:.02,gloss:1,iridescence:0,emission:0,coat:0,coatRoughness:.06,fresnel:1,hollow:0,wallThickness:1,thickness:1,translucency:0,scattering:0,subsurface:0,sssRadius:.55,sssColor:'#ffd0ac',scatterDirection:.25,thinFilm:0,filmThickness:420,absorption:.012,tintStrength:.03,dispersion:0,anisotropy:0,anisotropyAngle:0,surfaceTexture:0,iridScale:1,iridShift:0,glow:0,grounding:.35};
 export const MATERIAL_STYLES=[
  {name:'Bolla di sapone',values:{thinShell:1,thinFilm:1,iridescence:.9,refraction:1.333,hollow:1,wallThickness:.003,fullness:0,absorption:0,tintStrength:0,environmentRefraction:0,grounding:0}},

@@ -126,14 +126,14 @@ float wave=sin(clock*6.28318530718+cell.x*.37+cell.y*.23);
 float event=mod(floor(clock),max(1.,uCycles)),nextEvent=mod(event+1.,max(1.,uCycles)),blend=smoothstep(.25,.75,fract(clock));
 float rand=mix(glyphHash(cell+event*17.),glyphHash(cell+nextEvent*17.),blend);
 float animated=mix(glyphHash(cell),rand,uVariation),font=uFont;
-if(glyphHash(cell+52.)<uFontRandom)font=floor(glyphHash(cell+71.)*4.);
+if(glyphHash(cell+52.)<uFontRandom)font=mod(uFont+1.+floor(glyphHash(cell+71.)*3.),4.);
 
 float density=clamp(l*uDensity*(1.+uVariation*wave),0.,1.);
 float size=uScale*mix(1.,.3+glyphHash(cell+5.)*.7,uLayout.x);
 vec2 p=(fract(pixel/uCell)-.5-vec2(glyphHash(cell+31.)-.5,glyphHash(cell+41.)-.5)*uLayout.z*.6)/size;
 float angle=(glyphHash(cell+8.)*2.-1.)*uLayout.y;p=mat2(cos(angle),-sin(angle),sin(angle),cos(angle))*p+.5;
 vec2 q=p-.5;float mask=0.;
-if(uStyle==0){float index=mix(density,animated,uRandom.x)*(uCount-1.),i=floor(index),f=fract(index);float width=max(.001,uSoft*.5);float blend=smoothstep(.5-width,.5+width,f);mask=mix(glyph(i,p,font),glyph(i+1.,p,font),blend);}
+if(uStyle==0){float index=mix(density,animated,uRandom.x)*(uCount-1.),i=floor(index),f=fract(index);float width=max(.001,uSoft*.58);float blend=mix(smoothstep(.5-width,.5+width,f),f,min(1.,uSoft*.72));mask=mix(glyph(i,p,font),glyph(i+1.,p,font),blend);}
 else if(uStyle==1){float halfLength=.43*sqrt(density);float d=min(abs(q.x-q.y),abs(q.x+q.y))*.707107;float aa=max(.004,fwidth(q.x));mask=(1.-smoothstep(.025,.025+aa,d))*(1.-smoothstep(halfLength-aa,halfLength,max(abs(q.x),abs(q.y))));}
 else {float radius=.46*sqrt(density),aa=max(.004,fwidth(q.x));mask=1.-smoothstep(max(0.,radius-aa),radius+aa,length(q));}
 mask*=smoothstep(0.,.025,density);vec3 ink=mix(uInk,sampleColor.rgb,uSource);float alpha=clamp(mask*sampleColor.a,0.,1.);color=vec4(ink*alpha,alpha);}`;

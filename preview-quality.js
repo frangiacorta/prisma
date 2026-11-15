@@ -1,5 +1,5 @@
 export const PREVIEW_MODES={
- auto:{moving:480,max:720,initial:440,min:160,budget:25,samples:2,still:800},
+ auto:{moving:960,max:1200,initial:440,min:160,budget:25,samples:2,still:1280},
  fluid:{moving:300,max:420,initial:300,min:144,budget:17,samples:2,still:640},
  detail:{moving:800,max:1120,initial:800,min:224,budget:33,samples:4,still:1120}
 };
@@ -11,7 +11,7 @@ export class PreviewQuality{
  setMode(mode){this.mode=Object.hasOwn(PREVIEW_MODES,mode)?mode:'auto';this.profile=PREVIEW_MODES[this.mode];this.limit=this.profile.initial;this.workload=1;this.resetMeasurements();}
  resetMeasurements(){this.slow=0;this.fast=0;this.severe=0;this.lastCost=0;this.lastCpuCost=0;this.lastGpuCost=0;this.gpuKnown=false;this.gpuWarmed=false;this.lastChange=0;}
  size(width,height,dpr=1,interactive=false){return fit(width,height,dpr,Math.min(this.limit,interactive?this.profile.moving:this.profile.max));}
- idlePlan(width,height,dpr=1){const [w,h]=fit(width,height,dpr,this.profile.still);return {width:w,height:h,samples:this.profile.samples,quality:'balanced',forceTiled:true,tileSize:64,trackTiming:false};}
+ idlePlan(width,height,dpr=1){const [w,h]=fit(width,height,dpr,this.profile.still);return {width:w,height:h,samples:this.profile.samples,quality:'balanced',forceTiled:false,tileSize:128,trackTiming:false};}
  observe(ms,time=0,{gpu=false,interactive=true,settled=false,warmup=false,preparing=false,refining=false}={}){
   // Shader compilation, an initial field bake and idle tiles are not recurring
   // per-frame costs. Never feed them back into the live resolution controller.

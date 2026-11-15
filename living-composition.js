@@ -11,11 +11,26 @@ export function livingWeights(s){
 export const livingOcclusionGLSL=`
 uniform highp sampler2D uLivingDepth;
 uniform vec2 uLivingDepthSize;
-uniform float uLivingOcclusion;
-float livingVisibility(){
- if(uLivingOcclusion<=0.)return 1.;
- float depth=texture(uLivingDepth,gl_FragCoord.xy/uLivingDepthSize).r;
- return 1.-uLivingOcclusion*smoothstep(.0002,.0012,gl_FragCoord.z-depth);
+uniform float uLivingOcclusion,uStudioOcclusion;
+uniform highp sampler2D uStudioDepth;
+uniform float uStudioLens;
+float livingVisibility(float z){
+ vec2 uv=gl_FragCoord.xy/uLivingDepthSize;
+ float visibility=1.;
+ if(uLivingOcclusion>0.){
+  float depth=texture(uLivingDepth,uv).r;
+  visibility-=uLivingOcclusion*smoothstep(.0002,.0012,gl_FragCoord.z-depth);
+ }
+ if(uStudioOcclusion>0.){
+  vec2 screen=(uv-.5)*uLivingDepthSize/min(uLivingDepthSize.x,uLivingDepthSize.y)*3.4;
+  vec2 distorted=screen;
+  for(int i=0;i<3;i++)distorted=screen/max(.25,1.+uStudioLens*dot(distorted,distorted)*.18);
+  uv=.5+distorted*min(uLivingDepthSize.x,uLivingDepthSize.y)/uLivingDepthSize/3.4;
+  vec4 sampleDepth=texture(uStudioDepth,uv);
+  float nearest=16.-32.*dot(sampleDepth.rg,vec2(1.,1./255.));
+  visibility*=1.-sampleDepth.b*smoothstep(.003,.032,nearest-z);
+ }
+ return visibility;
 }`;
 // Use the relaxed, constrained surface, so attached grains follow its actual
 // folds rather than a second approximation of the particle field.

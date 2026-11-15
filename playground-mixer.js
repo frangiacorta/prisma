@@ -1,10 +1,11 @@
 // Fade / DirectionalWipe adapted from gl-transitions (gre), MIT.
 // Original shaders, license and pinned provenance: vendor/gl-transitions/.
+import {Renderer} from './renderer.js?v=ddff107e99e1';
 const vertex=`#version 300 es
 precision highp float;out vec2 uv;void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);uv=p;gl_Position=vec4(p*2.-1.,0.,1.);}`;
 const fragment=`#version 300 es
 precision highp float;in vec2 uv;out vec4 frag;
-uniform sampler2D sceneA,sceneB;uniform float progress,master;uniform int kind,direction;uniform vec2 aspects;
+uniform sampler2D sceneA,sceneB;uniform float progress,master,flash,invert;uniform int kind,direction;uniform vec2 aspects;
 vec2 fit(vec2 p,float r){return (p-.5)/vec2(min(1.,r),min(1.,1./r))+.5;}
 bool outside(vec2 p){return any(lessThan(p,vec2(0)))||any(greaterThan(p,vec2(1)));}
 vec4 getFromColor(vec2 p){p=fit(p,aspects.x);if(outside(p))return vec4(0);vec4 c=texture(sceneA,p);return vec4(c.rgb*c.a,c.a);}
@@ -15,20 +16,34 @@ void main(){vec4 a=getFromColor(uv),b=getToColor(uv);float m=progress;
   if(kind==4){float radius=length((uv-.5)*vec2(aspects.x,1.))/(.5*length(vec2(aspects.x,1.)));float edge=direction>1?1.-radius:radius;m=smoothstep(edge-.08,edge+.08,progress*1.16-.08);}
   if(kind==5){float bell=sin(progress*3.14159265),spin=(direction>1?-1.:1.)*bell*.42;mat2 rot=mat2(cos(spin),-sin(spin),sin(spin),cos(spin));a=getFromColor(rot*(uv-.5)*(1.+bell*.12)+.5);b=getToColor(transpose(rot)*(uv-.5)*(1.+bell*.12)+.5);m=smoothstep(0.,1.,progress);}
   if(kind==6){float bell=sin(progress*3.14159265);a=getFromColor((uv-.5)*(1.-bell*.12)+.5);b=getToColor((uv-.5)*(1.+(1.-progress)*.18)+.5);m=smoothstep(0.,1.,progress);}
-  if(kind==2){float lum=dot(b.rgb,vec3(.2126,.7152,.0722));m=smoothstep(1.-progress-.08,1.-progress+.08,lum);}
+  if(kind==2){float lum=dot(b.rgb,vec3(.2126,.7152,.0722));float threshold=1.08-1.16*progress;m=smoothstep(threshold-.08,threshold+.08,lum);}
  }
  vec3 c=mix(a.rgb,b.rgb,m);if(kind==3&&progress>0.&&progress<1.)c=min(vec3(1),a.rgb*(1.-progress)+b.rgb*progress+min(a.rgb,b.rgb)*sin(progress*3.14159265));
- frag=vec4(c*master,1.);
+ c=mix(c,1.-c,invert);frag=vec4(mix(c,vec3(1.),flash)*master,1.);
 }`;
 export class PlaygroundMixer{
  constructor(canvas){
-  this.canvas=canvas;const g=this.gl=canvas.getContext('webgl2',{alpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!g)throw Error('WebGL 2 non disponibile per il mix.');
+  this.canvas=canvas;const g=this.gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!g)throw Error('WebGL 2 non disponibile per il mix.');
   const compile=(type,src)=>{const s=g.createShader(type);g.shaderSource(s,src);g.compileShader(s);if(!g.getShaderParameter(s,g.COMPILE_STATUS))throw Error(g.getShaderInfoLog(s));return s;};
   const v=compile(g.VERTEX_SHADER,vertex),f=compile(g.FRAGMENT_SHADER,fragment),p=this.program=g.createProgram();g.attachShader(p,v);g.attachShader(p,f);g.linkProgram(p);g.deleteShader(v);g.deleteShader(f);if(!g.getProgramParameter(p,g.LINK_STATUS))throw Error(g.getProgramInfoLog(p));
   this.vao=g.createVertexArray();this.textures=[0,1].map(()=>{const t=g.createTexture();g.bindTexture(g.TEXTURE_2D,t);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,1,1,0,g.RGBA,g.UNSIGNED_BYTE,new Uint8Array([0,0,0,255]));return t;});
-  this.u=Object.fromEntries(['sceneA','sceneB','progress','kind','direction','master','aspects'].map(k=>[k,g.getUniformLocation(p,k)]));this.frames=0;this.aspects=[1,1];
+  this.u=Object.fromEntries(['sceneA','sceneB','progress','kind','direction','master','aspects','flash','invert'].map(k=>[k,g.getUniformLocation(p,k)]));this.frames=0;this.aspects=[1,1];
  }
  upload(index,canvas){const g=this.gl;g.activeTexture(g.TEXTURE0+index);g.bindTexture(g.TEXTURE_2D,this.textures[index]);g.pixelStorei(g.UNPACK_FLIP_Y_WEBGL,true);g.pixelStorei(g.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,g.RGBA,g.UNSIGNED_BYTE,canvas);}
- draw(c,w,h){const g=this.gl;if(g.isContextLost())throw Error('La GPU ha interrotto il mix. Chiudi e riapri il Playground.');if(this.canvas.width!==w||this.canvas.height!==h){this.canvas.width=w;this.canvas.height=h;}g.viewport(0,0,w,h);g.useProgram(this.program);g.bindVertexArray(this.vao);this.textures.forEach((t,i)=>{g.activeTexture(g.TEXTURE0+i);g.bindTexture(g.TEXTURE_2D,t);});g.uniform1i(this.u.sceneA,0);g.uniform1i(this.u.sceneB,1);g.uniform2f(this.u.aspects,this.aspects[0],this.aspects[1]);g.uniform1f(this.u.progress,c.mix);g.uniform1i(this.u.kind,['fade','wipe','luma','add','iris','swirl','zoom'].indexOf(c.transition));g.uniform1i(this.u.direction,c.direction);g.uniform1f(this.u.master,c.blackout?0:c.master);g.drawArrays(g.TRIANGLES,0,3);this.frames++;}
- dispose(){const g=this.gl;this.textures.forEach(t=>g.deleteTexture(t));g.deleteProgram(this.program);g.deleteVertexArray(this.vao);g.getExtension('WEBGL_lose_context')?.loseContext();}
+ draw(c,w,h,filters={},clock=0,dt=0){
+  const g=this.gl;if(g.isContextLost())return;
+  if(this.canvas.width!==w||this.canvas.height!==h){this.canvas.width=w;this.canvas.height=h;}
+  g.viewport(0,0,w,h);g.useProgram(this.program);g.bindVertexArray(this.vao);
+  this.textures.forEach((t,i)=>{g.activeTexture(g.TEXTURE0+i);g.bindTexture(g.TEXTURE_2D,t);});
+  g.uniform1i(this.u.sceneA,0);g.uniform1i(this.u.sceneB,1);g.uniform2f(this.u.aspects,this.aspects[0],this.aspects[1]);
+  g.uniform1f(this.u.progress,c.mix);g.uniform1i(this.u.kind,['fade','wipe','luma','add','iris','swirl','zoom'].indexOf(c.transition));g.uniform1i(this.u.direction,c.direction);
+  g.uniform1f(this.u.master,c.blackout?0:c.master);g.uniform1f(this.u.invert,c.invert?1:0);g.uniform1f(this.u.flash,c.flash||0);
+  g.drawArrays(g.TRIANGLES,0,3);
+  if(!c.blackout&&Object.keys(filters).length){
+   this.effects??=new Renderer(this.canvas);const phase=clock*c.bpm/60*Math.PI*2;
+   this.effects.finish(filters,{preview:true,liveDynamics:true,feedbackDeltaSeconds:dt},phase,phase);
+  }else this.effects?.feedbackFinishing?.release();
+  this.frames++;
+ }
+ dispose(){const g=this.gl;this.effects?.dispose({loseContext:false});this.textures.forEach(t=>g.deleteTexture(t));g.deleteProgram(this.program);g.deleteVertexArray(this.vao);g.getExtension('WEBGL_lose_context')?.loseContext();}
 }

@@ -1,5 +1,5 @@
-import {organizeSections} from './inspector-navigation.js?v=34287eff19e2';
-import {controlHelp} from './control-help.js?v=34287eff19e2';
+import {organizeSections} from './inspector-navigation.js?v=ddff107e99e1';
+import {controlHelp} from './control-help.js?v=ddff107e99e1';
 const STORE='prisma-interface-v2';
 let preferences={};try{preferences=JSON.parse(localStorage.getItem(STORE)||'{}')||{};}catch{}
 const save=()=>{try{localStorage.setItem(STORE,JSON.stringify(preferences));}catch{}};
@@ -20,7 +20,7 @@ document.addEventListener('focusin',e=>{const b=e.target.closest('[data-help-tex
 document.addEventListener('click',e=>{const b=e.target.closest('[data-help-text]');if(b){e.preventDefault();if(pinned&&owner===b)hideTip();else showTip(b,true);}else hideTip();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&owner){e.preventDefault();e.stopImmediatePropagation();hideTip();}});
 window.addEventListener('resize',hideTip);document.addEventListener('scroll',hideTip,true);
-function keyFor(el){const d=el.dataset;return (d.audioSetting?'audio.'+d.audioSetting:null)||(d.audioMap?'audio.'+d.audioMap:null)||(d.bodyParam?'body.'+d.bodyParam:null)||(d.bodyCheck?'body.'+d.bodyCheck:null)||(d.bodySelect?'body.'+d.bodySelect:null)||d.param||d.path||d.color||d.check||d.pathColor||d.pathCheck||d.pathSelect||d.particleSelect||d.finishSelect||(d.palette!==undefined?'palette.'+d.palette:null)||(d.forceParam?'force.'+d.forceParam:null)||(d.forceEnabled!==undefined?'force.enabled':null)||(d.guideParam?'guide.'+d.guideParam:null)||(d.guideFlag?'guide.'+d.guideFlag:null)||(d.guideSelect?'guide.'+d.guideSelect:null)||el.id;}
+function keyFor(el){const d=el.dataset;return (d.audioSetting?'audio.'+d.audioSetting:null)||(d.audioMap?'audio.'+d.audioMap:null)||(d.bodyParam?'body.'+d.bodyParam:null)||(d.bodyCheck?'body.'+d.bodyCheck:null)||(d.bodySelect?'body.'+d.bodySelect:null)||(d.grainSource?'grainSource':null)||d.param||d.path||d.color||d.check||d.pathColor||d.pathCheck||d.pathSelect||d.particleSelect||d.finishSelect||(d.palette!==undefined?'palette.'+d.palette:null)||(d.forceParam?'force.'+d.forceParam:null)||(d.forceEnabled!==undefined?'force.enabled':null)||(d.guideParam?'guide.'+d.guideParam:null)||(d.guideFlag?'guide.'+d.guideFlag:null)||(d.guideSelect?'guide.'+d.guideSelect:null)||el.id;}
 export function addHelp(root){
  for(const el of root.querySelectorAll('input:not(.number):not(.hex-input),select')){
   const key=keyFor(el),engine=root.dataset.inspectorEngine||root.closest('[data-inspector-engine]')?.dataset.inspectorEngine,text=controlHelp(key||'',engine);if(!text)continue;

@@ -31,7 +31,8 @@ float opticalVisibility(vec3 p,int light){
   vec2 uv=q.xy+vec2(x,y)*uOpticalShadow.z/uOpticalView.z;
   if(any(lessThan(uv,vec2(0.)))||any(greaterThan(uv,vec2(1.))))continue;
   vec4 s=texture(uOpticalMap,uv);
-  blocked+=s.a*step(opticalDepth(s.rgb)+uOpticalShadow.y/uOpticalView.y,q.z);
+  float delta=(q.z-opticalDepth(s.rgb))*uOpticalView.y;
+  blocked+=s.a*smoothstep(uOpticalShadow.y*.75,uOpticalShadow.y*1.25,delta);
  }
  return mix(1.,(1.-clamp(blocked/9.,0.,1.)*uOpticalShadow.w)*transmitted,uOpticalShadow.x);
 }
@@ -70,7 +71,7 @@ void main(){
 const photonVertex=`#version 300 es
 precision highp float;precision highp int;
 ${opticalGLSL}
-uniform vec4 uCaustic;uniform vec2 uOutputSize;uniform float uPlane;
+uniform vec4 uCaustic,uGrainCaustic;uniform vec2 uOutputSize;uniform float uPlane;
 out float vEnergy;
 vec3 worldAt(ivec2 cell,out float coverage){
  ivec2 size=textureSize(uOpticalMap,0);cell=clamp(cell,ivec2(0),size-1);
@@ -85,16 +86,22 @@ void main(){
  vec3 dx=worldAt(cell+ivec2(3,0),b)-worldAt(cell-ivec2(3,0),c);
  vec3 dy=worldAt(cell+ivec2(0,3),d)-worldAt(cell-ivec2(0,3),e);
  vEnergy=0.;gl_Position=vec4(2.,2.,2.,1.);gl_PointSize=1.;
- if(a<.01||min(min(b,c),min(d,e))<.01||p.y<=uPlane||max(length(dx),length(dy))>uOpticalView.x*.2)return;
- vec3 n=normalize(cross(dx,dy));if(dot(n,uOpticalForward)>0.)n=-n;
+ if(a<.01||p.y<=uPlane)return;
+ bool continuous=min(min(b,c),min(d,e))>=.01&&max(length(dx),length(dy))<=uOpticalView.x*.2;
+ if(!continuous&&uGrainCaustic.z<=0.)return;
+ vec3 normal=cross(dx,dy);
+ if(!continuous||dot(normal,normal)<1e-10)normal=p-vec3(uGrainCaustic.xy,0.);
+ vec3 n=normalize(normal+vec3(0.,.000001,0.));if(dot(n,uOpticalForward)>0.)n=-n;
  vec3 ray=refract(uOpticalForward,n,1./uCaustic.y);
  if(ray.y>=-.001)return;
  float travel=(uPlane-p.y)/ray.y;if(travel<=0.||travel>40.)return;
  vec3 hit=p+ray*travel;float depth=max(2.,7.5-hit.z);
- gl_Position=vec4(hit.xy*vec2(uOutputSize.y/uOutputSize.x,1.)*2.6/depth,(depth-3.)/12.,1.);
+ vec2 projection=mix(vec2(uOutputSize.y/uOutputSize.x,1.)*2.6/depth,min(uOutputSize.x,uOutputSize.y)/uOutputSize*(2./3.4),uGrainCaustic.w);
+ gl_Position=vec4(hit.xy*projection,(depth-3.)/12.,1.);
  float size=max(2.,(2.5+uCaustic.z*8.)*uOutputSize.y/512.);gl_PointSize=size;
  // Photon energy is normalized by map sampling area and splat area.
- vEnergy=a*uCaustic.x*pow(uOpticalView.x/4.,2.)*pow(uOutputSize.y/512.,2.)/(size*size)*.8888889;
+ vEnergy=a*uCaustic.x*pow(uOpticalView.x/4.,2.)*pow(uOutputSize.y/512.,2.)/(size*size)*.8888889
+    *(continuous?1.:uGrainCaustic.z);
 }`;
 const photonFragment=`#version 300 es
 precision highp float;in float vEnergy;uniform vec3 uCausticColor;out vec4 color;
@@ -162,6 +169,7 @@ export class ParticleOptics{
   this.caustic??=o.target(w,h);if(this.softTargets[0]?.w!==w||this.softTargets[0]?.h!==h){for(const t of this.softTargets){g.deleteTexture(t.texture);g.deleteFramebuffer(t.fbo);}this.softTargets=[o.target(w,h),o.target(w,h)];}this.photons??=o.program(photonVertex,photonFragment);
   o.bind(this.caustic);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);g.disable(g.DEPTH_TEST);g.depthMask(false);g.enable(g.BLEND);g.blendEquation(g.FUNC_ADD);g.blendFunc(g.ONE,g.ONE);g.bindVertexArray(o.empty);g.useProgram(this.photons.program);this.uniforms(this.photons,s);
   o.u(this.photons,'uCaustic',s.pCaustic*this.light.power*transmission*(1-s.metal),s.refraction,s.roughness+this.light.size*.2,0);
+  o.u(this.photons,'uGrainCaustic',s.positionX,s.positionY,s.pCount>0&&s.pOpacity>0?.9:0,o.studioLayer?.attachment?1:0);
   o.u(this.photons,'uOutputSize',w,h);o.u(this.photons,'uPlane',s.pShadowHeight);const palette=s.palette.map(rgb),tint=[0,1,2].map(i=>palette.reduce((v,c)=>v+c[i],0)/palette.length),peak=Math.max(.01,...tint);o.u(this.photons,'uCausticColor',...rgb(this.light.color).map((v,i)=>v*(.15+.85*tint[i]/peak)));
   g.drawArrays(g.POINTS,0,384*384);g.depthMask(true);this.causticActive=true;
   g.disable(g.BLEND);g.useProgram(o.blur.program);let src=this.caustic;const radius=s.pCausticSoftness/512;

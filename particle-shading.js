@@ -1,10 +1,11 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=34287eff19e2';
-import {opticalGLSL} from './particle-optics.js?v=34287eff19e2';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=ddff107e99e1';
+import {opticalGLSL} from './particle-optics.js?v=ddff107e99e1';
 // Particle shading uses Prisma's parameter names. It does not trace solid glass.
 export const prismaShadingGLSL=`
 ${FILM_PATTERN_GLSL}
 ${opticalGLSL}
 uniform vec4 uMaterial,uFinish,uEnvironment,uGradient;
+uniform vec3 uParticleOptical;
 uniform vec2 uPearl,uFiberLight;
 uniform vec4 uFilmLayer,uParticleFilmMotion,uFilmObject;
 uniform vec3 uFilmRotation,uFilmResponse[24],uFilmWhite;
@@ -105,7 +106,10 @@ vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
  float metal=uMaterial.x,rough=max(.04,uMaterial.y),gloss=uMaterial.z,irid=uMaterial.w;
  vec3 view=normalize(vec3(0.,0.,7.5)-p);if(dot(n,view)<0.)n=-n;
  float facing=clamp(dot(n,view),.001,1.);
- vec3 f0=mix(vec3(.04),clamp(base,0.,1.),metal);
+ float crystal=1.-uFinish.z;
+ vec3 spectrum=vec3(uParticleOptical.x)+uParticleOptical.z*vec3(-.026,0.,.035);
+ vec3 dielectric=pow((max(vec3(1.),spectrum)-1.)/(spectrum+1.),vec3(2.));
+ vec3 f0=mix(mix(vec3(.04),dielectric,crystal),clamp(base,0.,1.),metal);
  vec3 reflection=reflectedEnvironment(reflect(-view,n),rough);
  vec3 fresnel=pearlFresnel(f0,facing,irid,rough);
  vec3 film=vec3(0.);float coating=uFilmLayer.x;
@@ -123,7 +127,13 @@ vec3 shadeMatter(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk){
    reflection=mix(reflection*fresnel,strandReflection*strandFresnel,silk);
    fresnel=vec3(1.);
  }
- vec3 lit=base*(uFinish.x+(1.-metal)*uEnvironment.z*.22)*uFinish.z+reflection*fresnel*gloss;
+ vec3 pigment=base*mix(vec3(1.),exp(-max(0.,uParticleOptical.y-1.)*(1.-clamp(base,0.,1.))),crystal*.8);
+ vec3 lit=pigment*(uFinish.x+(1.-metal)*uEnvironment.z*.22)*uFinish.z+reflection*fresnel*gloss;
+ // Integrate an angular footprint for coatings on sub-pixel grains.
+ if(uFinish.w>0.&&coating+irid>0.){
+   vec3 spectral=coating>0.?film:pearlFresnel(vec3(.17),mix(.27,.74,facing),irid,rough);
+   lit+=spectral*mix(vec3(.4),normalize(base+vec3(.14)),.48)*uFinish.w*(.14+.36*coating+.18*irid);
+ }
  float shininess=mix(180.,2.,rough*rough);
  for(int i=0;i<uLightCount;i++){
    vec3 delta=uLights[i].xyz-p;float distance2=max(.01,dot(delta,delta));vec3 l=normalize(delta);

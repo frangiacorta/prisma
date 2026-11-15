@@ -1,8 +1,9 @@
-import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=34287eff19e2';
-import {beginVeilTransform} from './veil-model.js?v=34287eff19e2';
-import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=34287eff19e2';
+import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=ddff107e99e1';
+import {beginVeilTransform} from './veil-model.js?v=ddff107e99e1';
+import {cloudBody} from './body-layers.js?v=ddff107e99e1';
+import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=ddff107e99e1';
 export function applyLivingStyle(s,style){
- if(s.engine==='solid'){
+ if(!cloudBody(s)){
   const values={off:STRUCTURE_DEFAULTS,fibres:{structShell:1,structFibres:1},tissue:{structShell:1,structFibres:1,structWeft:1},membrane:{structShell:1},veils:{structShell:1,structRadial:.65,structCurl:.4}}[style];
   if(values)Object.assign(s,values,{pLiving:0,renderVersion:2});return;
  }
@@ -10,7 +11,7 @@ export function applyLivingStyle(s,style){
  const values=LIVING_STYLES[style];if(values)Object.assign(s,values);
 }
 export function livingChooser(s,h){return (s.pLiving===0?h.section('Transizione',`<button class="outline full" data-veil-transform="true">Suddividi questa forma in lamine</button><p class="help">Parti dalla forma che stai creando. Conservi colori, luci e animazioni.</p>`):'')+h.details('Tipo di forma',`<label class="field">Struttura<select data-particle-select="pLiving">${['Volume scolpito','Fibre a posa periodica','Tessuto connesso','Superficie continua','Lamine sovrapposte'].map((n,i)=>`<option value="${i}" ${s.pLiving===i?'selected':''}>${n}</option>`).join('')}</select></label><p class="help">Geometria qui; animazione in Movimento. ${s.pLiving===4?'Apri gradualmente la forma in strati: nessun preset viene caricato.':s.pLiving?"Per aggiungere particelle apri Particelle.":"Scegli una struttura viva per aggiungere granelli."}</p>`);}
-export function livingComposition(s,{slider,details}){if(!s.pLiving)return '';return details('Integrazione con la struttura',slider('pLivingBlend',['Solo granelli e scie','Solo struttura'])+slider('pSurfaceBind',['Nel volume','Sulla struttura'])+slider('pLivingOcclusion',['Nucleo visibile','Pelle schermante'])+`<p class="help">Adesione lega granelli e nodi alla superficie. Le scie conservano i propri percorsi; Schermatura rispetta pori e trasparenza.</p><button class="outline" data-living-core="true">Aggiungi granelli</button><button class="quiet" data-living-workspace="${s.engine==='solid'?'particles':'solid'}">Apri in ${s.engine==='solid'?'Particelle':'Forme'}</button>`);}
+export function livingComposition(s,{slider,details}){if(!s.pLiving)return '';return details('Integrazione con la struttura',slider('pLivingBlend',['Solo granelli e scie','Solo struttura'])+slider('pSurfaceBind',['Nel volume','Sulla struttura'])+slider('pLivingOcclusion',['Nucleo visibile','Pelle schermante'])+`<p class="help">Adesione lega granelli e nodi alla superficie. Le scie conservano i propri percorsi; Schermatura rispetta pori e trasparenza.</p><button class="outline" data-living-core="true">Aggiungi granelli</button>`);}
 export function livingMotion(s,{slider,details}){return s.pLiving?details('Vincoli di distanza e flessione',['pInflate','pContract','pBundleDelay','pElastic','pBend','pVolumeHold','pSelfContact','pContactClearance'].map(k=>slider(k)).join('')+'<p class="help">I vincoli regolano la risposta al moto. Conservazione del volume contrasta la contrazione. Contatto tra pieghe separa vertici, facce e bordi lontani nel reticolo. Distanza di contatto regola il margine. Nei fasci senza pelle il contatto agisce tra vertici.</p>'):'';}
 export function closeLivingSkin(s){if(!s.pLiving)s.pLiving=3;Object.assign(s,{pSkin:1,pSkinOpening:0,pPores:0,pOpening:0});for(const key of ['pSkinOpening','pPores','pOpening'])if(s.motions?.[key])s.motions[key].enabled=false;return s;}
 export function livingPanel(s,h){

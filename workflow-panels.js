@@ -1,5 +1,5 @@
-import {clockStatus} from './animation-clock.js?v=34287eff19e2';
-import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=34287eff19e2';
+import {clockStatus} from './animation-clock.js?v=ddff107e99e1';
+import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=ddff107e99e1';
 export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['library','Preset']];
 const html=s=>{const d=document.createElement('div');d.innerHTML=s;return d;};
 const section=(title,id)=>{const d=document.createElement('details');d.className='control-details';if(id)d.id=id;const h=document.createElement('summary');h.textContent=title;d.append(h);return d;};
@@ -16,13 +16,11 @@ export function animationMarkup(path,raw){const d=trackMap(raw).get(path);return
 export function motionGroups(raw){const root=html(raw('motion'));root.querySelector('[data-dynamics-panel]')?.remove();for(const e of [...root.querySelectorAll('[data-path-check$=".enabled"]')])e.closest('details').remove();for(const e of [...root.querySelectorAll('[data-param]')])if(motionOrigin(e.dataset.param)!=='motion'||['duration','speed','motion','pCycles'].includes(e.dataset.param))rowFor(e).remove();for(const e of root.querySelectorAll('[data-check],[data-particle-select]'))rowFor(e).remove();stripEmpty(root);return [...root.children].filter(d=>d.matches('details')&&d.querySelector('[data-param]'));}
 function baseMarkup(id,raw,state){
  const root=html(raw(id));
- if(id==='shape'&&isParticle(state))root.innerHTML+=raw('grains')+raw('trails');
  if(id==='shape'){
   for(const key of transforms)root.querySelector(`[data-param="${key}"]`)?.closest('.param')?.remove();
   for(const e of root.querySelectorAll('#force-controls,#guide-controls'))e.remove();
-  const cavity=section('Cavità degli elementi'),source=html(raw('material'));moveRows(source,cavity,['hollow','wallThickness']);if(cavity.querySelector('input'))root.append(cavity);
  }
- if(id==='material'){root.querySelector('#add-inside-light')?.remove();for(const k of ['hollow','wallThickness'])root.querySelector(`[data-param="${k}"]`)?.closest('.param')?.remove();}
+ if(id==='material')root.querySelector('#add-inside-light')?.remove();
  if(id==='background'){
   const frame=section('Inquadratura','scene-frame');moveRows(root,frame,transforms);moveRows(html(raw('shape')),frame,transforms);root.prepend(frame);root.innerHTML+=raw('tone');
  }
@@ -33,31 +31,13 @@ function baseMarkup(id,raw,state){
  const seen=new Set();for(const e of [...root.querySelectorAll('[data-param]')]){const key=e.dataset.param;if(seen.has(key))rowFor(e).remove();else seen.add(key);}
  stripEmpty(root);return root;
 }
-function particleLayers(root,state){
- const layers=[section('Nucleo','layer-core'),section('Granelli','layer-grains'),section('Fili','layer-links'),section('Scie','layer-trails'),section('Pelle','layer-skin')];
- const skin=/^p(?:Skin|Thread|Weft|Strands|Bundle|Bundles|Fray|Fold|Pore|Living|SurfaceBind)/;
- const classify=k=>/^pLink/.test(k)||k==='pNodeRatio'?2:/^pTrail/.test(k)?3:skin.test(k)?4:['pSizeRatio','pLargeCount','pSizeSpread','pSizeBias','pCount','pSize','pOpacity','pSoftness','pSizeVar','pSprite','pGrainSpacing','pGroupSpacing','pDistributionCells'].includes(k)?1:0;
- for(const node of [...root.children]){
-  if(!node.matches('details')){layers[0].append(node);continue;}
-  const e=node.querySelector('[data-param],[data-particle-select],[data-living-enabled]');const k=e?.dataset.param||e?.dataset.particleSelect||(e?.hasAttribute('data-living-enabled')?'pLiving':'');
-  const index=classify(k);const name=node.querySelector('summary')?.textContent||'';
-  if(['Forma','Particelle','Connessioni','Scie','Superficie e reticolo'].includes(name)){node.querySelector('summary')?.remove();layers[index].append(...node.childNodes);}else layers[index].append(node);
- }
- for(const e of layers[4].querySelectorAll('[data-living-enabled]'))e.closest('label')?.remove();
- const defs=[null,null,['links','pLinks'],['trails','pTrailCount'],['skin','pLiving']];
- layers.forEach((d,i)=>{d.dataset.particleLayer=String(i);if(defs[i]){const [kind,key]=defs[i],on=Number(state[key])>0;d.dataset.layerOff=String(!on);const toggle=document.createElement('input');toggle.type='checkbox';toggle.dataset.layerToggle=kind;toggle.checked=on;toggle.defaultChecked=on;toggle.setAttribute('aria-label','Attiva '+d.querySelector('summary').textContent);d.querySelector('summary').prepend(toggle);}else d.dataset.defaultOpen='true';});
- root.replaceChildren(...layers);
- const names={pOpening:'Sfera ↔ anello',pFill:'Riempimento',pThickness:'Spessore del nucleo',pOrganic:'Irregolarità',pCount:'Quantità',pSize:'Diametro comune · px',pOpacity:'Opacità',pLinks:'Intensità',pLinkNodes:'Nodi',pLinkWidth:'Spessore',pLinkReach:'Distanza',pTrailLength:'Lunghezza',pTrailWidth:'Spessore',pTrailCount:'Quantità',pSkin:'Visibilità della pelle',pFoldDepth:'Pieghe',pPores:'Pori'};
- for(const e of root.querySelectorAll('[data-param]'))if(names[e.dataset.param]){const label=rowFor(e).querySelector('label');e.dataset.searchAliases=label.textContent;label.textContent=names[e.dataset.param];}
- const sprite=root.querySelector('[data-particle-select=pSprite]');if(sprite)for(const n of sprite.closest('label').childNodes)if(n.nodeType===3)n.textContent='Sagoma';
-}
 export function composePanel(id,raw,state){
  if(id==='body')return raw(id).replace(/Usa mano ([ab])/g,(_,x)=>'Usa mano '+x.toUpperCase()).replace(/Usa braccio ([ab])/g,(_,x)=>'Usa braccio '+x.toUpperCase());
  if(id==='audio')return raw(id).replace(/>Ritmo</g,'>Battito<');
  if(id==='fields')return raw(id);
  const tracks=trackMap(raw);
  if(id==='library'){
-  const root=html('<p class="help">Preset completi: sostituiscono la creazione. Esempi per categoria: modificano solo quella parte.</p><button type="button" id="library-saved" class="outline full">I miei preset · importa ed esporta</button><details class="control-details" data-default-open="true" data-library-category="complete"><summary>Scene complete</summary><div id="complete-presets-slot"></div></details>');
+  const root=html('<p class="help">Le scene aprono un progetto completo. Gli ingredienti cambiano solo la parte indicata.</p><button type="button" id="library-saved" class="outline full">I miei preset · importa ed esporta</button><details class="control-details" data-default-open="true" data-library-category="complete"><summary>Scene complete</summary><div id="complete-presets-slot"></div></details>');
   const seen=new Set();for(const [tab,label]of WORK_TABS.filter(([t])=>t!=='library')){const source=baseMarkup(tab,raw,state),group=section(label),subgroups=new Map();group.dataset.libraryCategory=tab;
    for(const e of [...source.querySelectorAll(exampleSelector)]){if(seen.has(e.outerHTML))continue;seen.add(e.outerHTML);if(e.id==='material-picker'){for(const o of e.options)if(o.value!==''){const b=document.createElement('button');b.type='button';b.className='outline library-card';b.dataset.material=o.value;b.textContent=o.textContent;group.append(b);}continue;}const title=e.closest('details')?.querySelector(':scope > summary')?.textContent||label;let target=subgroups.get(title);if(!target){target=section(title);target.dataset.librarySubgroup=title;subgroups.set(title,target);group.append(target);}target.append(e.matches('select')?rowFor(e):e);}
    const cards=[...group.querySelectorAll(':scope > [data-material],:scope > [data-mood]')];if(cards.length){const grid=document.createElement('div');grid.className='library-card-grid';cards[0].before(grid);for(const c of cards)c.classList.add('library-card');grid.append(...cards);}if(group.querySelector('button,select'))root.append(group);
@@ -76,7 +56,7 @@ export function composePanel(id,raw,state){
  const root=baseMarkup(id,raw,state);for(const e of [...root.querySelectorAll(exampleSelector)])(e.matches('select')?rowFor(e):e).remove();
  // The editor is created on demand; no animation form is hidden in the panel DOM.
  for(const e of [...root.querySelectorAll('[data-path-check$=".enabled"]')]){const path=e.dataset.pathCheck.replace(/\.enabled$/,'');if(!/\.(orbit|pulse)$/.test(path))continue;const d=e.closest('details'),b=document.createElement('button');b.type='button';b.className='animation-link';b.dataset.animatePath=path;b.textContent=d.querySelector('summary').textContent;d.replaceWith(b);}
- nameControls(root);if(id==='shape'&&isParticle(state))particleLayers(root,state);
+ nameControls(root);if(id==='shape'){const first=root.querySelector(':scope > details');if(first)first.dataset.defaultOpen='true';}
  if(id==='material'&&isParticle(state))for(const d of root.querySelectorAll('details')){const h=d.querySelector(':scope > summary');if(h?.textContent==='Riflessi delle fibre')h.textContent='Fibre · riflessi';}
  for(const e of root.querySelectorAll('[data-param]')){const key=e.dataset.param,path='motions.'+key;if(!tracks.has(path))continue;const t=state.motions?.[key],b=document.createElement('button');b.type='button';b.className='animate-toggle';b.dataset.animatePath=path;b.dataset.animateOpen=key;b.dataset.animationLabel=rowFor(e).querySelector('label').textContent;b.textContent=t?.enabled?'∿ '+t.cycles+'×':'∿';b.setAttribute('aria-label','Anima '+b.dataset.animationLabel);b.setAttribute('aria-pressed',String(!!t?.enabled));rowFor(e).querySelector('.param-line').append(b);}
  stripEmpty(root);return root.innerHTML;
@@ -93,7 +73,7 @@ export function refinePanel(root,level='simple',{state={},baseline={},tab='shape
  // Detail levels choose parameters, never remove precision or help from a visible one.
  if(level==='simple'){
   root.querySelector('.finish-order')?.remove();
-  for(const e of [...root.querySelectorAll('input[data-check],select')]){const key=e.dataset.check||e.dataset.particleSelect||e.dataset.finishSelect||e.id;if(!(e.matches('select')?ESSENTIAL_FIELDS.has(key)||key==='add-animation':ESSENTIAL_FLAGS.has(key)))rowFor(e).remove();}
+  for(const e of [...root.querySelectorAll('input[data-check],select')]){const key=e.dataset.check||e.dataset.particleSelect||e.dataset.finishSelect||e.id;if(e.dataset.grainSource)continue;if(!(e.matches('select')?ESSENTIAL_FIELDS.has(key)||key==='add-animation':ESSENTIAL_FLAGS.has(key)))rowFor(e).remove();}
   for(const e of [...root.querySelectorAll('button')])if(!e.matches(ESSENTIAL_BUTTONS+',.parameter-info,[data-help-text],[data-color-move],[data-color-remove]')&&!e.closest('.base-form-grid,.light-list'))e.remove();
  }
  if(level==='simple')for(const layer of root.querySelectorAll('[data-particle-layer]'))for(const d of [...layer.querySelectorAll('details')].reverse()){d.querySelector(':scope > summary')?.remove();for(const p of d.querySelectorAll(':scope > .help'))p.remove();d.replaceWith(...d.childNodes);}

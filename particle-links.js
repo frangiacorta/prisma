@@ -1,8 +1,8 @@
-import {DYNAMICS_GLSL} from './dynamics.js?v=34287eff19e2';
-import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=34287eff19e2';
-import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=34287eff19e2';
-import {guideGLSL} from './particle-path-field.js?v=34287eff19e2';
-import {forceBarrierGLSL} from './particle-forces.js?v=34287eff19e2';
+import {DYNAMICS_GLSL} from './dynamics.js?v=ddff107e99e1';
+import {livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=ddff107e99e1';
+import {buildLinks3D,makeLinkBuffers} from './vendor/particle-hero/links-3d.js?v=ddff107e99e1';
+import {guideGLSL} from './particle-path-field.js?v=ddff107e99e1';
+import {forceBarrierGLSL} from './particle-forces.js?v=ddff107e99e1';
 
 // Stable topology in the nucleus rest configuration. Movement, fields and
 // materials are evaluated by the same GLSL as the visible particles each frame.
@@ -25,6 +25,18 @@ ${livingAttachmentGLSL}
 uniform sampler2D uSeeds;uniform int uLinkEndpoints;uniform float uLinkSegments;uniform vec4 uLinks;uniform vec2 uLinkPath;uniform vec3 uShadeOrigin;
 out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity,vSide;
 vec4 seedAt(int i){return texelFetch(uSeeds,ivec2(i%1024,i/1024),0);}
+vec3 bodyArc(vec3 a,vec3 b,float t){
+ if(t<=0.)return a;if(t>=1.)return b;
+ vec3 da=a-uShadeOrigin,db=b-uShadeOrigin;
+ float ra=length(da),rb=length(db);
+ if(min(ra,rb)<.0001)return mix(a,b,t);
+ vec3 axis=da/ra,next=db/rb;
+ float alignment=clamp(dot(axis,next),-1.,1.);
+ vec3 tangent=next-axis*alignment;
+ if(length(tangent)<.0001)tangent=cross(axis,abs(axis.y)<.9?vec3(0.,1.,0.):vec3(1.,0.,0.));
+ float angle=t*(acos(alignment)+uLinkPath.y*TAU);
+ return uShadeOrigin+mix(ra,rb,t)*(axis*cos(angle)+normalize(tangent)*sin(angle));
+}
 void main(){
  // Eight short ribbons per connection, with endpoints exactly on the particles.
  int triangle=gl_VertexID%6,segment=gl_VertexID/6;
@@ -46,7 +58,16 @@ void main(){
  bend=normalize(bend+vec3(.00001))*len*uLinks.z;
  vec3 p=mix(a,b,t)+bend*(4.*t*(1.-t));
  vec3 tangent=delta+bend*(4.-8.*t);
- if(uLinkPath.x>0.){p=mix(p,endpoints[2],uLinkPath.x);tangent=mix(tangent,(endpoints[3]-endpoints[4])/max(.001,min(1.,t+.001)-max(0.,t-.001)),uLinkPath.x);}
+ if(uLinkPath.x>0.){
+  float left=max(0.,t-.001),right=min(1.,t+.001);
+  if(uStudioBody.x>0.){
+   p=mix(p,bodyArc(a,b,t),uLinkPath.x);
+   tangent=mix(tangent,(bodyArc(a,b,right)-bodyArc(a,b,left))/(right-left),uLinkPath.x);
+  }else{
+   p=mix(p,endpoints[2],uLinkPath.x);
+   tangent=mix(tangent,(endpoints[3]-endpoints[4])/(right-left),uLinkPath.x);
+  }
+ }
  p=dynamicsContact(sceneBarriers(p,ra,uPhase));vPosition=p;vForceSeed=ra;
  vec4 clip=project(p);vec2 line=(project(p+tangent*.01).xy-project(p-tangent*.01).xy)*uResolution;
  vec2 normal=vec2(-line.y,line.x)/max(.00001,length(line));
@@ -63,7 +84,7 @@ ${guideGLSL}
 ${DYNAMICS_GLSL}
 uniform float uPhase;
 ${livingOcclusionGLSL}
-void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;float a=livingVisibility()*vOpacity*(1.-smoothstep(.1,1.,abs(vSide)));color=vec4(vColor*a,a);}`);
+void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;float a=livingVisibility(vPosition.z)*vOpacity*(1.-smoothstep(.1,1.,abs(vSide)));color=vec4(vColor*a,a);}`);
   this.feedback=gl.createTransformFeedback();this.captureBuffer=gl.createBuffer();
   this.buffer=gl.createBuffer();this.vao=gl.createVertexArray();
   gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);
@@ -72,7 +93,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
  }
  prepare(s){
   s=this.owner.linkRestState||s;
-  const key=JSON.stringify(GRAPH_KEYS.map(k=>s[k]));if(key===this.key)return;
+  const key=JSON.stringify([this.owner.studioLayer?.attachment?.kind||0,...GRAPH_KEYS.map(k=>s[k])]);if(key===this.key)return;
   const start=performance.now(),o=this.owner,gl=this.gl,n=Math.max(2,Math.min(4000,Math.round(s.pLinkNodes)));
   o.settings(this.capture,{...s,dynAmount:0,_dynamics:null},0);
   gl.bindVertexArray(o.pointVAO);gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK,this.feedback);
@@ -94,7 +115,7 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   this.prepare(s);if(!this.count)return;
   const o=this.owner,gl=this.gl,p=this.program;o.settings(p,s,phase);o.tex(p,'uSeeds',o.seedTexture,2);
   const surface=s.pLinkSurface||0,turns=Math.round(s.pLinkTurns||0);
-  gl.uniform1i(o.loc(p,'uLinkEndpoints'),surface>0?5:2);o.u(p,'uLinkPath',surface,turns);o.u(p,'uLinks',s.pLinks,s.pLinkWidth,s.pLinkCurve,s.pLinkStretch);const resolution=surface>0?Math.min(192,48*(1+Math.abs(turns))):8,segments=Math.max(2,Math.round(resolution*Math.sqrt(o.geometryBudget??1)));o.u(p,'uLinkSegments',segments);
+  gl.uniform1i(o.loc(p,'uLinkEndpoints'),surface>0&&!o.studioLayer?.attachment?5:2);o.u(p,'uLinkPath',surface,turns);o.u(p,'uLinks',s.pLinks,s.pLinkWidth,s.pLinkCurve,s.pLinkStretch);const resolution=surface>0?Math.min(192,48*(1+Math.abs(turns))):8,segments=Math.max(2,Math.round(resolution*Math.sqrt(o.geometryBudget??1)));o.u(p,'uLinkSegments',segments);
   gl.bindVertexArray(this.vao);o.opticalDrawState?.();gl.drawArraysInstanced(gl.TRIANGLES,0,segments*6,this.count);
  }
  dispose(){const gl=this.gl;gl.deleteProgram(this.program.program);gl.deleteProgram(this.capture.program);gl.deleteTransformFeedback(this.feedback);gl.deleteBuffer(this.captureBuffer);gl.deleteBuffer(this.buffer);gl.deleteVertexArray(this.vao);}

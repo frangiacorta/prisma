@@ -1,9 +1,9 @@
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=34287eff19e2';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=ddff107e99e1';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,
- loopAmount:0,loopKnot:0,loopRadius:.8,loopTube:.22,loopFlat:0,loopTwist:0,loopWave:0,loopPhase:0,loopBands:0,loopBandCount:6,
- structShell:0,structThickness:.09,structFibres:0,structWeft:0,structDensity:20,structThreadWidth:.32,structWeave:0,
+ loopAmount:0,loopKnot:0,loopTurns:3,loopRadius:.8,loopTube:.22,loopFlat:0,loopTwist:0,loopWave:0,loopPhase:0,loopBands:0,loopBandCount:6,
+ structShell:0,structThickness:.09,structFibres:0,structWeft:0,structDensity:20,structThreadWidth:.32,structWeave:0,structWeaveVariation:0,structWeaveNodes:0,
  structSlices:0,structSliceCount:6,structSliceWidth:.24,structRadial:0,structPetalCount:8,structPetalWidth:.45,
  structLayers:0,structLayerCount:3,structLayerWidth:.22,
  structGrowth:0,structCurl:0,structFold:0,structFoldCount:5,structBreath:0,structFlap:0,structFlowPhase:0,structDelay:.35,
@@ -14,8 +14,10 @@ export const STRUCTURE_META={
  ...FILAMENT_META,
  loopBands:['Fasce lungo il percorso',0,1,.01],loopBandCount:['Numero di fasce',1,36,1],
  loopAmount:['Apertura ad anello',0,1,.01],loopKnot:['Intreccio del nodo',0,1,.01],loopRadius:['Raggio del percorso',.6,1.6,.01],loopTube:['Spessore del tubo',.06,.6,.005],loopFlat:['Appiattimento a nastro',0,1,.01],loopTwist:['Torsione del nastro',-2,2,.01],loopWave:['Variazione di spessore',0,.35,.005],loopPhase:['Scorrimento',0,1,.001],
+ loopTurns:['Avvolgimenti del nodo',3,11,2],
  structShell:['Svuotamento · pieno → membrana',0,1,.01],structThickness:['Spessore della membrana',.035,.4,.005],
  structFibres:['Separazione in fibre',0,1,.01],structWeft:['Fili trasversali · tessitura',0,1,.01],structDensity:['Fili intorno alla forma',6,48,1],structThreadWidth:['Larghezza dei fili',.15,.9,.01],structWeave:['Intreccio sopra / sotto',0,.16,.005],
+ structWeaveVariation:['Irregolarità del reticolo',0,1,.01],structWeaveNodes:['Rilievo alle giunzioni',0,1,.01],
  structSlices:['Separazione in lamelle',0,1,.01],structSliceCount:['Numero di lamelle',2,12,1],structSliceWidth:['Spessore relativo delle lamelle',.12,.85,.01],
  structRadial:['Separazione radiale',0,1,.01],structPetalCount:['Divisioni radiali',3,20,1],structPetalWidth:['Larghezza delle divisioni',.1,.95,.01],
  structLayers:['Gusci concentrici',0,1,.01],structLayerCount:['Numero di strati concentrici',2,6,1],structLayerWidth:['Spessore relativo degli strati',.15,.85,.01],
@@ -30,6 +32,7 @@ export const STRUCTURE_FIELD_KEYS=Object.keys(STRUCTURE_DEFAULTS).filter(k=>!k.s
 export function hasStructure(s){return ['loopAmount','structShell','structFibres','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle'].some(k=>Math.abs(s[k]||0)>1e-6);}
 export function structureMayChange(s){return hasStructure(s)||STRUCTURE_FIELD_KEYS.some(k=>s.motions?.[k]?.enabled&&(s.motions[k].amplitude||s.motions[k].mode==='cycle'));}
 export function structureBounds(s){return Math.max(1,(s.loopAmount||0)>0?(s.loopRadius??.8)+.36*(s.loopKnot||0)+(s.loopTube??.22)*(1+(s.loopWave||0)):1)*(1+Math.abs(s.structGrowth||0)+Math.abs(s.structBreath||0))*(1+Math.abs(s.structCurl||0)+Math.abs(s.structFold||0)+Math.abs(s.structFlap||0)+Math.abs(s.structRuffle||0)*2+Math.abs(s.structStagger||0)*.6);}
+const knotTurns=s=>3+2*Math.max(0,Math.min(4,Math.round(((s.loopTurns??3)-3)/2)));
 export function structureUniforms(s,u){
  const v={...STRUCTURE_DEFAULTS,...s};
  u('uLoopA',[v.loopAmount,v.loopKnot,v.loopRadius,v.loopTube]);u('uLoopB',[v.loopFlat,v.loopTwist,v.loopWave,v.loopPhase]);
@@ -40,15 +43,15 @@ export function structureUniforms(s,u){
  u('uStructureE',[v.structGrowth,v.structCurl,v.structFold,v.structFoldCount]);
  u('uStructureF',[v.structBreath,v.structFlap,v.structFlowPhase,v.structDelay]);
  u('uStructureG',[v.structScallop,v.structSpiral,v.structStagger,v.structRuffle]);
- u('uStructureH',[v.structTaper,0]);
+ u('uStructureH',[v.structTaper,v.structWeaveVariation,v.structWeaveNodes,knotTurns(v)]);
  u('uStructureColor',[v.structCoreDark,v.structCoreRadius]);u('uLoopColor',[v.loopBands,v.loopBandCount]);
 }
-// Closed (2,3) torus-knot branches; parameterization also used by Three.js TorusKnotGeometry.
+// Closed torus-knot branches with two laps and an odd number of windings.
 // Own implicit cross-section implementation: two branches, no mesh or sampled-segment traversal.
 export function loopField(s,p){
  const a=Math.atan2(p[1],p[0]),r=Math.hypot(p[0],p[1]),phase=(s.loopPhase||0)*Math.PI*2,thin=1-.86*(s.loopFlat||0),twist=(s.loopTwist||0)*Math.sin(2*a+phase);
  const c=Math.cos(twist),sn=Math.sin(twist),tube=(s.loopTube??.22)*(1+(s.loopWave||0)*Math.sin(3*a-phase));let distance=1e9;
- for(let j=0;j<2;j++){const t=a*.5+j*Math.PI,k=.36*(s.loopKnot||0),x=r-(s.loopRadius??.8)-k*Math.cos(3*t),z=p[2]-k*Math.sin(3*t);const u=c*x+sn*z,v=-sn*x+c*z;distance=Math.min(distance,(Math.hypot(u,v/thin)-tube)*thin);}
+ for(let j=0;j<2;j++){const t=(a*.5+j*Math.PI)*knotTurns(s),k=.36*(s.loopKnot||0),x=r-(s.loopRadius??.8)-k*Math.cos(t),z=p[2]-k*Math.sin(t);const u=c*x+sn*z,v=-sn*x+c*z;distance=Math.min(distance,(Math.hypot(u,v/thin)-tube)*thin);}
  return distance;
 }
 export function loopBlend(s,d,p){return (s.loopAmount||0)>0?d+s.loopAmount*(loopField(s,p)-(Math.hypot(...p)-1)):d;}
@@ -69,14 +72,29 @@ export function structureWarp(s,p){
 }
 export function structureField(s,d,p){
  const v={...STRUCTURE_DEFAULTS,...s},r=Math.hypot(...p),phi=Math.atan2(p[1],p[0]),theta=Math.acos(Math.max(-1,Math.min(1,p[2]/Math.max(r,1e-6)))),tau=Math.PI*2;
- const a=phi*v.structDensity,b=theta*v.structDensity,phase=v.structFlowPhase*tau;
+ let a=phi*v.structDensity,b=theta*v.structDensity;
+ const phase=v.structFlowPhase*tau,variation=v.structWeaveVariation*Math.sin(theta);
+ if(variation>0){
+  a+=variation*(2.2*Math.sin(4*phi+2.3*Math.sin(theta*6))+1.12*Math.sin(13*phi-theta*7));
+  b+=variation*(1.9*Math.sin(5*phi-theta*3)+1.26*Math.sin(11*phi+theta*8));
+ }
  const thickness=v.structThickness*(1-v.structTaper*.85*Math.min(1,Math.hypot(p[0],p[1])));
+ const midSurface=d+thickness*.5;
  if(v.structShell>0)d=Math.max(d,-d-thickness-(1-thickness)*(1-v.structShell));
  if(v.structFibres>0){
   const width=1+(v.structThreadWidth-1)*v.structFibres,warp=(Math.abs(Math.sin(a*.5))-width)/v.structDensity*2;
   const weft=(Math.abs(Math.sin(b*.5))-width*v.structWeft)/v.structDensity*2;
   d=Math.max(d,v.structWeft>0?Math.min(warp,weft):warp);
-  d+=v.structWeave*Math.cos(a)*Math.cos(b)*Math.cos(phase)*v.structFibres;
+  const junction=Math.pow((.5+.5*Math.cos(a))*(.5+.5*Math.cos(b)),3);
+  d+=v.structFibres*(v.structWeave*Math.cos(a)*Math.cos(b)*Math.cos(phase)-v.structWeaveNodes*v.structWeft*junction*.095);
+  if(v.structWeaveVariation>0&&v.structShell>0){
+   const across=warp+width/v.structDensity*2,along=weft+width*v.structWeft/v.structDensity*2;
+   const radius=Math.max(thickness*.16,Math.min(thickness*.68,width*1.8/v.structDensity));
+   const ribs=Math.hypot(midSurface,across)-radius;
+   const cross=v.structWeft>0?Math.hypot(midSurface,along)-radius*v.structWeft:10;
+   const node=v.structWeft>0&&v.structWeaveNodes>0?Math.hypot(midSurface,across,along)-radius*(1+v.structWeaveNodes*1.5):10;
+   d+=(Math.min(ribs,cross,node)-d)*v.structWeaveVariation*v.structShell*v.structFibres;
+  }
  }
  if(v.structSlices>0)d=Math.max(d,(Math.abs(Math.sin(p[2]*v.structSliceCount*Math.PI)) -(1+(v.structSliceWidth-1)*v.structSlices))/ (v.structSliceCount*Math.PI));
  if(v.structRadial>0)d=Math.max(d,(Math.abs(Math.sin(phi*v.structPetalCount*.5))-(1+(v.structPetalWidth-1)*v.structRadial))*Math.hypot(p[0],p[1])/v.structPetalCount);
@@ -85,14 +103,16 @@ export function structureField(s,d,p){
 }
 export const STRUCTURE_GLSL=`
 uniform vec4 uStructureA,uStructureB,uStructureC,uStructureD,uStructureE,uStructureF,uStructureG;
-uniform vec2 uStructureColor,uStructureH;
+uniform vec2 uStructureColor;
+uniform vec4 uStructureH;
 uniform vec4 uLoopA,uLoopB;
 uniform vec2 uLoopColor;
 bool structureActive(){return uLoopA.x+dot(abs(uStructureA.xzw),vec3(1.))+abs(uStructureB.w)+abs(uStructureC.z)+abs(uStructureD.y)+dot(abs(uStructureE.xyz),vec3(1.))+dot(abs(uStructureF.xy),vec2(1.))+dot(abs(uStructureG),vec4(1.))>.000001;}
 float loopField(vec3 p){
  float a=atan(p.y,p.x),r=length(p.xy),phase=uLoopB.w*6.28318530718,thin=1.-.86*uLoopB.x,angle=uLoopB.y*sin(2.*a+phase);
  float c=cos(angle),sn=sin(angle),tube=uLoopA.w*(1.+uLoopB.z*sin(3.*a-phase));
- vec2 center=vec2(r-uLoopA.z,p.z),offset=.36*uLoopA.y*vec2(cos(1.5*a),sin(1.5*a));
+ float t=.5*a*uStructureH.w;
+ vec2 center=vec2(r-uLoopA.z,p.z),offset=.36*uLoopA.y*vec2(cos(t),sin(t));
  vec2 q=center-offset,v=center+offset;
  q=vec2(c*q.x+sn*q.y,(-sn*q.x+c*q.y)/thin);
  v=vec2(c*v.x+sn*v.y,(-sn*v.x+c*v.y)/thin);
@@ -112,13 +132,28 @@ vec3 structureWarp(vec3 p){
 }
 float structureField(float d,vec3 p){
  float r=length(p),phi=atan(p.y,p.x),theta=acos(clamp(p.z/max(r,.000001),-1.,1.)),a=phi*uStructureB.x,b=theta*uStructureB.x;
+ float variation=uStructureH.y*sin(theta);
+ if(variation>0.){
+  a+=variation*(2.2*sin(4.*phi+2.3*sin(theta*6.))+1.12*sin(13.*phi-theta*7.));
+  b+=variation*(1.9*sin(5.*phi-theta*3.)+1.26*sin(11.*phi+theta*8.));
+ }
  float thickness=uStructureA.y*(1.-uStructureH.x*.85*min(1.,length(p.xy)));
+ float midSurface=d+thickness*.5;
  if(uStructureA.x>0.)d=max(d,-d-thickness-(1.-thickness)*(1.-uStructureA.x));
  if(uStructureA.z>0.){
   float width=mix(1.,uStructureB.y,uStructureA.z),warp=(abs(sin(a*.5))-width)/uStructureB.x*2.;
   float weft=(abs(sin(b*.5))-width*uStructureA.w)/uStructureB.x*2.;
   d=max(d,uStructureA.w>0.?min(warp,weft):warp);
-  d+=uStructureB.z*cos(a)*cos(b)*cos(uStructureF.z*6.28318530718)*uStructureA.z;
+  float junction=pow((.5+.5*cos(a))*(.5+.5*cos(b)),3.);
+  d+=uStructureA.z*(uStructureB.z*cos(a)*cos(b)*cos(uStructureF.z*6.28318530718)-uStructureH.z*uStructureA.w*junction*.095);
+  if(uStructureH.y>0.&&uStructureA.x>0.){
+   float across=warp+width/uStructureB.x*2.,along=weft+width*uStructureA.w/uStructureB.x*2.;
+   float radius=max(thickness*.16,min(thickness*.68,width*1.8/uStructureB.x));
+   float ribs=length(vec2(midSurface,across))-radius;
+   float crossbar=uStructureA.w>0.?length(vec2(midSurface,along))-radius*uStructureA.w:10.;
+   float node=uStructureA.w>0.&&uStructureH.z>0.?length(vec3(midSurface,across,along))-radius*(1.+uStructureH.z*1.5):10.;
+   d=mix(d,min(ribs,min(crossbar,node)),uStructureH.y*uStructureA.x*uStructureA.z);
+  }
  }
  if(uStructureB.w>0.)d=max(d,(abs(sin(p.z*uStructureC.x*3.14159265359))-mix(1.,uStructureC.y,uStructureB.w))/(uStructureC.x*3.14159265359));
  if(uStructureC.z>0.)d=max(d,(abs(sin(phi*uStructureC.w*.5))-mix(1.,uStructureD.x,uStructureC.z))*length(p.xy)/uStructureC.w);
@@ -128,9 +163,9 @@ float structureField(float d,vec3 p){
 `;
 export function structurePanel(tab,s,{slider,details,section}){
  const sliders=keys=>keys.map(k=>slider(k)).join('');
- if(tab==='shape')return filamentPanel(tab,s,{slider,details})+ details('Curve toroidali e nodi',sliders(['loopAmount','loopRadius','loopTube','loopKnot','loopFlat','loopTwist','loopWave'])+'<p class="help">Apertura 0 mantiene la forma iniziale; 1 la trasforma in un anello. Intreccio separa e annoda il percorso. Appiattimento e torsione modellano il nastro. Spessore elevato può unire i passaggi del nodo.</p>')+section('Proprietà',(s.structureOriginal?'<p class="help">La struttura precedente è stata adattata alle proprietà comuni. Il risultato può cambiare; i dati originali sono conservati nel preset.</p><button class="quiet" data-structure-original="true">Scarica anche il preset originale</button>':'')+'<p class="help">Combina le proprietà sulla forma attuale. Profilo, ritagli e materia restano attivi.</p>')
+ if(tab==='shape')return filamentPanel(tab,s,{slider,details})+ details('Curve toroidali e nodi',sliders(['loopAmount','loopRadius','loopTube','loopKnot','loopTurns','loopFlat','loopTwist','loopWave'])+'<p class="help">Apertura 0 mantiene la forma iniziale; 1 la trasforma in un anello. Intreccio separa il percorso. Avvolgimenti aumenta le ripiegature del nodo. Appiattimento e torsione modellano il nastro. Spessore elevato può unire i passaggi del nodo.</p>')+section('Proprietà',(s.structureOriginal?'<p class="help">La struttura precedente è stata adattata alle proprietà comuni. Il risultato può cambiare; i dati originali sono conservati nel preset.</p><button class="quiet" data-structure-original="true">Scarica anche il preset originale</button>':'')+'<p class="help">Combina le proprietà sulla forma attuale. Profilo, ritagli e materia restano attivi.</p>')
  +details('Guscio e spessore',sliders(['structShell','structThickness','structTaper']))
- +details('Reticolo di fibre',sliders(['structFibres','structWeft','structDensity','structThreadWidth','structWeave'])+'<p class="help">Separazione apre gli spazi fra i fili. Tessitura aggiunge i fili trasversali; lo svuotamento può limitare la trama alla pelle.</p>')
+ +details('Reticolo di fibre',sliders(['structFibres','structWeft','structDensity','structThreadWidth','structWeave','structWeaveVariation','structWeaveNodes'])+'<p class="help">Separazione apre gli spazi fra i fili. Tessitura aggiunge i fili trasversali. Irregolarità curva i fili e Rilievo ingrossa le giunzioni. Lo svuotamento limita la trama alla pelle.</p>')
  +details('Suddivisione radiale e strati',sliders(['structScallop','structPetalCount','structRadial','structPetalWidth','structSlices','structSliceCount','structSliceWidth','structLayers','structLayerCount','structLayerWidth'])+'<p class="help">Arrotondamento disegna lobi morbidi sulla forma; Separazione radiale apre gli intervalli. Suddivisione radiale e strati concentrici aggiungono altri livelli combinabili. I valori intermedi aprono progressivamente gli spazi. Gli strati interni diventano visibili con trasparenza o ritagli.</p>')
  +details('Piegatura e curvatura',sliders(['structGrowth','structCurl','structSpiral','structStagger','structFold','structFoldCount','structRuffle'])+'<p class="help">La posa e la sua animazione si regolano in Movimento. Trasparenza e rifrazione sono in Materia.</p>');
  if(tab==='color')return filamentPanel(tab,s,{slider,details})+ (s.engine==='solid'?details('Colore lungo l’anello',sliders(['loopBands','loopBandCount'])+'<p class="help">La palette segue il percorso. Aumenta Apertura ad anello in Forma.</p>'):'')+details('Nucleo scuro',sliders(['structCoreDark','structCoreRadius'])+(s.engine==='particles'?'<p class="help">Scurisce granelli e fili vicino all’asse centrale della forma, anche con pellicola e riflessi attivi. Estensione regola l’area; non aggiunge una sfera piena fra i granelli.</p>':''));
@@ -141,7 +176,7 @@ export function structurePanel(tab,s,{slider,details,section}){
 // Old dedicated surfaces are translated once; retain their exact original data.
 // This is a geometric adaptation, not a claim of pixel-identical migration.
 export function integrateStructure(s){
- if((s.engine!=='solid'&&s.pLiving!==4)||!(s.pLiving>0))return s;
+ if(((s.engine!=='solid'||s.grainSource==='cloud')&&s.pLiving!==4)||!(s.pLiving>0))return s;
  if(!s.structureOriginal){s.structureOriginal=structuredClone(s);delete s.structureOriginal.structureOriginal;}
  const old=s.pLiving,v={...STRUCTURE_DEFAULTS,structShell:1,structThickness:.065,structFold:Math.min(.4,s.pFoldDepth||0),structFoldCount:s.pFoldCount||5};
  if(old===1||old===2){v.structFibres=1;v.structWeft=old===2?(s.pWeft??.65):0;v.structDensity=Math.max(6,Math.min(48,Math.round(Math.sqrt(s.pStrands||256)*1.4)));v.structThreadWidth=Math.max(.15,Math.min(.9,(s.pThreadWidth||.5)*.6));}

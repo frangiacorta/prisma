@@ -1,7 +1,8 @@
-import {AUDIO_HELP} from './audio-model.js?v=34287eff19e2';
-import {EXTRA_HELP} from './control-help-extra.js?v=34287eff19e2';
-import {FRACTAL_HELP} from './fractal-form.js?v=34287eff19e2';
-import {CELLULAR_HELP} from './cellular-form.js?v=34287eff19e2';
+import {AUDIO_HELP} from './audio-model.js?v=ddff107e99e1';
+import {EXTRA_HELP} from './control-help-extra.js?v=ddff107e99e1';
+import {FRACTAL_HELP} from './fractal-form.js?v=ddff107e99e1';
+import {CELLULAR_HELP} from './cellular-form.js?v=ddff107e99e1';
+import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=ddff107e99e1';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',
@@ -237,6 +238,27 @@ Object.assign(HELP,{
 export function controlCondition(s,key){
  const positive=k=>Math.abs(Number(s[k])||0)>1e-6||s.motions?.[k]?.enabled&&Math.abs(s.motions[k].amplitude||0)>1e-6;
  const need=(k,text)=>positive(k)?'':text;
+ const particles=hasGrainLayer(s),surface=grainMix(s)<1||s.motions?.sceneGrains?.enabled;
+ if(key==='lobes'&&!positive('lobeAmount'))return 'Aumenta l’ampiezza dei lobi.';
+ if(key==='pLobes'&&!positive('pLobeDepth'))return 'Aumenta la profondità dei lobi.';
+ if(key==='pFrequency'||key==='pDetail'||key==='pRough'){if(!positive('pOrganic'))return 'Aumenta l’irregolarità della nuvola.';}
+ if(['holeX','holeY','holeShape','holeAspect'].includes(key)&&!positive('hole'))return 'Aumenta l’apertura del foro.';
+ if(['cutX','cutY','cutAspect'].includes(key)&&!positive('cut'))return 'Aumenta il ritaglio.';
+ if(['gradientScale','gradientAngle','gradientOffset','colorSoftness','colorWaveAmount','colorLayers','colorLayerScale','colorLayerShift','colorLayerMix','colorWaveHeight','colorWaveRadius','colorWaveSwirl','colorWaveBands','colorWaveWarp','colorWavePhase'].includes(key)&&s.palette?.length<2)return 'Aggiungi un secondo colore nella palette.';
+ if(['hollow','wallThickness','fullness','dispersion','absorption','tintStrength','environmentRefraction'].includes(key)&&!positive('transparency'))return 'Aumenta la trasparenza.';
+ if(key==='scatterDirection'&&!positive('scattering')&&!positive('translucency')&&!positive('subsurface'))return 'Aumenta la diffusione interna.';
+ if(['groundShadow','pShadow','grounding'].includes(key)&&s.bgMode==='solid'&&s.background==='#000000')return 'Scegli un fondale più chiaro per vedere l’ombra.';
+ if(['filmThickness','iridShift','filmPattern','pFilmScale','pFilmVariation'].includes(key)&&!positive('thinFilm')&&!positive('pFilm')&&!positive('iridescence'))return 'Attiva la pellicola o aumenta l’iridescenza.';
+ if(['pLighting','pColorMode','pColorScatter','pLumaVar','pDepthFade','pLinks','pTrailCount','pOpacity','pCount','pSize','pFill','grainDispersal'].includes(key)&&!particles)return 'Porta Superficie ↔ granelli sopra zero in Forma.';
+ if(key==='refraction'&&!positive('transparency'))return 'Aumenta Trasparenza per vedere la rifrazione.';
+ if(key==='refraction'&&!surface&&!positive('pLighting')&&!positive('pCaustic'))return 'Attiva Risposta alle luci per vedere l’indice dei granelli.';
+ if(key==='pCaustic'&&(!particles||!positive('transparency')||s.refraction<=1||s.metal>=1||!s.lights?.some(l=>l.enabled&&l.power>0&&l.y>s.pShadowHeight)))return 'Servono granelli trasparenti, indice sopra 1 e una luce sopra il piano.';
+ if(key==='loopTurns'&&(!positive('loopAmount')||!positive('loopKnot')))return 'Aumenta Apertura ad anello e Intreccio del nodo.';
+ if(/^structWeave(Variation|Nodes)$/.test(key)&&!positive('structFibres'))return 'Aumenta Separazione in fibre per aprire il reticolo.';
+ if(key==='structWeaveNodes'&&!positive('structWeft'))return 'Aumenta i fili trasversali per creare giunzioni.';
+ if(['pSelfShadowSoftness','pSelfShadowBias','pOpticalExtent'].includes(key)&&!positive('pSelfShadow')&&!positive('pCaustic'))return 'Attiva ombre reciproche o caustiche.';
+ if(/^p(?:Orbit|Travel|Vortex|Wander|SpaceWarp|Reentry|Breath|Life|Random|Jitter)/.test(key)&&particles&&!cloudBody(s)&&!positive('grainDispersal'))return 'Aumenta Distacco dal corpo in Forma → Granelli.';
+ if(['filBaseWidth','filBaseHeight','filBaseCurve','filRibbon'].includes(key)&&!(s.filWidth>.02))return 'Aumenta lo spessore dei filamenti per distinguere il profilo.';
  if(key.startsWith('finishPrint')&&(!s.finishFeedback||!s.finishFeedbackLumen))return 'Attiva Persistenza e aumenta Impronte luminose.';
  if(key.startsWith('finishPrint')&&key!=='finishPrintLife'&&s.finishPrintLife<=0)return 'Imposta Dimezzamento della luce sopra zero.';
  if(key.startsWith('finishFeedback')&&key!=='finishFeedback'&&!s.finishFeedback)return 'Attiva la persistenza dei fotogrammi in Filtri.';
@@ -271,7 +293,6 @@ export function controlCondition(s,key){
  if(/^finishGlitch(Cycles|FlashMs|Duty|Softness|Rhythm|Scatter|Renew)$/.test(key)&&!s.finishGlitchAnimate)return 'Attiva l’animazione del glitch e premi Riproduci.';
  if(key==='environmentRefraction'&&!positive('transparency'))return 'Aumenta Trasparenza per vedere l’ambiente rifratto.';
  if(key==='environmentCycles'&&!s.environmentRotate)return 'Attiva Ruota ambiente e premi Riproduci.';
- if(key==='refraction'&&s.engine==='particles'&&(!positive('transparency')||!positive('pCaustic')))return 'Aumenta Trasparenza e Caustiche: nelle particelle questo indice regola la caustica.';
  if(key.startsWith('fil')&&!key.startsWith('film')&&key!=='filLength'&&!positive('filLength'))return 'Aggiungi filamenti aumentando Lunghezza in Forma.';
  if(key.startsWith('filBranch')&&key!=='filBranchAmount'&&!positive('filBranchAmount'))return 'Aumenta Quota di filamenti ramificati.';
  if(key==='filPhase')return need('filWind','Aumenta Ampiezza di oscillazione delle punte sopra zero.');
@@ -281,7 +302,10 @@ export function controlCondition(s,key){
  return '';
 }
 export function controlHelp(key,engine){
- if(engine==='particles'&&key==='refraction')return 'Indice usato dalle caustiche delle particelle trasparenti. Richiede Trasparenza e Caustiche sopra zero e una materia non completamente metallica. Non rifrange lo sfondo come un solido di vetro.';
+ if(key==='grainSource')return 'Dal corpo distribuisce i granelli sulla geometria scelta. Nuvola orbitale usa una propria distribuzione controllata da orbite e campi.';
+ if(key==='sceneGrains')return 'Trasforma la stessa scena. A zero vedi la superficie, a uno i granelli. Nel mezzo i due strati condividono forma, luci, colori e tempo.';
+ if(key==='grainDispersal')return 'A zero i granelli seguono il corpo. Aumenta il distacco per rendere visibili correnti, orbite e deviazioni del moto locale.';
+ if(key==='refraction')return 'Indice del materiale. Regola la deviazione della luce nella superficie e la concentrazione delle caustiche sui granelli trasparenti.';
  if(engine==='solid'&&key==='guide.strength')return 'Intensità della deformazione lungo la curva. Attrazione richiama la superficie; repulsione la allontana. A 3, la repulsione svuota il tubo definito dal raggio.';
  if(engine==='solid'&&key==='guide.radius')return 'Raggio del tubo 3D che circonda la curva. Regola la zona di superficie influenzata, anche in profondità.';
  if(EXTRA_HELP[key])return EXTRA_HELP[key];

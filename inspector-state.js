@@ -1,4 +1,6 @@
-import {controlCondition} from './control-help.js?v=34287eff19e2';
+import {controlCondition} from './control-help.js?v=ddff107e99e1';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=ddff107e99e1';
+import {syncMaterialControl} from './studio-model.js?v=ddff107e99e1';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pCloudCore','pCloudHalo','pCellAmount','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
@@ -33,12 +35,12 @@ const EFFECTS=[
  ['filLength','Filamenti su superficie'],['petalAmount','Petali e radici'],['stemAmount','Gambo'],['hole','Foro'],['cut','Ritaglio'],['lobeAmount','Lobi e onde','waves'],
  ['structCoreDark','Nucleo scuro'],['colorLayers','Strati di colore'],['textureDepth','Rilievo di superficie'],['growthAmount','Reazione-diffusione'],['iridescence','Iridescenza'],['colorWaveAmount','Onde di colore'],
  ['finishFeedback','Persistenza'],['finishScan','Linee modulate'],['finishWarp','Distorsione ricorsiva'],['finishGlass','Vetro ottico'],['finishGlitch','Glitch'],['finishGlyph','Segni e caratteri'],['finishEdge','Contorni'],['finishMosaic','Mosaico'],['finishRgb','Separazione dei colori'],
- ['pSelfShadow','Ombre reciproche'],['pCaustic','Caustica'],['pShadow','Ombra sul piano'],['pLiving','Pelle'],['pLinks','Fili'],['pTrailCount','Scie'],['pTentacle','Tentacoli del nucleo'],['pOuter','Fasci esterni']
+ ['sceneGrains','Granelli'],['pSelfShadow','Ombre reciproche'],['pCaustic','Caustica'],['pShadow','Ombra sul piano'],['pLiving','Pelle'],['pLinks','Fili'],['pTrailCount','Scie'],['pTentacle','Tentacoli del nucleo'],['pOuter','Fasci esterni']
 ];
 const active=v=>typeof v==='boolean'?v:typeof v==='number'&&Math.abs(v)>1e-7;
 const equal=(a,b)=>typeof a==='number'&&typeof b==='number'?Math.abs(a-b)<1e-7:a===b;
-function at(s,path){let v=s;for(const part of path.split('.'))v=Array.isArray(v)?v.find(x=>String(x.id)===part):v?.[part];return v;}
-function assign(s,path,value){const parts=path.split('.'),key=parts.pop(),parent=parts.length?at(s,parts.join('.')):s;if(parent)parent[key]=value;}
+function at(s,path){if(path==='sceneGrains')return grainMix(s);let v=s;for(const part of path.split('.'))v=Array.isArray(v)?v.find(x=>String(x.id)===part):v?.[part];return v;}
+function assign(s,path,value){const parts=path.split('.'),key=parts.pop(),parent=parts.length?at(s,parts.join('.')):s;if(parent){parent[key]=value;if(parent===s)syncMaterialControl(s,key);}}
 function reveal(target){document.getElementById('controls').classList.remove('only-changed');const toggle=document.getElementById('controls-changed');if(toggle)toggle.setAttribute('aria-pressed','false');let d=target.closest('details');while(d){d.open=true;d=d.parentElement.closest('details');}target.scrollIntoView({block:'center',behavior:'smooth'});target.focus({preventScroll:true});}
 export function decorateInspector({root,state,baseline,tab,edit}){
  const rangeRows=[];
@@ -47,7 +49,8 @@ export function decorateInspector({root,state,baseline,tab,edit}){
   const label=host.querySelector('label')?.textContent||key;
   const reset=document.createElement('button');reset.type='button';reset.className='parameter-reset';reset.textContent='↶';reset.title=`Ripristina ${label}: ${base}`;reset.setAttribute('aria-label',reset.title);
   reset.onclick=()=>edit(s=>assign(s,key,base),'Parametro ripristinato');host.querySelector('.param-line')?.append(reset);
-  rangeRows.push({host,el,key,base,reset});
+  const note=document.createElement('small');note.className='condition-note';note.hidden=true;host.append(note);
+  rangeRows.push({host,el,key,base,reset,note});
  }
  const flags=[...root.querySelectorAll('[data-check],[data-path-check],[data-particle-select],[data-path-select],[data-finish-select]')].map(el=>({el,key:el.dataset.check||el.dataset.pathCheck||el.dataset.particleSelect||el.dataset.pathSelect||el.dataset.finishSelect,host:el.closest('.check,.field')})).filter(r=>r.host&&at(baseline,r.key)!==undefined);
  const toolbar=document.createElement('div');toolbar.className='inspector-overview';
@@ -55,13 +58,31 @@ export function decorateInspector({root,state,baseline,tab,edit}){
  const heading=document.createElement('div');heading.className='overview-heading';heading.innerHTML='<strong>In uso</strong>';
  const toggle=document.createElement('button');toggle.type='button';toggle.id='controls-changed';toggle.className='quiet';toggle.textContent='Mostra modificati';toggle.setAttribute('aria-pressed',String(root.classList.contains('only-changed')));toggle.onclick=()=>{const on=root.classList.toggle('only-changed');toggle.setAttribute('aria-pressed',String(on));refresh();if(on)for(const d of root.querySelectorAll('details.has-changes'))d.open=true;};heading.append(toggle);toolbar.append(heading);
  const hint=document.createElement('p');hint.className='help';hint.textContent='Modificati: valori diversi da quelli iniziali.';toolbar.append(hint);
- const select=document.createElement('select');select.setAttribute('aria-label','Vai a una sezione');select.innerHTML='<option value="">Vai a una sezione…</option>';
- const sections=[...root.querySelectorAll(':scope > details')];sections.forEach((d,i)=>{const opt=document.createElement('option');opt.value=i;opt.textContent=[...d.querySelector('summary').childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();select.append(opt);});select.onchange=()=>{if(select.value!==''){reveal(sections[+select.value].querySelector('summary'));select.value='';}};toolbar.append(select);
+ const sections=[...root.querySelectorAll(':scope > details')];
+ const jumpBar=document.createElement('nav');jumpBar.className='section-jumps';jumpBar.setAttribute('aria-label','Sezioni della scheda');
+ const jumps=sections.map(section=>{
+  const summary=section.querySelector(':scope > summary');
+  if(!summary)return null;
+  const jump=document.createElement('button');jump.type='button';
+  jump.textContent=[...summary.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim()||summary.textContent;
+  jump.onclick=()=>{section.open=true;root.scrollTo({top:root.scrollTop+summary.getBoundingClientRect().top-jumpBar.getBoundingClientRect().bottom-5,behavior:'smooth'});};
+  jumpBar.append(jump);
+  return {jump,section,summary};
+ }).filter(Boolean);
+ function currentSection(){
+  const top=jumpBar.getBoundingClientRect().bottom+14;
+  const current=jumps.findLastIndex(r=>r.summary.getBoundingClientRect().top<=top);
+  jumps.forEach(({jump},i)=>jump.setAttribute('aria-current',i===Math.max(current,0)?'location':'false'));
+ }
+ root.onscroll=jumps.length?currentSection:null;
  const activeList=document.createElement('div');activeList.className='active-effect-list';toolbar.append(activeList);
  const activeMenu=document.createElement('details');activeMenu.className='overview-active';const activeSummary=document.createElement('summary');activeSummary.textContent='Effetti attivi';activeMenu.append(activeSummary,activeList);
  const visibility=document.createElement('div');visibility.className='section-visibility';const showActive=document.createElement('button');showActive.type='button';showActive.className='quiet';showActive.textContent='Apri attivi';showActive.id='sections-active';showActive.onclick=()=>{for(const d of sections){d.open=!!d.querySelector('.effect-status[data-on=true]');if(d.open)for(const child of d.querySelectorAll('details'))child.open=!!child.querySelector('.effect-status[data-on=true]');}};visibility.append(showActive);
- heading.replaceChildren(activeMenu,toggle);toolbar.replaceChildren(heading,select,visibility);if(['fields','body','audio'].includes(tab)){heading.hidden=true;showActive.hidden=true;}
- root.prepend(toolbar);
+ heading.replaceChildren(activeMenu,toggle);toolbar.replaceChildren(heading,visibility);if(['fields','body','audio'].includes(tab)){heading.hidden=true;showActive.hidden=true;}
+ const firstLayer=tab==='shape'&&matchMedia('(max-width:700px)').matches?root.querySelector('[data-param=sceneGrains]')?.closest('details'):null;
+ if(firstLayer)firstLayer.after(toolbar,jumpBar);
+ else if(jumps.length>2)root.prepend(toolbar,jumpBar);
+ else root.prepend(toolbar);
  const records=[];
  const motionEffects=tab==='motion'?[['pTravel','Orbite delle particelle'],['pVortex','Vorticità'],['pCounterflow','Rotazione differenziale'],['pReentry','Rientro'],['pLife','Pulsazione'],['pBreath','Dilatazione'],['pRandom','Irregolarità del moto'],['pJitter','Microfluttuazioni'],['pWander','Deriva'],['pSpaceWarp','Distorsione spaziale'],['growthFlow','Scorrimento della trama'],['filmFlow','Scorrimento della pellicola'],['filmSwirl','Rotazione della pellicola'],['environmentRotate','Rotazione dei riflessi']]:[];
  for(const [key,label,...extra] of [...EFFECTS,...motionEffects]){
@@ -89,22 +110,37 @@ export function decorateInspector({root,state,baseline,tab,edit}){
    info.title=condition||'';
    const description=document.getElementById(info.getAttribute('aria-describedby'));if(description)description.textContent=info.dataset.helpText;
   }
-  for(const {host,el,key,base,reset} of rangeRows){const changed=!equal(at(state,key),base);host.classList.toggle('is-changed',changed);reset.disabled=!changed;reset.hidden=!changed;}
+  for(const {host,key,base,reset,note} of rangeRows){
+   const changed=!equal(at(state,key),base),condition=controlCondition(state,key);
+   host.classList.toggle('is-changed',changed);host.classList.toggle('condition-unmet',!!condition);
+   reset.disabled=!changed;reset.hidden=!changed;note.hidden=!condition;
+   if(note.textContent!==condition)note.textContent=condition;
+  }
   for(const r of flags)r.host.classList.toggle('is-changed',!equal(at(state,r.key),at(baseline,r.key)));
   for(const d of root.querySelectorAll('details')){
    const n=d.querySelectorAll('.is-changed').length;d.classList.toggle('has-changes',n>0);let badge=d.querySelector(':scope > summary > .change-count');if(!badge){badge=document.createElement('span');badge.className='change-count';d.querySelector(':scope > summary')?.append(badge);}badge.textContent=n?`${n} ${n===1?'modificato':'modificati'}`:'';badge.hidden=!n;
   }
   activeList.replaceChildren();
   for(const r of records){
-   const on=r.path?!!at(state,r.path):r.keys.some(k=>active(state[k])||state.motions?.[k]?.enabled)&&(!r.keys[0].startsWith('finish')||state.finishEnabled!==false&&(state[r.keys[0]+'Mix']??1)>0);r.on=on;
+   const on=r.path?!!at(state,r.path):r.keys.some(k=>active(at(state,k))||state.motions?.[k]?.enabled)&&(!/^p[A-Z]/.test(r.keys[0])||hasGrainLayer(state))&&(!r.keys[0].startsWith('finish')||state.finishEnabled!==false&&(state[r.keys[0]+'Mix']??1)>0);r.on=on;
    if(on){let d=r.el.closest('details');while(d){d.classList.add('has-changes');d=d.parentElement.closest('details');}const chip=document.createElement('span');chip.className='active-effect';const jump=document.createElement('button');jump.type='button';jump.textContent=r.label;jump.onclick=()=>r.el.matches('[data-animate-path]')?r.el.click():reveal(r.el);const off=document.createElement('button');off.type='button';off.textContent='Disattiva';off.setAttribute('aria-label','Disattiva '+r.label);off.onclick=()=>{if(r.path){edit(s=>assign(s,r.path,false),r.label+' disattivata');}else edit(s=>{for(const k of r.keys){s[k]=typeof s[k]==='boolean'?false:0;if(s.motions?.[k])s.motions[k].enabled=false;}},r.label+' disattivato');};chip.append(jump,off);activeList.append(chip);}
   }
   const omitted=(root.omittedControls||[]).filter(r=>!equal(at(state,r.key),at(baseline,r.key)));
   for(const r of omitted){const b=document.createElement('button');b.type='button';b.className='animation-link';b.dataset.revealOmitted=r.key;b.textContent=r.label+' · modificato';activeList.append(b);}
   if(!activeList.children.length){const empty=document.createElement('span');empty.className='help';empty.textContent='Nessun effetto con interruttore attivo in questa scheda.';activeList.append(empty);}
   for(const d of root.querySelectorAll('details')){const effects=records.filter(r=>d.contains(r.el));if(!effects.length)continue;let badge=d.querySelector(':scope > summary > .effect-status');if(!badge){badge=document.createElement('span');badge.className='effect-status';d.querySelector(':scope > summary').append(badge);}const on=effects.filter(r=>r.on).length;const onlyTracks=effects.every(r=>r.path);badge.textContent=on?(onlyTracks?(on+' animazioni'):(on===1?'Attivo':on+' attivi')):(onlyTracks?'':'Spento');badge.dataset.on=String(on>0);d.classList.toggle('effect-off',on===0);}
+  for(const {jump,section,summary} of jumps){
+   const isOn=!!summary.querySelector('.effect-status[data-on=true]')||summary.querySelector('[data-layer-toggle]')?.checked;
+   jump.classList.toggle('section-on',!!isOn);
+   let hint=summary.querySelector('.section-values');
+   if(!hint){hint=document.createElement('span');hint.className='section-values';summary.append(hint);}
+   const changed=rangeRows.filter(r=>section.contains(r.host)&&!equal(at(state,r.key),r.base));
+   const top=changed.filter(r=>r.host.closest('details')===section);
+   const values=(top.length?top:changed).slice(0,2);
+   hint.textContent=values.map(({key,host})=>(host.querySelector('label')?.textContent||'')+' '+Number(at(state,key)).toLocaleString('it-IT',{maximumFractionDigits:3})).join(' · ');
+  }
   const n=root.querySelectorAll('.is-changed').length+omitted.length;toggle.textContent=root.classList.contains('only-changed')?`Mostra tutti · ${n} modificati`:`Modificati (${n})`;toggle.title='Valori diversi dalla configurazione iniziale; non equivale a effetto attivo';
-  activeSummary.textContent='Effetti attivi ('+(records.filter(r=>r.on).length+omitted.length)+')';empty.hidden=n>0;for(const r of sectionResets)r.button.disabled=!r.d.querySelector('.is-changed');
+  activeSummary.textContent='Attivi ('+records.filter(r=>r.on).length+')';empty.hidden=n>0;for(const r of sectionResets)r.button.disabled=!r.d.querySelector('.is-changed');
   activeList.hidden=false;if(!records.length&&!omitted.length){activeSummary.textContent='Effetti attivi (0)';activeList.hidden=true;}
  }
  refresh();return {refresh};

@@ -1,22 +1,54 @@
-import {dynamicsPanel} from './dynamics-panel.js?v=34287eff19e2';
-import {motionPeriod} from './animation-clock.js?v=34287eff19e2';
-import {GROWTH_STUDIES} from './growth-material.js?v=34287eff19e2';
-import {GLYPH_FONTS} from './finishing.js?v=34287eff19e2';
-import {BASE_FORMS} from './base-forms.js?v=34287eff19e2';
-import {structurePanel,STRUCTURE_TRACKS} from './structure-model.js?v=34287eff19e2';
-import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=34287eff19e2';
-import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=34287eff19e2';
-import {finishingOrderPanel} from './finishing-order.js?v=34287eff19e2';
-import {rootMotionSuspended} from './solid-renderer.js?v=34287eff19e2';
-import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=34287eff19e2';
-import {MOODS} from './model.js?v=34287eff19e2';
-import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=34287eff19e2';
+import {dynamicsPanel} from './dynamics-panel.js?v=ddff107e99e1';
+import {motionPeriod} from './animation-clock.js?v=ddff107e99e1';
+import {GROWTH_STUDIES} from './growth-material.js?v=ddff107e99e1';
+import {GLYPH_FONTS} from './finishing.js?v=ddff107e99e1';
+import {BASE_FORMS} from './base-forms.js?v=ddff107e99e1';
+import {structurePanel,STRUCTURE_TRACKS} from './structure-model.js?v=ddff107e99e1';
+import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=ddff107e99e1';
+import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=ddff107e99e1';
+import {finishingOrderPanel} from './finishing-order.js?v=ddff107e99e1';
+import {rootMotionSuspended} from './solid-renderer.js?v=ddff107e99e1';
+import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=ddff107e99e1';
+import {MOODS} from './model.js?v=ddff107e99e1';
+import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=ddff107e99e1';
 export function pathValue(s,path){const parts=path.split('.');let value=s;for(let i=0;i<parts.length;i++){if(i===1&&parts[0]==='lights')value=value.find(l=>l.id===Number(parts[i]));else value=value?.[parts[i]];}return value}
 export function pathMeta(path,state){const parts=path.split('.'),last=parts.at(-1);if(last==='cycles')return state?.perfectLoop===false?['Ripetizioni nel ciclo',.1,8,.1]:['Ripetizioni nel loop',1,8,1];if(last==='pace')return['Accelerazione / decelerazione',0,.95,.01];if(last==='pacePhase')return['Punto di massima velocità',0,360,1];if(last==='hold')return['Pausa a ogni giro',0,.8,.01];if(last==='phase')return['Fase di partenza',0,360,1];if(last==='amplitude'){if(parts[0]==='motions'){const m=TRACK_META[parts[1]];return ['Ampiezza',m[1],m[2],m[3]]}return parts[2]==='orbit'?['Ampiezza orbita',0,180,1]:['Ampiezza pulsazione',0,1,.01]}return LIGHT_META[last]}
 export function writePath(s,path,value){const parts=path.split('.');let object=s;for(let i=0;i<parts.length-1;i++){if(i===1&&parts[0]==='lights')object=object.find(l=>l.id===Number(parts[i]));else object=object[parts[i]];}if(object)object[parts.at(-1)]=value}
-import {livingChooser} from './living-panel.js?v=34287eff19e2';
-import {particlePanel} from './particle-panel.js?v=34287eff19e2';
-export function buildPanel(tab,s,h,selectedLight){const content=s.engine==='particles'||s.pLiving>0?particlePanel(tab,s,h,sharedPanel,selectedLight):sharedPanel(tab,s,h,selectedLight);return content+(tab==='motion'?dynamicsPanel(s,h):'');}
+import {livingChooser} from './living-panel.js?v=ddff107e99e1';
+import {particlePanel} from './particle-panel.js?v=ddff107e99e1';
+function uniqueControls(primary,extra){
+ const main=document.createElement('div'),addition=document.createElement('div');
+ main.innerHTML=primary;addition.innerHTML=extra;
+ const attributes=['data-param','data-check','data-color','data-particle-select','data-finish-select','data-path-check','data-path','id'];
+ const keys=new Set();
+ for(const root of [main,addition]){
+  for(const el of root.querySelectorAll(attributes.map(a=>'['+a+']').join(','))){
+   if(el.tagName==='OUTPUT'||el.dataset.dynamicsPanel!==undefined)continue;
+   const attr=attributes.find(a=>el.hasAttribute(a)),value=el.getAttribute(attr),key=attr+':'+value;
+   if(keys.has(key)&&root===addition){
+    const row=el.closest('.param,.field,.check,.color-field');
+    if(row)row.remove();else el.remove();
+   }else keys.add(key);
+  }
+ }
+ for(const d of [...addition.querySelectorAll('details')].reverse())if(!d.querySelector('input,select,button,canvas,video'))d.remove();
+ for(const p of addition.querySelectorAll(':scope > p.help,:scope > p.control-intro'))p.remove();
+ return main.innerHTML+addition.innerHTML;
+}
+import {cloudBody,grainMix} from './body-layers.js?v=ddff107e99e1';
+export function buildPanel(tab,s,h,selectedLight){
+ const cloud=cloudBody(s),base=(id=tab)=>sharedPanel(id,s,h,selectedLight),particles=(id=tab)=>particlePanel(id,s,{...h,cloud,grainMix:grainMix(s)},sharedPanel,selectedLight);
+ if(tab==='shape'){
+  const layers=h.section('Strati',h.slider('sceneGrains',['Superficie','Granelli'])+
+    `<label class="field">Distribuzione dei granelli<select data-grain-source="true"><option value="body" ${cloud?'':'selected'}>Dal corpo</option><option value="cloud" ${cloud?'selected':''}>Nuvola orbitale</option></select></label>`);
+  return layers+(cloud?particles():base())+particles('grains')+particles('trails');
+ }
+ if(tab==='color')return particles();
+ if(tab==='material')return uniqueControls(base(),particles());
+ if(tab==='background'||tab==='light')return uniqueControls(base(),particles());
+ if(tab==='motion')return uniqueControls(base(),particles())+dynamicsPanel(s,h);
+ return base();
+}
 export function sharedPanel(tab,s,h,selectedLight){
  const {slider,section,details,colorField,check,icon}=h;
  if(tab==='fields')return (h.forcePanel?.()||'')+(h.guidePanel?.()||'');
@@ -37,7 +69,7 @@ export function sharedPanel(tab,s,h,selectedLight){
  if(tab==='veil-motion')return details('Esempi di movimento',`<div class="motion-presets">${MOTION_PRESETS.filter(([k])=>['turn','float','pulse'].includes(k)).map(([k,n])=>`<button data-motion-preset="${k}">${n}</button>`).join('')}</div>`)+section('Transizione','<button class="outline full" data-veil-loop="true">Anima forma → veli → forma</button><p class="help">Un ciclo completo nella durata del loop. Gli altri movimenti restano attivi.</p>')+details('Animazione',trackPanel('motions.pVeilMorph','Forma → veli → forma')+trackPanel('motions.pVeilSpread','Apertura degli strati')+trackPanel('motions.pVeilStyle','Fra petali, aureola e ventaglio'))+details('Movimenti comuni',['rotateX','rotateY','rotateZ','scale','volume','deform','twist','waves','gradientOffset','colorWavePhase'].map(k=>trackPanel('motions.'+k,TRACK_META[k][0],k.startsWith('rotate'),k==='gradientOffset'||k==='colorWavePhase')).join('')+slider('motion'));
  if(tab==='particle-motion')return details('Gruppi',check('animateRotation','Rotazione completa')+check('animateShape','Forma e volume')+check('animateColor','Scorrimento dei colori')+check('animateLight','Orbita di tutte le luci'))+details('Esempi di movimento',`<div class="motion-presets">${MOTION_PRESETS.filter(([k])=>['turn','float','pulse','chromatic','reflect','film','orbit'].includes(k)).map(([k,n])=>`<button class="mood" data-motion-preset="${k}">${n}</button>`).join('')}</div>`)+details('Posizione',['positionX','positionY'].map(k=>trackPanel('motions.'+k,TRACK_META[k][0])).join(''))+details('Moto delle cellule',['pCellAmount','pCellAspect','pCellRelief','pCellLight'].map(k=>trackPanel('motions.'+k,TRACK_META[k][0])).join(''))+details('Rotazioni, colori e luci',['rotateX','rotateY','rotateZ'].map(k=>trackPanel('motions.'+k,TRACK_META[k][0],true)).join('')+['gradientOffset','colorWavePhase','iridescence','roughness','transparency','scale','volume','deform','twist','waves'].map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='gradientOffset'||k==='colorWavePhase')).join('')+slider('motion')+check('environmentRotate','Ruota ambiente')+slider('environmentCycles'))+details('Luci',s.lights.map((l,i)=>trackPanel(`lights.${l.id}.orbit`,`Luce ${i+1} · Orbita`,true)+trackPanel(`lights.${l.id}.pulse`,`Luce ${i+1} · Intensità`)).join(''))+'<p class="help">Attiva una traccia per animarla. I movimenti di particelle e fibre si dosano direttamente con i cursori: zero li ferma.</p>';
 
- if(tab==='shape')return section('Forma di base',`<div class="base-form-grid">${BASE_FORMS.map((name,i)=>`<button class="outline" ${i===0?'id="perfect-sphere"':''} data-base-form="${i}">${name}</button>`).join('')}</div><p class="help">Riparti da una geometria regolare. Azzera deformazioni e relative animazioni; conserva materia, colori, luci e filtri.</p>`+slider('volume',['Piatta','Volumetrica'])+slider('deform',['Regolare','Organica'])+slider('scale')+slider('edge',['Netto','Sfumato']))
+ if(tab==='shape')return section('Forma di base',`<div class="base-form-grid">${BASE_FORMS.map((name,i)=>`<button class="outline" ${i===0?'id="perfect-sphere"':''} data-base-form="${i}" aria-pressed="${i===s.baseForm}">${name}</button>`).join('')}</div><p class="help">Riparti da una geometria regolare. Azzera deformazioni e relative animazioni; conserva materia, colori, luci e filtri.</p>`+slider('volume',['Piatta','Volumetrica'])+slider('deform',['Regolare','Organica'])+slider('scale')+slider('edge',['Netto','Sfumato']))
   +details('Frattali 3D',`<div class="base-form-grid">${FRACTAL_FORMULAS.map((name,i)=>`<button class="outline" data-fractal-formula="${i}" aria-pressed="${i===s.fractalKind}">${name}</button>`).join('')}</div>`+slider('fractalAmount',['Forma di base','Frattale'])+slider('fractalLevels')+slider('fractalPower')+slider('fractalFold')+slider('fractalDetail')+'<div class="motion-shortcuts"><button data-jump-tab="motion">Anima il frattale</button></div>')
   +details('Cellule e spine',slider('cellMorph',['Forma di base','Sviluppo completo'])+slider('cellCore')
    +details('Cellule',['cellBubbles','cellCount','cellSize','cellSizeVariation','cellExposure','cellStretch'].map(k=>slider(k)).join(''))
@@ -75,7 +107,7 @@ export function sharedPanel(tab,s,h,selectedLight){
    +environment+presets
    +details('Animazione',trackPanel(prefix+'.orbit','Orbita',true)+trackPanel(prefix+'.pulse','Pulsazione di intensità'));
  }
- if(tab==='motion')return '<p class="control-intro">Scegli un movimento base o attiva una traccia. Premi Riproduci per vederlo; Velocità e Durata valgono per tutta la scena.</p><div class="motion-shortcuts"><button data-jump-tab="photo">Anima glitch e ASCII</button><button data-jump-tab="light">Configura luci</button></div>'+structurePanel(tab,s,h)+details('Curve toroidali e nodi',slider('loopPhase')+'<p class="help">Scorrimento sposta la variazione di spessore e la torsione lungo il percorso. Su un tubo uniforme non cambia la geometria.</p>'+Object.keys(STRUCTURE_TRACKS).filter(k=>k.startsWith('loop')).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='loopPhase')).join(''))+details('Filamenti su superficie','<p class="help">Aggiungi filamenti in Forma → Filamenti su superficie, poi regola qui scorrimento e vento. Per cambiare forma nel tempo attiva le singole tracce.</p>'+slider('filPhase')+slider('filWind')+Object.keys(STRUCTURE_TRACKS).filter(k=>k.startsWith('fil')).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='filPhase')).join(''))+details('Animazione',Object.keys(STRUCTURE_TRACKS).filter(k=>!k.startsWith('loop')&&!k.startsWith('fil')).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='structFlowPhase')).join(''))+section('Tempo',slider('speed')+slider('duration')+slider('motion')+check('perfectLoop','Loop continuo')+`<p class="help">Durata effettiva: <strong id="effective-duration">${(s.duration/s.speed).toFixed(1)} s</strong> (durata ÷ velocità).</p><p class="help">${s.perfectLoop!==false?'Ogni movimento completa un numero intero di cicli: l’ultimo istante torna al primo, senza salti.':'Le ripetizioni possono essere frazionarie. Alla ripartenza del ciclo forma, colori o luci possono cambiare bruscamente.'}</p>`)
+ if(tab==='motion')return details('Strati',trackPanel('motions.sceneGrains','Superficie ↔ granelli')+trackPanel('motions.grainDispersal','Distacco dal corpo'))+'<p class="control-intro">Scegli un movimento base o attiva una traccia. Premi Riproduci per vederlo; Velocità e Durata valgono per tutta la scena.</p><div class="motion-shortcuts"><button data-jump-tab="photo">Anima glitch e ASCII</button><button data-jump-tab="light">Configura luci</button></div>'+structurePanel(tab,s,h)+details('Curve toroidali e nodi',slider('loopPhase')+'<p class="help">Scorrimento sposta la variazione di spessore e la torsione lungo il percorso. Su un tubo uniforme non cambia la geometria.</p>'+Object.keys(STRUCTURE_TRACKS).filter(k=>k.startsWith('loop')).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='loopPhase')).join(''))+details('Filamenti su superficie','<p class="help">Aggiungi filamenti in Forma → Filamenti su superficie, poi regola qui scorrimento e vento. Per cambiare forma nel tempo attiva le singole tracce.</p>'+slider('filPhase')+slider('filWind')+Object.keys(STRUCTURE_TRACKS).filter(k=>k.startsWith('fil')).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='filPhase')).join(''))+details('Animazione',Object.keys(STRUCTURE_TRACKS).filter(k=>!k.startsWith('loop')&&!k.startsWith('fil')).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='structFlowPhase')).join(''))+section('Tempo',slider('speed')+slider('duration')+slider('motion')+check('perfectLoop','Loop continuo')+`<p class="help">Durata effettiva: <strong id="effective-duration">${(s.duration/s.speed).toFixed(1)} s</strong> (durata ÷ velocità).</p><p class="help">${s.perfectLoop!==false?'Ogni movimento completa un numero intero di cicli: l’ultimo istante torna al primo, senza salti.':'Le ripetizioni possono essere frazionarie. Alla ripartenza del ciclo forma, colori o luci possono cambiare bruscamente.'}</p>`)
   +details('Frattali 3D',Object.entries(FRACTAL_TRACKS).map(([k,[label]])=>trackPanel('motions.'+k,label)).join(''))
   +details('Cellule e spine','<button class="outline" data-cell-loop="true">Anima forma → cellule → forma</button>'
    +slider('cellBreath')+slider('cellFlex')+details('Posa',slider('cellBreathPhase')+slider('cellSpinePhase'))

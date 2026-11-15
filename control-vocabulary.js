@@ -46,7 +46,6 @@ export const ESSENTIAL_FLAGS=new Set(['animateRotation','animateShape','animateC
 export const ESSENTIAL_FIELDS=new Set(['dynObstacle','bg-mode','environment','glyph-characters','pSprite','pColorMode','pDirection','pShadowLight','finishGlitchShape']);
 export const ESSENTIAL_BUTTONS='#finish-save-preset,#finish-load-preset,#finish-brush-edit,#finish-brush-clear,[data-uniform-grains],[data-dynamics-reset],[data-base-form],[data-fractal-formula],#particle-sphere,#add-color,[data-remove-color],#add-light,[data-light-select],#show-lights,[data-remove-light],[data-animate-open],[data-animate-path],[data-animation-group],[data-parameter-jump],[data-open-library],[data-motion-preset],[data-jump-tab],#add-animation';
 export function essentialKeys(engine,tab){
- const engines=tab==='shape'?[engine==='particles'?'particles':'solid']:['solid','particles'];
- return new Set(engines.flatMap(e=>Object.values(ESSENTIALS[e]?.[tab]||{}).flat()));
+ return new Set(['sceneGrains','grainDispersal',...['solid','particles'].flatMap(e=>Object.values(ESSENTIALS[e]?.[tab]||{}).flat())]);
 }
 

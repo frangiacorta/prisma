@@ -1,15 +1,16 @@
-import {onlineDirector,DIRECTOR_ONLINE_URL} from './director-connection.js?v=34287eff19e2';
-import {PlaygroundDirector} from './playground-director.js?v=34287eff19e2';
-import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=34287eff19e2';
-import {familyName,presetFamily} from './preset-families.js?v=34287eff19e2';
-import {closeLivingSkin} from './living-panel.js?v=34287eff19e2';
-import {PlaygroundEngine} from './playground-engine.js?v=34287eff19e2';
-import {PlaygroundInputs} from './playground-inputs.js?v=34287eff19e2';
-import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=34287eff19e2';
-import {particleCreation} from './particle-model.js?v=34287eff19e2';
-import {readPreset} from './preset-files.js?v=34287eff19e2';
-import {controlHelp,controlCondition} from './control-help.js?v=34287eff19e2';
-import {normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=34287eff19e2';
+import {onlineDirector,DIRECTOR_ONLINE_URL} from './director-connection.js?v=ddff107e99e1';
+import {PlaygroundDirector} from './playground-director.js?v=ddff107e99e1';
+import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=ddff107e99e1';
+import {familyName,presetFamily} from './preset-families.js?v=ddff107e99e1';
+import {closeLivingSkin} from './living-panel.js?v=ddff107e99e1';
+import {PlaygroundEngine} from './playground-engine.js?v=ddff107e99e1';
+import {PlaygroundInputs} from './playground-inputs.js?v=ddff107e99e1';
+import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=ddff107e99e1';
+import {particleCreation} from './particle-model.js?v=ddff107e99e1';
+import {readPreset} from './preset-files.js?v=ddff107e99e1';
+import {controlHelp,controlCondition} from './control-help.js?v=ddff107e99e1';
+import {MUTATIONS} from './playground-performance.js?v=ddff107e99e1';
+import {LIVE_FILTERS,LIVE_BUSES,normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=ddff107e99e1';
 
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
 const button=(text,fn,cls='outline')=>{const b=el('button',cls,text);b.type='button';b.onclick=fn;return b;};
@@ -19,21 +20,27 @@ const numeric=(value,min,max,step,fn)=>{const n=el('input');n.type='number';n.mi
 const select=(list,value,fn)=>{const s=options(el('select'),list,value);s.onchange=()=>fn(s.value);return s;};
 
 export function mountPlayground(api){
+ let fxBus='output';
  let active=false,opening=false,config,engine,inputs,director,saveTimer,syncTimer,entry,activeMacro=0,targetKey='mix',focusedDeck='A';
  const controlNodes=new Map(),deckNodes={};
  const shell=el('section','pg-shell');shell.id='playground';shell.hidden=true;shell.setAttribute('aria-label','Playground · due scene vive');
  const header=el('header','pg-header'),title=el('strong','','Playground'),status=el('p','pg-status',''),stage=el('div','pg-stage');let canvas=el('canvas');canvas.id='playground-output';canvas.setAttribute('aria-label','Mix delle scene A e B');
  const consolePanel=el('div','pg-console'),top=el('div','pg-decks'),mixPanel=el('section','pg-mix'),macrosPanel=el('section','pg-macros'),details=el('div','pg-details');
+ const effectsPanel=el('details','pg-effects'),modulationPanel=el('details','pg-modulators');
  const flowPanel=el('section','pg-flow-panel');consolePanel.prepend(flowPanel);
  const mapDialog=el('dialog','pg-dialog'),macroDialog=el('dialog','pg-dialog'),parameterDialog=el('dialog','pg-dialog');
  const fullscreen=async()=>{try{if(document.fullscreenElement===shell)await document.exitFullscreen();else await shell.requestFullscreen();}catch{message('Schermo intero non disponibile in questo browser.');}};
  const flowMode=button('Flow',()=>{director?.stop();engine.flow.start();render();changed();}),manualMode=button('Manuale',()=>{director?.stop();engine.flow.stop();render();changed();});flowMode.dataset.pgMode='flow';manualMode.dataset.pgMode='manual';
- const directorButton=button('Regia AI',()=>{directorPanel.hidden=false;if(director?.running)director.stop();else director?.start();});directorButton.id='director-toggle';
- header.append(title,manualMode,flowMode,directorButton,button('Salva progetto',()=>{persist();api.exportProject();}),button('Collega controlli',()=>openMapping(config.flow.enabled?'flow.speed':'mix')),button('Schermo intero',fullscreen),button('Solo scena',()=>shell.classList.toggle('pg-clean')),button('Torna all’editor',()=>close()));
- stage.append(canvas,button('Controlli',()=>shell.classList.remove('pg-clean'),'pg-reveal'));shell.append(header,stage,status,consolePanel,mapDialog,macroDialog,parameterDialog);consolePanel.append(top,mixPanel,macrosPanel,details);document.body.append(shell);
+ const directorButton=button('Regia AI',()=>{if(director?.running){director.stop();return;}directorPanel.hidden=!directorPanel.hidden;if(!directorPanel.hidden)brief.focus();});directorButton.id='director-toggle';
+ const more=el('details','pg-menu'),morePanel=el('div','pg-menu-items');more.append(el('summary','','Menu'),morePanel);
+ morePanel.append(directorButton,button('Salva progetto',()=>{persist();api.exportProject();}),button('Collega controlli',()=>openMapping(config.flow.enabled?'flow.speed':'mix')),button('Schermo intero',fullscreen),button('Solo scena',()=>shell.classList.toggle('pg-clean')),button('Torna all’editor',()=>close()));
+ const compactMenu=matchMedia('(max-width:700px)');const menuLayout=()=>more.open=!compactMenu.matches;
+ menuLayout();compactMenu.addEventListener('change',menuLayout);morePanel.addEventListener('click',()=>{if(compactMenu.matches)more.open=false;});
+ header.append(title,manualMode,flowMode,more);
+ stage.append(canvas,button('Controlli',()=>shell.classList.remove('pg-clean'),'pg-reveal'));shell.append(header,stage,status,consolePanel,mapDialog,macroDialog,parameterDialog);consolePanel.append(mixPanel,macrosPanel,top,effectsPanel,modulationPanel,details);document.body.append(shell);
  const directorPanel=el('section','pg-director-panel');directorPanel.hidden=true;consolePanel.prepend(directorPanel);
  const directorText=el('p','pg-help','Premi Regia AI per affidare le scene a Codex. Puoi riprendere il controllo in ogni momento.'),brief=el('textarea'),directorLog=el('details');directorText.setAttribute('role','status');brief.rows=3;brief.maxLength=4000;brief.placeholder='Carta bianca, oppure una direzione: più liquido, resta su questi colori…';brief.setAttribute('aria-label','Direzione della regia AI');brief.oninput=()=>{if(config){config.director.brief=brief.value;changed();}};
- const steer=button('Invia direzione',()=>{if(director?.running)director.stop('Cambio direzione…');director?.start();});
+ const steer=button('Avvia regia',()=>{if(director?.running)director.stop('Cambio direzione…');director?.start();});
  const cloud=button('Apri questa sessione online',()=>{const snapshot=api.getSnapshot();snapshot.state={...snapshot.state,playground:engine.snapshot()};const data=JSON.stringify(snapshot);if(data.length>350000)return message('Salva il progetto e importalo nella Regia online: la sessione è troppo grande per il trasferimento diretto.');window.open(DIRECTOR_ONLINE_URL+'studio/index.html?playground=1&engine='+snapshot.state.engine+'#prisma-assistant='+encodeURIComponent(data),'_blank','noopener');});cloud.hidden=onlineDirector();
  const consumption=el('p','pg-help');consumption.setAttribute('role','status');
  const pc=button('Apri questa sessione sul PC',()=>{const snapshot=api.getSnapshot();snapshot.state={...snapshot.state,playground:engine.snapshot()};const data=JSON.stringify(snapshot);if(data.length>350000)return message('Salva il progetto e importalo in Prisma sul PC: questa sessione è troppo grande per il trasferimento diretto.');window.open('http://127.0.0.1:8242/?playground=1&engine='+snapshot.state.engine+'#prisma-assistant='+encodeURIComponent(data),'_blank','noopener');});pc.hidden=onlineDirector()||['localhost','127.0.0.1','[::1]'].includes(location.hostname);
@@ -43,6 +50,7 @@ export function mountPlayground(api){
  const takeover=button('Riprendi il controllo',()=>director?.stop(),'pg-director-takeover');takeover.hidden=true;stage.append(takeover);
  function directorUI(){if(!director)return;directorText.textContent=director.text||'Regia pronta';const u=director.usage;consumption.textContent=u?`${u.attempts}/${u.limit} tentativi · ${u.dayUsed}/${u.dayLimit} oggi · ${(u.inputTokens||0)+(u.outputTokens||0)} token`:'';directorButton.textContent=director.running?'Riprendi il controllo':'Regia AI';directorButton.setAttribute('aria-pressed',String(director.running));takeover.hidden=!director.running;shell.classList.toggle('pg-directed',director.running);directorLog.replaceChildren(el('summary','','Scelte della sessione'));for(const h of config?.director.history||[])directorLog.append(el('p','pg-help',h.intent));sync();}
  document.addEventListener('visibilitychange',()=>{if(document.hidden&&director?.running)director.stop('Regia sospesa: la scheda non è visibile. Premi Regia AI per riprendere.');});
+ document.addEventListener('keydown',e=>{if(active&&e.key==='Escape'&&shell.classList.contains('pg-clean')&&!shell.querySelector('dialog[open]')){shell.classList.remove('pg-clean');e.preventDefault();}});
  const opener=button('Playground',()=>open(),'outline');opener.id='playground-open';document.querySelector('.header-actions')?.prepend(opener);
  function message(text){status.textContent=text;}
  function persist(){if(!active||!engine)return;clearTimeout(saveTimer);api.save(engine.snapshot());}
@@ -63,6 +71,12 @@ export function mountPlayground(api){
   if(config.flow.enabled&&!['blackout','master'].includes(key))return null;
   if(key.startsWith('param:'))return parameterTarget(key);
   const value=(get,set)=>({kind:'value',get,set:v=>{set(clamp(v));changed();}}),action=fn=>({kind:'action',get:()=>0,set:v=>{if(v>.5)fn();changed();}});
+  if(['freeze','invert'].includes(key))return value(()=>+!!config[key],v=>config[key]=v>=.5);
+  if(key==='flash')return action(()=>engine.flashUntil=engine.clock+.32);
+  if(key==='rewind')return action(()=>{for(const id of ['A','B'])if(engine.decks[id]){engine.decks[id].phase=0;engine.refresh(id);}});
+  if(key.startsWith('fx.')){const [,bus,filter]=key.split('.');if(config.liveFx[bus]&&Object.hasOwn(config.liveFx[bus],filter))return value(()=>config.liveFx[bus][filter],v=>{config.liveFx[bus][filter]=v;if(bus!=='output')engine.refresh(bus);});}
+  if(key.startsWith('mutate.')){const [,id,kind]=key.split('.');return action(()=>engine.mutate(id,kind));}
+  if(key.startsWith('variant.')){const id=key.at(-1);return value(()=>engine.decks[id]?.mutation?.position||0,v=>engine.mutationPosition(id,v));}
   if(key==='mix')return value(()=>config.mix,v=>engine.mix(v));
   if(key==='blackout')return value(()=>+config.blackout,v=>config.blackout=v>=.5);
   if(key==='master')return value(()=>config.master,v=>config.master=v);
@@ -85,14 +99,69 @@ export function mountPlayground(api){
  function actionButton(name,key){const row=el('span','pg-action'),b=button(name,()=>touch(key,1));b.dataset.action=key;row.append(b,learnButton(key));return row;}
  function renderFlow(){
   flowPanel.replaceChildren(el('h2','','Flow'));const f=config.flow;
-  const description=el('p','pg-help','Forme, materiali e movimenti in evoluzione. Colori collegati tra le scene e passaggi radiali, torsioni o zoom. Varietà amplia le combinazioni; Manuale conserva il mix attuale.');flowPanel.append(description);
-  const choices=el('div','pg-grid');for(const [key,name,list]of [['mood','Mood',FLOW_MOODS],['colors','Palette',FLOW_COLORS],['engines','Scene',[['both','Forma e particelle'],['solid','Solo forma'],['particles','Solo particelle']]]]){const s=select(list,f[key],v=>{f[key]=v;changed();});s.dataset.control='flow.'+key;controlNodes.set('flow.'+key,{select:s});const box=el('div','pg-choice');box.append(field(name,s),learnButton('flow.'+key));choices.append(box);}flowPanel.append(choices);
+  const description=el('p','pg-help','Forme, materiali e movimenti in evoluzione. Colori collegati tra le scene e passaggi radiali, torsioni o zoom. Manuale ripristina le tue due scene.');flowPanel.append(description);
+  const choices=el('div','pg-grid');for(const [key,name,list]of [['mood','Mood',FLOW_MOODS],['colors','Palette',FLOW_COLORS],['engines','Scene',[['both','Forma e particelle'],['solid','Solo forma'],['particles','Solo particelle']]]]){const s=select(list,f[key],v=>{f[key]=v;changed();});s.dataset.control='flow.'+key;controlNodes.set('flow.'+key,{select:s});const box=el('div','pg-choice');box.append(field(name,s),learnButton('flow.'+key));choices.append(box);}flowPanel.append(choices);const seed=numeric(f.seed,0,4294967295,1,value=>{f.seed=value;f.step=0;changed();});flowPanel.append(field('Variante',seed),button('Nuova sequenza',()=>{f.seed=crypto.getRandomValues(new Uint32Array(1))[0];f.step=0;seed.value=f.seed;engine.flow.next();changed();}));
   const colors=el('div','pg-flow-colors');for(let i=0;i<3;i++){const c=el('input');c.type='color';c.dataset.flowColor=String(i);c.setAttribute('aria-label','Colore Flow '+(i+1));c.oninput=()=>{const previous=f.colors==='auto'?(engine.decks[config.mix<.5?'A':'B']?.state.palette||flowPalette(f)):flowPalette(f);f.palette=Array.from({length:3},(_,j)=>previous[j%previous.length]||'#ffffff');f.palette[i]=c.value;f.colors='custom';changed();};colors.append(c);}flowPanel.append(colors);
   flowPanel.append(slider('Velocità','flow.speed',.25,3,.05,v=>.25+v*2.75,v=>(v-.25)/2.75),slider('Intensità','flow.intensity'),slider('Varietà','flow.variety'));
   flowPanel.append(el('p','pg-help','Velocità regola movimento e durata dei passaggi. Intensità cambia deformazione e luminosità. Varietà cambia forme, materia e coreografie. Colori in evoluzione alterna le palette; le altre scelte mantengono i tuoi colori.'));const actions=el('div','pg-row'),pause=button('Mantieni scena',()=>{f.paused=!f.paused;if(!f.paused&&engine.flow.phase==='error')engine.flow.next();changed();});pause.dataset.flowPause='';const pauseGroup=el('span','pg-action');pauseGroup.append(pause,learnButton('flow.paused'));actions.append(pauseGroup,actionButton('Prossima scena','flow.next'));flowPanel.append(actions);const progress=el('p','pg-flow-status');progress.setAttribute('role','status');flowPanel.append(progress);
  }
+ function renderBank(id,d){
+  const panel=el('details','pg-bank'),summary=el('summary','','Banco scene '+id),grid=el('div','pg-bank-grid');
+  panel.append(summary,grid);
+  for(let i=0;i<8;i++){
+   const item=config.banks[id][i],cell=el('div','pg-slot'),load=button(item?item.name:String(i+1),()=>{if(item)loadScene(id,item);});
+   load.disabled=!item;load.setAttribute('aria-label',item?'Carica '+item.name+' in '+id:'Posizione '+(i+1)+' vuota');
+   if(item?.thumbnail){const img=el('img');img.src=item.thumbnail;img.alt='';load.prepend(img);}
+   const store=button('+',()=>{
+    if(!engine.decks[id])return;
+    const value=engine.deckSnapshot(id),small=el('canvas');small.width=144;small.height=81;
+    small.getContext('2d').drawImage(engine.decks[id].canvas,0,0,144,81);
+    config.banks[id][i]={...value,thumbnail:small.toDataURL('image/webp',.76)};
+    changed();const updated=renderBank(id,engine.decks[id]);panel.replaceWith(updated);updated.open=true;
+   });
+   store.setAttribute('aria-label','Conserva scena '+id+' nella posizione '+(i+1));cell.append(load,store);grid.append(cell);
+  }
+  return panel;
+ }
+ function renderEffects(){
+  effectsPanel.replaceChildren(el('summary','','Effetti e tasti'));
+  const transport=el('div','pg-row');
+  for(const [id,name] of [['blackout','Nero'],['freeze','Fermo'],['invert','Inverti'],['flash','Lampo'],['rewind','Riavvolgi']]){
+   const b=button(name,()=>{const t=target(id);if(t)t.set(t.kind==='action'?1:1-t.get());});b.dataset.performance=id;
+   const row=el('span','pg-action');row.append(b,learnButton(id));transport.append(row);
+  }
+  const bus=select(LIVE_BUSES,fxBus,value=>{fxBus=value;renderEffects();});effectsPanel.append(transport,field('Applica a',bus));
+  const grid=el('div','pg-effects-grid');
+  for(const [key,label] of LIVE_FILTERS){
+   const busId=fxBus,path='fx.'+busId+'.'+key,level=config.liveFx[busId][key],cell=el('div','pg-effect'),press=button(label,()=>touch(path,level>0?0:.7));
+   press.dataset.effect=path;press.setAttribute('aria-pressed',String(level>0));
+   press.onclick=()=>{const t=target(path);if(t)touch(path,t.get()>0?0:.7);};
+   const amount=numeric(level,0,1,.01,value=>touch(path,value));amount.setAttribute('aria-label',label+' · quantità');
+   controlNodes.set(path,{num:amount,read:v=>v});
+   const hit=button('Tieni',()=>{});hit.setAttribute('aria-label','Tieni '+label);
+   const down=()=>engine?.setHeldFx(busId,key,Math.max(.5,target(path)?.get()||0)),up=()=>engine?.setHeldFx(busId,key,0);
+   hit.onpointerdown=e=>{hit.setPointerCapture(e.pointerId);down();};
+   hit.onpointerup=hit.onpointercancel=hit.onlostpointercapture=up;
+   hit.onkeydown=e=>{if(e.code==='Space'||e.code==='Enter'){e.preventDefault();down();}};
+   hit.onkeyup=e=>{if(e.code==='Space'||e.code==='Enter'){e.preventDefault();up();}};hit.onblur=up;
+   cell.append(press,amount,hit,learnButton(path));grid.append(cell);
+  }
+  effectsPanel.append(grid);
+ }
+ function renderModulations(){
+  modulationPanel.replaceChildren(el('summary','','Modulatori'));
+  const destinations=[['mix','Mix A / B'],['master','Livello uscita'],...config.macros.map((m,i)=>['macro:'+i,m.name]),...LIVE_BUSES.flatMap(([bus,label])=>LIVE_FILTERS.map(([id,name])=>['fx.'+bus+'.'+id,name+' · '+label]))];
+  for(const [i,m] of config.modulations.entries()){
+   const row=el('div','pg-modulation');
+   row.append(field('Sorgente '+(i+1),select([['off','Spenta'],['sine','Sinusoide'],['triangle','Triangolare'],['beat','Battito'],['x','Pad X'],['y','Pad Y']],m.source,value=>{m.source=value;changed();})),
+    field('Destinazione',select(destinations,m.target,value=>{m.target=value;changed();})),
+    field('Intensità',numeric(m.depth,0,1,.01,value=>{m.depth=value;changed();})),
+    field('Frequenza · Hz',numeric(m.rate,.03,4,.01,value=>{m.rate=value;changed();})));
+   modulationPanel.append(row);
+  }
+ }
  function render(){
-  controlNodes.clear();renderFlow();top.replaceChildren();
+  controlNodes.clear();renderFlow();renderEffects();renderModulations();top.replaceChildren();
   for(const id of ['A','B']){
    const d=engine.decks[id],card=el('section','pg-deck'),head=el('div','pg-deck-head'),name=el('input'),state=el('small');name.type='text';name.maxLength=80;name.value=d?.name||config.decks[id].name;name.setAttribute('aria-label','Nome scena '+id);name.onchange=()=>{if(engine.decks[id])engine.decks[id].name=name.value;config.decks[id].name=name.value;changed();};head.append(el('strong','pg-letter',id),name,state);card.append(head);
    const preview=deckNodes[id]?.preview||el('canvas','pg-preview');if(preview.width!==320||preview.height!==180){preview.width=320;preview.height=180;}preview.setAttribute('aria-label','Anteprima scena '+id);card.append(preview);deckNodes[id]={card,state,preview,name};
@@ -101,11 +170,15 @@ export function mountPlayground(api){
    const sources=el('details','pg-source'),summary=el('summary','','Carica scena');sources.append(summary);
    sources.append(button('Scena dell’editor',()=>loadScene(id,entry)),button('Copia '+(id==='A'?'B':'A'),()=>{const other=engine.decks[id==='A'?'B':'A'];if(other)loadScene(id,{...other,state:sceneOnly(other.state)});}),button('Sfera semplice',()=>loadScene(id,{state:newCreation(),name:'Sfera semplice',phase:0})),button('Particelle',()=>loadScene(id,{state:particleCreation(newCreation()),name:'Particelle',phase:0})));
    const file=el('input');file.type='file';file.accept='.json,application/json';file.hidden=true;file.onchange=async()=>{const f=file.files[0];if(!f)return;try{if(f.size>2e6)throw Error('Il progetto deve essere inferiore a 2 MB.');const q=readPreset(await f.text(),f.name);await loadScene(id,q);}catch(e){message(e.message);}file.value='';};sources.append(button('Importa progetto JSON',()=>file.click()),file);
-   const saved=[...(api.favorites?.()||[])].sort((a,b)=>(familyName(presetFamily(a.state))+' '+a.name).localeCompare(familyName(presetFamily(b.state))+' '+b.name,'it'));if(saved.length){const s=select([['','Dai preset salvati…'],...saved.map((x,i)=>[String(i),familyName(presetFamily(x.state))+' · '+(x.name||'Preset '+(i+1))])],'',v=>{if(v!=='')loadScene(id,saved[+v]);});sources.append(s);}card.append(sources);top.append(card);
+   const saved=[...(api.favorites?.()||[])].sort((a,b)=>(familyName(presetFamily(a.state))+' '+a.name).localeCompare(familyName(presetFamily(b.state))+' '+b.name,'it'));if(saved.length){const s=select([['','Dai preset salvati…'],...saved.map((x,i)=>[String(i),familyName(presetFamily(x.state))+' · '+(x.name||'Preset '+(i+1))])],'',v=>{if(v!=='')loadScene(id,saved[+v]);});sources.append(s);}card.append(sources,renderBank(id,d));
+   const change=el('details','pg-mutation'),variant=select(MUTATIONS,'grains',()=>{});
+   change.append(el('summary','','Varia scena'),field('Varia',variant),button('Avvia passaggio',()=>touch('mutate.'+id+'.'+variant.value,1)),slider('Inizio ↔ variante','variant.'+id));card.append(change);top.append(card);
   }
   mixPanel.replaceChildren(el('h2','','Mix A / B'));mixPanel.append(slider('Mix · A ← → B','mix',0,1,.001));
   const actions=el('div','pg-row');actions.append(actionButton('A subito','cut.A'),actionButton('Transizione verso A','take.A'),actionButton('Transizione verso B','take.B'),actionButton('B subito','cut.B'));mixPanel.append(actions);
-  const choices=el('div','pg-grid');choices.append(choice('Transizione','transition',[['fade','Dissolvenza'],['wipe','Tendina'],['luma','Luminanza di B'],['add','Somma luminosa'],['iris','Apertura radiale'],['swirl','Torsione'],['zoom','Zoom']]),choice('Direzione tendina','direction',[[0,'Da sinistra'],[1,'Dal basso'],[2,'Da destra'],[3,'Dall’alto']]),choice('Andamento','curve',[['linear','Lineare'],['smooth','Morbido'],['in','Accelera'],['out','Rallenta']]),choice('Durata in','unit',[['seconds','Secondi'],['beats','Battiti']]));mixPanel.append(choices,slider('Durata transizione','duration',.05,64,.05,v=>.05+v*63.95,v=>(v-.05)/63.95),slider('Tempo · BPM','bpm',30,300,1,v=>30+v*270,v=>(v-30)/270));
+  const types=[['fade','Dissolvenza'],['wipe','Tendina'],['luma','Luminanza'],['add','Somma'],['iris','Radiale'],['swirl','Torsione'],['zoom','Zoom']];
+  const pads=el('div','pg-transition-pads');for(const [i,[key,label]] of types.entries()){const b=button(label,()=>touch('transition',i/(types.length-1)));b.dataset.transitionPad=key;pads.append(b);}mixPanel.append(pads);
+  const choices=el('details','pg-transition-settings');choices.append(el('summary','','Direzione e ritmo'),choice('Direzione','direction',[[0,'Da sinistra'],[1,'Dal basso'],[2,'Da destra'],[3,'Dall’alto']]),choice('Andamento','curve',[['linear','Lineare'],['smooth','Morbido'],['in','Accelera'],['out','Rallenta']]),choice('Durata in','unit',[['seconds','Secondi'],['beats','Battiti']]),slider('Tempo · BPM','bpm',30,300,1,v=>30+v*270,v=>(v-30)/270));mixPanel.append(slider('Durata transizione','duration',.05,64,.05,v=>.05+v*63.95,v=>(v-.05)/63.95),choices);
   const quant=el('div','pg-row'),q=el('input');q.type='checkbox';q.onchange=()=>touch('quantize',+q.checked);controlNodes.set('quantize',{check:q});quant.append(field('Avvia sul prossimo battito',q),learnButton('quantize'),button('Tap tempo',tap));mixPanel.append(quant,slider('Livello uscita','master'));
   const black=button('Nero',()=>touch('blackout',config.blackout?0:1));black.dataset.blackout='';mixPanel.append(black,learnButton('blackout'),el('p','pg-help','La velocità delle scene è indipendente dalla transizione. Puoi invertire il passaggio o riprendere il mix a mano senza saltare. La luminanza segue le zone chiare della scena B.'));
   macrosPanel.replaceChildren(el('h2','','Macro'));const grid=el('div','pg-macro-grid');config.macros.forEach((m,i)=>{const c=el('section','pg-macro');c.append(slider(m.name,'macro:'+i),button(m.routes.length+' parametri · configura',()=>openMacro(i),'quiet'));grid.append(c);});macrosPanel.append(grid);
@@ -115,7 +188,9 @@ export function mountPlayground(api){
  }
  let taps=[];function tap(){const now=performance.now();if(now-(taps.at(-1)||0)>2200)taps=[];taps.push(now);taps=taps.slice(-5);if(taps.length>1){config.bpm=clamp(60000/((now-taps[0])/(taps.length-1)),30,300);changed();}}
  function drawPreview(id){const d=engine?.decks[id],n=deckNodes[id];if(!d||!n||d.renderer.completionSync||d.frames===n.frames)return;const now=performance.now();if(n.frames!==undefined&&now-(n.previewAt||0)<150)return;const ctx=n.preview.getContext('2d'),fit=Math.min(320/d.canvas.width,180/d.canvas.height),w=d.canvas.width*fit,h=d.canvas.height*fit;ctx.fillStyle='#000';ctx.fillRect(0,0,320,180);ctx.drawImage(d.canvas,(320-w)/2,(180-h)/2,w,h);n.frames=d.frames;n.previewAt=now;}
- function sync(){if(!active||!engine)return;for(const [key,n]of controlNodes){const t=target(key);if(!t)continue;if(n.range){const v=n.read(t.get());n.range.value=v;if(document.activeElement!==n.num)n.num.value=Number(v.toFixed(3));}if(n.select)n.select.value=String(key.startsWith('flow.')?config.flow[key.slice(5)]:config[key]);if(n.check)n.check.checked=!!config[key];}
+ function sync(){if(!active||!engine)return;for(const [key,n]of controlNodes){const t=target(key);if(!t)continue;if(n.range){const v=n.read(t.get());n.range.value=v;if(document.activeElement!==n.num)n.num.value=Number(v.toFixed(3));}if(n.select)n.select.value=String(key.startsWith('flow.')?config.flow[key.slice(5)]:config[key]);if(n.num&&!n.range&&document.activeElement!==n.num)n.num.value=n.read(t.get());if(n.check)n.check.checked=!!config[key];}
+  for(const b of shell.querySelectorAll('[data-transition-pad]'))b.setAttribute('aria-pressed',String(config.transition===b.dataset.transitionPad));
+  for(const b of shell.querySelectorAll('[data-effect],[data-performance]')){const t=target(b.dataset.effect||b.dataset.performance);if(t?.kind==='value')b.setAttribute('aria-pressed',String(t.get()>0));}
   for(const id of ['A','B']){const d=engine.decks[id],n=deckNodes[id];if(!n)continue;n.state.textContent=engine.pending[id]?'Preparo…':d?`${d.state.engine==='particles'?'Particelle':'Forma'} · ${d.playing?'in movimento':'in pausa'}`:'In attesa';const b=n.card.querySelector('[data-play]');if(b)b.textContent=d?.playing?'Pausa':'Riproduci';drawPreview(id);}
   shell.classList.toggle('pg-flow',config.flow.enabled);flowPanel.hidden=!config.flow.enabled;flowMode.setAttribute('aria-pressed',String(config.flow.enabled));manualMode.setAttribute('aria-pressed',String(!config.flow.enabled&&!director?.running));
   const f=config.flow,fs=engine.flow.status(),visibleDeck=engine.decks[config.mix<.5?'A':'B'];const note=flowPanel.querySelector('.pg-flow-status');if(note)note.textContent=fs.error||`${visibleDeck?.name||'Preparo le scene'} · ${f.paused?'cambi in pausa':({settle:'avvio',loading:'preparo la prossima',ready:'prossimo mix fra '+Math.ceil((1-fs.progress)*flowTiming(f).hold)+' s',transition:'mix in corso',hold:'nuova scena',idle:'manuale'})[fs.phase]||''}`;
@@ -123,7 +198,7 @@ export function mountPlayground(api){
   shell.querySelector('[data-blackout]')?.classList.toggle('active',config.blackout);for(const b of shell.querySelectorAll('[data-map]')){const assigned=config.bindings[b.dataset.map];b.textContent=assigned?bindingName(assigned.input):'Assegna';b.classList.toggle('assigned',!!assigned);}
  }
  function dialogHead(dialog,title){dialog.replaceChildren();const head=el('header','pg-dialog-head');head.append(el('h2','',title),button('Chiudi',()=>dialog.close()));dialog.append(head);}
- function catalogOptions(id,includeColors=true){const d=engine.decks[id];return (d?.catalog||[]).filter(x=>includeColors||x.kind!=='color').map(x=>[x.path,x.name+' · '+x.path]);}
+ function catalogOptions(id,includeColors=true){const d=engine.decks[id];return (d?.catalog||[]).filter(x=>includeColors||x.kind!=='color').map(x=>[x.path,x.name]);}
  function openParameters(id){focusedDeck=id;dialogHead(parameterDialog,'Parametri · scena '+id);const search=el('input');search.type='search';search.placeholder='Cerca forma, colore, luce, moto…';search.setAttribute('aria-label','Cerca parametri scena '+id);const list=el('div','pg-parameter-list'),group=select([['all','Tutti i gruppi'],['shape','Forma / particelle'],['material','Materiale'],['color','Colore'],['light','Luce'],['motion','Movimento'],['interaction','Dinamica e campi'],['filters','Filtri'],['photo','Correzione colore'],['background','Sfondo']], 'shape',()=>draw());parameterDialog.append(search,field('Gruppo',group),actionButton('Chiudi pelle','close.'+id),el('p','pg-help','Gli stessi parametri dell’editor. Gli interruttori attivano i moduli; poi puoi regolarli, assegnarli a un dispositivo o collegarli a una macro. Un parametro guidato anche da un’animazione conserva quella modulazione.'),button('Aggiungi rotazione continua',()=>{const d=engine.decks[id];if(d){motionPreset(d.state,'turn');d.catalog=parameterCatalogFor(d.state);engine.refresh(id);d.playing=true;changed();draw();}}),list);
   function draw(){list.replaceChildren();const query=search.value.toLocaleLowerCase();for(const p of engine.decks[id]?.catalog||[]){if(!query&&group.value!=='all'&&p.group!==group.value)continue;if(query&&!`${p.name} ${p.path}`.toLocaleLowerCase().includes(query))continue;const row=el('div','pg-param'),value=readParameter(engine.decks[id].state,p.path),key=`param:${id}:${p.path}`;let control;
     if(p.kind==='color'){control=el('input');control.type='color';control.value=value;control.oninput=()=>{engine.setParameter(id,p.path,control.value);changed();};}
@@ -145,7 +220,7 @@ export function mountPlayground(api){
  }
  function openMacroBody(){openMacro(activeMacro);}
  macroDialog.addEventListener('close',()=>{render();changed();});
- function mappingCatalog(){const fixed=[['flow.enabled','Modalità Flow'],['flow.mood','Flow · mood'],['flow.colors','Flow · palette'],['flow.speed','Flow · velocità'],['flow.intensity','Flow · intensità'],['flow.variety','Flow · varietà'],['flow.engines','Flow · scene'],['flow.paused','Flow · mantieni scena'],['flow.next','Flow · prossima scena'],['mix','Mix A/B'],['take.A','Transizione verso A'],['take.B','Transizione verso B'],['cut.A','A subito'],['cut.B','B subito'],['transition','Tipo transizione'],['direction','Direzione tendina'],['curve','Andamento'],['duration','Durata'],['unit','Secondi / battiti'],['bpm','BPM'],['quantize','Partenza sul battito'],['master','Livello uscita'],['blackout','Nero'],['close.A','Chiudi pelle A'],['close.B','Chiudi pelle B'],['play:A','Riproduzione A'],['play:B','Riproduzione B'],...config.macros.map((m,i)=>['macro:'+i,'Macro · '+m.name])];for(const id of ['A','B'])for(const [p,n]of catalogOptions(id,false))fixed.push([`param:${id}:${p}`,id+' · '+n]);return fixed;}
+ function mappingCatalog(){const fixed=[['flow.enabled','Modalità Flow'],['flow.mood','Flow · mood'],['flow.colors','Flow · palette'],['flow.speed','Flow · velocità'],['flow.intensity','Flow · intensità'],['flow.variety','Flow · varietà'],['flow.engines','Flow · scene'],['flow.paused','Flow · mantieni scena'],['flow.next','Flow · prossima scena'],['mix','Mix A/B'],['take.A','Transizione verso A'],['take.B','Transizione verso B'],['cut.A','A subito'],['cut.B','B subito'],['transition','Tipo transizione'],['direction','Direzione tendina'],['curve','Andamento'],['duration','Durata'],['unit','Secondi / battiti'],['bpm','BPM'],['quantize','Partenza sul battito'],['master','Livello uscita'],['blackout','Nero'],['close.A','Chiudi pelle A'],['close.B','Chiudi pelle B'],['play:A','Riproduzione A'],['play:B','Riproduzione B'],...config.macros.map((m,i)=>['macro:'+i,'Macro · '+m.name]),['freeze','Fermo'],['invert','Inverti'],['flash','Lampo'],['rewind','Riavvolgi'],...LIVE_BUSES.flatMap(([id,name])=>LIVE_FILTERS.map(([key,label])=>['fx.'+id+'.'+key,name+' · '+label])),...['A','B'].flatMap(id=>[['variant.'+id,'Inizio ↔ variante '+id],...MUTATIONS.map(([k,n])=>['mutate.'+id+'.'+k,'Varia '+id+' · '+n])])];for(const id of ['A','B'])for(const [p,n]of catalogOptions(id,false))fixed.push([`param:${id}:${p}`,id+' · '+n]);return fixed;}
  function openMapping(key){targetKey=key;dialogHead(mapDialog,'Assegna un controllo');const catalog=mappingCatalog().filter(([id])=>config.flow.enabled?id.startsWith('flow.')||['master','blackout'].includes(id):true),search=el('input');search.type='search';search.placeholder='Cerca un controllo…';search.setAttribute('aria-label','Cerca controllo da assegnare');const choose=select(catalog,key,v=>{targetKey=v;openMapping(v);});search.oninput=()=>options(choose,catalog.filter(([,n])=>n.toLowerCase().includes(search.value.toLowerCase())),targetKey);const existing=config.bindings[key],mode=select([['toggle','Alterna minimo / massimo'],['hold','Attivo mentre premi'],['step','Avanza a passi del 10%']],existing?.mode||'toggle',()=>{}),invert=el('input'),pickup=el('input');invert.type=pickup.type='checkbox';invert.checked=existing?.invert||false;pickup.checked=existing?.pickup!==false;
   const info=el('p','pg-help');info.textContent=existing?'Collegato a '+bindingName(existing.input):'Nessuna assegnazione';mapDialog.append(search,field('Controllo',choose),field('Tasti e pulsanti',mode),field('Inverti',invert),field('Aggancia quando raggiungi il valore attuale',pickup),info,button('Impara assegnazione',()=>inputs.learn(targetKey,mode.value,invert.checked,pickup.checked)),button('Collega MIDI',()=>inputs.connectMidi()),button('Rimuovi assegnazione',()=>{delete config.bindings[targetKey];inputs.release();changed();openMapping(targetKey);}),el('p','pg-help','Tastiera, joystick e MIDI CC / note. Gli assi sono continui; una zona morta evita tremolii al centro. I controlli fisici agganciano il valore senza saltare. Il pad XY e i fader funzionano anche con mouse e touch.'));
   const all=el('details');all.append(el('summary','',Object.keys(config.bindings).length+' assegnazioni salvate'));for(const [k,v]of Object.entries(config.bindings)){const n=catalog.find(x=>x[0]===k)?.[1]||k;all.append(button(n+' ← '+bindingName(v.input),()=>openMapping(k),'quiet'));}mapDialog.append(all);if(!mapDialog.open)mapDialog.showModal();
@@ -159,7 +234,8 @@ export function mountPlayground(api){
    const fresh=canvas.cloneNode();canvas.replaceWith(fresh);canvas=fresh;engine=new PlaygroundEngine(canvas,config,notify);director=new PlaygroundDirector(engine,{notify:directorUI,save:persist});brief.value=config.director.brief;directorUI();stage.style.aspectRatio=String(engine.ratio);inputs=new PlaygroundInputs(config,target,(text,id)=>{if(text==='assigned'){changed();message('Assegnazione salvata nel progetto.');if(mapDialog.open)openMapping(id);}else message(text);});render();message('Preparo le due scene vive…');syncTimer=setInterval(sync,150);
    await loadScene('A',config.decks.A);if(active)await loadScene('B',config.decks.B);
   }catch(e){message(e.message);api.toast(e.message);if(active)close();else api.resume();}finally{opening=false;opener.disabled=false;}}
- function close(){if(!active)return;director?.stop();director=null;inputs?.dispose();persist();active=false;clearTimeout(saveTimer);clearInterval(syncTimer);for(const dialog of [mapDialog,macroDialog,parameterDialog])if(dialog.open)dialog.close();engine?.dispose();engine=null;inputs=null;shell.hidden=true;document.body.classList.remove('pg-open');for(const node of document.querySelectorAll('body > .topbar,body > .workspace'))node.inert=false;if(document.fullscreenElement===shell)document.exitFullscreen().catch(()=>{});api.resume();opener.focus();}
+ function close(){if(!active)return;const address=new URL(location.href);if(address.searchParams.has('playground')){address.searchParams.delete('playground');history.replaceState(null,'',address);}
+director?.stop();director=null;inputs?.dispose();persist();active=false;clearTimeout(saveTimer);clearInterval(syncTimer);for(const dialog of [mapDialog,macroDialog,parameterDialog])if(dialog.open)dialog.close();engine?.dispose();engine=null;inputs=null;shell.hidden=true;document.body.classList.remove('pg-open');for(const node of document.querySelectorAll('body > .topbar,body > .workspace'))node.inert=false;if(document.fullscreenElement===shell)document.exitFullscreen().catch(()=>{});api.resume();opener.focus();}
  function editDeck(id){const d=engine.decks[id];if(!d)return;const snapshot={state:sceneOnly(d.state),name:d.name,phase:d.phase,ratio:d.ratio},p=engine.snapshot();close();snapshot.state.playground=p;api.adopt(snapshot);api.toast('Modifica la scena; nel Playground usa “Carica scena → Scena dell’editor” per portarla in A o B.');}
  window.addEventListener('pagehide',()=>{director?.stop();if(active)persist();});
  shell.addEventListener('input',event=>{if(director?.running&&!directorPanel.contains(event.target))director.stop();},true);

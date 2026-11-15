@@ -1,4 +1,4 @@
-import {PRESET_FAMILIES,familyName} from './preset-families.js?v=34287eff19e2';
+import {PRESET_FAMILIES,familyName} from './preset-families.js?v=ddff107e99e1';
 // Browsing only: selection keeps the existing preset handlers and undo history.
 const clean=value=>String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const memory={library:{query:'',category:'',family:''},saved:{query:'',engine:'',family:'',sort:'recent'}};
@@ -28,7 +28,7 @@ export function mountPresetLibrary(root,categories){
 }
 export function mountSavedPresets(grid){
  savedController?.abort();savedController=new AbortController();
- const root=grid.parentElement,prefs=memory.saved,toolbar=bar(root,'saved-preset-browser'),[queryRow,query]=search(prefs.query),[engineRow,engine]=select('Motore',[['','Entrambi'],['solid','Forma'],['particles','Particelle']],prefs.engine),[sortRow,sort]=select('Ordina',[['recent','Più recenti'],['name','Nome A–Z']],prefs.sort),count=document.createElement('p');count.className='preset-results';count.setAttribute('role','status');const [familyRow,family]=select('Famiglia',[['','Tutte le famiglie'],...PRESET_FAMILIES],prefs.family);toolbar.append(queryRow,engineRow,familyRow,sortRow,count);grid.before(toolbar);
+ const root=grid.parentElement,prefs=memory.saved,toolbar=bar(root,'saved-preset-browser'),[queryRow,query]=search(prefs.query),[engineRow,engine]=select('Distribuzione',[['','Tutte'],['solid','Dal corpo'],['particles','Nuvola orbitale']],prefs.engine),[sortRow,sort]=select('Ordina',[['recent','Più recenti'],['name','Nome A–Z']],prefs.sort),count=document.createElement('p');count.className='preset-results';count.setAttribute('role','status');const [familyRow,family]=select('Famiglia',[['','Tutte le famiglie'],...PRESET_FAMILIES],prefs.family);toolbar.append(queryRow,engineRow,familyRow,sortRow,count);grid.before(toolbar);
  function filter(){prefs.query=query.value;prefs.engine=engine.value;prefs.family=family.value;prefs.sort=sort.value;const cards=[...grid.children];cards.sort((a,b)=>sort.value==='name'?a.querySelector('input').value.localeCompare(b.querySelector('input').value,'it'):Number(b.dataset.date)-Number(a.dataset.date));let shown=0;for(const card of cards){card.hidden=!!engine.value&&engine.value!==card.dataset.engine||!!family.value&&family.value!==card.dataset.family||!clean(card.querySelector('input').value).includes(clean(query.value).trim());if(!card.hidden)shown++;grid.append(card);}count.textContent=shown?`${shown} preset salvati`:'Nessun preset corrispondente';}
  query.addEventListener('input',filter);engine.addEventListener('change',filter);sort.addEventListener('change',filter);family.addEventListener('change',filter);grid.addEventListener('change',filter,{signal:savedController.signal});filter();
 }

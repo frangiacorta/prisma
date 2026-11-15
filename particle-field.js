@@ -1,7 +1,8 @@
-import {DYNAMICS_GLSL} from './dynamics.js?v=34287eff19e2';
+import {bodySampleGLSL} from './body-samples.js?v=ddff107e99e1';
+import {DYNAMICS_GLSL} from './dynamics.js?v=ddff107e99e1';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=34287eff19e2';
-import {forceBarrierGLSL} from './particle-forces.js?v=34287eff19e2';
+import {guideGLSL} from './particle-path-field.js?v=ddff107e99e1';
+import {forceBarrierGLSL} from './particle-forces.js?v=ddff107e99e1';
 export const grainSizingGLSL=`
 uniform vec2 uNodeStyle,uLargeGrains,uGrainDistribution;
 float grainDiameter(vec4 seed,int index){
@@ -28,6 +29,7 @@ uniform vec4 uLife,uNetwork;uniform float uSymmetry;
 uniform vec4 uOrbit,uDrift,uWander,uTentacle,uTentacleMotion,uSpaceWarp;
 uniform vec2 uMotionQuality;uniform float uMotionSeed;
 mat2 rot(float a){return mat2(cos(a),-sin(a),sin(a),cos(a));}
+${bodySampleGLSL}
 float clockAt(float q){
  q=clamp((fract(q)-uClock.z*.5)/(1.-uClock.z),0.,1.);
  float r=.14,y=min(q,1.-q)/r,ramp=r*y*y*y*(1.-.5*y);
@@ -105,7 +107,8 @@ vec3 shape(vec4 r,float t,float family){
  }
  return p;
 }
-vec3 restPoint(vec4 r){return mix(shape(r,0.,uShape.x),shape(r,0.,uShape.y),uDynamics.w);}
+vec3 cloudRestPoint(vec4 r){return mix(shape(r,0.,uShape.x),shape(r,0.,uShape.y),uDynamics.w);}
+vec3 restPoint(vec4 r){return uStudioBody.x>0.?studioRestPoint(r):cloudRestPoint(r);}
 // Repulsive volumes have priority over positive routes. Final depth escape
 // resolves intersections between point spheres and path tubes without undoing either.
 vec3 sceneBarriers(vec3 p,vec4 r,float phase){
@@ -120,11 +123,11 @@ vec3 sceneBarriers(vec3 p,vec4 r,float phase){
   }p.z=upper-p.z<=p.z-lower?upper:lower;
  }return containGuidePosition(p,r,phase);
 }
-vec3 positionUnconstrained(vec4 r,float phase){
+vec3 cloudMotion(vec4 r,float phase,vec3 rest){
  float global=clockAt(phase*uClock.x),c=1.+floor(r.z*3.)*step(1.-uClock.w,r.w);
  float seedPhase=(uMotionSeed-417.)*.013;
  float t=global*c+(r.w-.5)*uFlow.y*TAU+seedPhase+uOrbit.w*r.z*TAU-uMotionQuality.y*r.x*2.;
- vec3 rest=restPoint(r),p=mix(shape(r,t,uShape.x),shape(r,t,uShape.y),uDynamics.w);
+ vec3 p=mix(shape(r,t,uShape.x),shape(r,t,uShape.y),uDynamics.w);
  p=mix(rest,p,uDynamics.z);
  // Ellipses and rotating orbital planes affect the existing trajectories.
  p.xz*=vec2(1.+uOrbit.x*.45,1.-uOrbit.x*.65);
@@ -183,11 +186,27 @@ vec3 positionUnconstrained(vec4 r,float phase){
   vec3 jet=vec3(cos(a),sin(a)*.85,sin(a*2.)*.3)*(1.+exc*uOuter.y)+.18*vec3(sin(q*2.),cos(q),sin(q));
   p=mix(p,jet,uOuter.x*smoothstep(0.,.4,exc));
  }
- p*=vec3(uForm.xy,uForm.z*uForm.w);p.xz=rot(uWarp.y*p.y)*p.xz;
- p+=uWarp.x*.4*vec3(sin(p.y*2.6+global),cos(p.z*3.+global),sin(p.x*3.4-global));
- p+=uWarp.z*.3*sin(p.yzx*uWarp.w+vec3(global,-global,global));
- p.xy=rot(uRotation.z)*p.xy;p.yz=rot(uRotation.x)*p.yz;p.xz=rot(uRotation.y)*p.xz;
- p*=uFrame.x;p.xy+=uFrame.yz;
+ return p;
+}
+vec3 positionUnconstrained(vec4 r,float phase){
+ vec3 p;
+ if(uStudioBody.x>0.){
+  vec3 anchor=studioRestPoint(r);
+  if(anchor.z< -100.)return anchor;
+  if(uStudioBody.y>0.){
+   vec3 rest=cloudRestPoint(r);
+   anchor+=(cloudMotion(r,phase,rest)-rest)*uStudioBody.y;
+  }
+  p=studioTransform(anchor);
+ }else{
+  float global=clockAt(phase*uClock.x);
+  p=cloudMotion(r,phase,cloudRestPoint(r));
+  p*=vec3(uForm.xy,uForm.z*uForm.w);p.xz=rot(uWarp.y*p.y)*p.xz;
+  p+=uWarp.x*.4*vec3(sin(p.y*2.6+global),cos(p.z*3.+global),sin(p.x*3.4-global));
+  p+=uWarp.z*.3*sin(p.yzx*uWarp.w+vec3(global,-global,global));
+  p.xy=rot(uRotation.z)*p.xy;p.yz=rot(uRotation.x)*p.yz;p.xz=rot(uRotation.y)*p.xz;
+  p*=uFrame.x;p.xy+=uFrame.yz;
+ }
  // Static scene-space fields preserve periodicity and work equally on points and tails.
  vec3 pull=vec3(0.);float influence=0.;
  for(int i=0;i<uForceCount;i++){vec3 d=uForcePoints[i].xyz-p;
@@ -207,7 +226,7 @@ vec3 constrainedDynamics(vec3 p,vec4 r,float phase){
  return p;
 }
 vec3 position(vec4 r,float phase){return constrainedDynamics(positionUnconstrained(r,phase),r,phase);}
-vec4 project(vec3 p){float depth=max(2.,7.5-p.z);return vec4(p.xy*vec2(uResolution.y/uResolution.x,1.)*2.6/depth,(depth-3.)/12.,1.);}
+vec4 project(vec3 p){float depth=max(2.,7.5-p.z);float fit=min(uResolution.x,uResolution.y);vec2 scale=mix(vec2(uResolution.y/uResolution.x,1.)*2.6/depth,vec2(fit)/uResolution*(2./3.4),uStudioPerspective);return vec4(p.xy*scale,(depth-3.)/12.,1.);}
 float cellLightFactor(vec4 r){
  if(uCloudCells.x<=0.||abs(uCellDetail.z)<.00001)return 1.;
  vec3 index=floor(r.xyz*uCloudCells.y);

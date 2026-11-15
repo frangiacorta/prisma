@@ -12,17 +12,19 @@ export function flowPalette(f,seed=f.seed+f.step*113){
  const t=(step%4)/4;return a.map((c,i)=>flowColorMix(c,b[i],t));
 }
 export function flowProfile(seed,mood='organic',variety=.65){
- const r=k=>flowRandom(seed,k),limit=variety<.2?3:variety<.55?6:10;
- return {motion:Math.floor(r(11)*limit),material:Math.floor(r(12)*(variety<.2?3:variety<.55?6:9)),pace:.45+r(13)*1.2,rhythm:(mood==='calm'?.16:mood==='electric'?.8:.48)*(.3+r(14)*.7),cycles:1+Math.floor(r(15)*(mood==='electric'?4:3)),phase:r(16)*360,direction:r(17)<.5?-1:1};
+ const r=k=>flowRandom(seed,k),reach=Math.min(1,.36+variety);
+ return {motion:Math.floor(r(11)*(3+7*reach)),material:Math.floor(r(12)*(3+6*reach)),pace:.57+r(13)*(.56+.6*variety),rhythm:(mood==='calm'?.16:mood==='electric'?.8:.48)*(.28+r(14)*.72)*(.58+variety*.6),cycles:1+Math.floor(r(15)*(mood==='electric'?4:3)),phase:r(16)*360,direction:r(17)<.5?-1:1};
 }
 const n=(v,f,min,max)=>Number.isFinite(v)?Math.max(min,Math.min(max,v)):f;
 export function normalizeFlow(raw={}){raw=raw&&typeof raw==='object'?raw:{};return {enabled:raw.enabled===true,paused:raw.paused===true,mood:FLOW_MOODS.some(([k])=>k===raw.mood)?raw.mood:'organic',colors:FLOW_COLORS.some(([k])=>k===raw.colors)?raw.colors:'auto',engines:['both','solid','particles'].includes(raw.engines)?raw.engines:'both',speed:n(raw.speed,1,.25,3),intensity:n(raw.intensity,.55,0,1),variety:n(raw.variety,.65,0,1),seed:Math.floor(n(raw.seed,417,0,4294967295)),step:Math.floor(n(raw.step,0,0,1e9)),sourcePalette:colors(raw.sourcePalette),palette:colors(raw.palette)};}
 export function flowTiming(flow){const r=flowRandom(flow.seed+flow.step*113,23),spread=flow.variety;return {hold:(.85+r*.3*spread)*(flow.mood==='calm'?20:flow.mood==='electric'?9:14)/flow.speed,transition:(.8+flowRandom(flow.seed+flow.step*113,24)*.4)*(flow.mood==='calm'?8:flow.mood==='electric'?3:5)/flow.speed};}
 export const FLOW_FAMILIES=['volume','ring','layers','fibres','branches','disc','polyhedron','ribbon','cells','shell'];
 export function flowChoice(flow){
- // Cycle through a seed-dependent permutation; never repeat the preceding family.
- const step=flow.step,limit=flow.variety<.2?3:flow.variety<.55?6:10;
- return {family:FLOW_FAMILIES[(step*(limit===10?3:1)+flow.seed%limit)%limit],engine:flow.engines==='both'?([0,0,1,1,1,0,1,0][(step+flow.seed%8)%8]?'particles':'solid'):flow.engines};
+ // Full chapters have no duplicate family. Variety changes how often the
+ // wider repertoire replaces the three simplest forms.
+ const step=flow.step,chapter=Math.floor(step/10),wide=flowRandom(flow.seed+chapter,8)<flow.variety+.35;
+ const index=wide?(step*3+flow.seed%10)%10:(step+flow.seed%3)%3;
+ return {family:FLOW_FAMILIES[index],engine:flow.engines==='both'?([0,0,1,1,1,0,1,0][(step+flow.seed%8)%8]?'particles':'solid'):flow.engines};
 }
 export function flowTransition(f){
  const family=flowChoice(f).family,r=flowRandom(f.seed+f.step*113,78),styles=f.mood==='calm'?['fade','iris','zoom']:['fade','iris','swirl','zoom','luma','wipe','add'];
