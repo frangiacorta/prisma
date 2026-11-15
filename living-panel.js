@@ -1,6 +1,6 @@
-import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=95fdb8cbe5aa';
-import {beginVeilTransform} from './veil-model.js?v=95fdb8cbe5aa';
-import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=95fdb8cbe5aa';
+import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=34287eff19e2';
+import {beginVeilTransform} from './veil-model.js?v=34287eff19e2';
+import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=34287eff19e2';
 export function applyLivingStyle(s,style){
  if(s.engine==='solid'){
   const values={off:STRUCTURE_DEFAULTS,fibres:{structShell:1,structFibres:1},tissue:{structShell:1,structFibres:1,structWeft:1},membrane:{structShell:1},veils:{structShell:1,structRadial:.65,structCurl:.4}}[style];

@@ -1,6 +1,6 @@
-import {sphereOverlay} from './force-sphere-overlay.js?v=95fdb8cbe5aa';
-import {supportsManualFields as usesParticleSurface} from './living-composition.js?v=95fdb8cbe5aa';
-import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=95fdb8cbe5aa';
+import {sphereOverlay} from './force-sphere-overlay.js?v=34287eff19e2';
+import {supportsManualFields as usesParticleSurface} from './living-composition.js?v=34287eff19e2';
+import {MAX_FORCE_POINTS,FORCE_META,addForcePoint,screenToForce,forceToScreen,forcePanel} from './particle-forces.js?v=34287eff19e2';
 
 
 
@@ -53,7 +53,7 @@ export function mountParticleForces({canvas,board,getState,getMode,setMode,remem
 
  }
 
- function syncInputs(){const p=current();if(!p)return;for(const key of Object.keys(FORCE_META)){const v=p[key],[,lo,hi]=FORCE_META[key];for(const el of controls.querySelectorAll(`[data-force-param="${key}"],[data-force-number="${key}"]`)){if(el!==document.activeElement)el.value=Number(v.toFixed(3));el.style.setProperty('--fill',(v-lo)/(hi-lo)*100+'%');}}}
+ function syncInputs(){const p=current();if(!p)return;for(const key of Object.keys(FORCE_META)){const v=p[key];for(const el of controls.querySelectorAll(`[data-force-param="${key}"],[data-force-number="${key}"]`)){if(el!==document.activeElement)el.value=Number(v.toFixed(3));}}}
 
  function start(e,p,element){selected=p.id;drag={id:p.id,pointerId:e.pointerId,start:{...p},...pointer(e),clientY:e.clientY};element.setPointerCapture(e.pointerId);renderControls();sync();}
 

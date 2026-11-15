@@ -1,12 +1,12 @@
-import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=95fdb8cbe5aa';
-import {GROWTH_DEFAULTS} from './growth-material.js?v=95fdb8cbe5aa';
-import {FINISH_DEFAULTS} from './finishing.js?v=95fdb8cbe5aa';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=95fdb8cbe5aa';
-import {FRACTAL_KEYS} from './fractal-form.js?v=95fdb8cbe5aa';
-import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=95fdb8cbe5aa';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=95fdb8cbe5aa';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=95fdb8cbe5aa';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=95fdb8cbe5aa';
+import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=34287eff19e2';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=34287eff19e2';
+import {FINISH_DEFAULTS} from './finishing.js?v=34287eff19e2';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=34287eff19e2';
+import {FRACTAL_KEYS} from './fractal-form.js?v=34287eff19e2';
+import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=34287eff19e2';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=34287eff19e2';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=34287eff19e2';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=34287eff19e2';
 export const BASE = {
  ...DYNAMICS_DEFAULTS,...PARTICLE_DEFAULTS,engine:'solid',keepMotionSpeed:true,motionPeriod:0,
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,

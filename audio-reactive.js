@@ -1,8 +1,8 @@
-import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=95fdb8cbe5aa';
-import {RhythmClock,TapTempo} from './audio-rhythm.js?v=95fdb8cbe5aa';
-import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=95fdb8cbe5aa';
-import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=95fdb8cbe5aa';
-import {META} from './model.js?v=95fdb8cbe5aa';
+import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=34287eff19e2';
+import {RhythmClock,TapTempo} from './audio-rhythm.js?v=34287eff19e2';
+import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=34287eff19e2';
+import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=34287eff19e2';
+import {META} from './model.js?v=34287eff19e2';
 
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountAudioReactive({getState,remember,mark,renderControls,showTab,toast,invalidate,setPlaying}) {
@@ -88,7 +88,7 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
 
   const slider=(key,value,attr='data-audio-setting',label,min,max,step)=>{
     const meta=AUDIO_META[key]||[label,min,max,step],[name,lo,hi,increment]=meta,id='audio-'+key.replaceAll('.','-');
-    return `<div class="param"><div class="param-line"><label for="${id}">${name}</label><input data-audio class="number" type="number" ${attr}="${key}" aria-label="${name}: valore" min="${lo}" max="${hi}" step="${increment}" value="${Number(value.toFixed(3))}"></div><input data-audio id="${id}" type="range" ${attr}="${key}" min="${lo}" max="${hi}" step="${increment}" value="${value}" style="--fill:${(value-lo)/(hi-lo)*100}%"></div>`;
+    return `<div class="param"><div class="param-line"><label for="${id}">${name}</label><input data-audio class="number" type="number" ${attr}="${key}" aria-label="${name}: valore" min="${lo}" max="${hi}" step="${increment}" value="${Number(value.toFixed(3))}"></div><input data-audio id="${id}" type="range" ${attr}="${key}" min="${lo}" max="${hi}" step="${increment}" value="${value}"></div>`;
   };
   const options=(values,current)=>Object.entries(values).map(([id,label])=>`<option value="${escape(id)}" ${id===current?'selected':''}>${escape(label)}</option>`).join('');
   const targetOptions=current=>Object.entries(audioTargetGroups(getState().engine)).map(([group,keys])=>`<optgroup label="${escape(group)}">${options(Object.fromEntries(keys.filter(k=>META[k]).map(k=>[k,META[k][0]])),current)}</optgroup>`).join('')+(!audioTargets(getState().engine).includes(current)?`<option selected value="${escape(current)}">${escape(META[current][0])} · altro motore</option>`:'');
@@ -146,7 +146,6 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
       let value=key?c[key]:c.mappings[+path[0]]?.[path[1]];if(path?.[1]==='amount')value*=100;
       if(el.type==='checkbox'){el.checked=value;continue;}if(value===undefined)continue;
       if(el!==document.activeElement)el.value=Number(value.toFixed(3));
-      if(el.type==='range')el.style.setProperty('--fill',(value-el.min)/(el.max-el.min)*100+'%');
     }
   }
   controls.addEventListener('input',event=>{

@@ -1,5 +1,5 @@
-import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=95fdb8cbe5aa';
-import {BodyCamera} from './body-camera.js?v=95fdb8cbe5aa';
+import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=34287eff19e2';
+import {BodyCamera} from './body-camera.js?v=34287eff19e2';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountBodyTracking({board,getState,remember,mark,renderControls,showTab,toast,invalidate}){
  const runtime=new BodyTrackingState(),overlay=document.createElement('div');
@@ -30,7 +30,7 @@ export function mountBodyTracking({board,getState,remember,mark,renderControls,s
  }
  function panel(){
   const c=settings(),isFields=getState().engine==='particles'&&c.target==='fields';
-  const slider=(key,path=key,value=c[key])=>{const [name,min,max,step]=BODY_META[key];return `<div class="param"><div class="param-line"><label for="body-${path}">${name}</label><input class="number" type="number" data-body-number="${path}" aria-label="${name}: valore" min="${min}" max="${max}" step="${step}" value="${value}"></div><input id="body-${path}" type="range" data-body-param="${path}" min="${min}" max="${max}" step="${step}" value="${value}" style="--fill:${(value-min)/(max-min)*100}%"></div>`;};
+  const slider=(key,path=key,value=c[key])=>{const [name,min,max,step]=BODY_META[key];return `<div class="param"><div class="param-line"><label for="body-${path}">${name}</label><input class="number" type="number" data-body-number="${path}" aria-label="${name}: valore" min="${min}" max="${max}" step="${step}" value="${value}"></div><input id="body-${path}" type="range" data-body-param="${path}" min="${min}" max="${max}" step="${step}" value="${value}"></div>`;};
   const check=(key,label,value)=>`<label class="check"><input type="checkbox" data-body-check="${key}" ${value?'checked':''}>${label}</label>`;
   return `<details id="body-tracking-controls" class="control-details" open><summary>Mani e braccia</summary>
    <p id="body-tracking-status" class="help" role="status">${escape(status())}</p>
@@ -48,7 +48,7 @@ export function mountBodyTracking({board,getState,remember,mark,renderControls,s
    <button class="outline full" data-body-action="freeze">Congela questa influenza nel preset</button><p class="help">Le impostazioni si salvano nel preset. I gesti sono live: per esportare la posa attuale, congelala. La registrazione animata dei gesti non è ancora disponibile.</p></details>`;
  }
  const controls=document.querySelector('#controls');
- controls.addEventListener('input',e=>{const el=e.target,path=el.dataset.bodyParam||el.dataset.bodyNumber||el.dataset.bodyCheck||el.dataset.bodySelect;if(!path||(el.type==='number'&&(el.value===''||!Number.isFinite(el.valueAsNumber))))return;if(!el.dataset.bodyEditing){remember();el.dataset.bodyEditing='1';}const c=settings(),keys=path.split('.');let obj=c;for(const key of keys.slice(0,-1))obj=obj[key];obj[keys.at(-1)]=el.hasAttribute('data-body-check')?el.checked:el.hasAttribute('data-body-select')?el.value:Number(el.value);getState().bodyTracking=normalizeBodyTracking(c);mark();const v=keys.reduce((a,k)=>a[k],getState().bodyTracking);for(const other of controls.querySelectorAll('[data-body-param],[data-body-number]'))if((other.dataset.bodyParam||other.dataset.bodyNumber)===path){if(other!==document.activeElement)other.value=v;if(other.type==='range')other.style.setProperty('--fill',(v-other.min)/(other.max-other.min)*100+'%');}});
+ controls.addEventListener('input',e=>{const el=e.target,path=el.dataset.bodyParam||el.dataset.bodyNumber||el.dataset.bodyCheck||el.dataset.bodySelect;if(!path||(el.type==='number'&&(el.value===''||!Number.isFinite(el.valueAsNumber))))return;if(!el.dataset.bodyEditing){remember();el.dataset.bodyEditing='1';}const c=settings(),keys=path.split('.');let obj=c;for(const key of keys.slice(0,-1))obj=obj[key];obj[keys.at(-1)]=el.hasAttribute('data-body-check')?el.checked:el.hasAttribute('data-body-select')?el.value:Number(el.value);getState().bodyTracking=normalizeBodyTracking(c);mark();const v=keys.reduce((a,k)=>a[k],getState().bodyTracking);for(const other of controls.querySelectorAll('[data-body-param],[data-body-number]'))if((other.dataset.bodyParam||other.dataset.bodyNumber)===path){if(other!==document.activeElement)other.value=v;}});
  controls.addEventListener('change',e=>{delete e.target.dataset.bodyEditing;if(e.target.dataset.bodyNumber)e.target.value=e.target.dataset.bodyNumber.split('.').reduce((o,k)=>o[k],settings());if(e.target.dataset.bodySelect==='target')renderControls();});
  controls.addEventListener('click',e=>{
   const action=e.target.closest('[data-body-action]')?.dataset.bodyAction;if(!action)return;
