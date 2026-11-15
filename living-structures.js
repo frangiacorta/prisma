@@ -1,5 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume,separateLivingContacts,separateLivingFaces} from './living-topology.js?v=df84a2af0efa';
-import {excludeForcePositions} from './particle-forces.js?v=df84a2af0efa';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume,separateLivingContacts,separateLivingFaces} from './living-topology.js?v=059b95afd26a';
+import {excludeForcePositions} from './particle-forces.js?v=059b95afd26a';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;
 uniform float uBundleAmount;uniform vec3 uLivingMotion,uSkinFit;uniform int uSkinSamples;`;

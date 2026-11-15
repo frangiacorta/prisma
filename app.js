@@ -1,43 +1,43 @@
-import {presetFamily,familyName} from './preset-families.js?v=df84a2af0efa';
-import {closeLivingSkin} from './living-panel.js?v=df84a2af0efa';
-import {mountDynamicsOverlay} from './dynamics-overlay.js?v=df84a2af0efa';
-import {DYNAMICS_DEFAULTS} from './dynamics.js?v=df84a2af0efa';
-import {motionPeriod,setDuration,clockStatus} from './animation-clock.js?v=df84a2af0efa';
-import {mountSavedPresets} from './preset-library.js?v=df84a2af0efa';
-import {composePanel,refinePanel} from './workflow-panels.js?v=df84a2af0efa';
-import {mountWorkflowTools} from './workflow-tools.js?v=df84a2af0efa';
-import {mountPlayground} from './playground.js?v=df84a2af0efa';
-import {decorateInspector} from './inspector-state.js?v=df84a2af0efa';
-import {GROWTH_DEFAULTS,GROWTH_STUDIES} from './growth-material.js?v=df84a2af0efa';
-import {BASE_FORMS} from './base-forms.js?v=df84a2af0efa';
-import {integrateStructure,STRUCTURE_DEFAULTS} from './structure-model.js?v=df84a2af0efa';
-import {applyVeilLook,applyVeilGeometry,beginVeilTransform,VEIL_LOOKS} from './veil-model.js?v=df84a2af0efa';
-import {mountFinishingOrder} from './finishing-order.js?v=df84a2af0efa';
-import {mountFinishingAreas} from './finishing-areas.js?v=df84a2af0efa';
-import {INTERFERENCE_STYLE} from './studio-model.js?v=df84a2af0efa';
-import {FINISH_DEFAULTS,GLYPH_DEFAULTS,EDGE_DEFAULTS,GLITCH_DEFAULTS,TONE_NEUTRAL,PHOTO_NEUTRAL} from './finishing.js?v=df84a2af0efa';
-import {mountBodyTracking} from './body-tracking.js?v=df84a2af0efa';
-import {mountAudioReactive} from './audio-reactive.js?v=df84a2af0efa';
-import {Renderer,fieldAt,sampleFrame} from './renderer.js?v=df84a2af0efa';
-import {buildPanel,pathValue,pathMeta,writePath} from './panels.js?v=df84a2af0efa';
-import {MAX_COLORS,MAX_LIGHTS,newLight,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,EXTRA_BASE,BACKDROPS,SHAPE_TRACKS,LIGHT_SOURCES} from './studio-model.js?v=df84a2af0efa';
-import {BASE,PRESETS,MOODS,META,GROUPS,preset,randomize} from './model.js?v=df84a2af0efa';
-import {newCreation,material,upgrade,setFullness,motionPreset,surprise,similar,varyCreation,hasMotion,normalizeCreation,sculpt,bloomExample,lightRig,textureStyle} from './creative-model.js?v=df84a2af0efa';
-import {animateCellular,CELLULAR_DEFAULTS} from './cellular-form.js?v=df84a2af0efa';
-import {interpretDescription,applyDescriptionPlan,descriptionCatalog} from './description.js?v=df84a2af0efa';
-import {PreviewQuality,PREVIEW_MODES} from './preview-quality.js?v=df84a2af0efa';
-import {cleanPresetName,favoriteName,favoriteDate,uniqueDownloadName,presetDocument,readPreset} from './preset-files.js?v=df84a2af0efa';
-import {VideoExportSession} from './video-export.js?v=df84a2af0efa';
-import {RenderSession} from './render-session.js?v=df84a2af0efa';
-import {usesParticleSurface} from './living-composition.js?v=df84a2af0efa';
-import {applyLivingStyle} from './living-panel.js?v=df84a2af0efa';
-import {PARTICLE_META,PARTICLE_STUDIES,particleSphere,particleCreation,varyParticles,varyParticleMotion,FIBER_STYLES,FILM_STYLES,LINK_STYLES,LIVING_STYLES} from './particle-model.js?v=df84a2af0efa';
-import {mountCreativeAssistant} from './assistant-client.js?v=df84a2af0efa';
-import {assistantCatalog} from './assistant-model.js?v=df84a2af0efa';
-import {mountParticlePaths} from './particle-path-interaction.js?v=df84a2af0efa';
-import {mountParticleForces} from './particle-interaction.js?v=df84a2af0efa';
-import {renderNavigation,navigationTabs,mountControlSearch} from './inspector-navigation.js?v=df84a2af0efa';
-import {prepareInspector,captureInspector,mountStudioLayout} from './inspector-ui.js?v=df84a2af0efa';
+import {presetFamily,familyName} from './preset-families.js?v=059b95afd26a';
+import {closeLivingSkin} from './living-panel.js?v=059b95afd26a';
+import {mountDynamicsOverlay} from './dynamics-overlay.js?v=059b95afd26a';
+import {DYNAMICS_DEFAULTS} from './dynamics.js?v=059b95afd26a';
+import {motionPeriod,setDuration,clockStatus} from './animation-clock.js?v=059b95afd26a';
+import {mountSavedPresets} from './preset-library.js?v=059b95afd26a';
+import {composePanel,refinePanel} from './workflow-panels.js?v=059b95afd26a';
+import {mountWorkflowTools} from './workflow-tools.js?v=059b95afd26a';
+import {mountPlayground} from './playground.js?v=059b95afd26a';
+import {decorateInspector} from './inspector-state.js?v=059b95afd26a';
+import {GROWTH_DEFAULTS,GROWTH_STUDIES} from './growth-material.js?v=059b95afd26a';
+import {BASE_FORMS} from './base-forms.js?v=059b95afd26a';
+import {integrateStructure,STRUCTURE_DEFAULTS} from './structure-model.js?v=059b95afd26a';
+import {applyVeilLook,applyVeilGeometry,beginVeilTransform,VEIL_LOOKS} from './veil-model.js?v=059b95afd26a';
+import {mountFinishingOrder} from './finishing-order.js?v=059b95afd26a';
+import {mountFinishingAreas} from './finishing-areas.js?v=059b95afd26a';
+import {INTERFERENCE_STYLE} from './studio-model.js?v=059b95afd26a';
+import {FINISH_DEFAULTS,GLYPH_DEFAULTS,EDGE_DEFAULTS,GLITCH_DEFAULTS,TONE_NEUTRAL,PHOTO_NEUTRAL,luminousPrintEnabled,feedbackWarmupFrames} from './finishing.js?v=059b95afd26a';
+import {mountBodyTracking} from './body-tracking.js?v=059b95afd26a';
+import {mountAudioReactive} from './audio-reactive.js?v=059b95afd26a';
+import {Renderer,fieldAt,sampleFrame} from './renderer.js?v=059b95afd26a';
+import {buildPanel,pathValue,pathMeta,writePath} from './panels.js?v=059b95afd26a';
+import {MAX_COLORS,MAX_LIGHTS,newLight,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,EXTRA_BASE,BACKDROPS,SHAPE_TRACKS,LIGHT_SOURCES} from './studio-model.js?v=059b95afd26a';
+import {BASE,PRESETS,MOODS,META,GROUPS,preset,randomize} from './model.js?v=059b95afd26a';
+import {newCreation,material,upgrade,setFullness,motionPreset,surprise,similar,varyCreation,hasMotion,normalizeCreation,sculpt,bloomExample,lightRig,textureStyle} from './creative-model.js?v=059b95afd26a';
+import {animateCellular,CELLULAR_DEFAULTS} from './cellular-form.js?v=059b95afd26a';
+import {interpretDescription,applyDescriptionPlan,descriptionCatalog} from './description.js?v=059b95afd26a';
+import {PreviewQuality,PREVIEW_MODES} from './preview-quality.js?v=059b95afd26a';
+import {cleanPresetName,favoriteName,favoriteDate,uniqueDownloadName,presetDocument,readPreset} from './preset-files.js?v=059b95afd26a';
+import {VideoExportSession} from './video-export.js?v=059b95afd26a';
+import {RenderSession} from './render-session.js?v=059b95afd26a';
+import {usesParticleSurface} from './living-composition.js?v=059b95afd26a';
+import {applyLivingStyle} from './living-panel.js?v=059b95afd26a';
+import {PARTICLE_META,PARTICLE_STUDIES,particleSphere,particleCreation,varyParticles,varyParticleMotion,FIBER_STYLES,FILM_STYLES,LINK_STYLES,LIVING_STYLES} from './particle-model.js?v=059b95afd26a';
+import {mountCreativeAssistant} from './assistant-client.js?v=059b95afd26a';
+import {assistantCatalog} from './assistant-model.js?v=059b95afd26a';
+import {mountParticlePaths} from './particle-path-interaction.js?v=059b95afd26a';
+import {mountParticleForces} from './particle-interaction.js?v=059b95afd26a';
+import {renderNavigation,navigationTabs,mountControlSearch} from './inspector-navigation.js?v=059b95afd26a';
+import {prepareInspector,captureInspector,mountStudioLayout} from './inspector-ui.js?v=059b95afd26a';
 let inspectorStatus,workflowTools,playground,playgroundSuspended=false;let panelCache=new Map();
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const paths={photo:'M4 7h4l2-3h4l2 3h4v14H4ZM12 10a4 4 0 1 0 0 8 4 4 0 0 0 0-8',undo:'M3 9h10a7 7 0 0 1 0 14M3 9l5-5M3 9l5 5',redo:'M21 9H11a7 7 0 0 0 0 14M21 9l-5-5M21 9l-5 5',download:'M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5',reset:'M3 11a9 9 0 1 1 2 7M3 4v7h7',frame:'M5 3H3v5m16-5h2v5M3 16v5h5m13-5v5h-5',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',orbit:'M12 3a9 9 0 1 0 9 9M3 12h18M12 3c-5 5-5 13 0 18 4-4 5-10 2-15M18 3h3v3',move:'M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3m12-6 3 3-3 3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1',focus:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8',play:'m9 5 11 7-11 7Z',pause:'M8 5v14M16 5v14',sliders:'M4 5h6m4 0h6M4 12h11m4 0h1M4 19h1m4 0h11M10 2v6m5 1v6M5 16v6',shuffle:'M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 3-2 5-5m3-5c1-1 2-2 4-2h3m-4-4 4 4-4 4',shape:'M12 3c6-2 12 7 8 13-4 8-17 3-17-3 0-4 5-9 9-10Z',material:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M5 7c9-1 5 9 14 10M7 5c8 1 2 11 10 14',palette:'M12 3a9 9 0 0 0 0 18c3 0 3-3 2-4-2-2 0-4 2-3 7 1 5-11-4-11M7 10h.01M10 6h.01M15 6h.01',motion:'M3 8c4-9 8 14 12 5s5-6 6-4M3 16c4-9 8 7 12 3',background:'M3 3h18v18H3ZM3 16l6-7 5 6 3-3 4 4',lock:'M6 10h12v11H6ZM8 10V6a4 4 0 0 1 8 0v4',unlock:'M6 10h12v11H6ZM8 10V6a4 4 0 0 1 8 0'};
@@ -274,7 +274,7 @@ function frame(time){
     }
    }
   }
-  const feedbackVisible=previewState.finishEnabled!==false&&!previewState.finishCompare&&previewState.finishFeedback&&previewState.finishFeedbackMix>0&&previewState.finishFeedbackMemory>0;
+  const feedbackVisible=previewState.finishEnabled!==false&&!previewState.finishCompare&&previewState.finishFeedback&&previewState.finishFeedbackMix>0&&(previewState.finishFeedbackMemory>0||luminousPrintEnabled(previewState));
   if(!feedbackVisible&&!audioReactive?.active&&!bodyTracking?.active&&!playing&&!dirty&&!refined&&!renderer.completionSync&&time-lastEdit>650&&!drag&&!lightDrag&&!forceEditor?.dragging&&!guideEditor?.dragging&&!$('dialog[open]'))refineIdlePreview();
  }catch(error){suspendPreview(error);}
 }
@@ -318,6 +318,7 @@ async function importFinishPreset(input){
   if(prismaFilters!==1||!filters||Array.isArray(filters)||typeof filters!=='object')throw Error('Scegli un preset creato con Salva filtri.');
   const params=Object.fromEntries(finishPresetKeys.filter(key=>Object.hasOwn(filters,key)).map(key=>[key,filters[key]]));
   if(!Object.keys(params).length)throw Error('Il preset non contiene filtri.');
+  if(params.finishFeedbackLumen>0&&!Object.hasOwn(params,'finishPrintLife'))params.finishPrintLife=0;
   const values=normalizeCreation({...state,...params});
   remember();for(const key of finishPresetKeys)state[key]=values[key];
   state.finishCompare=false;renderer?.resetLiveDynamics();mark();renderControls();toast('Preset filtri applicato');
@@ -336,15 +337,33 @@ window.addEventListener('pagehide',e=>{if(!e.persisted&&readyVideo){URL.revokeOb
 function busyUI(value){busy=value;$('#download').disabled=value;$('#export-close').disabled=value;$('#export-cancel').hidden=!value;$('#export-progress').hidden=!value;$$('#export-options input,#export-options select,[data-export]').forEach(el=>el.disabled=value)}
 function progress(fraction,msg){$('#progress-fill').style.width=`${fraction*100}%`;$('#progress-text').textContent=msg}
 const waitPaint=()=>new Promise(r=>setTimeout(r,0));
+async function prepareExportFeedback(snapshot,fps,total,phase=0){
+ const warmup=feedbackWarmupFrames(snapshot,fps,total);
+ for(let remaining=warmup;remaining>0&&!cancelled;remaining--){
+  const previousPhase=(phase+Math.PI*2*(1-(remaining%total)/total))%(Math.PI*2);
+  progress(0,`Preparo la persistenza · ${warmup-remaining+1} / ${warmup}`);
+  const complete=await exportRenderer.drawAccumulated(snapshot,previousPhase,exportWidth,exportHeight,{samples:snapshot.renderVersion>=2?2:1,cancelled:()=>cancelled,feedbackDeltaSeconds:1/fps});
+  if(!complete&&!cancelled)throw Error('Preparazione delle impronte interrotta.');
+ }
+}
 $('#export-options').addEventListener('click',e=>{if(e.target.closest('#export-finishing')&&!busy){$('#export-dialog').close();showTab('photo');}});
 $('#export-cancel').onclick=()=>{cancelled=true;videoSession?.abort();$('#export-cancel').disabled=true;$('#progress-text').textContent='Interruzione in corso…'};
 $('#export-dialog').addEventListener('cancel',e=>{if(busy){e.preventDefault();cancelled=true;videoSession?.abort()}});
 async function download(){if(busy)return;let rendererFailed=false;const snapshot=structuredClone(state),capturePhase=phase,capturePhysics=renderer?.dynamicsFrame,resumePlaying=playing;setPlaying(false);previewRevision++;cancelled=false;$('#export-cancel').disabled=false;$('#export-message').textContent='';
  try{if(exportType!=='wallpaper'){exportWidth=+$('#export-width').value;exportHeight=+$('#export-height').value;if(!Number.isInteger(exportWidth)||!Number.isInteger(exportHeight)||exportWidth<64||exportHeight<64||exportWidth>4096||exportHeight>4096)throw new Error('Scegli dimensioni intere tra 64 e 4096 pixel.');if(exportType==='video'&&(exportWidth%2||exportHeight%2))throw new Error('Per il video, larghezza e altezza devono essere numeri pari.');updateExportSize(exportWidth,exportHeight)}
  busyUI(true);progress(0,'Preparo la tua creazione…');await awaitIdleStop();await thumbnailQueue;await waitPaint();if(exportType!=='wallpaper'&&renderer&&!renderer.gl.isContextLost())await renderer.waitForGpu({cancelled:()=>cancelled});if(cancelled)return;
- if(exportType==='wallpaper'){const modules=await Promise.all(['./solid-renderer.js?v=df84a2af0efa','./finishing.js?v=df84a2af0efa','./renderer.js?v=df84a2af0efa','./structure-model.js?v=df84a2af0efa','./base-forms.js?v=df84a2af0efa','./particle-paths.js?v=df84a2af0efa','./solid-forces.js?v=df84a2af0efa','./filament-model.js?v=df84a2af0efa','./particle-shading.js?v=df84a2af0efa','./filament-renderer.js?v=df84a2af0efa','./growth-material.js?v=df84a2af0efa','./finish-scanlines.js?v=df84a2af0efa','./particle-optics.js?v=df84a2af0efa','./animation-clock.js?v=df84a2af0efa','./dynamics.js?v=df84a2af0efa','./vendor/xpbd/distance.js?v=df84a2af0efa','./cellular-form.js?v=df84a2af0efa','./fractal-form.js?v=df84a2af0efa'].map(url=>fetch(url).then(r=>{if(!r.ok)throw new Error('Impossibile preparare il wallpaper.');return r.text()})));const source='const {Dynamics,DYNAMICS_GLSL,bindDynamics,disposeDynamics}=(()=>{'+modules[15].replace(/export /g,'')+'\n'+modules[14].replace(/^import .*;$/gm,'').replace(/export /g,'')+';return {Dynamics,DYNAMICS_GLSL,bindDynamics,disposeDynamics};})();\n'+modules[13]+'\n'+modules[10]+'\nconst {samplePath}=(()=>{'+modules[5].replace(/export /g,'')+';return {samplePath};})();\n'+modules[6].replace(/^import .*;$/gm,'')+'\n'+modules[4]+'\n'+modules[7]+'\nconst {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular}=(()=>{'+modules[16].replace(/export /g,'')+';return {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular};})();\n'+'const {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal}=(()=>{'+modules[17].replace(/export /g,'')+';return {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal};})();\n'+modules[3].replace(/^import .*;$/gm,'')+'\n'+modules[0].replace(/^import .*;$/gm,'').replace('export class Renderer','export class SolidRenderer')+'\n'+modules[1]+'\nconst ScanlinePass=(()=>{'+modules[11].replace(/^import .*;$/gm,'').replace(/export /g,'')+';return ScanlinePass;})();\n'+'const opticalGLSL=(()=>{'+modules[12].replace(/^import .*;$/gm,'').replace(/export /g,'')+';return opticalGLSL;})();\n'+modules[8].replace(/^import .*;$/gm,'')+'\nconst FilamentPass=(()=>{'+modules[9].replace(/^import .*;$/gm,'').replace(/export /g,'')+';return FilamentPass;})();\n'+modules[2].replace(/^import .*;$/gm,'').replace(/^export \{fieldAt,sampleFrame\}.*;$/gm,'');if(cancelled)return;const exported={...snapshot,finishCompare:false,bgMode:snapshot.bgMode==='transparent'?'solid':snapshot.bgMode};const serialized=JSON.stringify(exported).replace(/</g,'\\u003c');const html=`<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prisma Wallpaper</title><style>html,body{margin:0;overflow:hidden;background:${snapshot.background};width:100%;height:100%}canvas{width:100%;height:100%;display:block}</style><canvas id="art"></canvas><script type="module">${source}\nstartWallpaper(document.getElementById('art'),${serialized});<\/script></html>`;save(new Blob([html],{type:'text/html'}),uniqueDownloadName('prisma-wallpaper','html'));toast('Wallpaper HTML scaricato');return}
+ if(exportType==='wallpaper'){const modules=await Promise.all(['./solid-renderer.js?v=059b95afd26a','./finishing.js?v=059b95afd26a','./renderer.js?v=059b95afd26a','./structure-model.js?v=059b95afd26a','./base-forms.js?v=059b95afd26a','./particle-paths.js?v=059b95afd26a','./solid-forces.js?v=059b95afd26a','./filament-model.js?v=059b95afd26a','./particle-shading.js?v=059b95afd26a','./filament-renderer.js?v=059b95afd26a','./growth-material.js?v=059b95afd26a','./finish-scanlines.js?v=059b95afd26a','./particle-optics.js?v=059b95afd26a','./animation-clock.js?v=059b95afd26a','./dynamics.js?v=059b95afd26a','./vendor/xpbd/distance.js?v=059b95afd26a','./cellular-form.js?v=059b95afd26a','./fractal-form.js?v=059b95afd26a'].map(url=>fetch(url).then(r=>{if(!r.ok)throw new Error('Impossibile preparare il wallpaper.');return r.text()})));const source='const {Dynamics,DYNAMICS_GLSL,bindDynamics,disposeDynamics}=(()=>{'+modules[15].replace(/export /g,'')+'\n'+modules[14].replace(/^import .*;$/gm,'').replace(/export /g,'')+';return {Dynamics,DYNAMICS_GLSL,bindDynamics,disposeDynamics};})();\n'+modules[13]+'\n'+modules[10]+'\nconst {samplePath}=(()=>{'+modules[5].replace(/export /g,'')+';return {samplePath};})();\n'+modules[6].replace(/^import .*;$/gm,'')+'\n'+modules[4]+'\n'+modules[7]+'\nconst {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular}=(()=>{'+modules[16].replace(/export /g,'')+';return {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular};})();\n'+'const {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal}=(()=>{'+modules[17].replace(/export /g,'')+';return {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal};})();\n'+modules[3].replace(/^import .*;$/gm,'')+'\n'+modules[0].replace(/^import .*;$/gm,'').replace('export class Renderer','export class SolidRenderer')+'\n'+modules[1]+'\nconst ScanlinePass=(()=>{'+modules[11].replace(/^import .*;$/gm,'').replace(/export /g,'')+';return ScanlinePass;})();\n'+'const opticalGLSL=(()=>{'+modules[12].replace(/^import .*;$/gm,'').replace(/export /g,'')+';return opticalGLSL;})();\n'+modules[8].replace(/^import .*;$/gm,'')+'\nconst FilamentPass=(()=>{'+modules[9].replace(/^import .*;$/gm,'').replace(/export /g,'')+';return FilamentPass;})();\n'+modules[2].replace(/^import .*;$/gm,'').replace(/^export \{fieldAt,sampleFrame\}.*;$/gm,'');if(cancelled)return;const exported={...snapshot,finishCompare:false,bgMode:snapshot.bgMode==='transparent'?'solid':snapshot.bgMode};const serialized=JSON.stringify(exported).replace(/</g,'\\u003c');const html=`<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Prisma Wallpaper</title><style>html,body{margin:0;overflow:hidden;background:${snapshot.background};width:100%;height:100%}canvas{width:100%;height:100%;display:block}</style><canvas id="art"></canvas><script type="module">${source}\nstartWallpaper(document.getElementById('art'),${serialized});<\/script></html>`;save(new Blob([html],{type:'text/html'}),uniqueDownloadName('prisma-wallpaper','html'));toast('Wallpaper HTML scaricato');return}
  if(!exportRenderer||exportRenderer.gl.isContextLost()){exportRenderer?.dispose();exportRenderer=new Renderer(document.createElement('canvas'));}const output=exportRenderer.canvas;if(exportWidth>exportRenderer.maxSize||exportHeight>exportRenderer.maxSize)throw new Error(`Questo dispositivo supporta al massimo ${exportRenderer.maxSize} pixel per lato.`);
- if(exportType==='image'){const format=$('#file-format').value;if(format==='jpeg'&&snapshot.bgMode==='transparent')snapshot.bgMode='solid';await exportRenderer.drawAccumulated(snapshot,capturePhase,exportWidth,exportHeight,{samples:16,dynamicsFrame:capturePhysics,cancelled:()=>cancelled,onStage:stage=>{if(stage==='preparing')progress(0,'Preparo il rendering dell’immagine…');else if(stage==='preparing-slow')progress(0,'Preparazione ancora in corso · puoi annullare in qualsiasi momento');},progress:f=>progress(f*.8,`Rifinisco l’immagine · ${Math.round(f*100)}%`)});progress(.8,'Preparo il file alla risoluzione scelta…');await waitPaint();if(cancelled)return;const mime=`image/${format}`;const blob=await new Promise(r=>output.toBlob(r,mime,.95));if(cancelled)return;if(!blob)throw new Error('Memoria insufficiente: prova una risoluzione più piccola.');if(blob.type!==mime)throw new Error('Il browser non supporta questo formato. Scegli PNG.');save(blob,uniqueDownloadName(`prisma-${snapshot.seed}-${exportWidth}x${exportHeight}`,format==='jpeg'?'jpg':format));toast('Immagine scaricata');}
+ if(exportType==='image'){
+  const format=$('#file-format').value;
+  if(format==='jpeg'&&snapshot.bgMode==='transparent')snapshot.bgMode='solid';
+  if(luminousPrintEnabled(snapshot)&&hasMotion(snapshot))await prepareExportFeedback(snapshot,30,Math.max(1,Math.round(snapshot.duration/snapshot.speed*30)),capturePhase);
+  if(cancelled)return;
+  const complete=await exportRenderer.drawAccumulated(snapshot,capturePhase,exportWidth,exportHeight,{samples:16,dynamicsFrame:capturePhysics,feedbackDeltaSeconds:1/30,cancelled:()=>cancelled,onStage:stage=>{if(stage==='preparing')progress(0,'Preparo il rendering dell’immagine…');else if(stage==='preparing-slow')progress(0,'Preparazione ancora in corso · puoi annullare in qualsiasi momento');},progress:f=>progress(f*.8,`Rifinisco l’immagine · ${Math.round(f*100)}%`)});
+  if(cancelled)return;
+  if(!complete)throw Error('Rendering dell’immagine interrotto.');
+  progress(.8,'Preparo il file alla risoluzione scelta…');await waitPaint();if(cancelled)return;const mime=`image/${format}`;const blob=await new Promise(r=>output.toBlob(r,mime,.95));if(cancelled)return;if(!blob)throw new Error('Memoria insufficiente: prova una risoluzione più piccola.');if(blob.type!==mime)throw new Error('Il browser non supporta questo formato. Scegli PNG.');save(blob,uniqueDownloadName(`prisma-${snapshot.seed}-${exportWidth}x${exportHeight}`,format==='jpeg'?'jpg':format));toast('Immagine scaricata');
+ }
  else{
   if(!hasMotion(snapshot))throw new Error('Attiva un movimento oppure un’animazione nei Filtri.');
   if(snapshot.bgMode==='transparent')snapshot.bgMode='solid';
@@ -352,13 +371,7 @@ async function download(){if(busy)return;let rendererFailed=false;const snapshot
   if(!Number.isFinite(duration)||duration<=0||!Number.isSafeInteger(total)||total<1)throw new Error('Durata o velocità del movimento non valida. Controlla i due valori nel pannello Moto.');
   if(duration>3600)throw new Error('Il video supera un’ora. Riduci la durata o aumenta la velocità nel pannello Moto.');
   videoSession=new VideoExportSession();await videoSession.init({width:exportWidth,height:exportHeight,fps:exportFps,totalFrames:total});
-  if(snapshot.finishEnabled&&snapshot.finishFeedback&&snapshot.finishFeedbackMix>0&&snapshot.finishFeedbackMemory>0){
-   const warmup=Math.min(total,Math.ceil(Math.log(.02)/Math.log(snapshot.finishFeedbackMemory)));
-   for(let n=total-warmup;n<total&&!cancelled;n++){
-    progress(0,'Preparo la persistenza prima del primo fotogramma…');
-    await exportRenderer.drawAccumulated(snapshot,n/total*Math.PI*2,exportWidth,exportHeight,{samples:snapshot.renderVersion>=2?2:1,cancelled:()=>cancelled});
-   }
-  }
+  await prepareExportFeedback(snapshot,exportFps,total);
   const start=performance.now();let recentStart=start,recentFrame=0,frameMs=0;
   const timeLabel=seconds=>seconds>=3600?`${Math.ceil(seconds/3600)} h`:seconds>=60?`${Math.ceil(seconds/60)} min`:`${Math.ceil(seconds)} s`;
   for(let n=0;n<total;n++){
@@ -366,8 +379,9 @@ async function download(){if(busy)return;let rendererFailed=false;const snapshot
    const remaining=frameMs>0?` · circa ${timeLabel(frameMs*(total-n)/1000)} restanti`:'';
    progress(n/total,`Creo il loop · ${(n+1).toLocaleString('it-IT')} / ${total.toLocaleString('it-IT')} fotogrammi · ${Math.round(n/total*100)}%${remaining}`);
    await waitPaint();
-   await exportRenderer.drawAccumulated(snapshot,n/total*Math.PI*2,exportWidth,exportHeight,{samples:snapshot.renderVersion>=2?2:1,cancelled:()=>cancelled,onStage:stage=>{if(n===0&&stage==='preparing')progress(0,'Preparo il rendering del video…');else if(stage==='preparing-slow')progress(n/total,'Preparazione ancora in corso · puoi annullare in qualsiasi momento');},progress:f=>progress((n+f)/total,`Creo il loop · ${(n+1).toLocaleString('it-IT')} / ${total.toLocaleString('it-IT')} fotogrammi · ${Math.round((n+f)/total*100)}%${remaining}`)});
+   const complete=await exportRenderer.drawAccumulated(snapshot,n/total*Math.PI*2,exportWidth,exportHeight,{samples:snapshot.renderVersion>=2?2:1,feedbackDeltaSeconds:1/exportFps,cancelled:()=>cancelled,onStage:stage=>{if(n===0&&stage==='preparing')progress(0,'Preparo il rendering del video…');else if(stage==='preparing-slow')progress(n/total,'Preparazione ancora in corso · puoi annullare in qualsiasi momento');},progress:f=>progress((n+f)/total,`Creo il loop · ${(n+1).toLocaleString('it-IT')} / ${total.toLocaleString('it-IT')} fotogrammi · ${Math.round((n+f)/total*100)}%${remaining}`)});
    if(cancelled)break;
+   if(!complete)throw Error('Rendering del video interrotto.');
    await videoSession.frame(exportRenderer.pixels());
    if(n===0){recentStart=performance.now();recentFrame=1;}
    else if((n+1-recentFrame)>=8){const now=performance.now(),average=(now-recentStart)/(n+1-recentFrame);frameMs=frameMs?frameMs*.6+average*.4:average;recentStart=now;recentFrame=n+1;}

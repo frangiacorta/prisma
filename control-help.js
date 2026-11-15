@@ -1,7 +1,7 @@
-import {AUDIO_HELP} from './audio-model.js?v=df84a2af0efa';
-import {EXTRA_HELP} from './control-help-extra.js?v=df84a2af0efa';
-import {FRACTAL_HELP} from './fractal-form.js?v=df84a2af0efa';
-import {CELLULAR_HELP} from './cellular-form.js?v=df84a2af0efa';
+import {AUDIO_HELP} from './audio-model.js?v=059b95afd26a';
+import {EXTRA_HELP} from './control-help-extra.js?v=059b95afd26a';
+import {FRACTAL_HELP} from './fractal-form.js?v=059b95afd26a';
+import {CELLULAR_HELP} from './cellular-form.js?v=059b95afd26a';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',
@@ -237,6 +237,8 @@ Object.assign(HELP,{
 export function controlCondition(s,key){
  const positive=k=>Math.abs(Number(s[k])||0)>1e-6||s.motions?.[k]?.enabled&&Math.abs(s.motions[k].amplitude||0)>1e-6;
  const need=(k,text)=>positive(k)?'':text;
+ if(key.startsWith('finishPrint')&&(!s.finishFeedback||!s.finishFeedbackLumen))return 'Attiva Persistenza e aumenta Impronte luminose.';
+ if(key.startsWith('finishPrint')&&key!=='finishPrintLife'&&s.finishPrintLife<=0)return 'Imposta Dimezzamento della luce sopra zero.';
  if(key.startsWith('finishFeedback')&&key!=='finishFeedback'&&!s.finishFeedback)return 'Attiva la persistenza dei fotogrammi in Filtri.';
  if(key==='pCloudCore'&&!s.pFill)return 'Aumenta il riempimento per distribuire i granelli dentro il nucleo.';
  if(key==='pTrailForkSpread'&&!positive('pTrailFork'))return 'Aumenta Quota di scie ramificate.';

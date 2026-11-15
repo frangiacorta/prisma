@@ -15329,29 +15329,40 @@
         "img-20261010-03",
         "lumen-print"
       ],
-      "state": "partial",
+      "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Trattamento visivo da confrontare col tutorial. File TD a pagamento; beat opzionale.",
+      "summary": "I riflessi sopra soglia lasciano tracce colorate che si accumulano e sbiadiscono. La durata si regola in secondi. Valido in Forma e Particelle, con isolamento delle impronte ed esportazione.",
       "sources": [
+        "https://www.youtube.com/watch?v=3sDCdwstSDc",
         "https://www.patreon.com/pppanik/posts/audioreactive-86240898",
         "https://www.patreon.com/pppanik/posts/project-files-86241043"
       ],
       "sections": [
         {
-          "title": "Verifica v78",
+          "title": "Verifica v82",
           "fields": [
             {
               "label": "implemented",
               "value": [
-                "Impronte guidate dalla luminanza della scena con soglia ed estinzione regolabili."
+                "Selezione per luminanza, accumulo progressivo delle tracce e dimezzamento in secondi.",
+                "Filtro condiviso da Forma e Particelle. Le sole impronte possono essere esportate come PNG con alfa.",
+                "Preparazione della persistenza dal ciclo precedente per l’export MP4."
               ]
             },
             {
-              "label": "remaining",
+              "label": "controls",
               "value": [
-                "Confrontare l’accumulo e le sovrapposizioni con la reference. La modulazione audio è sospesa."
+                "Intensità impronte",
+                "Soglia e sfumatura",
+                "Dimezzamento in secondi",
+                "Accumulo nelle sovrapposizioni",
+                "Solo impronte"
               ]
+            },
+            {
+              "label": "Note sulla reference",
+              "value": "La parte visiva usa il compositing di Prisma. La modulazione audio è sospesa."
             }
           ]
         },
@@ -15379,14 +15390,11 @@
             {
               "label": "controls",
               "value": [
-                "Esposizione",
-                "Soglia impronta",
-                "Persistenza",
-                "Decadimento",
-                "Palette",
-                "Contrasto",
-                "Impulso manuale",
-                "Beat opzionale"
+                "Intensità impronte",
+                "Soglia e sfumatura",
+                "Dimezzamento in secondi",
+                "Accumulo nelle sovrapposizioni",
+                "Solo impronte"
               ]
             },
             {
@@ -15407,13 +15415,18 @@
       "result": "",
       "where": "Filtri → Persistenza → Impronte luminose",
       "platform": "",
-      "next": "Confrontare l’accumulo e le sovrapposizioni con la reference. La modulazione audio è sospesa.",
+      "next": "",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v82-impronte-luminose.webp",
+          "width": 512,
+          "height": 288
+        },
         {
           "src": "media/v78-persistenza.webp",
           "width": 480,
@@ -15435,8 +15448,9 @@
       "category": "filters",
       "addedOn": "2026-10-10",
       "engine": "solid",
-      "resultImage": "media/v78-persistenza.webp",
-      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
+      "resultImage": "media/v82-impronte-luminose.webp",
+      "resultUrl": "../previews/impronte-luminose.html?v=82",
+      "resultVideo": "../previews/impronte-luminose.mp4"
     },
     {
       "id": "roadmap-note-events",
