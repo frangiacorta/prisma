@@ -1,6 +1,6 @@
-import {controlCondition,conditionActivation} from './control-help.js?v=9d07961f209b';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=9d07961f209b';
-import {syncMaterialControl} from './studio-model.js?v=9d07961f209b';
+import {controlCondition,conditionActivation} from './control-help.js?v=06ab443b8d11';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=06ab443b8d11';
+import {syncMaterialControl} from './studio-model.js?v=06ab443b8d11';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pCloudCore','pCloudHalo','pCellAmount','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];

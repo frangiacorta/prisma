@@ -1,5 +1,5 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=9d07961f209b';
-import {opticalGLSL} from './particle-optics.js?v=9d07961f209b';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=06ab443b8d11';
+import {opticalGLSL} from './particle-optics.js?v=06ab443b8d11';
 export const materialCavity=s=>Math.max(0,Math.min(1,(s.hollow||0)*(1-(s.wallThickness??.08))));
 
 export const prismaPaletteGLSL=`

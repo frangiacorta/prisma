@@ -1,5 +1,5 @@
-import {onlineDirector} from './director-connection.js?v=9d07961f209b';
-import {DIRECTOR_BRIEF,validateDirectorPlan} from './director-model.js?v=9d07961f209b';
+import {onlineDirector} from './director-connection.js?v=06ab443b8d11';
+import {DIRECTOR_BRIEF,validateDirectorPlan} from './director-model.js?v=06ab443b8d11';
 
 async function readReply(response){
  try{return await response.json();}

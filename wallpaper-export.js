@@ -1,9 +1,9 @@
 const dependencies=[
- './vendor/xpbd/distance.js?v=9d07961f209b','./dynamics.js?v=9d07961f209b','./animation-clock.js?v=9d07961f209b','./growth-material.js?v=9d07961f209b',
- './particle-paths.js?v=9d07961f209b','./solid-forces.js?v=9d07961f209b','./base-forms.js?v=9d07961f209b','./filament-model.js?v=9d07961f209b',
- './cellular-form.js?v=9d07961f209b','./fractal-form.js?v=9d07961f209b','./structure-model.js?v=9d07961f209b','./solid-renderer.js?v=9d07961f209b',
- './finishing.js?v=9d07961f209b','./finish-scanlines.js?v=9d07961f209b','./particle-optics.js?v=9d07961f209b','./particle-shading.js?v=9d07961f209b',
- './filament-renderer.js?v=9d07961f209b','./body-composite.js?v=9d07961f209b','./body-layers.js?v=9d07961f209b','./renderer.js?v=9d07961f209b'
+ './vendor/xpbd/distance.js?v=06ab443b8d11','./dynamics.js?v=06ab443b8d11','./animation-clock.js?v=06ab443b8d11','./growth-material.js?v=06ab443b8d11',
+ './particle-paths.js?v=06ab443b8d11','./solid-forces.js?v=06ab443b8d11','./base-forms.js?v=06ab443b8d11','./filament-model.js?v=06ab443b8d11',
+ './cellular-form.js?v=06ab443b8d11','./fractal-form.js?v=06ab443b8d11','./structure-model.js?v=06ab443b8d11','./solid-renderer.js?v=06ab443b8d11',
+ './finishing.js?v=06ab443b8d11','./finish-scanlines.js?v=06ab443b8d11','./particle-optics.js?v=06ab443b8d11','./particle-shading.js?v=06ab443b8d11',
+ './filament-renderer.js?v=06ab443b8d11','./body-composite.js?v=06ab443b8d11','./body-layers.js?v=06ab443b8d11','./renderer.js?v=06ab443b8d11'
 ];
 const withoutImports=source=>source.replace(/^import .*;$/gm,'');
 const isolated=(names,source)=>`const {${names}}=(()=>{${source.replace(/^export /gm,'')}\nreturn {${names}};})();`;

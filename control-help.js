@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=9d07961f209b';
-import {EXTRA_HELP} from './control-help-extra.js?v=9d07961f209b';
-import {FRACTAL_HELP} from './fractal-form.js?v=9d07961f209b';
-import {CELLULAR_HELP} from './cellular-form.js?v=9d07961f209b';
-import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=9d07961f209b';
-import {trailLightCompensation} from './particle-model.js?v=9d07961f209b';
+import {AUDIO_HELP} from './audio-model.js?v=06ab443b8d11';
+import {EXTRA_HELP} from './control-help-extra.js?v=06ab443b8d11';
+import {FRACTAL_HELP} from './fractal-form.js?v=06ab443b8d11';
+import {CELLULAR_HELP} from './cellular-form.js?v=06ab443b8d11';
+import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=06ab443b8d11';
+import {trailLightCompensation} from './particle-model.js?v=06ab443b8d11';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',

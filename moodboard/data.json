@@ -23329,6 +23329,40 @@
       "comparisonOutcome": "vicino",
       "comparisonRef": "s04-01",
       "comparisonDate": "2026-11-15"
+    },
+    {
+      "id": "roadmap-growth-geometry",
+      "name": "Reazione-diffusione estrusa",
+      "kind": "project",
+      "state": "partial",
+      "category": "form",
+      "families": [
+        "growth",
+        "film"
+      ],
+      "topics": [
+        "growth"
+      ],
+      "related": [
+        "roadmap-organic-growth"
+      ],
+      "media": [],
+      "sections": [],
+      "summary": "Il campo Gray–Scott apre fori e genera rilievo nella geometria di Prisma. Le fasce si modellano con le lamelle.",
+      "sources": [
+        "https://github.com/dueyama/gray-scott-3d",
+        "https://www.arkestra.app/"
+      ],
+      "addedOn": "2026-11-15",
+      "where": "Materiale → Geometria della trama · Forma → Suddivisione radiale e strati",
+      "compareNote": "Estrusione e aperture reali dallo stesso campo Gray–Scott. Lo spessore, le fasce e la luce del labirinto restano da affinare rispetto alla fonte.",
+      "comparisonOutcome": "parziale",
+      "comparisonSource": "https://www.arkestra.app/",
+      "comparisonDate": "2026-11-15",
+      "resultPreset": "previews/trama-estrusa.prisma.json",
+      "resultImage": "../previews/trama-estrusa.webp",
+      "resultVideo": "../previews/trama-estrusa.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#trama-estrusa"
     }
   ],
   "families": [

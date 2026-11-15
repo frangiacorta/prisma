@@ -1,16 +1,16 @@
-import {Dynamics,disposeDynamics} from './dynamics.js?v=9d07961f209b';
-import {motionPeriod} from './animation-clock.js?v=9d07961f209b';
-import {animationPhase} from './animation-clock.js?v=9d07961f209b';
-import {ScanlinePass} from './finish-scanlines.js?v=9d07961f209b';
-import {FilamentPass} from './filament-renderer.js?v=9d07961f209b';
-import {VeilTransition} from './veil-transition.js?v=9d07961f209b';
-import {BodySamples} from './body-samples.js?v=9d07961f209b';
-import {BodyComposite} from './body-composite.js?v=9d07961f209b';
-import {cloudBody,cloudToBody,grainMix} from './body-layers.js?v=9d07961f209b';
-import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=9d07961f209b';
-import {ParticleRenderer} from './particle-renderer.js?v=9d07961f209b';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=9d07961f209b';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=9d07961f209b';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=06ab443b8d11';
+import {motionPeriod} from './animation-clock.js?v=06ab443b8d11';
+import {animationPhase} from './animation-clock.js?v=06ab443b8d11';
+import {ScanlinePass} from './finish-scanlines.js?v=06ab443b8d11';
+import {FilamentPass} from './filament-renderer.js?v=06ab443b8d11';
+import {VeilTransition} from './veil-transition.js?v=06ab443b8d11';
+import {BodySamples} from './body-samples.js?v=06ab443b8d11';
+import {BodyComposite} from './body-composite.js?v=06ab443b8d11';
+import {cloudBody,cloudToBody,grainMix} from './body-layers.js?v=06ab443b8d11';
+import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=06ab443b8d11';
+import {ParticleRenderer} from './particle-renderer.js?v=06ab443b8d11';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=06ab443b8d11';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=06ab443b8d11';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
