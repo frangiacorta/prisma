@@ -1,7 +1,7 @@
-import {DYNAMICS_GLSL} from './dynamics.js?v=b6be3a2f372d';
+import {DYNAMICS_GLSL} from './dynamics.js?v=df84a2af0efa';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=b6be3a2f372d';
-import {forceBarrierGLSL} from './particle-forces.js?v=b6be3a2f372d';
+import {guideGLSL} from './particle-path-field.js?v=df84a2af0efa';
+import {forceBarrierGLSL} from './particle-forces.js?v=df84a2af0efa';
 export const grainSizingGLSL=`
 uniform vec2 uNodeStyle,uLargeGrains,uGrainDistribution;
 float grainDiameter(vec4 seed,int index){
@@ -20,6 +20,7 @@ const float TAU=6.28318530718;
 uniform float uPhase,uSeed,uBreath,uPoleRadius,uPoleField;
 uniform vec2 uResolution;uniform vec3 uSpacing;
 uniform vec4 uCloudShape,uCloudCells;
+uniform vec3 uCellDetail;
 uniform float uCounterflow;
 uniform vec4 uShape,uStructure,uNoise,uFlow,uDynamics,uPoles,uOuter,uClock,uPoints,uTrails,uTail,uColor;
 uniform vec4 uForm,uWarp,uFrame,uRotation;
@@ -61,6 +62,27 @@ vec3 shapeBase(vec4 r,float t,float family){
  }
  return p;
 }
+float cellIdentity(vec3 index){return fract(dot(index,vec3(.1739,.2738,.3272)));}
+vec3 cellAnchor(vec3 index,float seed){
+ vec3 offset=fract(seed*vec3(2.514,4.942,7.146))-.5;
+ return (index+.5+offset*.65*uCloudCells.w)/uCloudCells.y;
+}
+vec3 cellProfile(vec3 unit,float seed){
+ vec3 profile=unit;
+ if(uCellDetail.y>0.){
+  float phase=seed*TAU;
+  float folds=.64*sin(dot(unit,vec3(4.7,3.9,2.8))+phase)+.36*cos(dot(unit,vec3(7.2,-4.2,5.1))-2.*phase);
+  profile*=1.+.51*uCellDetail.y*folds;
+ }
+ if(abs(uCellDetail.x)>.00001){
+  float angle=seed*TAU,latitude=2.*fract(seed*7.193)-1.;
+  vec3 axis=normalize(vec3(cos(angle),latitude,sin(angle)));
+  // Expand along one axis and compensate across it to keep the cell's volume.
+  float longitudinal=exp2(2.15*uCellDetail.x),transverse=inversesqrt(longitudinal);
+  profile=profile*transverse+axis*dot(profile,axis)*(longitudinal-transverse);
+ }
+ return profile;
+}
 vec3 shape(vec4 r,float t,float family){
  vec3 p=shapeBase(r,t,family);
  if(abs(uSpacing.x-1.)+abs(uSpacing.y-1.)>.00001){
@@ -72,14 +94,14 @@ vec3 shape(vec4 r,float t,float family){
  if(uCloudCells.x>0.){
   float cells=uCloudCells.y;
   vec3 index=floor(r.xyz*cells);
-  float seed=fract(dot(index,vec3(.1739,.2738,.3272)));
-  vec3 offset=fract(seed*vec3(2.514,4.942,7.146))-.5;
-  vec3 anchor=(index+.5+offset*.65*uCloudCells.w)/cells;
+  float seed=cellIdentity(index);
+  vec3 anchor=cellAnchor(index,seed);
   vec3 center=shapeBase(vec4(anchor,.5),t,family);
   float z=1.-2.*fract(r.x*cells),angle=TAU*fract(r.y*cells),circle=sqrt(max(0.,1.-z*z));
   float breath=1.+.15*sin(t+seed*TAU)*uCloudCells.w;
-  vec3 sphere=vec3(circle*cos(angle),z,circle*sin(angle))*uCloudCells.z*breath*pow(fract(r.z*cells),.333333);
-  p=mix(p,center+sphere,uCloudCells.x);
+  vec3 unit=vec3(circle*cos(angle),z,circle*sin(angle));
+  vec3 profile=cellProfile(unit,seed)*uCloudCells.z*breath*pow(fract(r.z*cells),.333333);
+  p=mix(p,center+profile,uCloudCells.x);
  }
  return p;
 }
@@ -186,6 +208,14 @@ vec3 constrainedDynamics(vec3 p,vec4 r,float phase){
 }
 vec3 position(vec4 r,float phase){return constrainedDynamics(positionUnconstrained(r,phase),r,phase);}
 vec4 project(vec3 p){float depth=max(2.,7.5-p.z);return vec4(p.xy*vec2(uResolution.y/uResolution.x,1.)*2.6/depth,(depth-3.)/12.,1.);}
+float cellLightFactor(vec4 r){
+ if(uCloudCells.x<=0.||abs(uCellDetail.z)<.00001)return 1.;
+ vec3 index=floor(r.xyz*uCloudCells.y);
+ vec3 center=shapeBase(vec4(cellAnchor(index,cellIdentity(index)),.5),0.,uShape.x);
+ vec2 direction=vec2(cos(uGradient.x),sin(uGradient.x));
+ float signedPosition=clamp(dot(center.xy,direction)/max(.15,uShape.w*2.+uShape.z*.8),-1.,1.);
+ return exp2(2.5*signedPosition*uCellDetail.z*uCloudCells.x);
+}
 vec3 particleColor(vec4 r,vec3 p){
  vec3 rest=restPoint(r),coord=uColor.x<.5?rest:uColor.x<1.5?vec3((r.z-.5)*4.5,0.,0.):uColor.x<2.5?vec3((floor(r.x*uOuter.z)/uOuter.z-.5)*4.5,0.,0.):p;
  vec3 base=prismaPaletteBase(coord,vec3(1.));

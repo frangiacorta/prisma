@@ -1,16 +1,16 @@
-import {normalizePlayground} from './playground-model.js?v=b6be3a2f372d';
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=b6be3a2f372d';
-import {FRACTAL_META} from './fractal-form.js?v=b6be3a2f372d';
-import {CELLULAR_META} from './cellular-form.js?v=b6be3a2f372d';
-import {normalizeFinishRegions,normalizeFinishOrder,normalizeBrushStrokes} from './finishing.js?v=b6be3a2f372d';
-import {normalizeAudioClip} from './audio-recording.js?v=b6be3a2f372d';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=b6be3a2f372d';
-import {normalizeAudio} from './audio-model.js?v=b6be3a2f372d';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=b6be3a2f372d';
-import {normalizeForcePaths} from './particle-paths.js?v=b6be3a2f372d';
-import {normalizeForcePoints} from './particle-forces.js?v=b6be3a2f372d';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=b6be3a2f372d';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=b6be3a2f372d';
+import {normalizePlayground} from './playground-model.js?v=df84a2af0efa';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=df84a2af0efa';
+import {FRACTAL_META} from './fractal-form.js?v=df84a2af0efa';
+import {CELLULAR_META} from './cellular-form.js?v=df84a2af0efa';
+import {normalizeFinishRegions,normalizeFinishOrder,normalizeBrushStrokes} from './finishing.js?v=df84a2af0efa';
+import {normalizeAudioClip} from './audio-recording.js?v=df84a2af0efa';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=df84a2af0efa';
+import {normalizeAudio} from './audio-model.js?v=df84a2af0efa';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=df84a2af0efa';
+import {normalizeForcePaths} from './particle-paths.js?v=df84a2af0efa';
+import {normalizeForcePoints} from './particle-forces.js?v=df84a2af0efa';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=df84a2af0efa';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META} from './studio-model.js?v=df84a2af0efa';
 
 export function setFullness(s,value){s.fullness=value;s.hollow=value<.999?1:0;s.wallThickness=Math.max(.003,value);s.thinShell=1-Math.min(1,value/.09);s.thickness=1;}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -170,7 +170,7 @@ export function varyCreation(source,seed,amount=.45,scope='all',locks={}){
  const allowed=g=>!locks[g]&&(scope==='all'||scope===g);
  if(!particle&&allowed('shape')){const target=surprise(seed);for(const k of GROUPS.shape){if(Object.hasOwn(PARTICLE_META,k))continue;if(typeof source[k]==='number'&&typeof target[k]==='number'){const m=META[k];out[k]=source[k]+(target[k]-source[k])*amount;if(m?.[3]>=1)out[k]=Math.round(out[k]);}}}
  if((allowed('motion')||scope==='sceneMotion')&&!locks.motion){
-  const r=random(seed^0x72963),keys=scope==='sceneMotion'?['rotateX','rotateY','rotateZ','positionX','positionY','scale']:Object.keys(TRACK_META).filter(k=>!k.startsWith('petal')&&!k.startsWith('struct')&&!k.startsWith('fil')&&!k.startsWith('loop')||source[k]>0||source.motions[k]?.enabled);
+  const r=random(seed^0x72963),keys=scope==='sceneMotion'?['rotateX','rotateY','rotateZ','positionX','positionY','scale']:Object.keys(TRACK_META).filter(k=>(source.engine==='particles'||!k.startsWith('pCell'))&&(!k.startsWith('petal')&&!k.startsWith('struct')&&!k.startsWith('fil')&&!k.startsWith('loop')||source[k]>0||source.motions[k]?.enabled));
   out.motions=structuredClone(source.motions);
   const active=keys.filter(k=>source.motions[k]?.enabled),chosen=active.length?active:keys.filter(k=>['rotateY','positionY','scale'].includes(k));
   for(const k of chosen){const t=out.motions[k],m=TRACK_META[k];if(!t||!m)continue;t.enabled=true;t.amplitude=Math.max(m[1],Math.min(m[2],t.amplitude+(m[2]*(.08+r()*.3)-t.amplitude)*amount));t.cycles=1+Math.floor(r()*3);t.phase=Math.round(r()*360);t.direction=r()<.5?-1:1;t.curve=['sine','soft','triangle'][Math.floor(r()*3)];}

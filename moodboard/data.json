@@ -14928,15 +14928,32 @@
         "img-20261010-03",
         "cellular-instancing"
       ],
-      "state": "partial",
+      "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Cellule organiche sul nucleo Particelle. Tutorial verificato; progetto non ancora provato.",
+      "summary": "La nube passa gradualmente a gruppi di granelli persistenti. Proporzioni e rilievo danno celle sferiche, allungate, appiattite o lobate. La luminosità del gruppo resta stabile mentre il gruppo si muove.",
       "sources": [
         "https://www.elekktronaut.com/tutorials/cellular-noise-with-instancing",
         "https://derivative.ca/community-post/tutorial/cellular-noise-instancing/62657"
       ],
       "sections": [
+        {
+          "title": "Verifica v81",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Proporzioni da schiacciate ad allungate, rilievo indipendente e gradiente di luce invertibile. Raggruppamento, proporzioni, rilievo e gradiente sono animabili."
+              ]
+            },
+            {
+              "label": "checks",
+              "value": [
+                "Confronti dei quattro profili, gradiente neutro e invertito con opacità invariata, ripristino della nube da preset e loop sfera → cellule → sfera verificato. Presenti cursori, valori numerici e tracce."
+              ]
+            }
+          ]
+        },
         {
           "title": "Verifica v78",
           "fields": [
@@ -14959,7 +14976,7 @@
           "fields": [
             {
               "label": "method",
-              "value": "Instancing e rumore cellulare; dimensione, distanza, coesione e respiro."
+              "value": "Centri e identità delle cellule ricavati dal seme del campo esistente. Il profilo si allunga lungo un asse locale e il rilievo altera radialmente la sagoma. La luminosità segue l’angolo del gradiente configurato in Colori."
             }
           ]
         },
@@ -14968,7 +14985,7 @@
           "fields": [
             {
               "label": "feasible",
-              "value": "Cellule organiche sul nucleo Particelle. Tutorial verificato; progetto non ancora provato."
+              "value": "Profili cellulari e gradiente implementati nel motore Particelle."
             }
           ]
         },
@@ -15008,15 +15025,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Particelle → Forma → Nucleo → Cellule di granelli",
+      "where": "Particelle → Forma → Nucleo → Cellule di granelli · Luci → Illuminazione",
       "platform": "",
-      "next": "Provare gradienti di luce fra le cellule e forme cellulari non sferiche.",
+      "next": "",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v81-cellule-instanziate.webp",
+          "width": 640,
+          "height": 360
+        },
         {
           "src": "media/v78-cellule.webp",
           "width": 480,
@@ -15040,8 +15062,9 @@
       "category": "form",
       "addedOn": "2026-10-10",
       "engine": "particles",
-      "resultImage": "media/v78-cellule.webp",
-      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
+      "resultImage": "media/v81-cellule-instanziate.webp",
+      "resultUrl": "../previews/cellule-instanziate.html?v=81",
+      "resultVideo": "../previews/cellule-instanziate.mp4"
     },
     {
       "id": "roadmap-recursive-warp",

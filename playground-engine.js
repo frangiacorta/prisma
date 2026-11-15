@@ -1,8 +1,8 @@
-import {Renderer} from './renderer.js?v=b6be3a2f372d';
-import {FlowDirector} from './playground-flow.js?v=b6be3a2f372d';
-import {PlaygroundMixer} from './playground-mixer.js?v=b6be3a2f372d';
-import {normalizeCreation} from './creative-model.js?v=b6be3a2f372d';
-import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=b6be3a2f372d';
+import {Renderer} from './renderer.js?v=df84a2af0efa';
+import {FlowDirector} from './playground-flow.js?v=df84a2af0efa';
+import {PlaygroundMixer} from './playground-mixer.js?v=df84a2af0efa';
+import {normalizeCreation} from './creative-model.js?v=df84a2af0efa';
+import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=df84a2af0efa';
 
 export class PlaygroundEngine{
  constructor(canvas,config,notify=()=>{}){

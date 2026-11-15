@@ -1,6 +1,6 @@
-import {veilPanel} from './veil-panel.js?v=b6be3a2f372d';
-import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=b6be3a2f372d';
-import {SPRITES,COLOR_MODES} from './particle-model.js?v=b6be3a2f372d';
+import {veilPanel} from './veil-panel.js?v=df84a2af0efa';
+import {livingPanel,livingComposition,livingMotion} from './living-panel.js?v=df84a2af0efa';
+import {SPRITES,COLOR_MODES} from './particle-model.js?v=df84a2af0efa';
 export function particlePanel(tab,s,h,shared,selectedLight){
  const veil=s.pLiving===4?veilPanel(tab,s,{...h,baseShapePanel:()=>particlePanel('shape',{...s,pLiving:s.pVeilSourceKind===4?0:s.pVeilSourceKind,engine:'solid'},h,shared,selectedLight)},shared,selectedLight):null;if(veil!==null)return veil;
  const {slider,section,details,colorField,check}=h;
@@ -10,7 +10,7 @@ export function particlePanel(tab,s,h,shared,selectedLight){
  if(tab==='shape')return livingPanel(s,h)+section('Forma',slider('pOpening',['Sfera · nessun foro','Anello aperto'])+sliders(['pFill','pThickness'])+`<button id="particle-sphere" class="outline full">Sfera piena · elimina deformazioni</button><p class="help">Azzera deformazioni e campi, conservando materia, palette e durata.</p>`)
   +details('Trasformazione',sliders(['scale','positionX','positionY','rotateX','rotateY','rotateZ'])+details('Proporzioni',sliders(['volume','stretchX','stretchY','stretchZ'])))
   +details('Volume particellare',sliders(['pCloudCore','pCloudHalo','pCloudRadius'])+'<p class="help">La concentrazione dipende anche dal riempimento. L’alone sposta una quota dei granelli già presenti verso l’esterno. Regola le ombre in Luci.</p>')
-  +details('Cellule di granelli',sliders(['pCellAmount','pCellDensity','pCellSize','pCellVariation'])+'<p class="help">Distribuisce i granelli in gruppi tridimensionali stabili. Numero, dimensione e intensità del raggruppamento sono indipendenti.</p>')
+  +details('Cellule di granelli',sliders(['pCellAmount','pCellDensity','pCellSize'])+slider('pCellAspect',['Schiacciate','Allungate'])+sliders(['pCellRelief','pCellVariation'])+'<p class="help">Raggruppamento trasforma la stessa nube in cellule. A zero nelle Proporzioni le cellule sono sferiche; Rilievo aggiunge lobi e pieghe. Variazione sposta leggermente i centri e sfalsa il respiro. Il gradiente fra cellule è in Luci.</p>')
   +details('Lobi, rami e addensamenti',sliders(['pLobes','pLobeDepth','pClumps','pSymmetry']))
   +details('Rumore multiscala',sliders(['pOrganic','pFrequency','pDetail','pRough','pWarp'])+'<p class="help">Scala del campo decide la grandezza delle pieghe. Le ottave sovrappongono dettagli più fini; il loro peso è indipendente.</p>')
   +details('Rete di percorsi',sliders(['pNeural','pNodes','pConnect'])+'<p class="help">Raggruppa i percorsi del nucleo in fibre collegate. Nodi e connettività agiscono quando Rete di percorsi è maggiore di zero. I segnali si regolano in Moto.</p>')
@@ -35,7 +35,7 @@ export function particlePanel(tab,s,h,shared,selectedLight){
   +details('Scorrimento pellicola',sliders(['filmFlow','filmSwirl','filmCycles']))+details('Ritmo e cadenze',sliders(['pRhythm','pPause','pSpeedSpread']))
   +details('Campi',sliders(['pAttract','pRepel','pMagnet','pPoles','pRadius','pField'])+'<p class="help">Campi artistici periodici: i poli attirano, respingono e avvolgono la materia. Raggio sposta i poli; Influenza ne regola l’area d’azione.</p>')
   +shared('particle-motion',s,h,selectedLight);
- if(tab==='light')return section('Illuminazione',sliders(['pLighting','pDepthFade']))+shared('particle-light',s,h,selectedLight);
+ if(tab==='light')return section('Illuminazione',sliders(['pLighting','pDepthFade'])+slider('pCellLight',['Inverti','Diretto'])+'<p class="help">Il gradiente assegna una luminosità diversa ai gruppi e la conserva mentre si muovono. Usa l’angolo del gradiente in Colori. A zero la luminosità fra gruppi segue la scena.</p>')+shared('particle-light',s,h,selectedLight);
  if(tab==='background')return shared(tab,s,h,selectedLight).replace(/<details class="control-details"><summary>Ombra e caustica<\/summary>[\s\S]*?<\/details>/,'')+details('Ombre e caustiche',sliders(['pShadow','pShadowHeight','pShadowSoftness','pSelfShadow','pVolumeShadow','pCaustic'])+details('Dettaglio e sfumatura',sliders(['pSelfShadowSoftness','pSelfShadowBias','pOpticalExtent','pCausticSoftness']))+`<label class="field">Sorgente<select data-particle-select="pShadowLight"><option value="-1" ${s.pShadowLight<0?'selected':''}>Automatica · più intensa</option>${s.pShadowLight>=0&&!s.lights.some(l=>l.id===s.pShadowLight)?`<option selected value="${s.pShadowLight}">Luce rimossa · scegli una sorgente</option>`:''}${s.lights.map((l,i)=>`<option value="${l.id}" ${s.pShadowLight===l.id?'selected':''}>Luce ${i+1}${l.enabled?'':' · spenta'}</option>`).join('')}</select></label><p class="help">Proiezione di granelli, fili, scie e pelle su un piano orizzontale. Il piano resta fermo quando sposti la figura. Solo le parti fra piano e luce proiettano ombra. Dimensione della luce e morbidezza sfumano i bordi. Sul nero puro l’ombra non è visibile; nel PNG trasparente viene conservata. Ombre reciproche attenua la luce sulle parti coperte: richiede Risposta alle luci sopra zero. Caustica usa Trasparenza e Rifrazione in Materiale; sul metallo opaco resta spenta. Assorbimento della nube usa la quantità di granelli lungo il raggio. A zero le ombre seguono la prima superficie vista dalla luce. Area della mappa luce deve contenere tutta la figura.</p>`);
  return shared(tab,s,h,selectedLight);
 }

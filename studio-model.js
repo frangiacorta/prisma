@@ -1,8 +1,9 @@
-import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=b6be3a2f372d';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=b6be3a2f372d';
-import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=b6be3a2f372d';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=b6be3a2f372d';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=b6be3a2f372d';
+import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=df84a2af0efa';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=df84a2af0efa';
+import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=df84a2af0efa';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=df84a2af0efa';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=df84a2af0efa';
+import {PARTICLE_CELL_TRACKS} from './particle-model.js?v=df84a2af0efa';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
@@ -11,6 +12,7 @@ export const SHAPE_TRACKS=[...Object.keys(STRUCTURE_TRACKS),...Object.keys(FRACT
 export const TRACK_META={
  ...STRUCTURE_TRACKS,
  ...CELLULAR_TRACKS,
+ ...PARTICLE_CELL_TRACKS,
  ...FRACTAL_TRACKS,
  pVeilStyle:['Petali / aureola / ventaglio',0,2,.01],pVeilMorph:['Trasformazione forma / veli',0,1,.01],pVeilSpread:['Apertura dei veli',0,1,.01],
  petalFlowPhase:['Scorrimento lungo le radici',0,1,.01],petalOrbitPhase:['Avanzamento continuo sulla sfera',0,1,.01],petalWeave:['Ampiezza intreccio',0,1,.01],

@@ -1,11 +1,11 @@
-importScripts('./vendor/mediapipe/vision_bundle.js?v=b6be3a2f372d');
+importScripts('./vendor/mediapipe/vision_bundle.js?v=df84a2af0efa');
 let hands,pose,convert,backend;
 self.onmessage=async({data})=>{
  try{
   if(data.type==='init'){
-   ({limbPoints:convert}=await import('./body-landmarks.js?v=b6be3a2f372d'));
+   ({limbPoints:convert}=await import('./body-landmarks.js?v=df84a2af0efa'));
    const files=await Vision.FilesetResolver.forVisionTasks(new URL('./vendor/mediapipe/wasm/',self.location.href).href);
-   const {createLimbDetectors}=await import('./vendor/mediapipe-td/limb-detectors.js?v=b6be3a2f372d');
+   const {createLimbDetectors}=await import('./vendor/mediapipe-td/limb-detectors.js?v=df84a2af0efa');
    ({hands,pose,backend}=await createLimbDetectors(Vision,files,name=>new URL('./vendor/mediapipe/models/'+name,self.location.href).href,{cpuOnly:data.cpuOnly===true}));
    self.postMessage({type:'ready',backend});
   }else if(data.type==='frame'){
