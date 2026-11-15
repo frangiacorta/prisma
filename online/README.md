@@ -1,12 +1,5 @@
 # Prisma · Regia online
 
-GitHub e Sites vanno aggiornati, verificati e committati insieme a ogni modifica
-di Prisma, come autorizzato dall'utente il 2 novembre 2026. Gli aggiornamenti a Flow
-non estendono automaticamente il comportamento della Regia AI.
-La roadmap prevede un futuro accesso unico da GitHub e la dismissione di Sites,
-dopo la sostituzione verificata delle sue funzioni server. L'architettura è da
-valutare; fino ad allora mantenere entrambe le pubblicazioni allineate.
-
 Site privato, accessibile al proprietario tramite l'accesso gestito da Sites.
 Il Playground è lo stesso codice pubblicato su GitHub: il renderer resta nel browser.
 Il collegamento dal sito pubblico trasferisce il progetto nel frammento URL; non avvia chiamate AI.
@@ -19,19 +12,18 @@ la revisione dell'ambiente. Senza chiave la regia segnala il collegamento mancan
 resta disattivata; editor, Manuale e Flow funzionano.
 
 Modello iniziale: gpt-5.4-mini. Responses API, immagini e output JSON strutturato,
-nessuno strumento o codice eseguibile generato. La regia osserva due fotogrammi consecutivi dell'uscita reale e usa memoria e diario
-per scegliere il prossimo intervento. Ogni proposta viene validata prima di essere applicata.
+nessuno strumento o codice eseguibile generato. La qualità dell'inferenza online va
+verificata con chiamate reali dopo il collegamento dell'account.
+
+Impostare anche `PRISMA_DIRECTOR_OWNER_EMAIL` nei segreti runtime. La regia verifica l’indirizzo del proprietario fornito dall’accesso del Site a ogni richiesta. Il limite di 60 tentativi al giorno vale anche per il totale delle sessioni del Site.
 
 ## Limiti e memoria
 
 12 tentativi per sessione di un'ora, 60 al giorno UTC, una richiesta alla volta.
 I tentativi falliti o interrotti consumano il limite in modo conservativo.
-Massimo 4096 token di output, 100 modifiche e 8 colori per proposta; questi limiti
-sono dichiarati anche nello schema strutturato inviato al modello. Prompt e immagini
-hanno limiti di dimensione.
+Massimo 4096 token di output per richiesta; prompt e immagini hanno limiti di dimensione.
 Questi sono limiti di utilizzo, non una promessa di prezzo o un tetto in euro.
-Il contatore include i tentativi falliti e lo stop, e i token restituiti dal fornitore
-anche quando la proposta viene rifiutata; richieste interrotte senza risposta
+Il contatore mostra i token restituiti dal fornitore; richieste interrotte senza risposta
 possono essere fatturate senza poter essere contabilizzate nei token visualizzati.
 
 D1 conserva proprietario, memoria e ultime 8 scelte della sessione, contatori e scadenza.
@@ -46,22 +38,17 @@ La risposta tardiva non viene applicata. Nessun ripiego su Flow in caso di error
 
 ## Aggiornamento
 
+GitHub e Sites devono essere aggiornati, verificati e committati insieme a ogni modifica
+di Prisma. Questa è l'autorizzazione permanente dell'utente del 2 novembre 2026.
+Un aggiornamento di Flow va pubblicato anche qui senza estendere automaticamente
+il comportamento creativo della Regia AI, che richiede una richiesta distinta.
+
+Roadmap: accesso unico da GitHub e futura dismissione di Sites dopo la sostituzione
+verificata di tutte le funzioni server, autenticazione, memoria e gestione segreti.
+GitHub Pages è statico: l'architettura del servizio sostitutivo resta da progettare.
+Fino alla migrazione mantenere lo stesso Site privato e la parità funzionale dei due siti.
+
 Sorgente principale: web/studio nel workspace Prisma. Dopo il build pubblico eseguire
 checks/package-regia-online.mjs per aggiornare public/studio e i modelli condivisi.
 Conservare il project_id esistente. Le migrazioni D1 sono in drizzle/.
 Non copiare reference private, credenziali o file di sessione nella pubblicazione.
-
-Questa cartella conserva il nucleo del server e le migrazioni per revisione. Il servizio completo è distribuito nel Site privato; GitHub Pages non esegue questo modulo. handleDirector richiede identità verificate dal gateway Sites: non pubblicarlo dietro un server che accetta intestazioni identità arbitrarie dai visitatori.
-
-## Test di regressione
-
-Con Node.js 25 (SQLite integrato), dalla radice della repository:
-
-```sh
-node --test online/tests/director-api.test.mjs
-```
-
-Copertura: espansione della palette, consumi di proposte rifiutate e stop, memoria
-persistente, risposta tardiva dopo lo stop, isolamento del proprietario e limiti 12/60.
-I test di regressione simulano il provider; la verifica visiva richiede inferenze reali
-nel Site privato e non inserisce credenziali nei file pubblicati.

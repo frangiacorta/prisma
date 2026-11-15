@@ -19,17 +19,32 @@
 <body>
  <h1>Confronti visivi</h1>
  <nav><a href="../">Prisma</a><a href="../moodboard/?view=roadmap">Moodboard</a></nav>
- <main>
-  <article id="volume-denso"><video controls muted playsinline preload="none" poster="volume-denso.webp" src="volume-denso.mp4"></video><div><h2>Volume denso</h2><p>Granelli in profondità, cavità scure e luce rossa laterale.</p><a href="../?preset=previews%2Fvolume-denso.prisma.json">Apri preset</a> · <a href="../moodboard/#s09-01">Riferimento</a></div></article>
-  <article id="velo-fibre"><video controls muted playsinline preload="none" poster="velo-fibre.webp" src="velo-fibre.mp4"></video><div><h2>Velo di fibre</h2><p>Spessore, striature e pieghe di un guscio perlaceo.</p><a href="../?preset=previews%2Fvelo-fibre.prisma.json">Apri preset</a> · <a href="../moodboard/#s06-01">Riferimento</a></div></article>
-  <article id="ricircolo-luminoso"><video controls muted playsinline preload="none" poster="ricircolo-luminoso.webp" src="ricircolo-luminoso.mp4"></video><div><h2>Ricircolo luminoso</h2><p>Impulsi, scie ramificate e diffusione interna.</p><a href="../?preset=previews%2Fricircolo-luminoso.prisma.json">Apri preset</a> · <a href="../moodboard/#s18-05">Riferimento</a></div></article>
-  <article id="filamenti-macro"><video controls muted playsinline preload="none" poster="filamenti-macro.webp" src="filamenti-macro.mp4"></video><div><h2>Filamenti in macro</h2><p>Curve, ciuffi e variazione di colore lungo i fili.</p><a href="../?preset=previews%2Ffilamenti-macro.prisma.json">Apri preset</a> · <a href="../moodboard/#s13-01">Riferimento</a></div></article>
-  <article id="mandelbulb-dettaglio"><video controls muted playsinline preload="none" poster="mandelbulb-dettaglio.webp" src="mandelbulb-dettaglio.mp4"></video><div><h2>Mandelbulb · dettaglio</h2><p>Ripetizione a più scale, bordi fini e riflessi metallici.</p><a href="../?preset=previews%2Fmandelbulb-dettaglio.prisma.json">Apri preset</a> · <a href="../moodboard/#s12-01">Riferimento</a></div></article>
-  <article id="pellicola-spettrale"><video controls muted playsinline preload="none" poster="pellicola-spettrale.webp" src="pellicola-spettrale.mp4"></video><div><h2>Pellicola spettrale</h2><p>Interferenza, contrasto cobalto–oro e dispersione sui bordi.</p><a href="../?preset=previews%2Fpellicola-spettrale.prisma.json">Apri preset</a> · <a href="../moodboard/#s11-01">Riferimento</a></div></article>
-  <article id="reticolo-giunzioni"><video controls muted playsinline preload="none" poster="reticolo-giunzioni.webp" src="reticolo-giunzioni.mp4"></video><div><h2>Reticolo con giunzioni</h2><p>Pori e rilievi fra fibre incurvate.</p><a href="../?preset=previews%2Freticolo-giunzioni.prisma.json">Apri preset</a> · <a href="../moodboard/#s07-05">Riferimento</a></div></article>
-  <article id="impulsi-sottili"><video controls muted playsinline preload="none" poster="impulsi-sottili.webp" src="impulsi-sottili.mp4"></video><div><h2>Impulsi sui filamenti</h2><p>Tracce fini e picchi di luce lungo i rami.</p><a href="../?preset=previews%2Fimpulsi-sottili.prisma.json">Apri preset</a> · <a href="../moodboard/#s18-02">Riferimento</a></div></article>
-  <article id="nodo-laccato"><video controls muted playsinline preload="none" poster="nodo-laccato.webp" src="nodo-laccato.mp4"></video><div><h2>Nodo laccato</h2><p>Avvolgimenti ravvicinati e fasce a più colori.</p><a href="../?preset=previews%2Fnodo-laccato.prisma.json">Apri preset</a> · <a href="../moodboard/#s16-02">Riferimento</a></div></article>
-  <article id="lamelle-asimmetriche"><video controls muted playsinline preload="none" poster="lamelle-asimmetriche.webp" src="lamelle-asimmetriche.mp4"></video><div><h2>Lamelle asimmetriche</h2><p>Lobi ripiegati, orli sottili e nucleo scuro.</p><a href="../?preset=previews%2Flamelle-asimmetriche.prisma.json">Apri preset</a> · <a href="../moodboard/#s17-01">Riferimento</a></div></article>
- </main>
+ <p id="loading" role="status">Carico i confronti…</p>
+ <main aria-label="Studi e fonti"></main>
+ <script type="module">
+  const grid=document.querySelector('main'),loading=document.getElementById('loading');
+  const cssSafe=/^[a-z0-9-]+$/;
+  const text=(tag,value)=>{const node=document.createElement(tag);node.textContent=value;return node;};
+  const link=(label,url)=>{const a=text('a',label);a.href=url;return a;};
+  const outcomes={raggiunto:'Raggiunto',vicino:'Vicino',parziale:'Parziale',lontano:'Scarto ampio',fonte:'Fonte esterna',funzionale:'Verifica funzionale'};
+  try{
+   const data=await fetch('../moodboard/data.json',{cache:'no-cache'}).then(response=>{if(!response.ok)throw Error();return response.json();});
+   const rendered=new Set();
+   for(const item of data.items.filter(item=>item.kind==='project'&&item.comparisonDate&&item.resultPreset)){
+    const slug=item.resultPreset.match(/^previews\/([a-z0-9-]+)\.prisma\.json$/)?.[1];
+    if(!cssSafe.test(slug||'')||rendered.has(slug))continue;
+    rendered.add(slug);
+    const article=document.createElement('article');article.id=slug;
+    const video=document.createElement('video');video.controls=true;video.muted=true;video.playsInline=true;video.preload='none';video.setAttribute('aria-label',item.name);
+    video.src=slug+'.mp4';video.poster=slug+'.webp';
+    const body=document.createElement('div'),heading=text('h2',item.name),note=text('p',item.compareNote||'');
+    body.append(heading,text('small',outcomes[item.comparisonOutcome]||'Verifica'),note,link('Apri preset','../?preset='+encodeURIComponent(item.resultPreset)),
+     document.createTextNode(' · '),link('Confronta nella moodboard','../moodboard/#'+encodeURIComponent(item.id)));
+    article.append(video,body);grid.append(article);
+   }
+   loading.hidden=true;
+   document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
+  }catch{loading.textContent='I confronti non sono disponibili. Ricarica la pagina per riprovare.';}
+ </script>
 </body>
 </html>

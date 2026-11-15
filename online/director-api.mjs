@@ -1,7 +1,7 @@
 import {prepareDirector} from '../director-request.js';
 import {DIRECTOR_SCHEMA,validateDirectorPlan} from '../director-model.js';
 
-export const SESSION_LIMIT=12,DAY_LIMIT=60,MODEL='gpt-5.4-mini';
+export const SESSION_LIMIT=12,DAY_LIMIT=60,GLOBAL_DAY_LIMIT=60,MODEL='gpt-5.4-mini';
 const json=(data,status=200)=>Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const fail=(message,status=400)=>Object.assign(new Error(message),{status});
 const usage=row=>({attempts:row.attempts,limit:row.limit_count,inputTokens:row.input_tokens,outputTokens:row.output_tokens});
@@ -17,7 +17,10 @@ export async function handleDirector(request,env,{fetcher=fetch,now=()=>Date.now
  const url=new URL(request.url),route=url.pathname;
  const owner=request.headers.get('oai-authenticated-user-id');
  if(!owner)return json({error:'Accedi con il tuo account per usare la regia.'},401);
- // Sites is owner-private. Identity comes from its authenticated dispatch, never a browser token.
+ // Sites supplies both fields after authentication. The explicit allowlist
+ // stays in force even if someone later shares the Site with more viewers.
+ const allowed=String(env.PRISMA_DIRECTOR_OWNER_EMAIL||'').trim().toLowerCase(),email=request.headers.get('oai-authenticated-user-email')?.trim().toLowerCase();
+ if(!allowed||email!==allowed)return json({error:'La regia online è riservata al proprietario.'},403);
  if(request.headers.get('origin')&&request.headers.get('origin')!==url.origin)return json({error:'Apri la regia dal suo sito personale.'},403);
  if(route==='/api/assistant/status'&&request.method==='GET')return json({available:configured(env),director:true,cloud:true,token:'same-origin',model:MODEL,sessionLimit:SESSION_LIMIT,dayLimit:DAY_LIMIT,message:configured(env)?'Regia online pronta.':'Regia online predisposta. Manca il collegamento dell’account API; Forma, Particelle e Flow sono disponibili.'});
  if(request.method!=='POST')return json({error:'Metodo non disponibile.'},405);
@@ -34,9 +37,14 @@ export async function handleDirector(request,env,{fetcher=fetch,now=()=>Date.now
    if(busy)throw fail('Una decisione è già in corso. Attendi qualche secondo.',409);
    const day=new Date(time).toISOString().slice(0,10);
    const daily=await env.DB.prepare('SELECT attempts FROM director_days WHERE owner=? AND day=?').bind(owner,day).first();
-   if(daily?.attempts>=DAY_LIMIT)throw fail('Limite giornaliero raggiunto. Puoi continuare manualmente.',429);
-   await env.DB.prepare('UPDATE director_sessions SET stopped=1 WHERE owner=?').bind(owner).run();
-   const id=crypto.randomUUID();await env.DB.prepare('INSERT INTO director_sessions (id,owner,expires,limit_count) VALUES (?,?,?,?)').bind(id,owner,time+3600000,SESSION_LIMIT).run();
+   const global=await env.DB.prepare('SELECT COALESCE(SUM(attempts),0) AS attempts FROM director_days WHERE day=?').bind(day).first();
+   if(daily?.attempts>=DAY_LIMIT||global?.attempts>=GLOBAL_DAY_LIMIT)throw fail('Limite giornaliero raggiunto. Puoi continuare manualmente.',429);
+   const id=crypto.randomUUID();
+   const [added]=await env.DB.batch([
+    env.DB.prepare('INSERT INTO director_sessions (id,owner,expires,limit_count) SELECT ?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM director_sessions WHERE owner=? AND lease>? AND stopped=0) RETURNING id').bind(id,owner,time+3600000,SESSION_LIMIT,owner,time),
+    env.DB.prepare('UPDATE director_sessions SET stopped=1 WHERE owner=? AND id<>? AND EXISTS(SELECT 1 FROM director_sessions WHERE id=?)').bind(owner,id,id)
+   ]);
+   if(!added?.results?.length)throw fail('Una decisione è già in corso. Attendi qualche secondo.',409);
    return json({id,limit:SESSION_LIMIT,dayLimit:DAY_LIMIT,dayUsed:daily?.attempts||0});
   }
   if(!['/api/director','/api/director/stop'].includes(route))throw fail('Operazione non disponibile.',404);
@@ -55,7 +63,7 @@ export async function handleDirector(request,env,{fetcher=fetch,now=()=>Date.now
   const day=new Date(time).toISOString().slice(0,10),leaseOwner=session.id+':'+session.attempts;
   try{
    await env.DB.prepare('INSERT INTO director_days (owner,day,attempts) VALUES (?,?,0) ON CONFLICT(owner,day) DO NOTHING').bind(owner,day).run();
-   const quota=await env.DB.prepare('UPDATE director_days SET attempts=attempts+1,lease=?,lease_owner=? WHERE owner=? AND day=? AND attempts<? AND lease<=? RETURNING attempts').bind(lease,leaseOwner,owner,day,DAY_LIMIT,time).first();
+   const quota=await env.DB.prepare('UPDATE director_days SET attempts=attempts+1,lease=?,lease_owner=? WHERE owner=? AND day=? AND attempts<? AND lease<=? AND (SELECT COALESCE(SUM(d.attempts),0) FROM director_days d WHERE d.day=?)<? RETURNING attempts').bind(lease,leaseOwner,owner,day,DAY_LIMIT,time,day,GLOBAL_DAY_LIMIT).first();
    if(!quota)throw fail('Limite giornaliero raggiunto o decisione ancora in corso. Puoi continuare manualmente.',429);
    const response=await fetcher('https://api.openai.com/v1/responses',{
     method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+env.OPENAI_API_KEY},

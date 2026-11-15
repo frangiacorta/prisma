@@ -1,8 +1,8 @@
 {
   "prismaProject": 2,
   "name": "Reticolo con giunzioni",
-  "createdAt": "2026-11-15T16:58:13.610Z",
-  "exportedAt": "2026-11-15T16:58:13.610Z",
+  "createdAt": "2026-11-15T20:13:47.954Z",
+  "exportedAt": "2026-11-15T20:13:47.954Z",
   "state": {
     "dynAmount": 0,
     "dynMass": 1,
@@ -275,9 +275,9 @@
     "background2": "#020308",
     "bgMode": "solid",
     "bgAngle": 35,
-    "scale": 1.7,
-    "positionX": -0.31,
-    "positionY": -0.15,
+    "scale": 3.7,
+    "positionX": -1.5,
+    "positionY": -1.21,
     "rotateX": 36,
     "rotateY": -45,
     "animateRotation": false,
@@ -300,6 +300,7 @@
     "filScatter": 0.35,
     "filBend": 0.2,
     "filComb": 0,
+    "filWrap": 0,
     "filCurl": 0,
     "filFrizz": 0.12,
     "filClump": 0,
@@ -333,12 +334,12 @@
     "loopBands": 0,
     "loopBandCount": 6,
     "structShell": 1,
-    "structThickness": 0.13,
+    "structThickness": 0.066,
     "structFibres": 1,
-    "structWeft": 0.87,
-    "structDensity": 8,
-    "structThreadWidth": 0.35,
-    "structWeave": 0.047,
+    "structWeft": 0.89,
+    "structDensity": 7,
+    "structThreadWidth": 0.28,
+    "structWeave": 0.018,
     "structWeaveVariation": 0.88,
     "structWeaveNodes": 0.95,
     "structSlices": 0,
@@ -642,6 +643,8 @@
     "lensDistortion": 0,
     "grainSize": 1,
     "photoAll": false,
+    "focusBlur": 0.51,
+    "focusDepth": 2.24,
     "motions": {
       "sceneGrains": {
         "enabled": false,
@@ -716,6 +719,18 @@
         "mode": "wave"
       },
       "filComb": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "filWrap": {
         "enabled": false,
         "amplitude": 0.2,
         "cycles": 1,
@@ -2030,8 +2045,8 @@
           "reverse": false,
           "enabled": true,
           "mode": "add",
-          "from": 0.35,
-          "to": 1.7,
+          "from": 0.22,
+          "to": 4.5,
           "curve": 1
         },
         {

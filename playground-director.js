@@ -1,6 +1,10 @@
-import {onlineDirector} from './director-connection.js?v=ddff107e99e1';
-import {DIRECTOR_BRIEF,validateDirectorPlan} from './director-model.js?v=ddff107e99e1';
+import {onlineDirector} from './director-connection.js?v=6a9e627b503d';
+import {DIRECTOR_BRIEF,validateDirectorPlan} from './director-model.js?v=6a9e627b503d';
 
+async function readReply(response){
+ try{return await response.json();}
+ catch{throw Error('Il servizio della regia non è raggiungibile.');}
+}
 const wait=(ms,signal)=>new Promise((resolve,reject)=>{if(signal.aborted)return reject(new DOMException('Interrotto','AbortError'));const done=()=>{signal.removeEventListener('abort',abort);resolve();},timer=setTimeout(done,ms),abort=()=>{clearTimeout(timer);signal.removeEventListener('abort',abort);reject(new DOMException('Interrotto','AbortError'));};signal.addEventListener('abort',abort,{once:true});});
 export class PlaygroundDirector{
  constructor(engine,{notify=()=>{},save=()=>{},request=(...args)=>fetch(...args)}={}){this.engine=engine;this.notify=notify;this.save=save;this.request=request;this.running=false;this.phase='idle';this.controller=null;this.loading=null;this.turn=0;this.sessionRevision=0;}
@@ -17,10 +21,10 @@ export class PlaygroundDirector{
   this.engine.flow.stop();this.engine.mix(this.engine.config.mix);
   const controller=new AbortController(),signal=controller.signal;this.sessionRevision++;this.controller=controller;this.running=true;this.phase='connecting';this.status(onlineDirector()?'Collego la regia online…':'Collego Codex…');
   try{
-   const response=await this.request('/api/assistant/status',{cache:'no-store',signal:AbortSignal.any([signal,AbortSignal.timeout(20000)])}),connection=await response.json();
+   const response=await this.request('/api/assistant/status',{cache:'no-store',signal:AbortSignal.any([signal,AbortSignal.timeout(20000)])}),connection=await readReply(response);
    if(!response.ok||!connection.available||!connection.token)throw Error(connection.message||'Apri Codex e accedi, poi riprova.');
    if(!connection.director)throw Error('Il servizio Prisma sul PC va aggiornato e riavviato per usare la regia AI.');
-   if(connection.cloud){const r=await this.request('/api/director/session',{method:'POST',headers:{'Content-Type':'application/json','X-Prisma-Assistant':connection.token},body:'{}',signal});const session=await r.json();if(!r.ok)throw Error(session.error||'Avvio non riuscito.');if(signal.aborted)return;this.onlineSession={id:session.id,token:connection.token};this.usage={attempts:0,limit:session.limit,dayUsed:session.dayUsed,dayLimit:session.dayLimit};}
+   if(connection.cloud){const r=await this.request('/api/director/session',{method:'POST',headers:{'Content-Type':'application/json','X-Prisma-Assistant':connection.token},body:'{}',signal});const session=await readReply(r);if(!r.ok)throw Error(session.error||'Avvio non riuscito.');if(signal.aborted)return;this.onlineSession={id:session.id,token:connection.token};this.usage={attempts:0,limit:session.limit,dayUsed:session.dayUsed,dayLimit:session.dayLimit};}
    while(!signal.aborted){
     if(document.hidden)throw Error('Regia sospesa: torna a questa scheda e riavviala quando vuoi.');
     const e=this.engine,c=e.config,d=c.director;
@@ -29,7 +33,7 @@ export class PlaygroundDirector{
     const decks={A:{name:e.decks.A.name,state:structuredClone(e.decks.A.state)},B:{name:e.decks.B.name,state:structuredClone(e.decks.B.state)}};
     this.phase='thinking';this.status('La regia sta scegliendo il prossimo intervento. La scena continua a muoversi.');
     const r=await this.request('/api/director',{method:'POST',headers:{'Content-Type':'application/json','X-Prisma-Assistant':connection.token},body:JSON.stringify({session:this.onlineSession?.id,frames,decks,mix:c.mix,stats:e.stats,brief:d.brief||DIRECTOR_BRIEF,memory:d.memory,history:d.history}),signal:AbortSignal.any([signal,AbortSignal.timeout(165000)])});
-    const raw=await r.json();if(signal.aborted)break;
+    const raw=await readReply(r);if(signal.aborted)break;
     if(raw.usage){this.usage=raw.usage;this.notify(this);}
     if(!r.ok)throw Error(raw.error||'Regia non disponibile.');
     const plan=validateDirectorPlan(raw,decks);
@@ -48,7 +52,7 @@ export class PlaygroundDirector{
     d.memory=plan.memory;d.history=[...d.history,{at:new Date().toISOString(),observation:plan.observation,intent:plan.intent,name:plan.name,source:plan.source}].slice(-8);this.turn++;
     this.save();if(this.usage&&this.usage.attempts>=this.usage.limit){this.phase='idle';this.status('Sessione completata: limite di '+this.usage.limit+' tentativi raggiunto. La scena continua; puoi riprendere i comandi.');break;}this.phase='watching';this.status(plan.intent+' · Osservo questo passaggio.');await wait(plan.holdSeconds*1000,signal);
    }
-  }catch(error){if(!signal.aborted){this.engine.mix(this.engine.config.mix);this.phase='error';this.running=false;this.status(error.message+' Puoi continuare manualmente o riprovare.');}}
+  }catch(error){if(!signal.aborted){this.engine.mix(this.engine.config.mix);this.phase='error';this.running=false;const text=error instanceof TypeError||error.name==='TimeoutError'?'Il servizio della regia non risponde.':error.message;this.status(text+' Puoi continuare manualmente o riprovare.');}}
   finally{if(this.controller===controller){this.endOnlineSession();this.controller=null;this.running=false;this.notify(this);}}
  }
  endOnlineSession(){const revision=this.sessionRevision,session=this.onlineSession;this.onlineSession=null;if(session)this.request('/api/director/stop',{method:'POST',headers:{'Content-Type':'application/json','X-Prisma-Assistant':session.token},body:JSON.stringify({session:session.id}),keepalive:true}).then(async response=>{const stopped=await response.json();if(this.sessionRevision===revision&&stopped.usage){this.usage=stopped.usage;this.notify(this);}}).catch(()=>{});}

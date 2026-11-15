@@ -1,5 +1,5 @@
-import {PANEL_GUIDES} from './workspace-layout.js?v=ddff107e99e1';
-import {SECTION_NAMES} from './control-vocabulary.js?v=ddff107e99e1';
+import {PANEL_GUIDES} from './workspace-layout.js?v=6a9e627b503d';
+import {SECTION_NAMES} from './control-vocabulary.js?v=6a9e627b503d';
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
  {id:'shape',label:'Forma',tabs:[['shape','Forma','shape']]},
@@ -83,7 +83,7 @@ function entryLabel(el){
  if(host){const clone=host.cloneNode(true);clone.querySelectorAll('input,select,output,button,.range-ends').forEach(n=>n.remove());return clone.textContent.trim();}
  return el.getAttribute('aria-label')||el.textContent.trim();
 }
-export function mountControlSearch({getEngine,getMarkup,showTab,revealControl}){
+export function mountControlSearch({getEngine,getMarkup,showTab,revealControl,prepare}){
  const input=document.getElementById('control-search'),results=document.getElementById('control-search-results'),status=document.getElementById('control-search-status');let entries=[];
  function close(){results.hidden=true;status.textContent='';}
  function refresh(){
@@ -123,7 +123,10 @@ export function mountControlSearch({getEngine,getMarkup,showTab,revealControl}){
    b.onclick=()=>{input.value='';close();if(entry.action){document.querySelector(entry.selector)?.click();return;}showTab(entry.tab);document.getElementById('controls').classList.remove('only-changed');const target=document.getElementById('controls').querySelector(entry.selector);if(!target){revealControl?.(entry);return;}let d=target.closest('details');while(d){d.open=true;d=d.parentElement.closest('details');}const host=target.closest('.param,.field,.check,.color-field')||target;host.classList.add('search-highlight');requestAnimationFrame(()=>{document.getElementById('controls').classList.add('search-reveal');target.focus({preventScroll:true});target.scrollIntoView({block:'center',behavior:'smooth'});});setTimeout(()=>host.classList.remove('search-highlight'),2200);};results.append(b);
   }
  }
- input.addEventListener('focus',()=>{refresh();search();});input.addEventListener('input',search);
+ input.addEventListener('focus',()=>{
+  refresh();search();
+  if(prepare)void prepare().then(()=>{if(document.activeElement===input){refresh();search();}});
+ });input.addEventListener('input',search);
  document.getElementById('control-search-clear').onclick=()=>{input.value='';close();input.focus();};
  input.addEventListener('keydown',e=>{if(e.key==='Escape'){input.value='';close();}if(e.key==='ArrowDown'){e.preventDefault();results.querySelector('button')?.focus();}if(e.key==='Enter'){e.preventDefault();results.querySelector('button')?.click();}});
  results.addEventListener('keydown',e=>{if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();const buttons=[...results.querySelectorAll('button')],i=buttons.indexOf(document.activeElement),next=e.key==='Home'?0:e.key==='End'?buttons.length-1:Math.max(0,Math.min(buttons.length-1,i+(e.key==='ArrowDown'?1:-1)));buttons[next]?.focus();}if(e.key==='Escape'){input.value='';close();input.focus();}});

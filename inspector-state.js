@@ -1,6 +1,6 @@
-import {controlCondition} from './control-help.js?v=ddff107e99e1';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=ddff107e99e1';
-import {syncMaterialControl} from './studio-model.js?v=ddff107e99e1';
+import {controlCondition,conditionActivation} from './control-help.js?v=6a9e627b503d';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=6a9e627b503d';
+import {syncMaterialControl} from './studio-model.js?v=6a9e627b503d';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pCloudCore','pCloudHalo','pCellAmount','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
@@ -49,8 +49,11 @@ export function decorateInspector({root,state,baseline,tab,edit}){
   const label=host.querySelector('label')?.textContent||key;
   const reset=document.createElement('button');reset.type='button';reset.className='parameter-reset';reset.textContent='↶';reset.title=`Ripristina ${label}: ${base}`;reset.setAttribute('aria-label',reset.title);
   reset.onclick=()=>edit(s=>assign(s,key,base),'Parametro ripristinato');host.querySelector('.param-line')?.append(reset);
-  const note=document.createElement('small');note.className='condition-note';note.hidden=true;host.append(note);
-  rangeRows.push({host,el,key,base,reset,note});
+  const note=document.createElement('small'),enable=document.createElement('button');note.className='condition-note';note.hidden=true;
+  enable.type='button';enable.className='condition-action';enable.textContent='Applica';enable.hidden=true;
+  const details=document.createElement('span');note.append(details,enable);host.append(note);
+  enable.onclick=()=>{const patch=conditionActivation(state,key);if(patch)edit(s=>{for(const [k,v] of Object.entries(patch))assign(s,k,v);},'Condizione applicata');};
+  rangeRows.push({host,el,key,base,reset,note,details,enable});
  }
  const flags=[...root.querySelectorAll('[data-check],[data-path-check],[data-particle-select],[data-path-select],[data-finish-select]')].map(el=>({el,key:el.dataset.check||el.dataset.pathCheck||el.dataset.particleSelect||el.dataset.pathSelect||el.dataset.finishSelect,host:el.closest('.check,.field')})).filter(r=>r.host&&at(baseline,r.key)!==undefined);
  const toolbar=document.createElement('div');toolbar.className='inspector-overview';
@@ -110,11 +113,12 @@ export function decorateInspector({root,state,baseline,tab,edit}){
    info.title=condition||'';
    const description=document.getElementById(info.getAttribute('aria-describedby'));if(description)description.textContent=info.dataset.helpText;
   }
-  for(const {host,key,base,reset,note} of rangeRows){
+  for(const {host,key,base,reset,note,details,enable} of rangeRows){
    const changed=!equal(at(state,key),base),condition=controlCondition(state,key);
    host.classList.toggle('is-changed',changed);host.classList.toggle('condition-unmet',!!condition);
    reset.disabled=!changed;reset.hidden=!changed;note.hidden=!condition;
-   if(note.textContent!==condition)note.textContent=condition;
+   if(details.textContent!==condition)details.textContent=condition;
+   enable.hidden=!conditionActivation(state,key,condition);
   }
   for(const r of flags)r.host.classList.toggle('is-changed',!equal(at(state,r.key),at(baseline,r.key)));
   for(const d of root.querySelectorAll('details')){

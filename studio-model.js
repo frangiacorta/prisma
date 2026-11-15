@@ -1,10 +1,10 @@
-import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=ddff107e99e1';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=ddff107e99e1';
-import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=ddff107e99e1';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=ddff107e99e1';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=ddff107e99e1';
-import {PARTICLE_CELL_TRACKS} from './particle-model.js?v=ddff107e99e1';
-import {BODY_LAYER_META} from './body-layers.js?v=ddff107e99e1';
+import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=6a9e627b503d';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=6a9e627b503d';
+import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=6a9e627b503d';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=6a9e627b503d';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=6a9e627b503d';
+import {PARTICLE_CELL_TRACKS} from './particle-model.js?v=6a9e627b503d';
+import {BODY_LAYER_META} from './body-layers.js?v=6a9e627b503d';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
@@ -39,7 +39,7 @@ export const EXTRA_BASE={
  roundness:0,taper:0,bendX:0,bendY:0,lobeAmount:0,lobes:5,pinch:0,rimRound:0,holeAspect:1,cutAspect:1,rotateZ:0,
  coat:0,coatRoughness:.1,fresnel:1,iridShift:0,iridScale:1,dispersion:0,absorption:.15,tintStrength:.15,anisotropy:0,anisotropyAngle:0,surfaceTexture:0,
  hollow:0,wallThickness:.08,translucency:0,scattering:0,scatterDirection:.25,thinFilm:0,filmThickness:420,subsurface:0,sssRadius:.35,sssColor:'#ffc49b',
- exposure:0,brightness:0,contrast:1,saturation:1,temperature:0,photoTint:0,gamma:1,blacks:0,highlights:0,vignette:0,lensDistortion:0,grainSize:1,photoAll:false,
+ exposure:0,brightness:0,contrast:1,saturation:1,temperature:0,photoTint:0,gamma:1,blacks:0,highlights:0,vignette:0,lensDistortion:0,grainSize:1,photoAll:false,focusBlur:0,focusDepth:0,
  motions:Object.fromEntries(Object.keys(TRACK_META).map(k=>[k,track(k==='filWidth'?.003:k==='rotateY'?360:k==='volume'?.12:k==='deform'?.048:k==='twist'?.4:k.startsWith('rotate')?30:.2,k==='volume'||k==='deform',k==='rotateY'||k==='gradientOffset'||k==='petalFlowPhase'||k==='petalOrbitPhase'||k==='structFlowPhase'||k==='loopPhase'||k==='filPhase'?'cycle':'wave')]))
 };
 export function newLight(id=1){return{id,enabled:true,visible:true,type:'circle',color:'#e0eaff',x:-1.4,y:1.8,z:2.5,power:1.8,size:.9,length:.6,roll:0,softness:.3,cone:30,grid:5,orbit:{...track(35),axis:'y'},pulse:track(.3)}}
@@ -147,6 +147,7 @@ export function syncMaterialControl(s,key){
  }
  if(key==='hollow'||key==='wallThickness')s.fullness=1-(s.hollow||0)*(1-(s.wallThickness??.08));
  if(key==='thinFilm')s.pFilm=s.thinFilm;
+ if(key==='thinShellMode'){s.thinShell=s.thinShellMode?1:0;s.renderVersion=2;}
 }
 const clear={...MODERN_BASE,metal:0,transparency:1,refraction:1.5,roughness:.02,gloss:1,iridescence:0,emission:0,coat:0,coatRoughness:.06,fresnel:1,hollow:0,wallThickness:1,thickness:1,translucency:0,scattering:0,subsurface:0,sssRadius:.55,sssColor:'#ffd0ac',scatterDirection:.25,thinFilm:0,filmThickness:420,absorption:.012,tintStrength:.03,dispersion:0,anisotropy:0,anisotropyAngle:0,surfaceTexture:0,iridScale:1,iridShift:0,glow:0,grounding:.35};
 export const MATERIAL_STYLES=[

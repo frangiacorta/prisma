@@ -110,6 +110,48 @@ export class FinishingPass{
  dispose(){this.release();if(this.program)this.gl.deleteProgram(this.program);if(this.vao)this.gl.deleteVertexArray(this.vao);this.program=this.vao=null;}
 }
 
+
+const FOCUS_FRAGMENT=`#version 300 es
+precision highp float;
+uniform sampler2D uImage,uDepth;uniform vec2 uSize,uFocus;out vec4 color;
+vec2 depthAt(vec2 uv){
+ vec4 packed=texture(uDepth,uv);
+ return vec2(16.-32.*(packed.x+packed.y/255.),packed.z);
+}
+float unfocused(float depth){return uFocus.x*smoothstep(.07,1.25,abs(depth-uFocus.y));}
+void main(){
+ vec2 uv=gl_FragCoord.xy/uSize,depth=depthAt(uv);
+ vec4 center=texture(uImage,uv);
+ float radius=depth.y>.5?unfocused(depth.x):uFocus.x*.72;
+ if(radius<=.004){color=center;return;}
+ float scale=min(uSize.x,uSize.y)*.033;
+ vec4 sum=vec4(center.rgb*center.a,center.a)*2.;float total=2.;
+ for(int i=0;i<14;i++){
+  float index=float(i),angle=index*2.39996323;
+  vec2 p=uv+vec2(cos(angle),sin(angle))*sqrt((index+.5)/14.)*radius*scale/uSize;
+  vec2 sampleDepth=depthAt(p);
+  float acceptance=depth.y>.5||sampleDepth.y<.5?1.:smoothstep(radius*.16,radius*.85,unfocused(sampleDepth.x));
+  vec4 a=texture(uImage,p);sum+=vec4(a.rgb*a.a,a.a)*acceptance;total+=acceptance;
+ }
+ vec4 result=sum/total;color=vec4(result.rgb/max(.00001,result.a),result.a);
+}`;
+export class FocusPass extends FinishingPass{
+ constructor(gl){super(gl,FOCUS_FRAGMENT,['uImage','uDepth','uSize','uFocus']);}
+ draw(s,w,h,depth){
+  const g=this.gl,u=this.uniforms;g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE0);
+  if(!this.texture){
+   this.texture=g.createTexture();g.bindTexture(g.TEXTURE_2D,this.texture);
+   g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);
+   g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);
+  }else g.bindTexture(g.TEXTURE_2D,this.texture);
+  if(this.width!==w||this.height!==h){g.texImage2D(g.TEXTURE_2D,0,g.RGBA8,w,h,0,g.RGBA,g.UNSIGNED_BYTE,null);this.width=w;this.height=h;}
+  g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,depth);
+  g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.SCISSOR_TEST);g.viewport(0,0,w,h);g.bindVertexArray(this.vao);g.useProgram(this.program);
+  g.uniform1i(u.uImage,0);g.uniform1i(u.uDepth,1);g.uniform2f(u.uSize,w,h);g.uniform2f(u.uFocus,s.focusBlur,s.focusDepth||0);
+  g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);g.activeTexture(g.TEXTURE0);
+ }
+}
+
 // Stateless glyph blending keeps seeking, repeated frames and offline exports identical.
 // The periodic variation travels across cells; it never depends on wall-clock frame rate.
 const GLYPH_FRAGMENT=`#version 300 es
@@ -182,7 +224,7 @@ const DETAIL_FRAGMENT=`#version 300 es
 precision highp float;
 uniform sampler2D uImage;uniform vec2 uSize;uniform int uKind;uniform float uMix,uTransparent;
 uniform float uWidth,uThreshold,uSoftness,uOnly,uSource;uniform vec3 uInk;
-uniform float uAmount,uBand,uCoverage,uSplit,uPhase,uDuty,uPulseSoft,uSeed,uAnimate;uniform vec2 uGlitchEnvelope;uniform float uHorizontal;
+uniform float uAmount,uBand,uCoverage,uSplit,uPhase,uDuty,uShutter,uSeed,uAnimate;uniform vec2 uGlitchEnvelope;uniform float uHorizontal;
 uniform vec4 uRects[8];uniform int uRectCount;uniform float uUseMask,uFeather,uInvert;
 out vec4 color;
 vec4 samplePM(vec2 uv){vec4 c=texture(uImage,clamp(uv,.5/uSize,1.-.5/uSize));return vec4(c.rgb*c.a,c.a);}
@@ -195,7 +237,7 @@ vec3 glitchBand(float id){
  float event=mod(floor(clock+.5),max(1.,uCycles)),r=hashBand(id);
  float key=id+event*177.*uRandom.w;
  float selected=step(hashBand(key),uCoverage)*step(.0001,uCoverage);
- float dist=abs(fract(clock+.5)-.5)*2.;
+ float dist=max(0.,abs(fract(clock+.5)-.5)*2.-uShutter);
  float softness=fract(clock+.5)<.5?uGlitchEnvelope.x:uGlitchEnvelope.y;
  float pulse=1.-smoothstep(max(0.,uDuty-max(.002,softness*uDuty)),uDuty,dist);
  pulse=mix(1.,pulse,uAnimate);float motion=mix(1.,cos(uPhase+r*6.28318530718),uAnimate);
@@ -240,14 +282,14 @@ if(uKind==0){
 }
 vec4 c=mix(base,effect,amount);color=vec4(c.a>0.000001?c.rgb/c.a:vec3(0.),c.a);}`;
 export class DetailPass extends FinishingPass{
- constructor(gl){super(gl,DETAIL_FRAGMENT,['uImage','uSize','uKind','uMix','uTransparent','uWidth','uThreshold','uSoftness','uOnly','uSource','uInk','uRandom','uDirectionRandom','uCross','uBlockWidth','uShape','uAngle','uCycles','uAmount','uBand','uCoverage','uSplit','uPhase','uDuty','uPulseSoft','uGlitchEnvelope','uHorizontal','uSeed','uAnimate','uRects[0]','uRectCount','uUseMask','uFeather','uInvert']);}
- draw(s,w,h,phase=0,kind=0){const g=this.gl,u=this.uniforms,scale=Math.min(w,h)/1080;g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE0);
+ constructor(gl){super(gl,DETAIL_FRAGMENT,['uImage','uSize','uKind','uMix','uTransparent','uWidth','uThreshold','uSoftness','uOnly','uSource','uInk','uRandom','uDirectionRandom','uCross','uBlockWidth','uShape','uAngle','uCycles','uAmount','uBand','uCoverage','uSplit','uPhase','uDuty','uShutter','uGlitchEnvelope','uHorizontal','uSeed','uAnimate','uRects[0]','uRectCount','uUseMask','uFeather','uInvert']);}
+ draw(s,w,h,phase=0,kind=0,interval=0){const g=this.gl,u=this.uniforms,scale=Math.min(w,h)/1080;g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE0);
   if(!this.texture){this.texture=g.createTexture();g.bindTexture(g.TEXTURE_2D,this.texture);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);}else g.bindTexture(g.TEXTURE_2D,this.texture);
   if(this.width!==w||this.height!==h){g.texImage2D(g.TEXTURE_2D,0,g.RGBA8,w,h,0,g.RGBA,g.UNSIGNED_BYTE,null);this.width=w;this.height=h;}
   g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.CULL_FACE);g.disable(g.SCISSOR_TEST);g.colorMask(true,true,true,true);g.viewport(0,0,w,h);g.bindVertexArray(this.vao);g.useProgram(this.program);
   g.uniform1i(u.uImage,0);g.uniform2f(u.uSize,w,h);g.uniform1i(u.uKind,kind);g.uniform1f(u.uMix,kind?s.finishGlitchMix:s.finishEdgeMix);g.uniform1f(u.uTransparent,s.bgMode==='transparent'?1:0);
   g.uniform1f(u.uWidth,Math.max(.5,s.finishEdgeWidth*scale));g.uniform1f(u.uThreshold,s.finishEdgeThreshold);g.uniform1f(u.uSoftness,s.finishEdgeSoftness);g.uniform1f(u.uOnly,s.finishEdgeOnly?1:0);g.uniform1f(u.uSource,s.finishEdgeSource?1:0);const hex=/^#[0-9a-f]{6}$/i.test(s.finishEdgeColor)?s.finishEdgeColor:'#d7ff91';g.uniform3f(u.uInk,...[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255));
-  g.uniform1f(u.uDirectionRandom,s.finishGlitchDirectionRandom||0);g.uniform1f(u.uCross,s.finishGlitchCross??1);g.uniform4f(u.uRandom,s.finishGlitchSizeRandom||0,s.finishGlitchRhythm||0,s.finishGlitchScatter||0,s.finishGlitchRenew||0);g.uniform1f(u.uShape,s.finishGlitchShape||0);g.uniform1f(u.uBlockWidth,Math.max(1,(s.finishGlitchWidth||180)*scale));g.uniform1f(u.uAngle,(s.finishGlitchAngle||0)*Math.PI/180);g.uniform1f(u.uCycles,s.finishGlitchCycles);g.uniform1f(u.uAmount,s.finishGlitchAmount*scale);g.uniform1f(u.uBand,Math.max(1,s.finishGlitchBand*scale));g.uniform1f(u.uCoverage,s.finishGlitchCoverage);g.uniform1f(u.uSplit,s.finishGlitchSplit*scale);g.uniform1f(u.uPhase,(((phase%(Math.PI*2))+Math.PI*2)%(Math.PI*2))*Math.round(s.finishGlitchCycles));const period=s.keepMotionSpeed!==false&&s.motionPeriod>0?s.motionPeriod:(s.duration||12);const duty=s.finishGlitchFlash?Math.min(1,(s.finishGlitchFlashMs??30)/1000*(s.speed||1)*s.finishGlitchCycles/period):s.finishGlitchDuty;g.uniform1f(u.uDuty,Math.max(.00001,duty));g.uniform1f(u.uPulseSoft,s.finishGlitchSoftness);g.uniform2f(u.uGlitchEnvelope,s.finishGlitchAttack??s.finishGlitchSoftness,s.finishGlitchRelease??s.finishGlitchSoftness);g.uniform1f(u.uHorizontal,s.finishGlitchHorizontal??1);g.uniform1f(u.uSeed,Math.round(s.finishGlitchSeed));g.uniform1f(u.uAnimate,s.finishGlitchAnimate?1:0);
+  g.uniform1f(u.uDirectionRandom,s.finishGlitchDirectionRandom||0);g.uniform1f(u.uCross,s.finishGlitchCross??1);g.uniform4f(u.uRandom,s.finishGlitchSizeRandom||0,s.finishGlitchRhythm||0,s.finishGlitchScatter||0,s.finishGlitchRenew||0);g.uniform1f(u.uShape,s.finishGlitchShape||0);g.uniform1f(u.uBlockWidth,Math.max(1,(s.finishGlitchWidth||180)*scale));g.uniform1f(u.uAngle,(s.finishGlitchAngle||0)*Math.PI/180);g.uniform1f(u.uCycles,s.finishGlitchCycles);g.uniform1f(u.uAmount,s.finishGlitchAmount*scale);g.uniform1f(u.uBand,Math.max(1,s.finishGlitchBand*scale));g.uniform1f(u.uCoverage,s.finishGlitchCoverage);g.uniform1f(u.uSplit,s.finishGlitchSplit*scale);g.uniform1f(u.uPhase,(((phase%(Math.PI*2))+Math.PI*2)%(Math.PI*2))*Math.round(s.finishGlitchCycles));const period=s.keepMotionSpeed!==false&&s.motionPeriod>0?s.motionPeriod:(s.duration||12);const duty=s.finishGlitchFlash?Math.min(1,(s.finishGlitchFlashMs??30)/1000*(s.speed||1)*s.finishGlitchCycles/period):s.finishGlitchDuty;g.uniform1f(u.uDuty,Math.max(.00001,duty));g.uniform1f(u.uShutter,s.finishGlitchFlash?Math.min(.5,Math.max(0,interval)*s.finishGlitchCycles*(s.speed||1)/period):0);g.uniform2f(u.uGlitchEnvelope,s.finishGlitchAttack??s.finishGlitchSoftness,s.finishGlitchRelease??s.finishGlitchSoftness);g.uniform1f(u.uHorizontal,s.finishGlitchHorizontal??1);g.uniform1f(u.uSeed,Math.round(s.finishGlitchSeed));g.uniform1f(u.uAnimate,s.finishGlitchAnimate?1:0);
   const regions=normalizeFinishRegions(s.finishRegions),rects=new Float32Array(32);regions.forEach((r,i)=>rects.set([r.x/100,r.y/100,r.w/100,r.h/100],i*4));g.uniform4fv(u['uRects[0]'],rects);g.uniform1i(u.uRectCount,regions.length);g.uniform1f(u.uUseMask,s.finishRegionsEnabled&&(kind?s.finishRegionGlitch:s.finishRegionEdge)?1:0);g.uniform1f(u.uFeather,(s.finishFeather||0)/100);g.uniform1f(u.uInvert,s.finishRegionInvert?1:0);g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);
  }
 }

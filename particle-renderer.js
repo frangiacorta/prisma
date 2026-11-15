@@ -1,19 +1,22 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=ddff107e99e1';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=ddff107e99e1';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=ddff107e99e1';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=ddff107e99e1';
-import {shadowLight} from './particle-shadow.js?v=ddff107e99e1';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=ddff107e99e1';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=ddff107e99e1';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=ddff107e99e1';
-import {ParticleLinks} from './particle-links.js?v=ddff107e99e1';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=ddff107e99e1';
-import {LayeredVeils} from './layered-veils.js?v=ddff107e99e1';
-import {LivingStructures} from './living-structures.js?v=ddff107e99e1';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=ddff107e99e1';
-import {forceBarrierGLSL} from './particle-forces.js?v=ddff107e99e1';
-import {prismaShadingGLSL} from './particle-shading.js?v=ddff107e99e1';
-const common=`${prismaShadingGLSL}\n${fieldGLSL}`;
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=6a9e627b503d';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=6a9e627b503d';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=6a9e627b503d';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=6a9e627b503d';
+import {shadowLight} from './particle-shadow.js?v=6a9e627b503d';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=6a9e627b503d';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes} from './particle-model.js?v=6a9e627b503d';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=6a9e627b503d';
+import {ParticleLinks} from './particle-links.js?v=6a9e627b503d';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=6a9e627b503d';
+import {LayeredVeils} from './layered-veils.js?v=6a9e627b503d';
+import {LivingStructures} from './living-structures.js?v=6a9e627b503d';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=6a9e627b503d';
+import {forceBarrierGLSL} from './particle-forces.js?v=6a9e627b503d';
+import {prismaShadingGLSL} from './particle-shading.js?v=6a9e627b503d';
+const common=`${prismaShadingGLSL}\n${fieldGLSL}
+uniform vec2 uFocus;
+float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
+`;
 const grainGLSL=`${common}\n${livingAttachmentGLSL}\n${grainSizingGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
@@ -28,7 +31,8 @@ ${grainGLSL}
 out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity,vCellLight;out vec2 vSpriteUV;uniform float uPointQuad;
 void main(){vec3 p=attachedPosition(aRandom,uPhase);gl_Position=project(p);
  int index=uPointQuad>.5?gl_InstanceID:gl_VertexID;
- float px=grainDiameter(aRandom,index)*uResolution.y/1080.;
+ float trueSize=grainDiameter(aRandom,index)*uResolution.y/1080.;
+ float px=trueSize+particleDefocus(p);
  vSpriteUV=vec2(0.);
  if(uPointQuad>.5){
   int vertex=gl_VertexID%6;
@@ -37,7 +41,7 @@ void main(){vec3 p=attachedPosition(aRandom,uPhase);gl_Position=project(p);
   vSpriteUV=vec2(corner.x,-corner.y)*.5+.5;
  }
  gl_PointSize=clamp(px,2.,64.);
- vForceSeed=aRandom;vOpacity=uPoints.z*3.*min(1.,px*px/4.);vPosition=p;vColor=particleColor(aRandom,p);vCellLight=cellLightFactor(aRandom);
+ vForceSeed=aRandom;vOpacity=uPoints.z*3.*min(1.,trueSize*trueSize/max(4.,px*px));vPosition=p;vColor=particleColor(aRandom,p);vCellLight=cellLightFactor(aRandom);
 }`;
 const pointFrag=`#version 300 es
 precision highp float;
@@ -95,7 +99,8 @@ void main(){
  vec4 clip=project(p);vec2 tangent=(project(next).xy-project(prev).xy)*uResolution;
  vec2 normal=vec2(-tangent.y,tangent.x)/max(.00001,length(tangent));
  float width=uTrails.y*mix(1.,pow(max(.001,1.-materialAge),.7),uTail.y)*uResolution.y/1080.*forkWidth;
- clip.xy+=normal*side*max(1.,width)/uResolution;
+ float defocus=particleDefocus(p),drawWidth=width+defocus;
+ clip.xy+=normal*side*max(1.,drawWidth)/uResolution;
  gl_Position=clip;vSide=side;vPosition=p;vForceSeed=r;vForcePhase=uPhase-materialAge*uTrails.x;
  vec3 strand=next-prev;if(dot(strand,strand)<1e-12)strand=next-p;
  vColor=shadeFibre(particleColor(original,p),p,normalize(p-uShadeOrigin+vec3(0.,0.,.0001)),strand);
@@ -106,7 +111,7 @@ void main(){
   vColor+=glow*uTrailPulse.x*pulse*(1.+crest*5.);
  }
  vColor*=cellLightFactor(original);
- vOpacity=uTrails.z*mix(pow(max(0.,1.-materialAge),uTail.x),1.,uFiber.x)*min(1.,width)*uFiber.w;
+ vOpacity=uTrails.z*mix(pow(max(0.,1.-materialAge),uTail.x),1.,uFiber.x)*min(1.,width/max(1.,drawWidth))*uFiber.w;
 }`;
 const trailFrag=`#version 300 es
 precision highp float;in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vForcePhase;in float vOpacity,vSide;out vec4 color;uniform vec4 uFiber;
@@ -218,6 +223,7 @@ export class ParticleRenderer{
  bind(t){const gl=this.gl;gl.bindFramebuffer(gl.FRAMEBUFFER,t?.fbo||null);gl.viewport(0,0,t?.w||this.width,t?.h||this.height);}
  tex(p,key,texture,unit){const gl=this.gl;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(this.loc(p,key),unit);}
  settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);bindDynamics(gl,p.program,s);this.guides.bind(p);
+  this.u(p,'uFocus',this.shadowPass?0:s.focusBlur||0,s.focusDepth||0);
   this.u(p,'uShadowPass',this.shadowPass?(this.shadowPass.mode||1):0);if(this.optics)this.optics.uniforms(p,s);else{this.u(p,'uOpticalShadow',0,0,0,0);this.tex(p,'uOpticalMap',this.seedTexture,8);this.tex(p,'uVolumeMap',this.seedTexture,9);}this.u(p,'uShadowHeight',s.pShadowHeight??-1.6);this.u(p,'uShadowOpacity',p.materialAlpha?1:Math.max(0,1-s.transparency));if(this.shadowPass)this.u(p,'uShadowLight',this.shadowPass.light.x,this.shadowPass.light.y,this.shadowPass.light.z);
   const layer=this.studioLayer,attachment=layer?.attachment;
   this.u(p,'uStudioBody',attachment?.kind||0,s.grainDispersal||0,s.pFill||0,s.pCloudCore||0);
@@ -259,7 +265,7 @@ export class ParticleRenderer{
   this.u(p,'uParticleFilmMotion',phase*Math.PI*2*filmCycles,s.filmFlow||0,s.filmSwirl||0,0);
   this.u(p,'uParticleCore',s.structCoreDark||0,s.structCoreRadius??.3,Math.max(.02,s.pThickness*2)*s.stretchX,Math.max(.02,s.pThickness*2)*s.stretchY);this.u(p,'uFilmObject',s.scale,s.positionX,s.positionY,0);this.u(p,'uFilmRotation',s.rotateX*rad,s.rotateY*rad,s.rotateZ*rad);
   gl.uniform3fv(this.loc(p,'uFilmResponse'),FILM_SPECTRUM.data);gl.uniform3fv(this.loc(p,'uFilmWhite'),FILM_SPECTRUM.white);
-  this.u(p,'uPearl',s.iridShift??0,s.filmThickness??420);this.u(p,'uShadeOrigin',s.positionX,s.positionY,0);
+  this.u(p,'uPearl',s.iridShift??0,s.filmThickness??420,s.iridScale??1);this.u(p,'uShadeOrigin',s.positionX,s.positionY,0);
   this.u(p,'uEnvironment',environments.indexOf(s.environment),s.environmentAngle*rad,s.environmentPower,0);
   this.u(p,'uGradient',s.gradientAngle*rad,s.gradientScale,s.gradientOffset,1);this.u(p,'uColorSoftness',s.colorSoftness);this.u(p,'uColorLayers',s.colorLayers||0,s.colorLayerScale??1,s.colorLayerShift||0,s.colorLayerMix||0);
   this.u(p,'uColorWave',s.colorWaveAmount,s.colorWaveBands,s.colorWavePhase*Math.PI*2,0);this.u(p,'uColorWave2',s.colorWaveHeight,s.colorWaveRadius,s.colorWaveSwirl,s.colorWaveWarp);
@@ -336,6 +342,7 @@ export class ParticleRenderer{
   this.u(c,'uBackground',...rgb(s.background));this.u(c,'uBackground2',...rgb(s.background2));this.u(c,'uBgMode',['solid','gradient','studio','transparent'].indexOf(s.bgMode));this.u(c,'uBg',s.bgAngle*rad,s.bgHeight,s.bgSoftness,s.bgWash);
   this.tex(c,'uStudioSurface',this.studioLayer?.color||scene.texture,13);this.u(c,'uStudioComposite',this.studioLayer?.color?1:0);this.u(c,'uStudioCamera',this.studioLayer?.attachment?1:0);
   this.tex(c,'uViewDensity',mist?.texture||scene.texture,10);this.u(c,'uViewVolume',mist?mist.amount*(1+s.transparency*.6):0,mist?mist.amount*2.3:0,mist?.width||1,mist?.height||1);
+  if(mist){const light=s.lights.find(l=>l.enabled);const aim=light?[light.x-s.positionX,light.y-s.positionY,light.z]:[-.5,.6,.6],length=Math.hypot(...aim)||1;this.u(c,'uVolumeLight',...aim.map(component=>component/length));}
   this.u(c,'uBgShade',s.bgShade??.06);this.u(c,'uOutputSize',w,h);
   gl.drawArrays(gl.TRIANGLES,0,3);gl.bindVertexArray(null);
   if(query){gl.endQuery(this.timerExtension.TIME_ELAPSED_EXT);this.queries.push(query);}
@@ -383,8 +390,17 @@ export class ParticleRenderer{
  opticalDrawState(){if(this.shadowPass?.mode===2){const g=this.gl;g.enable(g.DEPTH_TEST);g.depthFunc(g.LEQUAL);g.depthMask(true);g.disable(g.BLEND);}}
  async drawAccumulated(s,p,w,h,o={}){if(!await this.prepareAsync(s,p,o))return false;this.draw(s,p,w,h,o);const ok=await this.waitForGpu(o);o.progress?.(1);return ok;}
  async drawTiled(...args){return this.drawAccumulated(...args);}
- pollCompletion(){if(!this.completionSync)return true;const gl=this.gl,result=gl.clientWaitSync(this.completionSync,0,0);if(result===gl.WAIT_FAILED)throw Error('Sincronizzazione GPU interrotta.');if(result===gl.TIMEOUT_EXPIRED)return false;gl.deleteSync(this.completionSync);this.completionSync=null;this.completedFrames++;return true;}
- async waitForGpu(o={}){const start=performance.now();while(!this.pollCompletion()){if(this.gl.isContextLost()||performance.now()-start>120000)throw Error('La GPU non risponde.');await new Promise(r=>setTimeout(r,4));}return !o.cancelled?.();}
+ pollCompletion(){if(!this.completionSync)return true;const gl=this.gl;if(gl.isContextLost()||gl.getSyncParameter(this.completionSync,gl.SYNC_STATUS)!==gl.SIGNALED)return false;gl.deleteSync(this.completionSync);this.completionSync=null;this.completedFrames++;return true;}
+ async waitForGpu(o={}){
+  const start=performance.now();let polls=0;
+  while(!this.pollCompletion()){
+   if(o.cancelled?.())return false;
+   if(this.gl.isContextLost()||performance.now()-start>120000)throw Error('La GPU non risponde.');
+   if(polls++<8&&globalThis.scheduler?.yield)await globalThis.scheduler.yield();
+   else await new Promise(resolve=>setTimeout(resolve,4));
+  }
+  return !o.cancelled?.();
+ }
  pollGpuTime(){const gl=this.gl,e=this.timerExtension;if(!e)return;const disjoint=gl.getParameter(e.GPU_DISJOINT_EXT);while(this.queries.length&&(disjoint||gl.getQueryParameter(this.queries[0],gl.QUERY_RESULT_AVAILABLE))){const q=this.queries.shift();if(!disjoint){this.gpuMilliseconds=gl.getQueryParameter(q,gl.QUERY_RESULT)/1e6;this.gpuSample++;}gl.deleteQuery(q);}}
  hardwareInfo(){const gl=this.gl,e=gl.getExtension('WEBGL_debug_renderer_info'),name=gl.getParameter(e?e.UNMASKED_RENDERER_WEBGL:gl.RENDERER);return {name,software:/swiftshader|llvmpipe/i.test(name),timingAvailable:!!this.timerExtension};}
  pixels(){const gl=this.gl,a=new Uint8Array(this.width*this.height*4),out=new Uint8Array(a.length),stride=this.width*4;gl.readPixels(0,0,this.width,this.height,gl.RGBA,gl.UNSIGNED_BYTE,a);for(let y=0;y<this.height;y++)out.set(a.subarray(y*stride,(y+1)*stride),(this.height-y-1)*stride);return out;}

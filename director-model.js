@@ -1,12 +1,12 @@
-import {newCreation,normalizeCreation} from './creative-model.js?v=ddff107e99e1';
-import {particleCreation} from './particle-model.js?v=ddff107e99e1';
-import {parameterCatalog,readParameter,writeParameter,sceneOnly,clamp} from './playground-model.js?v=ddff107e99e1';
+import {newCreation,normalizeCreation} from './creative-model.js?v=6a9e627b503d';
+import {particleCreation} from './particle-model.js?v=6a9e627b503d';
+import {parameterCatalog,readParameter,writeParameter,sceneOnly,TRANSITIONS} from './playground-model.js?v=6a9e627b503d';
 
 export const DIRECTOR_BRIEF='Esplora liberamente forma e particelle, materia, luce, colore e movimento. Sviluppa idee riconoscibili, cambia ritmo e scala, alterna dettagli e insieme. Usa sovrapposizioni intenzionali, non alternare meccanicamente i due motori. Parti dalla scena presente e valuta visivamente ogni risultato. Sfondo nero, composizioni leggibili, niente lampeggi rapidi.';
 const obj=properties=>({type:'object',properties,required:Object.keys(properties),additionalProperties:false});
 const str={type:'string'},num={type:'number'};
 export const DIRECTOR_MAX_CHANGES=100,DIRECTOR_MAX_COLORS=8;
-export const DIRECTOR_SCHEMA=obj({observation:str,intent:str,memory:str,action:{type:'string',enum:['hold','evolve']},source:{type:'string',enum:['A','B','sphere','particles']},name:str,changes:{type:'array',maxItems:DIRECTOR_MAX_CHANGES,items:obj({path:str,value:{anyOf:[num,str,{type:'boolean'}]}})},palette:{type:'array',maxItems:DIRECTOR_MAX_COLORS,items:{type:'string',pattern:'^#[0-9a-fA-F]{6}$'}},transition:{type:'string',enum:['fade','wipe','luma','add']},direction:{type:'integer',minimum:0,maximum:3},curve:{type:'string',enum:['linear','smooth','in','out']},seconds:{type:'number',minimum:2,maximum:24},blend:{type:'number',minimum:.15,maximum:1},holdSeconds:{type:'number',minimum:8,maximum:45}});
+export const DIRECTOR_SCHEMA=obj({observation:str,intent:str,memory:str,action:{type:'string',enum:['hold','evolve']},source:{type:'string',enum:['A','B','sphere','particles']},name:str,changes:{type:'array',maxItems:DIRECTOR_MAX_CHANGES,items:obj({path:str,value:{anyOf:[num,str,{type:'boolean'}]}})},palette:{type:'array',maxItems:DIRECTOR_MAX_COLORS,items:{type:'string',pattern:'^#[0-9a-fA-F]{6}$'}},transition:{type:'string',enum:TRANSITIONS},direction:{type:'integer',minimum:0,maximum:3},curve:{type:'string',enum:['linear','smooth','in','out']},seconds:{type:'number',minimum:2,maximum:24},blend:{type:'number',minimum:.15,maximum:1},holdSeconds:{type:'number',minimum:8,maximum:45}});
 export function directorBase(source,decks){
  if(source==='sphere')return newCreation();
  if(source==='particles')return particleCreation(newCreation(),0);
@@ -23,23 +23,32 @@ export function directorCatalog(state){
 }
 export function validateDirectorPlan(reply,decks){
  if(!reply||!['hold','evolve'].includes(reply.action)||!['A','B','sphere','particles'].includes(reply.source))throw Error('Decisione della regia non valida.');
- for(const k of ['observation','intent','memory','name'])if(typeof reply[k]!=='string'||reply[k].length>(k==='memory'?3000:1000))throw Error('Testo della regia non valido.');
+ const copyText=(key,length)=>typeof reply[key]==='string'?reply[key].replace(/[\x00-\x08\x0b-\x1f\x7f]/g,'').trim().slice(0,length):'';
+ const observation=copyText('observation',1000),intent=copyText('intent',1000),memory=copyText('memory',3000),name=copyText('name',80);
  if(!Array.isArray(reply.changes)||reply.changes.length>DIRECTOR_MAX_CHANGES||!Array.isArray(reply.palette)||reply.palette.length>DIRECTOR_MAX_COLORS||reply.palette.some(c=>!/^#[\da-f]{6}$/i.test(c)))throw Error('Parametri della regia non validi.');
- if(!['fade','wipe','luma','add'].includes(reply.transition)||!['linear','smooth','in','out'].includes(reply.curve)||!Number.isInteger(reply.direction)||reply.direction<0||reply.direction>3)throw Error('Transizione non valida.');
+ if(!TRANSITIONS.includes(reply.transition)||!['linear','smooth','in','out'].includes(reply.curve)||!Number.isInteger(reply.direction)||reply.direction<0||reply.direction>3)throw Error('Transizione non valida.');
  for(const [key,min,max]of [['seconds',2,24],['blend',.15,1],['holdSeconds',8,45]])if(!Number.isFinite(reply[key])||reply[key]<min||reply[key]>max)throw Error('Tempo o mix non valido.');
  const state=directorBase(reply.source,decks);
  // Palette replacement defines the slots available to this same proposal.
  if(reply.palette.length)state.palette=[...reply.palette];
  // Enable the connected-surface catalog before applying its dependent controls.
- const living=reply.changes.find(c=>c.path==='pLiving');if(living&&typeof living.value==='number')state.pLiving=clamp(living.value,0,2);
- const catalog=parameterCatalog(state);
- for(const {path,value}of reply.changes){const entry=catalog.find(e=>e.path===path);if(!entry||entry.kind==='boolean'&&typeof value!=='boolean'||!writeParameter(state,entry,value))throw Error('Controllo non valido: '+String(path).slice(0,100));}
- // These caps affect only new AI proposals, never the user's current scene.
- if(state.pCount>120000||state.filCount>24000||state.pLinkNodes>2500||state.pTrailCount>12000)throw Error('La proposta supera il carico previsto per la regia live.');
+ const caps={pCount:120000,filCount:24000,pLinkNodes:2500,pTrailCount:12000};
+ const changes=[];
+ const accept=(entry,value)=>{
+  if(!entry||entry.kind==='boolean'&&typeof value!=='boolean')return false;
+  if(entry.kind==='number'&&(!Number.isFinite(value)||value<entry.min||value>Math.min(entry.max,caps[entry.path]??Infinity)))return false;
+  if(!writeParameter(state,entry,value))return false;
+  changes.push({path:entry.path,value});
+  return true;
+ };
+ const living=parameterCatalog(state).find(e=>e.path==='pLiving');
+ for(const change of reply.changes)if(change?.path==='pLiving')accept(living,change.value);
+ const catalog=new Map(parameterCatalog(state).map(entry=>[entry.path,entry]));
+ for(const change of reply.changes)if(change&&typeof change.path==='string'&&change.path!=='pLiving')accept(catalog.get(change.path),change.value);
  // Camera/microphone inputs belong to the user, not to a generated plan.
  if(state.bodyTracking)state.bodyTracking.enabled=false;
  if(state.audioReactive)state.audioReactive.enabled=false;
- return {...reply,state:normalizeCreation(state)};
+ return {...reply,observation,intent,memory,name,changes,state:normalizeCreation(state)};
 }
 export function directorStateSummary(state){
  const c=parameterCatalog(state);return Object.fromEntries(c.filter(e=>!e.path.startsWith('motions.')||state.motions?.[e.path.split('.')[1]]?.enabled).map(e=>[e.path,readParameter(state,e.path)]));

@@ -13465,7 +13465,8 @@
       "compareNote": "Mandelbulb con ripetizioni a più scale, cavità sottili e metallo iridescente. Il preset espone formula, iterazioni e spessore.",
       "comparisonRef": "s12-01",
       "comparisonDate": "2026-11-15",
-      "resultPreset": "previews/mandelbulb-dettaglio.prisma.json"
+      "resultPreset": "previews/mandelbulb-dettaglio.prisma.json",
+      "comparisonOutcome": "parziale"
     },
     {
       "id": "roadmap-particles",
@@ -13529,7 +13530,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Particelle → Movimento",
+      "where": "Forma → Granelli e scie · Movimento → Orbite",
       "platform": "",
       "next": "",
       "keep": "",
@@ -13554,7 +13555,15 @@
         "paths"
       ],
       "category": "movement",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "compareNote": "Nucleo chiaro con scie lunghe in rotazione. Densità, traiettorie e ramificazioni si regolano nella stessa scena.",
+      "comparisonOutcome": "parziale",
+      "comparisonRef": "s03-04",
+      "comparisonDate": "2026-11-15",
+      "resultPreset": "previews/percorsi-fibre.prisma.json",
+      "resultImage": "../previews/percorsi-fibre.webp",
+      "resultVideo": "../previews/percorsi-fibre.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#percorsi-fibre"
     },
     {
       "id": "roadmap-body-interaction",
@@ -13667,7 +13676,9 @@
         "tracking"
       ],
       "category": "interaction",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "comparisonOutcome": "funzionale",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "roadmap-audio-interaction",
@@ -13922,7 +13933,9 @@
         "audio"
       ],
       "category": "interaction",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "comparisonOutcome": "funzionale",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "roadmap-preset-morphing",
@@ -14084,7 +14097,7 @@
       "result": "",
       "where": "Forma → Strati · Playground → Varia scena",
       "platform": "",
-      "next": "Completare il morph automatico fra valori dei preset, sequenze multitraccia e uscita separata su secondo schermo. Il mix di due scene vive e le macro sono disponibili.",
+      "next": "Confrontare mutazioni, modulazione e uscita su secondo schermo con un controller durante una performance.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -14111,7 +14124,9 @@
       ],
       "category": "workflow",
       "addedOn": "2026-10-10",
-      "compareNote": "La transizione Superficie ↔ granelli condivide la geometria. Nel Playground si può animare o scorrere a mano la variante della scena."
+      "compareNote": "La transizione Superficie ↔ granelli condivide la geometria. Nel Playground si può animare o scorrere a mano la variante della scena.",
+      "comparisonOutcome": "funzionale",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "roadmap-particle-volume",
@@ -14332,7 +14347,8 @@
       "compareNote": "Il preset usa il volume dei granelli per dare spessore alle pieghe. Il lato chiaro e quello rosso si regolano dalla palette e dalle luci.",
       "comparisonRef": "s09-01",
       "comparisonDate": "2026-11-15",
-      "resultPreset": "previews/volume-denso.prisma.json"
+      "resultPreset": "previews/volume-denso.prisma.json",
+      "comparisonOutcome": "parziale"
     },
     {
       "id": "roadmap-membrane",
@@ -14430,7 +14446,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "membrana-viva",
-      "where": "Forma → Costruzione → Guscio e spessore",
+      "where": "Forma → Costruzione → Guscio e spessore · Materiale → Iridescenza",
       "platform": "",
       "next": "",
       "keep": "",
@@ -14446,9 +14462,9 @@
         }
       ],
       "assets": [],
-      "resultImage": "../presets/structure-membrane.webp",
-      "resultVideo": "../previews/structure-combinations-4s.mp4?v=36",
-      "resultUrl": "../?engine=solid&v=36",
+      "resultImage": "../previews/guscio-ottico.webp",
+      "resultVideo": "../previews/guscio-ottico.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#guscio-ottico",
       "completedProjects": [
         "project-cobalto-oro",
         "project-pellicola-viva"
@@ -14505,7 +14521,11 @@
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
-      "resultPreset": "previews/membrana-viva.prisma.json"
+      "resultPreset": "previews/guscio-ottico.prisma.json",
+      "compareNote": "Guscio cavo con bordo iridescente blu e centro in ombra. I picchi di luce della fonte restano più luminosi sul bordo.",
+      "comparisonOutcome": "parziale",
+      "comparisonRef": "s09-04",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "roadmap-fibre-motion",
@@ -14680,7 +14700,8 @@
       "compareNote": "Studio della variante con lobi perlacei. Spessore, piegatura, saturazione e densità delle linee sono modificabili nel preset.",
       "comparisonRef": "s06-01",
       "comparisonDate": "2026-11-15",
-      "resultPreset": "previews/velo-fibre.prisma.json"
+      "resultPreset": "previews/velo-fibre.prisma.json",
+      "comparisonOutcome": "parziale"
     },
     {
       "id": "roadmap-tissue",
@@ -14843,7 +14864,8 @@
       "resultPreset": "previews/reticolo-giunzioni.prisma.json",
       "compareNote": "Trama curva, pori irregolari e giunzioni in rilievo, visti da vicino. La crescita in steli e le coppe della reference restano da riprodurre.",
       "comparisonRef": "s07-05",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-15",
+      "comparisonOutcome": "parziale"
     },
     {
       "id": "roadmap-4d",
@@ -14936,7 +14958,9 @@
         "tracking"
       ],
       "category": "interaction",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "comparisonOutcome": "funzionale",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "roadmap-cellular",
@@ -15043,7 +15067,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Particelle → Forma → Nucleo → Cellule di granelli · Luci → Illuminazione",
+      "where": "Forma → Granelli → Cellule di granelli · Luci",
       "platform": "",
       "next": "",
       "keep": "",
@@ -15080,10 +15104,14 @@
       "category": "form",
       "addedOn": "2026-10-10",
       "engine": "particles",
-      "resultImage": "media/v81-cellule-instanziate.webp",
-      "resultUrl": "../previews/cellule-instanziate.html?v=81",
-      "resultVideo": "../previews/cellule-instanziate.mp4",
-      "resultPreset": "previews/cellule-instanziate.prisma.json"
+      "resultImage": "../previews/cellule-istanze.webp",
+      "resultUrl": "../previews/verifica-visiva.html#cellule-istanze",
+      "resultVideo": "../previews/cellule-istanze.mp4",
+      "resultPreset": "previews/cellule-istanze.prisma.json",
+      "compareNote": "Istanziazione delle cellule con variazione di dimensione, rilievo e luce. Il tutorial è consultabile sul sito dell’autore.",
+      "comparisonOutcome": "fonte",
+      "comparisonSource": "https://www.elekktronaut.com/tutorials/cellular-noise-with-instancing",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "roadmap-recursive-warp",
@@ -15102,7 +15130,8 @@
       "summary": "Warp ricorsivo integrato come filtro modulabile sulla scena. Feedback temporale ancora da sviluppare.",
       "sources": [
         "https://www.patreon.com/posts/recursive-ii-in-72162284",
-        "https://derivative.ca/UserGuide/Displace_TOP"
+        "https://derivative.ca/UserGuide/Displace_TOP",
+        "https://www.youtube.com/watch?v=AxXu0dw6fjQ"
       ],
       "sections": [
         {
@@ -15164,7 +15193,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "Deformazione iterativa per fotogramma, combinabile con tutti i filtri.",
-      "where": "Filtri → Persistenza e Distorsione ricorsiva",
+      "where": "Filtri → Distorsione ricorsiva e Persistenza",
       "platform": "",
       "next": "Misurare il raccordo dei loop brevi con persistenza molto alta.",
       "keep": "",
@@ -15202,8 +15231,14 @@
       },
       "addedOn": "2026-10-10",
       "engine": "solid",
-      "resultImage": "media/v78-persistenza.webp",
-      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
+      "resultImage": "../previews/distorsione-e-ricircolo.webp",
+      "resultUrl": "../previews/verifica-visiva.html#distorsione-e-ricircolo",
+      "compareNote": "Distorsione, colore e ricircolo temporale applicati direttamente alla forma di Prisma.",
+      "comparisonOutcome": "fonte",
+      "comparisonSource": "https://www.youtube.com/watch?v=AxXu0dw6fjQ",
+      "comparisonDate": "2026-11-15",
+      "resultPreset": "previews/distorsione-e-ricircolo.prisma.json",
+      "resultVideo": "../previews/distorsione-e-ricircolo.mp4"
     },
     {
       "id": "roadmap-liquid-painting",
@@ -15220,7 +15255,8 @@
       "sources": [
         "https://www.patreon.com/pppanik/sitemap",
         "https://www.patreon.com/pppanik/posts/interactive-42634595",
-        "https://www.patreon.com/pppanik/posts/touchdesigner-42634498"
+        "https://www.patreon.com/pppanik/posts/touchdesigner-42634498",
+        "https://www.youtube.com/watch?v=8T88sYeSUug"
       ],
       "sections": [
         {
@@ -15337,8 +15373,14 @@
       "category": "movement",
       "addedOn": "2026-10-10",
       "engine": "solid",
-      "resultImage": "media/v79-pennello.webp",
-      "resultUrl": "../previews/pennello-e-rami.html?v=79"
+      "resultImage": "../previews/liquido-sulla-forma.webp",
+      "resultUrl": "../previews/verifica-visiva.html#liquido-sulla-forma",
+      "compareNote": "Due tratti del pennello salvati nel preset. Il pennello deforma la forma renderizzata e segue l’inquadratura durante il movimento.",
+      "comparisonOutcome": "fonte",
+      "comparisonSource": "https://www.youtube.com/watch?v=8T88sYeSUug",
+      "comparisonDate": "2026-11-15",
+      "resultPreset": "previews/liquido-sulla-forma.prisma.json",
+      "resultVideo": "../previews/liquido-sulla-forma.mp4"
     },
     {
       "id": "roadmap-lumen-print",
@@ -15467,10 +15509,14 @@
       "category": "filters",
       "addedOn": "2026-10-10",
       "engine": "solid",
-      "resultImage": "media/v82-impronte-luminose.webp",
-      "resultUrl": "../previews/impronte-luminose.html?v=82",
-      "resultVideo": "../previews/impronte-luminose.mp4",
-      "resultPreset": "previews/impronte-luminose.prisma.json"
+      "resultImage": "../previews/impronte-moto.webp",
+      "resultUrl": "../previews/verifica-visiva.html#impronte-moto",
+      "resultVideo": "../previews/impronte-moto.mp4",
+      "resultPreset": "previews/impronte-moto.prisma.json",
+      "compareNote": "Accumulo della luce con decadimento e sovrapposizione lungo il loop. Il tutorial usa anche il rilevamento dei battiti.",
+      "comparisonOutcome": "fonte",
+      "comparisonSource": "https://www.patreon.com/pppanik/posts/audioreactive-86240898",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "roadmap-note-events",
@@ -15700,7 +15746,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "Dinamica elastica del volume condivisa",
-      "where": "Particelle → Movimento → Animazioni → Vincoli di distanza e flessione → Contatto tra pieghe",
+      "where": "Movimento → Dinamica · Forma → Pelle",
       "platform": "",
       "next": "Contatti tra fili o granelli singoli e distacco dalla pelle.",
       "keep": "",
@@ -15741,12 +15787,15 @@
         "surfaces"
       ],
       "category": "form",
-      "resultUrl": "../previews/contatto-spigoli.html?v=83",
+      "resultUrl": "../previews/verifica-visiva.html#membrana-contatto",
       "addedOn": "2026-10-10",
       "engine": "particles",
-      "resultImage": "media/v83-contatto-spigoli.webp",
-      "resultVideo": "../previews/contatto-spigoli.mp4",
-      "resultPreset": "previews/spigoli-membrana.prisma.json"
+      "resultImage": "../previews/membrana-contatto.webp",
+      "resultVideo": "../previews/membrana-contatto.mp4",
+      "resultPreset": "previews/membrana-contatto.prisma.json",
+      "compareNote": "Sequenza di verifica del contatto su una membrana in movimento.",
+      "comparisonOutcome": "funzionale",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "roadmap-filament-planets",
@@ -16057,10 +16106,11 @@
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
-      "compareNote": "Inquadratura ravvicinata di ciuffi, curve, ramificazioni e gradiente lungo i fili. Il preset contiene il moto dei filamenti.",
+      "compareNote": "Inquadratura macro con filamenti avvolti sulla forma, fuoco selettivo e palette lungo i fili. La profondità della trama varia durante il movimento.",
       "comparisonRef": "s13-01",
       "comparisonDate": "2026-11-15",
-      "resultPreset": "previews/filamenti-macro.prisma.json"
+      "resultPreset": "previews/filamenti-macro.prisma.json",
+      "comparisonOutcome": "parziale"
     },
     {
       "id": "roadmap-soft-knots",
@@ -16199,7 +16249,8 @@
       "comparisonRef": "s16-02",
       "comparisonDate": "2026-11-15",
       "resultPreset": "previews/nodo-laccato.prisma.json",
-      "resultVideo": "../previews/nodo-laccato.mp4"
+      "resultVideo": "../previews/nodo-laccato.mp4",
+      "comparisonOutcome": "parziale"
     },
     {
       "id": "roadmap-image-treatments",
@@ -16336,7 +16387,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Filtri → Preset filtri",
+      "where": "Filtri → Mosaico, Separazione dei colori, Segni e caratteri",
       "platform": "",
       "next": "Verificare un confronto più esteso dei trattamenti con le reference.",
       "keep": "",
@@ -16365,7 +16416,14 @@
       "category": "filters",
       "addedOn": "2026-10-10",
       "engine": "solid",
-      "resultUrl": "../previews/sviluppo-visivo.html?v=78"
+      "resultUrl": "../previews/verifica-visiva.html#segni-mosaico",
+      "compareNote": "Griglia di pixel, segni e separazione RGB su una forma Prisma. La griglia segue i colori e le luci della scena. La fonte applica lo stesso principio a un ritratto.",
+      "comparisonOutcome": "parziale",
+      "comparisonRef": "img-01",
+      "comparisonDate": "2026-11-15",
+      "resultPreset": "previews/segni-mosaico.prisma.json",
+      "resultImage": "../previews/segni-mosaico.webp",
+      "resultVideo": "../previews/segni-mosaico.mp4"
     },
     {
       "id": "roadmap-layered-veils",
@@ -16568,7 +16626,8 @@
       "resultPreset": "previews/lamelle-asimmetriche.prisma.json",
       "compareNote": "Pochi lobi disuguali, contorni sottili e nucleo scuro. La posa delle lamelle resta modificabile partendo dalla sfera.",
       "comparisonRef": "s17-01",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-15",
+      "comparisonOutcome": "parziale"
     },
     {
       "id": "roadmap-luminous-vortex",
@@ -16712,7 +16771,8 @@
       "comparisonRef": "s18-05",
       "comparisonDate": "2026-11-15",
       "resultPreset": "previews/ricircolo-luminoso.prisma.json",
-      "resultVideo": "../previews/ricircolo-luminoso.mp4"
+      "resultVideo": "../previews/ricircolo-luminoso.mp4",
+      "comparisonOutcome": "parziale"
     },
     {
       "id": "roadmap-electric-filaments",
@@ -16904,7 +16964,8 @@
       "comparisonRef": "s18-02",
       "comparisonDate": "2026-11-15",
       "resultPreset": "previews/impulsi-sottili.prisma.json",
-      "resultVideo": "../previews/impulsi-sottili.mp4"
+      "resultVideo": "../previews/impulsi-sottili.mp4",
+      "comparisonOutcome": "parziale"
     },
     {
       "id": "method-living-moodboard",
@@ -17120,7 +17181,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "trama-viva",
-      "where": "Particelle → Forma → Fili",
+      "where": "Forma → Granelli e fili · Materiale → Diffusione interna",
       "platform": "",
       "next": "Elasticità e membrane disponibili nel progetto Tessuto e connessioni. Questa ricetta conserva i legami visivi originali di Particle Hero.",
       "keep": "",
@@ -17136,9 +17197,9 @@
         }
       ],
       "assets": [],
-      "resultImage": "media/5427b6b4ff7a91df.webp",
-      "resultVideo": "../previews/trama-viva-10s.mp4",
-      "resultUrl": "../previews/trama-viva.html",
+      "resultImage": "../previews/trama-nebulosa.webp",
+      "resultVideo": "../previews/trama-nebulosa.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#trama-nebulosa",
       "completedProjects": [
         "roadmap-tissue",
         "roadmap-fibre-motion"
@@ -17156,7 +17217,11 @@
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
-      "resultPreset": "previews/trama-viva.prisma.json"
+      "resultPreset": "previews/trama-nebulosa.prisma.json",
+      "compareNote": "Nube chiara in ricircolo con legami e variazione del diametro. Il riferimento documenta una quantità di granelli maggiore.",
+      "comparisonOutcome": "parziale",
+      "comparisonRef": "img-20261010-02",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "project-cobalto-oro",
@@ -17247,7 +17312,8 @@
       "compareNote": "Confronto di venature, contrasto cobalto-oro e riflessi cromatici durante la deformazione. Il preset resta completamente modificabile.",
       "comparisonRef": "s11-01",
       "comparisonDate": "2026-11-15",
-      "resultPreset": "previews/pellicola-spettrale.prisma.json"
+      "resultPreset": "previews/pellicola-spettrale.prisma.json",
+      "comparisonOutcome": "parziale"
     },
     {
       "id": "project-fibre-setose",
@@ -17300,7 +17366,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "fibre-setose",
-      "where": "Particelle → Materiale → Riflessi delle fibre",
+      "where": "Materiale → Fibre · riflessi · Forma → Scie",
       "platform": "",
       "next": "",
       "keep": "",
@@ -17316,9 +17382,9 @@
         }
       ],
       "assets": [],
-      "resultImage": "media/f1deb95b4c9c8800.webp",
-      "resultVideo": "../previews/fibre-setose-10s.mp4",
-      "resultUrl": "../previews/fibre-setose.html",
+      "resultImage": "../previews/fibre-traslucide.webp",
+      "resultVideo": "../previews/fibre-traslucide.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#fibre-traslucide",
       "completedProjects": [
         "roadmap-fibre-motion"
       ],
@@ -17337,7 +17403,11 @@
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
-      "resultPreset": "previews/fibre-setose.prisma.json"
+      "resultPreset": "previews/fibre-traslucide.prisma.json",
+      "compareNote": "Riflessi direzionali, trasparenza e fasci. Il confronto riguarda la luce sui fili.",
+      "comparisonOutcome": "parziale",
+      "comparisonRef": "s06-01",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "project-pellicola-viva",
@@ -17389,7 +17459,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "pellicola-viva",
-      "where": "Particelle → Materiale → Iridescenza",
+      "where": "Forma → Pelle · Materiale → Iridescenza",
       "platform": "",
       "next": "",
       "keep": "",
@@ -17405,9 +17475,9 @@
         }
       ],
       "assets": [],
-      "resultImage": "media/1dd2c0af9c7c3a38.webp",
-      "resultVideo": "../previews/pellicola-viva-10s.mp4",
-      "resultUrl": "../previews/pellicola-viva.html",
+      "resultImage": "../previews/bolla-su-granelli.webp",
+      "resultVideo": "../previews/bolla-su-granelli.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#bolla-su-granelli",
       "completedProjects": [
         "roadmap-membrane"
       ],
@@ -17420,7 +17490,11 @@
       ],
       "category": "appearance",
       "addedOn": "2026-10-10",
-      "resultPreset": "previews/pellicola-viva.prisma.json"
+      "resultPreset": "previews/bolla-su-granelli.prisma.json",
+      "compareNote": "La pelle iridescente passa da bolla ad anello con i granelli ancora visibili. Il preset regola forma, cavità, colori, trasparenza e variazione nel tempo.",
+      "comparisonOutcome": "parziale",
+      "comparisonRef": "s07-03",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "project-moodboard",
@@ -17493,7 +17567,9 @@
         "tools"
       ],
       "category": "workflow",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "comparisonOutcome": "funzionale",
+      "comparisonDate": "2026-11-15"
     },
     {
       "id": "archive-calibration-20261009",
@@ -19323,7 +19399,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Filtri → Ordine dei filtri e Aree; Scena → Correzione colore",
+      "where": "Filtri → Ordine dei filtri e Aree · Scena → Colore ed esposizione",
       "platform": "",
       "next": "",
       "keep": "",
@@ -19348,7 +19424,15 @@
         "post"
       ],
       "category": "filters",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "compareNote": "Il preset conserva ordine, maschera rettangolare e intensità di quattro filtri.",
+      "comparisonOutcome": "funzionale",
+      "comparisonRef": "img-s16-mosaic",
+      "comparisonDate": "2026-11-15",
+      "resultPreset": "previews/segni-mosaico.prisma.json",
+      "resultImage": "../previews/segni-mosaico.webp",
+      "resultVideo": "../previews/segni-mosaico.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#segni-mosaico"
     },
     {
       "id": "img-s18-form-vision",
@@ -22744,7 +22828,8 @@
       "summary": "Scanalature, lenti e profilo prismatico sul risultato della scena. Rifrazione, dispersione, ondulazione, sfocatura e movimento combinabili con gli altri filtri.",
       "sources": [
         "https://derivative.ca/UserGuide/Displace_TOP",
-        "https://docs.blender.org/manual/en/dev/render/shader_nodes/shader/glass.html"
+        "https://docs.blender.org/manual/en/dev/render/shader_nodes/shader/glass.html",
+        "https://superhivemarket.com/products/opticlab"
       ],
       "sections": [
         {
@@ -22823,7 +22908,15 @@
         "description": "Filtro ottico sull’immagine finale, distinto dalla rifrazione del materiale 3D.",
         "verification": "code-reviewed"
       },
-      "addedOn": "2026-10-21"
+      "addedOn": "2026-10-21",
+      "compareNote": "Distorsione, sfocatura e dispersione su una trama di vetro. Il riferimento descrive un materiale Blender 3D.",
+      "comparisonOutcome": "parziale",
+      "comparisonSource": "https://superhivemarket.com/products/opticlab",
+      "comparisonDate": "2026-11-15",
+      "resultPreset": "previews/rifrazione-scene.prisma.json",
+      "resultImage": "../previews/rifrazione-scene.webp",
+      "resultVideo": "../previews/rifrazione-scene.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#rifrazione-scene"
     },
     {
       "id": "roadmap-organic-growth",
@@ -22887,7 +22980,7 @@
       ],
       "familyBasis": "Crescita locale, zone collegate e rilievo modulabile sulla forma esistente.",
       "result": "Integrato nella Materia. Esempi facoltativi; nessuna nuova modalità.",
-      "where": "Materiale → Reazione-diffusione; Materiale → Reazione-diffusione → Anima",
+      "where": "Materiale → Motivi organici",
       "platform": "WebGL2 + worker locale",
       "next": "Eventuale sviluppo geometrico del rilievo e crescita animata, da valutare separatamente.",
       "keep": "Tutti i parametri combinabili, intensità zero neutra, preset completi riproducibili.",
@@ -22919,8 +23012,8 @@
       ],
       "assets": [],
       "completedProjects": [],
-      "resultVideo": "../previews/venature-rame.mp4",
-      "resultUrl": "../previews/crescita-organica.html",
+      "resultVideo": "../previews/trama-reazione.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#trama-reazione",
       "aliases": [
         "Crescita organica",
         "Trame di reazione-diffusione"
@@ -22935,7 +23028,12 @@
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-21",
-      "resultPreset": "previews/venature-rame.prisma.json"
+      "resultPreset": "previews/trama-reazione.prisma.json",
+      "compareNote": "La reazione-diffusione genera canali e isole con colore e rilievo regolabili. Il preset anima lo scorrimento del motivo.",
+      "comparisonOutcome": "fonte",
+      "comparisonSource": "https://www.karlsims.com/rd.html",
+      "comparisonDate": "2026-11-15",
+      "resultImage": "../previews/trama-reazione.webp"
     },
     {
       "id": "roadmap-playground-touch",
@@ -23196,7 +23294,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "cellule-madreperlacee",
-      "where": "Forma → Cellule e spine · Materiale → Madreperla delle cellule · Movimento → Cellule e spine",
+      "where": "Forma → Cellule e spine · Materiale → Madreperla delle cellule",
       "platform": "",
       "next": "",
       "keep": "",
@@ -23212,9 +23310,9 @@
         }
       ],
       "assets": [],
-      "resultImage": "media/c8beb9655eb06d79.webp",
-      "resultVideo": "../previews/cellule-madreperlacee-6s.mp4?v=76",
-      "resultUrl": "../previews/cellule-madreperlacee.html?v=76",
+      "resultImage": "../previews/nacre-traslucida.webp",
+      "resultVideo": "../previews/nacre-traslucida.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#nacre-traslucida",
       "completedProjects": [],
       "addedOn": "2026-11-13",
       "aliases": [],
@@ -23224,7 +23322,11 @@
       ],
       "category": "form",
       "engine": "solid",
-      "resultPreset": "previews/cellule-madreperlacee.prisma.json"
+      "resultPreset": "previews/nacre-traslucida.prisma.json",
+      "compareNote": "Spine rastremate, cellule con luce interna, riflessi rosa e verde acqua. La distribuzione delle cellule e delle spine rimane procedurale.",
+      "comparisonOutcome": "vicino",
+      "comparisonRef": "s04-01",
+      "comparisonDate": "2026-11-15"
     }
   ],
   "families": [

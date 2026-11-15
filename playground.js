@@ -1,16 +1,16 @@
-import {onlineDirector,DIRECTOR_ONLINE_URL} from './director-connection.js?v=ddff107e99e1';
-import {PlaygroundDirector} from './playground-director.js?v=ddff107e99e1';
-import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=ddff107e99e1';
-import {familyName,presetFamily} from './preset-families.js?v=ddff107e99e1';
-import {closeLivingSkin} from './living-panel.js?v=ddff107e99e1';
-import {PlaygroundEngine} from './playground-engine.js?v=ddff107e99e1';
-import {PlaygroundInputs} from './playground-inputs.js?v=ddff107e99e1';
-import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=ddff107e99e1';
-import {particleCreation} from './particle-model.js?v=ddff107e99e1';
-import {readPreset} from './preset-files.js?v=ddff107e99e1';
-import {controlHelp,controlCondition} from './control-help.js?v=ddff107e99e1';
-import {MUTATIONS} from './playground-performance.js?v=ddff107e99e1';
-import {LIVE_FILTERS,LIVE_BUSES,normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=ddff107e99e1';
+import {onlineDirector,DIRECTOR_ONLINE_URL} from './director-connection.js?v=6a9e627b503d';
+import {PlaygroundDirector} from './playground-director.js?v=6a9e627b503d';
+import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=6a9e627b503d';
+import {familyName,presetFamily} from './preset-families.js?v=6a9e627b503d';
+import {closeLivingSkin} from './living-panel.js?v=6a9e627b503d';
+import {PlaygroundEngine} from './playground-engine.js?v=6a9e627b503d';
+import {PlaygroundInputs} from './playground-inputs.js?v=6a9e627b503d';
+import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=6a9e627b503d';
+import {particleCreation} from './particle-model.js?v=6a9e627b503d';
+import {readPreset} from './preset-files.js?v=6a9e627b503d';
+import {controlHelp,controlCondition} from './control-help.js?v=6a9e627b503d';
+import {MUTATIONS} from './playground-performance.js?v=6a9e627b503d';
+import {LIVE_FILTERS,LIVE_BUSES,MOD_SOURCES,TRANSITIONS,normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=6a9e627b503d';
 
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
 const button=(text,fn,cls='outline')=>{const b=el('button',cls,text);b.type='button';b.onclick=fn;return b;};
@@ -20,7 +20,8 @@ const numeric=(value,min,max,step,fn)=>{const n=el('input');n.type='number';n.mi
 const select=(list,value,fn)=>{const s=options(el('select'),list,value);s.onchange=()=>fn(s.value);return s;};
 
 export function mountPlayground(api){
- let fxBus='output';
+ let fxBus='output',modBank='mix',modLink=null,outputWindow=null;
+ const audioHost=el('div','pg-audio-player');
  let active=false,opening=false,config,engine,inputs,director,saveTimer,syncTimer,entry,activeMacro=0,targetKey='mix',focusedDeck='A';
  const controlNodes=new Map(),deckNodes={};
  const shell=el('section','pg-shell');shell.id='playground';shell.hidden=true;shell.setAttribute('aria-label','Playground · due scene vive');
@@ -32,8 +33,26 @@ export function mountPlayground(api){
  const fullscreen=async()=>{try{if(document.fullscreenElement===shell)await document.exitFullscreen();else await shell.requestFullscreen();}catch{message('Schermo intero non disponibile in questo browser.');}};
  const flowMode=button('Flow',()=>{director?.stop();engine.flow.start();render();changed();}),manualMode=button('Manuale',()=>{director?.stop();engine.flow.stop();render();changed();});flowMode.dataset.pgMode='flow';manualMode.dataset.pgMode='manual';
  const directorButton=button('Regia AI',()=>{if(director?.running){director.stop();return;}directorPanel.hidden=!directorPanel.hidden;if(!directorPanel.hidden)brief.focus();});directorButton.id='director-toggle';
+ function projectOutput(){
+  if(outputWindow&&!outputWindow.closed){outputWindow.focus();return;}
+  if(!canvas.captureStream){message('Usa Schermo intero per proiettare con questo browser.');return;}
+  const win=window.open('','prisma-output','popup,width=960,height=540');
+  if(!win){message('Consenti la finestra di uscita in questo browser.');return;}
+  const playingEngine=engine;
+  outputWindow=win;win.document.title='Prisma · Uscita';
+  const video=win.document.createElement('video');video.autoplay=true;video.muted=true;video.playsInline=true;video.srcObject=canvas.captureStream(60);
+  win.document.body.style.cssText='margin:0;background:#000;overflow:hidden';video.style.cssText='width:100vw;height:100vh;object-fit:contain;display:block';
+  win.document.body.replaceChildren(video);
+  video.onclick=()=>void win.document.body.requestFullscreen?.().catch(()=>{});
+  win.addEventListener('pagehide',()=>{
+   video.srcObject?.getTracks().forEach(t=>t.stop());
+   playingEngine.useOutputWindow(null);
+   if(outputWindow===win)outputWindow=null;
+  },{once:true});
+  playingEngine.useOutputWindow(win);
+ }
  const more=el('details','pg-menu'),morePanel=el('div','pg-menu-items');more.append(el('summary','','Menu'),morePanel);
- morePanel.append(directorButton,button('Salva progetto',()=>{persist();api.exportProject();}),button('Collega controlli',()=>openMapping(config.flow.enabled?'flow.speed':'mix')),button('Schermo intero',fullscreen),button('Solo scena',()=>shell.classList.toggle('pg-clean')),button('Torna all’editor',()=>close()));
+ morePanel.append(directorButton,button('Salva progetto',()=>{persist();api.exportProject();}),button('Collega controlli',()=>openMapping(config.flow.enabled?'flow.speed':'mix')),button('Schermo intero',fullscreen),button('Seconda finestra',projectOutput),button('Solo scena',()=>shell.classList.toggle('pg-clean')),button('Torna all’editor',()=>close()));
  const compactMenu=matchMedia('(max-width:700px)');const menuLayout=()=>more.open=!compactMenu.matches;
  menuLayout();compactMenu.addEventListener('change',menuLayout);morePanel.addEventListener('click',()=>{if(compactMenu.matches)more.open=false;});
  header.append(title,manualMode,flowMode,more);
@@ -51,7 +70,8 @@ export function mountPlayground(api){
  function directorUI(){if(!director)return;directorText.textContent=director.text||'Regia pronta';const u=director.usage;consumption.textContent=u?`${u.attempts}/${u.limit} tentativi · ${u.dayUsed}/${u.dayLimit} oggi · ${(u.inputTokens||0)+(u.outputTokens||0)} token`:'';directorButton.textContent=director.running?'Riprendi il controllo':'Regia AI';directorButton.setAttribute('aria-pressed',String(director.running));takeover.hidden=!director.running;shell.classList.toggle('pg-directed',director.running);directorLog.replaceChildren(el('summary','','Scelte della sessione'));for(const h of config?.director.history||[])directorLog.append(el('p','pg-help',h.intent));sync();}
  document.addEventListener('visibilitychange',()=>{if(document.hidden&&director?.running)director.stop('Regia sospesa: la scheda non è visibile. Premi Regia AI per riprendere.');});
  document.addEventListener('keydown',e=>{if(active&&e.key==='Escape'&&shell.classList.contains('pg-clean')&&!shell.querySelector('dialog[open]')){shell.classList.remove('pg-clean');e.preventDefault();}});
- const opener=button('Playground',()=>open(),'outline');opener.id='playground-open';document.querySelector('.header-actions')?.prepend(opener);
+ const opener=document.getElementById('playground-open');
+ opener.onclick=()=>open();
  function message(text){status.textContent=text;}
  function persist(){if(!active||!engine)return;clearTimeout(saveTimer);api.save(engine.snapshot());}
  function changed(){clearTimeout(saveTimer);saveTimer=setTimeout(persist,350);sync();}
@@ -71,8 +91,12 @@ export function mountPlayground(api){
   if(config.flow.enabled&&!['blackout','master'].includes(key))return null;
   if(key.startsWith('param:'))return parameterTarget(key);
   const value=(get,set)=>({kind:'value',get,set:v=>{set(clamp(v));changed();}}),action=fn=>({kind:'action',get:()=>0,set:v=>{if(v>.5)fn();changed();}});
-  if(['freeze','invert'].includes(key))return value(()=>+!!config[key],v=>config[key]=v>=.5);
+   if(['freeze','invert','strobe'].includes(key))return value(()=>+!!config[key],v=>config[key]=v>=.5);
   if(key==='flash')return action(()=>engine.flashUntil=engine.clock+.32);
+  if(key==='impact')return action(()=>engine.impactUntil=engine.clock+.34);
+  if(key==='random')return action(()=>engine.mutate(config.mix<.5?'A':'B','all'));
+  if(key==='sequence')return value(()=>+config.sequence.enabled,v=>config.sequence.enabled=v>=.5);
+  if(/^step:(?:[0-9]|1[0-5])$/.test(key)){const step=+key.slice(5);return value(()=>+config.sequence.steps[step],v=>config.sequence.steps[step]=v>=.5);}
   if(key==='rewind')return action(()=>{for(const id of ['A','B'])if(engine.decks[id]){engine.decks[id].phase=0;engine.refresh(id);}});
   if(key.startsWith('fx.')){const [,bus,filter]=key.split('.');if(config.liveFx[bus]&&Object.hasOwn(config.liveFx[bus],filter))return value(()=>config.liveFx[bus][filter],v=>{config.liveFx[bus][filter]=v;if(bus!=='output')engine.refresh(bus);});}
   if(key.startsWith('mutate.')){const [,id,kind]=key.split('.');return action(()=>engine.mutate(id,kind));}
@@ -82,7 +106,7 @@ export function mountPlayground(api){
   if(key==='master')return value(()=>config.master,v=>config.master=v);
   if(key==='duration')return value(()=>(config.duration-.05)/63.95,v=>config.duration=.05+v*63.95);
   if(key==='bpm')return value(()=>(config.bpm-30)/270,v=>config.bpm=30+v*270);
-  for(const [k,list]of [['transition',['fade','wipe','luma','add','iris','swirl','zoom']],['curve',['linear','smooth','in','out']],['direction',[0,1,2,3]],['unit',['seconds','beats']]])if(key===k)return value(()=>list.indexOf(config[k])/(list.length-1),v=>config[k]=list[Math.round(v*(list.length-1))]);
+  for(const [k,list]of [['transition',TRANSITIONS],['curve',['linear','smooth','in','out']],['direction',[0,1,2,3]],['unit',['seconds','beats']]])if(key===k)return value(()=>list.indexOf(config[k])/(list.length-1),v=>config[k]=list[Math.round(v*(list.length-1))]);
   if(key==='quantize')return value(()=>+config.quantize,v=>config.quantize=v>=.5);
   if(key==='take.A'||key==='take.B')return action(()=>engine.take(key.endsWith('A')?0:1));
   if(key==='close.A'||key==='close.B')return action(()=>{const id=key.at(-1),d=engine.decks[id];if(d){closeLivingSkin(d.state);d.catalog=parameterCatalog(d.state);engine.refresh(id);}});
@@ -126,7 +150,7 @@ export function mountPlayground(api){
  function renderEffects(){
   effectsPanel.replaceChildren(el('summary','','Effetti e tasti'));
   const transport=el('div','pg-row');
-  for(const [id,name] of [['blackout','Nero'],['freeze','Fermo'],['invert','Inverti'],['flash','Lampo'],['rewind','Riavvolgi']]){
+  for(const [id,name] of [['blackout','Nero'],['strobe','Strobo'],['freeze','Fermo'],['invert','Inverti'],['impact','Colpo'],['flash','Lampo'],['rewind','Riavvolgi'],['random','Casuale']]){
    const b=button(name,()=>{const t=target(id);if(t)t.set(t.kind==='action'?1:1-t.get());});b.dataset.performance=id;
    const row=el('span','pg-action');row.append(b,learnButton(id));transport.append(row);
   }
@@ -149,16 +173,65 @@ export function mountPlayground(api){
   effectsPanel.append(grid);
  }
  function renderModulations(){
-  modulationPanel.replaceChildren(el('summary','','Modulatori'));
-  const destinations=[['mix','Mix A / B'],['master','Livello uscita'],...config.macros.map((m,i)=>['macro:'+i,m.name]),...LIVE_BUSES.flatMap(([bus,label])=>LIVE_FILTERS.map(([id,name])=>['fx.'+bus+'.'+id,name+' · '+label]))];
-  for(const [i,m] of config.modulations.entries()){
-   const row=el('div','pg-modulation');
-   row.append(field('Sorgente '+(i+1),select([['off','Spenta'],['sine','Sinusoide'],['triangle','Triangolare'],['beat','Battito'],['x','Pad X'],['y','Pad Y']],m.source,value=>{m.source=value;changed();})),
-    field('Destinazione',select(destinations,m.target,value=>{m.target=value;changed();})),
-    field('Intensità',numeric(m.depth,0,1,.01,value=>{m.depth=value;changed();})),
-    field('Frequenza · Hz',numeric(m.rate,.03,4,.01,value=>{m.rate=value;changed();})));
-   modulationPanel.append(row);
+  modulationPanel.replaceChildren(el('summary','','Modulatori e sequencer'));
+  const banks={
+   mix:[['mix','Mix'],['master','Uscita'],['variant.A','Variante A'],['variant.B','Variante B']],
+   macros:config.macros.map((m,i)=>['macro:'+i,m.name]),
+   ...Object.fromEntries(LIVE_BUSES.map(([bus])=>[bus,LIVE_FILTERS.map(([id,name])=>['fx.'+bus+'.'+id,name])]))
+  };
+  const destinations=banks[modBank],all=Object.entries(banks).flatMap(([bank,targets])=>targets.map(([path,name])=>[path,(LIVE_BUSES.find(([key])=>key===bank)?.[1]||'')+(LIVE_BUSES.some(([key])=>key===bank)?' · ':'')+name]));
+  modulationPanel.append(field('Destinazioni',select([['mix','Mix e varianti'],['macros','Macro'],...LIVE_BUSES.map(([key,name])=>[key,'Filtri · '+name])],modBank,value=>{modBank=value;renderModulations();})));
+  const scroll=el('div','pg-patch-scroll'),table=el('table','pg-patch'),head=el('tr');
+  head.append(el('th','','Sorgente'),...destinations.map(([,name])=>el('th','',name)));table.append(head);scroll.append(table);
+  const editRoute=el('div','pg-modulation');
+  const showRoute=()=>{
+   editRoute.replaceChildren();
+   const route=config.modulations.find(m=>m.source===modLink?.[0]&&m.target===modLink?.[1]);
+   if(!route)return;
+   editRoute.append(field('Intensità',numeric(route.depth,0,1,.01,value=>{route.depth=value;changed();})));
+   if(['sine','triangle'].includes(route.source))editRoute.append(field('Frequenza · Hz',numeric(route.rate,.03,4,.01,value=>{
+    for(const m of config.modulations)if(m.source===route.source)m.rate=value;
+    changed();
+   })));
+  };
+  for(const [source,label] of MOD_SOURCES){
+   const row=el('tr'),name=el('th','',label);name.scope='row';row.append(name);
+   for(const [target,name] of destinations){
+    const cell=el('td'),pad=button('●',()=>{
+     const index=config.modulations.findIndex(m=>m.source===source&&m.target===target);
+     if(index<0){
+      const rate=config.modulations.find(m=>m.source===source)?.rate??(source==='triangle'?.13:.25);
+      config.modulations.push({source,target,depth:.35,rate});modLink=[source,target];
+     }else if(modLink?.[0]===source&&modLink?.[1]===target){
+      config.modulations.splice(index,1);modLink=null;
+     }else modLink=[source,target];
+     changed();renderModulations();
+    });
+    pad.setAttribute('aria-label',label+' → '+name);
+    pad.setAttribute('aria-pressed',String(config.modulations.some(m=>m.source===source&&m.target===target)));
+    if(modLink?.[0]===source&&modLink?.[1]===target)pad.classList.add('pg-patch-selected');
+    cell.append(pad);row.append(cell);
+   }
+   table.append(row);
   }
+  showRoute();modulationPanel.append(scroll,editRoute);
+  const file=el('input');file.type='file';file.accept='audio/*';file.hidden=true;
+  async function startAudio(input){
+   try{if(await engine?.startAudio(input,audioHost))message(input?'Audio dal file locale.':'Microfono attivo · l’audio resta sul dispositivo.');}
+   catch{message('Ingresso audio non disponibile. Controlla il microfono o prova un file audio.');}
+  }
+  file.onchange=()=>{if(file.files[0])void startAudio(file.files[0]);};
+  const audio=el('div','pg-row');audio.append(button('Microfono',()=>void startAudio()),button('File audio',()=>file.click()),button('Ferma audio',()=>engine?.stopAudio()),file);modulationPanel.append(audio,audioHost);
+  const seq=config.sequence,grid=el('div','pg-sequence');
+  for(const [i,value] of seq.steps.entries()){
+   const pad=button(i+1,()=>touch('step:'+i,+!seq.steps[i]));
+   pad.dataset.sequenceStep=i;pad.setAttribute('aria-label','Passo '+(i+1));pad.setAttribute('aria-pressed',String(value));grid.append(pad);
+  }
+  const run=button('Sequencer',()=>touch('sequence',+!seq.enabled));run.dataset.performance='sequence';
+  modulationPanel.append(run,grid,field('Destinazione del sequencer',select(all,seq.target,value=>{seq.target=value;changed();})),
+   field('Passi per battito',select([[1,'1'],[2,'2'],[4,'4'],[8,'8']],seq.division,value=>{seq.division=+value;changed();})),
+   field('Intensità sequencer',numeric(seq.depth,0,1,.01,value=>{seq.depth=value;changed();})));
+  sync();
  }
  function render(){
   controlNodes.clear();renderFlow();renderEffects();renderModulations();top.replaceChildren();
@@ -189,6 +262,9 @@ export function mountPlayground(api){
  let taps=[];function tap(){const now=performance.now();if(now-(taps.at(-1)||0)>2200)taps=[];taps.push(now);taps=taps.slice(-5);if(taps.length>1){config.bpm=clamp(60000/((now-taps[0])/(taps.length-1)),30,300);changed();}}
  function drawPreview(id){const d=engine?.decks[id],n=deckNodes[id];if(!d||!n||d.renderer.completionSync||d.frames===n.frames)return;const now=performance.now();if(n.frames!==undefined&&now-(n.previewAt||0)<150)return;const ctx=n.preview.getContext('2d'),fit=Math.min(320/d.canvas.width,180/d.canvas.height),w=d.canvas.width*fit,h=d.canvas.height*fit;ctx.fillStyle='#000';ctx.fillRect(0,0,320,180);ctx.drawImage(d.canvas,(320-w)/2,(180-h)/2,w,h);n.frames=d.frames;n.previewAt=now;}
  function sync(){if(!active||!engine)return;for(const [key,n]of controlNodes){const t=target(key);if(!t)continue;if(n.range){const v=n.read(t.get());n.range.value=v;if(document.activeElement!==n.num)n.num.value=Number(v.toFixed(3));}if(n.select)n.select.value=String(key.startsWith('flow.')?config.flow[key.slice(5)]:config[key]);if(n.num&&!n.range&&document.activeElement!==n.num)n.num.value=n.read(t.get());if(n.check)n.check.checked=!!config[key];}
+  for(const b of modulationPanel.querySelectorAll('[data-sequence-step]')){
+   const i=Number(b.dataset.sequenceStep);b.setAttribute('aria-pressed',String(config.sequence.steps[i]));b.classList.toggle('pg-step-current',config.sequence.enabled&&engine.step===i);
+  }
   for(const b of shell.querySelectorAll('[data-transition-pad]'))b.setAttribute('aria-pressed',String(config.transition===b.dataset.transitionPad));
   for(const b of shell.querySelectorAll('[data-effect],[data-performance]')){const t=target(b.dataset.effect||b.dataset.performance);if(t?.kind==='value')b.setAttribute('aria-pressed',String(t.get()>0));}
   for(const id of ['A','B']){const d=engine.decks[id],n=deckNodes[id];if(!n)continue;n.state.textContent=engine.pending[id]?'Preparo…':d?`${d.state.engine==='particles'?'Particelle':'Forma'} · ${d.playing?'in movimento':'in pausa'}`:'In attesa';const b=n.card.querySelector('[data-play]');if(b)b.textContent=d?.playing?'Pausa':'Riproduci';drawPreview(id);}
@@ -220,8 +296,10 @@ export function mountPlayground(api){
  }
  function openMacroBody(){openMacro(activeMacro);}
  macroDialog.addEventListener('close',()=>{render();changed();});
- function mappingCatalog(){const fixed=[['flow.enabled','Modalità Flow'],['flow.mood','Flow · mood'],['flow.colors','Flow · palette'],['flow.speed','Flow · velocità'],['flow.intensity','Flow · intensità'],['flow.variety','Flow · varietà'],['flow.engines','Flow · scene'],['flow.paused','Flow · mantieni scena'],['flow.next','Flow · prossima scena'],['mix','Mix A/B'],['take.A','Transizione verso A'],['take.B','Transizione verso B'],['cut.A','A subito'],['cut.B','B subito'],['transition','Tipo transizione'],['direction','Direzione tendina'],['curve','Andamento'],['duration','Durata'],['unit','Secondi / battiti'],['bpm','BPM'],['quantize','Partenza sul battito'],['master','Livello uscita'],['blackout','Nero'],['close.A','Chiudi pelle A'],['close.B','Chiudi pelle B'],['play:A','Riproduzione A'],['play:B','Riproduzione B'],...config.macros.map((m,i)=>['macro:'+i,'Macro · '+m.name]),['freeze','Fermo'],['invert','Inverti'],['flash','Lampo'],['rewind','Riavvolgi'],...LIVE_BUSES.flatMap(([id,name])=>LIVE_FILTERS.map(([key,label])=>['fx.'+id+'.'+key,name+' · '+label])),...['A','B'].flatMap(id=>[['variant.'+id,'Inizio ↔ variante '+id],...MUTATIONS.map(([k,n])=>['mutate.'+id+'.'+k,'Varia '+id+' · '+n])])];for(const id of ['A','B'])for(const [p,n]of catalogOptions(id,false))fixed.push([`param:${id}:${p}`,id+' · '+n]);return fixed;}
- function openMapping(key){targetKey=key;dialogHead(mapDialog,'Assegna un controllo');const catalog=mappingCatalog().filter(([id])=>config.flow.enabled?id.startsWith('flow.')||['master','blackout'].includes(id):true),search=el('input');search.type='search';search.placeholder='Cerca un controllo…';search.setAttribute('aria-label','Cerca controllo da assegnare');const choose=select(catalog,key,v=>{targetKey=v;openMapping(v);});search.oninput=()=>options(choose,catalog.filter(([,n])=>n.toLowerCase().includes(search.value.toLowerCase())),targetKey);const existing=config.bindings[key],mode=select([['toggle','Alterna minimo / massimo'],['hold','Attivo mentre premi'],['step','Avanza a passi del 10%']],existing?.mode||'toggle',()=>{}),invert=el('input'),pickup=el('input');invert.type=pickup.type='checkbox';invert.checked=existing?.invert||false;pickup.checked=existing?.pickup!==false;
+ function mappingCatalog(){const fixed=[['flow.enabled','Modalità Flow'],['flow.mood','Flow · mood'],['flow.colors','Flow · palette'],['flow.speed','Flow · velocità'],['flow.intensity','Flow · intensità'],['flow.variety','Flow · varietà'],['flow.engines','Flow · scene'],['flow.paused','Flow · mantieni scena'],['flow.next','Flow · prossima scena'],['mix','Mix A/B'],['take.A','Transizione verso A'],['take.B','Transizione verso B'],['cut.A','A subito'],['cut.B','B subito'],['transition','Tipo transizione'],['direction','Direzione tendina'],['curve','Andamento'],['duration','Durata'],['unit','Secondi / battiti'],['bpm','BPM'],['quantize','Partenza sul battito'],['master','Livello uscita'],['blackout','Nero'],['close.A','Chiudi pelle A'],['close.B','Chiudi pelle B'],['play:A','Riproduzione A'],['play:B','Riproduzione B'],...config.macros.map((m,i)=>['macro:'+i,'Macro · '+m.name]),['freeze','Fermo'],['invert','Inverti'],['flash','Lampo'],['rewind','Riavvolgi'],['strobe','Strobo'],['impact','Colpo'],['random','Casuale'],['sequence','Sequencer'],...config.sequence.steps.map((_,i)=>['step:'+i,'Passo '+(i+1)]),...LIVE_BUSES.flatMap(([id,name])=>LIVE_FILTERS.map(([key,label])=>['fx.'+id+'.'+key,name+' · '+label])),...['A','B'].flatMap(id=>[['variant.'+id,'Inizio ↔ variante '+id],...MUTATIONS.map(([k,n])=>['mutate.'+id+'.'+k,'Varia '+id+' · '+n])])];for(const id of ['A','B'])for(const [p,n]of catalogOptions(id,false))fixed.push([`param:${id}:${p}`,id+' · '+n]);return fixed;}
+ function openMapping(key){targetKey=key;dialogHead(mapDialog,'Assegna un controllo');const catalog=mappingCatalog().filter(([id])=>config.flow.enabled?id.startsWith('flow.')||['master','blackout'].includes(id):true),search=el('input');search.type='search';search.placeholder='Cerca un controllo…';search.setAttribute('aria-label','Cerca controllo da assegnare');const preferred=catalog.find(row=>row[0]===key),selectable=rows=>[...(preferred&&!rows.some(row=>row[0]===key)?[preferred]:[]),...rows.slice(0,40)];
+  const choose=select(selectable(catalog),key,value=>{targetKey=value;openMapping(value);});
+  search.oninput=()=>{const words=search.value.toLocaleLowerCase('it').trim().split(/\s+/);options(choose,selectable(catalog.filter(([,name])=>words.every(word=>name.toLocaleLowerCase('it').includes(word)))),targetKey);};const existing=config.bindings[key],mode=select([['toggle','Alterna minimo / massimo'],['hold','Attivo mentre premi'],['step','Avanza a passi del 10%']],existing?.mode||'toggle',()=>{}),invert=el('input'),pickup=el('input');invert.type=pickup.type='checkbox';invert.checked=existing?.invert||false;pickup.checked=existing?.pickup!==false;
   const info=el('p','pg-help');info.textContent=existing?'Collegato a '+bindingName(existing.input):'Nessuna assegnazione';mapDialog.append(search,field('Controllo',choose),field('Tasti e pulsanti',mode),field('Inverti',invert),field('Aggancia quando raggiungi il valore attuale',pickup),info,button('Impara assegnazione',()=>inputs.learn(targetKey,mode.value,invert.checked,pickup.checked)),button('Collega MIDI',()=>inputs.connectMidi()),button('Rimuovi assegnazione',()=>{delete config.bindings[targetKey];inputs.release();changed();openMapping(targetKey);}),el('p','pg-help','Tastiera, joystick e MIDI CC / note. Gli assi sono continui; una zona morta evita tremolii al centro. I controlli fisici agganciano il valore senza saltare. Il pad XY e i fader funzionano anche con mouse e touch.'));
   const all=el('details');all.append(el('summary','',Object.keys(config.bindings).length+' assegnazioni salvate'));for(const [k,v]of Object.entries(config.bindings)){const n=catalog.find(x=>x[0]===k)?.[1]||k;all.append(button(n+' ← '+bindingName(v.input),()=>openMapping(k),'quiet'));}mapDialog.append(all);if(!mapDialog.open)mapDialog.showModal();
  }
@@ -234,10 +312,10 @@ export function mountPlayground(api){
    const fresh=canvas.cloneNode();canvas.replaceWith(fresh);canvas=fresh;engine=new PlaygroundEngine(canvas,config,notify);director=new PlaygroundDirector(engine,{notify:directorUI,save:persist});brief.value=config.director.brief;directorUI();stage.style.aspectRatio=String(engine.ratio);inputs=new PlaygroundInputs(config,target,(text,id)=>{if(text==='assigned'){changed();message('Assegnazione salvata nel progetto.');if(mapDialog.open)openMapping(id);}else message(text);});render();message('Preparo le due scene vive…');syncTimer=setInterval(sync,150);
    await loadScene('A',config.decks.A);if(active)await loadScene('B',config.decks.B);
   }catch(e){message(e.message);api.toast(e.message);if(active)close();else api.resume();}finally{opening=false;opener.disabled=false;}}
- function close(){if(!active)return;const address=new URL(location.href);if(address.searchParams.has('playground')){address.searchParams.delete('playground');history.replaceState(null,'',address);}
+ function close(){if(!active)return;outputWindow?.close();outputWindow=null;const address=new URL(location.href);if(address.searchParams.has('playground')){address.searchParams.delete('playground');history.replaceState(null,'',address);}
 director?.stop();director=null;inputs?.dispose();persist();active=false;clearTimeout(saveTimer);clearInterval(syncTimer);for(const dialog of [mapDialog,macroDialog,parameterDialog])if(dialog.open)dialog.close();engine?.dispose();engine=null;inputs=null;shell.hidden=true;document.body.classList.remove('pg-open');for(const node of document.querySelectorAll('body > .topbar,body > .workspace'))node.inert=false;if(document.fullscreenElement===shell)document.exitFullscreen().catch(()=>{});api.resume();opener.focus();}
  function editDeck(id){const d=engine.decks[id];if(!d)return;const snapshot={state:sceneOnly(d.state),name:d.name,phase:d.phase,ratio:d.ratio},p=engine.snapshot();close();snapshot.state.playground=p;api.adopt(snapshot);api.toast('Modifica la scena; nel Playground usa “Carica scena → Scena dell’editor” per portarla in A o B.');}
- window.addEventListener('pagehide',()=>{director?.stop();if(active)persist();});
+ window.addEventListener('pagehide',()=>{outputWindow?.close();director?.stop();engine?.stopAudio();if(active)persist();});
  shell.addEventListener('input',event=>{if(director?.running&&!directorPanel.contains(event.target))director.stop();},true);
  return {open,close,get active(){return active;},get engine(){return engine;},get director(){return director;},getSnapshot:()=>engine?.snapshot()||null,loadScene,setControl:touch,getStatus:()=>engine?{pending:{...engine.pending},decks:Object.fromEntries(Object.entries(engine.decks).map(([id,d])=>[id,d?{engine:d.state.engine,frames:d.frames,phase:d.phase,playing:d.playing}:null])),mix:config.mix,transitioning:!!engine.job,stats:engine.stats,flow:engine.flow.status(),flowSettings:{...config.flow}}:null};
 }

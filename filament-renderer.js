@@ -1,8 +1,8 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=ddff107e99e1';
-import {BASE_FORM_GLSL} from './base-forms.js?v=ddff107e99e1';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=ddff107e99e1';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=ddff107e99e1';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=ddff107e99e1';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=6a9e627b503d';
+import {BASE_FORM_GLSL} from './base-forms.js?v=6a9e627b503d';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=6a9e627b503d';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=6a9e627b503d';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=6a9e627b503d';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -69,7 +69,9 @@ void main(){vec2 uv=(gl_FragCoord.xy/uCameraSize.zw*2.-1.)*uCameraSize.xy;uv*=1.
 const GROOM=`
 uniform sampler2D uRoots,uNormals;
 uniform vec4 uHairA,uHairB,uHairC,uHairD,uHairBase,uHairBranch;
+uniform vec2 uFocus;
 uniform float uSeed,uSegments,uHairScatter,uTube,uSides,uRootCore,uTubeDepth;uniform ivec2 uRootOrder;
+uniform int uInstanceStart;
 float rnd(float x){return fract(sin(x*127.1+uSeed)*43758.5453);}
 vec3 guide(float id,float count){float z=1.-2.*(id+.5)/count,a=id*2.39996323+uSeed;return normalize(vec3(cos(a)*sqrt(max(0.,1.-z*z)),sin(a)*sqrt(max(0.,1.-z*z)),z)+uHairScatter/sqrt(count)*vec3(rnd(id+41.)-.5,rnd(id+71.)-.5,rnd(id+91.)-.5)*2.);}
 float strandLength(float id,float clusterId){float variation=mix(rnd(id+19.),.75*rnd(clusterId+114.)+.25*rnd(id+19.),uHairC.x);return uHairA.x*mix(1.,.12+.88*variation,uHairB.x);}
@@ -87,6 +89,18 @@ vec3 strand(vec3 root,vec3 n,float id,float clusterId,float t){
  vec3 cluster=guide(clusterId,uHairC.y);
  vec3 offset=cluster-normalize(root);offset-=n*dot(offset,n);
  vec3 groupSide=normalize(cross(cluster,vec3(.01,1,.001)));side=normalize(mix(side,groupSide,uHairC.x*.9));float embed=min(uHairA.y*.65,len*.08);vec3 p=root+n*(len*t-embed*(1.-smoothstep(0.,.3,t)))+side*uHairB.y*len*t*t*.8+around*uHairB.z*len*t*smoothstep(0.,.15,t);
+ #if WRAPPED_STRANDS
+ if(abs(uHairA.w)>.0001){
+  float radius=max(.04,length(root)),amount=smoothstep(0.,.24,abs(uHairA.w));
+  vec3 radial=root/radius;
+  vec3 tangent=mix(side,around*(uHairB.z<0.?-1.:1.),abs(uHairB.z)*.82);
+  tangent-=radial*dot(tangent,radial);
+  tangent=normalize(tangent+cross(radial,axis)*.00001);
+  float turn=uHairA.w*6.2831853*t*len/1.4;
+  vec3 wrapped=(radius-embed*(1.-smoothstep(0.,.3,t))+len*t*.12)*(radial*cos(turn)+tangent*sin(turn));
+  p=mix(p,wrapped,amount);
+ }
+ #endif
  p+=uHairC.x*offset*(min(length(root),1.5)+len)*smoothstep(0.,1.,t)*(1.-uHairC.z*t*t*.65);
  p+=side*uHairC.x*uHairC.z*len*t*t*.25;
  p+=uHairB.w*len*t*(b*(cos(t*12.56637+az)-cos(az))+c*(sin(t*12.56637+az)-sin(az)))*.18;
@@ -106,33 +120,83 @@ vec3 hairPoint(vec3 root,vec3 normal,float id,float cluster,float t,float split,
  }
  return deformWorld(toWorld(p));
 }
+float axisTime(float t,float len,bool branch){
+ if(uTube<.5||branch)return t;
+ float foot=min(.45,(min(uHairA.y*.65,len*.08)+baseHeight(len,uHairA.y*.5))/max(.00001,len));
+ float focused=t<.3?foot*pow(t/.3,1.4):mix(foot,1.,(t-.3)/.7);
+ return mix(t*t,focused,smoothstep(0.,.15,uHairBase.x));
+}
+void axisSample(vec3 root,vec3 n,float id,float cluster,float t,float split,float extent,out vec3 p,out vec3 tangent){
+ p=hairPoint(root,n,id,cluster,t,split,extent);
+ vec3 next=hairPoint(root,n,id,cluster,min(1.,t+.002),split,extent);
+ vec3 prev=hairPoint(root,n,id,cluster,max(0.,t-.002),split,extent);
+ tangent=normalize(next-prev);
+}
 `;
-const HAIR_VERT=HEADER+SPACE+GROOM+`
+// Each row is a strand. The textures keep the original position and tangent
+// samples. The index buffer then reuses each vertex of the tube or ribbon.
+const axisFragment=wrap=>HEADER+'#define WRAPPED_STRANDS '+Number(wrap)+'\n'+SPACE+GROOM+`
+layout(location=0)out vec4 axisPoint;
+layout(location=1)out vec4 axisTangent;
+void main(){
+ ivec2 address=ivec2(gl_FragCoord.xy);
+ int instance=address.y+uInstanceStart,id=int((uint(instance)*uint(uRootOrder.y))%uint(uRootOrder.x));
+ ivec2 at=ivec2(id%256,id/256);
+ vec4 root=texelFetch(uRoots,at,0),nr=texelFetch(uNormals,at,0);
+ if(root.w<.5){axisPoint=vec4(0);axisTangent=vec4(0);return;}
+ float index=float(id),len=strandLength(index,nr.w),split=.32+.32*rnd(index+47.);
+ bool branch=uHairBranch.w>=0.;
+ float gain=clamp(uHairBranch.w-float(instance),0.,1.);
+ float extent=branch?max(.001,gain*uHairBranch.y):0.;
+ float t=axisTime(float(address.x)/uSegments,len,branch);
+ vec3 p,tangent;axisSample(root.xyz,nr.xyz,index,nr.w,t,split,extent,p,tangent);
+ axisPoint=vec4(p,t);axisTangent=vec4(tangent,0.);
+}
+`;
+const hairVertex=(cached,wrap=false)=>HEADER+'#define AXIS_CACHE '+Number(cached)+'\n#define WRAPPED_STRANDS '+Number(wrap)+'\n'+SPACE+GROOM+`
 out vec3 vWorld,vTangent,vNormal,vRootLocal,vRootNormal;out vec2 vAcross;out float vAlong,vRandom,vCoverage,vJoin;
-void main(){int id=int((uint(gl_InstanceID)*uint(uRootOrder.y))%uint(uRootOrder.x)),vertex=gl_VertexID,faces=uTube>.5?int(uSides):1,seg=vertex/(6*faces),facet=(vertex/6)%faces,k=vertex%6;
+#if AXIS_CACHE
+uniform highp sampler2D uAxisPoints,uAxisTangents;
+#endif
+void main(){
+ int instance=gl_InstanceID+uInstanceStart,id=int((uint(instance)*uint(uRootOrder.y))%uint(uRootOrder.x)),vertex=gl_VertexID,faces=uTube>.5?int(uSides):1;
+#if AXIS_CACHE
+ int sampleIndex=vertex/(faces+1);
+ float edgeIndex=float(vertex%(faces+1)),side=edgeIndex*2.-1.;
+#else
+ int seg=vertex/(6*faces),facet=(vertex/6)%faces,k=vertex%6;
  float end=(k==1||k==2||k==4)?1.:0.,side=(k==0||k==1||k==3)?-1.:1.,t=(float(seg)+end)/uSegments;
+ float edgeIndex=float(facet)+(side>0.?1.:0.);
+#endif
  ivec2 at=ivec2(id%256,id/256);vec4 root=texelFetch(uRoots,at,0),nr=texelFetch(uNormals,at,0);
  if(root.w<.5){gl_Position=vec4(2,2,2,1);vCoverage=0.;return;}
  float len=strandLength(float(id),nr.w);
  bool branch=uHairBranch.w>=0.;
- float gain=branch?clamp(uHairBranch.w-float(gl_InstanceID),0.,1.):1.;
+ float gain=branch?clamp(uHairBranch.w-float(instance),0.,1.):1.;
  float split=.32+.32*rnd(float(id)+47.),extent=branch?max(.001,gain*uHairBranch.y):0.;
- if(uTube>.5&&!branch){float foot=min(.45,(min(uHairA.y*.65,len*.08)+baseHeight(len,uHairA.y*.5))/max(.00001,len));float focused=t<.3?foot*pow(t/.3,1.4):mix(foot,1.,(t-.3)/.7);t=mix(t*t,focused,smoothstep(0.,.15,uHairBase.x));}
- vec3 p=hairPoint(root.xyz,nr.xyz,float(id),nr.w,t,split,extent),next=hairPoint(root.xyz,nr.xyz,float(id),nr.w,min(1.,t+.002),split,extent),prev=hairPoint(root.xyz,nr.xyz,float(id),nr.w,max(0.,t-.002),split,extent);
- vec3 tangent=normalize(next-prev),right=cross(tangent,uCameraZ);right=length(right)<.00001?uCameraX:normalize(right);
+#if AXIS_CACHE
+ ivec2 sampleAt=ivec2(sampleIndex,gl_InstanceID);
+ vec4 point=texelFetch(uAxisPoints,sampleAt,0);
+ float t=point.w;vec3 p=point.xyz,tangent=texelFetch(uAxisTangents,sampleAt,0).xyz;
+#else
+ t=axisTime(t,len,branch);
+ vec3 p,tangent;axisSample(root.xyz,nr.xyz,float(id),nr.w,t,split,extent,p,tangent);
+#endif
+ vec3 right=cross(tangent,uCameraZ);right=length(right)<.00001?uCameraX:normalize(right);
  float materialT=branch?mix(split,1.,t*extent):t;
  float branchTaper=branch?.56*gain*mix(1.,.05,t):1.;
  float radius=strandRadius(materialT,len)*uFrame.x*branchTaper;
  float rootRadius=uHairA.y*.5*min(1.,uHairA.x/.025),height=len*t-min(uHairA.y*.65,len*.08)*(1.-smoothstep(0.,.3,t));
  vJoin=uRootCore*uHairBase.w*smoothstep(0.,.15,uHairBase.x)*(1.-smoothstep(0.,max(.00001,baseHeight(len,rootRadius)),height));
- float pixel=2.*uCameraSize.y/uCameraSize.w,aa=max(radius,pixel*.55),coverage=min(1.,radius/(pixel*.55));
+ float pixel=2.*uCameraSize.y/uCameraSize.w,defocus=uFocus.x*smoothstep(.06,1.2,abs(p.z-uFocus.y))*.038;
+ float aa=max(radius,pixel*.55)+defocus,coverage=min(1.,radius/max(pixel*.55,aa));
  vRootNormal=normalWorld(nr.xyz);vRootLocal=root.xyz*uAxes.xyz;vNormal=vec3(0);vWorld=p;vTangent=tangent;vAcross=vec2(side,radius);vAlong=materialT;vRandom=rnd(float(id)+4.);vCoverage=coverage;
  if(branch)vJoin=0.;
  if(uTube>.5){
   // Transport a fixed root frame to the tangent instead of switching axes mid-curve.
   vec3 rn=normalWorld(nr.xyz),axis=abs(nr.y)<.95?vec3(0,1,0):vec3(1,0,0),rb=normalWorld(normalize(cross(nr.xyz,axis))),v=cross(rn,tangent);
   vec3 bx=rb+cross(v,rb)+cross(v,cross(v,rb))/max(.02,1.+dot(rn,tangent));bx=normalize(bx-tangent*dot(bx,tangent));vec3 by=cross(tangent,bx);
-  float angle=(float(facet)+(side>0.?1.:0.))*6.2831853/uSides;float thin=1.-.88*uHairD.z;vec3 radial=bx*cos(angle)+by*sin(angle)*thin;
+  float angle=edgeIndex*6.2831853/uSides;float thin=1.-.88*uHairD.z;vec3 radial=bx*cos(angle)+by*sin(angle)*thin;
   float lo=max(0.,materialT-.001),hi=min(1.,materialT+.001),slope=(strandRadius(hi,len)-strandRadius(lo,len))*branchTaper/max(.00001,(hi-lo)*len);
   vNormal=normalize(bx*cos(angle)+by*sin(angle)/thin-tangent*slope);vec3 front=normalize(cross(right,tangent));vec3 offset=radial*radius;offset-=front*dot(offset,front)*(1.-uTubeDepth);vWorld=p+offset;vAcross=vec2(0.,radius);vCoverage=1.;gl_Position=project(vWorld);
  }else gl_Position=project(p+right*side*aa);}
@@ -221,29 +285,105 @@ void main(){vec2 uv=gl_FragCoord.xy/uSize;vec4 base=texture(uScene,uv),sum=textu
 const rgb=hex=>[1,3,5].map(i=>{const v=parseInt(hex.slice(i,i+2),16)/255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;});
 const norm=a=>{const l=Math.hypot(...a);return a.map(x=>x/l);},cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
 export class FilamentPass{
- constructor(gl){this.gl=gl;this.parallelExtension=gl.getExtension('KHR_parallel_shader_compile');this.pendingPrograms=new Set();if(!gl.getExtension('EXT_color_buffer_float'))throw Error('I filamenti richiedono una GPU con buffer colore float.');this.resolveProgram=this.program(QUAD,RESOLVE);this.rootProgram=this.program(QUAD,ROOT);this.coreProgram=this.program(QUAD,CORE);this.hairProgram=this.program(HAIR_VERT,HAIR_FRAG);this.vao=gl.createVertexArray();this.roots=this.target(256,235,true);this.shadow=this.target(2048,2048,false,true);this.scene=gl.createTexture();this.rootBuilds=0;}
- program(v,f){const g=this.gl,p=g.createProgram();for(const [type,source] of [[g.VERTEX_SHADER,v],[g.FRAGMENT_SHADER,f]]){const s=g.createShader(type);g.shaderSource(s,source);g.compileShader(s);g.attachShader(p,s);g.deleteShader(s);}g.linkProgram(p);const result={program:p,locations:{},ready:false};this.pendingPrograms.add(result);return result;}
+ constructor(gl){this.gl=gl;this.parallelExtension=gl.getExtension('KHR_parallel_shader_compile');this.pendingPrograms=new Set();if(!gl.getExtension('EXT_color_buffer_float'))throw Error('I filamenti richiedono una GPU con buffer colore float.');this.resolveProgram=this.createProgram(QUAD,RESOLVE);this.rootProgram=this.createProgram(QUAD,ROOT);this.coreProgram=this.createProgram(QUAD,CORE);this.vao=gl.createVertexArray();this.indexBuffers=new Map();this.axisCapacity=Math.min(2048,gl.getParameter(gl.MAX_TEXTURE_SIZE));this.axes=this.axisTarget();this.hairProgram=this.createProgram(hairVertex(!!this.axes),HAIR_FRAG);if(this.axes)this.axisProgram=this.createProgram(QUAD,axisFragment(false));this.roots=this.target(256,235,true);this.shadow=this.target(2048,2048,false,true);this.scene=gl.createTexture();this.rootBuilds=0;}
+ createProgram(v,f){const g=this.gl,p=g.createProgram();for(const [type,source] of [[g.VERTEX_SHADER,v],[g.FRAGMENT_SHADER,f]]){const s=g.createShader(type);g.shaderSource(s,source);g.compileShader(s);g.attachShader(p,s);g.deleteShader(s);}g.linkProgram(p);const result={program:p,locations:{},ready:false};this.pendingPrograms.add(result);return result;}
  finishProgram(p){if(p.ready)return;const g=this.gl;if(!g.getProgramParameter(p.program,g.LINK_STATUS))throw Error(g.getProgramInfoLog(p.program)||'Impossibile preparare i filamenti.');for(let i=0;i<g.getProgramParameter(p.program,g.ACTIVE_UNIFORMS);i++){const u=g.getActiveUniform(p.program,i);p.locations[u.name.replace('[0]','')]=g.getUniformLocation(p.program,u.name);}p.ready=true;this.pendingPrograms.delete(p);}
- prepare(){let ready=true;for(const p of this.pendingPrograms){if(this.parallelExtension&&!this.gl.getProgramParameter(p.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}this.finishProgram(p);}return ready;}
+ prepare(wrap=false){
+  if(wrap&&this.axes)this.wrappedAxisProgram??=this.createProgram(QUAD,axisFragment(true));
+  if(wrap&&!this.axes)this.wrappedHairProgram??=this.createProgram(hairVertex(false,true),HAIR_FRAG);
+  let ready=true;for(const p of this.pendingPrograms){if(this.parallelExtension&&!this.gl.getProgramParameter(p.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}this.finishProgram(p);}return ready;}
  async prepareAsync(o={}){while(!o.cancelled?.()){if(this.gl.isContextLost())throw Error('La GPU è stata interrotta.');if(this.prepare())return true;o.onStage?.('preparing');await new Promise(r=>setTimeout(r,16));}return false;}
 
  u(p,key,...v){this.finishProgram(p);this.gl['uniform'+v.length+'fv'](p.locations[key]??null,v);}
  tex(p,key,t,unit){this.finishProgram(p);const g=this.gl;g.activeTexture(g.TEXTURE0+unit);g.bindTexture(g.TEXTURE_2D,t);g.uniform1i(p.locations[key]??null,unit);}
  texture(w,h,format,internal,type){const g=this.gl,t=g.createTexture();g.bindTexture(g.TEXTURE_2D,t);g.texImage2D(g.TEXTURE_2D,0,internal,w,h,0,format,type,null);for(const k of [g.TEXTURE_MIN_FILTER,g.TEXTURE_MAG_FILTER])g.texParameteri(g.TEXTURE_2D,k,g.NEAREST);for(const k of [g.TEXTURE_WRAP_S,g.TEXTURE_WRAP_T])g.texParameteri(g.TEXTURE_2D,k,g.CLAMP_TO_EDGE);return t;}
+ axisTarget(){
+  const g=this.gl,framebuffer=g.createFramebuffer();
+  g.bindFramebuffer(g.FRAMEBUFFER,framebuffer);g.activeTexture(g.TEXTURE0);
+  const pair=Array.from({length:2},(_,i)=>{
+   const texture=this.texture(113,this.axisCapacity,g.RGBA,g.RGBA32F,g.FLOAT);
+   g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0+i,g.TEXTURE_2D,texture,0);
+   return texture;
+  });
+  g.drawBuffers([g.COLOR_ATTACHMENT0,g.COLOR_ATTACHMENT1]);
+  const ready=g.checkFramebufferStatus(g.FRAMEBUFFER)===g.FRAMEBUFFER_COMPLETE;
+  g.bindFramebuffer(g.FRAMEBUFFER,null);
+  if(ready)return {framebuffer,pair};
+  pair.forEach(texture=>g.deleteTexture(texture));g.deleteFramebuffer(framebuffer);return null;
+ }
+ indices(segments,faces){
+  const key=segments+':'+faces;
+  if(this.indexBuffers.has(key))return this.indexBuffers.get(key);
+  const g=this.gl,buffer=g.createBuffer(),indices=new Uint16Array(segments*faces*6),stride=faces+1;
+  let offset=0;
+  for(let row=0;row<segments;row++)for(let side=0;side<faces;side++){
+   const a=row*stride+side,b=a+stride;
+   indices.set([a,b,b+1,a,b+1,a+1],offset);offset+=6;
+  }
+  g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,buffer);g.bufferData(g.ELEMENT_ARRAY_BUFFER,indices,g.STATIC_DRAW);
+  if(this.indexBuffers.size>=24){const first=this.indexBuffers.keys().next().value;g.deleteBuffer(this.indexBuffers.get(first));this.indexBuffers.delete(first);}
+  this.indexBuffers.set(key,buffer);return buffer;
+ }
+ hairGeometry(p,s,tube,segments,rootStride,branches){
+  const g=this.gl;
+  this.tex(p,'uRoots',this.roots.textures[0],0);this.tex(p,'uNormals',this.roots.textures[1],1);
+  this.u(p,'uSegments',segments);this.u(p,'uTube',+tube);
+  g.uniform2i(p.locations.uRootOrder,this.rootCount,rootStride);
+  this.u(p,'uHairA',s.filLength,s.filWidth,s.filTaper,s.filWrap);
+  this.u(p,'uHairB',s.filVariation,s.filBend,s.filComb,s.filCurl);
+  this.u(p,'uHairC',s.filClump,s.filClumps,s.filSpread,s.filFrizz);
+  this.u(p,'uHairD',s.filPhase,s.filWind,s.filRibbon,0);
+  this.u(p,'uHairBase',s.filBaseWidth,s.filBaseHeight,s.filBaseCurve,s.filBaseBlend);
+  this.u(p,'uHairBranch',0,s.filBranchLength,s.filBranchSpread,branches);
+  this.u(p,'uFocus',this.focus.blur,this.focus.depth);
+ }
+ *drawStrands(p,s,camera,w,h,tube,segments,sides,count,rootStride,branches){
+  const g=this.gl,faces=tube?sides:1,capacity=Math.min(this.axisCapacity,Math.max(96,Math.floor((this.useAxes?1500000:140000)/(segments*faces))));
+  this.focus=camera.shadow?{blur:0,depth:0}:{blur:s.focusBlur||0,depth:s.focusDepth||0};
+  this.hairGeometry(p,s,tube,segments,rootStride,branches);
+  if(!this.useAxes){
+   g.uniform1i(p.locations.uInstanceStart,0);
+   for(let start=0;start<count;start+=capacity){
+    const batch=Math.min(capacity,count-start);
+    g.uniform1i(p.locations.uInstanceStart,start);
+    g.drawArraysInstanced(g.TRIANGLES,0,segments*faces*6,batch);
+    yield batch*segments*faces;
+   }
+   return;
+  }
+  const fbo=g.getParameter(g.DRAW_FRAMEBUFFER_BINDING),blend=g.isEnabled(g.BLEND),depth=g.isEnabled(g.DEPTH_TEST),coverage=g.isEnabled(g.SAMPLE_ALPHA_TO_COVERAGE);
+  const axis=s.filWrap?this.wrappedAxisProgram:this.axisProgram,axes=this.axes;
+  this.common(axis,s,camera,w,h);this.hairGeometry(axis,s,tube,segments,rootStride,branches);
+  for(let start=0;start<count;start+=capacity){
+   const batch=Math.min(capacity,count-start);
+   g.bindFramebuffer(g.FRAMEBUFFER,axes.framebuffer);g.viewport(0,0,segments+1,batch);
+   g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.SAMPLE_ALPHA_TO_COVERAGE);
+   g.useProgram(axis.program);g.uniform1i(axis.locations.uInstanceStart,start);g.drawArrays(g.TRIANGLES,0,3);
+   this.axisSamples+=batch*(segments+1);
+   g.bindFramebuffer(g.FRAMEBUFFER,fbo);g.viewport(0,0,w,h);
+   if(blend)g.enable(g.BLEND);if(depth)g.enable(g.DEPTH_TEST);if(coverage)g.enable(g.SAMPLE_ALPHA_TO_COVERAGE);
+   g.useProgram(p.program);g.uniform1i(p.locations.uInstanceStart,start);
+   this.tex(p,'uAxisPoints',axes.pair[0],11);this.tex(p,'uAxisTangents',axes.pair[1],12);
+   g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,this.indices(segments,faces));
+   g.drawElementsInstanced(g.TRIANGLES,segments*faces*6,g.UNSIGNED_SHORT,0,batch);
+   yield batch*segments*faces;
+  }
+ }
  target(w,h,roots=false,shadow=false){const g=this.gl,fbo=g.createFramebuffer();g.bindFramebuffer(g.FRAMEBUFFER,fbo);const t={fbo,w,h,textures:[]};if(shadow){t.depth=this.texture(w,h,g.DEPTH_COMPONENT,g.DEPTH_COMPONENT24,g.UNSIGNED_INT);g.framebufferTexture2D(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.TEXTURE_2D,t.depth,0);g.drawBuffers([g.NONE]);g.readBuffer(g.NONE);}else{for(let i=0;i<(roots?2:1);i++){const tex=this.texture(w,h,g.RGBA,roots?g.RGBA16F:g.RGBA8,roots?g.HALF_FLOAT:g.UNSIGNED_BYTE);t.textures.push(tex);g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0+i,g.TEXTURE_2D,tex,0);}g.drawBuffers(t.textures.map((_,i)=>g.COLOR_ATTACHMENT0+i));}if(g.checkFramebufferStatus(g.FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE)throw Error('Buffer filamenti incompleto');g.bindFramebuffer(g.FRAMEBUFFER,null);return t;}
- resize(w,h){if(this.width===w&&this.height===h)return;this.release();const g=this.gl;this.width=w;this.height=h;this.coreDepth=this.target(w,h,false,true);this.oit=this.target(w,h,true);this.oit.depth=g.createRenderbuffer();g.bindFramebuffer(g.FRAMEBUFFER,this.oit.fbo);g.bindRenderbuffer(g.RENDERBUFFER,this.oit.depth);g.renderbufferStorage(g.RENDERBUFFER,g.DEPTH_COMPONENT24,w,h);g.framebufferRenderbuffer(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.RENDERBUFFER,this.oit.depth);this.fbo=g.createFramebuffer();g.bindFramebuffer(g.FRAMEBUFFER,this.fbo);this.color=g.createRenderbuffer();this.depth=g.createRenderbuffer();const samples=Math.min(4,g.getParameter(g.MAX_SAMPLES));for(const [r,format,attachment] of [[this.color,g.RGBA8,g.COLOR_ATTACHMENT0],[this.depth,g.DEPTH_COMPONENT24,g.DEPTH_ATTACHMENT]]){g.bindRenderbuffer(g.RENDERBUFFER,r);g.renderbufferStorageMultisample(g.RENDERBUFFER,samples,format,w,h);g.framebufferRenderbuffer(g.FRAMEBUFFER,attachment,g.RENDERBUFFER,r);}if(g.checkFramebufferStatus(g.FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE)throw Error('Antialias filamenti non disponibile');const floatSamples=[...g.getInternalformatParameter(g.RENDERBUFFER,g.RGBA16F,g.SAMPLES)];
+ resize(w,h){if(this.width===w&&this.height===h)return;this.release();const g=this.gl;g.deleteTexture(this.scene);g.activeTexture(g.TEXTURE0);this.scene=this.texture(w,h,g.RGBA,g.RGBA8,g.UNSIGNED_BYTE);this.width=w;this.height=h;this.coreDepth=this.target(w,h,false,true);this.oit=this.target(w,h,true);this.oit.depth=g.createRenderbuffer();g.bindFramebuffer(g.FRAMEBUFFER,this.oit.fbo);g.bindRenderbuffer(g.RENDERBUFFER,this.oit.depth);g.renderbufferStorage(g.RENDERBUFFER,g.DEPTH_COMPONENT24,w,h);g.framebufferRenderbuffer(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.RENDERBUFFER,this.oit.depth);this.fbo=g.createFramebuffer();g.bindFramebuffer(g.FRAMEBUFFER,this.fbo);this.color=g.createRenderbuffer();this.depth=g.createRenderbuffer();const samples=Math.min(4,g.getParameter(g.MAX_SAMPLES));for(const [r,format,attachment] of [[this.color,g.RGBA8,g.COLOR_ATTACHMENT0],[this.depth,g.DEPTH_COMPONENT24,g.DEPTH_ATTACHMENT]]){g.bindRenderbuffer(g.RENDERBUFFER,r);g.renderbufferStorageMultisample(g.RENDERBUFFER,samples,format,w,h);g.framebufferRenderbuffer(g.FRAMEBUFFER,attachment,g.RENDERBUFFER,r);}if(g.checkFramebufferStatus(g.FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE)throw Error('Antialias filamenti non disponibile');const floatSamples=[...g.getInternalformatParameter(g.RENDERBUFFER,g.RGBA16F,g.SAMPLES)];
  if(w*h<=4194304&&floatSamples.includes(samples)&&samples>1){this.oitMs={fbo:g.createFramebuffer(),buffers:[]};g.bindFramebuffer(g.FRAMEBUFFER,this.oitMs.fbo);for(const [format,attachment]of [[g.RGBA16F,g.COLOR_ATTACHMENT0],[g.RGBA16F,g.COLOR_ATTACHMENT1]]){const buffer=g.createRenderbuffer();this.oitMs.buffers.push(buffer);g.bindRenderbuffer(g.RENDERBUFFER,buffer);g.renderbufferStorageMultisample(g.RENDERBUFFER,samples,format,w,h);g.framebufferRenderbuffer(g.FRAMEBUFFER,attachment,g.RENDERBUFFER,buffer);}g.framebufferRenderbuffer(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.RENDERBUFFER,this.depth);g.drawBuffers([g.COLOR_ATTACHMENT0,g.COLOR_ATTACHMENT1]);if(g.checkFramebufferStatus(g.FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE)throw Error('Antialias trasparenza incompleto');}
  g.bindFramebuffer(g.FRAMEBUFFER,null);}
  field(p,s,solid){this.tex(p,'uField',solid.fieldTexture,3);this.u(p,'uAtlas',...solid.fieldAtlas);this.u(p,'uFieldMin',...solid.fieldMin);this.u(p,'uFieldMax',...solid.fieldMax);this.u(p,'uFieldWarp',...(solid.fieldWarp||[0,0]));this.u(p,'uPrimitive',+solid.cachedBasePrimitive);this.u(p,'uFloat',+solid.fieldHalfFloat);this.u(p,'uDeferred',+solid.deferredStructure);this.u(p,'uBaseForm',s.baseForm||0);}
  common(p,s,camera,w,h){const g=this.gl;g.useProgram(p.program);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uAxes',s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ),0);this.u(p,'uAngles',s.rotateX*Math.PI/180,s.rotateY*Math.PI/180,s.rotateZ*Math.PI/180,0);this.u(p,'uCameraX',...camera.x);this.u(p,'uCameraY',...camera.y);this.u(p,'uCameraZ',...camera.z);this.u(p,'uCameraSize',camera.ex,camera.ey,w,h);this.u(p,'uLens',camera.shadow?0:s.lensDistortion||0);this.u(p,'uShadowPass',+!!camera.shadow);this.u(p,'uSeed',(s.seed%997)*.013);this.u(p,'uHairScatter',s.filScatter);this.locations=p.locations;this.program=p.program;uploadSolidForces(this,s);}
- hair(s,camera,w,h,phase){const physical=this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth-.006)/.006)),projected=camera.shadow&&!this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth*.5*s.scale*h/(2*camera.ey)-.6)/.8)),x=Math.max(physical,projected,s.filRibbon>0?projected>.05?Math.min(1,s.filRibbon+projected):0:0),mix=x*x*(3-2*x);if(s.transparency===0){this.hairPart(s,camera,w,h,phase,mix>0,1,mix);return;}if(mix<1)this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)this.hairPart(s,camera,w,h,phase,true,mix);}
- hairPart(s,camera,w,h,phase,tube,opacity,tubeDepth=1){const g=this.gl,p=this.hairProgram;this.common(p,s,camera,w,h);this.tex(p,'uRoots',this.roots.textures[0],0);this.tex(p,'uNormals',this.roots.textures[1],1);this.tex(p,'uShadow',camera.shadow?this.roots.textures[0]:this.shadow.depth,2);
+ *hair(s,camera,w,h,phase){const physical=this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth-.006)/.006)),projected=camera.shadow&&!this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth*.5*s.scale*h/(2*camera.ey)-.6)/.8)),x=s.focusBlur>0&&!camera.shadow?0:Math.max(physical,projected,s.filRibbon>0?projected>.05?Math.min(1,s.filRibbon+projected):0:0),mix=x*x*(3-2*x);if(s.transparency===0){yield* this.hairPart(s,camera,w,h,phase,mix>0,1,mix);return;}if(mix<1)yield* this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)yield* this.hairPart(s,camera,w,h,phase,true,mix);}
+ *hairPart(s,camera,w,h,phase,tube,opacity,tubeDepth=1){const g=this.gl;
+ const p=this.useAxes?this.hairProgram:s.filWrap?(this.wrappedHairProgram??=this.createProgram(hairVertex(false,true),HAIR_FRAG)):this.axes?(this.fallbackProgram??=this.createProgram(hairVertex(false),HAIR_FRAG)):this.hairProgram;this.finishProgram(p);this.common(p,s,camera,w,h);this.tex(p,'uShadow',camera.shadow?this.roots.textures[0]:this.shadow.depth,2);
  bindGrowth(g,p.program,s,phase);
  const pixelsPerUnit=s.scale*h/(2*camera.ey),radiusPixels=s.filWidth*.5*pixelsPerUnit;
  const sides=Math.max(12,Math.min(32,Math.ceil(Math.PI*Math.sqrt(Math.max(1,radiusPixels*(1+s.filBaseWidth))/.12)/2)*2));
- const curvature=.08+Math.abs(s.filBend)*.3+Math.abs(s.filComb)*.25+s.filClump*.5+s.filCurl*4+s.filFrizz*6+s.filWind;
+ const curvature=.08+Math.abs(s.filBend)*.3+Math.abs(s.filComb)*.25+Math.abs(s.filWrap)*3+s.filClump*.5+s.filCurl*4+s.filFrizz*6+s.filWind;
  const segments=Math.max(24,Math.min(112,Math.ceil(Math.sqrt(s.filLength*pixelsPerUnit*curvature)*2.2/4)*4));
- this.tex(p,'uCoreDepth',this.coreDepth.depth,6);this.u(p,'uViewSize',w,h);this.u(p,'uRootCore',s.filCore*(1-s.transparency));this.u(p,'uHairBase',s.filBaseWidth,s.filBaseHeight,s.filBaseCurve,s.filBaseBlend);this.u(p,'uRepOpacity',opacity);this.u(p,'uTube',+tube);this.u(p,'uTubeDepth',tubeDepth);this.u(p,'uSides',sides);this.u(p,'uOpaquePass',camera.opaque?1:0);this.u(p,'uSegments',segments);g.uniform2i(p.locations.uRootOrder,this.rootCount,this.rootStride);this.u(p,'uHairA',s.filLength,s.filWidth,s.filTaper,0);this.u(p,'uHairB',s.filVariation,s.filBend,s.filComb,s.filCurl);this.u(p,'uHairC',s.filClump,s.filClumps,s.filSpread,s.filFrizz);this.u(p,'uHairD',s.filPhase,s.filWind,s.filRibbon,0);this.u(p,'uHairColor',s.filColor,s.filColorScatter,s.filRootShade,s.transparency);this.u(p,'uHairPulse',s.filPulse,phase*Math.round(s.filPulseCycles)/(2*Math.PI),s.filPulseWidth,0);this.u(p,'uShadowX',...this.lightCamera.x);this.u(p,'uShadowY',...this.lightCamera.y);this.u(p,'uShadowZ',...this.lightCamera.z);this.u(p,'uShadowExtent',this.lightCamera.ex);
+ this.tex(p,'uCoreDepth',this.coreDepth.depth,6);this.u(p,'uViewSize',w,h);this.u(p,'uRootCore',s.filCore*(1-s.transparency));this.u(p,'uRepOpacity',opacity);this.u(p,'uTubeDepth',tubeDepth);this.u(p,'uSides',sides);this.u(p,'uOpaquePass',camera.opaque?1:0);this.u(p,'uHairColor',s.filColor,s.filColorScatter,s.filRootShade,s.transparency);this.u(p,'uHairPulse',s.filPulse,phase*Math.round(s.filPulseCycles)/(2*Math.PI),s.filPulseWidth,0);this.u(p,'uShadowX',...this.lightCamera.x);this.u(p,'uShadowY',...this.lightCamera.y);this.u(p,'uShadowZ',...this.lightCamera.z);this.u(p,'uShadowExtent',this.lightCamera.ex);
  const rad=Math.PI/180;this.u(p,'uMat',s.transparency,s.refraction,s.metal,Math.min(1,s.roughness+(1-s.gloss)*.35));this.u(p,'uSurface',s.iridescence,s.thickness,s.gloss,s.emission);this.u(p,'uCoat',s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0);this.u(p,'uOptics',s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15);this.u(p,'uTexture',s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0);this.u(p,'uScatter',s.scatterDirection??.25,0,s.thinFilm||0,s.filmThickness??420);this.u(p,'uModern',s.thinShell||0,0,0,0);
  this.u(p,'uResolution',w,h);this.u(p,'uOther',s.rotateY*rad,s.rotateX*rad,0,0);this.u(p,'uExtraShape3',0,0,s.rotateZ*rad,0);this.u(p,'uRuntime',0,0,0,16);this.u(p,'uMaterialDetail',s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad);this.u(p,'uMaterialLayers',s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0);this.u(p,'uOrganicDetail',s.textureRandomness||0,s.textureWarp||0,s.textureLink||0,s.texturePatch||0);this.u(p,'uTextureSeed',s.textureSeed||0);this.u(p,'uSurfaceSeed',(s.seed%1000)*.013);
  this.u(p,'uTransport',s.subsurface||0,s.sssRadius??.35,0,0);this.u(p,'uSssColor',...rgb(s.sssColor||'#ffc49b'));this.u(p,'uInternalColor',...rgb(s.internalColor||'#e6f5ff'));
@@ -251,18 +391,54 @@ export class FilamentPass{
  this.u(p,'uEnvironment',['studio','sunset','neon','sky','aquarium','aurora','city'].indexOf(s.environment),s.environmentAngle*rad,s.environmentPower,0);this.u(p,'uGradient',s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness);this.u(p,'uColorWave',s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1);this.u(p,'uColorAxis',s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0);this.u(p,'uColorLayers',s.colorLayers||0,s.colorLayerScale??1,s.colorLayerShift||0,s.colorLayerMix??.5);
  g.uniform1i(p.locations.uPaletteCount,s.palette.length);g.uniform3fv(p.locations.uPalette,s.palette.flatMap(rgb));this.u(p,'uPaletteMean',...s.palette.map(rgb).reduce((sum,c)=>sum.map((v,i)=>v+c[i]/s.palette.length),[0,0,0]));
  const lights=s.lights.filter(l=>l.enabled).slice(0,8),types={circle:0,bar:1,spot:2,diffuser:3,grid:4,ring:5,orb:6};g.uniform1i(p.locations.uLightCount,lights.length);if(lights.length){g.uniform4fv(p.locations.uLights,lights.flatMap(l=>[l.x,l.y,l.z,l.power]));g.uniform3fv(p.locations.uLightColors,lights.flatMap(l=>rgb(l.color)));g.uniform4fv(p.locations.uLightProps,lights.flatMap(l=>[l.size,l.length,l.roll*rad,types[l.type]??0]));g.uniform4fv(p.locations.uLightExtra,lights.flatMap(l=>[l.softness,Math.tan(l.cone*rad),l.grid,+!!l.visible]));}
- this.u(p,'uPhoto1',s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1);this.u(p,'uPhoto2',s.temperature||0,s.photoTint||0,s.vignette||0,0);this.u(p,'uPhoto3',s.blacks||0,s.highlights||0,0,0);this.u(p,'uPhoto4',s.gamma||1,0,0,0);this.u(p,'uHairBranch',0,s.filBranchLength,s.filBranchSpread,-1);
- const verticesPerSegment=6*(tube?sides:1);
- g.drawArraysInstanced(g.TRIANGLES,0,segments*verticesPerSegment,this.drawCount);
+ this.u(p,'uPhoto1',s.exposure||0,s.brightness||0,s.contrast??1,s.saturation??1);this.u(p,'uPhoto2',s.temperature||0,s.photoTint||0,s.vignette||0,0);this.u(p,'uPhoto3',s.blacks||0,s.highlights||0,0,0);this.u(p,'uPhoto4',s.gamma||1,0,0,0);
+ yield* this.drawStrands(p,s,camera,w,h,tube,segments,sides,this.drawCount,this.rootStride,-1);
  const branches=s.filBranchAmount*this.drawCount;
  if(branches>0){
   const branchSegments=Math.max(12,Math.ceil(segments*.55));
-  this.u(p,'uSegments',branchSegments);g.uniform2i(p.locations.uRootOrder,this.rootCount,this.branchStride);
-  this.u(p,'uHairBranch',0,s.filBranchLength,s.filBranchSpread,branches);
-  g.drawArraysInstanced(g.TRIANGLES,0,branchSegments*verticesPerSegment,Math.ceil(branches));
+  yield* this.drawStrands(p,s,camera,w,h,tube,branchSegments,sides,Math.ceil(branches),this.branchStride,branches);
  }
  }
- draw(frame,phase,w,h,solid,options={}){const s={...FILAMENT_DEFAULTS,...frame};if(s.filLength<=.000001)return;const g=this.gl;
+ draw(frame,phase,w,h,solid,options={}){
+  for(const _ of this.drawFrame(frame,phase,w,h,solid,options)){}
+  return true;
+ }
+ async drawAsync(frame,phase,w,h,solid,options={}){
+  const g=this.gl;let work=0,slice=0,complete=false;
+  const yieldBrowser=()=>globalThis.scheduler?.yield?.()||new Promise(resolve=>setTimeout(resolve,0));
+  try{
+   for(const triangles of this.drawFrame(frame,phase,w,h,solid,options)){
+    if(options.cancelled?.())return false;
+    work+=triangles;slice+=triangles;
+    if(work<(this.useAxes?12000000:540000)){
+     if(slice>=540000){slice=0;await yieldBrowser();}
+     continue;
+    }
+    work=0;slice=0;
+    const sync=g.fenceSync(g.SYNC_GPU_COMMANDS_COMPLETE,0),start=performance.now();
+    if(!sync)throw Error('La GPU non può sincronizzare i filamenti.');
+    try{
+     g.flush();
+     let polls=0;
+     for(;;){
+      if(polls++<4)await yieldBrowser();
+      else await new Promise(resolve=>setTimeout(resolve,4));
+      if(options.cancelled?.())return false;
+      if(g.isContextLost())throw Error('La GPU si è interrotta mentre disegnava i filamenti.');
+      if(g.getSyncParameter(sync,g.SYNC_STATUS)===g.SIGNALED)break;
+      if(performance.now()-start>120000)throw Error('La GPU non risponde durante il disegno dei filamenti.');
+     }
+    }finally{g.deleteSync(sync);}
+   }
+   complete=true;return true;
+  }finally{
+   if(!complete&&!g.isContextLost()){
+    g.bindFramebuffer(g.FRAMEBUFFER,null);g.bindVertexArray(null);g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.SAMPLE_ALPHA_TO_COVERAGE);g.depthMask(true);g.activeTexture(g.TEXTURE0);
+   }
+  }
+ }
+ *drawFrame(frame,phase,w,h,solid,options={}){const s={...FILAMENT_DEFAULTS,...frame};if(s.filLength<=.000001)return;const g=this.gl;
+ this.useAxes=!!this.axes&&options.filamentAxisCache!==false;this.axisSamples=0;
  this.previewGeometry=!!options.preview&&options.quality==='fast';const budget=this.previewGeometry?Math.max(1/16,Math.min(1,options.geometryBudget??1)):1;
  this.rootCount=Math.round(s.filCount);this.drawCount=Math.min(this.rootCount,Math.max(100,Math.round(this.rootCount*budget)));this.rootStride=1;
  // A nested, evenly distributed subset: taking the first Fibonacci roots
@@ -278,12 +454,12 @@ export class FilamentPass{
  const light=s.lights.find(l=>l.enabled),z=norm(light?[light.x-s.positionX,light.y-s.positionY,light.z]:[-2,3,4]),x=norm(cross(Math.abs(z[1])>.95?[1,0,0]:[0,1,0],z)),y=cross(z,x),extent=Math.max(3,Math.max(...solid.fieldMax.map(Math.abs))*(Math.max(s.stretchX,s.stretchY,s.volume*s.stretchZ)+s.filLength)*s.scale+Math.hypot(s.positionX,s.positionY)+(s._dynamics?.max||0)*2);this.lightCamera={x,y,z,ex:extent,ey:extent,shadow:true};
  const key=JSON.stringify([solid.cachedBasePrimitive?s.baseForm:solid.fieldKey,solid.fieldWarp,s.filCount,s.seed,s.filClumps,s.filScatter]);if(key!==this.rootKey){g.bindFramebuffer(g.FRAMEBUFFER,this.roots.fbo);g.viewport(0,0,256,235);this.common(this.rootProgram,s,main,256,235);this.field(this.rootProgram,s,solid);this.u(this.rootProgram,'uCount',s.filCount);this.u(this.rootProgram,'uClumps',s.filClumps);g.drawArrays(g.TRIANGLES,0,3);this.rootKey=key;this.rootBuilds++;}
  // Capture only after the root pass; it never touches the default framebuffer.
- g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE5);g.bindTexture(g.TEXTURE_2D,this.scene);g.copyTexImage2D(g.TEXTURE_2D,0,g.RGBA,0,0,w,h,0);for(const k of [g.TEXTURE_MIN_FILTER,g.TEXTURE_MAG_FILTER])g.texParameteri(g.TEXTURE_2D,k,g.NEAREST);for(const k of [g.TEXTURE_WRAP_S,g.TEXTURE_WRAP_T])g.texParameteri(g.TEXTURE_2D,k,g.CLAMP_TO_EDGE);
+ g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE5);g.bindTexture(g.TEXTURE_2D,this.scene);g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);
  this.common(this.coreProgram,s,main,w,h);this.field(this.coreProgram,s,solid);this.tex(this.coreProgram,'uScene',this.scene,5);this.u(this.coreProgram,'uBound',extent);this.u(this.coreProgram,'uCore',s.filCore);this.u(this.coreProgram,'uDepthOnly',1);g.bindFramebuffer(g.FRAMEBUFFER,this.coreDepth.fbo);g.viewport(0,0,w,h);g.enable(g.DEPTH_TEST);g.depthFunc(g.ALWAYS);g.drawArrays(g.TRIANGLES,0,3);this.u(this.coreProgram,'uDepthOnly',0);
- for(const camera of [this.lightCamera,main]){const shadow=!!camera.shadow,cw=shadow?this.shadow.w:w,ch=shadow?this.shadow.h:h;g.bindFramebuffer(g.FRAMEBUFFER,shadow?this.shadow.fbo:this.fbo);g.viewport(0,0,cw,ch);g.enable(g.DEPTH_TEST);g.depthFunc(g.ALWAYS);g.clearDepth(1);g.clear(g.DEPTH_BUFFER_BIT);this.common(this.coreProgram,s,camera,cw,ch);this.field(this.coreProgram,s,solid);this.tex(this.coreProgram,'uScene',this.scene,5);this.u(this.coreProgram,'uBound',extent);this.u(this.coreProgram,'uCore',s.filCore*(1-s.transparency));g.drawArrays(g.TRIANGLES,0,3);g.depthFunc(g.LEQUAL);if(!shadow){if(s.transparency===0){g.enable(g.SAMPLE_ALPHA_TO_COVERAGE);this.hair(s,{...camera,opaque:true},cw,ch,phase);g.disable(g.SAMPLE_ALPHA_TO_COVERAGE);}g.bindFramebuffer(g.READ_FRAMEBUFFER,this.fbo);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,this.oitMs?.fbo||this.oit.fbo);if(!this.oitMs)g.blitFramebuffer(0,0,w,h,0,0,w,h,g.DEPTH_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,null);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE5);g.bindTexture(g.TEXTURE_2D,this.scene);g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.bindFramebuffer(g.FRAMEBUFFER,this.oitMs?.fbo||this.oit.fbo);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);g.depthMask(false);g.enable(g.BLEND);g.blendEquation(g.FUNC_ADD);g.blendFunc(g.ONE,g.ONE);}this.hair(s,camera,cw,ch,phase);g.disable(g.BLEND);g.depthMask(true);}
+ for(const camera of light?[this.lightCamera,main]:[main]){const shadow=!!camera.shadow,cw=shadow?this.shadow.w:w,ch=shadow?this.shadow.h:h;g.bindFramebuffer(g.FRAMEBUFFER,shadow?this.shadow.fbo:this.fbo);g.viewport(0,0,cw,ch);g.enable(g.DEPTH_TEST);g.depthFunc(g.ALWAYS);g.clearDepth(1);g.clear(g.DEPTH_BUFFER_BIT);this.common(this.coreProgram,s,camera,cw,ch);this.field(this.coreProgram,s,solid);this.tex(this.coreProgram,'uScene',this.scene,5);this.u(this.coreProgram,'uBound',extent);this.u(this.coreProgram,'uCore',s.filCore*(1-s.transparency));g.drawArrays(g.TRIANGLES,0,3);g.depthFunc(g.LEQUAL);if(!shadow){if(s.transparency===0){g.enable(g.SAMPLE_ALPHA_TO_COVERAGE);yield* this.hair(s,{...camera,opaque:true},cw,ch,phase);g.disable(g.SAMPLE_ALPHA_TO_COVERAGE);}g.bindFramebuffer(g.READ_FRAMEBUFFER,this.fbo);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,this.oitMs?.fbo||this.oit.fbo);if(!this.oitMs)g.blitFramebuffer(0,0,w,h,0,0,w,h,g.DEPTH_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,null);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE5);g.bindTexture(g.TEXTURE_2D,this.scene);g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.bindFramebuffer(g.FRAMEBUFFER,this.oitMs?.fbo||this.oit.fbo);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);g.depthMask(false);g.enable(g.BLEND);g.blendEquation(g.FUNC_ADD);g.blendFunc(g.ONE,g.ONE);}yield* this.hair(s,camera,cw,ch,phase);g.disable(g.BLEND);g.depthMask(true);}
  if(this.oitMs){g.bindFramebuffer(g.READ_FRAMEBUFFER,this.oitMs.fbo);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,this.oit.fbo);for(let i=0;i<2;i++){g.readBuffer(g.COLOR_ATTACHMENT0+i);g.drawBuffers(i?[g.NONE,g.COLOR_ATTACHMENT1]:[g.COLOR_ATTACHMENT0,g.NONE]);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);}g.drawBuffers([g.COLOR_ATTACHMENT0,g.COLOR_ATTACHMENT1]);}
  g.bindFramebuffer(g.FRAMEBUFFER,null);g.disable(g.DEPTH_TEST);g.useProgram(this.resolveProgram.program);this.tex(this.resolveProgram,'uScene',this.scene,0);this.tex(this.resolveProgram,'uAccum',this.oit.textures[0],1);this.tex(this.resolveProgram,'uExtinction',this.oit.textures[1],2);this.u(this.resolveProgram,'uSize',w,h);g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);g.activeTexture(g.TEXTURE0);
  }
  release(){const g=this.gl;if(this.oitMs){g.deleteFramebuffer(this.oitMs.fbo);for(const b of this.oitMs.buffers)g.deleteRenderbuffer(b);this.oitMs=null;}if(this.coreDepth){g.deleteFramebuffer(this.coreDepth.fbo);g.deleteTexture(this.coreDepth.depth);this.coreDepth=null;}if(this.oit){g.deleteFramebuffer(this.oit.fbo);for(const t of this.oit.textures)g.deleteTexture(t);g.deleteRenderbuffer(this.oit.depth);this.oit=null;}if(this.fbo)g.deleteFramebuffer(this.fbo);if(this.color)g.deleteRenderbuffer(this.color);if(this.depth)g.deleteRenderbuffer(this.depth);this.fbo=this.color=this.depth=null;this.width=this.height=0;}
- dispose(){const g=this.gl;this.release();for(const p of [this.rootProgram,this.coreProgram,this.hairProgram,this.resolveProgram])g.deleteProgram(p.program);for(const t of [this.roots,this.shadow]){g.deleteFramebuffer(t.fbo);for(const tex of t.textures)g.deleteTexture(tex);if(t.depth)g.deleteTexture(t.depth);}g.deleteTexture(this.scene);if(this.sculptTexture)g.deleteTexture(this.sculptTexture);g.deleteVertexArray(this.vao);}
+ dispose(){const g=this.gl;this.release();for(const p of [this.rootProgram,this.coreProgram,this.hairProgram,this.axisProgram,this.wrappedAxisProgram,this.wrappedHairProgram,this.fallbackProgram,this.resolveProgram])if(p)g.deleteProgram(p.program);for(const b of this.indexBuffers.values())g.deleteBuffer(b);if(this.axes){for(const t of this.axes.pair)g.deleteTexture(t);g.deleteFramebuffer(this.axes.framebuffer);}for(const t of [this.roots,this.shadow]){g.deleteFramebuffer(t.fbo);for(const tex of t.textures)g.deleteTexture(tex);if(t.depth)g.deleteTexture(t.depth);}g.deleteTexture(this.scene);if(this.sculptTexture)g.deleteTexture(this.sculptTexture);g.deleteVertexArray(this.vao);}
 }

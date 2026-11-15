@@ -1,20 +1,29 @@
-// Deposit the animated points into eight view-depth slices. The resolve
-// integrates emission and extinction from the camera towards the back.
-import {livingAttachmentGLSL} from './living-composition.js?v=ddff107e99e1';
+// Deposit animated points into depth slices, then integrate extinction
+// from front to back. Density differences provide a local lighting normal.
+import {livingAttachmentGLSL} from './living-composition.js?v=6a9e627b503d';
 
 export const volumeResolveGLSL=`
 uniform highp sampler2D uViewDensity;
 uniform vec4 uViewVolume;
+uniform vec3 uVolumeLight;
+vec2 densityAddress(int layer,vec2 uv){
+ return (vec2(layer%4,layer/4)+(1.+clamp(uv,0.,1.)*(uViewVolume.zw-2.))/uViewVolume.zw)/vec2(4.,3.);
+}
+float densityAt(int layer,vec2 uv){return layer<0||layer>11?0.:texture(uViewDensity,densityAddress(layer,uv)).a;}
 vec4 viewVolume(vec2 uv){
  if(uViewVolume.x<=0.||any(lessThan(uv,vec2(0)))||any(greaterThan(uv,vec2(1))))return vec4(0.);
- vec3 light=vec3(0.);float transmission=1.;
- for(int i=0;i<8;i++){
-  vec2 corner=vec2(i%4,i/4)/vec2(4.,2.);
-  vec2 p=corner+(vec2(1.)+uv*(uViewVolume.zw-2.))/uViewVolume.zw/vec2(4.,2.);
-  vec4 voxel=texture(uViewDensity,p);
+ vec3 light=vec3(0.);float transmission=1.;vec2 cell=1./uViewVolume.zw;
+ for(int i=0;i<12;i++){
+  vec4 voxel=texture(uViewDensity,densityAddress(i,uv));
+  if(voxel.a<=.0001)continue;
   float opacity=1.-exp(-min(12.,max(0.,voxel.a)*uViewVolume.x));
-  light+=transmission*opacity*(voxel.rgb/max(.0001,voxel.a));
+  vec3 gradient=vec3(densityAt(i,uv-vec2(cell.x,0.))-densityAt(i,uv+vec2(cell.x,0.)),
+   densityAt(i,uv-vec2(0.,cell.y))-densityAt(i,uv+vec2(0.,cell.y)),(densityAt(i+1,uv)-densityAt(i-1,uv))*.28);
+  float normalLength=length(gradient),diffuse=normalLength>.0001?max(0.,dot(gradient/normalLength,uVolumeLight)):0.;
+  float contrast=smoothstep(0.,.36,normalLength)*min(1.,uViewVolume.x*.8);
+  light+=transmission*opacity*(voxel.rgb/max(.0001,voxel.a))*mix(1.,.48+1.13*diffuse,contrast);
   transmission*=1.-opacity;
+  if(transmission<.005)break;
  }
  return vec4(light*uViewVolume.y,1.-transmission);
 }`;
@@ -38,10 +47,10 @@ void main(){
  vec4 seed=texelFetch(uSeeds,ivec2(index%1024,index/1024),0);
  vec3 p=attachedPosition(seed,uPhase);
  vec4 clip=project(p);
- float layer=clamp((.5-p.z/uDeposit.z)*7.,0.,6.999);
+ float layer=clamp((.5-p.z/uDeposit.z)*11.,0.,10.999);
  int secondary=gl_VertexID%2,i=int(floor(layer))+secondary;
  vec2 tile=vec2(i%4,i/4);vOrigin=tile*uTileSize;
- gl_Position=vec4(((clip.xy/clip.w*.5+.5)+tile)/vec2(4.,2.)*2.-1.,0.,1.);
+ gl_Position=vec4(((clip.xy/clip.w*.5+.5)+tile)/vec2(4.,3.)*2.-1.,0.,1.);
  if(p.z< -100.||max(abs(clip.x),abs(clip.y))>1.2)gl_Position=vec4(2.,2.,0.,1.);
  gl_PointSize=uDeposit.x*mix(.76,1.3,seed.y);
  vMass=uDeposit.y*(secondary==0?1.-fract(layer):fract(layer));
@@ -82,7 +91,7 @@ export class ParticleVolume{
   const o=this.owner,g=o.gl;
   const scale=Math.min(1/2,480/Math.max(w,h));
   const width=Math.max(32,Math.ceil(w*scale)),height=Math.max(24,Math.ceil(h*scale));
-  if(this.target?.w!==width*4||this.target?.h!==height*2){this.release();this.target=o.target(width*4,height*2);}
+  if(this.target?.w!==width*4||this.target?.h!==height*3){this.release();this.target=o.target(width*4,height*3);}
   o.bind(this.target);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);
   g.disable(g.DEPTH_TEST);g.enable(g.BLEND);g.blendEquation(g.FUNC_ADD);g.blendFunc(g.ONE,g.ONE);g.bindVertexArray(o.empty);
   const p=this.program,points=Math.max(1,Math.round(s.pCount)),count=Math.min(points,source.preview&&source.quality==='fast'?28000:100000);

@@ -1,4 +1,4 @@
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=ddff107e99e1';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=6a9e627b503d';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,
@@ -92,7 +92,22 @@ export function structureField(s,d,p){
    const radius=Math.max(thickness*.16,Math.min(thickness*.68,width*1.8/v.structDensity));
    const ribs=Math.hypot(midSurface,across)-radius;
    const cross=v.structWeft>0?Math.hypot(midSurface,along)-radius*v.structWeft:10;
-   const node=v.structWeft>0&&v.structWeaveNodes>0?Math.hypot(midSurface,across,along)-radius*(1+v.structWeaveNodes*1.5):10;
+   let node=10;
+   if(v.structWeft>0&&v.structWeaveNodes>0){
+    const growth=v.structWeaveNodes,cellA=Math.floor(a/tau+.5),cellB=Math.floor(b/tau+.5);
+    const x=(a-cellA*tau)/v.structDensity,y=(b-cellB*tau)/v.structDensity,z=midSurface;
+    const shift=.5+.5*Math.sin(23.71*cellA+16.13*cellB),space=radius*(.82+.34*shift);
+    node=Math.hypot(z,x,y)-radius*(.96+.32*growth);
+    if(growth>.25&&Math.abs(x)+Math.abs(y)<radius*5){
+     const buds=Math.min(
+      Math.hypot(x-space,y+.37*space,z-1.12*space)-radius*(.22+.31*growth),
+      Math.hypot(x+.72*space,y-.57*space,z-1.16*space)-radius*(.2+.26*growth),
+      Math.hypot(x-.18*space,y-1.06*space,z-.76*space)-radius*(.18+.21*growth),
+      Math.hypot(x+.48*space,y+.72*space,z-.99*space)-radius*(.18+.23*growth)
+     );
+     node+=Math.min(0,buds-node)*Math.min(1,(growth-.25)*4);
+    }
+   }
    d+=(Math.min(ribs,cross,node)-d)*v.structWeaveVariation*v.structShell*v.structFibres;
   }
  }
@@ -151,7 +166,21 @@ float structureField(float d,vec3 p){
    float radius=max(thickness*.16,min(thickness*.68,width*1.8/uStructureB.x));
    float ribs=length(vec2(midSurface,across))-radius;
    float crossbar=uStructureA.w>0.?length(vec2(midSurface,along))-radius*uStructureA.w:10.;
-   float node=uStructureA.w>0.&&uStructureH.z>0.?length(vec3(midSurface,across,along))-radius*(1.+uStructureH.z*1.5):10.;
+   float node=10.;
+#ifdef WEAVE_DETAIL
+   float growth=uStructureH.z;const float tau=6.28318530718;
+   if(uStructureA.w>0.&&growth>0.){
+    vec2 cell=floor(vec2(a,b)/tau+.5);
+    vec3 q=vec3((vec2(a,b)-cell*tau)/uStructureB.x,midSurface);
+    float shift=.5+.5*sin(dot(cell,vec2(23.71,16.13))),space=radius*(.82+.34*shift);
+    node=length(q)-radius*(.96+.32*growth);
+    if(growth>.25&&abs(q.x)+abs(q.y)<radius*5.){
+     float buds=min(min(length(q+space*vec3(-1.,.37,-1.12))-radius*(.22+.31*growth),length(q+space*vec3(.72,-.57,-1.16))-radius*(.2+.26*growth)),
+      min(length(q+space*vec3(-.18,-1.06,-.76))-radius*(.18+.21*growth),length(q+space*vec3(.48,.72,-.99))-radius*(.18+.23*growth)));
+     node=mix(node,min(buds,node),min(1.,(growth-.25)*4.));
+    }
+   }
+#endif
    d=mix(d,min(ribs,min(crossbar,node)),uStructureH.y*uStructureA.x*uStructureA.z);
   }
  }

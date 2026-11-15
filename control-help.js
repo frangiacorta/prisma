@@ -1,8 +1,8 @@
-import {AUDIO_HELP} from './audio-model.js?v=ddff107e99e1';
-import {EXTRA_HELP} from './control-help-extra.js?v=ddff107e99e1';
-import {FRACTAL_HELP} from './fractal-form.js?v=ddff107e99e1';
-import {CELLULAR_HELP} from './cellular-form.js?v=ddff107e99e1';
-import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=ddff107e99e1';
+import {AUDIO_HELP} from './audio-model.js?v=6a9e627b503d';
+import {EXTRA_HELP} from './control-help-extra.js?v=6a9e627b503d';
+import {FRACTAL_HELP} from './fractal-form.js?v=6a9e627b503d';
+import {CELLULAR_HELP} from './cellular-form.js?v=6a9e627b503d';
+import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=6a9e627b503d';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',
@@ -135,6 +135,7 @@ const HELP={
  pCounterflow:'Fa ruotare nucleo e guscio in direzioni opposte in fasi diverse del loop.',
  pVeilCrease:'Estende l’ondulazione dei bordi verso il centro. Regola prima Ondulazione dei bordi.',
  loopBands:'Mescola la palette lungo il percorso toroidale. Usa Apertura ad anello per farlo emergere.',
+ filWrap:'Avvolge i filamenti intorno al corpo. Il segno cambia il verso e il numero indica quanti giri compie una fibra di lunghezza massima. Pettinatura orienta i percorsi, Curvatura e Arricciamento li differenziano.',
  filRibbon:'Appiattisce la sezione dei filamenti. Aumenta lo spessore per vederla da lontano.',
  pVolumeHold:'Mantiene il volume di riferimento mentre la struttura si deforma. Per misurarlo considera chiusa l’apertura della pelle; valori alti contrastano il respiro.',
  pBundleDelay:'Sfasa progressivamente il movimento delle zone della struttura, mantenendo pieghe collegate e un loop chiuso.',
@@ -239,20 +240,39 @@ export function controlCondition(s,key){
  const positive=k=>Math.abs(Number(s[k])||0)>1e-6||s.motions?.[k]?.enabled&&Math.abs(s.motions[k].amplitude||0)>1e-6;
  const need=(k,text)=>positive(k)?'':text;
  const particles=hasGrainLayer(s),surface=grainMix(s)<1||s.motions?.sceneGrains?.enabled;
+ if(/^dyn[A-Z]/.test(key)&&key!=='dynAmount'&&!positive('dynAmount'))return 'Aumenta l’intensità della dinamica.';
+ if(['dynWindAngle','dynGust','dynFrequency','dynTurbulence'].includes(key)&&!positive('dynWind'))return 'Aumenta Vento.';
+ if(key==='dynFloorY'&&!positive('dynFloor'))return 'Attiva il piano di contatto.';
+ if(/^dynObstacle(X|Y|Z|Size|Aspect)$/.test(key)&&!positive('dynObstacle'))return 'Scegli un ostacolo.';
+ if(key==='dynObstacleAspect'&&s.dynObstacle===1)return 'L’altezza relativa agisce con scatola e cilindro.';
+ if(['dynBounce','dynFriction','dynMargin'].includes(key)&&!positive('dynFloor')&&!positive('dynObstacle'))return 'Attiva un piano o un ostacolo per vedere il contatto.';
+ if(key==='dynFields'&&![...s.forcePoints||[],...s.forcePaths||[]].some(f=>f.enabled&&Math.abs(f.strength||0)>1e-6))return 'Posiziona un campo attivo in Interazione → Campi.';
  if(key==='lobes'&&!positive('lobeAmount'))return 'Aumenta l’ampiezza dei lobi.';
  if(key==='pLobes'&&!positive('pLobeDepth'))return 'Aumenta la profondità dei lobi.';
  if(key==='pFrequency'||key==='pDetail'||key==='pRough'){if(!positive('pOrganic'))return 'Aumenta l’irregolarità della nuvola.';}
  if(['holeX','holeY','holeShape','holeAspect'].includes(key)&&!positive('hole'))return 'Aumenta l’apertura del foro.';
  if(['cutX','cutY','cutAspect'].includes(key)&&!positive('cut'))return 'Aumenta il ritaglio.';
+ if(key==='waveScale'&&!positive('waves'))return 'Aumenta Increspature.';
+ if(key==='rimRound'&&!positive('hole')&&!positive('cut'))return 'Aggiungi un foro o un ritaglio per ammorbidirne il bordo.';
+ if(key==='wallThickness'&&!positive('hollow')&&!positive('thinShell'))return 'Apri una cavità nella materia.';
+ if(key==='coatRoughness'&&!positive('coat'))return 'Aumenta la vernice.';
+ if(key==='anisotropyAngle'&&!positive('anisotropy'))return 'Aumenta i riflessi allungati.';
+ if(['textureDepth','textureScale','textureOrganic','textureAngle','textureRandomness','textureWarp','textureLink','texturePatch','textureSeed'].includes(key)&&!['textureWrinkles','textureFolds','textureRipples','textureWear','surfaceTexture'].some(positive))return 'Aggiungi rilievo, per esempio Grinze.';
+ if(['colorLayerScale','colorLayerShift','colorLayerMix'].includes(key)&&!positive('colorLayers'))return 'Aumenta Strati di colore.';
+ if(/^colorWave/.test(key)&&key!=='colorWaveAmount'&&!positive('colorWaveAmount'))return 'Aumenta Onde di colore.';
+ if(['bgHeight','bgSoftness','bgWash','bgShade'].includes(key)&&s.bgMode!=='studio')return 'Scegli Fondale morbido.';
+ if(key==='grainSize'&&!positive('grain'))return 'Aumenta la grana.';
  if(['gradientScale','gradientAngle','gradientOffset','colorSoftness','colorWaveAmount','colorLayers','colorLayerScale','colorLayerShift','colorLayerMix','colorWaveHeight','colorWaveRadius','colorWaveSwirl','colorWaveBands','colorWaveWarp','colorWavePhase'].includes(key)&&s.palette?.length<2)return 'Aggiungi un secondo colore nella palette.';
  if(['hollow','wallThickness','fullness','dispersion','absorption','tintStrength','environmentRefraction'].includes(key)&&!positive('transparency'))return 'Aumenta la trasparenza.';
  if(key==='scatterDirection'&&!positive('scattering')&&!positive('translucency')&&!positive('subsurface'))return 'Aumenta la diffusione interna.';
  if(['groundShadow','pShadow','grounding'].includes(key)&&s.bgMode==='solid'&&s.background==='#000000')return 'Scegli un fondale più chiaro per vedere l’ombra.';
- if(['filmThickness','iridShift','filmPattern','pFilmScale','pFilmVariation'].includes(key)&&!positive('thinFilm')&&!positive('pFilm')&&!positive('iridescence'))return 'Attiva la pellicola o aumenta l’iridescenza.';
+ if(['filmThickness','iridShift','iridScale','filmPattern','pFilmScale','pFilmVariation'].includes(key)&&!positive('thinFilm')&&!positive('pFilm')&&!positive('iridescence'))return 'Attiva la pellicola o aumenta l’iridescenza.';
  if(['pLighting','pColorMode','pColorScatter','pLumaVar','pDepthFade','pLinks','pTrailCount','pOpacity','pCount','pSize','pFill','grainDispersal'].includes(key)&&!particles)return 'Porta Superficie ↔ granelli sopra zero in Forma.';
  if(key==='refraction'&&!positive('transparency'))return 'Aumenta Trasparenza per vedere la rifrazione.';
  if(key==='refraction'&&!surface&&!positive('pLighting')&&!positive('pCaustic'))return 'Attiva Risposta alle luci per vedere l’indice dei granelli.';
  if(key==='pCaustic'&&(!particles||!positive('transparency')||s.refraction<=1||s.metal>=1||!s.lights?.some(l=>l.enabled&&l.power>0&&l.y>s.pShadowHeight)))return 'Servono granelli trasparenti, indice sopra 1 e una luce sopra il piano.';
+ if(key==='loopTwist'&&(!positive('loopAmount')||!positive('loopFlat')))return 'Apri l’anello e appiattisci la sezione per vedere la torsione.';
+ if(key==='structPetalWidth'&&!positive('structRadial'))return 'Aumenta Separazione radiale.';
  if(key==='loopTurns'&&(!positive('loopAmount')||!positive('loopKnot')))return 'Aumenta Apertura ad anello e Intreccio del nodo.';
  if(/^structWeave(Variation|Nodes)$/.test(key)&&!positive('structFibres'))return 'Aumenta Separazione in fibre per aprire il reticolo.';
  if(key==='structWeaveNodes'&&!positive('structWeft'))return 'Aumenta i fili trasversali per creare giunzioni.';
@@ -265,11 +285,37 @@ export function controlCondition(s,key){
  if(key==='pCloudCore'&&!s.pFill)return 'Aumenta il riempimento per distribuire i granelli dentro il nucleo.';
  if(key==='pTrailForkSpread'&&!positive('pTrailFork'))return 'Aumenta Quota di scie ramificate.';
  if((key==='pTrailPulse'||key==='pTrailPulseWidth')&&!s.pTrailCount)return 'Attiva le scie in Forma → Scie.';
+ if(/^pTrail[A-Z]/.test(key)&&key!=='pTrailCount'&&(!s.pTrailCount||key!=='pTrailOpacity'&&!s.pTrailOpacity))return 'Aumenta Quantità e Opacità delle scie.';
+ if(/^pLink[A-Z]/.test(key)&&!positive('pLinks'))return 'Aumenta Visibilità dei fili.';
+ if(/^pLink(?:Turns|Stretch)$/.test(key)&&!positive('pLinkSurface'))return 'Aumenta Percorso sulla distribuzione.';
+ if(['pSkinScale','pSkinThickness','pSkinFollow','pSkinOpening','pSkinOffset','pPores','pPoreCount'].includes(key)&&!positive('pSkin'))return 'Aumenta la visibilità della pelle.';
+ if(key==='pPoreCount'&&!positive('pPores'))return 'Aumenta i pori della pelle.';
+ if(['pFoldCount','pFoldPhase'].includes(key)&&!positive('pFoldDepth'))return 'Aumenta la profondità delle pieghe.';
+ if(['structThickness','structTaper'].includes(key)&&!positive('structShell'))return 'Aumenta Svuotamento per vedere lo spessore del guscio.';
+ if(['structDensity','structThreadWidth','structWeft','structWeave'].includes(key)&&!positive('structFibres'))return 'Aumenta Separazione in fibre per aprire il reticolo.';
+ if(['structSliceCount','structSliceWidth'].includes(key)&&!positive('structSlices'))return 'Aumenta Separazione delle sezioni.';
+ if(['structLayerCount','structLayerWidth'].includes(key)&&!positive('structLayers'))return 'Aumenta Separazione degli strati.';
+ if(key==='structCoreRadius'&&!positive('structCoreDark'))return 'Aumenta Oscurità del nucleo.';
  if(/^filPulse/.test(key)&&!s.filLength)return 'Aumenta Lunghezza in Forma → Filamenti su superficie.';
+ if(/^filPulse(Cycles|Width)$/.test(key)&&!positive('filPulse'))return 'Aumenta l’intensità degli impulsi sui filamenti.';
+ if(/^growth[A-Z]/.test(key)&&key!=='growthAmount'&&!positive('growthAmount'))return 'Aumenta Intensità della reazione-diffusione.';
  if(key==='pVeilCrease'&&!s.pVeilRipple)return 'Aumenta Ondulazione dei bordi.';
  if(key==='loopBandCount'&&!s.loopBands)return 'Aumenta Fasce lungo il percorso.';
  if(key==='pContactClearance'&&(!s.pSelfContact||(s.pLiving===1&&!s.pSkin)))return 'Aumenta Contatto tra pieghe in un tessuto o su una superficie.';
  if(key==='pVolumeShadow'&&(!positive('pSelfShadow')||!s.pCount||!s.pOpacity||!s.pLighting))return 'Attiva Ombre reciproche, granelli visibili e Risposta alle luci.';
+ if(key==='pCausticSoftness'&&!positive('pCaustic'))return 'Aumenta la caustica.';
+ if(['sssRadius','sssColor'].includes(key)&&!positive('subsurface'))return 'Aumenta Diffusione sotto la superficie.';
+ if(key==='internalColor'&&!positive('transparency')&&!positive('scattering')&&!positive('translucency'))return 'Aumenta Trasparenza o Diffusione interna.';
+ if(key==='bgAngle'&&s.bgMode!=='gradient')return 'Scegli Gradiente per ruotare il passaggio fra i colori.';
+ if(['pReach','pBranches'].includes(key)&&!positive('pOuter'))return 'Aumenta Fasci esterni in Forma.';
+ if(key==='pFlowBalance'&&!positive('pWander'))return 'Aumenta Deriva in Movimento.';
+ if(/^pShadow(Height|Softness|Light|Bias|Center|Span)/.test(key)&&!positive('pShadow')&&!positive('pCaustic'))return 'Aumenta l’ombra sul piano o la caustica.';
+ if(['pFiberSheen','pFiberSpread'].includes(key)&&!positive('pTrailCount')&&!positive('pLinks'))return 'Attiva scie o fili per vedere il riflesso delle fibre.';
+ if(key==='pFiberSpread'&&!positive('pFiberSheen'))return 'Aumenta Intensità del riflesso delle fibre.';
+ if(['pNodes','pConnect'].includes(key)&&!positive('pNeural'))return 'Aumenta la struttura neuronale.';
+ if(/^pTentacle(Count|Length|Taper|Curl|Wave|Cycles)$/.test(key)&&!positive('pTentacle'))return 'Aumenta i tentacoli del nucleo.';
+ if(/^pWarp(Scale|Cycles|Twist)$/.test(key)&&!positive('pSpaceWarp'))return 'Aumenta Distorsione spaziale.';
+ if(/^pWander(Scale|Cycles)$/.test(key)&&!positive('pWander'))return 'Aumenta Deriva.';
  if(key==='pCloudRadius'&&!s.pCloudHalo)return 'Aumenta Particelle nell’alone.';
  if(/^pCell(Density|Size|Variation|Aspect|Relief|Light)$/.test(key)&&!s.pCellAmount)return 'Attiva Raggruppamento in cellule.';
  if(Object.hasOwn(FRACTAL_HELP,key)&&key!=='fractalAmount'&&!positive('fractalAmount'))return 'Aumenta Intensità del frattale in Forma.';
@@ -289,19 +335,103 @@ export function controlCondition(s,key){
  if(key==='pDistributionCells'&&Math.abs((s.pGrainSpacing??1)-1)+Math.abs((s.pGroupSpacing??1)-1)<1e-6)return 'Porta Dispersione o Distanza dei gruppi a un valore diverso da 1.';
  if(key==='pTrailDensity'&&(s.pTrailCount||0)*Math.max(1,(s.pTrailLength||0)/.2)*(1+(s.pTrailPersistence||0))<=4000)return 'La trama attuale non richiede compensazione: servono più scie, più lunghezza o più persistenza.';
  if(key==='finishScanFrequency')return need('finishScanWave','Aumenta Ondulazione sopra zero.');
+ if(key==='finishScanCycles'&&!s.finishScanAnimate)return 'Attiva il movimento delle linee e premi Riproduci.';
+ if(key==='finishGlyphColor'&&s.finishGlyphSource)return 'Disattiva Usa i colori della scena per scegliere il colore dei segni.';
+ if(key==='finishGlitchFlashMs'&&!s.finishGlitchFlash)return 'Attiva Impulsi brevi in millisecondi.';
+ if(key==='finishGlitchDuty'&&s.finishGlitchFlash)return 'Disattiva Impulsi brevi in millisecondi per impostare una durata relativa.';
+ if(['finishGlitchHorizontal','finishGlitchCross'].includes(key)&&s.finishGlitchShape!==3)return 'Scegli Orizzontali + verticali per regolare le due intensità.';
+ if(/^finishRegion(?:[A-Z]|sEnabled)/.test(key)&&key!=='finishRegionsEnabled'&&(!s.finishRegionsEnabled||!s.finishRegions?.length))return 'Attiva Aree e disegna almeno un riquadro.';
  if(key==='finishGlyphSeed'&&!['finishGlyphRandom','finishGlyphFontRandom','finishGlyphSizeRandom','finishGlyphRotation','finishGlyphJitter'].some(positive))return 'Aumenta una variazione casuale dei caratteri, delle dimensioni, della rotazione o della posizione.';
  if(/^finishGlitch(Cycles|FlashMs|Duty|Softness|Rhythm|Scatter|Renew)$/.test(key)&&!s.finishGlitchAnimate)return 'Attiva l’animazione del glitch e premi Riproduci.';
  if(key==='environmentRefraction'&&!positive('transparency'))return 'Aumenta Trasparenza per vedere l’ambiente rifratto.';
  if(key==='environmentCycles'&&!s.environmentRotate)return 'Attiva Ruota ambiente e premi Riproduci.';
  if(key.startsWith('fil')&&!key.startsWith('film')&&key!=='filLength'&&!positive('filLength'))return 'Aggiungi filamenti aumentando Lunghezza in Forma.';
  if(key.startsWith('filBranch')&&key!=='filBranchAmount'&&!positive('filBranchAmount'))return 'Aumenta Quota di filamenti ramificati.';
+ if(['filClumps','filSpread'].includes(key)&&!positive('filClump'))return 'Aumenta la coesione dei ciuffi.';
+ if(['stemRadius','stemBend'].includes(key)&&!positive('stemAmount'))return 'Aumenta il gambo.';
  if(key==='filPhase')return need('filWind','Aumenta Ampiezza di oscillazione delle punte sopra zero.');
  if(key.startsWith('petal')&&key!=='petalAmount'&&!positive('petalAmount'))return 'Aumenta Appendici in Forma → Petali e radici.';
  if(key==='petalDirectionSpread'&&!['petalCoil','petalReentry','petalCurl','petalWander'].some(positive))return 'Aggiungi una curva, una deviazione o un avvolgimento al percorso.';
+ if(key==='focusDepth'&&!positive('focusBlur'))return 'Aumenta la sfocatura fuori fuoco.';
  if(key==='motion'&&!Object.values(s.motions||{}).some(t=>t.enabled&&t.mode!=='cycle'&&Math.abs(t.amplitude)>1e-6)&&!s.lights?.some(l=>l.pulse?.enabled||l.orbit?.enabled&&l.orbit.mode!=='cycle'))return 'Attiva una traccia in oscillazione: l’ampiezza generale non modifica i giri completi.';
  return '';
 }
+// Changes suggested inline are opt-in edits. The same values are useful for
+// exercising a dependent control with the procedural renderer.
+const conditionValues={
+  'Aumenta l’ampiezza dei lobi.':{lobeAmount:.18},'Aumenta la profondità dei lobi.':{pLobeDepth:.24},
+  'Aumenta l’irregolarità della nuvola.':{pOrganic:.38},'Aumenta l’apertura del foro.':{hole:.24},'Aumenta il ritaglio.':{cut:.25},
+  'Aumenta la trasparenza.':{transparency:.42},'Aumenta Trasparenza per vedere la rifrazione.':{transparency:.42},
+  'Aumenta la diffusione interna.':{scattering:.55},'Scegli un fondale più chiaro per vedere l’ombra.':{background:'#363942'},
+  'Attiva la pellicola o aumenta l’iridescenza.':{thinFilm:.58,pFilm:.58},
+  'Porta Superficie ↔ granelli sopra zero in Forma.':{sceneGrains:.52},
+  'Aumenta Distacco dal corpo in Forma → Granelli.':{grainDispersal:.4},
+  'Aumenta Apertura ad anello e Intreccio del nodo.':{loopAmount:.72,loopKnot:.67},
+  'Aumenta Separazione in fibre per aprire il reticolo.':{structFibres:.73},
+  'Aumenta i fili trasversali per creare giunzioni.':{structWeft:.7},
+  'Attiva Persistenza e aumenta Impronte luminose.':{finishEnabled:true,finishCompare:false,finishFeedback:true,finishFeedbackLumen:.75},
+  'Imposta Dimezzamento della luce sopra zero.':{finishPrintLife:.24},
+  'Attiva la persistenza dei fotogrammi in Filtri.':{finishFeedback:true},
+  'Aumenta il riempimento per distribuire i granelli dentro il nucleo.':{pFill:.8},
+  'Aumenta Visibilità dei fili.':{pLinks:.68},'Aumenta Percorso sulla distribuzione.':{pLinkSurface:.8},
+  'Aumenta la visibilità della pelle.':{pSkin:.75},'Aumenta i pori della pelle.':{pPores:.5},
+  'Aumenta la profondità delle pieghe.':{pFoldDepth:.3},
+  'Aumenta Svuotamento per vedere lo spessore del guscio.':{structShell:.76},
+  'Aumenta Separazione delle sezioni.':{structSlices:.74},'Aumenta Separazione degli strati.':{structLayers:.74},
+  'Aumenta Oscurità del nucleo.':{structCoreDark:.68},'Aumenta l’intensità degli impulsi sui filamenti.':{filPulse:.75},
+  'Aumenta Intensità della reazione-diffusione.':{growthAmount:.62},
+  'Attiva Raggruppamento in cellule.':{pCellAmount:.72},'Aumenta Intensità del frattale in Forma.':{fractalAmount:.75},
+  'Aumenta Sviluppo cellulare in Forma.':{cellMorph:.8},'Attiva i filtri per vedere il risultato.':{finishEnabled:true},
+  'Disattiva il confronto con l’originale per vedere i filtri.':{finishCompare:false},
+  'Aumenta Appendici in Forma → Petali e radici.':{petalAmount:.62},
+  'Aggiungi filamenti aumentando Lunghezza in Forma.':{filLength:.28},
+  'Aumenta Lunghezza in Forma → Filamenti su superficie.':{filLength:.28},
+  'Aumenta Quota di filamenti ramificati.':{filBranchAmount:.36},
+  'Aumenta Ampiezza di oscillazione delle punte sopra zero.':{filWind:.36},
+  'Scegli quanti granelli usano una misura diversa, in Distribuzione dimensioni.':{pLargeCount:.25},
+  'Aumenta Escursione dei diametri sopra zero.':{pSizeSpread:.7},
+  'Aumenta la sfocatura fuori fuoco.':{focusBlur:.48},
+  'Aumenta l’intensità della dinamica.':{dynAmount:.55},'Aumenta Vento.':{dynWind:.8},
+  'Attiva il piano di contatto.':{dynFloor:1},'Scegli un ostacolo.':{dynObstacle:2},
+  'L’altezza relativa agisce con scatola e cilindro.':{dynObstacle:2},'Attiva un piano o un ostacolo per vedere il contatto.':{dynFloor:1},
+  'Aumenta Increspature.':{waves:.13},'Aggiungi un foro o un ritaglio per ammorbidirne il bordo.':{hole:.35},'Apri una cavità nella materia.':{hollow:1},
+  'Aumenta la vernice.':{coat:.64},'Aumenta i riflessi allungati.':{anisotropy:.65},
+  'Aggiungi rilievo, per esempio Grinze.':{textureWrinkles:.65},'Aumenta Strati di colore.':{colorLayers:.65},
+  'Aumenta Onde di colore.':{colorWaveAmount:.61},'Scegli Fondale morbido.':{bgMode:'studio'},'Aumenta la grana.':{grain:.07},
+  'Apri l’anello e appiattisci la sezione per vedere la torsione.':{loopAmount:.75,loopFlat:.63},'Aumenta Separazione radiale.':{structRadial:.63},
+  'Aumenta la caustica.':{pCaustic:.72},'Aumenta l’ombra sul piano o la caustica.':{pShadow:.78},
+  'Attiva scie o fili per vedere il riflesso delle fibre.':{pTrailCount:260,pTrailOpacity:.75},'Aumenta la struttura neuronale.':{pNeural:.7},
+  'Aumenta i tentacoli del nucleo.':{pTentacle:.65},'Aumenta Distorsione spaziale.':{pSpaceWarp:.64},'Aumenta Deriva.':{pWander:.62},
+  'Aumenta la coesione dei ciuffi.':{filClump:.58},'Aumenta il gambo.':{stemAmount:.67},
+  'Aumenta Diffusione sotto la superficie.':{subsurface:.54},'Aumenta Trasparenza o Diffusione interna.':{transparency:.54},
+  'Scegli Gradiente per ruotare il passaggio fra i colori.':{bgMode:'gradient'},'Aumenta Fasci esterni in Forma.':{pOuter:.63},
+  'Aumenta Deriva in Movimento.':{pWander:.63},'Aumenta Intensità del riflesso delle fibre.':{pFiberSheen:.7,pLighting:1},
+  'Attiva Ombre reciproche, granelli visibili e Risposta alle luci.':{pSelfShadow:.75,pLighting:1,pCount:16000,pOpacity:.76},
+  'Attiva ombre reciproche o caustiche.':{pSelfShadow:.75,pLighting:1},'Aumenta Particelle nell’alone.':{pCloudHalo:.54},
+  'Porta Dispersione o Distanza dei gruppi a un valore diverso da 1.':{pGrainSpacing:1.8},
+  'Attiva i fili: questo rapporto riguarda i granelli usati come nodi.':{pLinks:.52},
+  'Attiva il movimento delle linee e premi Riproduci.':{finishScanAnimate:true,finishScanWave:.42},
+  'Disattiva Usa i colori della scena per scegliere il colore dei segni.':{finishGlyphSource:false},
+  'Attiva Impulsi brevi in millisecondi.':{finishGlitchFlash:true},'Disattiva Impulsi brevi in millisecondi per impostare una durata relativa.':{finishGlitchFlash:false},
+  'Scegli Orizzontali + verticali per regolare le due intensità.':{finishGlitchShape:3},
+  'Attiva l’animazione del glitch e premi Riproduci.':{finishGlitchAnimate:true},'Attiva Ruota ambiente e premi Riproduci.':{environmentRotate:true}
+};
+export function conditionActivation(s,key,condition=controlCondition(s,key)){
+ if(!condition)return null;
+ if(Object.hasOwn(conditionValues,condition))return conditionValues[condition];
+ if(condition==='Aggiungi un secondo colore nella palette.')return {palette:[...(s.palette||[]),'#35a5c0']};
+ if(condition==='Aumenta lo spessore dei filamenti per distinguere il profilo.')return {filWidth:.045,filLength:Math.max(.25,s.filLength||0)};
+ if(condition==='Aumenta Quota di scie ramificate.')return {pTrailFork:.52,pTrailCount:Math.max(100,s.pTrailCount||0)};
+ if(condition==='Aumenta Quantità e Opacità delle scie.')return {pTrailCount:s.pTrailCount||320,pTrailOpacity:s.pTrailOpacity||.7};
+ if(condition==='Attiva questo filtro per vedere il risultato.'){
+  const type=key.match(/^finish(Rgb|Mosaic|Cell|Glyph|Edge|Glitch|Warp|Glass|Scan)/)?.[1];
+  if(type)return {['finish'+(type==='Cell'?'Mosaic':type)]:true};
+ }
+ return null;
+}
 export function controlHelp(key,engine){
+ if(key==='focusBlur')return 'Regola quanto si ammorbidiscono i dettagli davanti e dietro il piano di fuoco.';
+ if(key==='focusDepth')return 'Sposta il piano nitido lungo la profondità della scena. I valori positivi sono più vicini alla camera.';
  if(key==='grainSource')return 'Dal corpo distribuisce i granelli sulla geometria scelta. Nuvola orbitale usa una propria distribuzione controllata da orbite e campi.';
  if(key==='sceneGrains')return 'Trasforma la stessa scena. A zero vedi la superficie, a uno i granelli. Nel mezzo i due strati condividono forma, luci, colori e tempo.';
  if(key==='grainDispersal')return 'A zero i granelli seguono il corpo. Aumenta il distacco per rendere visibili correnti, orbite e deviazioni del moto locale.';

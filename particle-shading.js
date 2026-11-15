@@ -1,12 +1,12 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=ddff107e99e1';
-import {opticalGLSL} from './particle-optics.js?v=ddff107e99e1';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=6a9e627b503d';
+import {opticalGLSL} from './particle-optics.js?v=6a9e627b503d';
 // Particle shading uses Prisma's parameter names. It does not trace solid glass.
 export const prismaShadingGLSL=`
 ${FILM_PATTERN_GLSL}
 ${opticalGLSL}
 uniform vec4 uMaterial,uFinish,uEnvironment,uGradient;
 uniform vec3 uParticleOptical;
-uniform vec2 uPearl,uFiberLight;
+uniform vec3 uPearl;uniform vec2 uFiberLight;
 uniform vec4 uFilmLayer,uParticleFilmMotion,uFilmObject;
 uniform vec3 uFilmRotation,uFilmResponse[24],uFilmWhite;
 uniform vec4 uColorLayers,uParticleCore;uniform vec4 uColorWave;uniform vec4 uColorWave2;uniform float uColorSoftness;
@@ -55,6 +55,7 @@ vec3 pearlFresnel(vec3 f0,float cosine,float irid,float rough){
  float f=pow(1.-clamp(cosine,0.,1.),5.);
  vec3 fresnel=f0+(1.-f0)*f;
  float inside=sqrt(max(0.,1.-(1.-cosine*cosine)/(1.33*1.33)));
+ inside=1.+(inside-1.)*uPearl.z;
  vec3 phase=12.5663706*1.33*uPearl.y*inside/vec3(650.,510.,475.)+uPearl.x*6.2831853;
  vec3 spectrum=.5+.5*cos(phase);
  vec3 tint=mix(vec3(1.),.45+1.05*spectrum,irid*(1.-rough*.5));
@@ -80,6 +81,7 @@ vec3 livingFilm(vec3 world,float facing,float rough){
  local.xz=filmRotate(-uFilmRotation.y)*local.xz;
  local.yz=filmRotate(-uFilmRotation.x)*local.yz;
  local.xy=filmRotate(-uFilmRotation.z)*local.xy;
+ local*=uPearl.z;
  vec3 coatingLocal=local;
  local*=uFilmLayer.y;
  float phase=uParticleFilmMotion.x,flow=uParticleFilmMotion.y,swirl=uParticleFilmMotion.z;

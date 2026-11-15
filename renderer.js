@@ -1,20 +1,21 @@
-import {Dynamics,disposeDynamics} from './dynamics.js?v=ddff107e99e1';
-import {motionPeriod} from './animation-clock.js?v=ddff107e99e1';
-import {animationPhase} from './animation-clock.js?v=ddff107e99e1';
-import {ScanlinePass} from './finish-scanlines.js?v=ddff107e99e1';
-import {FilamentPass} from './filament-renderer.js?v=ddff107e99e1';
-import {VeilTransition} from './veil-transition.js?v=ddff107e99e1';
-import {BodySamples} from './body-samples.js?v=ddff107e99e1';
-import {BodyComposite} from './body-composite.js?v=ddff107e99e1';
-import {cloudBody,cloudToBody,grainMix} from './body-layers.js?v=ddff107e99e1';
-import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=ddff107e99e1';
-import {ParticleRenderer} from './particle-renderer.js?v=ddff107e99e1';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=ddff107e99e1';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=ddff107e99e1';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=6a9e627b503d';
+import {motionPeriod} from './animation-clock.js?v=6a9e627b503d';
+import {animationPhase} from './animation-clock.js?v=6a9e627b503d';
+import {ScanlinePass} from './finish-scanlines.js?v=6a9e627b503d';
+import {FilamentPass} from './filament-renderer.js?v=6a9e627b503d';
+import {VeilTransition} from './veil-transition.js?v=6a9e627b503d';
+import {BodySamples} from './body-samples.js?v=6a9e627b503d';
+import {BodyComposite} from './body-composite.js?v=6a9e627b503d';
+import {cloudBody,cloudToBody,grainMix} from './body-layers.js?v=6a9e627b503d';
+import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=6a9e627b503d';
+import {ParticleRenderer} from './particle-renderer.js?v=6a9e627b503d';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=6a9e627b503d';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=6a9e627b503d';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
 const solidBody=s=>({...s,engine:'solid',pLiving:0});
+const focusOptions={layers:true,focusDepthOnly:true,preview:true,quality:'fast',trackTiming:false,deferCompletion:true,keepCanvas:true};
 // A scene owns a clock, a simulation and a shared graphics context.
 export class Renderer{
  constructor(canvas){this.dynamics=new Dynamics(sampleFrame);this.liveDynamics=new Dynamics(sampleFrame,true);this.canvas=canvas;this.context=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!this.context)throw Error('WebGL 2 non disponibile.');this.frameTimer=this.context.getExtension('EXT_disjoint_timer_query_webgl2');this.frameQueries=[];this.frameGpuSample=0;this.frameGpuMs=null;}
@@ -80,11 +81,11 @@ export class Renderer{
   const layers=this.bodyComposite.target(w,h);
   return {surface,solid,layers,studioLayer:{color:layers.color,depth:layers.depth,attachment}};
  }
- drawGrains(plan,frame,p,w,h,o){
+ drawGrains(plan,frame,p,w,h,o,async=false){
   const {surface,solid,studioLayer}=frame;
   const ok=this.select(plan.grains).draw(finishingSource(plan.grains,o),p,w,h,{...o,studioLayer});
   if(ok&&this.needsFilaments(surface,p)){
-   this.filamentPass.draw({...sampleFrame(surface,p),filCore:(surface.filCore??1)*(1-plan.mix)},p,w,h,solid,o);
+   return this.filamentPass[async?'drawAsync':'draw']({...sampleFrame(surface,p),filCore:(surface.filCore??1)*(1-plan.mix)},p,w,h,solid,o);
   }
   return ok;
  }
@@ -102,41 +103,67 @@ export class Renderer{
   if(!(plan.surface&&plan.grains)){
    const frame=finishingSource(plan.surface||plan.grains,o);
    const ok=await this.select(frame)[method](frame,p,w,h,o);
-   if(ok&&plan.surface)this.filaments(frame,p,w,h,o);
-   return ok;
+   return ok&&(!plan.surface||await this.filaments(frame,p,w,h,o,true));
   }
   const inner={...o,trackTiming:false,deferCompletion:true};
   const samples=method==='drawAccumulated'?o.samples||16:1;
-  if(samples===1||plan.mix>=1||plan.surface.renderVersion<2)return this.drawLayers(plan,p,w,h,inner);
   const frame=this.compositeFrame(plan,p,w,h,inner),layerOpacity=1-plan.mix;
+  if(samples===1||plan.mix>=1||plan.surface.renderVersion<2)
+   return frame.solid.draw(frame.surface,p,w,h,{...inner,layers:frame.layers,layerOpacity})&&await this.drawGrains(plan,frame,p,w,h,inner,true);
   if(!await frame.solid.drawTiled(frame.surface,p,w,h,{...inner,layers:frame.layers,layerOpacity,deferCompletion:false}))return false;
   this.gl.bindFramebuffer(this.gl.FRAMEBUFFER,null);
   if(!await frame.solid.drawAccumulated(frame.surface,p,w,h,{...o,layerOpacity,samples,progress:f=>o.progress?.(f*.92)}))return false;
   frame.layers.captureColor();
-  return this.drawGrains(plan,frame,p,w,h,inner);
+  return this.drawGrains(plan,frame,p,w,h,inner,true);
  }
- prepare(s,p,o){p=animationPhase(s,p||0);s=this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o);if(!s)return false;const plan=this.layerPlan(s,p);if(plan)return this.prepareLayers(plan,p,o||{});s=this.endpoint(s,p);const ready=this.select(s).prepare(s,p,o),fil=this.prepareFilaments(s,p);return ready&&fil;}async prepareAsync(s,p,o){p=animationPhase(s,p||0);s=await this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o,true);if(!s)return false;const plan=this.layerPlan(s,p);if(plan)return this.prepareLayersAsync(plan,p,o||{});s=this.endpoint(s,p);const ready=await this.select(s).prepareAsync(s,p,o);if(!ready)return false;this.prepareFilaments(s,p);return this.needsFilaments(s,p)?this.filamentPass.prepareAsync(o):true;}
+ focusBody(s,p,plan=this.layerPlan(s,p)){
+  if(!(s.focusBlur>0))return null;
+  const source=plan?plan.surface:this.endpoint(s,p);
+  if(!source||source.engine==='particles'||source.pLiving>0)return null;
+  return {...source,renderVersion:2};
+ }
+ prepareFocus(s,p,o,async=false){
+  const source=this.focusBody(s,p);
+  if(!source)return true;
+  this.focusPass??=new FocusPass(this.gl);
+  return this.select(source)[async?'prepareAsync':'prepare'](source,p,{...focusOptions,cancelled:o?.cancelled});
+ }
+ applyFocus(s,p,w,h,plan){
+  const source=this.focusBody(s,p,plan);if(!source)return;
+  const solid=this.select(source),scale=Math.min(.6,800/Math.max(w,h)),width=Math.max(1,Math.round(w*scale)),height=Math.max(1,Math.round(h*scale));
+  this.focusDepthTarget??=new BodyComposite(this.gl);const layers=this.focusDepthTarget.target(width,height);
+  solid.draw(source,p,width,height,{...focusOptions,layers});
+  this.focusPass.draw(s,w,h,layers.depth);
+ }
+ prepare(s,p,o){p=animationPhase(s,p||0);s=this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o);if(!s)return false;const focusReady=this.prepareFocus(s,p,o);const plan=this.layerPlan(s,p);if(plan)return this.prepareLayers(plan,p,o||{})&&focusReady;s=this.endpoint(s,p);const ready=this.select(s).prepare(s,p,o),fil=this.prepareFilaments(s,p);return ready&&fil&&focusReady;}async prepareAsync(s,p,o){p=animationPhase(s,p||0);s=await this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o,true);if(!s||!await this.prepareFocus(s,p,o,true))return false;const plan=this.layerPlan(s,p);if(plan)return this.prepareLayersAsync(plan,p,o||{});s=this.endpoint(s,p);const ready=await this.select(s).prepareAsync(s,p,o);if(!ready)return false;this.prepareFilaments(s,p);return this.needsFilaments(s,p)?this.filamentPass.prepareAsync(o):true;}
  needsFilaments(s,p){s=this.endpoint(s,p);return !(s.engine==='particles'||s.pLiving>0)&&sampleFrame(s,p).filLength>0;}
- prepareFilaments(s,p){if(!this.needsFilaments(s,p))return true;this.filamentPass??=new FilamentPass(this.gl);return this.filamentPass.prepare();}
- filaments(s,p,w,h,o){if(this.kind==='solid'&&sampleFrame(s,p).filLength>0){this.filamentPass??=new FilamentPass(this.gl);this.filamentPass.draw(sampleFrame(finishingSource(s,o),p),p,w,h,this.impl,o);}}
+ prepareFilaments(s,p){if(!this.needsFilaments(s,p))return true;this.filamentPass??=new FilamentPass(this.gl);return this.filamentPass.prepare(!!(s.filWrap||s.motions?.filWrap?.enabled));}
+ filaments(s,p,w,h,o,async=false){
+  if(this.kind!=='solid'||sampleFrame(s,p).filLength<=0)return true;
+  this.filamentPass??=new FilamentPass(this.gl);
+  return this.filamentPass[async?'drawAsync':'draw'](sampleFrame(finishingSource(s,o),p),p,w,h,this.impl,o);
+ }
+ prepareFilter(kind){
+  const constructors={mosaic:['finishing',FinishingPass],rgb:['finishing',FinishingPass],warp:['opticalFinishing',OpticalPass],glass:['opticalFinishing',OpticalPass],feedback:['feedbackFinishing',FeedbackPass],scan:['scanFinishing',ScanlinePass],glyph:['glyphFinishing',GlyphPass],edge:['detailFinishing',DetailPass],glitch:['detailFinishing',DetailPass]};
+  const descriptor=constructors[kind];
+  if(descriptor){const [key,Pass]=descriptor;this[key]??=new Pass(this.gl);}
+ }
  finish(s,o={},phase=0,timeline=phase){
   if(finishingOff(s,o)){this.feedbackFinishing?.release();return;}
   const values={...FINISH_DEFAULTS,...s},order=normalizeFinishOrder(s.finishOrder),w=this.canvas.width,h=this.canvas.height;
   const active={feedback:values.finishFeedback&&values.finishFeedbackMix>0,scan:values.finishScan&&values.finishScanMix>0,warp:values.finishWarp&&values.finishWarpMix>0,glass:values.finishGlass&&values.finishGlassMix>0,mosaic:values.finishMosaic&&values.finishMosaicMix>0,rgb:values.finishRgb&&values.finishRgbMix>0,edge:values.finishEdge&&values.finishEdgeMix>0,glyph:values.finishGlyph&&values.finishGlyphMix>0,glitch:values.finishGlitch&&values.finishGlitchMix>0&&values.finishGlitchCoverage>0&&(values.finishGlitchAmount>0||values.finishGlitchSplit>0)};
   if(!active.feedback)this.feedbackFinishing?.release();
-  let drawn=false;
   for(let i=0;i<order.length;i++){
-   const kind=order[i];if(!active[kind])continue;drawn=true;
+   const kind=order[i];if(!active[kind])continue;this.prepareFilter(kind);
    if(kind==='mosaic'||kind==='rgb'){
-    this.finishing??=new FinishingPass(this.gl);
     // Preserve the legacy fused pass when the two active filters remain adjacent.
     const fused=kind==='mosaic'&&order[i+1]==='rgb'&&active.rgb;
     this.finishing.draw({...values,finishMosaic:kind==='mosaic',finishRgb:kind==='rgb'||fused},w,h);if(fused)i++;
-   }else if(kind==='warp'||kind==='glass'){this.opticalFinishing??=new OpticalPass(this.gl);this.opticalFinishing.draw(values,w,h,phase,kind==='glass'?1:0);}
-   else if(kind==='feedback'){this.feedbackFinishing??=new FeedbackPass(this.gl);this.feedbackFinishing.draw(values,w,h,luminousPrintEnabled(values)?timeline:phase,!o.preview||o.liveDynamics,o.feedbackDeltaSeconds);}
-   else if(kind==='scan'){this.scanFinishing??=new ScanlinePass(this.gl);this.scanFinishing.draw(values,w,h,phase);}
-   else if(kind==='glyph'){this.glyphFinishing??=new GlyphPass(this.gl);this.glyphFinishing.draw(values,w,h,phase);}
-   else{this.detailFinishing??=new DetailPass(this.gl);this.detailFinishing.draw(values,w,h,phase,kind==='edge'?0:1);}
+   }else if(kind==='warp'||kind==='glass'){this.opticalFinishing.draw(values,w,h,phase,kind==='glass'?1:0);}
+   else if(kind==='feedback'){this.feedbackFinishing.draw(values,w,h,luminousPrintEnabled(values)?timeline:phase,!o.preview||o.liveDynamics,o.feedbackDeltaSeconds);}
+   else if(kind==='scan'){this.scanFinishing.draw(values,w,h,phase);}
+   else if(kind==='glyph'){this.glyphFinishing.draw(values,w,h,phase);}
+   else{this.detailFinishing.draw(values,w,h,phase,kind==='edge'?0:1,o.frameInterval);}
   }
  }
 
@@ -148,15 +175,15 @@ export class Renderer{
   this.pollGpuTime();const g=this.gl,q=o.preview&&o.trackTiming!==false&&this.frameTimer&&this.frameQueries.length<3?g.createQuery():null;
   if(q)g.beginQuery(this.frameTimer.TIME_ELAPSED_EXT,q);
   const inner={...printPreviewOptions(s,o),trackTiming:false,deferCompletion:true};let completed=false;
-  try{const plan=this.layerPlan(s,p);if(plan){if(!this.prepareLayers(plan,p,inner)||!this.drawLayers(plan,p,w,h,inner))return false;this.finish(s,o,p,timeline);if(o.liveDynamics)this.lastPreviewDynamicsFrame=s._dynamics||null;completed=true;return true;}const mix=this.transitionAmount(s,p);if(mix>0&&mix<1){const base=this.sourceState(s);if(!this.select(base).draw(finishingSource(base,o),p,w,h,inner))return false;this.veilTransition??=new VeilTransition(this.gl);this.veilTransition.capture(0,w,h);}s=this.endpoint(s,p);const ok=this.select(s).draw(finishingSource(s,o),p,w,h,inner);if(ok){if(mix>0&&mix<1)this.veilTransition.draw(w,h,mix);this.filaments(s,p,w,h,o);this.finish(s,o,p,timeline);if(o.liveDynamics)this.lastPreviewDynamicsFrame=s._dynamics||null;completed=true;}return ok;}
+  try{const plan=this.layerPlan(s,p);if(!this.prepareFocus(s,p,o))return false;if(plan){if(!this.prepareLayers(plan,p,inner)||!this.drawLayers(plan,p,w,h,inner))return false;this.applyFocus(s,p,w,h,plan);this.finish(s,o,p,timeline);if(o.liveDynamics)this.lastPreviewDynamicsFrame=s._dynamics||null;completed=true;return true;}const mix=this.transitionAmount(s,p);if(mix>0&&mix<1){const base=this.sourceState(s);if(!this.select(base).draw(finishingSource(base,o),p,w,h,inner))return false;this.veilTransition??=new VeilTransition(this.gl);this.veilTransition.capture(0,w,h);}s=this.endpoint(s,p);const ok=this.select(s).draw(finishingSource(s,o),p,w,h,inner);if(ok){if(mix>0&&mix<1)this.veilTransition.draw(w,h,mix);this.filaments(s,p,w,h,o);this.applyFocus(s,p,w,h,null);this.finish(s,o,p,timeline);if(o.liveDynamics)this.lastPreviewDynamicsFrame=s._dynamics||null;completed=true;}return ok;}
   finally{if(q){g.endQuery(this.frameTimer.TIME_ELAPSED_EXT);this.frameQueries.push(q);}if(completed)this.fence();else if(q)g.flush();}
  }
- async drawWithTransition(method,s,p,w,h,o){const timeline=p;p=animationPhase(s,p);s=await this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o,true);if(!s)return false;o=printPreviewOptions(s,o);const plan=this.layerPlan(s,p);if(plan){if(!await this.prepareLayersAsync(plan,p,o)||o.cancelled?.())return false;const ok=await this.drawLayerExport(plan,method,p,w,h,o);if(!ok||o.cancelled?.())return false;this.finish(s,o,p,timeline);this.fence();const complete=await this.waitForGpu(o);if(complete)o.progress?.(1);return complete;}this.prepareFilaments(s,p);if(this.needsFilaments(s,p)&&!await this.filamentPass.prepareAsync(o))return false;const mix=this.transitionAmount(s,p);if(mix>0&&mix<1){const base=this.sourceState(s);if(!await this.select(base)[method](finishingSource(base,o),p,w,h,o)||o.cancelled?.())return false;this.veilTransition??=new VeilTransition(this.gl);this.veilTransition.capture(0,w,h);}s=this.endpoint(s,p);const ok=await this.select(s)[method](finishingSource(s,o),p,w,h,o);if(!ok||o.cancelled?.())return false;if(mix>0&&mix<1)this.veilTransition.draw(w,h,mix);this.filaments(s,p,w,h,o);this.finish(s,o,p,timeline);this.fence();return this.waitForGpu(o);}
+ async drawWithTransition(method,s,p,w,h,o){const timeline=p;p=animationPhase(s,p);s=await this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o,true);if(!s)return false;o=printPreviewOptions(s,o);if(!await this.prepareFocus(s,p,o,true))return false;const plan=this.layerPlan(s,p);if(plan){if(!await this.prepareLayersAsync(plan,p,o)||o.cancelled?.())return false;const ok=await this.drawLayerExport(plan,method,p,w,h,o);if(!ok||o.cancelled?.())return false;this.applyFocus(s,p,w,h,plan);this.finish(s,o,p,timeline);this.fence();const complete=await this.waitForGpu(o);if(complete)o.progress?.(1);return complete;}this.prepareFilaments(s,p);if(this.needsFilaments(s,p)&&!await this.filamentPass.prepareAsync(o))return false;const mix=this.transitionAmount(s,p);if(mix>0&&mix<1){const base=this.sourceState(s);if(!await this.select(base)[method](finishingSource(base,o),p,w,h,o)||o.cancelled?.())return false;this.veilTransition??=new VeilTransition(this.gl);this.veilTransition.capture(0,w,h);}s=this.endpoint(s,p);const ok=await this.select(s)[method](finishingSource(s,o),p,w,h,o);if(!ok||o.cancelled?.())return false;if(mix>0&&mix<1)this.veilTransition.draw(w,h,mix);if(!await this.filaments(s,p,w,h,o,true))return false;this.applyFocus(s,p,w,h,null);this.finish(s,o,p,timeline);this.fence();return this.waitForGpu(o);}
  async drawAccumulated(s,p,w,h,o={}){return this.drawWithTransition('drawAccumulated',s,p,w,h,o);}
  async drawTiled(s,p,w,h,o={}){return this.drawWithTransition('drawTiled',s,p,w,h,o);}
  fence(){if(this.impl?.completionSync)this.gl.deleteSync(this.impl.completionSync);this.impl.completionSync=this.gl.fenceSync(this.gl.SYNC_GPU_COMMANDS_COMPLETE,0);this.gl.flush();}
  pollGpuTime(){this.impl?.pollGpuTime();const g=this.gl,e=this.frameTimer;if(!e||g.isContextLost())return;const disjoint=g.getParameter(e.GPU_DISJOINT_EXT);while(this.frameQueries.length&&(disjoint||g.getQueryParameter(this.frameQueries[0],g.QUERY_RESULT_AVAILABLE))){const q=this.frameQueries.shift();if(!disjoint){const ms=g.getQueryParameter(q,g.QUERY_RESULT)/1e6;if(Number.isFinite(ms)&&ms>0){this.frameGpuMs=ms;this.frameGpuSample++;}}g.deleteQuery(q);}if(disjoint)this.frameGpuMs=null;}pollCompletion(){return this.impl?.pollCompletion();}async waitForGpu(o){return this.impl?this.impl.waitForGpu(o):true;}
  hardwareInfo(){if(this.impl)return this.impl.hardwareInfo();const gl=this.gl,e=gl.getExtension('WEBGL_debug_renderer_info'),name=gl.getParameter(e?e.UNMASKED_RENDERER_WEBGL:gl.RENDERER);return {name,software:/swiftshader|llvmpipe/i.test(name)};}
- pixels(){return this.impl.pixels();}releaseSurface(){const ok=this.impl?.releaseSurface()??true;if(ok){this.bodyComposite?.release();this.filamentPass?.release();this.feedbackFinishing?.release();this.finishing?.release();this.glyphFinishing?.release();this.detailFinishing?.release();this.opticalFinishing?.release();this.scanFinishing?.release();}return ok;}
- dispose(o){disposeDynamics(this.gl);if(!this.gl.isContextLost())for(const q of this.frameQueries)this.gl.deleteQuery(q);this.frameQueries=[];this.bodyComposite?.release();this.bodySamples?.dispose();this.bodySamples=null;this.filamentPass?.dispose();this.filamentPass=null;this.veilTransition?.dispose();this.veilTransition=null;this.scanFinishing?.dispose();this.scanFinishing=null;this.opticalFinishing?.dispose();this.opticalFinishing=null;this.detailFinishing?.dispose();this.detailFinishing=null;this.feedbackFinishing?.dispose();this.feedbackFinishing=null;this.finishing?.dispose();this.finishing=null;this.glyphFinishing?.dispose();this.glyphFinishing=null;const implementations=new Set([...Object.values(this.implementations||{}),this.impl].filter(Boolean));for(const renderer of implementations)renderer.dispose({loseContext:false});if(o?.loseContext!==false)this.recoveryExtension?.loseContext();this.implementations={};this.impl=null;this.kind=null;}
+ pixels(){return this.impl.pixels();}releaseSurface(){const ok=this.impl?.releaseSurface()??true;if(ok){this.focusPass?.release();this.focusDepthTarget?.release();this.bodyComposite?.release();this.filamentPass?.release();this.feedbackFinishing?.release();this.finishing?.release();this.glyphFinishing?.release();this.detailFinishing?.release();this.opticalFinishing?.release();this.scanFinishing?.release();}return ok;}
+ dispose(o){disposeDynamics(this.gl);if(!this.gl.isContextLost())for(const q of this.frameQueries)this.gl.deleteQuery(q);this.frameQueries=[];this.focusPass?.dispose();this.focusDepthTarget?.release();this.bodyComposite?.release();this.bodySamples?.dispose();this.bodySamples=null;this.filamentPass?.dispose();this.filamentPass=null;this.veilTransition?.dispose();this.veilTransition=null;this.scanFinishing?.dispose();this.scanFinishing=null;this.opticalFinishing?.dispose();this.opticalFinishing=null;this.detailFinishing?.dispose();this.detailFinishing=null;this.feedbackFinishing?.dispose();this.feedbackFinishing=null;this.finishing?.dispose();this.finishing=null;this.glyphFinishing?.dispose();this.glyphFinishing=null;const implementations=new Set([...Object.values(this.implementations||{}),this.impl].filter(Boolean));for(const renderer of implementations)renderer.dispose({loseContext:false});if(o?.loseContext!==false)this.recoveryExtension?.loseContext();this.implementations={};this.impl=null;this.kind=null;}
 }

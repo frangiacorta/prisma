@@ -1,12 +1,12 @@
-import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=ddff107e99e1';
-import {GROWTH_DEFAULTS} from './growth-material.js?v=ddff107e99e1';
-import {FINISH_DEFAULTS} from './finishing.js?v=ddff107e99e1';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=ddff107e99e1';
-import {FRACTAL_KEYS} from './fractal-form.js?v=ddff107e99e1';
-import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=ddff107e99e1';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=ddff107e99e1';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=ddff107e99e1';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=ddff107e99e1';
+import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=6a9e627b503d';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=6a9e627b503d';
+import {FINISH_DEFAULTS} from './finishing.js?v=6a9e627b503d';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=6a9e627b503d';
+import {FRACTAL_KEYS} from './fractal-form.js?v=6a9e627b503d';
+import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=6a9e627b503d';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=6a9e627b503d';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=6a9e627b503d';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=6a9e627b503d';
 export const BASE = {
  ...DYNAMICS_DEFAULTS,...PARTICLE_DEFAULTS,engine:'solid',keepMotionSpeed:true,motionPeriod:0,
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -69,7 +69,7 @@ export const META = {
  volume:['Volume',.08,1.5,.01],stretchX:['Larghezza',.45,1.7,.01],stretchY:['Altezza',.45,1.7,.01],stretchZ:['Profondità',.45,1.7,.01],deform:['Deformazione',0,.75,.01],asymmetry:['Asimmetria',-.6,.6,.01],twist:['Torsione',-2.5,2.5,.01],waves:['Increspature',0,.4,.01],waveScale:['Frequenza onde',1,9,.1],hole:['Apertura del vuoto',0,.95,.01],holeX:['Vuoto · orizzontale',-.8,.8,.01],holeY:['Vuoto · verticale',-.8,.8,.01],holeShape:['Vuoto · rotondo / quadrato',0,1,.01],cut:['Dimensione del ritaglio',0,1.6,.01],cutX:['Ritaglio · orizzontale',-1.4,1.4,.01],cutY:['Ritaglio · verticale',-1.4,1.4,.01],edge:['Contorno sfumato',0,.45,.005],
  transparency:['Trasparenza',0,1,.01],refraction:['Rifrazione',1,2.4,.01],thickness:['Spessore ottico',0,2,.01],metal:['Metallicità',0,1,.01],roughness:['Rugosità',0,1,.01],gloss:['Lucentezza',0,1,.01],iridescence:['Iridescenza',0,1,.01],emission:['Emissione',0,1,.01],gradientAngle:['Direzione gradiente',-180,180,1],gradientScale:['Distribuzione colori',.2,3,.01],gradientOffset:['Posizione colori',0,1,.01],colorSoftness:['Fusione dei colori',0,3,.01],glow:['Diffusione luminosa',0,1,.01],grain:['Grana',0,.2,.005],
  lightAngle:['Angolo orizzontale',-180,180,1],lightHeight:['Altezza della luce',-85,85,1],lightPower:['Intensità',0,4,.01],lightSize:['Ampiezza riflesso',.05,1,.01],light2Angle:['Angolo orizzontale',-180,180,1],light2Height:['Altezza della luce',-85,85,1],light2Power:['Intensità',0,4,.01],light2Size:['Ampiezza riflesso',.05,1,.01],
- bgAngle:['Direzione sfondo',-180,180,1],scale:['Dimensione figura',.35,1.7,.01],positionX:['Posizione orizzontale',-1.5,1.5,.01],positionY:['Posizione verticale',-1.5,1.5,.01],rotateX:['Rotazione verticale',-180,180,1],rotateY:['Rotazione orizzontale',-180,180,1],motion:['Intensità delle oscillazioni',0,1,.01],duration:['Durata di base (secondi)',2,300,.5],speed:['Velocità globale',.25,2,.05]
+ bgAngle:['Direzione sfondo',-180,180,1],scale:['Dimensione figura',.22,4.5,.01],positionX:['Posizione orizzontale',-1.5,1.5,.01],positionY:['Posizione verticale',-1.5,1.5,.01],rotateX:['Rotazione verticale',-180,180,1],rotateY:['Rotazione orizzontale',-180,180,1],motion:['Intensità delle oscillazioni',0,1,.01],duration:['Durata di base (secondi)',2,300,.5],speed:['Velocità globale',.25,2,.05]
 };
 export const GROUPS={
  shape:['baseForm',...STRUCTURE_GROUPS.shape,'volume','stretchX','stretchY','stretchZ','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','cut','cutX','cutY','edge','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','holeAspect','cutAspect'],
@@ -118,6 +118,8 @@ GROUPS.photo=GROUPS.photo.filter(k=>!GROUPS.tone.includes(k));
 
 GROUPS.material.push(...Object.keys(GROWTH_DEFAULTS).filter(k=>!['growthFlow','growthCycles'].includes(k)));GROUPS.motion.push('growthFlow','growthCycles');
 
+Object.assign(META,{focusBlur:['Sfocatura fuori fuoco',0,1,.01],focusDepth:['Piano di fuoco',-3,4,.01]});
+GROUPS.background.push('focusBlur','focusDepth');
 GROUPS.motion.push('keepMotionSpeed','motionPeriod');
 
 Object.assign(META,DYNAMICS_META);GROUPS.motion.push(...Object.keys(DYNAMICS_DEFAULTS));
