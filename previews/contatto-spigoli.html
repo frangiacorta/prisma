@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="it">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contatto tra spigoli · Prisma Studio</title>
+<style>
+:root{color-scheme:dark}body{margin:0;background:#111319;color:#e4e8f1;font:16px/1.55 system-ui}main{max-width:960px;margin:auto;padding:20px}h1{font-size:clamp(1.55rem,5vw,2.4rem);margin:.3em 0}h2{font-size:1.15rem;margin:24px 0 8px}p{max-width:66ch}a{color:#d3f6a8}nav{display:flex;flex-wrap:wrap;gap:8px 18px;margin:14px 0 20px}video,img{display:block;width:100%;height:auto;background:#080a12;border-radius:8px}.pair{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,242px),1fr))}figure{margin:0}figcaption{margin-top:5px;color:#c0c8d4}
+</style>
+<main>
+ <h1>Contatto tra spigoli</h1>
+ <p>Quando due pieghe lontane nel reticolo si incontrano a metà bordo, il contatto distribuisce la correzione sulle due pieghe. I confronti usano lo stesso preset e la stessa fase del movimento.</p>
+ <nav><a href="../?engine=particles&v=83">Apri Particelle</a><a href="../moodboard/?view=board#project-living-extensions">Scheda e riferimenti</a></nav>
+ <video src="contatto-spigoli.mp4" poster="spigoli-membrana-dopo.webp" controls muted loop playsinline preload="metadata" width="512" height="288" aria-label="Ciclo di quattro secondi di una membrana con contatto tra pieghe"></video>
+ <h2>Membrana</h2>
+ <div class="pair">
+  <figure><img src="spigoli-membrana-prima.webp" width="512" height="288" alt="Membrana con i contatti di Prisma v82"><figcaption>Prisma v82</figcaption></figure>
+  <figure><img src="spigoli-membrana-dopo.webp" width="512" height="288" alt="Stessa posa della membrana con contatto tra spigoli"><figcaption>Prisma v83</figcaption></figure>
+ </div>
+ <p><a href="spigoli-membrana.prisma.json" download>Scarica preset Membrana</a></p>
+ <h2>Tessuto</h2>
+ <div class="pair">
+  <figure><img src="spigoli-tessuto-prima.webp" width="512" height="288" alt="Tessuto con i contatti di Prisma v82"><figcaption>Prisma v82</figcaption></figure>
+  <figure><img src="spigoli-tessuto-dopo.webp" width="512" height="288" alt="Stessa posa del tessuto con contatto tra spigoli"><figcaption>Prisma v83</figcaption></figure>
+ </div>
+ <p><a href="spigoli-tessuto.prisma.json" download>Scarica preset Tessuto</a></p>
+ <h2>Dettaglio di un incrocio</h2>
+ <figure><img src="spigoli-incrocio.webp" width="768" height="288" alt="Due spigoli in contatto passano da un incrocio a distanza zero a una separazione di 0,45 unità"><figcaption>Prova con due spigoli isolati. La distanza misurata al centro passa da 0 a 0,45 unità.</figcaption></figure>
+ <p>In modalità Esperto, apri <strong>Movimento → Animazioni → Vincoli di distanza e flessione</strong> e regola <strong>Contatto tra pieghe</strong> e <strong>Distanza di contatto</strong>.</p>
+</main>
+</html>

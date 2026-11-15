@@ -1,7 +1,7 @@
-import {AUDIO_HELP} from './audio-model.js?v=059b95afd26a';
-import {EXTRA_HELP} from './control-help-extra.js?v=059b95afd26a';
-import {FRACTAL_HELP} from './fractal-form.js?v=059b95afd26a';
-import {CELLULAR_HELP} from './cellular-form.js?v=059b95afd26a';
+import {AUDIO_HELP} from './audio-model.js?v=95fdb8cbe5aa';
+import {EXTRA_HELP} from './control-help-extra.js?v=95fdb8cbe5aa';
+import {FRACTAL_HELP} from './fractal-form.js?v=95fdb8cbe5aa';
+import {CELLULAR_HELP} from './cellular-form.js?v=95fdb8cbe5aa';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',

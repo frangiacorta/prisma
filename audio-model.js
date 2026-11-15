@@ -1,4 +1,4 @@
-import {META} from './model.js?v=059b95afd26a';
+import {META} from './model.js?v=95fdb8cbe5aa';
 
 export const AUDIO_BANDS = {all:'Volume',low:'Bassi',mid:'Medi',high:'Alti',peak:'Picchi',onset:'Impulsi',brightness:'Brillantezza',texture:'Rumorosità',beat:'Ritmo'};
 export const AUDIO_META = {

@@ -1,4 +1,4 @@
-import {projectTension} from './vendor/xpbd/distance.js?v=059b95afd26a';
+import {projectTension} from './vendor/xpbd/distance.js?v=95fdb8cbe5aa';
 
 function contactCell(x,y,z){
  const stride=262144,limit=stride/2;
@@ -111,6 +111,185 @@ export function separateLivingFaces(topology,positions,amount,clearance=.65){
   }else for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++)for(let z=z0;z<=z1;z++)buckets.get(contactCell(x,y,z))?.forEach(contact);
  }
  for(let i=0;i<vertices;i++)if(visits[i])for(let axis=0;axis<3;axis++)positions[i*3+axis]+=corrections[i*3+axis]/visits[i];
+}
+
+function surfaceEdges(topology,vertices){
+ const unique=new Set(),segments=[];
+ const {triangles,columns}=topology;
+ for(let i=0;i<triangles.length;i+=3){
+  for(let j=0;j<3;j++){
+   const a=Math.min(triangles[i+j],triangles[i+(j+1)%3]),b=Math.max(triangles[i+j],triangles[i+(j+1)%3]);
+   const key=a*vertices+b;
+   if(a===b||unique.has(key))continue;
+   unique.add(key);
+   segments.push({a:a*3,b:b*3,row:Math.floor(a/columns),column:a%columns,tail:b>=vertices-columns});
+  }
+ }
+ return segments;
+}
+
+const unitInterval=x=>Math.max(0,Math.min(1,x));
+
+function edgeCorrection(p,rest,corrections,visits,left,right,gap,amount){
+ const {a,b}=left,{a:c,b:d}=right;
+ const ux=p[b]-p[a],uy=p[b+1]-p[a+1],uz=p[b+2]-p[a+2];
+ const vx=p[d]-p[c],vy=p[d+1]-p[c+1],vz=p[d+2]-p[c+2];
+ const wx=p[a]-p[c],wy=p[a+1]-p[c+1],wz=p[a+2]-p[c+2];
+ const uu=ux*ux+uy*uy+uz*uz,vv=vx*vx+vy*vy+vz*vz;
+ if(Math.min(uu,vv)<1e-12)return false;
+ const uv=ux*vx+uy*vy+uz*vz,uw=ux*wx+uy*wy+uz*wz,vw=vx*wx+vy*wy+vz*wz;
+ const determinant=uu*vv-uv*uv;
+ let s;
+ if(determinant>uu*vv*1e-6)s=unitInterval((uv*vw-vv*uw)/determinant);
+ else{
+  // Centre a parallel contact inside the overlap so each edge shares the load.
+  const first=-uw/uu,last=first+uv/uu;
+  s=(unitInterval(Math.min(first,last))+unitInterval(Math.max(first,last)))*.5;
+ }
+ const t=(vw+s*uv)/vv;
+ // Vertex contacts already handle the endpoints. This pass acts between edges.
+ if(s<=0||s>=1||t<=0||t>=1)return false;
+ const dx=wx+s*ux-t*vx,dy=wy+s*uy-t*vy,dz=wz+s*uz-t*vz,distance2=dx*dx+dy*dy+dz*dz;
+ if(distance2>=gap*gap)return false;
+ const rx=rest[a]*(1-s)+rest[b]*s-rest[c]*(1-t)-rest[d]*t;
+ const ry=rest[a+1]*(1-s)+rest[b+1]*s-rest[c+1]*(1-t)-rest[d+1]*t;
+ const rz=rest[a+2]*(1-s)+rest[b+2]*s-rest[c+2]*(1-t)-rest[d+2]*t;
+ const threshold=Math.min(gap,Math.hypot(rx,ry,rz)*.45),distance=Math.sqrt(distance2);
+ if(threshold<1e-6||distance>=threshold)return false;
+ let nx=0,ny=0,nz=0;
+ const blend=unitInterval(distance/(threshold*.4));
+ if(blend<1){
+  // At a crossing the closest points coincide. The rest shape supplies a
+  // consistent side and the blend avoids a full-strength sign flip.
+  if(determinant>uu*vv*1e-6){
+   nx=uy*vz-uz*vy;ny=uz*vx-ux*vz;nz=ux*vy-uy*vx;
+   if(nx*rx+ny*ry+nz*rz<0){nx=-nx;ny=-ny;nz=-nz;}
+  }else{
+   const along=(rx*ux+ry*uy+rz*uz)/uu;
+   nx=rx-along*ux;ny=ry-along*uy;nz=rz-along*uz;
+   if(nx*nx+ny*ny+nz*nz<1e-12){
+    if(Math.abs(ux)>Math.abs(uz)){nx=-uy;ny=ux;nz=0;}
+    else{nx=0;ny=uz;nz=-uy;}
+   }
+  }
+  const weight=(1-blend)/Math.hypot(nx,ny,nz);
+  nx*=weight;ny*=weight;nz*=weight;
+ }
+ const weight=distance>1e-10?blend/distance:0;
+ nx+=dx*weight;ny+=dy*weight;nz+=dz*weight;
+ const aWeight=1-s,bWeight=s,cWeight=1-t,dWeight=t;
+ const move=(threshold-distance)*amount/(aWeight*aWeight+bWeight*bWeight+cWeight*cWeight+dWeight*dWeight);
+ for(let k=0;k<3;k++){
+  const shift=(k===0?nx:k===1?ny:nz)*move;
+  corrections[a+k]+=shift*aWeight;corrections[b+k]+=shift*bWeight;
+  corrections[c+k]-=shift*cWeight;corrections[d+k]-=shift*dWeight;
+ }
+ if(aWeight>0)visits[a/3]++;
+ if(bWeight>0)visits[b/3]++;
+ if(cWeight>0)visits[c/3]++;
+ if(dWeight>0)visits[d/3]++;
+ return true;
+}
+
+export function separateLivingEdges(topology,positions,amount,clearance=.65,weldStart=true){
+ if(!(amount>0&&clearance>0))return 0;
+ const {columns,restPositions,contactScale}=topology,vertices=positions.length/3;
+ const neighborhood=topology.edgeNeighborhood??2;
+ const gap=contactScale*clearance,padding=gap*.5,cell=Math.max(gap,contactScale*.85);
+ const edges=topology.contactEdges??=surfaceEdges(topology,vertices);
+ const corrections=topology.contactCorrections??=new Float32Array(positions.length);
+ const visits=topology.contactVisits??=new Uint16Array(vertices);
+ const seen=topology.edgeContactSeen??=new Uint32Array(edges.length);
+ const bounds=topology.edgeContactBounds??=new Float64Array(edges.length*6);
+ const buckets=new Map(),wide=[],inserted=[];
+ corrections.fill(0);visits.fill(0);seen.fill(0);
+ let count=0;
+ for(let i=0;i<edges.length;i++){
+  const left=edges[i],{a,b}=left;
+  // Leave all segments attached to a welded pole to the existing constraints.
+  if(left.tail||(weldStart&&left.row===0))continue;
+  const dx=positions[a]-positions[b],dy=positions[a+1]-positions[b+1],dz=positions[a+2]-positions[b+2];
+  if(dx*dx+dy*dy+dz*dz<1e-12)continue;
+  const x0=Math.min(positions[a],positions[b])-padding,x1=Math.max(positions[a],positions[b])+padding;
+  const y0=Math.min(positions[a+1],positions[b+1])-padding,y1=Math.max(positions[a+1],positions[b+1])+padding;
+  const z0=Math.min(positions[a+2],positions[b+2])-padding,z1=Math.max(positions[a+2],positions[b+2])+padding;
+  const offset=i*6;
+  bounds[offset]=x0;bounds[offset+1]=x1;bounds[offset+2]=y0;bounds[offset+3]=y1;bounds[offset+4]=z0;bounds[offset+5]=z1;
+  const span=Math.max(Math.abs(dx),Math.abs(dy),Math.abs(dz));
+  const parts=Math.max(1,Math.ceil(span/(2*cell)));
+  const test=j=>{
+   if(seen[j]===i+1)return;
+   seen[j]=i+1;
+   const offset=j*6;
+   if(x0>bounds[offset+1]||x1<bounds[offset]||y0>bounds[offset+3]||y1<bounds[offset+2]||z0>bounds[offset+5]||z1<bounds[offset+4])return;
+   const right=edges[j],u=Math.abs(left.column-right.column);
+   if(Math.min(u,columns-u)<=neighborhood&&Math.abs(left.row-right.row)<=neighborhood)return;
+   if(edgeCorrection(positions,restPositions,corrections,visits,left,right,gap,amount))count++;
+  };
+  if(parts>128){
+   // Keep exceptional spans out of the grid without dropping their contacts.
+   for(const j of inserted)test(j);
+   wide.push(i);
+  }else{
+   for(const j of wide)test(j);
+   // Follow long diagonals in pieces so their boxes stay close to the edge.
+   let px=positions[a],py=positions[a+1],pz=positions[a+2];
+   for(let k=1;k<=parts;k++){
+    const t=k/parts,qx=positions[a]-dx*t,qy=positions[a+1]-dy*t,qz=positions[a+2]-dz*t;
+    const gx=Math.floor((Math.min(px,qx)-padding)/cell),endX=Math.floor((Math.max(px,qx)+padding)/cell);
+    const gy=Math.floor((Math.min(py,qy)-padding)/cell),endY=Math.floor((Math.max(py,qy)+padding)/cell);
+    const gz=Math.floor((Math.min(pz,qz)-padding)/cell),endZ=Math.floor((Math.max(pz,qz)+padding)/cell);
+    for(let x=gx;x<=endX;x++)for(let y=gy;y<=endY;y++)for(let z=gz;z<=endZ;z++){
+     const key=contactCell(x,y,z),bucket=buckets.get(key);
+     if(!bucket)buckets.set(key,[i]);
+     else if(bucket[bucket.length-1]!==i){for(const j of bucket)test(j);bucket.push(i);}
+    }
+    px=qx;py=qy;pz=qz;
+   }
+  }
+  inserted.push(i);
+ }
+ for(let i=0;i<vertices;i++)if(visits[i])for(let axis=0;axis<3;axis++)positions[i*3+axis]+=corrections[i*3+axis]/visits[i];
+ return count;
+}
+
+export function separateLivingSurfaceEdges(topology,positions,amount,clearance,weldStart){
+ if(!(amount>0&&clearance>0))return 0;
+ const {columns,rows,restPositions,contactScale}=topology;
+ if(columns%2!==0||rows%2!==1||columns<32||rows<25)return separateLivingEdges(topology,positions,amount,clearance,weldStart);
+ // Solve edge pairs on a coarser copy. Vertex and face contacts still use the
+ // fine mesh, and the displacement is spread across it without changing its tessellation.
+ const cols=columns/2,lines=(rows+1)/2,size=cols*lines*3;
+ const mesh=topology.edgeContactMesh??={grid:makeLivingTopology(cols,lines,3),before:new Float32Array(size),after:new Float32Array(size)};
+ const {grid,before,after}=mesh;
+ const gather=(source,target)=>{
+  for(let y=0;y<lines;y++)for(let x=0;x<cols;x++){
+   const src=(y*columns+x)*6,dst=(y*cols+x)*3;
+   for(let axis=0;axis<3;axis++)target[dst+axis]=source[src+axis];
+  }
+ };
+ if(mesh.restSource!==restPositions){
+  grid.restPositions??=new Float32Array(size);
+  gather(restPositions,grid.restPositions);mesh.restSource=restPositions;
+ }
+ grid.contactScale=contactScale;grid.edgeNeighborhood=1;
+ gather(positions,before);after.set(before);
+ const contacts=separateLivingEdges(grid,after,amount,clearance,weldStart);
+ if(!contacts)return 0;
+ for(let i=0;i<size;i++)after[i]-=before[i];
+ for(let y=0;y<rows;y++){
+  if((weldStart&&y===0)||y===rows-1)continue;
+  const top=Math.floor(y/2),bottom=Math.min(lines-1,top+1),mixY=(y%2)*.5;
+  for(let x=0;x<columns;x++){
+   const left=Math.floor(x/2),right=(left+1)%cols,mixX=(x%2)*.5;
+   const a=(top*cols+left)*3,b=(top*cols+right)*3,c=(bottom*cols+left)*3,d=(bottom*cols+right)*3;
+   for(let axis=0;axis<3;axis++){
+    const upper=after[a+axis]*(1-mixX)+after[b+axis]*mixX,lower=after[c+axis]*(1-mixX)+after[d+axis]*mixX;
+    positions[(y*columns+x)*3+axis]+=upper*(1-mixY)+lower*mixY;
+   }
+  }
+ }
+ return contacts;
 }
 // Signed tetrahedra around the centroid, with virtual end caps for open skins.
 export function livingVolume(t,p){

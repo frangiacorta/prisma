@@ -1,13 +1,13 @@
-import {Dynamics,disposeDynamics} from './dynamics.js?v=059b95afd26a';
-import {motionPeriod} from './animation-clock.js?v=059b95afd26a';
-import {animationPhase} from './animation-clock.js?v=059b95afd26a';
-import {ScanlinePass} from './finish-scanlines.js?v=059b95afd26a';
-import {FilamentPass} from './filament-renderer.js?v=059b95afd26a';
-import {VeilTransition} from './veil-transition.js?v=059b95afd26a';
-import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=059b95afd26a';
-import {ParticleRenderer} from './particle-renderer.js?v=059b95afd26a';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=059b95afd26a';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=059b95afd26a';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=95fdb8cbe5aa';
+import {motionPeriod} from './animation-clock.js?v=95fdb8cbe5aa';
+import {animationPhase} from './animation-clock.js?v=95fdb8cbe5aa';
+import {ScanlinePass} from './finish-scanlines.js?v=95fdb8cbe5aa';
+import {FilamentPass} from './filament-renderer.js?v=95fdb8cbe5aa';
+import {VeilTransition} from './veil-transition.js?v=95fdb8cbe5aa';
+import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=95fdb8cbe5aa';
+import {ParticleRenderer} from './particle-renderer.js?v=95fdb8cbe5aa';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=95fdb8cbe5aa';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=95fdb8cbe5aa';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }

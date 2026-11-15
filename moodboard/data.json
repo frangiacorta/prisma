@@ -15589,9 +15589,28 @@
       "state": "partial",
       "priority": false,
       "author": "",
-      "summary": "Dinamica elastica condivisa da Forme e Particelle: inerzia, gravità, vento, ancoraggio e contatti con piano e ostacoli. Restano da sviluppare le collisioni fra singoli elementi e le altre estensioni.",
+      "summary": "Nel tessuto e nelle membrane, il contatto tra pieghe agisce anche lungo gli spigoli del reticolo. La dinamica elastica comprende gravità, vento, ancoraggio e contatti con il piano e gli ostacoli.",
       "sources": [],
       "sections": [
+        {
+          "title": "Verifica v83",
+          "fields": [
+            {
+              "label": "implemented",
+              "value": [
+                "Il contatto tra pieghe rileva anche quando due spigoli del reticolo si avvicinano a metà bordo. Il margine e la forza usano i cursori già presenti.",
+                "Confronto fotogramma a fotogramma su tessuto e membrana. Prova con incrocio a 90°, spigoli paralleli e bordo aperto.",
+                "I contatti fra spigoli usano una griglia 32 × 25 e distribuiscono le correzioni sulla superficie 64 × 49. I contatti fra vertici e facce lavorano sulla griglia della superficie."
+              ]
+            },
+            {
+              "label": "remaining",
+              "value": [
+                "Contatti tra fili o granelli singoli e distacco dalla pelle."
+              ]
+            }
+          ]
+        },
         {
           "title": "Verifica v79",
           "fields": [
@@ -15661,15 +15680,20 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "Dinamica elastica del volume condivisa",
-      "where": "Movimento → Vincoli di distanza e flessione → Contatto tra pieghe",
+      "where": "Particelle → Movimento → Animazioni → Vincoli di distanza e flessione → Contatto tra pieghe",
       "platform": "",
-      "next": "Restano il contatto tra spigoli, i contatti tra fili o granelli e il distacco dalla pelle.",
+      "next": "Contatti tra fili o granelli singoli e distacco dalla pelle.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
         "reference/creative-roadmap.json"
       ],
       "media": [
+        {
+          "src": "media/v83-contatto-spigoli.webp",
+          "width": 512,
+          "height": 288
+        },
         {
           "src": "media/v79-contatti.webp",
           "width": 480,
@@ -15697,10 +15721,11 @@
         "surfaces"
       ],
       "category": "form",
-      "resultUrl": "../previews/pennello-e-rami.html?v=79",
+      "resultUrl": "../previews/contatto-spigoli.html?v=83",
       "addedOn": "2026-10-10",
       "engine": "particles",
-      "resultImage": "media/v79-contatti.webp"
+      "resultImage": "media/v83-contatto-spigoli.webp",
+      "resultVideo": "../previews/contatto-spigoli.mp4"
     },
     {
       "id": "roadmap-filament-planets",

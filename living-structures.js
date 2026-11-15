@@ -1,5 +1,5 @@
-import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume,separateLivingContacts,separateLivingFaces} from './living-topology.js?v=059b95afd26a';
-import {excludeForcePositions} from './particle-forces.js?v=059b95afd26a';
+import {makeLivingTopology,setLivingRest,relaxLiving,preserveLivingVolume,separateLivingContacts,separateLivingFaces,separateLivingSurfaceEdges} from './living-topology.js?v=95fdb8cbe5aa';
+import {excludeForcePositions} from './particle-forces.js?v=95fdb8cbe5aa';
 
 const controls=`uniform vec4 uLivingShape,uLivingFold;uniform float uLivingMode;
 uniform float uBundleAmount;uniform vec3 uLivingMotion,uSkinFit;uniform int uSkinSamples;`;
@@ -159,7 +159,10 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
   this.prepare(s);const gl=this.gl,o=this.owner,t=this.topology;
   this.positions=relaxLiving(t,this.capturePositions(s,phase),s.pElastic,s.pBend);
   separateLivingContacts(t,this.positions,s.pSelfContact);
-  if(s.pLiving!==1||s.pSkin>0)separateLivingFaces(t,this.positions,s.pSelfContact,s.pContactClearance);
+  if(s.pLiving!==1||s.pSkin>0){
+   separateLivingFaces(t,this.positions,s.pSelfContact,s.pContactClearance);
+   separateLivingSurfaceEdges(t,this.positions,s.pSelfContact,s.pContactClearance,s.pSkinOpening===0);
+  }
   // Weld the polar vertices after relaxation: a closed end must stay closed.
   for(const row of (s.pSkinOpening===0?[0,t.rows-1]:[t.rows-1])){const mean=[0,0,0];for(let x=0;x<t.columns;x++)for(let k=0;k<3;k++)mean[k]+=this.positions[(row*t.columns+x)*3+k]/t.columns;for(let x=0;x<t.columns;x++)this.positions.set(mean,(row*t.columns+x)*3);}
   preserveLivingVolume(t,this.positions,s.pVolumeHold);
