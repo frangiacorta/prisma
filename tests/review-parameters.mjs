@@ -37,6 +37,9 @@ try{
   const link={...solid,sceneGrains:.9,pCount:3800,pSize:2,pOpacity:.19,pLinks:.69,pTrailCount:0,pLinkNodes:130,pLinkNeighbors:2,pLinkReach:1,pLinkCurve:.17,pLinkSurface:1,pLinkWidth:2};
   const glyph={...solid,finishGlyph:true,finishGlyphCell:18,finishGlyphMix:1,finishGlyphSource:true,finishGlyphSeed:334};
   const cavity={...p,transparency:.86,thinShell:0,absorption:.63,tintStrength:.79,refraction:1.64,gloss:.9,wallThickness:.11,scattering:.27,pCount:6400,pSize:13,pOpacity:.36};
+  const continuous={...p,engine:'solid',sceneGrains:.88,grainSource:'body',pVolumeContinuity:1,pVolumeTurbulence:.63,pCount:0,scattering:.8,pVolumeShadow:.8,pFill:.61};
+  const reaction={...solid,growthAmount:1,growthExtrusion:.5,growthOpening:.91,growthCoverage:.86,growthScale:.74,structShell:1,structThickness:.15};
+  const sprout={...weave,structDensity:7,structWeaveVariation:.8,structWeaveNodes:.8,scale:1.35};
   const denseTrails={...trails,pTrailCount:5500,pTrailLength:.62,pTrailPersistence:.79,pOpacity:.51};
   const cases=[
    ['Dispersione',glass,'dispersion',0,1],
@@ -59,6 +62,16 @@ try{
    ['Irregolarità del reticolo',weave,'structWeaveVariation',0,1],
    ['Rilievo alle giunzioni',weave,'structWeaveNodes',0,1],
    ['Giri dei fili',link,'pLinkTurns',0,2],
+   ['Da granelli a volume',continuous,'pVolumeContinuity',0,1],
+   ['Turbolenza della densità',continuous,'pVolumeTurbulence',0,1],
+   ['Reticolo luminoso nella densità',continuous,'pVolumeFilaments',0,1],
+   ['Da orbita a linea',trails,'pTrailStraighten',0,1],
+   ['Steli nel reticolo',sprout,'structWeaveGrowth',0,1],
+   ['Coppe nel reticolo',{...sprout,structWeaveGrowth:1},'structWeaveCup',0,1],
+   ['Dalla sfera alle lamine',{...solid,structThickness:.11,stretchY:1.2},'structFan',0,1],
+   ['Fori della trama',reaction,'growthOpening',0,1],
+   ['Estrusione della trama',{...reaction,sceneGrains:.64,pCount:9000,pTrailCount:0},'growthExtrusion',0,1],
+   ['Densità sopra 300.000',{...p,pSize:.58,pOpacity:.16,pTrailCount:0},'pCount',300000,2000000],
    ['Mescola font',{...glyph,finishGlyphFont:0},'finishGlyphFontRandom',0,1]
   ];
   const r=new Renderer(document.createElement('canvas')),results=[];

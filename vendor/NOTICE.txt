@@ -18,3 +18,6 @@ Originals, fixed commit and license: meyda/NOTICE.txt and meyda/LICENSE.md.
 
 Particle Hero (MIT, Danny Stuart): 3D adaptation of nearest-neighbour connections.
 Original, license and modifications: particle-hero/NOTICE.txt and particle-hero/LICENSE.
+
+webgl-noise (MIT, Ian McEwan, Ashima Arts, Stefan Gustavson): 3D simplex noise.
+Pinned upstream path and license: webgl-noise/NOTICE.txt and webgl-noise/LICENSE.

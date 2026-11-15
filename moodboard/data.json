@@ -14304,7 +14304,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Forma → Strati e Granelli · Materiale → Diffusione interna",
+      "where": "Forma → Strati · Materiale → Volume dei granelli",
       "platform": "",
       "next": "Verificare la qualità e le prestazioni su un telefono reale, soprattutto nelle nubi più fitte.",
       "keep": "",
@@ -14344,7 +14344,7 @@
       "resultImage": "../previews/volume-denso.webp",
       "resultUrl": "../previews/verifica-visiva.html#volume-denso",
       "resultVideo": "../previews/volume-denso.mp4",
-      "compareNote": "Il volume dei granelli forma una cavità centrale. Palette e luci distinguono il lato chiaro a sinistra dal rosso a destra. La trama resta più granulare della fonte.",
+      "compareNote": "Densità 3D continua, ombre interne e volute attraversano il profilo della forma. La cavità e la diffusione del rosso restano diverse dalla fonte.",
       "comparisonRef": "s09-01",
       "comparisonDate": "2026-11-15",
       "resultPreset": "previews/volume-denso.prisma.json",
@@ -14622,7 +14622,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "fibre-vive",
-      "where": "Forma → Costruzione e Reticolo di fibre · Movimento → Animazioni",
+      "where": "Forma → Suddivisione radiale e strati · Movimento → Posa",
       "platform": "",
       "next": "",
       "keep": "",
@@ -14697,7 +14697,7 @@
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
-      "compareNote": "Studio della variante con lobi perlacei. Spessore, piegatura, saturazione e densità delle linee sono modificabili nel preset.",
+      "compareNote": "Lamine curve sovrapposte con piegatura e luce trasmessa. Le ondulazioni e la trama delle fibre si discostano dal movimento della fonte.",
       "comparisonRef": "s06-01",
       "comparisonDate": "2026-11-15",
       "resultPreset": "previews/velo-fibre.prisma.json",
@@ -14862,7 +14862,7 @@
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/reticolo-giunzioni.prisma.json",
-      "compareNote": "Trama curva, pori irregolari e giunzioni in rilievo, visti da vicino. La crescita in steli e le coppe della reference restano da riprodurre.",
+      "compareNote": "Pori irregolari, steli curvi e coppe concave crescono dalle stesse giunzioni. La trama fra gli steli rimane più rada della fonte.",
       "comparisonRef": "s07-05",
       "comparisonDate": "2026-11-15",
       "comparisonOutcome": "parziale"
@@ -16624,7 +16624,7 @@
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/lamelle-asimmetriche.prisma.json",
-      "compareNote": "Pochi lobi disuguali, contorni sottili e nucleo scuro. La posa delle lamelle resta modificabile partendo dalla sfera.",
+      "compareNote": "Lamine sovrapposte, pigmento vicino al nucleo scuro e margini curvi. Le aperture fra i lobi e la piega dei bordi restano diverse dalla fonte.",
       "comparisonRef": "s17-01",
       "comparisonDate": "2026-11-15",
       "comparisonOutcome": "parziale"
@@ -16646,7 +16646,8 @@
       "summary": "Stessa spirale modulabile in resa luminosa o grafica, con cavità facoltativa e pennacchi coerenti.",
       "sources": [
         "https://linktr.ee/Rembagram",
-        "https://www.patreon.com/posts/touchdesigner-113546237"
+        "https://www.patreon.com/posts/touchdesigner-113546237",
+        "https://boosty.to/incrprl/posts/65f922ff-fa2e-41b1-b302-90c8718007e3"
       ],
       "sections": [
         {
@@ -16732,7 +16733,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Forma → Scie e Fasci esterni · Movimento → Orbite",
+      "where": "Materiale → Volume dei granelli · Movimento → Pulsazione",
       "platform": "",
       "next": "Restano flare indipendente e confronto dei lembi luminosi in movimento con le reference.",
       "keep": "",
@@ -16767,12 +16768,13 @@
       "engine": "particles",
       "resultImage": "../previews/ricircolo-luminoso.webp",
       "resultUrl": "../previews/verifica-visiva.html#ricircolo-luminoso",
-      "compareNote": "Ricircolo, scie ramificate e picchi lungo le fibre. La sorgente con ambiente filmato resta una prova a parte.",
+      "compareNote": "Ramificazioni nel volume e lampi che concentrano l’emissione. La distribuzione dei nodi e il ritmo restano diversi dalla fonte.",
       "comparisonRef": "s18-05",
       "comparisonDate": "2026-11-15",
       "resultPreset": "previews/ricircolo-luminoso.prisma.json",
       "resultVideo": "../previews/ricircolo-luminoso.mp4",
-      "comparisonOutcome": "parziale"
+      "comparisonOutcome": "parziale",
+      "comparisonSource": "https://boosty.to/incrprl/posts/65f922ff-fa2e-41b1-b302-90c8718007e3"
     },
     {
       "id": "roadmap-electric-filaments",
@@ -16960,7 +16962,7 @@
       "engine": "solid",
       "resultImage": "../previews/impulsi-sottili.webp",
       "resultUrl": "../previews/verifica-visiva.html#impulsi-sottili",
-      "compareNote": "Scie sottili con impulsi localizzati. Il preset consente di regolare separatamente durata, intensità, numero di rami e apertura.",
+      "compareNote": "Scie raddrizzate con impulsi localizzati e rotazione lungo il loop. Coda, intensità e ramificazione si regolano nello stesso preset.",
       "comparisonRef": "s18-02",
       "comparisonDate": "2026-11-15",
       "resultPreset": "previews/impulsi-sottili.prisma.json",
@@ -17218,7 +17220,7 @@
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/trama-nebulosa.prisma.json",
-      "compareNote": "Nube chiara in ricircolo con legami e variazione del diametro. Il riferimento documenta una quantità di granelli maggiore.",
+      "compareNote": "Due milioni di granelli nel render. Il ricircolo, il diametro e la rete dei collegamenti sono regolabili. La densità lungo il bordo differisce dalla fonte.",
       "comparisonOutcome": "parziale",
       "comparisonRef": "img-20261010-02",
       "comparisonDate": "2026-11-15"
@@ -19425,14 +19427,14 @@
       ],
       "category": "filters",
       "addedOn": "2026-10-10",
-      "compareNote": "Il preset conserva ordine, maschera rettangolare e intensità di quattro filtri.",
+      "compareNote": "Mosaico a pixel netti e spostamenti a bande, applicati in tre riquadri della forma. L’ordine e le dimensioni si salvano con il preset.",
       "comparisonOutcome": "funzionale",
       "comparisonRef": "img-s16-mosaic",
       "comparisonDate": "2026-11-15",
-      "resultPreset": "previews/segni-mosaico.prisma.json",
-      "resultImage": "../previews/segni-mosaico.webp",
-      "resultVideo": "../previews/segni-mosaico.mp4",
-      "resultUrl": "../previews/verifica-visiva.html#segni-mosaico"
+      "resultPreset": "previews/mosaico-finestre.prisma.json",
+      "resultImage": "../previews/mosaico-finestre.webp",
+      "resultVideo": "../previews/mosaico-finestre.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#mosaico-finestre"
     },
     {
       "id": "img-s18-form-vision",

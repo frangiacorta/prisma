@@ -1,18 +1,19 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=0b52b3909b22';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=0b52b3909b22';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=0b52b3909b22';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=0b52b3909b22';
-import {shadowLight} from './particle-shadow.js?v=0b52b3909b22';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=0b52b3909b22';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=0b52b3909b22';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=0b52b3909b22';
-import {ParticleLinks} from './particle-links.js?v=0b52b3909b22';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=0b52b3909b22';
-import {LayeredVeils} from './layered-veils.js?v=0b52b3909b22';
-import {LivingStructures} from './living-structures.js?v=0b52b3909b22';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=0b52b3909b22';
-import {forceBarrierGLSL} from './particle-forces.js?v=0b52b3909b22';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=0b52b3909b22';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=9d07961f209b';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=9d07961f209b';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=9d07961f209b';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=9d07961f209b';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=9d07961f209b';
+import {shadowLight} from './particle-shadow.js?v=9d07961f209b';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=9d07961f209b';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=9d07961f209b';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=9d07961f209b';
+import {ParticleLinks} from './particle-links.js?v=9d07961f209b';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=9d07961f209b';
+import {LayeredVeils} from './layered-veils.js?v=9d07961f209b';
+import {LivingStructures} from './living-structures.js?v=9d07961f209b';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=9d07961f209b';
+import {forceBarrierGLSL} from './particle-forces.js?v=9d07961f209b';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=9d07961f209b';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec2 uFocus;
 float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
@@ -21,17 +22,41 @@ const grainGLSL=`${common}\n${livingAttachmentGLSL}\n${grainSizingGLSL}`;
 const trailSampling=`
 uniform sampler2D uSeeds;uniform int uBatchStart,uSegments;
 uniform vec4 uFiber;
+uniform float uTrailLine;
 vec4 seedAt(int i){return texelFetch(uSeeds,ivec2(i%1024,i/1024),0);}
 vec4 fiberSeed(vec4 r){r.w=fract(r.w+uTail.w*.618);r.zw=mix(r.zw,vec2(.5),uFiber.z);return r;}
+vec3 trailPosition(int j,vec4 seed){
+ float age=float(j)/float(uSegments),phase=uPhase-age*uTrails.x;
+ if(uTrailLine<=.00001)return position(seed,phase);
+ float x=(age-.5)*mix(.18,5.65,abs(uTrails.x))*sign(uTrails.x);
+ float timer=clockAt(uPhase*uClock.x),fibre=seed.x*TAU;
+ float envelope=.4+.6*sin(clamp(age,0.,1.)*TAU*.5);
+ float wiggle=sin(timer+fibre+x*9.)*.031+sin(fibre+floor(x*14.+.5)*2.1)*.009;
+ vec3 line=vec3(x,(seed.y-.5)*(.022+.17*(1.-uFiber.z))+wiggle*(.22+.78*uFlow.y)*envelope,(seed.z-.5)*.13);
+ line*=vec3(uForm.xy,max(.06,uForm.z*uForm.w));
+ if(uStudioPerspective>.5){line.yz=rot(-uRotation.x)*line.yz;line.xz=rot(-uRotation.y)*line.xz;line.xy=rot(-uRotation.z)*line.xy;}
+ else{line.xy=rot(uRotation.z)*line.xy;line.yz=rot(uRotation.x)*line.yz;line.xz=rot(uRotation.y)*line.xz;}
+ line=line*uFrame.x+vec3(uFrame.yz,0.);
+ line=constrainedDynamics(line,seed,phase);
+ return uTrailLine>=.99999?line:mix(position(seed,phase),line,uTrailLine);
+}
 `;
 const pointVert=`#version 300 es
 precision highp float;
 layout(location=0) in vec4 aRandom;
 ${grainGLSL}
 out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity,vCellLight;out vec2 vSpriteUV;uniform float uPointQuad;
-void main(){vec3 p=attachedPosition(aRandom,uPhase);gl_Position=project(p);
+uniform int uSeedOffset;
+void main(){
  int index=uPointQuad>.5?gl_InstanceID:gl_VertexID;
- float trueSize=grainDiameter(aRandom,index)*uResolution.y/1080.;
+ #ifdef GENERATED_GRAINS
+ index+=uSeedOffset;
+ vec4 seed=generatedGrain(index);
+ #else
+ vec4 seed=aRandom;
+ #endif
+ vec3 p=attachedPosition(seed,uPhase);gl_Position=project(p);
+ float trueSize=grainDiameter(seed,index)*uResolution.y/1080.;
  float px=trueSize+particleDefocus(p);
  vSpriteUV=vec2(0.);
  if(uPointQuad>.5){
@@ -41,7 +66,7 @@ void main(){vec3 p=attachedPosition(aRandom,uPhase);gl_Position=project(p);
   vSpriteUV=vec2(corner.x,-corner.y)*.5+.5;
  }
  gl_PointSize=clamp(px,2.,64.);
- vForceSeed=aRandom;vOpacity=uPoints.z*3.*min(1.,trueSize*trueSize/max(4.,px*px));vPosition=p;vColor=particleColor(aRandom,p);vCellLight=cellLightFactor(aRandom);
+ vForceSeed=seed;vOpacity=uPoints.z*3.*min(1.,trueSize*trueSize/max(4.,px*px));vPosition=p;vColor=particleColor(seed,p);vCellLight=cellLightFactor(seed);
 }`;
 const pointFrag=`#version 300 es
 precision highp float;
@@ -73,7 +98,7 @@ out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vForcePhase;out flo
 uniform vec2 uTrailPulse;
 uniform vec2 uTrailFork;
 uniform ivec2 uForkOrder;
-vec3 pathAt(int j,vec4 r,int row){return uBaked?texelFetch(uPaths,ivec2(j+1,row),0).xyz:position(r,uPhase-float(j)/float(uSegments)*uTrails.x);}
+vec3 pathAt(int j,vec4 r,int row){return uBaked?texelFetch(uPaths,ivec2(j+1,row),0).xyz:trailPosition(j,r);}
 vec3 forkPoint(float t,float split,float gain,vec4 seed,vec4 r,int row){
  float at=mix(split,1.,t*.8*gain)*float(uSegments);
  int index=int(floor(at));
@@ -128,7 +153,7 @@ precision highp float;precision highp sampler2D;
 ${common}
 ${trailSampling}
 out vec4 color;
-void main(){int row=int(gl_FragCoord.y),j=int(gl_FragCoord.x)-1;vec4 r=fiberSeed(seedAt(row+uBatchStart));color=vec4(position(r,uPhase-float(j)/float(uSegments)*uTrails.x),1.);}`;
+void main(){int row=int(gl_FragCoord.y),j=int(gl_FragCoord.x)-1;vec4 r=fiberSeed(seedAt(row+uBatchStart));color=vec4(trailPosition(j,r),1.);}`;
 const blurFrag=`#version 300 es
 precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage;uniform vec2 uStep;
 void main(){vec4 c=texture(uImage,uv)*.227027;c+=texture(uImage,uv+uStep*1.384615)*.316216;c+=texture(uImage,uv-uStep*1.384615)*.316216;c+=texture(uImage,uv+uStep*3.230769)*.070270;c+=texture(uImage,uv-uStep*3.230769)*.070270;color=c;}`;
@@ -138,6 +163,8 @@ uniform vec4 uGrade,uPhoto,uTone,uLens,uBg;uniform vec3 uBackground,uBackground2
 uniform float uBgShade;uniform vec2 uOutputSize;
 uniform highp sampler2D uStudioSurface;
 uniform float uStudioComposite,uStudioCamera;
+uniform highp sampler2D uMedium;
+uniform vec2 uMediumMix;
 ${volumeResolveGLSL}
 vec3 grade(vec3 c){c=(c*exp2(uGrade.x)+uGrade.y-.5)*uGrade.z+.5;float grey=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(grey),c,uGrade.w);c*=vec3(1.+uPhoto.x*.25,1.+uPhoto.y*.2,1.-uPhoto.x*.25);c+=uTone.x*pow(1.-clamp(c,0.,1.),vec3(2.))+uTone.y*pow(clamp(c,0.,1.),vec3(2.));return pow(max(c,0.),vec3(1./max(.1,uPhoto.z)));}
 void main(){vec2 p=uv-.5,world=p*uOutputSize/min(uOutputSize.x,uOutputSize.y)*3.4;
@@ -145,6 +172,7 @@ void main(){vec2 p=uv-.5,world=p*uOutputSize/min(uOutputSize.x,uOutputSize.y)*3.
  // Compress accumulated light with a shared scale: channel-by-channel clipping
  // used to wash different palettes into the same pink/white highlights.
  vec4 mist=viewVolume(q);
+ if(uMediumMix.x>0.)mist=mix(mist,texture(uMedium,q)*uMediumMix.y,uMediumMix.x);
  vec3 radiance=max(vec3(0.),src.rgb+bloom.rgb*uGlow*2.2)*(1.7-mist.a*.95)+mist.rgb;
  if(uVeilCompose>.5)radiance/=max(.00001,clamp(src.a,0.,1.));
  vec3 linear=radiance/(1.+max(radiance.r,max(radiance.g,radiance.b)));
@@ -186,6 +214,8 @@ void main(){vec2 p=uv-.5,world=p*uOutputSize/min(uOutputSize.x,uOutputSize.y)*3.
 const rad=Math.PI/180,rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
 const linearRgb=hex=>rgb(hex).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));
 const environments=['studio','sunset','neon','sky','aquarium','aurora','city'];
+const seedWidth=1024,seedHeight=293,storedGrains=seedWidth*seedHeight;
+const previewGrainLimit=options=>options.preview&&options.quality!=='full'?(options.quality==='fast'?storedGrains:450000):Infinity;
 export class ParticleRenderer{
  constructor(canvas){
   this.canvas=canvas;const gl=this.gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});
@@ -203,10 +233,10 @@ export class ParticleRenderer{
  loc(p,k){this.finishProgram(p);if(!p.uniforms.has(k))p.uniforms.set(k,this.gl.getUniformLocation(p.program,k));return p.uniforms.get(k);}
  u(p,k,...v){const loc=this.loc(p,k);if(loc!==null)this.gl['uniform'+v.length+'f'](loc,...v);}
  geometry(seed){const gl=this.gl;if(this.buffer)gl.deleteBuffer(this.buffer);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pointVAO)gl.deleteVertexArray(this.pointVAO);if(this.quadVAO)gl.deleteVertexArray(this.quadVAO);
-  const r=rng(seed),random=new Float32Array(1024*293*4);for(let i=0;i<random.length;i++)random[i]=r();
+  const r=rng(seed),random=new Float32Array(storedGrains*4);for(let i=0;i<random.length;i++)random[i]=r();
   this.buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.bufferData(gl.ARRAY_BUFFER,random,gl.STATIC_DRAW);
   this.pointVAO=gl.createVertexArray();gl.bindVertexArray(this.pointVAO);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,4,gl.FLOAT,false,0,0);gl.bindVertexArray(null);this.quadVAO=gl.createVertexArray();gl.bindVertexArray(this.quadVAO);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,4,gl.FLOAT,false,0,0);gl.vertexAttribDivisor(0,1);gl.bindVertexArray(null);
-  this.seedTexture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,this.seedTexture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,1024,293,0,gl.RGBA,gl.FLOAT,random);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.NEAREST);this.seed=seed;this.random=random;
+  this.seedTexture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,this.seedTexture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,seedWidth,seedHeight,0,gl.RGBA,gl.FLOAT,random);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.NEAREST);this.seed=seed;this.random=random;
  }
  trailGeometry(segments){const gl=this.gl;if(this.segments===segments)return;this.segments=segments;
   if(this.lineVAO)gl.deleteVertexArray(this.lineVAO);if(this.lineIndices)gl.deleteBuffer(this.lineIndices);if(this.pathTarget){gl.deleteTexture(this.pathTarget.texture);gl.deleteFramebuffer(this.pathTarget.fbo);}
@@ -215,11 +245,11 @@ export class ParticleRenderer{
   if(this.float){this.pathTarget=this.target(segments+3,1024);gl.bindTexture(gl.TEXTURE_2D,this.pathTarget.texture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,segments+3,1024,0,gl.RGBA,gl.FLOAT,null);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.NEAREST);}
  }
  target(w,h){const gl=this.gl,texture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,texture);gl.texImage2D(gl.TEXTURE_2D,0,this.float?gl.RGBA16F:gl.RGBA8,w,h,0,gl.RGBA,this.float?gl.HALF_FLOAT:gl.UNSIGNED_BYTE,null);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.LINEAR);for(const k of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,k,gl.CLAMP_TO_EDGE);const fbo=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('Buffer grafico non disponibile.');return {texture,fbo,w,h};}
- releaseSurface(){this.volume?.release();this.optics?.release();this.shadow?.release();if(this.depthCopy){this.gl.deleteTexture(this.depthCopy.texture);this.gl.deleteFramebuffer(this.depthCopy.fbo);this.depthCopy=null;}for(const t of this.targets){this.gl.deleteTexture(t.texture);this.gl.deleteFramebuffer(t.fbo);if(t.depth)this.gl.deleteRenderbuffer(t.depth);}this.targets=[];this.width=0;this.height=0;this.canvas.width=1;this.canvas.height=1;return true;}
+ releaseSurface(){this.volume?.release();this.medium?.release();this.optics?.release();this.shadow?.release();if(this.depthCopy){this.gl.deleteTexture(this.depthCopy.texture);this.gl.deleteFramebuffer(this.depthCopy.fbo);this.depthCopy=null;}for(const t of this.targets){this.gl.deleteTexture(t.texture);this.gl.deleteFramebuffer(t.fbo);if(t.depth)this.gl.deleteRenderbuffer(t.depth);}this.targets=[];this.width=0;this.height=0;this.canvas.width=1;this.canvas.height=1;return true;}
  resize(w,h){if(this.width===w&&this.height===h){if(this.canvas.width!==w)this.canvas.width=w;if(this.canvas.height!==h)this.canvas.height=h;return;}this.releaseSurface();this.width=w;this.height=h;this.canvas.width=w;this.canvas.height=h;this.targets=[this.target(w,h),this.target(Math.ceil(w/4),Math.ceil(h/4)),this.target(Math.ceil(w/4),Math.ceil(h/4))];}
  bind(t){const gl=this.gl;gl.bindFramebuffer(gl.FRAMEBUFFER,t?.fbo||null);gl.viewport(0,0,t?.w||this.width,t?.h||this.height);}
  tex(p,key,texture,unit){const gl=this.gl;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(this.loc(p,key),unit);}
- settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);bindDynamics(gl,p.program,s);this.guides.bind(p);
+ settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);bindDynamics(gl,p.program,s);this.guides.bind(p);gl.uniform1ui(this.loc(p,'uGrainSeed'),s.seed>>>0);
   this.u(p,'uFocus',this.shadowPass?0:s.focusBlur||0,s.focusDepth||0);
   this.u(p,'uShadowPass',this.shadowPass?(this.shadowPass.mode||1):0);if(this.optics)this.optics.uniforms(p,s);else{this.u(p,'uOpticalShadow',0,0,0,0);this.tex(p,'uOpticalMap',this.seedTexture,8);this.tex(p,'uVolumeMap',this.seedTexture,9);}this.u(p,'uShadowHeight',s.pShadowHeight??-1.6);this.u(p,'uShadowOpacity',p.materialAlpha?1:Math.max(0,1-s.transparency));if(this.shadowPass)this.u(p,'uShadowLight',this.shadowPass.light.x,this.shadowPass.light.y,this.shadowPass.light.z);
   const layer=this.studioLayer,attachment=layer?.attachment;
@@ -244,7 +274,7 @@ export class ParticleRenderer{
   this.u(p,'uSpacing',s.pGrainSpacing??1,s.pGroupSpacing??1,s.pDistributionCells??4);this.u(p,'uPoints',s.pSize,s.pSizeVar,s.pOpacity,s.pSoftness);this.u(p,'uSprite',s.pSprite);this.u(p,'uLargeGrains',s.pLargeCount||0,grainDiameters(s).large);this.u(p,'uGrainDistribution',s.pSizeSpread||0,s.pSizeBias||0);this.u(p,'uNodeStyle',s.pLinks>0?s.pLinkNodes:0,grainDiameters(s).node);
   this.u(p,'uTrails',s.pTrailLength*s.pDirection,s.pTrailWidth,s.pTrailOpacity,0);this.u(p,'uTail',s.pTrailFade,s.pTrailTaper,0,s.pTrailScatter);
   this.u(p,'uFiber',s.pTrailPersistence,s.pTrailSoftness,s.pTrailCoherence,Math.pow(trailLightCompensation(s),s.pTrailDensity*.8));
-  this.u(p,'uFiberLight',s.pFiberSheen,s.pFiberSpread);
+  this.u(p,'uFiberLight',s.pFiberSheen,s.pFiberSpread);this.u(p,'uTrailLine',s.pTrailStraighten||0);
   const forces=[...(s.forcePoints||[]).filter(f=>f.enabled).slice(0,8),...(s.bodyForces||[]).filter(f=>f.enabled).slice(0,3)];gl.uniform1i(this.loc(p,'uForcePasses'),3);gl.uniform1i(this.loc(p,'uForceCount'),forces.length);if(forces.length){gl.uniform4fv(this.loc(p,'uForcePoints'),forces.flatMap(f=>[f.x,f.y,f.z,f.strength]));gl.uniform2fv(this.loc(p,'uForceOptions'),forces.flatMap(f=>[f.radius,f.swirl]));}
   this.u(p,'uColor',s.pColorMode,s.pColorScatter,s.pLumaVar,s.pDepthFade);
   this.u(p,'uLife',s.pLife,s.pPulse,s.pSignal,s.pPropagation);this.u(p,'uTrailPulse',s.pTrailPulse,s.pTrailPulseWidth);this.u(p,'uNetwork',s.pNeural,s.pNodes,s.pConnect,0);this.u(p,'uSymmetry',s.pSymmetry);
@@ -264,6 +294,9 @@ export class ParticleRenderer{
   gl.uniform3fv(this.loc(p,'uFilmResponse'),FILM_SPECTRUM.data);gl.uniform3fv(this.loc(p,'uFilmWhite'),FILM_SPECTRUM.white);
   this.u(p,'uPearl',s.iridShift??0,s.filmThickness??420,s.iridScale??1);this.u(p,'uShadeOrigin',s.positionX,s.positionY,0);
   this.u(p,'uEnvironment',environments.indexOf(s.environment),s.environmentAngle*rad,s.environmentPower,0);
+  this.colorUniforms(p,s);
+ }
+ colorUniforms(p,s){const gl=this.gl;
   this.u(p,'uGradient',s.gradientAngle*rad,s.gradientScale,s.gradientOffset,1);this.u(p,'uColorSoftness',s.colorSoftness);this.u(p,'uColorLayers',s.colorLayers||0,s.colorLayerScale??1,s.colorLayerShift||0,s.colorLayerMix||0);
   this.u(p,'uColorWave',s.colorWaveAmount,s.colorWaveBands,s.colorWavePhase*Math.PI*2,0);this.u(p,'uColorWave2',s.colorWaveHeight,s.colorWaveRadius,s.colorWaveSwirl,s.colorWaveWarp);
   gl.uniform1i(this.loc(p,'uPaletteCount'),s.palette.length);gl.uniform3fv(this.loc(p,'uPalette'),s.palette.flatMap(linearRgb));
@@ -274,10 +307,10 @@ export class ParticleRenderer{
   if(!(s.pTrailCount>0&&s.pTrailLength>0))return;
   // Float trajectories are always baked before drawing: do not compile a second
   // copy of the full simulation into each of the three ribbon samples.
-  this.lines??=this.program(this.float?trailVert.replace('uBaked?texelFetch(uPaths,ivec2(j+1,row),0).xyz:position(r,uPhase-float(j)/float(uSegments)*uTrails.x)','texelFetch(uPaths,ivec2(j+1,row),0).xyz'):trailVert,trailFrag);
+  this.lines??=this.program(this.float?trailVert.replace('uBaked?texelFetch(uPaths,ivec2(j+1,row),0).xyz:trailPosition(j,r)','texelFetch(uPaths,ivec2(j+1,row),0).xyz'):trailVert,trailFrag);
   if(this.float)this.pathProgram??=this.program(screenVert,pathFrag);
  }
- prepare(source,phase=0){
+ prepare(source,phase=0,options={}){
   if(this.gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');
   const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};migrateGrainSizes(s,source);this.ensureTrails(s);
   // Queue optional geometry programs before drawing, without blocking the UI
@@ -286,7 +319,9 @@ export class ParticleRenderer{
   else if(s.pLiving>0)this.living??=new LivingStructures(this,common);
   if(s.pLinks>0&&s.pLiving!==4)this.connections??=new ParticleLinks(this,common);
   const required=new Set([this.points,this.blur,this.compose]);
-  if(s.pLiving!==4&&particleVolumeAmount(s)>0){this.volume??=new ParticleVolume(this,common);required.add(this.volume.program);}
+  if(s.pOpacity>0&&Math.min(s.pCount,previewGrainLimit(options))>storedGrains)required.add(this.generatedPoints());
+  if(s.pLiving!==4&&mediumAmount(s)<1&&particleVolumeAmount(s)>0){this.volume??=new ParticleVolume(this,common);required.add(this.volume.program);}
+  if(mediumAmount(s)>0){this.medium??=new ParticleMedium(this);for(const p of this.medium.programs)required.add(p);}
   if(usesCloudAbsorption(s,this.float)&&shadowLight(s,false)){
    this.optics??=new ParticleOptics(this);
    required.add(this.optics.prepareVolume(grainGLSL));
@@ -298,9 +333,10 @@ export class ParticleRenderer{
   // An effect switched off while it compiles must not hold up the active scene.
   let ready=true;for(const p of required){if(p.ready)continue;if(this.parallelExtension&&!this.gl.getProgramParameter(p.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}this.finishProgram(p);}return ready;
  }
- async prepareAsync(s,p,o={}){let slow=false;const start=performance.now();o.onStage?.('preparing');while(!o.cancelled?.()){if(this.prepare(s,p)){o.onStage?.('rendering');return true;}if(!slow&&performance.now()-start>30000){slow=true;o.onStage?.('preparing-slow');}await new Promise(r=>setTimeout(r,16));}return false;}
+ generatedPoints(){return this.proceduralPoints??=this.program(pointVert.replace('#version 300 es','#version 300 es\n#define GENERATED_GRAINS 1'),pointFrag);}
+ async prepareAsync(s,p,o={}){let slow=false;const start=performance.now();o.onStage?.('preparing');while(!o.cancelled?.()){if(this.prepare(s,p,o)){o.onStage?.('rendering');return true;}if(!slow&&performance.now()-start>30000){slow=true;o.onStage?.('preparing-slow');}await new Promise(r=>setTimeout(r,16));}return false;}
  draw(source,phase=0,w=this.canvas.width,h=this.canvas.height,options={}){
-  const gl=this.gl;if(gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');if(options.preview&&!this.prepare(source,phase))return false;
+  const gl=this.gl;if(gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');if(options.preview&&!this.prepare(source,phase,options))return false;
   const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};migrateGrainSizes(s,source);this.ensureTrails(s);
   phase/=Math.PI*2;if(s.perfectLoop!==false)phase=((phase%1)+1)%1;
   if(s.pLiving===4){s.pCount=0;s.pTrailCount=0;s.pLinks=0;s.pLivingBlend=1;}
@@ -328,8 +364,10 @@ export class ParticleRenderer{
   }
   if(!sceneDrawn||s.pSelfShadow>0)this.drawGeometry(scene,s,phase,options,weights);
   }finally{this.reuseGeometry=false;}
-  let mist;
-  if(s.pLiving!==4&&particleVolumeAmount(s)>0){this.volume??=new ParticleVolume(this,common);mist=this.volume.draw(s,phase*s.pDirection,w,h,options);}
+  let mist,medium;
+  const continuum=mediumAmount(s);
+  if(s.pLiving!==4&&continuum<1&&particleVolumeAmount(s)>0){this.volume??=new ParticleVolume(this,common);mist=this.volume.draw(s,phase*s.pDirection,w,h,options);}
+  if(continuum>0){this.medium??=new ParticleMedium(this);medium=this.medium.draw(s,phase,w,h,options,this.studioLayer);}
   const causticTexture=opticalLight?this.optics.drawCaustic(s):null;
   let shadowTexture=null;if(s.pShadow>0){this.shadow??=new ParticleShadow(this);shadowTexture=this.shadow.draw(s,phase,options,weights);}
   gl.depthMask(true);gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);gl.bindVertexArray(this.empty);gl.useProgram(this.blur.program);
@@ -338,6 +376,7 @@ export class ParticleRenderer{
   this.u(c,'uGrade',s.exposure,s.brightness,s.contrast,s.saturation);this.u(c,'uPhoto',s.temperature,s.photoTint,s.gamma,s.vignette);this.u(c,'uTone',s.blacks,s.highlights,0,0);this.u(c,'uLens',s.lensDistortion,s.grain,s.grainSize,0);this.u(c,'uPhotoAll',+s.photoAll);
   this.u(c,'uBackground',...rgb(s.background));this.u(c,'uBackground2',...rgb(s.background2));this.u(c,'uBgMode',['solid','gradient','studio','transparent'].indexOf(s.bgMode));this.u(c,'uBg',s.bgAngle*rad,s.bgHeight,s.bgSoftness,s.bgWash);
   this.tex(c,'uStudioSurface',this.studioLayer?.color||scene.texture,13);this.u(c,'uStudioComposite',this.studioLayer?.color?1:0);this.u(c,'uStudioCamera',this.studioLayer?.attachment?1:0);
+  this.tex(c,'uMedium',medium||scene.texture,14);this.u(c,'uMediumMix',medium?continuum:0,this.studioLayer?.grainMix??1);
   this.tex(c,'uViewDensity',mist?.texture||scene.texture,10);this.u(c,'uViewVolume',mist?mist.amount*(1+s.transparency*.6):0,mist?mist.amount*2.3:0,mist?.width||1,mist?.height||1);
   if(mist){const light=s.lights.find(l=>l.enabled);const aim=light?[light.x-s.positionX,light.y-s.positionY,light.z]:[-.5,.6,.6],length=Math.hypot(...aim)||1;this.u(c,'uVolumeLight',...aim.map(component=>component/length));}
   this.u(c,'uBgShade',s.bgShade??.06);this.u(c,'uOutputSize',w,h);
@@ -378,11 +417,22 @@ export class ParticleRenderer{
   }else this.previewTrailCount=0;
   if(s.pLinks>0){this.connections??=new ParticleLinks(this,common);this.connections.draw(s,phase*s.pDirection);}
   if(s.pCount>0&&s.pOpacity>0){
-   const count=Math.min(Math.round(s.pCount),Math.max(s.pLinks>0?s.pLinkNodes:256,Math.round(s.pCount*this.geometryBudget)));this.previewCounts.points=count;this.settings(this.points,{...s,pOpacity:s.pOpacity*Math.min(16,s.pCount/count)},phase*s.pDirection);
-   const size=Math.max(s.pSize,s.pLargeCount>0?grainDiameters(s).large:0,s.pLinks>0?grainDiameters(s).node:0),quad=Math.min(1024,size*(1+s.pSizeVar*.85)*Math.pow(2,s.pSizeSpread||0))*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
-   this.u(this.points,'uPointQuad',quad?1:0);gl.bindVertexArray(quad?this.quadVAO:this.pointVAO);this.opticalDrawState();
-   if(quad)gl.drawArraysInstanced(gl.TRIANGLES,0,6,count);else gl.drawArrays(gl.POINTS,0,count);
+   const cap=this.shadowPass?storedGrains:previewGrainLimit(options);
+   const count=Math.min(Math.round(s.pCount),cap,Math.max(s.pLinks>0?s.pLinkNodes:256,Math.round(s.pCount*this.geometryBudget)));
+   const points={...s,pLargeCount:s.pCount>storedGrains?Math.round(s.pLargeCount*count/s.pCount):s.pLargeCount,pOpacity:s.pOpacity*Math.min(16,s.pCount/count)};
+   this.previewCounts.points=count;
+   const sizes=grainDiameters(s),size=Math.max(s.pSize,s.pLargeCount>0?sizes.large:0,s.pLinks>0?sizes.node:0);
+   const quad=Math.min(1024,size*(1+s.pSizeVar*.85)*Math.pow(2,s.pSizeSpread||0))*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
+   this.opticalDrawState();
+   this.drawPoints(this.points,points,phase,quad,Math.min(storedGrains,count),0);
+   if(count>storedGrains)this.drawPoints(this.generatedPoints(),points,phase,quad,count-storedGrains,storedGrains);
   }
+ }
+ drawPoints(program,s,phase,quad,count,offset){
+  const gl=this.gl;this.settings(program,s,phase*s.pDirection);this.u(program,'uPointQuad',quad?1:0);
+  if(offset)gl.uniform1i(this.loc(program,'uSeedOffset'),offset);
+  gl.bindVertexArray(offset?this.empty:quad?this.quadVAO:this.pointVAO);
+  if(quad)gl.drawArraysInstanced(gl.TRIANGLES,0,6,count);else gl.drawArrays(gl.POINTS,0,count);
  }
  opticalDrawState(){if(this.shadowPass?.mode===2){const g=this.gl;g.enable(g.DEPTH_TEST);g.depthFunc(g.LEQUAL);g.depthMask(true);g.disable(g.BLEND);}}
  async drawAccumulated(s,p,w,h,o={}){if(!await this.prepareAsync(s,p,o))return false;this.draw(s,p,w,h,o);const ok=await this.waitForGpu(o);o.progress?.(1);return ok;}
@@ -401,5 +451,5 @@ export class ParticleRenderer{
  pollGpuTime(){const gl=this.gl,e=this.timerExtension;if(!e)return;const disjoint=gl.getParameter(e.GPU_DISJOINT_EXT);while(this.queries.length&&(disjoint||gl.getQueryParameter(this.queries[0],gl.QUERY_RESULT_AVAILABLE))){const q=this.queries.shift();if(!disjoint){this.gpuMilliseconds=gl.getQueryParameter(q,gl.QUERY_RESULT)/1e6;this.gpuSample++;}gl.deleteQuery(q);}}
  hardwareInfo(){const gl=this.gl,e=gl.getExtension('WEBGL_debug_renderer_info'),name=gl.getParameter(e?e.UNMASKED_RENDERER_WEBGL:gl.RENDERER);return {name,software:/swiftshader|llvmpipe/i.test(name),timingAvailable:!!this.timerExtension};}
  pixels(){const gl=this.gl,a=new Uint8Array(this.width*this.height*4),out=new Uint8Array(a.length),stride=this.width*4;gl.readPixels(0,0,this.width,this.height,gl.RGBA,gl.UNSIGNED_BYTE,a);for(let y=0;y<this.height;y++)out.set(a.subarray(y*stride,(y+1)*stride),(this.height-y-1)*stride);return out;}
- dispose({loseContext=false}={}){const gl=this.gl;if(this.completionSync)gl.deleteSync(this.completionSync);for(const q of this.queries)gl.deleteQuery(q);this.living?.dispose();this.veils?.dispose();this.connections?.dispose();this.guides.dispose();this.optics?.dispose();this.volume?.dispose();this.releaseSurface();if(this.buffer)gl.deleteBuffer(this.buffer);if(this.lineIndices)gl.deleteBuffer(this.lineIndices);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pathTarget){gl.deleteTexture(this.pathTarget.texture);gl.deleteFramebuffer(this.pathTarget.fbo);}for(const p of [this.points,this.lines,this.pathProgram,this.blur,this.compose])if(p)gl.deleteProgram(p.program);for(const v of [this.pointVAO,this.quadVAO,this.lineVAO,this.empty])if(v)gl.deleteVertexArray(v);gl.bindVertexArray(null);if(loseContext)this.recoveryExtension?.loseContext();}
+ dispose({loseContext=false}={}){const gl=this.gl;if(this.completionSync)gl.deleteSync(this.completionSync);for(const q of this.queries)gl.deleteQuery(q);this.living?.dispose();this.veils?.dispose();this.connections?.dispose();this.guides.dispose();this.optics?.dispose();this.volume?.dispose();this.medium?.dispose();this.releaseSurface();if(this.buffer)gl.deleteBuffer(this.buffer);if(this.lineIndices)gl.deleteBuffer(this.lineIndices);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pathTarget){gl.deleteTexture(this.pathTarget.texture);gl.deleteFramebuffer(this.pathTarget.fbo);}for(const p of [this.points,this.proceduralPoints,this.lines,this.pathProgram,this.blur,this.compose])if(p)gl.deleteProgram(p.program);for(const v of [this.pointVAO,this.quadVAO,this.lineVAO,this.empty])if(v)gl.deleteVertexArray(v);gl.bindVertexArray(null);if(loseContext)this.recoveryExtension?.loseContext();}
 }

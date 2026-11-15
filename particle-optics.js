@@ -47,7 +47,7 @@ flat out int vSlice;
 out float vDeposit;
 void main(){
  int sampleIndex=int((float(gl_VertexID)+.5)*float(uVolumeSamples.x)/float(uVolumeSamples.y));
- vec4 seed=texelFetch(uSeeds,ivec2(sampleIndex%1024,sampleIndex/1024),0);
+ vec4 seed=grainSeed(uSeeds,sampleIndex);
  vec3 q=opticalCoordinate(attachedPosition(seed,uPhase));
  float depth=(q.z-uOpticalVolume.y)/uOpticalVolume.z;
  vSlice=int(clamp(depth*4.,0.,3.));
@@ -143,7 +143,7 @@ export class ParticleOptics{
   const fast=options.preview&&options.quality==='fast';
   const size=fast?(o.geometryBudget<.6?192:256):512;
   if(this.volumeMap?.w!==size){this.releaseTarget(this.volumeMap);this.volumeMap=o.target(size,size);}
-  const count=fast?Math.min(Math.round(s.pCount),Math.max(10000,Math.round(52000*o.geometryBudget))):Math.round(s.pCount);
+  const count=Math.min(Math.round(s.pCount),fast?Math.max(10000,Math.round(52000*o.geometryBudget)):300032);
   const diameter=Math.max(2,Math.round(size*.017));
   const screenDensity=(size/(2*this.span))**2;
   const deposit=s.pOpacity*screenDensity*.00008/(Math.PI*diameter*diameter/12)*s.pCount/count;

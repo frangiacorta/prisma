@@ -1,8 +1,8 @@
-import {bodySampleGLSL} from './body-samples.js?v=0b52b3909b22';
-import {DYNAMICS_GLSL} from './dynamics.js?v=0b52b3909b22';
+import {bodySampleGLSL} from './body-samples.js?v=9d07961f209b';
+import {DYNAMICS_GLSL} from './dynamics.js?v=9d07961f209b';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=0b52b3909b22';
-import {forceBarrierGLSL} from './particle-forces.js?v=0b52b3909b22';
+import {guideGLSL} from './particle-path-field.js?v=9d07961f209b';
+import {forceBarrierGLSL} from './particle-forces.js?v=9d07961f209b';
 export const grainSizingGLSL=`
 uniform vec2 uNodeStyle,uLargeGrains,uGrainDistribution;
 float grainDiameter(vec4 seed,int index){
@@ -28,6 +28,19 @@ uniform vec4 uForm,uWarp,uFrame,uRotation;
 uniform vec4 uLife,uNetwork;uniform float uSymmetry;
 uniform vec4 uOrbit,uDrift,uWander,uTentacle,uTentacleMotion,uSpaceWarp;
 uniform vec2 uMotionQuality;uniform float uMotionSeed;
+uniform highp uint uGrainSeed;
+uint hashGrain(uint value){
+ value^=value>>16u;value*=0x7feb352du;value^=value>>15u;value*=0x846ca68bu;return value^(value>>16u);
+}
+vec4 generatedGrain(int index){
+ uint h=hashGrain(uint(index)^uGrainSeed),a=hashGrain(h+0x9e3779b9u),b=hashGrain(a),c=hashGrain(b);
+ return vec4(uvec4(h,a,b,c)>>8u)/16777216.;
+}
+vec4 grainSeed(sampler2D stored,int index){
+ ivec2 size=textureSize(stored,0);
+ if(index>=size.x*size.y)return generatedGrain(index);
+ return texelFetch(stored,ivec2(index%size.x,index/size.x),0);
+}
 mat2 rot(float a){return mat2(cos(a),-sin(a),sin(a),cos(a));}
 ${bodySampleGLSL}
 float clockAt(float q){

@@ -1,7 +1,7 @@
 // Deposit animated points into depth slices, then integrate extinction
 // from front to back. Density differences provide a local lighting normal.
-import {livingAttachmentGLSL} from './living-composition.js?v=0b52b3909b22';
-import {materialCavity} from './particle-shading.js?v=0b52b3909b22';
+import {livingAttachmentGLSL} from './living-composition.js?v=9d07961f209b';
+import {materialCavity} from './particle-shading.js?v=9d07961f209b';
 
 export const volumeResolveGLSL=`
 uniform highp sampler2D uViewDensity;
@@ -45,7 +45,7 @@ out float vMass;
 flat out vec2 vOrigin;
 void main(){
  int index=min(uCloudSamples.x-1,int((float(gl_VertexID/2)+.5)*float(uCloudSamples.x)/float(uCloudSamples.y)));
- vec4 seed=texelFetch(uSeeds,ivec2(index%1024,index/1024),0);
+ vec4 seed=grainSeed(uSeeds,index);
  vec3 p=attachedPosition(seed,uPhase);
  vec4 clip=project(p);
  float layer=clamp((.5-p.z/uDeposit.z)*11.,0.,10.999);

@@ -1,40 +1,40 @@
-import {presetFamily,familyName} from './preset-families.js?v=0b52b3909b22';
-import {closeLivingSkin} from './living-panel.js?v=0b52b3909b22';
-import {mountDynamicsOverlay} from './dynamics-overlay.js?v=0b52b3909b22';
-import {DYNAMICS_DEFAULTS} from './dynamics.js?v=0b52b3909b22';
-import {motionPeriod,setDuration,clockStatus,exportLoop,loopSeamAmount,loopStatus} from './animation-clock.js?v=0b52b3909b22';
-import {VeilTransition} from './veil-transition.js?v=0b52b3909b22';
-import {mountSavedPresets} from './preset-library.js?v=0b52b3909b22';
-import {composePanel,refinePanel} from './workflow-panels.js?v=0b52b3909b22';
-import {mountWorkflowTools} from './workflow-tools.js?v=0b52b3909b22';
-import {decorateInspector} from './inspector-state.js?v=0b52b3909b22';
-import {GROWTH_DEFAULTS,GROWTH_STUDIES} from './growth-material.js?v=0b52b3909b22';
-import {BASE_FORMS} from './base-forms.js?v=0b52b3909b22';
-import {integrateStructure,STRUCTURE_DEFAULTS} from './structure-model.js?v=0b52b3909b22';
-import {applyVeilLook,applyVeilGeometry,beginVeilTransform,VEIL_LOOKS} from './veil-model.js?v=0b52b3909b22';
-import {mountFinishingOrder} from './finishing-order.js?v=0b52b3909b22';
-import {mountFinishingAreas} from './finishing-areas.js?v=0b52b3909b22';
-import {FINISH_DEFAULTS,GLYPH_DEFAULTS,EDGE_DEFAULTS,GLITCH_DEFAULTS,TONE_NEUTRAL,PHOTO_NEUTRAL,luminousPrintEnabled,feedbackWarmupFrames} from './finishing.js?v=0b52b3909b22';
-import {Renderer,fieldAt,sampleFrame} from './renderer.js?v=0b52b3909b22';
-import {changeGrainSource,cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=0b52b3909b22';
-import {buildPanel,pathValue,pathMeta,writePath} from './panels.js?v=0b52b3909b22';
-import {MAX_COLORS,MAX_LIGHTS,newLight,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,EXTRA_BASE,BACKDROPS,SHAPE_TRACKS,LIGHT_SOURCES,INTERFERENCE_STYLE,syncMaterialControl} from './studio-model.js?v=0b52b3909b22';
-import {BASE,PRESETS,MOODS,META,GROUPS,preset,randomize} from './model.js?v=0b52b3909b22';
-import {newCreation,material,upgrade,motionPreset,surprise,similar,varyCreation,hasMotion,normalizeCreation,sculpt,bloomExample,lightRig,textureStyle} from './creative-model.js?v=0b52b3909b22';
-import {animateCellular,CELLULAR_DEFAULTS} from './cellular-form.js?v=0b52b3909b22';
-import {interpretDescription,applyDescriptionPlan,descriptionCatalog} from './description.js?v=0b52b3909b22';
-import {PreviewQuality,PREVIEW_MODES} from './preview-quality.js?v=0b52b3909b22';
-import {cleanPresetName,favoriteName,favoriteDate,uniqueDownloadName,presetDocument,readPreset} from './preset-files.js?v=0b52b3909b22';
-import {VideoExportSession} from './video-export.js?v=0b52b3909b22';
-import {RenderSession} from './render-session.js?v=0b52b3909b22';
-import {usesParticleSurface} from './living-composition.js?v=0b52b3909b22';
-import {applyLivingStyle} from './living-panel.js?v=0b52b3909b22';
-import {PARTICLE_META,PARTICLE_STUDIES,particleSphere,particleCreation,varyParticles,varyParticleMotion,FIBER_STYLES,FILM_STYLES,LINK_STYLES,LIVING_STYLES} from './particle-model.js?v=0b52b3909b22';
-import {assistantCatalog} from './assistant-model.js?v=0b52b3909b22';
-import {mountParticlePaths} from './particle-path-interaction.js?v=0b52b3909b22';
-import {mountParticleForces} from './particle-interaction.js?v=0b52b3909b22';
-import {renderNavigation,navigationTabs,mountControlSearch} from './inspector-navigation.js?v=0b52b3909b22';
-import {prepareInspector,captureInspector,mountStudioLayout} from './inspector-ui.js?v=0b52b3909b22';
+import {presetFamily,familyName} from './preset-families.js?v=9d07961f209b';
+import {closeLivingSkin} from './living-panel.js?v=9d07961f209b';
+import {mountDynamicsOverlay} from './dynamics-overlay.js?v=9d07961f209b';
+import {DYNAMICS_DEFAULTS} from './dynamics.js?v=9d07961f209b';
+import {motionPeriod,setDuration,clockStatus,exportLoop,loopSeamAmount,loopStatus} from './animation-clock.js?v=9d07961f209b';
+import {VeilTransition} from './veil-transition.js?v=9d07961f209b';
+import {mountSavedPresets} from './preset-library.js?v=9d07961f209b';
+import {composePanel,refinePanel} from './workflow-panels.js?v=9d07961f209b';
+import {mountWorkflowTools} from './workflow-tools.js?v=9d07961f209b';
+import {decorateInspector} from './inspector-state.js?v=9d07961f209b';
+import {GROWTH_DEFAULTS,GROWTH_STUDIES} from './growth-material.js?v=9d07961f209b';
+import {BASE_FORMS} from './base-forms.js?v=9d07961f209b';
+import {integrateStructure,STRUCTURE_DEFAULTS} from './structure-model.js?v=9d07961f209b';
+import {applyVeilLook,applyVeilGeometry,beginVeilTransform,VEIL_LOOKS} from './veil-model.js?v=9d07961f209b';
+import {mountFinishingOrder} from './finishing-order.js?v=9d07961f209b';
+import {mountFinishingAreas} from './finishing-areas.js?v=9d07961f209b';
+import {FINISH_DEFAULTS,GLYPH_DEFAULTS,EDGE_DEFAULTS,GLITCH_DEFAULTS,TONE_NEUTRAL,PHOTO_NEUTRAL,luminousPrintEnabled,feedbackWarmupFrames} from './finishing.js?v=9d07961f209b';
+import {Renderer,fieldAt,sampleFrame} from './renderer.js?v=9d07961f209b';
+import {changeGrainSource,cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=9d07961f209b';
+import {buildPanel,pathValue,pathMeta,writePath} from './panels.js?v=9d07961f209b';
+import {MAX_COLORS,MAX_LIGHTS,newLight,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,EXTRA_BASE,BACKDROPS,SHAPE_TRACKS,LIGHT_SOURCES,INTERFERENCE_STYLE,syncMaterialControl} from './studio-model.js?v=9d07961f209b';
+import {BASE,PRESETS,MOODS,META,GROUPS,preset,randomize} from './model.js?v=9d07961f209b';
+import {newCreation,material,upgrade,motionPreset,surprise,similar,varyCreation,hasMotion,normalizeCreation,sculpt,bloomExample,lightRig,textureStyle} from './creative-model.js?v=9d07961f209b';
+import {animateCellular,CELLULAR_DEFAULTS} from './cellular-form.js?v=9d07961f209b';
+import {interpretDescription,applyDescriptionPlan,descriptionCatalog} from './description.js?v=9d07961f209b';
+import {PreviewQuality,PREVIEW_MODES} from './preview-quality.js?v=9d07961f209b';
+import {cleanPresetName,favoriteName,favoriteDate,uniqueDownloadName,presetDocument,readPreset} from './preset-files.js?v=9d07961f209b';
+import {VideoExportSession} from './video-export.js?v=9d07961f209b';
+import {RenderSession} from './render-session.js?v=9d07961f209b';
+import {usesParticleSurface} from './living-composition.js?v=9d07961f209b';
+import {applyLivingStyle} from './living-panel.js?v=9d07961f209b';
+import {PARTICLE_META,PARTICLE_STUDIES,particleSphere,particleCreation,varyParticles,varyParticleMotion,FIBER_STYLES,FILM_STYLES,LINK_STYLES,LIVING_STYLES} from './particle-model.js?v=9d07961f209b';
+import {assistantCatalog} from './assistant-model.js?v=9d07961f209b';
+import {mountParticlePaths} from './particle-path-interaction.js?v=9d07961f209b';
+import {mountParticleForces} from './particle-interaction.js?v=9d07961f209b';
+import {renderNavigation,navigationTabs,mountControlSearch} from './inspector-navigation.js?v=9d07961f209b';
+import {prepareInspector,captureInspector,mountStudioLayout} from './inspector-ui.js?v=9d07961f209b';
 let inspectorStatus,workflowTools,playground,playgroundModule,playgroundSuspended=false;let panelCache=new Map();
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const paths={photo:'M4 7h4l2-3h4l2 3h4v14H4ZM12 10a4 4 0 1 0 0 8 4 4 0 0 0 0-8',undo:'M3 9h10a7 7 0 0 1 0 14M3 9l5-5M3 9l5 5',redo:'M21 9H11a7 7 0 0 0 0 14M21 9l-5-5M21 9l-5 5',download:'M12 3v12m-4-4 4 4 4-4M4 16v5h16v-5',reset:'M3 11a9 9 0 1 1 2 7M3 4v7h7',frame:'M5 3H3v5m16-5h2v5M3 16v5h5m13-5v5h-5',expand:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5',orbit:'M12 3a9 9 0 1 0 9 9M3 12h18M12 3c-5 5-5 13 0 18 4-4 5-10 2-15M18 3h3v3',move:'M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3m12-6 3 3-3 3',sun:'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1 1m12 12 1 1M5 19l1-1M18 6l1-1',focus:'M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8',play:'m9 5 11 7-11 7Z',pause:'M8 5v14M16 5v14',sliders:'M4 5h6m4 0h6M4 12h11m4 0h1M4 19h1m4 0h11M10 2v6m5 1v6M5 16v6',shuffle:'M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 3-2 5-5m3-5c1-1 2-2 4-2h3m-4-4 4 4-4 4',shape:'M12 3c6-2 12 7 8 13-4 8-17 3-17-3 0-4 5-9 9-10Z',material:'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M5 7c9-1 5 9 14 10M7 5c8 1 2 11 10 14',palette:'M12 3a9 9 0 0 0 0 18c3 0 3-3 2-4-2-2 0-4 2-3 7 1 5-11-4-11M7 10h.01M10 6h.01M15 6h.01',motion:'M3 8c4-9 8 14 12 5s5-6 6-4M3 16c4-9 8 7 12 3',background:'M3 3h18v18H3ZM3 16l6-7 5 6 3-3 4 4',lock:'M6 10h12v11H6ZM8 10V6a4 4 0 0 1 8 0v4',unlock:'M6 10h12v11H6ZM8 10V6a4 4 0 0 1 8 0'};
@@ -105,7 +105,27 @@ function clampValue(key,value){if(key==='pDirection')return Number(value)<0?-1:1
 function parameterValue(key,s=state){if(key==='sceneGrains')return grainMix(s);if(key==='thinFilm'&&cloudBody(s)&&grainMix(s)>=1)return s.pFilm;return s[key];}
 function setValue(key,value,record=false){if(record)remember();if(GROUPS.material.includes(key)||/^(dyn|fil|loop|struct|environment|film|petal|stem|colorWave|ground)/.test(key))upgrade(state);if(key==='duration'){const ratio=setDuration(state,clampValue(key,value));if(state.keepMotionSpeed!==false){phase*=ratio;if(loopStatus(state).closed)phase%=Math.PI*2;}}else state[key]=clampValue(key,value);syncMaterialControl(state,key);mark();syncValue(key)}
 function format(key,v){return controlMeta(key)?.[3]>=1?Math.round(v):Number(v.toFixed(controlMeta(key)?.[3]<.001?4:3))}
-function slider(key,ends){const [label,min,max,step]=controlMeta(key),val=parameterValue(key);if(['pSize','pSizeRatio','pNodeRatio','pTrailWidth','pLinkWidth','filWidth'].includes(key)){const position=min===0?Math.log1p(val/.01)/Math.log1p(max/.01):Math.log(val/min)/Math.log(max/min);return `<div class="param"><div class="param-line"><label for="range-${key}">${label}</label>${key==='finishGlitchFlashMs'?`<output data-flash-ms>${Math.round(val)} ms</output>`:''}<input class="number" aria-label="${label}: valore" data-number="${key}" type="number" min="${min}" max="${max}" step="${step}" value="${format(key,val)}"></div><input id="range-${key}" data-param="${key}" data-log="true" type="range" min="0" max="1" step=".001" value="${position}"><div class="range-ends"><span>${key==='filWidth'?'Fili sottili':key==='pNodeRatio'?'0 · distribuzione comune':key==='pSizeRatio'?'Più piccoli':'Micro · '+min+' px'}</span><span>${key==='filWidth'?'Spine':['pSizeRatio','pNodeRatio'].includes(key)?'Più grandi':max+' px'}</span></div></div>`;}return `<div class="param"><div class="param-line"><label for="range-${key}">${label}</label>${key==='finishGlitchFlashMs'?`<output data-flash-ms>${Math.round(val)} ms</output>`:''}<input class="number" aria-label="${label}: valore" data-number="${key}" type="number" min="${min}" max="${max}" step="${step}" value="${format(key,val)}"></div><input id="range-${key}" data-param="${key}" type="range" min="${min}" max="${max}" step="${step}" value="${val}">${ends?`<div class="range-ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>`:''}</div>`}
+const logSliders=new Set(['pCount','pLargeCount','pSize','pSizeRatio','pNodeRatio','pTrailWidth','pLinkWidth','filWidth']);
+const logAnchor=key=>key==='pCount'||key==='pLargeCount'?18000:.01;
+function sliderPosition(key,value){
+ const [,min,max]=controlMeta(key),anchor=logAnchor(key);
+ return min===0?Math.log1p(value/anchor)/Math.log1p(max/anchor):Math.log(value/min)/Math.log(max/min);
+}
+function sliderValue(key,position){
+ const [,min,max]=controlMeta(key),anchor=logAnchor(key);
+ return min===0?anchor*Math.expm1(position*Math.log1p(max/anchor)):min*Math.pow(max/min,position);
+}
+function slider(key,ends){
+ const [label,min,max,step]=controlMeta(key),val=parameterValue(key),log=logSliders.has(key);
+ if(log&&!ends){
+  const labels={pCount:['0','2 milioni'],pLargeCount:['0','2 milioni'],filWidth:['Fili sottili','Spine'],pSizeRatio:['Più piccoli','Più grandi'],pNodeRatio:['0 · distribuzione comune','Più grandi']};
+  ends=labels[key]||['Micro · '+min+' px',max+' px'];
+ }
+ const range=log?'data-log="true" min="0" max="1" step=".001" value="'+sliderPosition(key,val)+'"':'min="'+min+'" max="'+max+'" step="'+step+'" value="'+val+'"';
+ const milliseconds=key==='finishGlitchFlashMs'?'<output data-flash-ms>'+Math.round(val)+' ms</output>':'';
+ const captions=ends?'<div class="range-ends"><span>'+ends[0]+'</span><span>'+ends[1]+'</span></div>':'';
+ return '<div class="param"><div class="param-line"><label for="range-'+key+'">'+label+'</label>'+milliseconds+'<input class="number" aria-label="'+label+': valore" data-number="'+key+'" type="number" min="'+min+'" max="'+max+'" step="'+step+'" value="'+format(key,val)+'"></div><input id="range-'+key+'" data-param="'+key+'" type="range" '+range+'>'+captions+'</div>';
+}
 const heading=name=>name===name.toLocaleUpperCase('it')?name.charAt(0)+name.slice(1).toLocaleLowerCase('it'):name;
 const section=(name,content)=>`<details class="control-section control-details primary-section"><summary>${heading(name)}</summary>${content}</details>`;
 const details=(name,content)=>`<details class="control-details"><summary>${heading(name)}</summary>${content}</details>`;
@@ -138,16 +158,13 @@ function syncValue(key){
  const value=parameterValue(key);
  if(key==='finishGlitchFlashMs'&&$('[data-flash-ms]'))$('[data-flash-ms]').textContent=Math.round(value)+' ms';
  const range=$(`[data-param="${key}"]`),number=$(`[data-number="${key}"]`);
- if(range?.dataset.log){
-  const [,min,max]=controlMeta(key);
-  range.value=min===0?Math.log1p(value/.01)/Math.log1p(max/.01):Math.log(value/min)/Math.log(max/min);
- }else if(range)range.value=value;
+ if(range)range.value=range.dataset.log?sliderPosition(key,value):value;
  if(number&&number!==document.activeElement)number.value=format(key,value);
 }
 $('#tabs').addEventListener('click',e=>{const t=e.target.closest('[data-tab]');if(t)showTab(t.dataset.tab)});
 $('#controls').addEventListener('pointerdown',e=>{if(e.target.matches('input:not([data-layer-toggle]):not([data-audio]):not([data-force-param]):not([data-force-number]):not([data-force-enabled]):not([data-guide-param]):not([data-guide-number]):not([data-guide-flag])'))dragBefore=structuredClone(state)});
 $('#controls').addEventListener('focusin',e=>{if(e.target.matches('input:not([data-layer-toggle]):not([data-audio]):not([data-force-param]):not([data-force-number]):not([data-force-enabled]):not([data-guide-param]):not([data-guide-number]):not([data-guide-flag])')&&!dragBefore)dragBefore=structuredClone(state)});
-$('#controls').addEventListener('input',e=>{const el=e.target;if(el.dataset.param){setValue(el.dataset.param,el.dataset.log?(META[el.dataset.param][1]===0?.01*Math.expm1(+el.value*Math.log1p(META[el.dataset.param][2]/.01)):META[el.dataset.param][1]*Math.pow(META[el.dataset.param][2]/META[el.dataset.param][1],+el.value)):el.value)}if(el.dataset.number&&el.value!==''&&Number.isFinite(+el.value)){setValue(el.dataset.number,el.value)}if(el.dataset.palette!==undefined){state.palette[+el.dataset.palette]=el.value;mark()}if(el.dataset.color){if(el.dataset.color==='internalColor'||el.dataset.color==='sssColor')upgrade(state);state[el.dataset.color]=el.value;mark()}});
+$('#controls').addEventListener('input',e=>{const el=e.target;if(el.dataset.param){setValue(el.dataset.param,el.dataset.log?sliderValue(el.dataset.param,+el.value):el.value)}if(el.dataset.number&&el.value!==''&&Number.isFinite(+el.value)){setValue(el.dataset.number,el.value)}if(el.dataset.palette!==undefined){state.palette[+el.dataset.palette]=el.value;mark()}if(el.dataset.color){if(el.dataset.color==='internalColor'||el.dataset.color==='sssColor')upgrade(state);state[el.dataset.color]=el.value;mark()}});
 $('#controls').addEventListener('click',e=>{if(e.target.closest('[data-uniform-grains]')){remember();Object.assign(state,{pSizeVar:0,pSizeSpread:0,pSizeBias:0,pLargeCount:0,pNodeRatio:0});mark();renderControls();toast('Diametri uniformi · quantità e forma conservate');return;}if(e.target.closest('[data-close-skin]')){remember();closeLivingSkin(state);mark();renderControls();toast('Pelle chiusa · aperture e pori azzerati');return;}if(e.target.closest('[data-dynamics-reset]')){remember();Object.assign(state,DYNAMICS_DEFAULTS);mark();renderControls();toast('Dinamica ripristinata');}});
 $('#controls').addEventListener('change',e=>{const el=e.target;if(el.dataset.grainSource){remember(undefined,'Distribuzione dei granelli');state.sceneGrains=grainMix(state);changeGrainSource(state,el.value);mark();persistCurrent();renderControls();return;}if(el.id==='finish-preset-file'){importFinishPreset(el);return;}if(el.dataset.finishSelect){remember();state[el.dataset.finishSelect]=Number(el.value);mark();renderControls();return;}if(el.id==='glyph-characters'){remember();state.finishGlyphChars=el.value||' .:-=+*#%@';mark();return;}if(el.dataset.livingEnabled){remember();state.pLiving=el.checked?2:0;mark();renderControls();return;}if(el.matches('input:not([data-layer-toggle]):not([data-audio]):not([data-force-param]):not([data-force-number]):not([data-force-enabled]):not([data-guide-param]):not([data-guide-number]):not([data-guide-flag])')){const key=el.dataset.param||el.dataset.number,before=dragBefore||state;const label=key?controlMeta(key)[0]+' '+format(key,parameterValue(key,before))+' → '+format(key,parameterValue(key)):undefined;remember(before,label);dragBefore=null}if(el.dataset.particleSelect){remember();if(el.dataset.particleSelect==='pLiving')applyLivingStyle(state,['off','fibres','tissue','membrane','veils'][Number(el.value)]);else state[el.dataset.particleSelect]=Number(el.value);mark();renderControls();}if(el.dataset.check){if(el.dataset.check==='keepMotionSpeed'){state.motionPeriod=state.duration;}if(el.dataset.check==='thinShellMode'){upgrade(state);state.thinShell=el.checked?1:0;}if(el.dataset.check==='environmentRotate')upgrade(state);state[el.dataset.check]=el.checked;finishOrderEditor?.sync();if(['finishGlyphSource','finishEdgeSource','finishGlitchAnimate','finishGlitchFlash','keepMotionSpeed','finishScanSource'].includes(el.dataset.check))renderControls();if(el.dataset.check==='perfectLoop'){if(el.checked){for(const t of Object.values(state.motions))t.cycles=Math.max(1,Math.round(t.cycles));for(const l of state.lights)for(const t of [l.orbit,l.pulse])t.cycles=Math.max(1,Math.round(t.cycles));for(const k of ['environmentCycles','filmCycles'])if(Number.isFinite(state[k]))state[k]=Math.max(1,Math.round(state[k]));}renderControls();}if(el.dataset.check.startsWith('animate')){masterMotion(el.dataset.check,el.checked);renderControls();if(el.checked)setPlaying(true)}mark()}if(el.id==='material-picker'&&el.value!==''){remember();material(state,+el.value);mark();renderControls();$('#art-name').textContent=state.materialName;}if(el.id==='environment'){remember();upgrade(state);state.environment=el.value;mark();renderControls()}if(el.id==='light-rig'&&el.value!==''){remember();lightRig(state,+el.value);selectedLightId=state.lights[0]?.id;syncMasterStates();mark();renderControls();setMode('light');toast('Schema di luci applicato')}if(el.id==='bg-mode'){remember();state.bgMode=el.value;mark();renderControls()}if(el.dataset.number){el.value=format(el.dataset.number,parameterValue(el.dataset.number))}if(tab==='motion'&&(['growthFlow','filmFlow','filmSwirl','pTravel','pVortex','pReentry','pLife','pBreath','pPulse','pSignal','pRandom','pJitter','pWander','pSpaceWarp'].includes(el.dataset.param||el.dataset.number)||el.dataset.check==='environmentRotate'))renderControls()});
 $('#controls').addEventListener('click',e=>{const m=e.target.closest('[data-mood]');if(m){remember();state.palette=[...MOODS[+m.dataset.mood].colors];mark();renderControls();toast(`Palette ${MOODS[+m.dataset.mood].name}`)}if(e.target.closest('#random-palette')){remember();state.palette=[...MOODS[Math.floor(Math.random()*MOODS.length)].colors];mark();renderControls()}if(e.target.closest('#show-lights'))setMode('light')});
@@ -431,7 +448,7 @@ async function download(){if(busy)return;let rendererFailed=false,seam=null;cons
  try{if(exportType!=='wallpaper'){exportWidth=+$('#export-width').value;exportHeight=+$('#export-height').value;if(!Number.isInteger(exportWidth)||!Number.isInteger(exportHeight)||exportWidth<64||exportHeight<64||exportWidth>4096||exportHeight>4096)throw new Error('Scegli dimensioni intere tra 64 e 4096 pixel.');if(exportType==='video'){exportWidth+=exportWidth%2;exportHeight+=exportHeight%2;}updateExportSize(exportWidth,exportHeight)}
  busyUI(true);progress(0,'Preparo la tua creazione…');await awaitIdleStop();await primingExport;await thumbnailQueue;await waitPaint();if(exportType!=='wallpaper'&&renderer&&!renderer.gl.isContextLost())await renderer.waitForGpu({cancelled:()=>cancelled});if(cancelled)return;
  if(exportType==='wallpaper'){
-  const {createWallpaper}=await import('./wallpaper-export.js?v=0b52b3909b22');
+  const {createWallpaper}=await import('./wallpaper-export.js?v=9d07961f209b');
   const file=await createWallpaper(snapshot);
   if(cancelled)return;
   save(file,uniqueDownloadName('prisma-wallpaper','html'));toast('Wallpaper HTML scaricato');return;
@@ -506,7 +523,7 @@ function applyTextDescription(text){
 }
 const assistantOptions={getState:()=>state,applyPlan:applyTextPlan,quickCommand:applyTextDescription,setPlaying,getSnapshot:()=>({state,ratio,phase,name:$('#art-name').textContent}),importCreation:data=>{const next=normalizeCreation(data.state);remember();adopt(next,'Creazione',{ratio:Number.isFinite(data.ratio)&&data.ratio>.1&&data.ratio<10?data.ratio:1,phase:Number.isFinite(data.phase)?data.phase:0});}};
 let assistantModule;
-function loadAssistant(){return assistantModule??=import('./assistant-client.js?v=0b52b3909b22').then(m=>m.mountCreativeAssistant(assistantOptions)).catch(()=>{assistantModule=null;$('#description-status').textContent='Assistente non disponibile. Chiudi e riapri per riprovare.';});}
+function loadAssistant(){return assistantModule??=import('./assistant-client.js?v=9d07961f209b').then(m=>m.mountCreativeAssistant(assistantOptions)).catch(()=>{assistantModule=null;$('#description-status').textContent='Assistente non disponibile. Chiudi e riapri per riprovare.';});}
 $('#assistant-section').addEventListener('toggle',()=>{if($('#assistant-section').open)void loadAssistant();});
 $('#creation-description').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('#description-form').requestSubmit();}};
 $('#description-undo').onclick=()=>{undo();$('#description-status').textContent='Ultima modifica annullata.';};
@@ -602,8 +619,8 @@ function loadInteractionPanel(id){
  if(id!=='audio'&&id!=='body')return;
  const invalidate=()=>{cancelIdlePreview();dirty=true;refined=false;};
  return interactionModules[id]??=(id==='audio'
-  ?import('./audio-reactive.js?v=0b52b3909b22').then(m=>{audioReactive=m.mountAudioReactive({getState:()=>state,remember,mark,renderControls,showTab,toast,setPlaying,invalidate});})
-  :import('./body-tracking.js?v=0b52b3909b22').then(m=>{bodyTracking=m.mountBodyTracking({board,getState:()=>state,remember,mark,renderControls,showTab,toast,invalidate});})
+  ?import('./audio-reactive.js?v=9d07961f209b').then(m=>{audioReactive=m.mountAudioReactive({getState:()=>state,remember,mark,renderControls,showTab,toast,setPlaying,invalidate});})
+  :import('./body-tracking.js?v=9d07961f209b').then(m=>{bodyTracking=m.mountBodyTracking({board,getState:()=>state,remember,mark,renderControls,showTab,toast,invalidate});})
  ).then(()=>{if(tab===id)renderControls();}).catch(()=>{delete interactionModules[id];if(tab===id)$('#controls').textContent='Controlli non disponibili. Riapri la scheda per riprovare.';});
 }
 try{tab=localStorage.getItem('prisma-last-tab')||'shape';}catch{}
@@ -614,7 +631,7 @@ const playgroundOptions={getSnapshot:()=>({state:structuredClone(state),ratio,ph
 async function openPlayground(){
  const button=$('#playground-open');button.disabled=true;
  try{
-  playgroundModule??=import('./playground.js?v=0b52b3909b22');
+  playgroundModule??=import('./playground.js?v=9d07961f209b');
   const {mountPlayground}=await playgroundModule;
   playground??=mountPlayground(playgroundOptions);
   window.prismaPlayground=playground;

@@ -1,27 +1,11 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=0b52b3909b22';
-import {opticalGLSL} from './particle-optics.js?v=0b52b3909b22';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=9d07961f209b';
+import {opticalGLSL} from './particle-optics.js?v=9d07961f209b';
 export const materialCavity=s=>Math.max(0,Math.min(1,(s.hollow||0)*(1-(s.wallThickness??.08))));
 
-// The opacity of a hollow particle uses the visible material along the ray.
-export const prismaShadingGLSL=`
-${FILM_PATTERN_GLSL}
-${opticalGLSL}
-uniform vec4 uMaterial,uFinish,uEnvironment,uGradient;
-uniform vec4 uParticleOptical;
-float particleWallCoverage(float radius){
- float inner=uParticleOptical.w;
- if(inner<=0.||radius>=inner)return 1.;
- float r2=radius*radius;
- float occupied=1.-sqrt(max(0.,inner*inner-r2)/max(.0001,1.-r2));
- // Even a nearly empty shell retains a visible reflected surface.
- return mix(1.,.22+.78*occupied,1.-uFinish.z);
-}
-uniform vec3 uPearl;uniform vec2 uFiberLight;
-uniform vec4 uFilmLayer,uParticleFilmMotion,uFilmObject;
-uniform vec3 uFilmRotation,uFilmResponse[24],uFilmWhite;
-uniform vec4 uColorLayers,uParticleCore;uniform vec4 uColorWave;uniform vec4 uColorWave2;uniform float uColorSoftness;
-uniform vec3 uPalette[12];uniform highp int uPaletteCount,uLightCount;
-uniform vec4 uLights[8];uniform vec3 uLightColors[8];uniform float uLightSizes[8];
+export const prismaPaletteGLSL=`
+uniform vec4 uGradient,uColorLayers,uColorWave,uColorWave2;
+uniform float uColorSoftness;
+uniform vec3 uPalette[12];uniform highp int uPaletteCount;
 vec3 prismaPaletteAt(float t){
  t=fract(t);
  float index=t*float(uPaletteCount);int a=int(floor(index)),b=(a+1)%uPaletteCount;
@@ -43,6 +27,29 @@ vec3 prismaColorLayers(vec3 p,vec3 base){
  return mix(base,mix(a,a*b*1.6,uColorLayers.w),uColorLayers.x);
 }
 vec3 prismaPalette(vec3 p,vec3 original){return prismaColorLayers(p,prismaPaletteBase(p,original));}
+`;
+
+// The opacity of a hollow particle uses the visible material along the ray.
+export const prismaShadingGLSL=`
+${FILM_PATTERN_GLSL}
+${opticalGLSL}
+uniform vec4 uMaterial,uFinish,uEnvironment;
+uniform vec4 uParticleOptical;
+float particleWallCoverage(float radius){
+ float inner=uParticleOptical.w;
+ if(inner<=0.||radius>=inner)return 1.;
+ float r2=radius*radius;
+ float occupied=1.-sqrt(max(0.,inner*inner-r2)/max(.0001,1.-r2));
+ // Even a nearly empty shell retains a visible reflected surface.
+ return mix(1.,.22+.78*occupied,1.-uFinish.z);
+}
+uniform vec3 uPearl;uniform vec2 uFiberLight;
+uniform vec4 uFilmLayer,uParticleFilmMotion,uFilmObject;
+uniform vec3 uFilmRotation,uFilmResponse[24],uFilmWhite;
+uniform vec4 uParticleCore;
+uniform highp int uLightCount;
+uniform vec4 uLights[8];uniform vec3 uLightColors[8];uniform float uLightSizes[8];
+${prismaPaletteGLSL}
 
 vec3 reflectedEnvironment(vec3 r,float rough){
  r.xz=mat2(cos(uEnvironment.y),-sin(uEnvironment.y),sin(uEnvironment.y),cos(uEnvironment.y))*r.xz;

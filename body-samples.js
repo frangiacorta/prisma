@@ -1,22 +1,14 @@
 // Sample the same local distance field the surface uses, before the camera
 // transform. Sampling is deterministic at any phase, including export seeks.
-import {BASE_FORM_GLSL} from './base-forms.js?v=0b52b3909b22';
+import {BASE_FORM_GLSL} from './base-forms.js?v=9d07961f209b';
 
-const vertex = `#version 300 es
-void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2.-1.,0.,1.);}`;
-
-const fragment = `#version 300 es
-precision highp float;
-precision highp int;
+export const bodyFieldGLSL = `
 uniform highp sampler2D uField;
 uniform vec4 uAtlas;
 uniform vec3 uMin,uMax;
-uniform vec2 uWarp,uProfile;
+uniform vec2 uWarp;
 uniform float uFloat,uPrimitive,uDeferred,uCavity;
-out vec4 samplePoint;
 ${BASE_FORM_GLSL}
-uint scramble(uint x){x^=x>>16u;x*=0x7feb352du;x^=x>>15u;x*=0x846ca68bu;return x^(x>>16u);}
-float random(inout uint x){x=scramble(x);return float(x>>8u)/16777216.;}
 vec2 sliceAt(vec2 xy,float z){
  vec2 tile=vec2(mod(z,uAtlas.y),floor(z/uAtlas.y));
  vec4 a=texture(uField,(tile*(uAtlas.x+2.)+xy+1.5)/uAtlas.z);
@@ -36,6 +28,30 @@ float distanceAt(vec3 p){
  float d=outerDistance(p);
  return uCavity>0.?max(d,-d-(1.-uCavity)):d;
 }
+`;
+
+export function bindBodyField(gl,field,placeholder,loc){
+ gl.activeTexture(gl.TEXTURE0);
+ gl.bindTexture(gl.TEXTURE_2D,field?.texture||placeholder);
+ gl.uniform1i(loc('uField'),0);
+ gl.uniform3fv(loc('uMin'),field?.lo||[-1,-1,-1]);gl.uniform3fv(loc('uMax'),field?.hi||[1,1,1]);
+ gl.uniform4fv(loc('uAtlas'),field?.atlas||[1,1,1,1]);gl.uniform2fv(loc('uWarp'),field?.warp||[0,0]);
+ gl.uniform1f(loc('uFloat'),+!!field?.float);gl.uniform1f(loc('uPrimitive'),field?.sphere||field?.primitive?1:0);
+ gl.uniform1f(loc('uBaseForm'),field?.form||0);gl.uniform1f(loc('uDeferred'),+!!field?.deferred);
+ gl.uniform1f(loc('uCavity'),field?.inner||0);
+}
+
+const vertex = `#version 300 es
+void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2.-1.,0.,1.);}`;
+
+const fragment = `#version 300 es
+precision highp float;
+precision highp int;
+${bodyFieldGLSL}
+uniform vec2 uProfile;
+out vec4 samplePoint;
+uint scramble(uint x){x^=x>>16u;x*=0x7feb352du;x^=x>>15u;x*=0x846ca68bu;return x^(x>>16u);}
+float random(inout uint x){x=scramble(x);return float(x>>8u)/16777216.;}
 float refine(vec3 start,vec3 axis,float lo,float hi,bool inside){
  for(int i=0;i<6;i++){float mid=(lo+hi)*.5;if((distanceAt(start+axis*mid)<0.)==inside)lo=mid;else hi=mid;}
  return (lo+hi)*.5;
@@ -139,13 +155,8 @@ export class BodySamples {
    if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('Buffer dei granelli non disponibile.');
    gl.viewport(0,0,this.width,height);gl.disable(gl.SCISSOR_TEST);gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);
    gl.bindVertexArray(this.vao);gl.useProgram(this.program);
-   gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,field.texture);
    const loc=name=>gl.getUniformLocation(this.program,name);
-   gl.uniform1i(loc('uField'),0);gl.uniform4fv(loc('uAtlas'),field.atlas);
-   gl.uniform3fv(loc('uMin'),field.lo);gl.uniform3fv(loc('uMax'),field.hi);gl.uniform2fv(loc('uWarp'),field.warp);
-   gl.uniform1f(loc('uFloat'),+field.float);gl.uniform1f(loc('uPrimitive'),+field.primitive);
-   gl.uniform1f(loc('uBaseForm'),field.form);gl.uniform1f(loc('uDeferred'),+field.deferred);
-   gl.uniform1f(loc('uCavity'),field.inner);
+   bindBodyField(gl,field,null,loc);
    gl.uniform2f(loc('uProfile'),s.pFill??0,s.pCloudCore??0);
    gl.drawArrays(gl.TRIANGLES,0,3);gl.bindVertexArray(null);gl.bindFramebuffer(gl.FRAMEBUFFER,null);
    this.key=key;

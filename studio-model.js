@@ -1,10 +1,10 @@
-import {GROWTH_DEFAULTS,GROWTH_META} from './growth-material.js?v=0b52b3909b22';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=0b52b3909b22';
-import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=0b52b3909b22';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=0b52b3909b22';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=0b52b3909b22';
-import {PARTICLE_CELL_TRACKS} from './particle-model.js?v=0b52b3909b22';
-import {BODY_LAYER_META} from './body-layers.js?v=0b52b3909b22';
+import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=9d07961f209b';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=9d07961f209b';
+import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=9d07961f209b';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=9d07961f209b';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=9d07961f209b';
+import {PARTICLE_CELL_TRACKS,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=9d07961f209b';
+import {BODY_LAYER_META} from './body-layers.js?v=9d07961f209b';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
@@ -14,7 +14,7 @@ export const TRACK_META={
  ...BODY_LAYER_META,
  ...STRUCTURE_TRACKS,
  ...CELLULAR_TRACKS,
- ...PARTICLE_CELL_TRACKS,
+ ...PARTICLE_CELL_TRACKS,...PARTICLE_VOLUME_TRACKS,...PARTICLE_TRAIL_TRACKS,...GROWTH_TRACKS,
  ...FRACTAL_TRACKS,
  pVeilStyle:['Petali / aureola / ventaglio',0,2,.01],pVeilMorph:['Trasformazione forma / veli',0,1,.01],pVeilSpread:['Apertura dei veli',0,1,.01],
  petalFlowPhase:['Scorrimento lungo le radici',0,1,.01],petalOrbitPhase:['Avanzamento continuo sulla sfera',0,1,.01],petalWeave:['Ampiezza intreccio',0,1,.01],
