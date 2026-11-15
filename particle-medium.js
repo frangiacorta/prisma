@@ -1,6 +1,6 @@
-import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=06ab443b8d11';
-import {prismaPaletteGLSL} from './particle-shading.js?v=06ab443b8d11';
-import {simplex3DGLSL} from './vendor/webgl-noise/simplex-3d.js?v=06ab443b8d11';
+import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=0049c9863913';
+import {prismaPaletteGLSL} from './particle-shading.js?v=0049c9863913';
+import {simplex3DGLSL} from './vendor/webgl-noise/simplex-3d.js?v=0049c9863913';
 
 const header=`#version 300 es
 precision highp float;
@@ -22,6 +22,7 @@ const bake=header+bounds+bodyFieldGLSL+simplex3DGLSL+`
 uniform vec4 uFogShape,uFogMotion,uFogPattern,uFogLight;
 uniform vec2 uFogCut;
 uniform float uHasBody,uFogSeed;
+uniform int uCellNeighbors;
 float cloudDistance(vec3 p){
  float d=length(p)-uFogShape.y;
  float hole=uFogShape.x;
@@ -37,13 +38,22 @@ vec3 siteOffset(vec3 cell){
 }
 vec2 cellularRidges(vec3 p){
  vec3 cell=floor(p),f=fract(p),closest=vec3(8.);
- for(int z=-1;z<=1;z++)for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){
-  vec3 offset=vec3(x,y,z),delta=offset+siteOffset(cell+offset)-f;
+ for(int neighbor=0;neighbor<uCellNeighbors;neighbor++){
+  vec3 offset=vec3(neighbor%3,(neighbor/3)%3,neighbor/9)-1.;
+  vec3 delta=offset+siteOffset(cell+offset)-f;
   float distance=dot(delta,delta),second=max(distance,closest.x);
   closest=vec3(min(distance,closest.x),min(second,closest.y),min(max(second,closest.y),closest.z));
  }
  vec3 d=sqrt(closest);
  return d.yz-d.x;
+}
+// Three Fourier modes with transverse velocity. The field bends strands
+// coherently without creating sharp local compression at individual cells.
+vec3 coherentFlow(vec3 p,float time){
+ vec3 k1=vec3(2.3,-1.7,1.2),k2=vec3(-1.1,2.8,1.7),k3=vec3(1.5,1.1,-3.1);
+ return vec3(0.,k1.z,-k1.y)*sin(dot(p,k1)+time)*.32+
+  vec3(k2.z,0.,-k2.x)*cos(dot(p,k2)-time)*.27+
+  vec3(k3.y,-k3.x,0.)*sin(dot(p,k3)+2.*time)*.22;
 }
 void main(){
  float n=uFogAtlas.x,cell=n+2.;
@@ -55,7 +65,8 @@ void main(){
  float d=uHasBody>.5?distanceAt(p):cloudDistance(p);
  float turbulence=uFogPattern.x,web=uFogPattern.y,frequency=uFogPattern.z;
  if(d>mix(.055,.25,turbulence)+web*.33){color=vec4(0.);return;}
- vec2 orbit=vec2(cos(uFogMotion.x),sin(uFogMotion.x));
+ float time=uFogMotion.x;
+ vec2 orbit=vec2(cos(time),sin(time));
  vec3 bend=p+vec3(orbit.y,orbit.x,orbit.x-orbit.y)*uFogMotion.y*.21;
  float turn=uFogMotion.z*(p.y*.52+orbit.y*.2);
  bend.xz=mat2(cos(turn),-sin(turn),sin(turn),cos(turn))*bend.xz;
@@ -80,23 +91,33 @@ void main(){
  float knot=0.,ridge=0.;
  if(web>.001){
   // A triple boundary between nearby cells is a connected edge in 3D.
-  vec3 cells=bend*vec3(1.,.84,1.19)*(1.05+frequency*.29)+curl*(.19+.44*turbulence);
+  float rhythm=time*uFogLight.x-1.7+sin(time-.5)*uFogLight.z;
+  float localPhase=rhythm+sin(rhythm)*(.21+.36*uFogLight.w);
+  float flash=pow(.5+.5*cos(localPhase),9.5)*uFogLight.y;
+  float swell=pow(.5+.5*cos(localPhase-.29),2.35)*uFogLight.y;
+  vec3 center=vec3(orbit.y*.42+.1*sin(time*2.),orbit.x*.34,orbit.y*.19)*(.36+.64*uFogMotion.w);
+  vec3 axis=normalize(vec3(.57+orbit.y*.55,-.63+.23*orbit.x,.34));
+  vec3 offset=p-center,along=axis*dot(offset,axis),across=offset-along;
+  float pulseAtP=pow(.5+.5*cos(localPhase-length(offset)*uFogMotion.w*1.9),5.5)*uFogLight.y;
+  vec3 current=bend-center+coherentFlow(bend,time)*(.27+turbulence*.37);
+  current+=across*(swell*.83)-along*(.22+.26*orbit.x);
+  vec3 cells=current*vec3(.88,.95,1.19)*(1.00+frequency*.24)+curl*(.12+.23*turbulence);
   cells+=vec3(uFogSeed*.85,-uFogSeed*.28,uFogSeed*.63);
   vec2 ridgeDistance=cellularRidges(cells);
-  float filament=exp(-ridgeDistance.y*18.);
-  float haze=exp(-ridgeDistance.x*12.-ridgeDistance.y*8.);
-  float pulse=pow(.5+.5*cos(uFogMotion.x*uFogLight.x-1.7),12.)*uFogLight.y;
-  vec3 pulseCenter=vec3(orbit.y*.27,orbit.x*.17,orbit.y*.25)*(.4+.6*uFogMotion.w);
-  vec3 plumeAxis=normalize(vec3(.42+orbit.y*.47,-.63,.34));
-  vec3 shift=p-pulseCenter;
-  float centerScale=dot(shift,plumeAxis);
-  float burst=exp(-15.*length(shift-plumeAxis*centerScale)-7.2*abs(centerScale))*pulse;
-  float inCloud=(1.-smoothstep(-.38,.15+web*.09,d+erosion*.44))*(1.-.97*pulse);
-  float cluster=smoothstep(.09,.75,.47+fold*.43+coarse*.46);
-  float band=exp(-pow((p.z-curl.z*.32)*mix(4.8,1.5,uFogPattern.w),2.));
-  ridge=web*inCloud*(filament*filament+haze*.04)*(.13+.87*cluster)*band;
-  knot=ridge*filament*cluster*(.3+.4*uFogLight.y)+burst*web*3.9;
-  cloud=mix(cloud,.004*cloud+ridge*.1+burst*.18,web);
+  float filament=exp(-ridgeDistance.y*20.);
+  float haze=exp(-ridgeDistance.x*6.-ridgeDistance.y*6.);
+  float contraction=length(across)*(.25+swell*1.1)+length(along)*.35*swell;
+  float freeSpace=d+contraction+coarse*.23+fold*.14-.37*length(along)*(1.-swell);
+  float envelope=1.-smoothstep(-.43,.24,mix(d+contraction,freeSpace,.39+.52*turbulence)+erosion*.52);
+  float suppression=1.-.98*mix(swell,pulseAtP,.45*uFogMotion.w);
+  float cluster=smoothstep(-.12,.68,.38+fold*.38+coarse*.57);
+  float band=exp(-pow((p.z-curl.z*.35)*mix(3.4,1.24,uFogPattern.w),2.));
+  float core=length(across)*(10.5+4.8*flash)+length(along)*(6.2+3.7*flash);
+  float burst=exp(-core)*(flash+.135*swell);
+  float halo=exp(-core*.46)*swell;
+  ridge=web*envelope*(filament+haze*.055)*(.23+.77*cluster)*band*suppression;
+  knot=ridge*filament*cluster*(.13+.21*pulseAtP)+web*(burst*5.1+halo*.045);
+  cloud=mix(cloud,.012*cloud+ridge*.117+burst*.155+halo*.073,web);
  }
  float core=length(p)/max(.06,uFogCut.y);
  float hollow=1.-uFogCut.x*(1.-smoothstep(.13,1.,core));
@@ -179,7 +200,9 @@ void main(){
   float depth=density.r*localStep*uFogMaterial.x;
   vec3 tint=exp(-uFogOptics.x*depth*(1.-pigment));
   float opacity=(1.-exp(-depth))*visible;
-  vec3 glow=mix(pigment,vec3(1.),min(.86,density.b*3.4))*localStep*(density.g*uFogMaterial.w+density.b*uFogOptics.w);
+  float heat=1.-exp(-density.b*3.8);
+  vec3 emissionColor=mix(pigment,mix(vec3(1.),normalize(pigment+vec3(.1)),.28),heat);
+  vec3 glow=emissionColor*localStep*(density.g*uFogMaterial.w+density.b*uFogOptics.w);
   radiance+=transmission*(pigment*tint*(irradiance+uFogMaterial.z)*opacity+glow*visible);
   transmission*=1.-max(opacity,min(.9,localStep*density.g*.36)*visible);
   if(transmission<.009)break;
@@ -208,7 +231,7 @@ export class ParticleMedium{
   const frequency=Math.min(8,1.7+s.pFrequency*.7),speed=s.perfectLoop===false?s.pCycles:Math.round(s.pCycles);
   const angle=phase*(Math.PI*2)*Math.max(1,speed)*(s.pDirection||1);
   const motion=[s.pTravel>0||Math.abs(s.pVortex)>0||s.pVolumeFilaments*s.pSignal>0?angle:0,s.pTravel,s.pVortex,s.pPropagation];
-  const key=[resolution,field?.key,field?.inner,...low,...high,s.seed,...motion,s.pOpening,s.pFill,s.pVolumeTurbulence,s.pVolumeFilaments,frequency,s.pPulse,s.pSignal,s.structCoreDark,s.structCoreRadius].join('|');
+  const key=[resolution,field?.key,field?.inner,...low,...high,s.seed,...motion,s.pOpening,s.pFill,s.pVolumeTurbulence,s.pVolumeFilaments,frequency,s.pPulse,s.pSignal,s.pSpeedSpread,s.pRhythm,s.structCoreDark,s.structCoreRadius].join('|');
   g.disable(g.DEPTH_TEST);g.disable(g.BLEND);g.disable(g.SCISSOR_TEST);g.bindVertexArray(o.empty);
   const common=p=>{o.u(p,'uFogAtlas',...atlas);o.u(p,'uFogMin',...low);o.u(p,'uFogMax',...high);};
   if(this.key!==key){
@@ -217,7 +240,9 @@ export class ParticleMedium{
    o.u(p,'uHasBody',+!!field);o.u(p,'uFogShape',s.pOpening,extent,0,0);
    o.u(p,'uFogPattern',s.pVolumeTurbulence,s.pVolumeFilaments,frequency,s.pFill);
    o.u(p,'uFogSeed',(s.seed%1601)*.013);o.u(p,'uFogMotion',...motion);
-   o.u(p,'uFogCut',s.structCoreDark||0,s.structCoreRadius??.3);o.u(p,'uFogLight',Math.max(1,s.pPulse||1),s.pSignal||0,0,0);
+   o.u(p,'uFogCut',s.structCoreDark||0,s.structCoreRadius??.3);
+   o.u(p,'uFogLight',Math.max(1,Math.round(s.pPulse||1)),s.pSignal||0,s.pSpeedSpread||0,s.pRhythm||0);
+   g.uniform1i(o.loc(p,'uCellNeighbors'),27);
    g.drawArrays(g.TRIANGLES,0,3);this.key=key;
   }
   const p=this.march;o.bind(this.image);g.useProgram(p.program);common(p);

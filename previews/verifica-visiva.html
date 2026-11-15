@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it">
+<html lang="it" data-release="0049c9863913">
 <head>
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,11 +24,13 @@
  <script type="module">
   const grid=document.querySelector('main'),loading=document.getElementById('loading');
   const cssSafe=/^[a-z0-9-]+$/;
+  const revision=document.documentElement.dataset.release;
+  const asset=name=>revision?name+'?v='+revision:name;
   const text=(tag,value)=>{const node=document.createElement(tag);node.textContent=value;return node;};
   const link=(label,url)=>{const a=text('a',label);a.href=url;return a;};
   const outcomes={raggiunto:'Raggiunto',vicino:'Vicino',parziale:'Parziale',lontano:'Scarto ampio',fonte:'Fonte esterna',funzionale:'Verifica funzionale'};
   try{
-   const data=await fetch('../moodboard/data.json',{cache:'no-cache'}).then(response=>{if(!response.ok)throw Error();return response.json();});
+   const data=await fetch(asset('../moodboard/data.json'),{cache:'no-cache'}).then(response=>{if(!response.ok)throw Error();return response.json();});
    const rendered=new Set();
    for(const item of data.items.filter(item=>item.kind==='project'&&item.comparisonDate&&item.resultPreset)){
     const slug=item.resultPreset.match(/^previews\/([a-z0-9-]+)\.prisma\.json$/)?.[1];
@@ -36,7 +38,7 @@
     rendered.add(slug);
     const article=document.createElement('article');article.id=slug;
     const video=document.createElement('video');video.controls=true;video.muted=true;video.playsInline=true;video.preload='none';video.setAttribute('aria-label',item.name);
-    video.src=slug+'.mp4';video.poster=slug+'.webp';
+    video.src=asset(slug+'.mp4');video.poster=asset(slug+'.webp');
     const body=document.createElement('div'),heading=text('h2',item.name),note=text('p',item.compareNote||'');
     body.append(heading,text('small',outcomes[item.comparisonOutcome]||'Verifica'),note,link('Apri preset','../?preset='+encodeURIComponent(item.resultPreset)),
      document.createTextNode(' · '),link('Confronta nella moodboard','../moodboard/#'+encodeURIComponent(item.id)));

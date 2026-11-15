@@ -1,10 +1,13 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=06ab443b8d11';
-import {opticalGLSL} from './particle-optics.js?v=06ab443b8d11';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=0049c9863913';
+import {LOOP_PALETTE_GLSL} from './structure-model.js?v=0049c9863913';
+import {opticalGLSL} from './particle-optics.js?v=0049c9863913';
 export const materialCavity=s=>Math.max(0,Math.min(1,(s.hollow||0)*(1-(s.wallThickness??.08))));
 
 export const prismaPaletteGLSL=`
 uniform vec4 uGradient,uColorLayers,uColorWave,uColorWave2;
 uniform float uColorSoftness;
+uniform vec4 uKnot,uKnotPath,uKnotPigment,uKnotFrame;
+uniform vec3 uKnotAxes,uKnotRotation;
 uniform vec3 uPalette[12];uniform highp int uPaletteCount;
 vec3 prismaPaletteAt(float t){
  t=fract(t);
@@ -26,7 +29,18 @@ vec3 prismaColorLayers(vec3 p,vec3 base){
  vec3 b=prismaPaletteAt(t-p.z*uColorLayers.y*.21+uColorLayers.z+.37);
  return mix(base,mix(a,a*b*1.6,uColorLayers.w),uColorLayers.x);
 }
-vec3 prismaPalette(vec3 p,vec3 original){return prismaColorLayers(p,prismaPaletteBase(p,original));}
+${LOOP_PALETTE_GLSL}
+vec3 prismaKnotBands(vec3 p,vec3 color){
+ if(uKnot.x*uKnotPigment.x<.0001)return color;
+ vec3 q=(p-vec3(uKnotFrame.yz,0.))/max(.001,uKnotFrame.x);
+ vec3 c=cos(uKnotRotation),s=sin(uKnotRotation);
+ q.xy=mat2(c.z,-s.z,s.z,c.z)*q.xy;
+ q.xz=mat2(c.y,-s.y,s.y,c.y)*q.xz;
+ q.yz=mat2(c.x,-s.x,s.x,c.x)*q.yz;
+ vec2 bands=loopBandCoordinates(q/uKnotAxes,uKnot,uKnotPath,uKnotPigment.xyz,uKnotPigment.w);
+ return mix(color,mix(prismaPaletteAt(bands.x),prismaPaletteAt(bands.y),uKnotPigment.z),uKnot.x*uKnotPigment.x);
+}
+vec3 prismaPalette(vec3 p,vec3 original){return prismaKnotBands(p,prismaColorLayers(p,prismaPaletteBase(p,original)));}
 `;
 
 // The opacity of a hollow particle uses the visible material along the ray.

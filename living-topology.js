@@ -1,4 +1,4 @@
-import {projectTension} from './vendor/xpbd/distance.js?v=06ab443b8d11';
+import {projectTension} from './vendor/xpbd/distance.js?v=0049c9863913';
 
 function contactCell(x,y,z){
  const stride=262144,limit=stride/2;

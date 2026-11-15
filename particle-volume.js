@@ -1,7 +1,7 @@
 // Deposit animated points into depth slices, then integrate extinction
 // from front to back. Density differences provide a local lighting normal.
-import {livingAttachmentGLSL} from './living-composition.js?v=06ab443b8d11';
-import {materialCavity} from './particle-shading.js?v=06ab443b8d11';
+import {livingAttachmentGLSL} from './living-composition.js?v=0049c9863913';
+import {materialCavity} from './particle-shading.js?v=0049c9863913';
 
 export const volumeResolveGLSL=`
 uniform highp sampler2D uViewDensity;

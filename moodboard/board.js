@@ -6,6 +6,11 @@ const outcomes={raggiunto:'Raggiunto',vicino:'Vicino',parziale:'Parziale',lontan
 const states={implemented:'Disponibile',partial:'In corso',proposed:'Da sviluppare',reference:'Riferimento'};
 let data,byId,preferences={},view=new URL(location.href).searchParams.get('view')||'board',onlySaved=false,current=null,lastFocus=null;
 const KEY='prisma-moodboard-choices-v1';
+const mediaVersion=new URL(import.meta.url).searchParams.get('v');
+function projectMedia(url){
+ if(!mediaVersion||!url?.startsWith('../previews/'))return url;
+ const media=new URL(url,location.href);media.searchParams.set('v',mediaVersion);return media.href;
+}
 try{preferences=JSON.parse(localStorage.getItem(KEY)||'{}');if(!preferences||Array.isArray(preferences)||typeof preferences!=='object')preferences={};}catch{$('#storage-status').textContent='Memoria locale non disponibile. Puoi comunque esportare le scelte di questa sessione.';}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(preferences));}catch{$('#storage-status').textContent='Salvataggio locale non riuscito: esporta le scelte prima di chiudere.';}}
 function pref(id){return preferences[id]||{};}
@@ -147,7 +152,12 @@ $('#import').onchange=async e=>{try{const file=e.target.files[0];if(!file)return
 window.addEventListener('popstate',()=>{const id=decodeURIComponent(location.hash.slice(1));if(byId?.has(id))openDetail(id,false);else if($('#detail').open){stopVideos();$('#detail').close();document.body.classList.remove('modal-open');current=null;}});
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!$('#detail').open){e.preventDefault();$('#search').focus();}});
 try{
- const response=await fetch('data.json?v=06ab443b8d11');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();byId=new Map(data.items.map(r=>[r.id,r]));
+ const response=await fetch('data.json?v=0049c9863913');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
+ for(const item of data.items)if(item.kind==='project'){
+  item.resultImage=projectMedia(item.resultImage);
+  item.resultVideo=projectMedia(item.resultVideo);
+ }
+ byId=new Map(data.items.map(r=>[r.id,r]));
  $('#archive-count').textContent=`${data.stats.videos} video · ${data.stats.images} immagini · ${data.stats.tools} strumenti · ${data.stats.projects} progetti`;
  $('#family').innerHTML='<option value="all">Tutte le categorie</option>'+data.categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');topicOptions();
  $('#workflow').innerHTML=data.workflow.map(s=>`<li>${esc(s)}</li>`).join('');$('#principles').innerHTML=data.principles.map(([name,text])=>`<details><summary>${esc(name)}</summary><p>${esc(text)}</p></details>`).join('');

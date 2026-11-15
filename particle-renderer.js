@@ -1,19 +1,20 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=06ab443b8d11';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=06ab443b8d11';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=06ab443b8d11';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=06ab443b8d11';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=06ab443b8d11';
-import {shadowLight} from './particle-shadow.js?v=06ab443b8d11';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=06ab443b8d11';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=06ab443b8d11';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=06ab443b8d11';
-import {ParticleLinks} from './particle-links.js?v=06ab443b8d11';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=06ab443b8d11';
-import {LayeredVeils} from './layered-veils.js?v=06ab443b8d11';
-import {LivingStructures} from './living-structures.js?v=06ab443b8d11';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=06ab443b8d11';
-import {forceBarrierGLSL} from './particle-forces.js?v=06ab443b8d11';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=06ab443b8d11';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=0049c9863913';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=0049c9863913';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=0049c9863913';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=0049c9863913';
+import {knotTurns} from './structure-model.js?v=0049c9863913';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=0049c9863913';
+import {shadowLight} from './particle-shadow.js?v=0049c9863913';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=0049c9863913';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=0049c9863913';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=0049c9863913';
+import {ParticleLinks} from './particle-links.js?v=0049c9863913';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=0049c9863913';
+import {LayeredVeils} from './layered-veils.js?v=0049c9863913';
+import {LivingStructures} from './living-structures.js?v=0049c9863913';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=0049c9863913';
+import {forceBarrierGLSL} from './particle-forces.js?v=0049c9863913';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=0049c9863913';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec2 uFocus;
 float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
@@ -215,12 +216,14 @@ const rad=Math.PI/180,rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255)
 const linearRgb=hex=>rgb(hex).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));
 const environments=['studio','sunset','neon','sky','aquarium','aurora','city'];
 const seedWidth=1024,seedHeight=293,storedGrains=seedWidth*seedHeight;
+const visibleGrains=s=>s.pLiving!==4&&s.pCount>0&&s.pOpacity>0;
+const visibleTrails=s=>s.pLiving!==4&&s.pTrailCount>0&&s.pTrailLength>0&&s.pTrailOpacity>0;
 const previewGrainLimit=options=>options.preview&&options.quality!=='full'?(options.quality==='fast'?storedGrains:450000):Infinity;
 export class ParticleRenderer{
  constructor(canvas){
   this.canvas=canvas;const gl=this.gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});
   if(!gl)throw Error('WebGL 2 non disponibile.');this.parallelExtension=gl.getExtension('KHR_parallel_shader_compile');this.pendingPrograms=new Set();this.float=!!gl.getExtension('EXT_color_buffer_float');this.pointSizeLimit=gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)[1];
-  this.points=this.program(pointVert,pointFrag);this.lines=null;this.pathProgram=null;this.blur=this.program(screenVert,blurFrag);this.compose=this.program(screenVert,composeFrag);
+  this.points=null;this.lines=null;this.pathProgram=null;this.blur=this.program(screenVert,blurFrag);this.compose=this.program(screenVert,composeFrag);
   this.empty=gl.createVertexArray();this.guides=new GuideField(this);this.targets=[];this.width=0;this.height=0;this.seed=null;this.completedFrames=0;this.gpuSample=0;this.gpuMilliseconds=null;
   this.maxSize=Math.min(4096,gl.getParameter(gl.MAX_TEXTURE_SIZE),gl.getParameter(gl.MAX_RENDERBUFFER_SIZE));this.recoveryExtension=gl.getExtension('WEBGL_lose_context');
   this.timerExtension=gl.getExtension('EXT_disjoint_timer_query_webgl2');this.queries=[];
@@ -297,6 +300,14 @@ export class ParticleRenderer{
   this.colorUniforms(p,s);
  }
  colorUniforms(p,s){const gl=this.gl;
+  this.u(p,'uKnot',s.loopBands>0?s.loopAmount||0:0,s.loopKnot||0,s.loopRadius??.8,s.loopTube??.22);
+  if(s.loopAmount>0&&s.loopBands>0){
+   this.u(p,'uKnotPath',s.loopFlat||0,s.loopTwist||0,s.loopWave||0,s.loopPhase||0);
+   this.u(p,'uKnotPigment',s.loopBands,s.loopBandCount??6,s.loopBandAxis||0,knotTurns(s));
+   this.u(p,'uKnotFrame',s.scale,s.positionX,s.positionY,0);
+   this.u(p,'uKnotAxes',s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ));
+   this.u(p,'uKnotRotation',s.rotateX*rad,s.rotateY*rad,s.rotateZ*rad);
+  }
   this.u(p,'uGradient',s.gradientAngle*rad,s.gradientScale,s.gradientOffset,1);this.u(p,'uColorSoftness',s.colorSoftness);this.u(p,'uColorLayers',s.colorLayers||0,s.colorLayerScale??1,s.colorLayerShift||0,s.colorLayerMix||0);
   this.u(p,'uColorWave',s.colorWaveAmount,s.colorWaveBands,s.colorWavePhase*Math.PI*2,0);this.u(p,'uColorWave2',s.colorWaveHeight,s.colorWaveRadius,s.colorWaveSwirl,s.colorWaveWarp);
   gl.uniform1i(this.loc(p,'uPaletteCount'),s.palette.length);gl.uniform3fv(this.loc(p,'uPalette'),s.palette.flatMap(linearRgb));
@@ -304,7 +315,7 @@ export class ParticleRenderer{
   if(lights.length){gl.uniform4fv(this.loc(p,'uLights'),lights.flatMap(l=>[l.x,l.y,l.z,l.power]));gl.uniform3fv(this.loc(p,'uLightColors'),lights.flatMap(l=>linearRgb(l.color)));gl.uniform1fv(this.loc(p,'uLightSizes'),lights.map(l=>l.size));}
  }
  ensureTrails(s){
-  if(!(s.pTrailCount>0&&s.pTrailLength>0))return;
+  if(!visibleTrails(s))return;
   // Float trajectories are always baked before drawing: do not compile a second
   // copy of the full simulation into each of the three ribbon samples.
   this.lines??=this.program(this.float?trailVert.replace('uBaked?texelFetch(uPaths,ivec2(j+1,row),0).xyz:trailPosition(j,r)','texelFetch(uPaths,ivec2(j+1,row),0).xyz'):trailVert,trailFrag);
@@ -318,21 +329,25 @@ export class ParticleRenderer{
   if(s.pLiving===4)this.veils??=new LayeredVeils(this,common);
   else if(s.pLiving>0)this.living??=new LivingStructures(this,common);
   if(s.pLinks>0&&s.pLiving!==4)this.connections??=new ParticleLinks(this,common);
-  const required=new Set([this.points,this.blur,this.compose]);
-  if(s.pOpacity>0&&Math.min(s.pCount,previewGrainLimit(options))>storedGrains)required.add(this.generatedPoints());
+  const required=new Set([this.blur,this.compose]);
+  if(visibleGrains(s)){
+   required.add(this.grainProgram());
+   if(Math.min(s.pCount,previewGrainLimit(options))>storedGrains)required.add(this.generatedPoints());
+  }
   if(s.pLiving!==4&&mediumAmount(s)<1&&particleVolumeAmount(s)>0){this.volume??=new ParticleVolume(this,common);required.add(this.volume.program);}
   if(mediumAmount(s)>0){this.medium??=new ParticleMedium(this);for(const p of this.medium.programs)required.add(p);}
   if(usesCloudAbsorption(s,this.float)&&shadowLight(s,false)){
    this.optics??=new ParticleOptics(this);
    required.add(this.optics.prepareVolume(grainGLSL));
   }
-  if(s.pTrailCount>0&&s.pTrailLength>0){required.add(this.lines);if(this.pathProgram)required.add(this.pathProgram);}
+  if(visibleTrails(s)){required.add(this.lines);if(this.pathProgram)required.add(this.pathProgram);}
   if(this.guides.program&&s.forcePaths?.some(p=>p.enabled&&p.points?.length>=2))required.add(this.guides.program);
   if(s.pLiving>0&&s.pLiving!==4)for(const p of this.living.programs(s))required.add(p);
   for(const effect of [s.pLiving===4?this.veils:null,s.pLinks>0&&s.pLiving!==4?this.connections:null])if(effect)for(const p of Object.values(effect))if(p?.uniforms instanceof Map)required.add(p);
   // An effect switched off while it compiles must not hold up the active scene.
   let ready=true;for(const p of required){if(p.ready)continue;if(this.parallelExtension&&!this.gl.getProgramParameter(p.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}this.finishProgram(p);}return ready;
  }
+ grainProgram(){return this.points??=this.program(pointVert,pointFrag);}
  generatedPoints(){return this.proceduralPoints??=this.program(pointVert.replace('#version 300 es','#version 300 es\n#define GENERATED_GRAINS 1'),pointFrag);}
  async prepareAsync(s,p,o={}){let slow=false;const start=performance.now();o.onStage?.('preparing');while(!o.cancelled?.()){if(this.prepare(s,p,o)){o.onStage?.('rendering');return true;}if(!slow&&performance.now()-start>30000){slow=true;o.onStage?.('preparing-slow');}await new Promise(r=>setTimeout(r,16));}return false;}
  draw(source,phase=0,w=this.canvas.width,h=this.canvas.height,options={}){
@@ -348,7 +363,8 @@ export class ParticleRenderer{
   const transmission=s.pLiving===4?1-s.pVeilOpacity:s.transparency;
   const caustics=s.pCaustic>0&&transmission>0&&s.refraction>1&&s.metal<1;
   const volume=usesCloudAbsorption(s,this.float);
-  const opticalLight=(s.pSelfShadow>0||caustics)?shadowLight(s,!volume):null;
+  const castsLight=s.pLiving>0||visibleGrains(s)||visibleTrails(s)||s.pLinks>0;
+  const opticalLight=castsLight&&(s.pSelfShadow>0||caustics)?shadowLight(s,!volume):null;
   if(this.optics){this.optics.ready=false;this.optics.volumeReady=false;this.optics.causticActive=false;}
   try{if(opticalLight){
    this.optics??=new ParticleOptics(this);this.optics.configure(s,opticalLight);
@@ -394,7 +410,7 @@ export class ParticleRenderer{
    this.occlusion=s.pSkin*(1-s.transparency)*s.pLivingOcclusion;
   }
   gl.disable(gl.DEPTH_TEST);gl.depthMask(false);
-  if(s.pTrailCount>0&&s.pTrailLength>0&&s.pTrailOpacity>0){
+  if(visibleTrails(s)){
    const total=Math.round(s.pTrailCount),count=options.preview&&options.quality==='fast'?Math.min(total,Math.max(128,Math.round(8000*this.geometryBudget))):total,segments=Math.round(options.preview&&options.quality==='fast'?Math.min(s.pTrailQuality,Math.max(24,Math.round(96*Math.sqrt(this.geometryBudget)/8)*8)):s.pTrailQuality);
    this.trailGeometry(segments);this.previewTrailCount=count;this.previewCounts.trails=count;
    const setup=p=>{this.settings(p,s,phase*s.pDirection);this.tex(p,'uSeeds',this.seedTexture,2);gl.uniform1i(this.loc(p,'uSegments'),segments);};
@@ -416,7 +432,7 @@ export class ParticleRenderer{
    }
   }else this.previewTrailCount=0;
   if(s.pLinks>0){this.connections??=new ParticleLinks(this,common);this.connections.draw(s,phase*s.pDirection);}
-  if(s.pCount>0&&s.pOpacity>0){
+  if(visibleGrains(s)){
    const cap=this.shadowPass?storedGrains:previewGrainLimit(options);
    const count=Math.min(Math.round(s.pCount),cap,Math.max(s.pLinks>0?s.pLinkNodes:256,Math.round(s.pCount*this.geometryBudget)));
    const points={...s,pLargeCount:s.pCount>storedGrains?Math.round(s.pLargeCount*count/s.pCount):s.pLargeCount,pOpacity:s.pOpacity*Math.min(16,s.pCount/count)};
@@ -424,7 +440,7 @@ export class ParticleRenderer{
    const sizes=grainDiameters(s),size=Math.max(s.pSize,s.pLargeCount>0?sizes.large:0,s.pLinks>0?sizes.node:0);
    const quad=Math.min(1024,size*(1+s.pSizeVar*.85)*Math.pow(2,s.pSizeSpread||0))*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
    this.opticalDrawState();
-   this.drawPoints(this.points,points,phase,quad,Math.min(storedGrains,count),0);
+   this.drawPoints(this.grainProgram(),points,phase,quad,Math.min(storedGrains,count),0);
    if(count>storedGrains)this.drawPoints(this.generatedPoints(),points,phase,quad,count-storedGrains,storedGrains);
   }
  }

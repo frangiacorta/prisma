@@ -1,8 +1,8 @@
 {
   "prismaProject": 2,
   "name": "Pellicola spettrale",
-  "createdAt": "2026-11-15T22:07:56.303Z",
-  "exportedAt": "2026-11-15T22:07:56.303Z",
+  "createdAt": "2026-11-15T23:41:21.178Z",
+  "exportedAt": "2026-11-15T23:41:21.178Z",
   "state": {
     "dynAmount": 0,
     "dynMass": 1,
@@ -249,7 +249,7 @@
     "refraction": 1.7,
     "thickness": 1,
     "metal": 0,
-    "roughness": 0.23,
+    "roughness": 0.27,
     "gloss": 1,
     "iridescence": 1,
     "emission": 0.02,
@@ -335,6 +335,7 @@
     "loopPhase": 0,
     "loopBands": 0,
     "loopBandCount": 6,
+    "loopBandAxis": 0,
     "structShell": 0,
     "structThickness": 0.09,
     "structFibres": 0,
@@ -344,6 +345,7 @@
     "structWeave": 0,
     "structWeaveVariation": 0,
     "structWeaveNodes": 0,
+    "structWeaveMembrane": 0,
     "structWeaveGrowth": 0,
     "structWeaveCup": 0.65,
     "structSlices": 0,
@@ -351,6 +353,7 @@
     "structSliceWidth": 0.24,
     "structRadial": 0,
     "structFan": 0,
+    "structFanBias": 0,
     "structPetalCount": 8,
     "structPetalWidth": 0.45,
     "structLayers": 0,
@@ -614,7 +617,7 @@
     "holeAspect": 1,
     "cutAspect": 1,
     "rotateZ": 0,
-    "coat": 0.7,
+    "coat": 0.51,
     "coatRoughness": 0.06,
     "fresnel": 1,
     "iridShift": 0,
@@ -635,10 +638,10 @@
     "subsurface": 0,
     "sssRadius": 0.55,
     "sssColor": "#ffd0ac",
-    "exposure": 0.24,
+    "exposure": 0.19,
     "brightness": 0,
     "contrast": 1,
-    "saturation": 1,
+    "saturation": 1.26,
     "temperature": 0,
     "photoTint": 0,
     "gamma": 1,
@@ -987,6 +990,18 @@
         "hold": 0,
         "mode": "cycle"
       },
+      "loopBandAxis": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
       "structShell": {
         "enabled": false,
         "amplitude": 0.2,
@@ -1048,6 +1063,18 @@
         "mode": "wave"
       },
       "structFan": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "structFanBias": {
         "enabled": false,
         "amplitude": 0.2,
         "cycles": 1,
@@ -1180,6 +1207,18 @@
         "mode": "wave"
       },
       "structRuffle": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "structWeaveMembrane": {
         "enabled": false,
         "amplitude": 0.2,
         "cycles": 1,
@@ -1768,16 +1807,16 @@
         "mode": "wave"
       },
       "rotateY": {
-        "enabled": false,
-        "amplitude": 360,
+        "enabled": true,
+        "amplitude": 21,
         "cycles": 1,
-        "phase": 0,
+        "phase": 25,
         "direction": 1,
         "curve": "sine",
         "pace": 0,
         "pacePhase": 0,
         "hold": 0,
-        "mode": "cycle"
+        "mode": "wave"
       },
       "rotateX": {
         "enabled": false,
@@ -1816,10 +1855,10 @@
         "mode": "wave"
       },
       "deform": {
-        "enabled": false,
-        "amplitude": 0.048,
+        "enabled": true,
+        "amplitude": 0.067,
         "cycles": 1,
-        "phase": 0,
+        "phase": 70,
         "direction": 1,
         "curve": "sine",
         "pace": 0,
@@ -1958,6 +1997,14 @@
         "pacePhase": 0,
         "hold": 0,
         "mode": "wave"
+      },
+      "filmThickness": {
+        "enabled": true,
+        "amplitude": 61,
+        "phase": 160,
+        "cycles": 1,
+        "mode": "wave",
+        "curve": "sine"
       }
     },
     "renderVersion": 2,
@@ -1970,8 +2017,8 @@
     "internalColor": "#e6f5ff",
     "fullness": 0,
     "thinShell": 0,
-    "filmFlow": 0.7,
-    "filmSwirl": 0.65,
+    "filmFlow": 0.56,
+    "filmSwirl": 0.28,
     "filmCycles": 1,
     "grounding": 0,
     "filmPattern": 1,
@@ -1979,7 +2026,7 @@
     "filmPatternWarp": 1.35,
     "filmPatternDetail": 0.85,
     "filmChroma": 1,
-    "filmDuo": 0.88,
+    "filmDuo": 0.94,
     "textureRandomness": 0,
     "textureWarp": 0,
     "textureLink": 0,

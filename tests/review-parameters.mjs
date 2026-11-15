@@ -5,11 +5,17 @@ import {startRegiaServer} from '../pc/server.mjs';
 const startCreativeServer=(port,options)=>startRegiaServer(port,options?.studioRoot);
 import {newCreation,normalizeCreation} from '../creative-model.js';
 import {parameterCatalog,writeParameter} from '../playground-model.js';
-import {fieldAt} from '../solid-renderer.js';
+import {fieldAt,sampleFrame} from '../solid-renderer.js';
 import {loopField} from '../structure-model.js';
 
 const imported=normalizeCreation({renderVersion:2,fullness:.19});
 assert.equal(imported.hollow,1);assert.equal(imported.wallThickness,.19);
+const macro={...newCreation(),scale:4.08};
+Object.assign(macro.motions.scale,{enabled:true,amplitude:.2,phase:90});
+assert(sampleFrame(macro,0).scale>4.2);assert(sampleFrame(macro,Math.PI).scale<4);
+Object.assign(macro.motions.structFlowPhase,{enabled:true,mode:'cycle',cycles:1,phase:21});
+assert.notEqual(sampleFrame(macro,0).structFlowPhase,sampleFrame(macro,Math.PI).structFlowPhase);
+assert.equal(sampleFrame(macro,0).structFlowPhase,sampleFrame(macro,Math.PI*2).structFlowPhase);
 const material=newCreation(),entry=parameterCatalog(material).find(p=>p.path==='fullness');
 assert(writeParameter(material,entry,.09));assert.equal(material.wallThickness,.09);
 const fractal={...newCreation(),fractalAmount:1,fractalKind:0};
@@ -41,6 +47,7 @@ try{
   const reaction={...solid,growthAmount:1,growthExtrusion:.5,growthOpening:.91,growthCoverage:.86,growthScale:.74,structShell:1,structThickness:.15};
   const sprout={...weave,structDensity:7,structWeaveVariation:.8,structWeaveNodes:.8,scale:1.35};
   const denseTrails={...trails,pTrailCount:5500,pTrailLength:.62,pTrailPersistence:.79,pOpacity:.51};
+  const knot={...solid,loopAmount:1,loopKnot:1,loopTurns:5,loopBands:1,loopBandCount:2};
   const cases=[
    ['Dispersione',glass,'dispersion',0,1],
    ['Spessore ottico',glass,'thickness',.05,3.8],
@@ -69,6 +76,10 @@ try{
    ['Steli nel reticolo',sprout,'structWeaveGrowth',0,1],
    ['Coppe nel reticolo',{...sprout,structWeaveGrowth:1},'structWeaveCup',0,1],
    ['Dalla sfera alle lamine',{...solid,structThickness:.11,stretchY:1.2},'structFan',0,1],
+   ['Apertura delle lamine',{...glass,structThickness:.12,structFan:1,structPetalCount:4,stretchY:1.2},'structFanBias',0,1],
+   ['Membrana tra i rami',{...sprout,structWeaveVariation:.98,structWeaveGrowth:.56},'structWeaveMembrane',0,1],
+   ['Fasce orientabili sulla forma',knot,'loopBandAxis',0,1],
+   ['Fasce orientabili sui granelli',{...p,...knot,engine:'solid',sceneGrains:1,grainSource:'body',pCount:7000,pTrailCount:0},'loopBandAxis',0,1],
    ['Fori della trama',reaction,'growthOpening',0,1],
    ['Estrusione della trama',{...reaction,sceneGrains:.64,pCount:9000,pTrailCount:0},'growthExtrusion',0,1],
    ['Densità sopra 300.000',{...p,pSize:.58,pOpacity:.16,pTrailCount:0},'pCount',300000,2000000],

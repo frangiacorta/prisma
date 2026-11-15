@@ -1,8 +1,8 @@
 {
   "prismaProject": 2,
   "name": "Filamenti in macro",
-  "createdAt": "2026-11-15T22:07:56.298Z",
-  "exportedAt": "2026-11-15T22:07:56.298Z",
+  "createdAt": "2026-11-15T23:26:09.696Z",
+  "exportedAt": "2026-11-15T23:26:09.696Z",
   "state": {
     "dynAmount": 0,
     "dynMass": 1,
@@ -340,6 +340,7 @@
     "loopPhase": 0,
     "loopBands": 0,
     "loopBandCount": 6,
+    "loopBandAxis": 0,
     "structShell": 0,
     "structThickness": 0.09,
     "structFibres": 0,
@@ -349,6 +350,7 @@
     "structWeave": 0,
     "structWeaveVariation": 0,
     "structWeaveNodes": 0,
+    "structWeaveMembrane": 0,
     "structWeaveGrowth": 0,
     "structWeaveCup": 0.65,
     "structSlices": 0,
@@ -356,6 +358,7 @@
     "structSliceWidth": 0.24,
     "structRadial": 0,
     "structFan": 0,
+    "structFanBias": 0,
     "structPetalCount": 8,
     "structPetalWidth": 0.45,
     "structLayers": 0,
@@ -992,6 +995,18 @@
         "hold": 0,
         "mode": "cycle"
       },
+      "loopBandAxis": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
       "structShell": {
         "enabled": false,
         "amplitude": 0.2,
@@ -1053,6 +1068,18 @@
         "mode": "wave"
       },
       "structFan": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "structFanBias": {
         "enabled": false,
         "amplitude": 0.2,
         "cycles": 1,
@@ -1185,6 +1212,18 @@
         "mode": "wave"
       },
       "structRuffle": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "structWeaveMembrane": {
         "enabled": false,
         "amplitude": 0.2,
         "cycles": 1,

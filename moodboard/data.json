@@ -13464,7 +13464,7 @@
       "resultVideo": "../previews/mandelbulb-dettaglio.mp4",
       "compareNote": "Mandelbulb con ripetizioni a più scale, cavità sottili e metallo iridescente. Il preset espone formula, iterazioni e spessore.",
       "comparisonRef": "s12-01",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/mandelbulb-dettaglio.prisma.json",
       "comparisonOutcome": "parziale"
     },
@@ -13556,10 +13556,10 @@
       ],
       "category": "movement",
       "addedOn": "2026-10-10",
-      "compareNote": "Nucleo chiaro con scie lunghe in rotazione. Densità, traiettorie e ramificazioni si regolano nella stessa scena.",
+      "compareNote": "Nucleo chiaro con scie lunghe in rotazione. Densità, traiettorie e ramificazioni si regolano nella stessa scena. La forma del nucleo e le scie radiali si discostano dalla fonte.",
       "comparisonOutcome": "parziale",
       "comparisonRef": "s03-04",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/percorsi-fibre.prisma.json",
       "resultImage": "../previews/percorsi-fibre.webp",
       "resultVideo": "../previews/percorsi-fibre.mp4",
@@ -14126,7 +14126,7 @@
       "addedOn": "2026-10-10",
       "compareNote": "La transizione Superficie ↔ granelli condivide la geometria. Nel Playground si può animare o scorrere a mano la variante della scena.",
       "comparisonOutcome": "funzionale",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-16"
     },
     {
       "id": "roadmap-particle-volume",
@@ -14346,7 +14346,7 @@
       "resultVideo": "../previews/volume-denso.mp4",
       "compareNote": "Densità 3D continua, ombre interne e volute attraversano il profilo della forma. La cavità e la diffusione del rosso restano diverse dalla fonte.",
       "comparisonRef": "s09-01",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/volume-denso.prisma.json",
       "comparisonOutcome": "parziale"
     },
@@ -14525,7 +14525,7 @@
       "compareNote": "Guscio cavo con bordo iridescente blu e centro in ombra. I picchi di luce della fonte restano più luminosi sul bordo.",
       "comparisonOutcome": "parziale",
       "comparisonRef": "s09-04",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-16"
     },
     {
       "id": "roadmap-fibre-motion",
@@ -14697,9 +14697,9 @@
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
-      "compareNote": "Lamine curve sovrapposte con piegatura e luce trasmessa. Le ondulazioni e la trama delle fibre si discostano dal movimento della fonte.",
+      "compareNote": "Lamine biforcate, pieghe che scorrono verso i lembi e microtexture radiale in controluce. Restano diversi i contorni e l’addensamento della trama durante il movimento.",
       "comparisonRef": "s06-01",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/velo-fibre.prisma.json",
       "comparisonOutcome": "parziale"
     },
@@ -14862,9 +14862,9 @@
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/reticolo-giunzioni.prisma.json",
-      "compareNote": "Pori irregolari, steli curvi e coppe concave crescono dalle stesse giunzioni. La trama fra gli steli rimane più rada della fonte.",
+      "compareNote": "Noduli, ponti porosi e steli con coppe crescono dalle stesse giunzioni in macro. Restano diversi la finezza delle fibre e il modo in cui il tessuto si allunga.",
       "comparisonRef": "s07-05",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "comparisonOutcome": "parziale"
     },
     {
@@ -15111,7 +15111,7 @@
       "compareNote": "Istanziazione delle cellule con variazione di dimensione, rilievo e luce. Il tutorial è consultabile sul sito dell’autore.",
       "comparisonOutcome": "fonte",
       "comparisonSource": "https://www.elekktronaut.com/tutorials/cellular-noise-with-instancing",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-16"
     },
     {
       "id": "roadmap-recursive-warp",
@@ -15236,7 +15236,7 @@
       "compareNote": "Distorsione, colore e ricircolo temporale applicati direttamente alla forma di Prisma.",
       "comparisonOutcome": "fonte",
       "comparisonSource": "https://www.youtube.com/watch?v=AxXu0dw6fjQ",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/distorsione-e-ricircolo.prisma.json",
       "resultVideo": "../previews/distorsione-e-ricircolo.mp4"
     },
@@ -15378,7 +15378,7 @@
       "compareNote": "Due tratti del pennello salvati nel preset. Il pennello deforma la forma renderizzata e segue l’inquadratura durante il movimento.",
       "comparisonOutcome": "fonte",
       "comparisonSource": "https://www.youtube.com/watch?v=8T88sYeSUug",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/liquido-sulla-forma.prisma.json",
       "resultVideo": "../previews/liquido-sulla-forma.mp4"
     },
@@ -15513,10 +15513,10 @@
       "resultUrl": "../previews/verifica-visiva.html#impronte-moto",
       "resultVideo": "../previews/impronte-moto.mp4",
       "resultPreset": "previews/impronte-moto.prisma.json",
-      "compareNote": "Accumulo della luce con decadimento e sovrapposizione lungo il loop. Il tutorial usa anche il rilevamento dei battiti.",
+      "compareNote": "Accumulo della luce con decadimento e sovrapposizione. Il loop parte con la persistenza già inizializzata. Il tutorial usa anche il rilevamento dei battiti.",
       "comparisonOutcome": "fonte",
       "comparisonSource": "https://www.patreon.com/pppanik/posts/audioreactive-86240898",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-16"
     },
     {
       "id": "roadmap-note-events",
@@ -15795,7 +15795,7 @@
       "resultPreset": "previews/membrana-contatto.prisma.json",
       "compareNote": "Sequenza di verifica del contatto su una membrana in movimento.",
       "comparisonOutcome": "funzionale",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-16"
     },
     {
       "id": "roadmap-filament-planets",
@@ -16108,7 +16108,7 @@
       "addedOn": "2026-10-10",
       "compareNote": "Filamenti avvolti sulla forma con spessore e lunghezza leggibili in macro. Il fuoco selettivo e la palette lungo i fili si regolano nel preset.",
       "comparisonRef": "s13-01",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/filamenti-macro.prisma.json",
       "comparisonOutcome": "parziale"
     },
@@ -16245,9 +16245,9 @@
       "addedOn": "2026-10-10",
       "resultImage": "../previews/nodo-laccato.webp",
       "resultUrl": "../previews/verifica-visiva.html#nodo-laccato",
-      "compareNote": "Nodo compatto con avvolgimenti, fasce fitte e riflessi di vernice. Nella reference cambia anche il fondo durante la rotazione.",
+      "compareNote": "Le fasce possono seguire la curva del tubo mentre il nodo ruota, con orientamento e ripetizioni regolabili. Nella fonte cambiano anche il fondale e la direzione della rotazione.",
       "comparisonRef": "s16-02",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/nodo-laccato.prisma.json",
       "resultVideo": "../previews/nodo-laccato.mp4",
       "comparisonOutcome": "parziale"
@@ -16420,7 +16420,7 @@
       "compareNote": "Griglia di pixel, segni e separazione RGB su una forma Prisma. La griglia segue i colori e le luci della scena. La fonte applica lo stesso principio a un ritratto.",
       "comparisonOutcome": "parziale",
       "comparisonRef": "img-01",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/segni-mosaico.prisma.json",
       "resultImage": "../previews/segni-mosaico.webp",
       "resultVideo": "../previews/segni-mosaico.mp4"
@@ -16624,9 +16624,9 @@
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/lamelle-asimmetriche.prisma.json",
-      "compareNote": "Lamine sovrapposte, pigmento vicino al nucleo scuro e margini curvi. Le aperture fra i lobi e la piega dei bordi restano diverse dalla fonte.",
+      "compareNote": "Fogli sovrapposti con assorbimento ridotto, nucleo scuro e pigmento ciano e ambra. La disposizione delle pieghe e la loro traiettoria rimangono diverse dalla fonte.",
       "comparisonRef": "s17-01",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "comparisonOutcome": "parziale"
     },
     {
@@ -16768,9 +16768,9 @@
       "engine": "particles",
       "resultImage": "../previews/ricircolo-luminoso.webp",
       "resultUrl": "../previews/verifica-visiva.html#ricircolo-luminoso",
-      "compareNote": "Ramificazioni nel volume e lampi che concentrano l’emissione. La distribuzione dei nodi e il ritmo restano diversi dalla fonte.",
+      "compareNote": "Filamenti tridimensionali si contraggono verso un nucleo in movimento e si riaprono con impulsi sfalsati. I percorsi dei rami e la cadenza rimangono diversi dalla fonte.",
       "comparisonRef": "s18-05",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/ricircolo-luminoso.prisma.json",
       "resultVideo": "../previews/ricircolo-luminoso.mp4",
       "comparisonOutcome": "parziale",
@@ -16964,7 +16964,7 @@
       "resultUrl": "../previews/verifica-visiva.html#impulsi-sottili",
       "compareNote": "Scie raddrizzate con impulsi localizzati e rotazione lungo il loop. Coda, intensità e ramificazione si regolano nello stesso preset.",
       "comparisonRef": "s18-02",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/impulsi-sottili.prisma.json",
       "resultVideo": "../previews/impulsi-sottili.mp4",
       "comparisonOutcome": "parziale"
@@ -17223,7 +17223,7 @@
       "compareNote": "Due milioni di granelli nel render. Il ricircolo, il diametro e la rete dei collegamenti sono regolabili. La densità lungo il bordo differisce dalla fonte.",
       "comparisonOutcome": "parziale",
       "comparisonRef": "img-20261010-02",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-16"
     },
     {
       "id": "project-cobalto-oro",
@@ -17313,7 +17313,7 @@
       "addedOn": "2026-10-10",
       "compareNote": "Confronto di venature, contrasto cobalto-oro e riflessi cromatici durante la deformazione. Il preset resta completamente modificabile.",
       "comparisonRef": "s11-01",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/pellicola-spettrale.prisma.json",
       "comparisonOutcome": "parziale"
     },
@@ -17409,7 +17409,7 @@
       "compareNote": "Riflessi direzionali, trasparenza e fasci. Il confronto riguarda la luce sui fili.",
       "comparisonOutcome": "parziale",
       "comparisonRef": "s06-01",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-16"
     },
     {
       "id": "project-pellicola-viva",
@@ -17496,7 +17496,7 @@
       "compareNote": "La pelle iridescente passa da bolla ad anello con i granelli ancora visibili. Il preset regola forma, cavità, colori, trasparenza e variazione nel tempo.",
       "comparisonOutcome": "parziale",
       "comparisonRef": "s07-03",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-16"
     },
     {
       "id": "project-moodboard",
@@ -19430,7 +19430,7 @@
       "compareNote": "Mosaico a pixel netti e spostamenti a bande, applicati in tre riquadri della forma. L’ordine e le dimensioni si salvano con il preset.",
       "comparisonOutcome": "funzionale",
       "comparisonRef": "img-s16-mosaic",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/mosaico-finestre.prisma.json",
       "resultImage": "../previews/mosaico-finestre.webp",
       "resultVideo": "../previews/mosaico-finestre.mp4",
@@ -22914,7 +22914,7 @@
       "compareNote": "Distorsione, sfocatura e dispersione su una trama di vetro. Il riferimento descrive un materiale Blender 3D.",
       "comparisonOutcome": "parziale",
       "comparisonSource": "https://superhivemarket.com/products/opticlab",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/rifrazione-scene.prisma.json",
       "resultImage": "../previews/rifrazione-scene.webp",
       "resultVideo": "../previews/rifrazione-scene.mp4",
@@ -23031,10 +23031,10 @@
       },
       "addedOn": "2026-10-21",
       "resultPreset": "previews/trama-reazione.prisma.json",
-      "compareNote": "La reazione-diffusione genera canali e isole con colore e rilievo regolabili. Il preset anima lo scorrimento del motivo.",
+      "compareNote": "La reazione-diffusione genera rilievi che scorrono su una forma aperta, con distorsione e feedback. La forma e la sequenza restano diverse dalla fonte.",
       "comparisonOutcome": "fonte",
       "comparisonSource": "https://www.karlsims.com/rd.html",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultImage": "../previews/trama-reazione.webp"
     },
     {
@@ -23325,10 +23325,10 @@
       "category": "form",
       "engine": "solid",
       "resultPreset": "previews/nacre-traslucida.prisma.json",
-      "compareNote": "Spine rastremate, cellule con luce interna, riflessi rosa e verde acqua. La distribuzione delle cellule e delle spine rimane procedurale.",
+      "compareNote": "Le spine si ritirano e ricrescono mentre le cellule cambiano volume. I riflessi sono rosa e verde acqua. La distribuzione delle cellule e la direzione delle spine differiscono dalla fonte.",
       "comparisonOutcome": "vicino",
       "comparisonRef": "s04-01",
-      "comparisonDate": "2026-11-15"
+      "comparisonDate": "2026-11-16"
     },
     {
       "id": "roadmap-growth-geometry",
@@ -23355,10 +23355,10 @@
       ],
       "addedOn": "2026-11-15",
       "where": "Materiale → Geometria della trama · Forma → Suddivisione radiale e strati",
-      "compareNote": "Estrusione e aperture reali dallo stesso campo Gray–Scott. Lo spessore, le fasce e la luce del labirinto restano da affinare rispetto alla fonte.",
+      "compareNote": "Il campo Gray–Scott genera rilievi e aperture su fasce che si aprono durante il loop. Restano diversi la scala del labirinto, i colori e la regia della fonte.",
       "comparisonOutcome": "parziale",
       "comparisonSource": "https://www.arkestra.app/",
-      "comparisonDate": "2026-11-15",
+      "comparisonDate": "2026-11-16",
       "resultPreset": "previews/trama-estrusa.prisma.json",
       "resultImage": "../previews/trama-estrusa.webp",
       "resultVideo": "../previews/trama-estrusa.mp4",

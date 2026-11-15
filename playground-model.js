@@ -1,12 +1,12 @@
 // Project-only data: never retain devices, canvases or a nested performance.
-import {META,GROUPS} from './model.js?v=06ab443b8d11';
-import {cloudBody,grainMix} from './body-layers.js?v=06ab443b8d11';
-import {CONTROL_NAMES} from './control-vocabulary.js?v=06ab443b8d11';
-import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=06ab443b8d11';
-import {LIGHT_META,TRACK_META,syncMaterialControl} from './studio-model.js?v=06ab443b8d11';
-import {FORCE_META} from './particle-forces.js?v=06ab443b8d11';
-import {PATH_META} from './particle-paths.js?v=06ab443b8d11';
-import {normalizeFlow} from './flow-model.js?v=06ab443b8d11';
+import {META,GROUPS} from './model.js?v=0049c9863913';
+import {cloudBody,grainMix} from './body-layers.js?v=0049c9863913';
+import {CONTROL_NAMES} from './control-vocabulary.js?v=0049c9863913';
+import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=0049c9863913';
+import {LIGHT_META,TRACK_META,syncMaterialControl} from './studio-model.js?v=0049c9863913';
+import {FORCE_META} from './particle-forces.js?v=0049c9863913';
+import {PATH_META} from './particle-paths.js?v=0049c9863913';
+import {normalizeFlow} from './flow-model.js?v=0049c9863913';
 export const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const number=(x,f,a,b)=>Number.isFinite(x)?clamp(x,a,b):f;
 const label=(x,f='',n=80)=>typeof x==='string'?x.replace(/[\x00-\x1f<>]/g,'').slice(0,n):f;

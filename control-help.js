@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=06ab443b8d11';
-import {EXTRA_HELP} from './control-help-extra.js?v=06ab443b8d11';
-import {FRACTAL_HELP} from './fractal-form.js?v=06ab443b8d11';
-import {CELLULAR_HELP} from './cellular-form.js?v=06ab443b8d11';
-import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=06ab443b8d11';
-import {trailLightCompensation} from './particle-model.js?v=06ab443b8d11';
+import {AUDIO_HELP} from './audio-model.js?v=0049c9863913';
+import {EXTRA_HELP} from './control-help-extra.js?v=0049c9863913';
+import {FRACTAL_HELP} from './fractal-form.js?v=0049c9863913';
+import {CELLULAR_HELP} from './cellular-form.js?v=0049c9863913';
+import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=0049c9863913';
+import {trailLightCompensation} from './particle-model.js?v=0049c9863913';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',
@@ -136,7 +136,8 @@ const HELP={
  pContactClearance:'Distanza relativa tra una piega e la faccia più vicina del reticolo. Cresce rispetto alla dimensione media delle maglie.',
  pCounterflow:'Fa ruotare nucleo e guscio in direzioni opposte in fasi diverse del loop.',
  pVeilCrease:'Estende l’ondulazione dei bordi verso il centro. Regola prima Ondulazione dei bordi.',
- loopBands:'Mescola la palette lungo il percorso toroidale. Usa Apertura ad anello per farlo emergere.',
+ loopBands:'Mescola la palette con le fasce dell’anello. Usa Apertura ad anello per farlo emergere.',
+ loopBandAxis:'Ruota la direzione delle fasce sulla sezione del tubo. A 1 seguono la curva del nodo.',
  filWrap:'Avvolge i filamenti intorno al corpo. Il segno cambia il verso e il numero indica quanti giri compie una fibra di lunghezza massima. Pettinatura orienta i percorsi, Curvatura e Arricciamento li differenziano.',
  filRibbon:'Appiattisce la sezione dei filamenti. Aumenta lo spessore per vederla da lontano.',
  pVolumeHold:'Mantiene il volume di riferimento mentre la struttura si deforma. Per misurarlo considera chiusa l’apertura della pelle; valori alti contrastano il respiro.',
@@ -279,10 +280,11 @@ export function controlCondition(s,key){
  if(key==='refraction'&&!surface&&!positive('pLighting')&&!positive('pCaustic'))return 'Attiva Risposta alle luci per vedere l’indice dei granelli.';
  if(key==='pCaustic'&&(!particles||!positive('transparency')||s.refraction<=1||s.metal>=1||!s.lights?.some(l=>l.enabled&&l.power>0&&l.y>s.pShadowHeight)))return 'Servono granelli trasparenti, indice sopra 1 e una luce sopra il piano.';
  if(key==='loopTwist'&&(!positive('loopAmount')||!positive('loopFlat')))return 'Apri l’anello e appiattisci la sezione per vedere la torsione.';
- if(key==='structPetalWidth'&&!positive('structRadial'))return 'Aumenta Separazione radiale.';
+ if(key==='structPetalWidth'&&!positive('structRadial')&&!positive('structFan'))return 'Aumenta Separazione radiale o Lamine curve.';
+ if(key==='structFanBias'&&!positive('structFan'))return 'Aumenta Lamine curve.';
  if(key==='loopTurns'&&(!positive('loopAmount')||!positive('loopKnot')))return 'Aumenta Apertura ad anello e Intreccio del nodo.';
  if(/^structWeave(Variation|Nodes)$/.test(key)&&!positive('structFibres'))return 'Aumenta Separazione in fibre per aprire il reticolo.';
- if(key==='structPetalWidth'&&positive('structFan'))return '';
+ if(key==='structWeaveMembrane'&&(!positive('structFibres')||!positive('structWeft')||!positive('structShell')))return 'Aumenta fibre, tessitura e svuotamento per aprire la membrana fra i rami.';
  if(key==='structWeaveCup'&&!positive('structWeaveGrowth'))return 'Aumenta Crescita degli steli.';
  if(key==='structWeaveGrowth'&&(!positive('structFibres')||!positive('structWeft')||!positive('structShell')))return 'Aumenta fibre, tessitura e svuotamento per creare le giunzioni.';
  if(key==='structWeaveNodes'&&!positive('structWeft'))return 'Aumenta i fili trasversali per creare giunzioni.';
@@ -311,7 +313,7 @@ export function controlCondition(s,key){
  if(/^filPulse(Cycles|Width)$/.test(key)&&!positive('filPulse'))return 'Aumenta l’intensità degli impulsi sui filamenti.';
  if(/^growth[A-Z]/.test(key)&&key!=='growthAmount'&&!positive('growthAmount'))return 'Aumenta Intensità della reazione-diffusione.';
  if(key==='pVeilCrease'&&!s.pVeilRipple)return 'Aumenta Ondulazione dei bordi.';
- if(key==='loopBandCount'&&!s.loopBands)return 'Aumenta Fasce lungo il percorso.';
+ if(['loopBandCount','loopBandAxis'].includes(key)&&!s.loopBands)return 'Aumenta Intensità fasce.';
  if(key==='pContactClearance'&&(!s.pSelfContact||(s.pLiving===1&&!s.pSkin)))return 'Aumenta Contatto tra pieghe in un tessuto o su una superficie.';
  if(key==='pVolumeShadow'&&!positive('pVolumeContinuity')&&(!positive('pSelfShadow')||!s.pCount||!s.pOpacity||!s.pLighting))return 'Attiva Ombre reciproche, granelli visibili e Risposta alle luci.';
  if(key==='pCausticSoftness'&&!positive('pCaustic'))return 'Aumenta la caustica.';
