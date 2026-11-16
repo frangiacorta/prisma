@@ -1,6 +1,6 @@
-import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=93b0d9476f96';
-import {prismaPaletteGLSL} from './particle-shading.js?v=93b0d9476f96';
-import {simplex3DGLSL} from './vendor/webgl-noise/simplex-3d.js?v=93b0d9476f96';
+import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=00f94f9b4def';
+import {prismaPaletteGLSL} from './particle-shading.js?v=00f94f9b4def';
+import {simplex3DGLSL} from './vendor/webgl-noise/simplex-3d.js?v=00f94f9b4def';
 
 const header=`#version 300 es
 precision highp float;
@@ -30,6 +30,17 @@ float cloudDistance(vec3 p){
   d=mix(d,length(q)-max(.09,.56-.37*hole)*uFogShape.y,smoothstep(0.,.92,hole));
  }
  return d;
+}
+// Match cloud Fill support without reinterpreting attached-body sampling.
+float cloudFillSupport(float surfaceDistance){
+ if(uHasBody>.5||uFogPattern.w>=1.)return 1.;
+ float opened=smoothstep(0.,.92,uFogShape.x);
+ float minorRadius=max(.09,.56-.37*uFogShape.x)*uFogShape.y;
+ float radius=mix(uFogShape.y,minorRadius,opened);
+ float reconstruction=max(.004,2.*uFogShape.y/max(32.,uFogAtlas.x));
+ float depth=max(reconstruction*.5,radius*clamp(uFogPattern.w,0.,1.));
+ float innerRadius=radius*(1.-clamp(uFogPattern.w,0.,1.));
+ return mix(1.,smoothstep(-reconstruction,reconstruction,surfaceDistance+depth),smoothstep(0.,reconstruction,innerRadius));
 }
 // Three Fourier modes with transverse velocity. The field bends strands
 // coherently without creating sharp local compression at individual cells.
@@ -69,7 +80,7 @@ void main(){
  float shell=1.-smoothstep(-.018-turbulence*.012,.008,d+erosion*.045);
  float pocket=abs(snoise(q*.85+vec3(11.,-7.,-2.)));
  float plume=1.-smoothstep(.34,.89,pocket+turbulence*.3*fold);
- float cloud=shell*mix(.66,smoothstep(-.28,.44,.025+erosion+.24*coarse)*plume,turbulence);
+ float cloud=shell*cloudFillSupport(d+erosion*.045)*mix(.66,smoothstep(-.28,.44,.025+erosion+.24*coarse)*plume,turbulence);
  float weather=snoise(bend*2.22+vec3(uFogSeed,3.,13.));
  cloud*=1.-turbulence*.84*smoothstep(.02,.56,weather)*smoothstep(-.97,-.08,-d);
  float ridge=0.;vec3 strands=vec3(.5,.5,0.);
@@ -98,7 +109,8 @@ void main(){
   vec3 shape=current+coherentFlow(current*.83,time)*(.11+.28*turbulence);
   float freeSpace=length(shape*vec3(.78,1.02,1.28))-uFogShape.y*.78;
   freeSpace+=coarse*.25+fold*.11-.24*abs(dot(shape,axis));
-  float envelope=1.-smoothstep(-.19,.19,mix(d+contraction,freeSpace,.46+.53*turbulence));
+  float supportDistance=mix(d+contraction,freeSpace,.46+.53*turbulence);
+  float envelope=(1.-smoothstep(-.19,.19,supportDistance))*cloudFillSupport(supportDistance);
   if(uHasBody>.5)envelope*=1.-smoothstep(-.025,.1,d);
   float cluster=smoothstep(-.2,.62,.35+fold*.4+coarse*.58);
   float clusterWeight=mix(.36+.64*cluster,.04+.96*pow(cluster,2.2),uFogShape.z);
@@ -207,7 +219,7 @@ void main(){
   vec3 world=worldOrigin+worldRay*t;
   float visible=1.-surface.b*smoothstep(.004,.04,nearSurface-world.z);
   if(visible<.001)continue;
-  vec3 pigment=prismaPalette(world,uPalette[0]);
+  vec3 pigment=prismaKnotBands(world,prismaColorLayersAt(world,prismaPaletteBase(world,uPalette[0]),p,uOrthographic>.5));
   vec3 irradiance=vec3(.045+.28*uFogMaterial.y);
   for(int light=0;light<uLightCount;light++){
    vec3 offset=uLights[light].xyz-world;

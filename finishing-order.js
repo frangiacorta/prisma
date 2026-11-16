@@ -1,4 +1,4 @@
-import {FINISH_FILTERS,FINISH_ORDER,normalizeFinishOrder} from './finishing.js?v=93b0d9476f96';
+import {FINISH_FILTERS,FINISH_ORDER,normalizeFinishOrder} from './finishing.js?v=00f94f9b4def';
 
 export function finishingOrderPanel(s){
  const order=normalizeFinishOrder(s.finishOrder);

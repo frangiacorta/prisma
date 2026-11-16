@@ -13462,7 +13462,7 @@
       "resultImage": "../previews/mandelbulb-dettaglio.webp",
       "resultUrl": "../previews/verifica-visiva.html#mandelbulb-dettaglio",
       "resultVideo": "../previews/mandelbulb-dettaglio.mp4",
-      "compareNote": "Mandelbulb con ripetizioni a più scale, cavità sottili e metallo iridescente. Il preset espone formula, iterazioni e spessore.",
+      "compareNote": "Mandelbulb classico con colori che seguono le ripetizioni del frattale, anche nel passaggio a granelli e fili. Restano diversi la finezza dei lobi, i riflessi e il movimento della fonte.",
       "comparisonRef": "s12-01",
       "comparisonDate": "2026-11-16",
       "resultPreset": "previews/mandelbulb-dettaglio.prisma.json",

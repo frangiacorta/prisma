@@ -1,6 +1,6 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=93b0d9476f96';
-import {LOOP_PALETTE_GLSL} from './structure-model.js?v=93b0d9476f96';
-import {opticalGLSL} from './particle-optics.js?v=93b0d9476f96';
+import {FILM_PATTERN_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,FRACTAL_PARTICLE_PALETTE_GLSL} from './solid-renderer.js?v=00f94f9b4def';
+import {LOOP_PALETTE_GLSL} from './structure-model.js?v=00f94f9b4def';
+import {opticalGLSL} from './particle-optics.js?v=00f94f9b4def';
 export const materialCavity=s=>Math.max(0,Math.min(1,(s.hollow||0)*(1-(s.wallThickness??.08))));
 
 export const prismaPaletteGLSL=`
@@ -9,6 +9,8 @@ uniform float uColorSoftness;
 uniform vec4 uKnot,uKnotPath,uKnotPigment,uKnotFrame;
 uniform vec3 uKnotAxes,uKnotRotation;
 uniform vec3 uPalette[12];uniform highp int uPaletteCount;
+${FRACTAL_LOCAL_MATERIAL_GLSL}
+${FRACTAL_PARTICLE_PALETTE_GLSL}
 vec3 prismaPaletteAt(float t){
  t=fract(t);
  float index=t*float(uPaletteCount);int a=int(floor(index)),b=(a+1)%uPaletteCount;
@@ -22,13 +24,20 @@ vec3 prismaPaletteAt(float t){
  return prismaPaletteAt(t);
 }
 
-vec3 prismaColorLayers(vec3 p,vec3 base){
+vec3 prismaColorLayersAt(vec3 p,vec3 base,vec3 anchor,bool attached){
  if(uColorLayers.x<=0.||uGradient.w<.5)return base;
  float t=dot(p,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z;
  vec3 a=prismaPaletteAt(t+p.z*uColorLayers.y*.35+uColorLayers.z);
  vec3 b=prismaPaletteAt(t-p.z*uColorLayers.y*.21+uColorLayers.z+.37);
- return mix(base,mix(a,a*b*1.6,uColorLayers.w),uColorLayers.x);
+ vec3 layers=mix(a,a*b*1.6,uColorLayers.w);
+ if(attached&&int(uFractal.y+.5)==3&&uFractal.x>0.){
+  float orbit=fractalColorCoordinate(fractalMaterialPoint(anchor))*uColorLayers.y+uColorLayers.z;
+  vec3 recursiveA=fractalPaletteAt(orbit),recursiveB=fractalPaletteAt(orbit+.37);
+  layers=mix(layers,mix(recursiveA,recursiveA*recursiveB*1.6,uColorLayers.w),uFractal.x);
+ }
+ return mix(base,layers,uColorLayers.x);
 }
+vec3 prismaColorLayers(vec3 p,vec3 base){return prismaColorLayersAt(p,base,vec3(0.),false);}
 ${LOOP_PALETTE_GLSL}
 vec3 prismaKnotBands(vec3 p,vec3 color){
  if(uKnot.x*uKnotPigment.x<.0001)return color;

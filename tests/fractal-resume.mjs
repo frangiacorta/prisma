@@ -16,6 +16,7 @@ try {
   let renderer=new Renderer(document.createElement('canvas'));
   const cases=[
    ['bulb-blend',{fractalKind:0,fractalAmount:.5}],
+   ['classic-material',{fractalKind:3,fractalAmount:.7,colorLayers:1,colorLayerScale:1.2}],
    ['menger-extreme',{fractalKind:1,fractalAmount:.8,fractalLevels:14,fractalDetail:0,deform:.3,twist:.8,waves:.15,waveScale:5}],
    ['menger-inside',{fractalKind:1,fractalAmount:1,scale:7}],
    ['box-sheet',{fractalKind:2,fractalAmount:.5,structFan:.35,structCurl:.3,structFlap:.1}],

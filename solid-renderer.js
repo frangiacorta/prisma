@@ -1,13 +1,13 @@
-import {ImplicitRayStatus} from './implicit-ray-status.js?v=93b0d9476f96';
-import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=93b0d9476f96';
-import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=93b0d9476f96';
-import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=93b0d9476f96';
-import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=93b0d9476f96';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=93b0d9476f96';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=93b0d9476f96';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=93b0d9476f96';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=93b0d9476f96';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=93b0d9476f96';
+import {ImplicitRayStatus} from './implicit-ray-status.js?v=00f94f9b4def';
+import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=00f94f9b4def';
+import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=00f94f9b4def';
+import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=00f94f9b4def';
+import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=00f94f9b4def';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=00f94f9b4def';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=00f94f9b4def';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=00f94f9b4def';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=00f94f9b4def';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=00f94f9b4def';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -518,9 +518,19 @@ vec3 layeredPigment(vec3 p){
  vec3 a=palette(t+p.z*uColorLayers.y*.35+uColorLayers.z),b=palette(t-p.z*uColorLayers.y*.21+uColorLayers.z+.37);
  return mix(a,a*b*1.6,uColorLayers.w);
 }
-vec3 surfacePalette(vec3 p,vec3 base){
+vec3 fractalMaterialPoint(vec3 world){return world;}
+vec3 surfacePaletteMapped(vec3 p,vec3 base,vec3 world,bool worldKnown){
  base=mix(base,palette(colorCoordinate(p)),uColorWave.x);
  vec3 layers=uColorLayers.x>0.?layeredPigment(p):base;
+ #ifdef FRACTAL_ENABLED
+ #if FRACTAL_ENABLED
+ if(worldKnown&&int(uFractal.y+.5)==3&&uFractal.x>0.&&uColorLayers.x>0.){
+  float t=fractalColorCoordinate(fractalMaterialPoint(world))*uColorLayers.y+uColorLayers.z;
+  vec3 recursiveA=palette(t),recursiveB=palette(t+.37);
+  layers=mix(layers,mix(recursiveA,recursiveA*recursiveB*1.6,uColorLayers.w),uFractal.x);
+ }
+ #endif
+ #endif
  #ifdef FAN_FIELD
  if(uStructureFan>0.&&uColorLayers.x>0.){
   vec2 plane=p.xy/axes().xy;
@@ -540,6 +550,8 @@ vec3 surfacePalette(vec3 p,vec3 base){
  if(uGrowthShape.x>0.){float h=organicGrowth(p/axes()).x;base=mix(base,palette(h*float(uPaletteCount-1)/float(uPaletteCount)+uGradient.z),uGrowthShape.x*uGrowthLook.x);}
  return base;
 }
+vec3 surfacePalette(vec3 p,vec3 base){return surfacePaletteMapped(p,base,vec3(0.),false);}
+vec3 surfacePalette(vec3 p,vec3 base,vec3 world){return surfacePaletteMapped(p,base,world,true);}
 vec3 loopSurfacePalette(vec3 p,vec3 color){
  if(uLoopA.x*uLoopColor.x<.0001)return color;
  vec2 coordinates=loopBandCoordinates(p/axes(),uLoopA,uLoopB,uLoopColor,uStructureH.w);
@@ -884,7 +896,8 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
     +interior*uCellOptics.w*(.14+.26*facing);
   alpha=mix(alpha,backdrop.a,clarity);
  }
- return vec4(below,clamp(alpha,0.,1.));
+ float coreVisibility=1.-structureCore(local);
+ return vec4(below*coreVisibility,1.-(1.-clamp(alpha,0.,1.))*coreVisibility);
 }`);
 MODERN_FRAG=shaderFunction(MODERN_FRAG,'photo',`vec3 filmic(vec3 x){
  // ACES RRT/ODT fit in its working color space, preserving hue and a soft highlight shoulder.
@@ -968,7 +981,7 @@ MODERN_FRAG=MODERN_FRAG.replace('vec4 shade(',`vec4 structureBehind(vec3 first,v
   vec3 local=transform(hit),n=boundaryNormal(hit);if(dot(n,rd)>0.)n=-n;
   float facing=max(.08,dot(n,-rd));
   float pos=dot(local,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z;
-  vec3 tint=loopSurfacePalette(local,surfacePalette(local,palette(pos)))*(1.-structureCore(local));
+  vec3 tint=loopSurfacePalette(local,surfacePalette(local,palette(pos),hit))*(1.-structureCore(local));
   vec3 light=environment(n,hit,1.)*.14;
   for(int j=0;j<uLightCount;j++){vec3 off=uLights[j].xyz-hit;light+=uLightColors[j]*max(dot(n,normalize(off)),0.)*uLights[j].w*.35/(1.+dot(off,off)*.08);}
   vec3 beta=exp(-absorptionCoefficient(tint)*mix(max(.003,uStructureA.y),filmPath(local),uStructureFan)*4./facing)*filmPigment(tint,facing);
@@ -977,7 +990,8 @@ MODERN_FRAG=MODERN_FRAG.replace('vec4 shade(',`vec4 structureBehind(vec3 first,v
   f=f*2./(vec3(1.)+f);
   vec3 transmission=beta*uMat.x*(vec3(1.)-f);
   vec3 reflected=environment(reflect(rd,n),hit,uMat.w)*f;
-  sum+=through*(tint*light*(1.-uMat.x)*(vec3(1.)-f)+reflected+tint*uSurface.w*(1.-uMat.x));
+  sum+=through*(tint*light*(1.-uMat.x)*(vec3(1.)-f)+reflected+tint*uSurface.w*(1.-uMat.x))*(1.-structureCore(local));
+  transmission*=1.-structureCore(local);
   through*=transmission;remaining*=min(min(transmission.r,transmission.g),transmission.b);
   if(max(max(through.r,through.g),through.b)<.003)break;
  }
@@ -1005,7 +1019,7 @@ MODERN_FRAG=specializeAnalytic(MODERN_FRAG,'surfaceGradient',`vec3 size=vec3(uSh
 MODERN_FRAG=specializeAnalytic(MODERN_FRAG,'traceBoundary',`float t=firstRoot(ellipsoidRoots(origin,direction,1.));if(!outerOnly&&hasCavity())t=min(t,firstRoot(ellipsoidRoots(origin,direction,uInterior.x*(1.-uInterior.y))));travel=t;point=origin+direction*t;return t<maximum;`);
 MODERN_FRAG=MODERN_FRAG.replace('if(uModern.x>.999||!hit){glass=straight;}else{', '#if THIN_SHELL_ENABLED\n glass=straight;\n#else\n if(uModern.x>.999||!hit){glass=straight;}else{');
 MODERN_FRAG=MODERN_FRAG.replace('glass=mix(glass,straight,clamp(uModern.x,0.,1.));\n  }','glass=mix(glass,straight,clamp(uModern.x,0.,1.));\n  }\n#endif');
-MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos)*', 'vec3 base=loopSurfacePalette(local,surfacePalette(local,palette(pos)))*');
+MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos)*', 'vec3 base=loopSurfacePalette(local,surfacePalette(local,palette(pos),p))*');
 // Preview budgets are normalized independently: changing sample counts never
 // changes optical density or scattering strength. Full exports retain 16/4.
 MODERN_FRAG=MODERN_FRAG.replace('for(int j=0;j<int(uRuntime.w)*14;j++){','for(int j=0;j<TRACE_STEPS;j++){if(j>=int(uBudget.x))break;');
@@ -1089,6 +1103,46 @@ MODERN_FRAG=MODERN_FRAG.replace('d=structureField(d,p);',`d=structureField(d,p);
  d=growthGeometryField(d,p);
  #endif
 `);
+const FRACTAL_MATERIAL_DOMAIN=(()=>{
+ const marker='vec3 fieldParts(vec3 world){',start=MODERN_FRAG.indexOf(marker)+marker.length,end=MODERN_FRAG.indexOf('float w=',start);
+ if(start<marker.length||end<start)throw new Error('Fractal material domain is unavailable.');
+ const prefix=MODERN_FRAG.slice(start,end);
+ if(!prefix.includes('p=structureWarp(p);'))throw new Error('Fractal material domain must follow the shared structure map.');
+ return prefix;
+})();
+
+function materialShaderFunction(source,name){
+ const start=source.search(new RegExp('(?:vec[234]|float|bool|void)\\s+'+name+'\\s*\\('));
+ if(start<0)throw Error('Missing shared material function: '+name);
+ let end=source.indexOf('{',start)+1,depth=1;
+ while(depth&&end<source.length){depth+=(source[end]==='{')-(source[end]==='}');end++;}
+ if(depth)throw Error('Incomplete shared material function: '+name);
+ return source.slice(start,end);
+}
+const MATERIAL_DOMAIN_UNIFORMS={uWarp:'uPigmentWarp',uExtraShape:'uPigmentShape',uExtraShape2:'uPigmentShape2',uStructureC:'uPigmentStructureC',uStructureE:'uPigmentStructureE',uStructureF:'uPigmentStructureF',uStructureG:'uPigmentStructureG',uStructureFan:'uPigmentStructureFan'};
+export const FRACTAL_LOCAL_MATERIAL_GLSL=(()=>{
+ const marker='p/=vec3(uShape.y,uShape.z,volume);',start=FRACTAL_MATERIAL_DOMAIN.indexOf(marker);
+ if(start<0)throw Error('Shared material affine boundary is unavailable.');
+ let mapping=FRACTAL_MATERIAL_DOMAIN.slice(start+marker.length);
+ let warp=materialShaderFunction(STRUCTURE_GLSL,'structureWarp');
+ let local='vec3 fractalMaterialPoint(vec3 p){'+mapping+'return p;}';
+ let code=warp+'\n'+local;
+ for(const [name,replacement] of Object.entries(MATERIAL_DOMAIN_UNIFORMS))code=code.replace(new RegExp('\\b'+name+'\\b','g'),replacement);
+ code=code.replaceAll('structureWarp(','pigmentStructureWarp(').replaceAll('rot(','pigmentRotate(');
+ return 'uniform vec4 uFractal,uPigmentWarp,uPigmentShape,uPigmentShape2,uPigmentStructureC,uPigmentStructureE,uPigmentStructureF,uPigmentStructureG;\nuniform float uPigmentStructureFan;\nmat2 pigmentRotate(float a){return mat2(cos(a),-sin(a),sin(a),cos(a));}\n'+code+'\n'+materialShaderFunction(FRACTAL_GLSL,'fractalColorCoordinate');
+})();
+// Keep the surface palette's interpolation, including its narrowest transition,
+// while preserving the old particle palette for every pre-existing formula.
+export const FRACTAL_PARTICLE_PALETTE_GLSL='uniform vec3 uPigmentPaletteMean;\n'+materialShaderFunction(MODERN_FRAG,'palette').replace('vec3 palette(','vec3 fractalPaletteAt(').replaceAll('uGradient.w','uColorSoftness').replaceAll('uPaletteMean','uPigmentPaletteMean');
+export function uploadFractalMaterial(s,u){
+ uploadFractal(s,u);
+ u('uPigmentWarp',[s.deform||0,s.asymmetry||0,s.twist||0,s.waveScale||0]);
+ u('uPigmentShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);
+ u('uPigmentShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);
+ structureUniforms(s,(name,values)=>{const target=MATERIAL_DOMAIN_UNIFORMS[name];if(target)u(target,values);});
+ const palette=s.palette||['#ffffff'];u('uPigmentPaletteMean',palette.map(rgb).reduce((sum,c)=>sum.map((v,i)=>v+c[i]/palette.length),[0,0,0]));
+}
+
 let BAKE_FRAG=MODERN_FRAG.slice(0,MODERN_FRAG.indexOf('// Shared solid/cavity field.'));
 // Uniform loop bounds prevent drivers expanding nine copies of the cone
 // kernel during first-use JIT; the runtime value remains exactly three cells.
@@ -1866,6 +1920,20 @@ function compactLayerTrace(source){
   vec3 hit=first+rd*crossing;
   vec3 local=transform(hit),n=surfaceNormal(hit);`);
 }
+function withFractalMaterialDomain(source,sculpt){
+ let mapping='';
+ if(sculpt){
+  // Derive the same world-space inverse map from the actual force wrapper,
+  // rather than maintaining a second sculpt/dynamics implementation.
+  const marker='float field(vec3 world){',start=source.indexOf(marker)+marker.length,ret=source.indexOf('return ',start),call=source.indexOf('unforcedField(',ret);
+  if(start<marker.length||ret<start||call<ret)throw new Error('Fractal force mapping is unavailable.');
+  const begin=call+'unforcedField('.length;let end=begin,depth=1;
+  while(depth&&end<source.length){if(source[end]==='(')depth++;if(source[end]===')')depth--;end++;}
+  if(depth)throw new Error('Fractal force mapping is incomplete.');
+  mapping='{'+source.slice(start,ret)+'world='+source.slice(begin,end-1)+';}';
+ }
+ return shaderFunction(source,'fractalMaterialPoint','vec3 fractalMaterialPoint(vec3 world){'+mapping+FRACTAL_MATERIAL_DOMAIN+'return p;}');
+}
 function variantSource(key,floatAtlas=false){
  const fields=(key&FAN_FIELD?'\n#define FAN_FIELD 1':'')+(key&GROWTH_GEOMETRY?'\n#define GROWTH_GEOMETRY 1':'')+(key&WEAVE_DETAIL?'\n#define WEAVE_DETAIL 1':'');
  const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4,ROOTS_ENABLED:32768,STRUCTURE_ENABLED:65536};
@@ -1873,6 +1941,7 @@ function variantSource(key,floatAtlas=false){
  if(key&ATLAS_BAKE)return BAKE_FRAG.replace('#version 300 es','#version 300 es\n'+defines+fields);
  if(key&8)defines+='\n#define TRACE_STEPS '+(key&ATLAS_PREVIEW?128:key&4096?128:224)+'\n#define INTERFACE_STEPS '+(key&ATLAS_PREVIEW?4:key&4096?8:32)+'\n#define LENGTH_SAMPLES '+(key&4096?8:16)+'\n#define SCATTER_SAMPLES '+(key&4096?2:4)+'\n#define SPECTRAL_SAMPLES '+(key&4096?3:5);
  let source=key&ATLAS_PREVIEW?(key&SCULPT_ENABLED?SCULPT_PREVIEW_FRAG:PREVIEW_FRAG):key&8?(key&SCULPT_ENABLED?SCULPT_FRAG:MODERN_FRAG):FRAG;
+ if(key&8&&key&FRACTAL_ENABLED)source=withFractalMaterialDomain(source,!!(key&SCULPT_ENABLED));
  if(key&8&&!(key&CELLULAR_ENABLED)){
   source=source.replace('if(max(uCellOptics.x,uCellOptics.w)>.0001){','if(false){');
   source=shaderFunction(source,'cellularInterior','vec3 cellularInterior(vec3 p,vec3 ray){return vec3(0.);}');
@@ -1978,6 +2047,7 @@ export function implicitSurfaceSource(source,{accumulate=false,independentFan=fa
   shader=shader.replace('below=below*(vec3(1.)-filmF)+specular*filmF;','implicitTransmission*=vec3(1.)-filmF;below=below*(vec3(1.)-filmF)+specular*filmF;');
   shader=shader.replace('below=below*(vec3(1.)-coatF)+environment','implicitTransmission*=vec3(1.)-coatF;below=below*(vec3(1.)-coatF)+environment');
  }
+ if(accumulate)shader=shader.replace('return vec4(below*coreVisibility,','implicitTransmission*=coreVisibility;return vec4(below*coreVisibility,');
  shader=shader.replace('out vec4 fragColor;','layout(location=0) out vec4 fragColor;');
  return shaderFunction(shader,'main',accumulate?(independentFan?INDEPENDENT_FAN_ACCUMULATE_MAIN:IMPLICIT_ACCUMULATE_MAIN):IMPLICIT_SURFACE_MAIN);
 }
@@ -2429,7 +2499,7 @@ export function startWallpaper(canvas,source,RendererClass=Renderer){
 // The strand pass uses the same final material functions as the surface shader.
 // Extract complete functions after the modern shader substitutions, so palette,
 // spectral substrate and environment fixes cannot silently diverge between passes.
-export const FORM_MATERIAL_GLSL=['palette','colorCoordinate','layeredPigment','surfacePalette','fixture','envLight','environment','fresnel','xyzRGB','soapFilm','absorptionCoefficient','organicHash','organicNoise','materialRelief','reliefNormal'].map(name=>{
+export const FORM_MATERIAL_GLSL=['palette','colorCoordinate','layeredPigment','surfacePaletteMapped','surfacePalette','fixture','envLight','environment','fresnel','xyzRGB','soapFilm','absorptionCoefficient','organicHash','organicNoise','materialRelief','reliefNormal'].map(name=>{
  const start=MODERN_FRAG.search(new RegExp('(?:vec[234]|float|bool|void)\\s+'+name+'\\s*\\('));
  if(start<0)throw Error('Missing shared surface function: '+name);
  let end=MODERN_FRAG.indexOf('{',start)+1,depth=1;

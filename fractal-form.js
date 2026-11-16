@@ -1,7 +1,7 @@
-export const FRACTAL_FORMULAS=['Mandelbulb','Menger','Mandelbox'];
+export const FRACTAL_FORMULAS=['Mandelbulb','Menger','Mandelbox','Mandelbulb classico'];
 export const FRACTAL_META={
  fractalAmount:['Intensità del frattale',0,1,.01],
- fractalKind:['Formula frattale',0,2,1],
+ fractalKind:['Formula frattale',0,3,1],
  fractalPower:['Potenza Mandelbulb',2,14,.01],
  fractalLevels:['Iterazioni',3,14,1],
  fractalFold:['Ampiezza delle pieghe',.55,1.45,.01],
@@ -15,6 +15,7 @@ export const FRACTAL_TRACKS={
  fractalFold:['Ampiezza delle pieghe',0,.45,.01],
 };
 export const FRACTAL_HELP={
+ fractalKind:'Mandelbulb conserva la convenzione polare dei progetti esistenti. Mandelbulb classico usa la latitudine e colora la ricorsione con gli Strati di colore. Menger e Mandelbox conservano le loro formule.',
  fractalAmount:'Trasforma gradualmente la forma di base. A zero ritrovi la figura di partenza.',
  fractalPower:'Cambia il numero e la distribuzione dei lobi nella formula Mandelbulb. Si può animare.',
  fractalLevels:'Aumenta i livelli di ricorsione. In Menger il dettaglio geometrico arriva al quinto livello.',
@@ -23,19 +24,19 @@ export const FRACTAL_HELP={
 };
 
 const clamp=(x,min,max)=>Math.max(min,Math.min(max,x));
-const bounds=[[.75,1.43],[.79,1.39],[.58,1.58]];
+const bounds=[[.75,1.43],[.79,1.39],[.58,1.58],[.75,1.43]];
 export function fractalBounds(s){
  const amount=s.fractalAmount||0;
  return amount>0?bounds[s.fractalKind||0][1]+(s.fractalDetail??.005):1;
 }
 
-function bulb(c,power,levels){
+function bulb(c,power,levels,kind=0){
  let [x,y,z]=c,dr=1,r=0;
  for(let i=0;i<=levels;i++){
   r=Math.hypot(x,y,z);
   if(r>2.5)return Math.log(r)*r/(2*dr);
   if(i===levels)break;
-  const theta=Math.acos(clamp(z/Math.max(r,1e-8),-1,1))*power;
+  const theta=Math.acos(clamp(z/Math.max(r,1e-8),-1,1))*power+(kind===3?(1-power)*Math.PI*.5:0);
   const phi=Math.atan2(y,x)*power;
   const zr=r**power,radial=zr*Math.sin(theta);
   dr=power*r**(power-1)*dr+1;
@@ -76,7 +77,7 @@ export function fractalField(s,base,p){
  const kind=s.fractalKind||0,levels=s.fractalLevels??9,fold=s.fractalFold??1;
  const [size,limit]=bounds[kind],q=p.map(x=>x/size),radius=Math.hypot(...p);
  if(radius>limit+.14)return base*(1-amount)+(radius-limit-(s.fractalDetail??.005))*amount;
- const d=kind===1?menger(p,levels,fold):kind===2?box(q,levels,fold)*size:bulb(q,s.fractalPower??8,levels)*size;
+ const d=kind===1?menger(p,levels,fold):kind===2?box(q,levels,fold)*size:bulb(q,s.fractalPower??8,levels,kind)*size;
  const bounding=kind===2?Math.max(...p.map(Math.abs))-.9:radius-limit;
  const field=Math.max(d,bounding)-(s.fractalDetail??.005);
  return base*(1-amount)+field*amount;
@@ -90,14 +91,32 @@ export function uploadFractal(s,u){
 export const FRACTAL_GLSL=`
 uniform vec4 uFractal;
 uniform vec2 uFractalDetail;
+float fractalColorCoordinate(vec3 point){
+ vec3 c=point/.75,z=c;float minimum=1000.;int kind=int(uFractal.y+.5);
+ float power=uFractal.z;
+ for(int i=0;i<int(uFractal.w+.5);i++){
+  float r=length(z);
+  // The minimum starts at1000. At r>=33 and power>=2, the next
+  // radius exceeds1000, cannot lower that minimum and must escape.
+  // Exit before pow to preserve the result without float overflow.
+  if(r>=33.)break;
+  float theta=acos(clamp(z.z/max(r,1e-8),-1.,1.))*power+(kind==3?(1.-power)*1.5707963267948966:0.);
+  float phi=atan(z.y,z.x)*power,magnitude=pow(r,power),radial=magnitude*sin(theta);
+  z=c+vec3(radial*cos(phi),radial*sin(phi),magnitude*cos(theta));
+  r=length(z);minimum=min(minimum,r);if(r>10.)break;
+ }
+ return mod(abs(minimum*5000.),63488.)/2560.;
+}
+
 #if FRACTAL_ENABLED
 float bulbDistance(vec3 c,float power,int levels){
+ int kind=int(uFractal.y+.5);
  vec3 z=c;float dr=1.,r=0.;
  for(int i=0;i<=levels;i++){
   r=length(z);
   if(r>2.5)return log(r)*r/(2.*dr);
   if(i==levels)break;
-  float theta=acos(clamp(z.z/max(r,1e-8),-1.,1.))*power;
+  float theta=acos(clamp(z.z/max(r,1e-8),-1.,1.))*power+(kind==3?(1.-power)*1.5707963267948966:0.);
   float phi=atan(z.y,z.x)*power;
   float zr=pow(r,power),radial=zr*sin(theta);
   dr=power*pow(r,power-1.)*dr+1.;

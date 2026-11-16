@@ -1,8 +1,8 @@
-import {bodySampleGLSL} from './body-samples.js?v=93b0d9476f96';
-import {DYNAMICS_GLSL} from './dynamics.js?v=93b0d9476f96';
+import {bodySampleGLSL} from './body-samples.js?v=00f94f9b4def';
+import {DYNAMICS_GLSL} from './dynamics.js?v=00f94f9b4def';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=93b0d9476f96';
-import {forceBarrierGLSL} from './particle-forces.js?v=93b0d9476f96';
+import {guideGLSL} from './particle-path-field.js?v=00f94f9b4def';
+import {forceBarrierGLSL} from './particle-forces.js?v=00f94f9b4def';
 export const grainSizingGLSL=`
 uniform vec2 uNodeStyle,uLargeGrains,uGrainDistribution;
 float grainDiameter(vec4 seed,int index){
@@ -259,7 +259,7 @@ vec3 particleColor(vec4 r,vec3 p){
  vec3 rest=restPoint(r),coord=uColor.x<.5?rest:uColor.x<1.5?vec3((r.z-.5)*4.5,0.,0.):uColor.x<2.5?vec3((floor(r.x*uOuter.z)/uOuter.z-.5)*4.5,0.,0.):p;
  vec3 base=prismaPaletteBase(coord,vec3(1.));
  base=mix(base,prismaPaletteBase(vec3((r.w-.5)*5.,0.,0.),vec3(1.)),uColor.y);
- base=prismaKnotBands(p,prismaColorLayers(uColor.x>2.5?p:rest,base));
+ base=prismaKnotBands(p,prismaColorLayersAt(uColor.x>2.5?p:rest,base,uColor.x>2.5?p:rest,uStudioBody.x>0.));
  base*=mix(1.,.25+r.z*1.5,uColor.z)*mix(1.,.2+.8*smoothstep(-2.,2.,p.z),uColor.w);
  float wave=pow(.5+.5*sin(r.y*TAU-clockAt(uPhase*uClock.x)*uLife.y-r.x*TAU*uLife.w),8.);
  if(r.w>.86&&uOuter.x>0.){

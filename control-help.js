@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=93b0d9476f96';
-import {EXTRA_HELP} from './control-help-extra.js?v=93b0d9476f96';
-import {FRACTAL_HELP} from './fractal-form.js?v=93b0d9476f96';
-import {CELLULAR_HELP} from './cellular-form.js?v=93b0d9476f96';
-import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=93b0d9476f96';
-import {trailLightCompensation} from './particle-model.js?v=93b0d9476f96';
+import {AUDIO_HELP} from './audio-model.js?v=00f94f9b4def';
+import {EXTRA_HELP} from './control-help-extra.js?v=00f94f9b4def';
+import {FRACTAL_HELP} from './fractal-form.js?v=00f94f9b4def';
+import {CELLULAR_HELP} from './cellular-form.js?v=00f94f9b4def';
+import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=00f94f9b4def';
+import {trailLightCompensation} from './particle-model.js?v=00f94f9b4def';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishPalette:'Converte il chiaroscuro della scena in una palette ordinata da scuro a chiaro. La trasparenza resta invariata.',
@@ -339,8 +339,8 @@ export function controlCondition(s,key){
  if(key==='pCloudRadius'&&!s.pCloudHalo)return 'Aumenta Particelle nell’alone.';
  if(/^pCell(Density|Size|Variation|Aspect|Relief|Light)$/.test(key)&&!s.pCellAmount)return 'Attiva Raggruppamento in cellule.';
  if(Object.hasOwn(FRACTAL_HELP,key)&&key!=='fractalAmount'&&!positive('fractalAmount'))return 'Aumenta Intensità del frattale in Forma.';
- if(key==='fractalPower'&&s.fractalKind!==0)return 'La potenza si applica alla formula Mandelbulb.';
- if(key==='fractalFold'&&s.fractalKind===0)return 'Le pieghe si applicano a Menger e Mandelbox.';
+ if(key==='fractalPower'&&s.fractalKind!==0&&s.fractalKind!==3)return 'La potenza si applica alla formula Mandelbulb.';
+ if(key==='fractalFold'&&(s.fractalKind===0||s.fractalKind===3))return 'Le pieghe si applicano a Menger e Mandelbox.';
  if(Object.hasOwn(CELLULAR_HELP,key)&&key!=='cellMorph'&&!positive('cellMorph'))return 'Aumenta Sviluppo cellulare in Forma.';
  if(/^lights\.\d+\./.test(key)){const l=s.lights?.find(l=>String(l.id)===key.split('.')[1]);if(l?.enabled===false&&!key.endsWith('.enabled'))return 'Attiva questa luce per vedere il risultato.';}
  if(key.startsWith('finish')&&!['finishEnabled','finishCompare'].includes(key)){

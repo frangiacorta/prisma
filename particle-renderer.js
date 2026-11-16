@@ -1,20 +1,20 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=93b0d9476f96';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=93b0d9476f96';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=93b0d9476f96';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=93b0d9476f96';
-import {knotTurns} from './structure-model.js?v=93b0d9476f96';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=93b0d9476f96';
-import {shadowLight} from './particle-shadow.js?v=93b0d9476f96';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=93b0d9476f96';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=93b0d9476f96';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=93b0d9476f96';
-import {ParticleLinks} from './particle-links.js?v=93b0d9476f96';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=93b0d9476f96';
-import {LayeredVeils} from './layered-veils.js?v=93b0d9476f96';
-import {LivingStructures} from './living-structures.js?v=93b0d9476f96';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=93b0d9476f96';
-import {forceBarrierGLSL} from './particle-forces.js?v=93b0d9476f96';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=93b0d9476f96';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=00f94f9b4def';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=00f94f9b4def';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=00f94f9b4def';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=00f94f9b4def';
+import {knotTurns} from './structure-model.js?v=00f94f9b4def';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=00f94f9b4def';
+import {shadowLight} from './particle-shadow.js?v=00f94f9b4def';
+import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=00f94f9b4def';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=00f94f9b4def';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=00f94f9b4def';
+import {ParticleLinks} from './particle-links.js?v=00f94f9b4def';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=00f94f9b4def';
+import {LayeredVeils} from './layered-veils.js?v=00f94f9b4def';
+import {LivingStructures} from './living-structures.js?v=00f94f9b4def';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=00f94f9b4def';
+import {forceBarrierGLSL} from './particle-forces.js?v=00f94f9b4def';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=00f94f9b4def';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec2 uFocus;
 float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
@@ -383,7 +383,7 @@ export class ParticleRenderer{
   this.u(p,'uEnvironment',environments.indexOf(s.environment),s.environmentAngle*rad,s.environmentPower,0);
   this.colorUniforms(p,s);
  }
- colorUniforms(p,s){const gl=this.gl;
+ colorUniforms(p,s){const gl=this.gl;uploadFractalMaterial(s,(name,values)=>this.u(p,name,...values));
   this.u(p,'uKnot',s.loopBands>0?s.loopAmount||0:0,s.loopKnot||0,s.loopRadius??.8,s.loopTube??.22);
   if(s.loopAmount>0&&s.loopBands>0){
    this.u(p,'uKnotPath',s.loopFlat||0,s.loopTwist||0,s.loopWave||0,s.loopPhase||0);

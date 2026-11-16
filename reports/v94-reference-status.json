@@ -1,0 +1,268 @@
+{
+  "version": 94,
+  "updatedAt": "2026-11-16T16:28:51.517Z",
+  "mediaPathsRelativeTo": "report-directory",
+  "note": "Nessuno studio è ancora stato verificato come equivalente alla fonte sia nell’aspetto sia nel movimento. Le fonti statiche o molto brevi limitano la verifica. I controlli tecnici e la continuità del ciclo non equivalgono alla parità con la fonte.",
+  "cases": [
+    {
+      "slug": "mandelbulb-dettaglio",
+      "title": "Frattali 3D",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 14,
+      "stato": "miglioramento parziale",
+      "gap": "Restano dettagli più granulosi e meno rame nei lobi. La fonte mostra 4 secondi; il resto del giro è una continuazione autoriale.",
+      "currentMedia": "../previews/mandelbulb-dettaglio.mp4"
+    },
+    {
+      "slug": "percorsi-fibre",
+      "title": "Percorsi delle particelle",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 4,
+      "stato": "miglioramento parziale",
+      "gap": "I fasci sono troppo uniformi e il nucleo troppo pieno; direzione e cadenza differiscono.",
+      "currentMedia": "../previews/percorsi-fibre.mp4"
+    },
+    {
+      "slug": "volume-denso",
+      "title": "Volumi di particelle",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 0.85,
+      "currentDurationSeconds": 4,
+      "stato": "confronto ancora aperto",
+      "gap": "Mancano i recessi minuti e la separazione netta fra bianco e rosso. La breve finestra della fonte non basta per valutare un intero ciclo.",
+      "currentMedia": "../previews/volume-denso.mp4"
+    },
+    {
+      "slug": "guscio-ottico",
+      "title": "Guscio e spessore",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 3.55,
+      "currentDurationSeconds": 4,
+      "stato": "miglioramento parziale",
+      "gap": "Geometria e moto sono più leggibili, ma colore, trasmissione e riflessi differiscono dalla fonte.",
+      "currentMedia": "../previews/guscio-ottico.mp4"
+    },
+    {
+      "slug": "velo-fibre",
+      "title": "Oscillazione delle fibre",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 4,
+      "stato": "confronto ancora aperto",
+      "gap": "Curvatura, sovrapposizioni, distribuzione dei fili e trasmissione richiedono ulteriori confronti.",
+      "currentMedia": "../previews/velo-fibre.mp4"
+    },
+    {
+      "slug": "reticolo-giunzioni",
+      "title": "Reticolo di fibre",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 8,
+      "currentDurationSeconds": 16,
+      "stato": "miglioramento parziale",
+      "gap": "Nodo centrale, porosità e luce sono ancora diversi. Il ritorno aggiunto dopo la crescita è autoriale.",
+      "currentMedia": "../previews/reticolo-giunzioni.mp4"
+    },
+    {
+      "slug": "cellule-istanze",
+      "title": "Cellule instanziate",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 4,
+      "stato": "confronto ancora aperto",
+      "gap": "Distribuzione, dimensioni e movimento delle cellule non coincidono; resta aperta la loro occlusione reciproca.",
+      "currentMedia": "../previews/cellule-istanze.mp4"
+    },
+    {
+      "slug": "distorsione-e-ricircolo",
+      "title": "Distorsione ricorsiva 2D e feedback",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 4,
+      "stato": "miglioramento parziale",
+      "gap": "La deformazione funziona, ma struttura interna, dettagli e ritmo non riproducono ancora il riferimento.",
+      "currentMedia": "../previews/distorsione-e-ricircolo.mp4"
+    },
+    {
+      "slug": "liquido-sulla-forma",
+      "title": "Pittura liquida",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 4,
+      "stato": "miglioramento parziale",
+      "gap": "Il risultato è più granuloso; mancano pieghe ampie e lucide e il movimento della fonte.",
+      "currentMedia": "../previews/liquido-sulla-forma.mp4"
+    },
+    {
+      "slug": "impronte-moto",
+      "title": "Impronte luminose",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 1.1,
+      "currentDurationSeconds": 4,
+      "stato": "miglioramento parziale",
+      "gap": "Il trattamento è più leggibile e animato; soggetto botanico e cadenza restano diversi.",
+      "currentMedia": "../previews/impronte-moto.mp4"
+    },
+    {
+      "slug": "membrana-contatto",
+      "title": "Vincoli e dinamica delle strutture",
+      "sourceKind": "internal-study",
+      "sourceDurationSeconds": null,
+      "currentDurationSeconds": 4,
+      "stato": "verifica funzionale",
+      "gap": "Studio interno di contatto e continuità. Non esiste un riferimento esterno per una verifica di parità.",
+      "currentMedia": "../previews/membrana-contatto.mp4"
+    },
+    {
+      "slug": "filamenti-macro",
+      "title": "Filamenti su superficie",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 0.45,
+      "currentDurationSeconds": 4,
+      "stato": "miglioramento parziale",
+      "gap": "Direzioni, incroci, densità e colori differiscono. La fonte utile dura meno di mezzo secondo.",
+      "currentMedia": "../previews/filamenti-macro.mp4"
+    },
+    {
+      "slug": "nodo-laccato",
+      "title": "Curve toroidali e nodi",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 4.35,
+      "stato": "miglioramento parziale",
+      "gap": "Forma del nodo, proporzioni e riflessi restano diversi; il ciclo continuo non certifica il moto della fonte.",
+      "currentMedia": "../previews/nodo-laccato.mp4"
+    },
+    {
+      "slug": "segni-mosaico",
+      "title": "Segni, mosaico e contorni",
+      "sourceKind": "image",
+      "sourceDurationSeconds": null,
+      "currentDurationSeconds": 4,
+      "stato": "miglioramento parziale",
+      "gap": "Il trattamento dei segni è migliorato; soggetto fotografico e accenti luminosi non sono riprodotti. Fonte statica.",
+      "currentMedia": "../previews/segni-mosaico.mp4"
+    },
+    {
+      "slug": "lamelle-asimmetriche",
+      "title": "Suddivisione radiale e strati",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 8,
+      "stato": "miglioramento parziale",
+      "gap": "Centro e stratificazione sono più leggibili; silhouette, curvatura, ottica e moto differiscono.",
+      "currentMedia": "../previews/lamelle-asimmetriche.mp4"
+    },
+    {
+      "slug": "ricircolo-luminoso",
+      "title": "Rotazione e ricircolo",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 8,
+      "currentDurationSeconds": 8,
+      "stato": "miglioramento parziale",
+      "gap": "I lampi sono più compatti; pause troppo luminose, curve troppo lisce e contrazione tardiva non coincidono.",
+      "currentMedia": "../previews/ricircolo-luminoso.mp4"
+    },
+    {
+      "slug": "impulsi-sottili",
+      "title": "Tracce persistenti e ramificazione",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 4,
+      "stato": "confronto ancora aperto",
+      "gap": "Gli assi sono più sottili, ma lampi, direzioni e ritmo restano diversi.",
+      "currentMedia": "../previews/impulsi-sottili.mp4"
+    },
+    {
+      "slug": "rifrazione-scene",
+      "title": "Rifrazione 2D",
+      "sourceKind": "image",
+      "sourceDurationSeconds": null,
+      "currentDurationSeconds": 4,
+      "stato": "confronto ancora aperto",
+      "gap": "Soggetto tridimensionale e trattamento ottico differiscono; la fonte statica non permette di verificare il movimento.",
+      "currentMedia": "../previews/rifrazione-scene.mp4"
+    },
+    {
+      "slug": "trama-nebulosa",
+      "title": "Connessioni tra particelle",
+      "sourceKind": "image",
+      "sourceDurationSeconds": null,
+      "currentDurationSeconds": 4,
+      "stato": "confronto ancora aperto",
+      "gap": "La nube resta troppo bianca e regolare. La fonte è statica; il movimento originale non è disponibile.",
+      "currentMedia": "../previews/trama-nebulosa.mp4"
+    },
+    {
+      "slug": "pellicola-spettrale",
+      "title": "Interferenza di pellicola",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 4,
+      "stato": "miglioramento parziale",
+      "gap": "Isole e inquadratura sono migliorate; rilievo, colori dei bordi e movimento restano diversi.",
+      "currentMedia": "../previews/pellicola-spettrale.mp4"
+    },
+    {
+      "slug": "fibre-traslucide",
+      "title": "Riflessi direzionali delle fibre",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 4,
+      "stato": "confronto ancora aperto",
+      "gap": "Forma, spaziatura, radici e trasmissione dei fili non coincidono ancora con la fonte.",
+      "currentMedia": "../previews/fibre-traslucide.mp4"
+    },
+    {
+      "slug": "bolla-su-granelli",
+      "title": "Pellicola ottica sulle particelle",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 8,
+      "currentDurationSeconds": 8,
+      "stato": "confronto ancora aperto",
+      "gap": "Apertura della bolla e distribuzione ad arco dei granelli non sono ancora fedeli; il ritorno aggiunto è autoriale.",
+      "currentMedia": "../previews/bolla-su-granelli.mp4"
+    },
+    {
+      "slug": "mosaico-finestre",
+      "title": "Ordine, aree e preset dei filtri",
+      "sourceKind": "image",
+      "sourceDurationSeconds": null,
+      "currentDurationSeconds": 4,
+      "stato": "miglioramento parziale",
+      "gap": "Blocchi e spostamento sono migliorati, ma la fonte mostra solo una piccola fascia statica: non consente una verifica completa.",
+      "currentMedia": "../previews/mosaico-finestre.mp4"
+    },
+    {
+      "slug": "trama-estrusa",
+      "title": "Displacement e isosuperfici cellulari",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 8,
+      "currentDurationSeconds": 8,
+      "stato": "miglioramento parziale",
+      "gap": "La rete attraversa lo spessore, ma nodi, disposizione degli strati e movimento restano diversi.",
+      "currentMedia": "../previews/trama-estrusa.mp4"
+    },
+    {
+      "slug": "nacre-traslucida",
+      "title": "Cellule madreperlacee",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 4,
+      "currentDurationSeconds": 8,
+      "stato": "miglioramento parziale",
+      "gap": "Forma e punte sono migliorate; restano troppo bianco uniforme e riflessi diversi dai piccoli accenti ciano, rosa e oro della fonte.",
+      "currentMedia": "../previews/nacre-traslucida.mp4"
+    },
+    {
+      "slug": "trama-reazione",
+      "title": "Reazione-diffusione",
+      "sourceKind": "video",
+      "sourceDurationSeconds": 8,
+      "currentDurationSeconds": 4,
+      "stato": "miglioramento parziale",
+      "gap": "Rilievo e centro sono più leggibili; composizione dei lobi e movimento della fonte non sono ancora riprodotti.",
+      "currentMedia": "../previews/trama-reazione.mp4"
+    }
+  ]
+}

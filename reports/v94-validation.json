@@ -1,0 +1,327 @@
+{
+  "release": "prisma-studio-94",
+  "updatedAt": "2026-11-16T16:28:52.133Z",
+  "sourceVisualParity": false,
+  "sourceMotionParity": false,
+  "scope": "Correzioni condivise di materiale e volume, Mandelbulb classico componibile con superficie, granelli e fili, sei video nativi aggiornati. La parità con le fonti resta aperta.",
+  "darkCore": {
+    "production": true,
+    "tests": [
+      {
+        "name": "lamella",
+        "change": {
+          "max": 174,
+          "mean": 2.129733615451389
+        },
+        "restored": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "finite": true,
+        "throughRange": true,
+        "readGl": 0,
+        "clear": 0,
+        "partial": 0
+      },
+      {
+        "name": "transparent-export",
+        "change": {
+          "max": 177,
+          "mean": 1.8701985677083333
+        },
+        "restored": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "finite": true,
+        "throughRange": true,
+        "readGl": 0,
+        "clear": 23565,
+        "partial": 12341
+      },
+      {
+        "name": "hair",
+        "change": {
+          "max": 152,
+          "mean": 3.6793280707465277
+        },
+        "restored": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "finite": true,
+        "throughRange": true,
+        "readGl": 0,
+        "clear": 0,
+        "partial": 0
+      },
+      {
+        "name": "mixed-grains",
+        "change": {
+          "max": 87,
+          "mean": 1.0677286783854167
+        },
+        "restored": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "finite": true,
+        "throughRange": true,
+        "readGl": 0,
+        "clear": 0,
+        "partial": 0
+      }
+    ],
+    "zeroValueLegacyImages": "pixel-identical in six body/hair comparisons before the shared fractal merge"
+  },
+  "cloudFill": {
+    "production": true,
+    "contractFrames": 40,
+    "glErrors": 0,
+    "fullFillAndAttachedMaxDifference": 0,
+    "loopMaxDifference": 0,
+    "scope": "Cloud support follows Fill for spheres and toroidal clouds; attached-body sampling stays unchanged."
+  },
+  "recursiveMaterial": {
+    "production": true,
+    "classicFormulaIndex": 3,
+    "oldFormulaIndicesPreserved": [
+      0,
+      1,
+      2
+    ],
+    "sharedDomain": {
+      "points": 9216,
+      "maximumDomainError": 4.77e-7,
+      "maximumPigmentError": 5.96e-8,
+      "maximumSurfaceError": 1.19e-7,
+      "glErrors": 0
+    },
+    "legacyCasesPixelIdentical": 14,
+    "lifecycle": "Surface → half grains → grains → surface; moving trails and fibres; exact restore, GL0.",
+    "ui": {
+      "formulas": 4,
+      "classicSelected": true,
+      "powerEnabled": true,
+      "persistedPower": 8.25,
+      "downloadImport": true,
+      "duration": 14,
+      "rotateYTrack": true,
+      "ratio": 1.7486338797814207
+    },
+    "offline": {
+      "production": true,
+      "unmodifiedExport": true,
+      "errors": [],
+      "httpRequests": [],
+      "width": 160,
+      "height": 91,
+      "status": "",
+      "glError": 0,
+      "contextLost": false,
+      "visibleCanvas": true,
+      "animationChanged": true
+    }
+  },
+  "fractalContinuation": {
+    "passed": true,
+    "cases": [
+      "bulb-blend",
+      "classic-material",
+      "menger-extreme",
+      "menger-inside",
+      "box-sheet"
+    ],
+    "imageMaxDifference": 0,
+    "hitMaxDifference": 0,
+    "allComplete": true,
+    "glErrors": 0,
+    "lifecycle": {
+      "entered": true,
+      "cancelled": true,
+      "cancelMs": 4.2,
+      "queryReleased": true,
+      "restoreMax": 0,
+      "recreateMax": 0,
+      "gl": 0,
+      "recreatedGl": 0
+    },
+    "command": "node checks/fractal-resume.mjs",
+    "sourceParity": false
+  },
+  "nativeVideos": [
+    {
+      "name": "lamelle-asimmetriche",
+      "width": 640,
+      "height": 640,
+      "duration": 8,
+      "frames": 240,
+      "samples": 4,
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "glError": 0,
+      "firstRenderWallMs": 7803.70000000298,
+      "firstOutputWallMs": 7803.70000000298,
+      "warmupFrames": 0
+    },
+    {
+      "name": "guscio-ottico",
+      "width": 640,
+      "height": 640,
+      "duration": 4,
+      "frames": 120,
+      "samples": 4,
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "glError": 0,
+      "firstRenderWallMs": 4260.20000000298,
+      "firstOutputWallMs": 4260.20000000298,
+      "warmupFrames": 0
+    },
+    {
+      "name": "trama-reazione",
+      "width": 640,
+      "height": 640,
+      "duration": 4,
+      "frames": 120,
+      "samples": 4,
+      "loop": {
+        "mean": 0.00017333984375,
+        "max": 1
+      },
+      "glError": 0,
+      "firstRenderWallMs": 11915.699999988079,
+      "firstOutputWallMs": 12562.5,
+      "warmupFrames": 6
+    },
+    {
+      "name": "percorsi-fibre",
+      "width": 640,
+      "height": 640,
+      "duration": 4,
+      "frames": 120,
+      "samples": 2,
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "glError": 0,
+      "firstRenderWallMs": 1470.2999999970198
+    },
+    {
+      "name": "ricircolo-luminoso",
+      "width": 640,
+      "height": 640,
+      "duration": 8,
+      "frames": 240,
+      "samples": 2,
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "glError": 0,
+      "firstRenderWallMs": 459
+    },
+    {
+      "name": "mandelbulb-dettaglio",
+      "width": 640,
+      "height": 366,
+      "duration": 14,
+      "frames": 420,
+      "samples": 4,
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "glError": 0,
+      "observedSourceSeconds": 4,
+      "authoredContinuationSeconds": 10
+    }
+  ],
+  "reproducibleTests": [
+    "../tests/core-material.mjs",
+    "../tests/fractal-material.mjs",
+    "../tests/fractal-resume.mjs"
+  ],
+  "referenceCount": 26,
+  "referenceStatus": "v94-reference-status.json",
+  "remaining": [
+    "Silhouette, material and motion differences remain across the reference collection.",
+    "Fibres following a continuously transforming sheet still fail on some local branches; no endpoint-only mode was added.",
+    "The ordered whole-scene compositor is a research prototype, with focus, shared camera and large scenes not yet validated.",
+    "A separate nebula prototype needs a shared coordinate system for the flare and the contracting field. Its measured energy problem and correction have not been established for the released renderer."
+  ],
+  "timingScope": "Wall times from the native export renderer on this workstation at the recorded dimensions and sampling. These are not live FPS or guarantees for every device.",
+  "stagedApplicationChecks": {
+    "github": {
+      "passed": true,
+      "engines": {
+        "solid": {
+          "visible": true,
+          "unique": true,
+          "savedValue": 0.73,
+          "savedTrackEnabled": true
+        },
+        "particles": {
+          "visible": true,
+          "unique": true,
+          "savedValue": 0.73,
+          "savedTrackEnabled": true
+        }
+      },
+      "offline": {
+        "width": 192,
+        "height": 192,
+        "color": true,
+        "error": "",
+        "gl": 0,
+        "httpRequests": []
+      }
+    },
+    "site": {
+      "passed": true,
+      "engines": {
+        "solid": {
+          "visible": true,
+          "unique": true,
+          "savedValue": 0.73,
+          "savedTrackEnabled": true
+        },
+        "particles": {
+          "visible": true,
+          "unique": true,
+          "savedValue": 0.73,
+          "savedTrackEnabled": true
+        }
+      },
+      "offline": {
+        "width": 192,
+        "height": 192,
+        "color": true,
+        "error": "",
+        "gl": 0,
+        "httpRequests": []
+      }
+    }
+  }
+}

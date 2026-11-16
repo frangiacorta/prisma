@@ -1,9 +1,9 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=93b0d9476f96';
-import {BASE_FORM_GLSL} from './base-forms.js?v=93b0d9476f96';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=93b0d9476f96';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=93b0d9476f96';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=93b0d9476f96';
-import {materialCavity} from './particle-shading.js?v=93b0d9476f96';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=00f94f9b4def';
+import {BASE_FORM_GLSL} from './base-forms.js?v=00f94f9b4def';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=00f94f9b4def';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,uploadFractalMaterial} from './solid-renderer.js?v=00f94f9b4def';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=00f94f9b4def';
+import {materialCavity} from './particle-shading.js?v=00f94f9b4def';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -219,12 +219,19 @@ uniform int uPaletteCount,uLightCount;
 uniform vec4 uGradient,uColorWave,uColorAxis,uColorLayers,uEnvironment,uLights[8],uLightProps[8],uLightExtra[8];
 uniform vec4 uMat,uSurface,uCoat,uOptics,uTexture,uScatter,uModern,uFilmMotion,uTransport,uMaterialDetail,uMaterialLayers,uOrganicDetail,uRuntime,uOther,uExtraShape3;
 uniform vec2 uResolution;uniform float uSeed,uTextureSeed,uSurfaceSeed,uHairCavity;
+uniform vec3 uHairDarkCore;
 uniform vec3 uFilmResponse[24],uFilmWhite;
 mat2 rot(float a){return turn(a);}vec3 axes(){return uAxes.xyz;}
 ${FILM_PATTERN_GLSL}
 float filteredInterference(float phase){float width=max(.0001,fwidth(phase)*.5);return cos(phase)*sin(min(width,PI))/width;}
 ${GROWTH_GLSL}
+#define FRACTAL_ENABLED 1
+${FRACTAL_LOCAL_MATERIAL_GLSL}
 ${FORM_MATERIAL_GLSL.replaceAll('uSeed','uSurfaceSeed').replace('cos(4.*PI*n1*max(20.,thickness)*c1/wavelength)', 'filteredInterference(4.*PI*n1*max(20.,thickness)*c1/wavelength)')}
+float strandCoreVisibility(vec3 world){
+ float radius=length(toLocal(world).xy),inner=uHairDarkCore.y*uHairDarkCore.z*.45;
+ return 1.-uHairDarkCore.x*(1.-smoothstep(inner,uHairDarkCore.y,radius));
+}
 vec4 strandMaterial(vec3 base,vec3 local,vec3 p,vec3 normal,vec3 tangent,float radius){
  vec3 view=vec3(0,0,1),n=normal;if(dot(n,view)<0.)n=-n;
  // Unresolved highlights are filtered with roughness, without replacing the strand normal.
@@ -257,7 +264,8 @@ vec4 strandMaterial(vec3 base,vec3 local,vec3 p,vec3 normal,vec3 tangent,float r
  below=below*(1.-filmF)+spec*filmF;alpha=1.-(1.-alpha)*(1.-max(max(filmF.r,filmF.g),filmF.b));
  if(uCoat.x>.001){vec3 f=fresnel(facing,1.,1.5,local)*uCoat.x;below=below*(1.-f)+environment(reflect(-view,n),p,uCoat.y)*f;alpha=1.-(1.-alpha)*(1.-max(max(f.r,f.g),f.b));}
  below+=base*uSurface.w*(1.-transmission+transmission*pow(1.-facing,3.));
- return vec4(below/max(.0001,alpha),clamp(alpha,0.,1.));
+ float coreVisibility=strandCoreVisibility(p);below*=coreVisibility;alpha=1.-(1.-clamp(alpha,0.,1.))*coreVisibility;
+ return vec4(below/max(.0001,alpha),alpha);
 }
 
 vec3 photoHair(vec3 c){c=max(vec3(0),c*exp2(uPhoto1.x));c=mat3(.59719,.076,.0284,.35458,.90834,.13383,.04823,.01566,.83777)*c;c=(c*(c+.0245786)-.000090537)/(c*(.983729*c+.432951)+.238081);c=clamp(mat3(1.60475,-.10208,-.00327,-.53108,1.10813,-.07276,-.07367,-.00605,1.07602)*c,0.,1.);c=mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(vec3(.0031308),c));c+=uPhoto1.y;float lum=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(lum),c,uPhoto1.w);c=(c-.5)*uPhoto1.z+.5;c+=uPhoto3.x*pow(max(0.,1.-lum),2.)+uPhoto3.y*pow(max(0.,lum),2.);c*=vec3(1.+uPhoto2.x*.18+uPhoto2.y*.08,1.-uPhoto2.y*.14,1.-uPhoto2.x*.18+uPhoto2.y*.08);return pow(max(c,vec3(0)),vec3(1./uPhoto4.x))*(1.-uPhoto2.z*smoothstep(.3,2.4,length(vWorld.xy)));}
@@ -284,14 +292,14 @@ void main(){gl_FragDepth=gl_FragCoord.z;float barrier;sculptMap(vWorld,barrier);
 
  float index=clamp(vAlong+(vRandom-.5)*uHairColor.y,0.,.99999)*float(max(1,uPaletteCount-1));int a=int(floor(index)),b=min(a+1,uPaletteCount-1);vec3 along=mix(uPalette[a],uPalette[b],fract(index));
  float attachment=clamp(vJoin,0.,1.);
- vec3 base=mix(surfacePalette(vRootLocal,palette(dot(vRootLocal,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z)),along,uHairColor.x*(1.-attachment));base*=mix(1.-uHairColor.z*.9*(1.-attachment),1.,smoothstep(0.,.85,vAlong));
+ vec3 base=mix(surfacePaletteMapped(vRootLocal,palette(dot(vRootLocal,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z),vRootLocal/uAxes.xyz,true),along,uHairColor.x*(1.-attachment));base*=mix(1.-uHairColor.z*.9*(1.-attachment),1.,smoothstep(0.,.85,vAlong));
  vec4 material=strandMaterial(base,vRootLocal,vWorld,n,normalize(vTangent),vAcross.y);
  float visibility=gl_FragCoord.z>texture(uCoreDepth,gl_FragCoord.xy/uViewSize).r+.00004?1.-uRootCore:1.;
  alpha=1.-pow(max(.0001,1.-baseAlpha*material.a*visibility),uRepOpacity);if(alpha<.0001)discard;
  vec3 lit=material.rgb;
  if(uHairPulse.x>0.){
   float distanceToPulse=abs(fract(vAlong-uHairPulse.y+vRandom*.1+.5)-.5);
-  lit+=along*uHairPulse.x*(1.-smoothstep(0.,uHairPulse.z,distanceToPulse));
+  lit+=along*uHairPulse.x*(1.-smoothstep(0.,uHairPulse.z,distanceToPulse))*strandCoreVisibility(vWorld);
  }
  // The attachment is shaded as geometry, so opaque roots also occlude the core.
  vec3 shaded=photoHair(lit);
@@ -406,12 +414,12 @@ export class FilamentPass{
  }if(mix<1)yield* this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)yield* this.hairPart(s,camera,w,h,phase,true,mix);}
  *hairPart(s,camera,w,h,phase,tube,opacity,tubeDepth=1){const g=this.gl;
  const p=this.useAxes?this.hairProgram:s.filWrap?(this.wrappedHairProgram??=this.createProgram(hairVertex(false,true),HAIR_FRAG)):this.axes?(this.fallbackProgram??=this.createProgram(hairVertex(false),HAIR_FRAG)):this.hairProgram;this.finishProgram(p);this.common(p,s,camera,w,h);this.tex(p,'uShadow',camera.shadow?this.roots.textures[0]:this.shadow.depth,2);
- bindGrowth(g,p.program,s,phase);
+ bindGrowth(g,p.program,s,phase);uploadFractalMaterial(s,(name,values)=>this.u(p,name,...values));
  const pixelsPerUnit=s.scale*h/(2*camera.ey),radiusPixels=s.filWidth*.5*pixelsPerUnit;
  const sides=Math.max(12,Math.min(32,Math.ceil(Math.PI*Math.sqrt(Math.max(1,radiusPixels*(1+s.filBaseWidth))/.12)/2)*2));
  const curvature=.08+Math.abs(s.filBend)*.3+Math.abs(s.filComb)*.25+Math.abs(s.filWrap)*3+s.filClump*.5+s.filCurl*4+s.filFrizz*6+s.filWind;
  const segments=Math.max(24,Math.min(112,Math.ceil(Math.sqrt(s.filLength*pixelsPerUnit*curvature)*2.2/4)*4));
- this.tex(p,'uCoreDepth',this.coreDepth.depth,6);this.u(p,'uViewSize',w,h);this.u(p,'uRootCore',s.filCore*(1-s.transparency));this.u(p,'uRepOpacity',opacity);this.u(p,'uTubeDepth',tubeDepth);this.u(p,'uSides',sides);this.u(p,'uOpaquePass',camera.opaque?1:0);this.u(p,'uHairColor',s.filColor,s.filColorScatter,s.filRootShade,s.transparency);this.u(p,'uHairCavity',materialCavity(s));this.u(p,'uHairPulse',s.filPulse,phase*Math.round(s.filPulseCycles)/(2*Math.PI),s.filPulseWidth,0);this.u(p,'uShadowX',...this.lightCamera.x);this.u(p,'uShadowY',...this.lightCamera.y);this.u(p,'uShadowZ',...this.lightCamera.z);this.u(p,'uShadowExtent',this.lightCamera.ex);
+ this.tex(p,'uCoreDepth',this.coreDepth.depth,6);this.u(p,'uViewSize',w,h);this.u(p,'uRootCore',s.filCore*(1-s.transparency));this.u(p,'uRepOpacity',opacity);this.u(p,'uTubeDepth',tubeDepth);this.u(p,'uSides',sides);this.u(p,'uOpaquePass',camera.opaque?1:0);this.u(p,'uHairColor',s.filColor,s.filColorScatter,s.filRootShade,s.transparency);this.u(p,'uHairCavity',materialCavity(s));this.u(p,'uHairDarkCore',s.structCoreDark||0,s.structCoreRadius??.3,s.structFan||0);this.u(p,'uHairPulse',s.filPulse,phase*Math.round(s.filPulseCycles)/(2*Math.PI),s.filPulseWidth,0);this.u(p,'uShadowX',...this.lightCamera.x);this.u(p,'uShadowY',...this.lightCamera.y);this.u(p,'uShadowZ',...this.lightCamera.z);this.u(p,'uShadowExtent',this.lightCamera.ex);
  const rad=Math.PI/180;this.u(p,'uMat',s.transparency,s.refraction,s.metal,Math.min(1,s.roughness+(1-s.gloss)*.35));this.u(p,'uSurface',s.iridescence,s.thickness,s.gloss,s.emission);this.u(p,'uCoat',s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0);this.u(p,'uOptics',s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15);this.u(p,'uTexture',s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0);this.u(p,'uScatter',s.scatterDirection??.25,0,s.thinFilm||0,s.filmThickness??420);this.u(p,'uModern',s.thinShell||0,0,0,0);
  this.u(p,'uResolution',w,h);this.u(p,'uOther',s.rotateY*rad,s.rotateX*rad,0,0);this.u(p,'uExtraShape3',0,0,s.rotateZ*rad,0);this.u(p,'uRuntime',0,0,0,16);this.u(p,'uMaterialDetail',s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad);this.u(p,'uMaterialLayers',s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0);this.u(p,'uOrganicDetail',s.textureRandomness||0,s.textureWarp||0,s.textureLink||0,s.texturePatch||0);this.u(p,'uTextureSeed',s.textureSeed||0);this.u(p,'uSurfaceSeed',(s.seed%1000)*.013);
  this.u(p,'uTransport',s.subsurface||0,s.sssRadius??.35,0,0);this.u(p,'uSssColor',...rgb(s.sssColor||'#ffc49b'));this.u(p,'uInternalColor',...rgb(s.internalColor||'#e6f5ff'));

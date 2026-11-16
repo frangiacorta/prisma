@@ -78,7 +78,7 @@ export const EXTRA_HELP={
  growthCycles:'Ripetizioni dello scorrimento della trama nel ciclo di movimento. Richiede Scorrimento sopra zero.',
  filColorScatter:'Varia l’assegnazione della palette fra filamenti adiacenti.',
  filRootShade:'Scurisce la radice del filamento rispetto alla punta, senza cambiare il colore della forma.',
- structCoreDark:'Scurisce il centro della struttura. Nelle particelle attenua il colore finale, compresi riflessi ed emissione, per mantenere leggibile il nucleo scuro.',
+ structCoreDark:'Attenua colore, riflessi ed emissione nella zona centrale della forma, dei granelli e dei fili. Estensione regola il raggio.',
  structCoreRadius:'Estensione della zona centrale scurita. Richiede Oscurità del nucleo sopra zero.',
  finishWarpMix:'Miscela la scena originale con la distorsione ricorsiva. Zero conserva l’immagine originale.',
  finishWarpScale:'Dimensione delle ondulazioni del campo che deforma l’immagine.',

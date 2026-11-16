@@ -1,22 +1,22 @@
-import {paletteTonePanel} from './finish-palette-panel.js?v=93b0d9476f96';
-import {dynamicsPanel} from './dynamics-panel.js?v=93b0d9476f96';
-import {motionPeriod} from './animation-clock.js?v=93b0d9476f96';
-import {GROWTH_STUDIES} from './growth-material.js?v=93b0d9476f96';
-import {GLYPH_FONTS} from './finishing.js?v=93b0d9476f96';
-import {BASE_FORMS} from './base-forms.js?v=93b0d9476f96';
-import {structurePanel,STRUCTURE_TRACKS} from './structure-model.js?v=93b0d9476f96';
-import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=93b0d9476f96';
-import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=93b0d9476f96';
-import {finishingOrderPanel} from './finishing-order.js?v=93b0d9476f96';
-import {rootMotionSuspended} from './solid-renderer.js?v=93b0d9476f96';
-import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=93b0d9476f96';
-import {MOODS} from './model.js?v=93b0d9476f96';
-import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=93b0d9476f96';
+import {paletteTonePanel} from './finish-palette-panel.js?v=00f94f9b4def';
+import {dynamicsPanel} from './dynamics-panel.js?v=00f94f9b4def';
+import {motionPeriod} from './animation-clock.js?v=00f94f9b4def';
+import {GROWTH_STUDIES} from './growth-material.js?v=00f94f9b4def';
+import {GLYPH_FONTS} from './finishing.js?v=00f94f9b4def';
+import {BASE_FORMS} from './base-forms.js?v=00f94f9b4def';
+import {structurePanel,STRUCTURE_TRACKS} from './structure-model.js?v=00f94f9b4def';
+import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=00f94f9b4def';
+import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=00f94f9b4def';
+import {finishingOrderPanel} from './finishing-order.js?v=00f94f9b4def';
+import {rootMotionSuspended} from './solid-renderer.js?v=00f94f9b4def';
+import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=00f94f9b4def';
+import {MOODS} from './model.js?v=00f94f9b4def';
+import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=00f94f9b4def';
 export function pathValue(s,path){const parts=path.split('.');let value=s;for(let i=0;i<parts.length;i++){if(i===1&&parts[0]==='lights')value=value.find(l=>l.id===Number(parts[i]));else value=value?.[parts[i]];}return value}
 export function pathMeta(path,state){const parts=path.split('.'),last=parts.at(-1);if(last==='cycles')return state?.perfectLoop===false?['Ripetizioni nel ciclo',.1,8,.1]:['Ripetizioni nel loop',1,8,1];if(last==='pace')return['Accelerazione / decelerazione',0,.95,.01];if(last==='pacePhase')return['Punto di massima velocità',0,360,1];if(last==='hold')return['Pausa a ogni giro',0,.8,.01];if(last==='phase')return['Fase di partenza',0,360,1];if(last==='amplitude'){if(parts[0]==='motions'){const m=TRACK_META[parts[1]];return ['Ampiezza',m[1],m[2],m[3]]}return parts[2]==='orbit'?['Ampiezza orbita',0,180,1]:['Ampiezza pulsazione',0,1,.01]}return LIGHT_META[last]}
 export function writePath(s,path,value){const parts=path.split('.');let object=s;for(let i=0;i<parts.length-1;i++){if(i===1&&parts[0]==='lights')object=object.find(l=>l.id===Number(parts[i]));else object=object[parts[i]];}if(object)object[parts.at(-1)]=value}
-import {livingChooser} from './living-panel.js?v=93b0d9476f96';
-import {particlePanel} from './particle-panel.js?v=93b0d9476f96';
+import {livingChooser} from './living-panel.js?v=00f94f9b4def';
+import {particlePanel} from './particle-panel.js?v=00f94f9b4def';
 function uniqueControls(primary,extra){
  const main=document.createElement('div'),addition=document.createElement('div');
  main.innerHTML=primary;addition.innerHTML=extra;
@@ -36,7 +36,7 @@ function uniqueControls(primary,extra){
  for(const p of addition.querySelectorAll(':scope > p.help,:scope > p.control-intro'))p.remove();
  return main.innerHTML+addition.innerHTML;
 }
-import {cloudBody,grainMix} from './body-layers.js?v=93b0d9476f96';
+import {cloudBody,grainMix} from './body-layers.js?v=00f94f9b4def';
 export function buildPanel(tab,s,h,selectedLight){
  const cloud=cloudBody(s),base=(id=tab)=>sharedPanel(id,s,h,selectedLight),particles=(id=tab)=>particlePanel(id,s,{...h,cloud,grainMix:grainMix(s)},sharedPanel,selectedLight);
  if(tab==='shape'){
@@ -71,7 +71,7 @@ export function sharedPanel(tab,s,h,selectedLight){
  if(tab==='particle-motion')return details('Distribuzione della pellicola',trackPanel('motions.filmIslands',TRACK_META.filmIslands[0]))+details('Gruppi',check('animateRotation','Rotazione completa')+check('animateShape','Forma e volume')+check('animateColor','Scorrimento dei colori')+check('animateLight','Orbita di tutte le luci'))+details('Esempi di movimento',`<div class="motion-presets">${MOTION_PRESETS.filter(([k])=>['turn','float','pulse','chromatic','reflect','film','orbit'].includes(k)).map(([k,n])=>`<button class="mood" data-motion-preset="${k}">${n}</button>`).join('')}</div>`)+details('Posizione',['positionX','positionY'].map(k=>trackPanel('motions.'+k,TRACK_META[k][0])).join(''))+details('Moto delle cellule',['pCellAmount','pCellAspect','pCellRelief','pCellLight'].map(k=>trackPanel('motions.'+k,TRACK_META[k][0])).join(''))+details('Rotazioni, colori e luci',['rotateX','rotateY','rotateZ'].map(k=>trackPanel('motions.'+k,TRACK_META[k][0],true)).join('')+['gradientOffset','colorWavePhase','iridescence','roughness','transparency','scale','volume','deform','twist','waves'].map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='gradientOffset'||k==='colorWavePhase')).join('')+slider('motion')+check('environmentRotate','Ruota ambiente')+slider('environmentCycles'))+details('Luci',s.lights.map((l,i)=>trackPanel(`lights.${l.id}.orbit`,`Luce ${i+1} · Orbita`,true)+trackPanel(`lights.${l.id}.pulse`,`Luce ${i+1} · Intensità`)).join(''))+'<p class="help">Attiva una traccia per animarla. I movimenti di particelle e fibre si dosano direttamente con i cursori: zero li ferma.</p>';
 
  if(tab==='shape')return section('Forma di base',`<div class="base-form-grid">${BASE_FORMS.map((name,i)=>`<button class="outline" ${i===0?'id="perfect-sphere"':''} data-base-form="${i}" aria-pressed="${i===s.baseForm}">${name}</button>`).join('')}</div><p class="help">Riparti da una geometria regolare. Azzera deformazioni e relative animazioni; conserva materia, colori, luci e filtri.</p>`+slider('volume',['Piatta','Volumetrica'])+slider('deform',['Regolare','Organica'])+slider('scale')+slider('edge',['Netto','Sfumato']))
-  +details('Frattali 3D',`<div class="base-form-grid">${FRACTAL_FORMULAS.map((name,i)=>`<button class="outline" data-fractal-formula="${i}" aria-pressed="${i===s.fractalKind}">${name}</button>`).join('')}</div>`+slider('fractalAmount',['Forma di base','Frattale'])+slider('fractalLevels')+slider('fractalPower')+slider('fractalFold')+slider('fractalDetail')+'<div class="motion-shortcuts"><button data-jump-tab="motion">Anima il frattale</button></div>')
+  +details('Frattali 3D',`<div class="base-form-grid">${FRACTAL_FORMULAS.map((name,i)=>`<button class="outline" data-fractal-formula="${i}" aria-pressed="${i===s.fractalKind}">${name}</button>`).join('')}</div>`+slider('fractalAmount',['Forma di base','Frattale'])+slider('fractalLevels')+slider('fractalPower')+slider('fractalFold')+slider('fractalDetail')+(s.fractalKind===3?'<p class="help">In Mandelbulb classico, gli Strati di colore seguono le forme che si ripetono nel frattale.</p>':'')+'<div class="motion-shortcuts"><button data-jump-tab="motion">Anima il frattale</button></div>')
   +details('Cellule e spine',slider('cellMorph',['Forma di base','Sviluppo completo'])+slider('cellCore')
    +details('Cellule',['cellBubbles','cellCount','cellSize','cellSizeVariation','cellExposure','cellStretch'].map(k=>slider(k)).join(''))
    +details('Spine',['cellSpines','cellSpineCount','cellSpineLength','cellSpineWidth','cellSpineTaper','cellSpineBend','cellSpineVariation'].map(k=>slider(k)).join(''))
