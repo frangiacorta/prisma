@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=f9c4c37d093c';
-import {EXTRA_HELP} from './control-help-extra.js?v=f9c4c37d093c';
-import {FRACTAL_HELP} from './fractal-form.js?v=f9c4c37d093c';
-import {CELLULAR_HELP} from './cellular-form.js?v=f9c4c37d093c';
-import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=f9c4c37d093c';
-import {trailLightCompensation} from './particle-model.js?v=f9c4c37d093c';
+import {AUDIO_HELP} from './audio-model.js?v=bfebe1e74135';
+import {EXTRA_HELP} from './control-help-extra.js?v=bfebe1e74135';
+import {FRACTAL_HELP} from './fractal-form.js?v=bfebe1e74135';
+import {CELLULAR_HELP} from './cellular-form.js?v=bfebe1e74135';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=bfebe1e74135';
+import {trailLightCompensation} from './particle-model.js?v=bfebe1e74135';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishPalette:'Converte il chiaroscuro della scena in una palette ordinata da scuro a chiaro. La trasparenza resta invariata.',
@@ -208,7 +208,7 @@ const HELP={
  pCount:'Fino a due milioni di granelli. L’anteprima adattiva campiona le scene più dense e compensa la copertura. Le fibre hanno un conteggio indipendente.',pSize:'Diametro comune a 1080p: scala insieme granelli, quota con misura diversa e nodi. I rapporti della distribuzione restano invariati. Valori sotto 1 producono polvere fine; il cursore è più preciso alle misure piccole.',pSizeVar:'Differenza di diametro tra granelli piccoli e grandi.',pSprite:'Sagoma di ogni granello, distinta dalla forma dell’intera struttura.',pOpacity:'Visibilità dei granelli. A 0 restano solo le fibre, se attive.',pSoftness:'Sfuma il bordo dei singoli granelli.',
  pOpening:'A 0 il nucleo è sferico e senza foro. Aumentando apre gradualmente un anello. Le deformazioni restano indipendenti.',pThickness:'Raggio del corpo sferico o spessore del tubo dell’anello.',pFill:'A 0 distribuisce le particelle sulla superficie; a 1 le distribuisce anche dentro il volume.',pClumps:'Concentra la materia in addensamenti lungo la forma.',pLobes:'Numero dei lobi; agisce quando Profondità lobi è sopra 0.',pLobeDepth:'Fa crescere lobi sulla forma. A 0 elimina le sporgenze regolari.',
  pOrganic:'Intensità delle pieghe organiche del campo. A 0 conserva la base geometrica.',pFrequency:'Aumentando, le pieghe organiche diventano più fitte.',pDetail:'Numero di scale di dettaglio sovrapposte al campo organico.',pRough:'Quanto contano le scale più piccole del dettaglio.',pWarp:'Deforma il campo che genera le pieghe organiche.',pNeural:'Raggruppa i percorsi in fasci simili a connessioni neuronali.',pNodes:'Numero dei gruppi della rete; richiede Rete di percorsi sopra 0.',pConnect:'Avvolge e collega i fasci neuronali.',pSymmetry:'Ripete il campo in settori radiali. A 1 non impone simmetria.',
- pLife:'Intensità delle pulsazioni coordinate della materia.',pPulse:'Quante pulsazioni si completano nel loop.',pSignal:'Enfatizza segnali luminosi che attraversano i filamenti.',pPropagation:'Sfalsa l’arrivo delle pulsazioni tra le zone.',pCohesion:'Rende il campo organico più coordinato tra le particelle.',pRandom:'Irregolarità e sfasamento dei percorsi individuali.',pJitter:'Piccoli tremolii della materia.',pVortex:'Avvolge il nucleo in un vortice; il segno cambia il verso.',pReentry:'Richiama periodicamente la materia verso il centro.',pBreath:'Espande e contrae il nucleo insieme.',pTravel:'Ampiezza del percorso orbitale della materia. Con Campo orbitale muove sia la superficie sia i granelli. A 0 mantiene le posizioni di base prima delle altre deformazioni.',pMotionSoftness:'Riduce accelerazioni brusche, dettagli rapidi e microfluttuazioni.',pFollow:'Sfalsa la risposta delle fibre, come un ritardo elastico.',
+ pLife:'Intensità delle pulsazioni coordinate della materia.',pPulse:'Quante pulsazioni si completano nel loop.',pSignal:'Enfatizza segnali luminosi che attraversano i filamenti.',pPropagation:'Sfalsa l’arrivo delle pulsazioni tra le zone.',pCohesion:'Rende il campo organico più coordinato tra le particelle.',pRandom:'Irregolarità e sfasamento dei percorsi individuali.',pJitter:'Piccoli tremolii della materia.',pVortex:'Avvolge il nucleo in un vortice; il segno cambia il verso.',pReentry:'Richiama periodicamente la materia verso il centro.',pBreath:'Espande e contrae il nucleo insieme.',pTravel:'Ampiezza delle orbite lungo il percorso condiviso da superficie e granelli. A zero elimina la componente orbitale, lasciando le altre correnti e pulsazioni. Il controllo Movimento dei granelli ferma il moto locale nella posa attuale.',pMotionSoftness:'Riduce accelerazioni brusche, dettagli rapidi e microfluttuazioni.',pFollow:'Sfalsa la risposta delle fibre, come un ritardo elastico.',
  pOrbitOval:'Da orbite circolari a ellittiche.',pOrbitTilt:'Inclina i piani delle orbite.',pOrbitPrecession:'Fa oscillare i piani orbitali nel tempo.',pOrbitSpread:'Sfalsa le partenze delle orbite tra le particelle.',pOrbitDrift:'Sposta lentamente i centri delle orbite.',pWander:'Intensità delle correnti casuali periodiche.',pWanderScale:'Scala spaziale delle correnti casuali.',pWanderCycles:'Evoluzioni delle correnti in un loop.',pFlowBalance:'A 0 le zone si muovono insieme, a 1 prevalgono percorsi individuali.',pMotionSeed:'Sceglie una nuova coreografia deterministica, conservando la materia e i colori.',
  pTentacle:'Allunga la stessa materia in bracci; a 0 li disattiva.',pTentacleCount:'Numero dei bracci quando Tentacolarità è attiva.',pTentacleLength:'Quanto lontano si estendono i bracci.',pTentacleTaper:'Concentra la materia in bracci più stretti.',pTentacleCurl:'Avvolge i bracci; il segno inverte il verso.',pTentacleWave:'Ampiezza delle onde che scorrono lungo i bracci.',pTentacleCycles:'Numero delle onde dei tentacoli in un loop.',pSpaceWarp:'Piega l’intero spazio della materia.',pWarpScale:'Scala delle pieghe nello spazio.',pWarpCycles:'Ripetizioni del warp nel loop.',pWarpTwist:'Avvolge le pieghe dello spazio in una torsione.',
  pAttract:'Forza con cui i poli richiamano la materia.',pRepel:'Forza con cui i poli allontanano la materia.',pMagnet:'Avvolge la materia attorno ai poli; il segno cambia verso.',pPoles:'Numero dei poli mobili del campo.',pRadius:'Distanza dei poli dal centro.',pField:'Ampiezza dell’area influenzata da ciascun polo.',pOuter:'Quantità di materia proiettata nei fasci esterni. A 0 li elimina.',pReach:'Estensione dei fasci esterni, quando attivi.',pBranches:'Numero dei fasci esterni, quando attivi.',
@@ -281,7 +281,7 @@ export function controlCondition(s,key){
  if(['groundShadow','pShadow','grounding'].includes(key)&&s.bgMode==='solid'&&s.background==='#000000')return 'Scegli un fondale più chiaro per vedere l’ombra.';
  if(key==='filmIslands'&&!positive('filmPattern'))return 'Aumenta Venature di interferenza.';
  if(['filmIslands','filmThickness','iridShift','iridScale','filmPattern','pFilmScale','pFilmVariation'].includes(key)&&!positive('thinFilm')&&!positive('pFilm')&&!positive('iridescence'))return 'Attiva la pellicola o aumenta l’iridescenza.';
- if(['pLighting','pColorMode','pColorScatter','pLumaVar','pDepthFade','pLinks','pTrailCount','pOpacity','pCount','pSize','grainDispersal'].includes(key)&&!particles)return 'Porta Superficie ↔ granelli sopra zero in Forma.';
+ if(['pLighting','pColorMode','pColorScatter','pLumaVar','pDepthFade','pLinks','pTrailCount','pOpacity','pCount','pSize'].includes(key)&&!particles)return 'Porta Superficie ↔ granelli sopra zero in Forma.';
  if(key==='pFill'&&!particles)return 'Porta Superficie ↔ granelli sopra zero in Forma.';
  if(key==='refraction'&&!positive('transparency'))return 'Aumenta Trasparenza per vedere la rifrazione.';
  if(key==='dispersion'&&!surface&&!positive('pLighting'))return 'Attiva Risposta alle luci per separare i colori sui granelli.';
@@ -297,7 +297,8 @@ export function controlCondition(s,key){
  if(key==='structWeaveGrowth'&&(!positive('structFibres')||!positive('structWeft')||!positive('structShell')))return 'Aumenta fibre, tessitura e svuotamento per creare le giunzioni.';
  if(key==='structWeaveNodes'&&!positive('structWeft'))return 'Aumenta i fili trasversali per creare giunzioni.';
  if(['pSelfShadowSoftness','pSelfShadowBias','pOpticalExtent'].includes(key)&&!positive('pSelfShadow')&&!positive('pCaustic'))return 'Attiva ombre reciproche o caustiche.';
- if(/^p(?:Orbit|Travel|Vortex|Wander|SpaceWarp|Reentry|Breath|Life|Random|Jitter)/.test(key)&&particles&&!cloudBody(s)&&!positive('grainDispersal'))return 'Aumenta Distacco dal corpo in Forma → Granelli.';
+ if((key==='grainDispersal'||/^p(?:Orbit|Travel|Vortex|Counterflow|Wander|SpaceWarp|Warp|Reentry|Breath|Life|Random|Jitter|MotionSoftness|Rhythm|Pause|SpeedSpread|TentacleWave|TentacleCycles)/.test(key))&&s.grainMotion===false)return 'Riprendi Movimento dei granelli in Movimento.';
+ if(/^p(?:Orbit|Travel|Vortex|Counterflow|Wander|SpaceWarp|Warp|Reentry|Breath|Life|Random|Jitter)/.test(key)&&!positive('grainDispersal'))return 'Aumenta Ampiezza del movimento in Movimento.';
  if(['filBaseWidth','filBaseHeight','filBaseCurve','filRibbon'].includes(key)&&!(s.filWidth>.02))return 'Aumenta lo spessore dei filamenti per distinguere il profilo.';
  if(key.startsWith('finishPrint')&&(!s.finishFeedback||!s.finishFeedbackLumen))return 'Attiva Persistenza e aumenta Impronte luminose.';
  if(key.startsWith('finishPrint')&&key!=='finishPrintLife'&&s.finishPrintLife<=0)return 'Imposta Dimezzamento della luce sopra zero.';
@@ -386,7 +387,7 @@ const conditionValues={
   'Aumenta la diffusione interna.':{scattering:.55},'Scegli un fondale più chiaro per vedere l’ombra.':{background:'#363942'},
   'Attiva la pellicola o aumenta l’iridescenza.':{thinFilm:.58,pFilm:.58},
   'Porta Superficie ↔ granelli sopra zero in Forma.':{sceneGrains:.52},
-  'Aumenta Distacco dal corpo in Forma → Granelli.':{grainDispersal:.4},
+  'Aumenta Ampiezza del movimento in Movimento.':{grainDispersal:.4},
   'Aumenta Apertura ad anello e Intreccio del nodo.':{loopAmount:.72,loopKnot:.67},
   'Aumenta Separazione in fibre per aprire il reticolo.':{structFibres:.73},
   'Aumenta i fili trasversali per creare giunzioni.':{structWeft:.7},
@@ -455,10 +456,11 @@ export function conditionActivation(s,key,condition=controlCondition(s,key)){
 export function controlHelp(key,engine){
  if(key==='focusBlur')return 'Regola quanto si ammorbidiscono i dettagli davanti e dietro il piano di fuoco.';
  if(key==='focusDepth')return 'Sposta il piano nitido lungo la profondità della scena. I valori positivi sono più vicini alla camera.';
- if(key==='grainSource')return 'Sceglie il generatore e i suoi parametri: Corpo parametrico usa forme e deformazioni; Campo orbitale usa distribuzione, orbite e campi. Il cambio converte la forma in modo approssimato e può cambiarne l’aspetto e il movimento. Superficie ↔ granelli è una scelta separata.';
- if(key==='sceneGrains')return 'Miscela superficie e granelli della sorgente scelta. Con Campo orbitale, la superficie segue l’involucro esterno della nuvola e il suo moto; i granelli mostrano anche la distribuzione interna. Non cambia generatore.';
+
+ if(key==='sceneGrains')return 'Miscela superficie e granelli della stessa geometria, mantenendo il suo movimento. Il cursore cambia la rappresentazione; il riempimento distribuisce i granelli anche dentro il volume.';
  if(key==='pFill')return 'Distribuisce i granelli sulla superficie a 0 e anche dentro il volume a 1. Cambia il riempimento interno dei granelli, non l’involucro esterno mostrato come superficie.';
- if(key==='grainDispersal')return 'A zero i granelli seguono il corpo. Aumenta il distacco per rendere visibili correnti, orbite e deviazioni del moto locale.';
+ if(key==='grainMotion')return 'Ferma il movimento locale nella posa attuale e lo riprende da lì. Vale per superficie e granelli; rotazione dell’insieme, luci, colori e altre animazioni restano indipendenti.';
+ if(key==='grainDispersal')return 'Ampiezza complessiva di orbite, correnti e pulsazioni, condivisa da superficie e granelli. Zero elimina questi spostamenti. Per conservare la posa attuale e fermare il tempo locale, disattiva Movimento dei granelli.';
  if(key==='refraction')return 'Indice del materiale. Regola la deviazione della luce nella superficie e la concentrazione delle caustiche sui granelli trasparenti.';
  if(engine==='solid'&&key==='guide.strength')return 'Intensità della deformazione lungo la curva. Attrazione richiama la superficie; repulsione la allontana. A 3, la repulsione svuota il tubo definito dal raggio.';
  if(engine==='solid'&&key==='guide.radius')return 'Raggio del tubo 3D che circonda la curva. Regola la zona di superficie influenzata, anche in profondità.';

@@ -1,8 +1,8 @@
-import {bodySampleGLSL} from './body-samples.js?v=f9c4c37d093c';
-import {DYNAMICS_GLSL} from './dynamics.js?v=f9c4c37d093c';
+import {bodySampleGLSL} from './body-samples.js?v=bfebe1e74135';
+import {DYNAMICS_GLSL} from './dynamics.js?v=bfebe1e74135';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=f9c4c37d093c';
-import {forceBarrierGLSL} from './particle-forces.js?v=f9c4c37d093c';
+import {guideGLSL} from './particle-path-field.js?v=bfebe1e74135';
+import {forceBarrierGLSL} from './particle-forces.js?v=bfebe1e74135';
 export const grainSizingGLSL=`
 uniform vec2 uNodeStyle,uLargeGrains,uGrainDistribution;
 float grainDiameter(vec4 seed,int index){
@@ -22,7 +22,7 @@ uniform float uPhase,uSeed,uBreath,uPoleRadius,uPoleField;
 uniform vec2 uResolution;uniform vec3 uSpacing;
 uniform vec4 uCloudShape,uCloudCells;
 uniform vec3 uCellDetail;
-uniform float uCounterflow;
+uniform float uCounterflow,uGrainMotionAmount;
 uniform vec4 uShape,uStructure,uNoise,uFlow,uDynamics,uPoles,uOuter,uClock,uPoints,uTrails,uTail,uColor;
 uniform vec4 uForm,uWarp,uFrame,uRotation;
 uniform vec4 uLife,uNetwork;uniform float uSymmetry;
@@ -220,7 +220,7 @@ vec3 positionUnconstrained(vec4 r,float phase){
   p=studioTransform(anchor);
  }else{
   float global=clockAt(phase*uClock.x);
-  p=cloudMotion(r,phase,cloudRestPoint(r));
+  vec3 rest=cloudRestPoint(r);p=mix(rest,cloudMotion(r,phase,rest),uGrainMotionAmount);
   p*=vec3(uForm.xy,uForm.z*uForm.w);p.xz=rot(uWarp.y*p.y)*p.xz;
   p+=uWarp.x*.4*vec3(sin(p.y*2.6+global),cos(p.z*3.+global),sin(p.x*3.4-global));
   p+=uWarp.z*.3*sin(p.yzx*uWarp.w+vec3(global,-global,global));

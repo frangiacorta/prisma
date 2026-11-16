@@ -1,13 +1,41 @@
-import {FIGURE_SCALE} from './base-forms.js?v=f9c4c37d093c';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META} from './structure-model.js?v=f9c4c37d093c';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META} from './cellular-form.js?v=f9c4c37d093c';
-import {FRACTAL_DEFAULTS,FRACTAL_META} from './fractal-form.js?v=f9c4c37d093c';
-import {PARTICLE_DEFAULTS,PARTICLE_META} from './particle-model.js?v=f9c4c37d093c';
+import {FIGURE_SCALE} from './base-forms.js?v=bfebe1e74135';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META} from './structure-model.js?v=bfebe1e74135';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META} from './cellular-form.js?v=bfebe1e74135';
+import {FRACTAL_DEFAULTS,FRACTAL_META} from './fractal-form.js?v=bfebe1e74135';
+import {PARTICLE_DEFAULTS,PARTICLE_META} from './particle-model.js?v=bfebe1e74135';
 
 export const BODY_LAYER_META = {
  sceneGrains:['Superficie ↔ granelli',0,1,.001],
- grainDispersal:['Distacco dal corpo',0,1,.01]
+ grainDispersal:['Ampiezza del movimento',0,1,.01]
 };
+
+// Internal material time is independent of the representation and its origin.
+// Phases/offsets are measured in turns, not wrapped: fractional pCycles and
+// animationPhase values beyond one turn must retain their exact current time.
+// These are transport state, deliberately not animatable parameter tracks.
+export const GRAIN_MOTION_DEFAULTS={grainMotion:true,grainMotionPhase:0,grainMotionOffset:0};
+const TAU=Math.PI*2;
+function finitePhase(value){if(!Number.isFinite(value))throw new TypeError('La fase del movimento deve essere finita.');return value;}
+function savedTurns(value){return Number.isFinite(value)&&Number.isFinite(value*TAU)?value:0;}
+export function grainPhaseRadians(s,currentPhaseRadians){
+ const phase=finitePhase(currentPhaseRadians);
+ if(s.grainMotion===false)return savedTurns(s.grainMotionPhase)*TAU;
+ const offset=savedTurns(s.grainMotionOffset);
+ // Preserve the legacy clock exactly, including its endpoint, when no offset
+ // has been introduced. pDirection and pCycles are applied by the consumer once.
+ return finitePhase(offset===0?phase:phase+offset*TAU);
+}
+export function setGrainMotion(s,enabled,currentPhaseRadians){
+ if(typeof enabled!=='boolean')throw new TypeError('Movimento dei granelli non valido.');
+ const phase=finitePhase(currentPhaseRadians);
+ if(enabled===(s.grainMotion!==false))return s;
+ if(enabled)s.grainMotionOffset=savedTurns(s.grainMotionPhase)-phase/TAU;
+ else s.grainMotionPhase=grainPhaseRadians(s,phase)/TAU;
+ s.grainMotion=enabled;
+ return s;
+}
+export const freezeGrainMotion=(s,phase)=>setGrainMotion(s,false,phase);
+export const resumeGrainMotion=(s,phase)=>setGrainMotion(s,true,phase);
 
 export const grainMix = s => Math.max(0,Math.min(1,s.sceneGrains??(s.engine==='particles'||s.pLiving>0?1:0)));
 export const cloudBody = s => (s.grainSource??(s.engine==='particles'?'cloud':'body'))==='cloud';
@@ -41,6 +69,15 @@ const cloudNeutral={
  pGrainSpacing:1,pGroupSpacing:1,pLiving:0,pSurfaceBind:0
 };
 const cloudKeys=[...new Set([...Object.keys(cloudNeutral),...'pCloudRadius pCellDensity pCellSize pCellVariation pCellAspect pCellRelief pFrequency pDetail pRough pCohesion pMotionSoftness pFollow pWanderScale pWanderCycles pFlowBalance pMotionSeed pTentacleCount pTentacleLength pTentacleTaper pTentacleCurl pTentacleWave pTentacleCycles pWarpScale pWarpCycles pWarpTwist pPoles pRadius pField pReach pBranches pCycles pDirection pRhythm pPause pSpeedSpread pPulse pPropagation pNodes pConnect pDistributionCells'.split(' ')])];
+export function grainFrame(source,phaseRadians,sampleFrame){
+ const internalPhase=grainPhaseRadians(source,phaseRadians),common=sampleFrame(source,phaseRadians);
+ if(internalPhase===phaseRadians)return common;
+ const internal=sampleFrame(source,internalPhase);
+ // Freeze internal geometry/kinematics, not the common scene's camera, shape
+ // transform, material, lights, dynamics or representation crossfade.
+ for(const key of [...cloudKeys,'pFill','grainDispersal'])if(Object.hasOwn(internal,key))common[key]=internal[key];
+ return common;
+}
 const sourceKeys=[...new Set([...Object.keys(bodyDefaults),...cloudKeys,'scale'])];
 const limits={...STRUCTURE_META,...CELLULAR_META,...FRACTAL_META,...PARTICLE_META,scale:['',...FIGURE_SCALE,.01],lobeAmount:['',0,.4,.01],lobes:['',2,12,1],baseForm:['',0,6,1]};
 function safeNumber(k,v){if(!Number.isFinite(v))return undefined;const m=limits[k];return m?clamp(v,m[1],m[2]):clamp(v,-10000,10000);}
@@ -116,6 +153,11 @@ function conversion(input,target){
 export function cloudToBody(s){return conversion(s,'body').out;}
 
 export function normalizeBodyLayers(s,raw){
+ s.grainMotionVersion=1;
+ s.grainDispersal=cloudBody(raw)&&raw.grainMotionVersion!==1?1:Math.max(0,Math.min(1,raw.grainDispersal||0));
+ s.grainMotion=raw.grainMotion!==false;
+ s.grainMotionPhase=savedTurns(raw.grainMotionPhase);
+ s.grainMotionOffset=savedTurns(raw.grainMotionOffset);
  if(Number.isFinite(raw.sceneGrains))s.sceneGrains=grainMix(raw);
  else delete s.sceneGrains;
  if(raw.grainSource==='cloud'||raw.grainSource==='body')s.grainSource=raw.grainSource;

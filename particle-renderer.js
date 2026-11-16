@@ -1,22 +1,22 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=f9c4c37d093c';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=f9c4c37d093c';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=f9c4c37d093c';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=f9c4c37d093c';
-import {knotTurns} from './structure-model.js?v=f9c4c37d093c';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=f9c4c37d093c';
-import {shadowLight} from './particle-shadow.js?v=f9c4c37d093c';
-import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=f9c4c37d093c';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=f9c4c37d093c';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=f9c4c37d093c';
-import {ParticleLinks} from './particle-links.js?v=f9c4c37d093c';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=f9c4c37d093c';
-import {LayeredVeils} from './layered-veils.js?v=f9c4c37d093c';
-import {LivingStructures} from './living-structures.js?v=f9c4c37d093c';
-import {CloudSurface} from './cloud-surface.js?v=f9c4c37d093c';
-import {cloudBody} from './body-layers.js?v=f9c4c37d093c';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=f9c4c37d093c';
-import {forceBarrierGLSL} from './particle-forces.js?v=f9c4c37d093c';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=f9c4c37d093c';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=bfebe1e74135';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=bfebe1e74135';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=bfebe1e74135';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=bfebe1e74135';
+import {knotTurns} from './structure-model.js?v=bfebe1e74135';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=bfebe1e74135';
+import {shadowLight} from './particle-shadow.js?v=bfebe1e74135';
+import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=bfebe1e74135';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=bfebe1e74135';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=bfebe1e74135';
+import {ParticleLinks} from './particle-links.js?v=bfebe1e74135';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=bfebe1e74135';
+import {LayeredVeils} from './layered-veils.js?v=bfebe1e74135';
+import {LivingStructures} from './living-structures.js?v=bfebe1e74135';
+import {ParticleSurface} from './particle-surface.js?v=bfebe1e74135';
+import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=bfebe1e74135';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=bfebe1e74135';
+import {forceBarrierGLSL} from './particle-forces.js?v=bfebe1e74135';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=bfebe1e74135';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec2 uFocus;
 float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
@@ -355,7 +355,7 @@ export class ParticleRenderer{
   this.u(p,'uShape',s.pFamily,s.pTarget,s.pOpening,s.pThickness);this.u(p,'uStructure',s.pFill,s.pLobes,s.pLobeDepth,s.pClumps);
   this.u(p,'uCloudShape',s.pCloudCore,s.pCloudHalo,s.pCloudRadius,0);
   this.u(p,'uCloudCells',s.pCellAmount,s.pCellDensity,s.pCellSize,s.pCellVariation);
-  this.u(p,'uCellDetail',s.pCellAspect,s.pCellRelief,s.pCellLight);this.u(p,'uCounterflow',s.pCounterflow);
+  this.u(p,'uCellDetail',s.pCellAspect,s.pCellRelief,s.pCellLight);this.u(p,'uCounterflow',s.pCounterflow);this.u(p,'uGrainMotionAmount',s.grainDispersal??(cloudBody(s)?1:0));
   this.u(p,'uNoise',s.pOrganic,s.pFrequency,s.pDetail,s.pWarp);this.u(p,'uFlow',s.pCohesion,s.pRandom,s.pJitter,s.pRough);
   this.u(p,'uDynamics',s.pVortex,s.pReentry,s.pTravel,s.pMorph);this.u(p,'uPoles',s.pAttract,s.pRepel,s.pMagnet,s.pPoles);this.u(p,'uPoleRadius',s.pRadius);this.u(p,'uPoleField',s.pField);this.u(p,'uBreath',s.pBreath);
   const repeat=v=>s.perfectLoop===false?v:Math.max(1,Math.round(v||1));
@@ -409,7 +409,7 @@ export class ParticleRenderer{
  }
  prepare(source,phase=0,options={}){
   if(this.gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');
-  const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};migrateGrainSizes(s,source);this.configureFields(s,options);this.ensureTrails(s);
+  const s={...PARTICLE_DEFAULTS,...grainFrame(source,phase,sampleFrame)};migrateGrainSizes(s,source);this.configureFields(s,options);this.ensureTrails(s);
   // Queue optional geometry programs before drawing, without blocking the UI
   // on LINK_STATUS while the driver is still compiling them.
   if(s._cloudSurfaceActive&&s.pLiving>0&&s.pLiving!==4)s.pSkin=Math.max(s.pSkin,s._cloudSurfaceMix);
@@ -417,7 +417,7 @@ export class ParticleRenderer{
   else if(s.pLiving>0)this.living??=new LivingStructures(this,common);
   if(s.pLinks>0&&s.pLiving!==4)this.connections??=new ParticleLinks(this,common);
   const required=new Set([this.blur,this.compose]);
-  if(s._cloudSurfaceActive&&!(s.pLiving>0)){this.cloudSurface??=new CloudSurface(this,common);required.add(this.cloudSurface.program);}
+  if(s._cloudSurfaceActive&&!(s.pLiving>0)){this.cloudSurface??=new ParticleSurface(this,grainGLSL);for(const p of this.cloudSurface.programs)required.add(p);}
   if(visibleGrains(s)){
    required.add(this.grainProgram());
    if(Math.min(s.pCount,previewGrainLimit(options))>storedGrains)required.add(this.generatedPoints());
@@ -440,8 +440,8 @@ export class ParticleRenderer{
  async prepareAsync(s,p,o={}){let slow=false;const start=performance.now();o.onStage?.('preparing');while(!o.cancelled?.()){if(this.prepare(s,p,o)){o.onStage?.('rendering');return true;}if(!slow&&performance.now()-start>30000){slow=true;o.onStage?.('preparing-slow');}await new Promise(r=>setTimeout(r,16));}return false;}
  draw(source,phase=0,w=this.canvas.width,h=this.canvas.height,options={}){
   const gl=this.gl;if(gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');if(options.preview&&!this.prepare(source,phase,options))return false;
-  const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};migrateGrainSizes(s,source);this.configureFields(s,options);this.ensureTrails(s);
-  phase/=Math.PI*2;if(s.perfectLoop!==false)phase=((phase%1)+1)%1;
+  const s={...PARTICLE_DEFAULTS,...grainFrame(source,phase,sampleFrame)};migrateGrainSizes(s,source);this.configureFields(s,options);this.ensureTrails(s);
+  phase=grainPhaseRadians(source,phase)/(Math.PI*2);if(s.perfectLoop!==false)phase=((phase%1)+1)%1;
   if(s.pLiving===4){s.pCount=0;s.pTrailCount=0;s.pLinks=0;s.pLivingBlend=1;}
   this.geometryBudget=options.preview&&options.quality==='fast'?Math.max(1/16,Math.min(1,options.geometryBudget??1)):1;this.previewCounts={};this.studioLayer=options.studioLayer;this.linkRestState={...s};for(const k of ['volume','stretchX','stretchY','stretchZ'])this.linkRestState[k]=source[k]??s[k];
   const weights=livingWeights(s);s.pOpacity*=weights.core;s.pTrailOpacity*=weights.core;s.pLinks*=weights.core;s.pSkin*=weights.structure;s.pThreadOpacity*=weights.structure;this.occlusion=0;
@@ -496,7 +496,7 @@ export class ParticleRenderer{
  }
  drawGeometry(scene,s,phase,options,weights){
   const gl=this.gl,w=this.width,h=this.height;this.bind(scene);if(!this.shadowPass&&(s.pLiving>0||s._cloudSurfaceMix>0)&&!scene.depth){scene.depth=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,scene.depth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT24,w,h);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,scene.depth);}gl.depthMask(true);gl.clearDepth(1);gl.clearColor(this.shadowPass?.mode===2?1:0,this.shadowPass?.mode===2?1:0,this.shadowPass?.mode===2?1:0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.disable(gl.SCISSOR_TEST);gl.enable(gl.BLEND);gl.blendEquation(gl.FUNC_ADD);gl.blendFunc(gl.ONE,this.shadowPass?gl.ONE_MINUS_SRC_ALPHA:gl.ONE);
-  if(s._cloudSurfaceMix>0&&!(s.pLiving>0)){this.cloudSurface??=new CloudSurface(this,common);this.cloudSurface.draw(s,phase*s.pDirection);}
+  if(s._cloudSurfaceMix>0&&!(s.pLiving>0)){this.cloudSurface??=new ParticleSurface(this,grainGLSL);this.cloudSurface.draw(s,phase*s.pDirection,options);}
   if(s.pLiving===4){this.veils??=new LayeredVeils(this,common);this.veils.draw({...s,pVeilOpacity:s.pVeilOpacity*weights.structure},phase*s.pDirection,options);}
   else if(s.pLiving>0){this.living??=new LivingStructures(this,common);this.living.draw(s,phase*s.pDirection);}
   if(!this.shadowPass&&((s.pLiving>0&&s.pLiving!==4&&s.pSkin>0)||(s._cloudSurfaceMix>0&&!(s.pLiving>0)))){

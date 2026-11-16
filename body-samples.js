@@ -1,6 +1,6 @@
 // Sample the same local distance field the surface uses, before the camera
 // transform. Sampling is deterministic at any phase, including export seeks.
-import {BASE_FORM_GLSL} from './base-forms.js?v=f9c4c37d093c';
+import {BASE_FORM_GLSL} from './base-forms.js?v=bfebe1e74135';
 
 export const bodyFieldGLSL = `
 uniform highp sampler2D uField;
@@ -115,7 +115,7 @@ vec3 studioTransform(vec3 p){
 `;
 
 export class BodySamples {
- constructor(gl){this.gl=gl;this.vao=gl.createVertexArray();this.width=512;this.height=96;this.key='';}
+ constructor(gl){this.gl=gl;this.vao=gl.createVertexArray();this.width=512;this.height=192;this.key='';}
  prepare(){
   const gl=this.gl;
   if(this.program)return;
@@ -140,7 +140,10 @@ export class BodySamples {
  }
  update(field,s,options){
   if(field.sphere)return {kind:1,inner:field.inner,texture:null,lo:field.lo,hi:field.hi};
-  const gl=this.gl, height=options.preview&&options.quality==='fast'?96:192;
+  // Quality may change drawing work, never the canonical sample IDs/positions.
+  // Keep the full export lattice in preview as well; changing its height changes
+  // the hash→sample mapping and makes grains jump on export or refinement.
+  const gl=this.gl, height=192;
   const key=[field.key,field.inner,s.pFill,s.pCloudCore,height].join('|');
   if(this.key!==key){
    if(!this.framebuffer){this.framebuffer=gl.createFramebuffer();this.texture=gl.createTexture();}

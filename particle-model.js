@@ -1,4 +1,4 @@
-import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=f9c4c37d093c';
+import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=bfebe1e74135';
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
 export const PARTICLE_VERSION=14;
 // Normalize the light accumulated by long, persistent trails.
@@ -119,7 +119,7 @@ export const PARTICLE_STUDIES=[
  {name:'Membrana viva',label:'Pelle · apertura e involuzione',values:{...LIVING_BASE,...LIVING_STYLES.membrane,pFoldDepth:.19,pInflate:.12,pContract:.25,pSkinOpening:.75,rotateX:-40,scale:1.5,metal:.45,roughness:.2,gloss:1,pLighting:1,pFilm:.5,filmThickness:430,pFilmVariation:.2,emission:.02,pThreadOpacity:0,palette:['#638f9b','#ead5aa','#7773a8']}},
 ];
 export function particleCreation(base,index=0,seed=417){
- const s=structuredClone(base);Object.assign(s,PARTICLE_DEFAULTS,{engine:'particles',particleVersion:PARTICLE_VERSION,seed:seed>>>0,forcePoints:[],forcePaths:[],
+ const s=structuredClone(base);Object.assign(s,PARTICLE_DEFAULTS,{engine:'particles',grainSource:'cloud',grainMotionVersion:1,grainDispersal:1,particleVersion:PARTICLE_VERSION,seed:seed>>>0,forcePoints:[],forcePaths:[],
  volume:1,stretchX:1,stretchY:1,stretchZ:1,deform:0,twist:0,waves:0,waveScale:3,scale:1.25,positionX:0,positionY:0,rotateX:20,rotateY:-18,rotateZ:0,
  duration:10,speed:1,perfectLoop:true,transparency:0,metal:.18,roughness:.38,gloss:.7,iridescence:.1,emission:.6,glow:.22,
  environment:'studio',environmentPower:.35,environmentAngle:0,environmentRotate:false,filmFlow:0,filmSwirl:0,

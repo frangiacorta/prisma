@@ -1,5 +1,5 @@
-import {clockStatus} from './animation-clock.js?v=f9c4c37d093c';
-import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=f9c4c37d093c';
+import {clockStatus} from './animation-clock.js?v=bfebe1e74135';
+import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=bfebe1e74135';
 export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['library','Preset']];
 const html=s=>{const d=document.createElement('div');d.innerHTML=s;return d;};
 const section=(title,id)=>{const d=document.createElement('details');d.className='control-details';if(id)d.id=id;const h=document.createElement('summary');h.textContent=title;d.append(h);return d;};
@@ -13,7 +13,7 @@ function moveRows(source,target,keys){for(const k of keys){const el=source.query
 function motionOrigin(key){if(['duration','speed','motion','pCycles','pDirection','perfectLoop'].includes(key))return 'motion';if(/^environment/.test(key))return 'light';if(/^filPulse/.test(key))return 'motion';if(/^(film|growth)/.test(key))return 'material';if(/^(struct|fil|petal|stem|loop)/.test(key))return 'shape';return 'motion';}
 function trackMap(raw){const root=html(raw('motion')),map=new Map();for(const el of root.querySelectorAll('[data-path-check$=".enabled"]')){const path=el.dataset.pathCheck.replace(/\.enabled$/,'');if(!map.has(path))map.set(path,el.closest('details'));}return map;}
 export function animationMarkup(path,raw){const d=trackMap(raw).get(path);return d?.outerHTML||'';}
-export function motionGroups(raw){const root=html(raw('motion'));root.querySelector('[data-dynamics-panel]')?.remove();for(const e of [...root.querySelectorAll('[data-path-check$=".enabled"]')])e.closest('details').remove();for(const e of [...root.querySelectorAll('[data-param]')])if(motionOrigin(e.dataset.param)!=='motion'||['duration','speed','motion','pCycles'].includes(e.dataset.param))rowFor(e).remove();for(const e of root.querySelectorAll('[data-check],[data-particle-select]'))rowFor(e).remove();stripEmpty(root);return [...root.children].filter(d=>d.matches('details')&&d.querySelector('[data-param]'));}
+export function motionGroups(raw){const root=html(raw('motion'));root.querySelector('[data-dynamics-panel]')?.remove();root.querySelector('[data-grain-motion-panel]')?.remove();for(const e of [...root.querySelectorAll('[data-path-check$=".enabled"]')])e.closest('details').remove();for(const e of [...root.querySelectorAll('[data-param]')])if(motionOrigin(e.dataset.param)!=='motion'||['duration','speed','motion','pCycles'].includes(e.dataset.param))rowFor(e).remove();for(const e of root.querySelectorAll('[data-check],[data-particle-select]'))rowFor(e).remove();stripEmpty(root);return [...root.children].filter(d=>d.matches('details')&&d.querySelector('[data-param]'));}
 function baseMarkup(id,raw,state){
  const root=html(raw(id));
  if(id==='shape'){
@@ -44,7 +44,7 @@ export function composePanel(id,raw,state){
   }return root.innerHTML;
  }
  if(id==='motion'){
-  const original=html(raw('motion')),root=document.createElement('div'),time=section('Tempo del loop','motion-time'),list=section('Animazioni','animation-list'),recipes=section('Movimenti pronti','motion-recipes'),reactions=section('Reazioni','motion-reactions');time.dataset.defaultOpen='true';list.dataset.defaultOpen='true';
+  const original=html(raw('motion')),root=document.createElement('div'),time=section('Tempo del loop','motion-time'),list=section('Animazioni','animation-list'),recipes=section('Movimenti pronti','motion-recipes'),reactions=section('Reazioni','motion-reactions');time.dataset.defaultOpen='true';list.dataset.defaultOpen='true';const grainMotion=original.querySelector('[data-grain-motion-panel]');if(grainMotion)root.append(grainMotion);
   for(const e of original.querySelectorAll('[data-param],[data-check],[data-particle-select]'))if(['duration','speed','motion','pCycles','pDirection','perfectLoop'].includes(e.dataset.param||e.dataset.check||e.dataset.particleSelect))time.append(rowFor(e));
   for(const [path,track]of tracks){const parts=path.split('.');const value=parts[0]==='motions'?state.motions?.[parts[1]]:state.lights.find(l=>String(l.id)===parts[1])?.[parts[2]];if(!value?.enabled)continue;const b=document.createElement('button');b.className='animation-link';b.dataset.animatePath=path;b.textContent=labelFor(parts[1],track.querySelector('summary').textContent)+' · '+value.cycles+'×';list.append(b);}
   const add=document.createElement('select');add.id='add-animation';add.setAttribute('aria-label','Aggiungi animazione');add.innerHTML='<option value="">Aggiungi animazione…</option>';for(const [path,t]of tracks){const o=document.createElement('option');o.value=path;o.textContent=labelFor(path.split('.')[1],t.querySelector('summary').textContent);add.append(o);}list.append(add);
@@ -73,7 +73,7 @@ export function refinePanel(root,level='simple',{state={},baseline={},tab='shape
  // Detail levels choose parameters, never remove precision or help from a visible one.
  if(level==='simple'){
   root.querySelector('.finish-order')?.remove();
-  for(const e of [...root.querySelectorAll('input[data-check],select')]){const key=e.dataset.check||e.dataset.particleSelect||e.dataset.finishSelect||e.id;if(e.dataset.grainSource)continue;if(!(e.matches('select')?ESSENTIAL_FIELDS.has(key)||key==='add-animation':ESSENTIAL_FLAGS.has(key)))rowFor(e).remove();}
+  for(const e of [...root.querySelectorAll('input[data-check],select')]){const key=e.dataset.check||e.dataset.particleSelect||e.dataset.finishSelect||e.id;if(!(e.matches('select')?ESSENTIAL_FIELDS.has(key)||key==='add-animation':ESSENTIAL_FLAGS.has(key)))rowFor(e).remove();}
   for(const e of [...root.querySelectorAll('button')])if(!e.matches(ESSENTIAL_BUTTONS+',.parameter-info,[data-help-text],[data-color-move],[data-color-remove]')&&!e.closest('.base-form-grid,.light-list'))e.remove();
  }
  if(level==='simple')for(const layer of root.querySelectorAll('[data-particle-layer]'))for(const d of [...layer.querySelectorAll('details')].reverse()){d.querySelector(':scope > summary')?.remove();for(const p of d.querySelectorAll(':scope > .help'))p.remove();d.replaceWith(...d.childNodes);}

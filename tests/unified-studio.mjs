@@ -105,9 +105,7 @@ try{
  await page.goto(server.url);
  const mix=page.locator('#controls [data-param=sceneGrains]');
  await mix.waitFor();
- const origin=page.locator('#controls [data-grain-source]');
- assert.deepEqual(await origin.locator('option').allTextContents(),['Corpo parametrico','Campo orbitale']);
- assert(await page.evaluate(()=>!!(document.querySelector('#controls [data-grain-source]').compareDocumentPosition(document.querySelector('#controls [data-param=sceneGrains]'))&Node.DOCUMENT_POSITION_FOLLOWING)));
+ assert.equal(await page.locator('#controls [data-grain-source]').count(),0);
  assert.equal(await page.locator('#controls [data-param=sceneGrains]').count(),1);
  await mix.evaluate(el=>{el.focus();el.value='0.67';for(const type of ['input','change'])el.dispatchEvent(new Event(type,{bubbles:true}));});
  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('prisma-current-v2')||'{}').state?.sceneGrains===.67);

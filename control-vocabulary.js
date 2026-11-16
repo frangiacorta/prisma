@@ -1,5 +1,6 @@
 // Public wording and search aliases share one source. State/preset keys stay stable.
 export const CONTROL_NAMES={
+ grainDispersal:'Ampiezza del movimento',
  hollow:'Svuotamento degli elementi',wallThickness:'Spessore della parete',scattering:'Diffusione interna',translucency:'Luce in controluce',thinFilm:'Intensità della pellicola',coat:'Vernice trasparente',coatRoughness:'Rugosità della vernice',
  volume:'Profondità della forma',deform:'Irregolarità della forma',scale:'Dimensione della figura',positionX:'Posizione orizzontale',positionY:'Posizione verticale',
  structShell:'Svuotamento',structThickness:'Spessore del guscio',structWeave:'Intreccio della trama',petalWeave:'Intreccio delle appendici',filLength:'Lunghezza dei filamenti',petalLength:'Lunghezza delle appendici',

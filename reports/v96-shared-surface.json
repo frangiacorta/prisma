@@ -1,0 +1,364 @@
+{
+  "version": "prisma-studio-96",
+  "scope": "Shared particle positions for surface/grain representation and independent grain transport",
+  "changes": [
+    "Removed the body/orbital-field selector from the editor. Representation changes no longer convert procedural parameters.",
+    "Surface reconstruction consumes every actual grain ID and the same attachedPosition function/time as the point renderer.",
+    "Shared movement amplitude plus pause/resume at the current pose; persisted phase and offset.",
+    "Fixed body sample texture dimensions across preview/export.",
+    "Flush pending project save when leaving the page."
+  ],
+  "gpu": {
+    "rows": [
+      {
+        "name": "cloud",
+        "count": 6000,
+        "identity": 3.5762786865234375e-07,
+        "mix": {
+          "max": 0,
+          "mean": 0
+        },
+        "motion": {
+          "max": 0.8915550708770752,
+          "mean": 0.11412276657751239
+        },
+        "freeze": {
+          "max": 0,
+          "mean": 0
+        },
+        "resume": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "ms": 1450,
+        "visible": 12666,
+        "stats": {
+          "count": 6000,
+          "gridResolution": 128,
+          "slicesPerGrain": 15,
+          "boundsReadbackMs": 1,
+          "allocatedBytes": 34832352,
+          "voxelSize": 0.015707623431874866,
+          "minimumKernelVoxels": 5.667603965775956,
+          "estimatedSpacing": 0.05564036803463082,
+          "cohesion": 0.08902458885540931,
+          "densityFormat": "RGBA32F",
+          "depositScale": 1,
+          "decimated": false
+        }
+      },
+      {
+        "name": "outer",
+        "count": 6000,
+        "identity": 1.087784767150879e-06,
+        "mix": {
+          "max": 0,
+          "mean": 0
+        },
+        "motion": {
+          "max": 1.3632931113243103,
+          "mean": 0.13124421735476513
+        },
+        "freeze": {
+          "max": 0,
+          "mean": 0
+        },
+        "resume": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "ms": 14,
+        "visible": 17076,
+        "stats": {
+          "count": 6000,
+          "gridResolution": 128,
+          "slicesPerGrain": 13,
+          "boundsReadbackMs": 1.0999999940395355,
+          "allocatedBytes": 34832352,
+          "voxelSize": 0.026515730421730672,
+          "minimumKernelVoxels": 4.880893402143697,
+          "estimatedSpacing": 0.08088778354277884,
+          "cohesion": 0.12942045366844615,
+          "densityFormat": "RGBA32F",
+          "depositScale": 1,
+          "decimated": false
+        }
+      },
+      {
+        "name": "cells",
+        "count": 6000,
+        "identity": 3.5762786865234375e-07,
+        "mix": {
+          "max": 0,
+          "mean": 0
+        },
+        "motion": {
+          "max": 0.7813749462366104,
+          "mean": 0.11611166005850836
+        },
+        "freeze": {
+          "max": 0,
+          "mean": 0
+        },
+        "resume": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "ms": 2217,
+        "visible": 9630,
+        "stats": {
+          "count": 6000,
+          "gridResolution": 128,
+          "slicesPerGrain": 15,
+          "boundsReadbackMs": 1.2999999970197678,
+          "allocatedBytes": 34832352,
+          "voxelSize": 0.014393687459379665,
+          "minimumKernelVoxels": 5.715495712450504,
+          "estimatedSpacing": 0.05141691185027315,
+          "cohesion": 0.08226705896043705,
+          "densityFormat": "RGBA32F",
+          "depositScale": 1,
+          "decimated": false
+        }
+      },
+      {
+        "name": "body",
+        "count": 6000,
+        "identity": 1.7881393432617188e-07,
+        "mix": {
+          "max": 0,
+          "mean": 0
+        },
+        "motion": {
+          "max": 0.4277724586427212,
+          "mean": 0.05617455470791545
+        },
+        "freeze": {
+          "max": 0,
+          "mean": 0
+        },
+        "resume": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "ms": 2586,
+        "visible": 49029,
+        "stats": {
+          "count": 6000,
+          "gridResolution": 128,
+          "slicesPerGrain": 13,
+          "boundsReadbackMs": 1.199999988079071,
+          "allocatedBytes": 34832352,
+          "voxelSize": 0.017346767774142662,
+          "minimumKernelVoxels": 4.142986802439986,
+          "estimatedSpacing": 0.044917143720790184,
+          "cohesion": 0.0718674299532643,
+          "densityFormat": "RGBA32F",
+          "depositScale": 1,
+          "decimated": false
+        }
+      }
+    ],
+    "filaments": {
+      "difference": {
+        "max": 185,
+        "mean": 1.1918402777777777
+      },
+      "error": 0
+    }
+  },
+  "halfFloatDense": {
+    "rows": [
+      {
+        "name": "cloud",
+        "count": 100000,
+        "identity": 4.76837158203125e-07,
+        "mix": {
+          "max": 0,
+          "mean": 0
+        },
+        "motion": {
+          "max": 0.9140002429485321,
+          "mean": 0.11484324893581879
+        },
+        "freeze": {
+          "max": 0,
+          "mean": 0
+        },
+        "resume": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "ms": 1413,
+        "visible": 12186,
+        "stats": {
+          "count": 100000,
+          "gridResolution": 128,
+          "slicesPerGrain": 9,
+          "boundsReadbackMs": 0.5,
+          "allocatedBytes": 20794848,
+          "voxelSize": 0.015150665877449307,
+          "minimumKernelVoxels": 2.0092142811109097,
+          "estimatedSpacing": 0.01902558390581931,
+          "cohesion": 0.030440934249310898,
+          "densityFormat": "RGBA16F",
+          "depositScale": 1e-05,
+          "decimated": false
+        }
+      },
+      {
+        "name": "outer",
+        "count": 100000,
+        "identity": 1.7285346984863281e-06,
+        "mix": {
+          "max": 0,
+          "mean": 0
+        },
+        "motion": {
+          "max": 1.3688461780548096,
+          "mean": 0.1346743882413849
+        },
+        "freeze": {
+          "max": 0,
+          "mean": 0
+        },
+        "resume": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "ms": 14,
+        "visible": 15096,
+        "stats": {
+          "count": 100000,
+          "gridResolution": 128,
+          "slicesPerGrain": 7,
+          "boundsReadbackMs": 1,
+          "allocatedBytes": 20794848,
+          "voxelSize": 0.025299449961447125,
+          "minimumKernelVoxels": 1.7307508549175994,
+          "estimatedSpacing": 0.02736690290607477,
+          "cohesion": 0.043787044649719636,
+          "densityFormat": "RGBA16F",
+          "depositScale": 1e-05,
+          "decimated": false
+        }
+      },
+      {
+        "name": "cells",
+        "count": 100000,
+        "identity": 3.8743019104003906e-07,
+        "mix": {
+          "max": 0,
+          "mean": 0
+        },
+        "motion": {
+          "max": 0.7931977361440659,
+          "mean": 0.11682066874837409
+        },
+        "freeze": {
+          "max": 0,
+          "mean": 0
+        },
+        "resume": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "ms": 1873,
+        "visible": 8964,
+        "stats": {
+          "count": 100000,
+          "gridResolution": 128,
+          "slicesPerGrain": 9,
+          "boundsReadbackMs": 2,
+          "allocatedBytes": 20794848,
+          "voxelSize": 0.01392764780210572,
+          "minimumKernelVoxels": 2.030529558510365,
+          "estimatedSpacing": 0.017675312839185987,
+          "cohesion": 0.02828050054269758,
+          "densityFormat": "RGBA16F",
+          "depositScale": 1e-05,
+          "decimated": false
+        }
+      },
+      {
+        "name": "body",
+        "count": 100000,
+        "identity": 5.960464477539062e-07,
+        "mix": {
+          "max": 0,
+          "mean": 0
+        },
+        "motion": {
+          "max": 0.4379813186824322,
+          "mean": 0.0566351185105604
+        },
+        "freeze": {
+          "max": 0,
+          "mean": 0
+        },
+        "resume": {
+          "max": 0,
+          "mean": 0
+        },
+        "seam": {
+          "max": 0,
+          "mean": 0
+        },
+        "ms": 2443,
+        "visible": 47175,
+        "stats": {
+          "count": 100000,
+          "gridResolution": 128,
+          "slicesPerGrain": 7,
+          "boundsReadbackMs": 1.5999999940395355,
+          "allocatedBytes": 20794848,
+          "voxelSize": 0.016606828041346878,
+          "minimumKernelVoxels": 1.6,
+          "estimatedSpacing": 0.01108514067377196,
+          "cohesion": 0.01773622507803514,
+          "densityFormat": "RGBA16F",
+          "depositScale": 1e-05,
+          "decimated": false
+        }
+      }
+    ]
+  },
+  "cpu": "checks/grain-motion-v96.mjs: all six time/state contracts passed",
+  "ui": "Mobile 390x844: selector absent, movement enabled, paused position retained through representation changes and reload. No page errors.",
+  "regressions": "Core material: lamellae, transparency, filaments and mixed grains passed; render-loop pixel differences zero for these fixtures.",
+  "limitations": [
+    "Surface extraction has finite 128^3 resolution; very close features can merge. It uses the same positions, not a claim of exact topology for a point cloud.",
+    "Special living meshes retain their dedicated topology.",
+    "Body filament roots still follow the procedural body field, not the advected density; that pass does not yet receive density-depth occlusion.",
+    "Complex animated body-field resampling can still change sample placement; fixed preview/export dimensions do not solve material-space tracking for all deformations.",
+    "Requested browser-local favorite Sfera semplice · 912486 was not available in the accessible Chrome profile. It was not claimed as tested."
+  ]
+}

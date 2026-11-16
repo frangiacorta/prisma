@@ -1,9 +1,9 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=f9c4c37d093c';
-import {BASE_FORM_GLSL} from './base-forms.js?v=f9c4c37d093c';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=f9c4c37d093c';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,uploadFractalMaterial} from './solid-renderer.js?v=f9c4c37d093c';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=f9c4c37d093c';
-import {materialCavity} from './particle-shading.js?v=f9c4c37d093c';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=bfebe1e74135';
+import {BASE_FORM_GLSL} from './base-forms.js?v=bfebe1e74135';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=bfebe1e74135';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,uploadFractalMaterial} from './solid-renderer.js?v=bfebe1e74135';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=bfebe1e74135';
+import {materialCavity} from './particle-shading.js?v=bfebe1e74135';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.

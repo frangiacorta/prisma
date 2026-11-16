@@ -1,10 +1,10 @@
-import {organizeWorkspace} from './workspace-layout.js?v=f9c4c37d093c';
-import {mountPresetLibrary} from './preset-library.js?v=f9c4c37d093c';
-import {newCreation,material} from './creative-model.js?v=f9c4c37d093c';
-import {addHelp} from './inspector-ui.js?v=f9c4c37d093c';
-import {MOODS} from './model.js?v=f9c4c37d093c';
-import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=f9c4c37d093c';
-import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=f9c4c37d093c';
+import {organizeWorkspace} from './workspace-layout.js?v=bfebe1e74135';
+import {mountPresetLibrary} from './preset-library.js?v=bfebe1e74135';
+import {newCreation,material} from './creative-model.js?v=bfebe1e74135';
+import {addHelp} from './inspector-ui.js?v=bfebe1e74135';
+import {MOODS} from './model.js?v=bfebe1e74135';
+import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=bfebe1e74135';
+import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=bfebe1e74135';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){

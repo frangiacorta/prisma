@@ -1,18 +1,18 @@
-import {CooperativePreview} from './cooperative-preview.js?v=f9c4c37d093c';
-import {PaletteFinishPass} from './finish-palette.js?v=f9c4c37d093c';
-import {Dynamics,disposeDynamics} from './dynamics.js?v=f9c4c37d093c';
-import {motionPeriod} from './animation-clock.js?v=f9c4c37d093c';
-import {animationPhase} from './animation-clock.js?v=f9c4c37d093c';
-import {ScanlinePass} from './finish-scanlines.js?v=f9c4c37d093c';
-import {FilamentPass} from './filament-renderer.js?v=f9c4c37d093c';
-import {VeilTransition} from './veil-transition.js?v=f9c4c37d093c';
-import {BodySamples} from './body-samples.js?v=f9c4c37d093c';
-import {BodyComposite} from './body-composite.js?v=f9c4c37d093c';
-import {cloudBody,grainMix} from './body-layers.js?v=f9c4c37d093c';
-import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=f9c4c37d093c';
-import {ParticleRenderer} from './particle-renderer.js?v=f9c4c37d093c';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=f9c4c37d093c';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=f9c4c37d093c';
+import {CooperativePreview} from './cooperative-preview.js?v=bfebe1e74135';
+import {PaletteFinishPass} from './finish-palette.js?v=bfebe1e74135';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=bfebe1e74135';
+import {motionPeriod} from './animation-clock.js?v=bfebe1e74135';
+import {animationPhase} from './animation-clock.js?v=bfebe1e74135';
+import {ScanlinePass} from './finish-scanlines.js?v=bfebe1e74135';
+import {FilamentPass} from './filament-renderer.js?v=bfebe1e74135';
+import {VeilTransition} from './veil-transition.js?v=bfebe1e74135';
+import {BodySamples} from './body-samples.js?v=bfebe1e74135';
+import {BodyComposite} from './body-composite.js?v=bfebe1e74135';
+import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=bfebe1e74135';
+import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=bfebe1e74135';
+import {ParticleRenderer} from './particle-renderer.js?v=bfebe1e74135';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=bfebe1e74135';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=bfebe1e74135';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
@@ -40,14 +40,17 @@ export class Renderer{
  get gpuSample(){return this.frameGpuSample;}get gpuMilliseconds(){return this.frameGpuMs;}get timerExtension(){return this.frameTimer;}get bakeUploads(){return this.impl?.bakeUploads||0;}
  layerPlan(s,p){
   if(s.sceneGrains===undefined&&!s.motions?.sceneGrains?.enabled)return null;
-  const frame=sampleFrame(s,p),mix=grainMix(frame),cloud=cloudBody(s);
+  const frame=grainFrame(s,p,sampleFrame),mix=grainMix(frame),cloud=cloudBody(s);
   if(mix>=1&&cloud&&s.engine==='particles'&&!s.motions?.sceneGrains?.enabled)return null;
   if(cloud)return {grains:{...s,engine:'particles',grainSource:'cloud',_cloudSurfaceMix:1-mix,_cloudSurfaceActive:true},mix};
   const surface=solidBody(s);
-  if(mix<=0)return {surface,mix};
   const grains={...s,engine:'particles',pLiving:cloud?s.pLiving:0};
   if(!cloud)grains.pFilm=s.thinFilm;
+  if(!cloud&&(frame.grainDispersal>0||s.motions?.grainDispersal?.enabled)){
+   return {body:surface,grains:{...grains,grainSource:'body',_cloudSurfaceMix:1-mix,_cloudSurfaceActive:true},attach:true,mix,frame};
+  }
   if(mix>=1&&cloud)return {grains,mix};
+  if(mix<=0)return {surface,mix};
   // Scale layer strengths after sampling the animation and before drawing.
   for(const k of ['pOpacity','pTrailOpacity','pLinks','pSkin','pThreadOpacity','pShadow','pCaustic'])
    grains[k]=frame[k]*mix;
@@ -63,7 +66,10 @@ export class Renderer{
   if(plan.surface){
    surfaceReady=this.select(plan.surface).prepare(plan.surface,p,so);
    surfaceReady=this.prepareFilaments(plan.surface,p)&&surfaceReady;
-  }else if(plan.body)surfaceReady=this.select(plan.body).prepareBodyField(plan.body,p);
+  }else if(plan.body){
+   surfaceReady=this.select(plan.body).prepareBodyField(plan.body,p);
+   surfaceReady=this.prepareFilaments(plan.body,p)&&surfaceReady;
+  }
   if(plan.attach){this.bodySamples??=new BodySamples(this.gl);surfaceReady=this.bodySamples.ready()&&surfaceReady;}
   const grainsReady=!plan.grains||this.select(plan.grains).prepare(plan.grains,p,o);
   return surfaceReady&&grainsReady;
@@ -74,6 +80,9 @@ export class Renderer{
    if(!await this.select(plan.surface).prepareAsync(plan.surface,p,so))return false;
    this.prepareFilaments(plan.surface,p);
    if(this.needsFilaments(plan.surface,p)&&!await this.filamentPass.prepareAsync(o))return false;
+  }else if(plan.body){
+   this.prepareFilaments(plan.body,p);
+   if(this.needsFilaments(plan.body,p)&&!await this.filamentPass.prepareAsync(o))return false;
   }
   if(plan.attach){
    this.bodySamples??=new BodySamples(this.gl);
@@ -113,7 +122,8 @@ export class Renderer{
  drawLayers(plan,p,w,h,o){
   if(!plan.surface){
    const options=this.grainOptions(plan,p,o);
-   return this.select(plan.grains).draw(finishingSource(plan.grains,o),p,w,h,options);
+   const ok=this.select(plan.grains).draw(finishingSource(plan.grains,o),p,w,h,options);
+   return ok&&this.drawBodyFilaments(plan,p,w,h,o);
   }
   if(!plan.grains){
    const surface=finishingSource(plan.surface,o),ok=this.select(surface).draw(surface,p,w,h,o);
@@ -123,11 +133,20 @@ export class Renderer{
   const frame=this.compositeFrame(plan,p,w,h,o);
   return frame.solid.draw(frame.surface,p,w,h,{...o,layers:frame.layers,layerOpacity:1-plan.mix})&&this.drawGrains(plan,frame,p,w,h,o);
  }
+ drawBodyFilaments(plan,p,w,h,o,async=false){
+  if(!plan.body||!this.needsFilaments(plan.body,p))return true;
+  const source=finishingSource(plan.body,o),solid=this.select(plan.body);
+  // Preserve existing roots on the parametric body. They do not yet follow or
+  // receive depth occlusion from the advected density surface. filCore=0 keeps
+  // that density as the only visible body; the pass copies the existing canvas.
+  return this.filamentPass[async?'drawAsync':'draw']({...sampleFrame(source,p),filCore:0},p,w,h,solid,o);
+ }
  async drawLayerExport(plan,method,p,w,h,o){
   if(!(plan.surface&&plan.grains)){
    const frame=finishingSource(plan.surface||plan.grains,o);
    const options=this.grainOptions(plan,p,o);
    const ok=await this.select(frame)[method](frame,p,w,h,options);
+   if(plan.body)return ok&&await this.drawBodyFilaments(plan,p,w,h,o,true);
    return ok&&(!plan.surface||await this.filaments(frame,p,w,h,o,true));
   }
   const inner={...o,trackTiming:false,deferCompletion:true};
@@ -224,7 +243,7 @@ export class Renderer{
   if(plan){
    if(!await this.prepareLayersAsync(plan,p,o)||o.cancelled?.())return false;
    if(!await this.drawLayerExport(plan,method,p,w,h,o)||o.cancelled?.())return false;
-   drawsAfterBase=!!(plan.surface&&(plan.grains||this.needsFilaments(plan.surface,p)));
+   drawsAfterBase=!!(plan.surface&&(plan.grains||this.needsFilaments(plan.surface,p))||plan.body&&this.needsFilaments(plan.body,p));
   }else{
    this.prepareFilaments(s,p);
    const filaments=this.needsFilaments(s,p),mix=this.transitionAmount(s,p),transition=mix>0&&mix<1;
