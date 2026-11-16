@@ -1,22 +1,22 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=bfebe1e74135';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=bfebe1e74135';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=bfebe1e74135';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=bfebe1e74135';
-import {knotTurns} from './structure-model.js?v=bfebe1e74135';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=bfebe1e74135';
-import {shadowLight} from './particle-shadow.js?v=bfebe1e74135';
-import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=bfebe1e74135';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=bfebe1e74135';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=bfebe1e74135';
-import {ParticleLinks} from './particle-links.js?v=bfebe1e74135';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=bfebe1e74135';
-import {LayeredVeils} from './layered-veils.js?v=bfebe1e74135';
-import {LivingStructures} from './living-structures.js?v=bfebe1e74135';
-import {ParticleSurface} from './particle-surface.js?v=bfebe1e74135';
-import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=bfebe1e74135';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=bfebe1e74135';
-import {forceBarrierGLSL} from './particle-forces.js?v=bfebe1e74135';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=bfebe1e74135';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=cdd6d085dad9';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=cdd6d085dad9';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=cdd6d085dad9';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=cdd6d085dad9';
+import {knotTurns} from './structure-model.js?v=cdd6d085dad9';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=cdd6d085dad9';
+import {shadowLight} from './particle-shadow.js?v=cdd6d085dad9';
+import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=cdd6d085dad9';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=cdd6d085dad9';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=cdd6d085dad9';
+import {ParticleLinks} from './particle-links.js?v=cdd6d085dad9';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=cdd6d085dad9';
+import {LayeredVeils} from './layered-veils.js?v=cdd6d085dad9';
+import {LivingStructures} from './living-structures.js?v=cdd6d085dad9';
+import {ParticleSurface} from './particle-surface.js?v=cdd6d085dad9';
+import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=cdd6d085dad9';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=cdd6d085dad9';
+import {forceBarrierGLSL} from './particle-forces.js?v=cdd6d085dad9';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=cdd6d085dad9';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec2 uFocus;
 float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
@@ -418,7 +418,7 @@ export class ParticleRenderer{
   if(s.pLinks>0&&s.pLiving!==4)this.connections??=new ParticleLinks(this,common);
   const required=new Set([this.blur,this.compose]);
   if(s._cloudSurfaceActive&&!(s.pLiving>0)){this.cloudSurface??=new ParticleSurface(this,grainGLSL);for(const p of this.cloudSurface.programs)required.add(p);}
-  if(visibleGrains(s)){
+  if(visibleGrains(s)||(s._cloudSurfaceMix>0&&!(s.pLiving>0)&&s.pCount>0)){
    required.add(this.grainProgram());
    if(Math.min(s.pCount,previewGrainLimit(options))>storedGrains)required.add(this.generatedPoints());
   }
@@ -447,6 +447,8 @@ export class ParticleRenderer{
   const weights=livingWeights(s);s.pOpacity*=weights.core;s.pTrailOpacity*=weights.core;s.pLinks*=weights.core;s.pSkin*=weights.structure;s.pThreadOpacity*=weights.structure;this.occlusion=0;
   if(s._cloudSurfaceActive){
    const mix=1-s._cloudSurfaceMix;
+   s._cloudGrainOpacity=s.pOpacity;
+   s._cloudGrainLinks=s.pLinks;
    for(const key of ['pOpacity','pTrailOpacity','pLinks'])s[key]*=mix;
    s.pVolumeContinuity*=mix;
    if(s.pLiving>0&&s.pLiving!==4){s.pSkin=s.pSkin*mix+s._cloudSurfaceMix;s.pThreadOpacity*=mix;}
@@ -496,7 +498,13 @@ export class ParticleRenderer{
  }
  drawGeometry(scene,s,phase,options,weights){
   const gl=this.gl,w=this.width,h=this.height;this.bind(scene);if(!this.shadowPass&&(s.pLiving>0||s._cloudSurfaceMix>0)&&!scene.depth){scene.depth=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,scene.depth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT24,w,h);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,scene.depth);}gl.depthMask(true);gl.clearDepth(1);gl.clearColor(this.shadowPass?.mode===2?1:0,this.shadowPass?.mode===2?1:0,this.shadowPass?.mode===2?1:0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.disable(gl.SCISSOR_TEST);gl.enable(gl.BLEND);gl.blendEquation(gl.FUNC_ADD);gl.blendFunc(gl.ONE,this.shadowPass?gl.ONE_MINUS_SRC_ALPHA:gl.ONE);
-  if(s._cloudSurfaceMix>0&&!(s.pLiving>0)){this.cloudSurface??=new ParticleSurface(this,grainGLSL);this.cloudSurface.draw(s,phase*s.pDirection,options);}
+  let surfaceMergedGrains=false;
+  if(s._cloudSurfaceMix>0&&!(s.pLiving>0)){
+   this.cloudSurface??=new ParticleSurface(this,grainGLSL);
+   const projectGrains=this.shadowPass?null:opacity=>this.drawGrainLayer({...s,pOpacity:opacity,pLinks:s._cloudGrainLinks},phase,options);
+   const drewSurface=this.cloudSurface.draw(s,phase*s.pDirection,options,projectGrains);
+   surfaceMergedGrains=drewSurface&&!!projectGrains;
+  }
   if(s.pLiving===4){this.veils??=new LayeredVeils(this,common);this.veils.draw({...s,pVeilOpacity:s.pVeilOpacity*weights.structure},phase*s.pDirection,options);}
   else if(s.pLiving>0){this.living??=new LivingStructures(this,common);this.living.draw(s,phase*s.pDirection);}
   if(!this.shadowPass&&((s.pLiving>0&&s.pLiving!==4&&s.pSkin>0)||(s._cloudSurfaceMix>0&&!(s.pLiving>0)))){
@@ -527,17 +535,19 @@ export class ParticleRenderer{
    }
   }else this.previewTrailCount=0;
   if(s.pLinks>0){this.connections??=new ParticleLinks(this,common);this.connections.draw(s,phase*s.pDirection);}
-  if(visibleGrains(s)){
-   const cap=this.shadowPass?storedGrains:previewGrainLimit(options);
-   const count=Math.min(Math.round(s.pCount),cap,Math.max(s.pLinks>0?s.pLinkNodes:256,Math.round(s.pCount*this.geometryBudget)));
-   const points={...s,pLargeCount:s.pCount>storedGrains?Math.round(s.pLargeCount*count/s.pCount):s.pLargeCount,pOpacity:s.pOpacity*Math.min(16,s.pCount/count)};
-   this.previewCounts.points=count;
-   const sizes=grainDiameters(s),size=Math.max(s.pSize,s.pLargeCount>0?sizes.large:0,s.pLinks>0?sizes.node:0);
-   const quad=Math.min(1024,size*(1+s.pSizeVar*.85)*Math.pow(2,s.pSizeSpread||0))*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
-   this.opticalDrawState();
-   this.drawPoints(this.grainProgram(),points,phase,quad,Math.min(storedGrains,count),0);
-   if(count>storedGrains)this.drawPoints(this.generatedPoints(),points,phase,quad,count-storedGrains,storedGrains);
-  }
+  if(!surfaceMergedGrains&&visibleGrains(s))this.drawGrainLayer(s,phase,options);
+ }
+ drawGrainLayer(s,phase,options){
+  const cap=this.shadowPass?storedGrains:previewGrainLimit(options);
+  const count=Math.min(Math.round(s.pCount),cap,Math.max(s.pLinks>0?s.pLinkNodes:256,Math.round(s.pCount*this.geometryBudget)));
+  const points={...s,pLargeCount:s.pCount>storedGrains?Math.round(s.pLargeCount*count/s.pCount):s.pLargeCount,pOpacity:s.pOpacity*Math.min(16,s.pCount/count)};
+  this.previewCounts.points=count;
+  const sizes=grainDiameters(s);
+  const size=Math.max(s.pSize,s.pLargeCount>0?sizes.large:0,s.pLinks>0?sizes.node:0);
+  const quad=Math.min(1024,size*(1+s.pSizeVar*.85)*Math.pow(2,s.pSizeSpread||0))*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
+  this.opticalDrawState();
+  this.drawPoints(this.grainProgram(),points,phase,quad,Math.min(storedGrains,count),0);
+  if(count>storedGrains)this.drawPoints(this.generatedPoints(),points,phase,quad,count-storedGrains,storedGrains);
  }
  drawPoints(program,s,phase,quad,count,offset){
   const gl=this.gl;this.settings(program,s,phase*s.pDirection);this.u(program,'uPointQuad',quad?1:0);

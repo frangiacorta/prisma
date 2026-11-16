@@ -1,18 +1,18 @@
-import {CooperativePreview} from './cooperative-preview.js?v=bfebe1e74135';
-import {PaletteFinishPass} from './finish-palette.js?v=bfebe1e74135';
-import {Dynamics,disposeDynamics} from './dynamics.js?v=bfebe1e74135';
-import {motionPeriod} from './animation-clock.js?v=bfebe1e74135';
-import {animationPhase} from './animation-clock.js?v=bfebe1e74135';
-import {ScanlinePass} from './finish-scanlines.js?v=bfebe1e74135';
-import {FilamentPass} from './filament-renderer.js?v=bfebe1e74135';
-import {VeilTransition} from './veil-transition.js?v=bfebe1e74135';
-import {BodySamples} from './body-samples.js?v=bfebe1e74135';
-import {BodyComposite} from './body-composite.js?v=bfebe1e74135';
-import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=bfebe1e74135';
-import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=bfebe1e74135';
-import {ParticleRenderer} from './particle-renderer.js?v=bfebe1e74135';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=bfebe1e74135';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=bfebe1e74135';
+import {CooperativePreview} from './cooperative-preview.js?v=cdd6d085dad9';
+import {PaletteFinishPass} from './finish-palette.js?v=cdd6d085dad9';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=cdd6d085dad9';
+import {motionPeriod} from './animation-clock.js?v=cdd6d085dad9';
+import {animationPhase} from './animation-clock.js?v=cdd6d085dad9';
+import {ScanlinePass} from './finish-scanlines.js?v=cdd6d085dad9';
+import {FilamentPass} from './filament-renderer.js?v=cdd6d085dad9';
+import {VeilTransition} from './veil-transition.js?v=cdd6d085dad9';
+import {BodySamples} from './body-samples.js?v=cdd6d085dad9';
+import {BodyComposite} from './body-composite.js?v=cdd6d085dad9';
+import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=cdd6d085dad9';
+import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=cdd6d085dad9';
+import {ParticleRenderer} from './particle-renderer.js?v=cdd6d085dad9';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=cdd6d085dad9';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=cdd6d085dad9';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
