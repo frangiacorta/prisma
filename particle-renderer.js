@@ -1,20 +1,20 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=0049c9863913';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=0049c9863913';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=0049c9863913';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=0049c9863913';
-import {knotTurns} from './structure-model.js?v=0049c9863913';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=0049c9863913';
-import {shadowLight} from './particle-shadow.js?v=0049c9863913';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=0049c9863913';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=0049c9863913';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=0049c9863913';
-import {ParticleLinks} from './particle-links.js?v=0049c9863913';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=0049c9863913';
-import {LayeredVeils} from './layered-veils.js?v=0049c9863913';
-import {LivingStructures} from './living-structures.js?v=0049c9863913';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=0049c9863913';
-import {forceBarrierGLSL} from './particle-forces.js?v=0049c9863913';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=0049c9863913';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=a55ab48fe9e6';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=a55ab48fe9e6';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=a55ab48fe9e6';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=a55ab48fe9e6';
+import {knotTurns} from './structure-model.js?v=a55ab48fe9e6';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=a55ab48fe9e6';
+import {shadowLight} from './particle-shadow.js?v=a55ab48fe9e6';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=a55ab48fe9e6';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=a55ab48fe9e6';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=a55ab48fe9e6';
+import {ParticleLinks} from './particle-links.js?v=a55ab48fe9e6';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=a55ab48fe9e6';
+import {LayeredVeils} from './layered-veils.js?v=a55ab48fe9e6';
+import {LivingStructures} from './living-structures.js?v=a55ab48fe9e6';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=a55ab48fe9e6';
+import {forceBarrierGLSL} from './particle-forces.js?v=a55ab48fe9e6';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=a55ab48fe9e6';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec2 uFocus;
 float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
@@ -28,18 +28,30 @@ vec4 seedAt(int i){return texelFetch(uSeeds,ivec2(i%1024,i/1024),0);}
 vec4 fiberSeed(vec4 r){r.w=fract(r.w+uTail.w*.618);r.zw=mix(r.zw,vec2(.5),uFiber.z);return r;}
 vec3 trailPosition(int j,vec4 seed){
  float age=float(j)/float(uSegments),phase=uPhase-age*uTrails.x;
- if(uTrailLine<=.00001)return position(seed,phase);
+ float streamAmount=seed.w>.86?uOuter.x:0.;
+ vec3 moving=uTrailLine>=.99999?vec3(0.):position(seed,mix(phase,uPhase,streamAmount));
+ if(streamAmount>0.&&uTrailLine<.99999){
+  vec3 head=moving,root=uStudioBody.x>0.?studioTransform(vec3(0.)):vec3(uFrame.yz,0.);
+  vec3 direction=head-root,side=cross(direction,vec3(.3,.1,1.));
+  side/=max(.0001,length(side));
+  vec3 stream=mix(head,root,pow(clamp(age,0.,1.),.85)*clamp(abs(uTrails.x)*3.2,0.,1.));
+  stream+=side*sin(age*TAU*.5)*sin(age*3.+seed.x*TAU+clockAt(uPhase*uClock.x))*.4*uNoise.x*min(3.,length(direction));
+  moving=mix(moving,sceneBarriers(stream,seed,uPhase),streamAmount);
+ }
+ if(uTrailLine<=.00001)return moving;
  float x=(age-.5)*mix(.18,5.65,abs(uTrails.x))*sign(uTrails.x);
  float timer=clockAt(uPhase*uClock.x),fibre=seed.x*TAU;
  float envelope=.4+.6*sin(clamp(age,0.,1.)*TAU*.5);
  float wiggle=sin(timer+fibre+x*9.)*.031+sin(fibre+floor(x*14.+.5)*2.1)*.009;
  vec3 line=vec3(x,(seed.y-.5)*(.022+.17*(1.-uFiber.z))+wiggle*(.22+.78*uFlow.y)*envelope,(seed.z-.5)*.13);
+ float spread=(1.-uFiber.z)*((seed.x-.5)*TAU+sin(timer+fibre)*uFlow.y*.55);
+ line.xy=rot(spread)*line.xy;
  line*=vec3(uForm.xy,max(.06,uForm.z*uForm.w));
  if(uStudioPerspective>.5){line.yz=rot(-uRotation.x)*line.yz;line.xz=rot(-uRotation.y)*line.xz;line.xy=rot(-uRotation.z)*line.xy;}
  else{line.xy=rot(uRotation.z)*line.xy;line.yz=rot(uRotation.x)*line.yz;line.xz=rot(uRotation.y)*line.xz;}
  line=line*uFrame.x+vec3(uFrame.yz,0.);
  line=constrainedDynamics(line,seed,phase);
- return uTrailLine>=.99999?line:mix(position(seed,phase),line,uTrailLine);
+ return uTrailLine>=.99999?line:mix(moving,line,uTrailLine);
 }
 `;
 const pointVert=`#version 300 es
@@ -81,7 +93,7 @@ ${livingOcclusionGLSL}
 uniform vec4 uPoints;uniform float uSprite;uniform vec3 uShadeOrigin;
 void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;vec2 xy=(uPointQuad>.5?vSpriteUV:gl_PointCoord)*2.-1.;float d=length(xy),aa=max(fwidth(d),.04);
  float coverage=1.-smoothstep(1.-aa,1.,d);
- if(uSprite>1.5&&uSprite<2.5)coverage*=smoothstep(.35,.55,d);
+ if(uSprite>1.5&&uSprite<2.5){float inner=.45+.36*uParticleOptical.w;coverage*=smoothstep(inner-.1,inner+.1,d);}
  if(uSprite>2.5)coverage*=exp(-min(abs(xy.x),abs(xy.y))*12.);
  float profile=uSprite<.5?exp(-d*d*mix(.2,3.,uPoints.w)):mix(1.,exp(-d*d*3.),uPoints.w);
  float a=coverage*profile*vOpacity*livingVisibility(vPosition.z)*particleWallCoverage(d);
@@ -134,10 +146,12 @@ void main(){
   float fraction=clockAt(uPhase*uClock.x)*uLife.y/TAU-original.x*uLife.w;
   float pulse=1.-smoothstep(0.,uTrailPulse.y,abs(fract(materialAge-fraction+.5)-.5));
   float crest=pulse*pulse;vec3 glow=mix(particleColor(original,p),vec3(1.),crest*.7);
-  vColor+=glow*uTrailPulse.x*pulse*(1.+crest*5.);
+  vColor+=glow*uTrailPulse.x*pulse*(1.+crest*16.);
  }
  vColor*=cellLightFactor(original);
  vOpacity=uTrails.z*mix(pow(max(0.,1.-materialAge),uTail.x),1.,uFiber.x)*min(1.,width/max(1.,drawWidth))*uFiber.w*particleWallCoverage(.35);
+ float appearance=pow(.5+.5*sin(clockAt(uPhase*uClock.x)+original.x*TAU),5.);
+ vOpacity*=mix(1.,.045+appearance*1.5,uTrailLine*uLife.z);
 }`;
 const trailFrag=`#version 300 es
 precision highp float;in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vForcePhase;in float vOpacity,vSide;out vec4 color;uniform vec4 uFiber;
@@ -156,8 +170,9 @@ ${trailSampling}
 out vec4 color;
 void main(){int row=int(gl_FragCoord.y),j=int(gl_FragCoord.x)-1;vec4 r=fiberSeed(seedAt(row+uBatchStart));color=vec4(trailPosition(j,r),1.);}`;
 const blurFrag=`#version 300 es
-precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage;uniform vec2 uStep;
-void main(){vec4 c=texture(uImage,uv)*.227027;c+=texture(uImage,uv+uStep*1.384615)*.316216;c+=texture(uImage,uv-uStep*1.384615)*.316216;c+=texture(uImage,uv+uStep*3.230769)*.070270;c+=texture(uImage,uv-uStep*3.230769)*.070270;color=c;}`;
+precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage,uMedium;uniform vec2 uStep;uniform float uMediumBloom;
+vec4 bloomSource(vec2 p){return texture(uImage,p)+texture(uMedium,p)*uMediumBloom;}
+void main(){vec4 c=bloomSource(uv)*.227027;c+=bloomSource(uv+uStep*1.384615)*.316216;c+=bloomSource(uv-uStep*1.384615)*.316216;c+=bloomSource(uv+uStep*3.230769)*.070270;c+=bloomSource(uv-uStep*3.230769)*.070270;color=c;}`;
 const composeFrag=`#version 300 es
 precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage,uBloom,uShadow,uCausticMap;uniform float uCausticOn,uShadowStrength;uniform float uGlow,uBgMode,uPhotoAll,uVeilCompose;
 uniform vec4 uGrade,uPhoto,uTone,uLens,uBg;uniform vec3 uBackground,uBackground2;
@@ -219,6 +234,31 @@ const seedWidth=1024,seedHeight=293,storedGrains=seedWidth*seedHeight;
 const visibleGrains=s=>s.pLiving!==4&&s.pCount>0&&s.pOpacity>0;
 const visibleTrails=s=>s.pLiving!==4&&s.pTrailCount>0&&s.pTrailLength>0&&s.pTrailOpacity>0;
 const previewGrainLimit=options=>options.preview&&options.quality!=='full'?(options.quality==='fast'?storedGrains:450000):Infinity;
+// The force and dynamics fragment masks still need pixel-space coordinates
+// even when there is no artist-drawn guide. Keep that camera mapping intact.
+const guideFreeGLSL=`
+const highp int uGuideCount=0;uniform vec4 uGuideA[4];
+uniform vec2 uGuideScreenSize;uniform float uGuideDrawPass;
+vec3 guidePixelPosition(vec2 pixel,vec3 world){
+ if(uGuideDrawPass>.5)return world;
+ return vec3((pixel/uGuideScreenSize*2.-1.)*vec2(uGuideScreenSize.x/uGuideScreenSize.y,1.)*max(2.,7.5-world.z)/2.6,world.z);
+}
+vec3 lockGuidePosition(vec3 p,vec4 r,float phase){return p;}
+vec3 excludeGuideCores(vec3 p,vec4 r,float phase){return p;}
+vec3 containGuidePosition(vec3 p,vec4 r,float phase){return p;}
+vec3 guidePosition(vec3 p,vec4 r,float phase){return p;}
+float guideCore(int i,vec4 r,float phase){return 0.;}
+float guideClearance(int i,vec2 p){return 1e10;}
+bool insideGuideCore(vec3 p,vec4 r,float phase){return false;}
+bool outsideGuidePixel(vec2 pixel,vec3 world,vec4 r,float phase){return false;}
+`;
+const forceFreeGLSL=`
+const highp int uForceCount=0;uniform highp int uForcePasses;
+uniform vec4 uForcePoints[11];uniform vec2 uForceOptions[11];
+float forceCore(int i){return 0.;}
+bool insideForceCore(vec3 p){return false;}
+vec3 excludeForceCores(vec3 p){return p;}
+`;
 export class ParticleRenderer{
  constructor(canvas){
   this.canvas=canvas;const gl=this.gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});
@@ -228,7 +268,47 @@ export class ParticleRenderer{
   this.maxSize=Math.min(4096,gl.getParameter(gl.MAX_TEXTURE_SIZE),gl.getParameter(gl.MAX_RENDERBUFFER_SIZE));this.recoveryExtension=gl.getExtension('WEBGL_lose_context');
   this.timerExtension=gl.getExtension('EXT_disjoint_timer_query_webgl2');this.queries=[];
  }
- program(v,f,varyings=null,materialAlpha=false){const shaders=shadowProgram(v,f,varyings);v=shaders.vertex;f=shaders.fragment;const gl=this.gl,program=gl.createProgram();for(const [type,source]of [[gl.VERTEX_SHADER,v],[gl.FRAGMENT_SHADER,f]]){const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);gl.attachShader(program,shader);gl.deleteShader(shader);}if(varyings)gl.transformFeedbackVaryings(program,varyings,gl.INTERLEAVED_ATTRIBS);gl.linkProgram(program);const result={program,uniforms:new Map(),materialAlpha,ready:false};this.pendingPrograms.add(result);return result;}
+ program(v,f,varyings=null,materialAlpha=false){
+  // Without any authored path, remove the nested guide-search graph before
+  // ANGLE inlines particle, attachment and connection evaluations. Paths that
+  // are merely disabled still keep the complete program, including release
+  // and coverage animation; adding/deleting a path rebuilds dependent passes.
+  if(this.guideVariant===false){v=v.replace(guideGLSL,guideFreeGLSL);f=f.replace(guideGLSL,guideFreeGLSL);}
+  if(this.forceVariant===false){v=v.replace(forceBarrierGLSL,forceFreeGLSL);f=f.replace(forceBarrierGLSL,forceFreeGLSL);}
+  // Constant-zero optional graphs let ANGLE eliminate their nested function
+  // calls. Enabled animation tracks retain the graph across every phase.
+  const specialize=source=>{
+   if(!this.featureVariant)return source;
+   if(!this.featureVariant.cells)source=source.replace('uniform vec4 uCloudShape,uCloudCells;','uniform vec4 uCloudShape;const vec4 uCloudCells=vec4(0.);');
+   if(!this.featureVariant.spacing)source=source.replace('uniform vec2 uResolution;uniform vec3 uSpacing;','uniform vec2 uResolution;const vec3 uSpacing=vec3(1.,1.,4.);');
+   if(!this.featureVariant.film)source=source.replace('uniform vec4 uFilmLayer,uParticleFilmMotion,uFilmObject;','uniform vec4 uParticleFilmMotion,uFilmObject;const vec4 uFilmLayer=vec4(0.);');
+   if(!this.featureVariant.body)source=source.replace('uniform vec4 uStudioBody;','const vec4 uStudioBody=vec4(0.);');
+   if(!this.featureVariant.attachment)source=source.replace('uniform float uSurfaceBind;','const float uSurfaceBind=0.;');
+   if(!this.featureVariant.knots)source=source.replace('uniform vec4 uKnot,uKnotPath,uKnotPigment,uKnotFrame;','uniform vec4 uKnotPath,uKnotPigment,uKnotFrame;const vec4 uKnot=vec4(0.);');
+   return source;
+  };
+  v=specialize(v);f=specialize(f);
+  const shaders=shadowProgram(v,f,varyings);v=shaders.vertex;f=shaders.fragment;const gl=this.gl,program=gl.createProgram();for(const [type,source]of [[gl.VERTEX_SHADER,v],[gl.FRAGMENT_SHADER,f]]){const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);gl.attachShader(program,shader);gl.deleteShader(shader);}if(varyings)gl.transformFeedbackVaryings(program,varyings,gl.INTERLEAVED_ATTRIBS);gl.linkProgram(program);const result={program,uniforms:new Map(),materialAlpha,ready:false};this.pendingPrograms.add(result);return result;
+ }
+ configureFields(s,options={}){
+  const active=!!s.forcePaths?.some(path=>path.points?.length>=2);
+  // Live tracking can briefly lose every landmark. Once its field has been
+  // used, retain the complete force program instead of rebuilding on loss.
+  this.bodyFieldSeen||=!!s.bodyForces?.length;
+  const forces=!!(s.forcePoints?.length||this.bodyFieldSeen);
+  const mayChange=key=>!!s.motions?.[key]?.enabled;
+  const cloud=s.grainSource==='cloud'||(s.grainSource===undefined&&s.sceneGrains===undefined&&s.engine==='particles');
+  const feature={cells:s.pCellAmount>0||mayChange('pCellAmount'),spacing:s.pGrainSpacing!==1||s.pGroupSpacing!==1||mayChange('pGrainSpacing')||mayChange('pGroupSpacing'),film:s.pFilm>0||mayChange('pFilm'),
+   body:!!options.studioLayer?.attachment||!cloud,attachment:(s.pLiving>0&&s.pLiving!==4)||mayChange('pLiving'),knots:(s.loopAmount>0&&s.loopBands>0)||mayChange('loopAmount')||mayChange('loopBands')};
+  const featureKey=JSON.stringify(feature);
+  if(active===this.guideVariant&&forces===this.forceVariant&&featureKey===this.featureKey)return;
+  if(this.guideVariant!==undefined){
+   for(const name of ['points','proceduralPoints','lines','pathProgram']){const p=this[name];if(p){this.pendingPrograms.delete(p);this.gl.deleteProgram(p.program);this[name]=null;}}
+   for(const name of ['connections','volume','medium','optics','living','veils']){const pass=this[name];if(pass){for(const p of Object.values(pass))if(p?.uniforms instanceof Map)this.pendingPrograms.delete(p);pass.dispose();this[name]=null;}}
+   this.shadow?.release();
+  }
+  this.guideVariant=active;this.forceVariant=forces;this.featureVariant=feature;this.featureKey=featureKey;
+ }
  finishProgram(p){if(p.ready)return;const gl=this.gl;if(!gl.getProgramParameter(p.program,gl.LINK_STATUS)){
   const details=gl.getAttachedShaders(p.program)?.map(shader=>gl.getShaderInfoLog(shader)).filter(Boolean).join('\n');
   throw Error(details||gl.getProgramInfoLog(p.program)||'Impossibile preparare le particelle.');
@@ -323,7 +403,7 @@ export class ParticleRenderer{
  }
  prepare(source,phase=0,options={}){
   if(this.gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');
-  const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};migrateGrainSizes(s,source);this.ensureTrails(s);
+  const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};migrateGrainSizes(s,source);this.configureFields(s,options);this.ensureTrails(s);
   // Queue optional geometry programs before drawing, without blocking the UI
   // on LINK_STATUS while the driver is still compiling them.
   if(s.pLiving===4)this.veils??=new LayeredVeils(this,common);
@@ -352,7 +432,7 @@ export class ParticleRenderer{
  async prepareAsync(s,p,o={}){let slow=false;const start=performance.now();o.onStage?.('preparing');while(!o.cancelled?.()){if(this.prepare(s,p,o)){o.onStage?.('rendering');return true;}if(!slow&&performance.now()-start>30000){slow=true;o.onStage?.('preparing-slow');}await new Promise(r=>setTimeout(r,16));}return false;}
  draw(source,phase=0,w=this.canvas.width,h=this.canvas.height,options={}){
   const gl=this.gl;if(gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');if(options.preview&&!this.prepare(source,phase,options))return false;
-  const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};migrateGrainSizes(s,source);this.ensureTrails(s);
+  const s={...PARTICLE_DEFAULTS,...sampleFrame(source,phase)};migrateGrainSizes(s,source);this.configureFields(s,options);this.ensureTrails(s);
   phase/=Math.PI*2;if(s.perfectLoop!==false)phase=((phase%1)+1)%1;
   if(s.pLiving===4){s.pCount=0;s.pTrailCount=0;s.pLinks=0;s.pLivingBlend=1;}
   this.geometryBudget=options.preview&&options.quality==='fast'?Math.max(1/16,Math.min(1,options.geometryBudget??1)):1;this.previewCounts={};this.studioLayer=options.studioLayer;this.linkRestState={...s};for(const k of ['volume','stretchX','stretchY','stretchZ'])this.linkRestState[k]=source[k]??s[k];
@@ -387,7 +467,7 @@ export class ParticleRenderer{
   const causticTexture=opticalLight?this.optics.drawCaustic(s):null;
   let shadowTexture=null;if(s.pShadow>0){this.shadow??=new ParticleShadow(this);shadowTexture=this.shadow.draw(s,phase,options,weights);}
   gl.depthMask(true);gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);gl.bindVertexArray(this.empty);gl.useProgram(this.blur.program);
-  for(const [dst,src,step]of [[a,scene,[2/w,0]],[b,a,[0,1/a.h]],[a,b,[1/a.w,0]]]){this.bind(dst);this.tex(this.blur,'uImage',src.texture,0);this.u(this.blur,'uStep',...step);gl.drawArrays(gl.TRIANGLES,0,3);}
+  for(const [dst,src,step]of [[a,scene,[2/w,0]],[b,a,[0,1/a.h]],[a,b,[1/a.w,0]]]){this.bind(dst);this.tex(this.blur,'uImage',src.texture,0);this.tex(this.blur,'uMedium',medium||scene.texture,1);this.u(this.blur,'uMediumBloom',medium&&src===scene?continuum*(this.studioLayer?.grainMix??1):0);this.u(this.blur,'uStep',...step);gl.drawArrays(gl.TRIANGLES,0,3);}
   this.bind(null);const c=this.compose;gl.useProgram(c.program);this.tex(c,'uImage',scene.texture,0);this.tex(c,'uBloom',a.texture,1);this.tex(c,'uShadow',shadowTexture||scene.texture,4);this.u(c,'uShadowStrength',shadowTexture?this.shadow.strength:0);this.tex(c,'uCausticMap',causticTexture||scene.texture,5);this.u(c,'uCausticOn',causticTexture?1:0);this.u(c,'uGlow',s.glow);this.u(c,'uVeilCompose',s.pLiving===4?1:0);
   this.u(c,'uGrade',s.exposure,s.brightness,s.contrast,s.saturation);this.u(c,'uPhoto',s.temperature,s.photoTint,s.gamma,s.vignette);this.u(c,'uTone',s.blacks,s.highlights,0,0);this.u(c,'uLens',s.lensDistortion,s.grain,s.grainSize,0);this.u(c,'uPhotoAll',+s.photoAll);
   this.u(c,'uBackground',...rgb(s.background));this.u(c,'uBackground2',...rgb(s.background2));this.u(c,'uBgMode',['solid','gradient','studio','transparent'].indexOf(s.bgMode));this.u(c,'uBg',s.bgAngle*rad,s.bgHeight,s.bgSoftness,s.bgWash);

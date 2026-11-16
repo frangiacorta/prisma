@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=0049c9863913';
-import {EXTRA_HELP} from './control-help-extra.js?v=0049c9863913';
-import {FRACTAL_HELP} from './fractal-form.js?v=0049c9863913';
-import {CELLULAR_HELP} from './cellular-form.js?v=0049c9863913';
-import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=0049c9863913';
-import {trailLightCompensation} from './particle-model.js?v=0049c9863913';
+import {AUDIO_HELP} from './audio-model.js?v=a55ab48fe9e6';
+import {EXTRA_HELP} from './control-help-extra.js?v=a55ab48fe9e6';
+import {FRACTAL_HELP} from './fractal-form.js?v=a55ab48fe9e6';
+import {CELLULAR_HELP} from './cellular-form.js?v=a55ab48fe9e6';
+import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=a55ab48fe9e6';
+import {trailLightCompensation} from './particle-model.js?v=a55ab48fe9e6';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',
@@ -225,6 +225,7 @@ Object.assign(HELP,{
  finishWarpDecay:'Quanto resta dell’ampiezza a ogni passaggio successivo. Zero usa soltanto il primo; uno mantiene tutta la forza.',
  finishWarpImage:'A zero guida la deformazione un campo ondulato. Verso uno la guidano le differenze di colore della scena.',
  finishWarpMotion:'Fa evolvere il campo quando premi Riproduci. Zero mantiene il filtro fermo.',
+ finishPrintNegative:'A zero conserva le tracce luminose. Verso uno inverte il colore composto: le luci diventano inchiostro scuro e il fondo nero diventa chiaro. Lo sfondo trasparente conserva la sua trasparenza.',
  finishGlassSize:'Distanza tra le scanalature o le lenti. Più piccolo crea una trama più fitta.',
  finishGlassShine:'Aggiunge il riflesso della lastra anche sullo sfondo opaco. Portalo a zero per conservare il nero.',
  finishGlassDispersion:'Separa leggermente i colori lungo la rifrazione. Zero mantiene i canali uniti.',
@@ -304,7 +305,7 @@ export function controlCondition(s,key){
  if(['pSkinScale','pSkinThickness','pSkinFollow','pSkinOpening','pSkinOffset','pPores','pPoreCount'].includes(key)&&!positive('pSkin'))return 'Aumenta la visibilità della pelle.';
  if(key==='pPoreCount'&&!positive('pPores'))return 'Aumenta i pori della pelle.';
  if(['pFoldCount','pFoldPhase'].includes(key)&&!positive('pFoldDepth'))return 'Aumenta la profondità delle pieghe.';
- if(['structThickness','structTaper'].includes(key)&&!positive('structShell'))return 'Aumenta Svuotamento per vedere lo spessore del guscio.';
+ if(['structThickness','structTaper'].includes(key)&&!positive('structShell')&&!positive('structFan'))return 'Aumenta Svuotamento o Lamine curve per regolare lo spessore della superficie.';
  if(['structDensity','structThreadWidth','structWeft','structWeave'].includes(key)&&!positive('structFibres'))return 'Aumenta Separazione in fibre per aprire il reticolo.';
  if(['structSliceCount','structSliceWidth'].includes(key)&&!positive('structSlices'))return 'Aumenta Separazione delle sezioni.';
  if(['structLayerCount','structLayerWidth'].includes(key)&&!positive('structLayers'))return 'Aumenta Separazione degli strati.';

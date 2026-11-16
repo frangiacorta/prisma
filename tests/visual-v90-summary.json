@@ -1,0 +1,433 @@
+{
+  "release": "prisma-studio-90",
+  "visualParity": false,
+  "validation": "25 native full-quality video exports; no GL errors. Comparison remains incomplete.",
+  "hardware": "NVIDIA RTX 5090 Laptop via Chrome ANGLE D3D11",
+  "cases": {
+    "volume-denso": {
+      "at": "2026-11-16T07:43:44.677Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 768.5999999940395,
+      "average": 16.93145161230237,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "velo-fibre": {
+      "at": "2026-11-16T07:44:03.495Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 7245.5,
+      "average": 90.15483870946112,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 4
+    },
+    "ricircolo-luminoso": {
+      "at": "2026-11-16T07:44:08.620Z",
+      "duration": 8,
+      "video": true,
+      "firstFrame": 74.70000000298023,
+      "average": 17.681147540690468,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "filamenti-macro": {
+      "at": "2026-11-16T07:44:23.423Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 9412.59999999404,
+      "average": 36.59919354752187,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 4
+    },
+    "mandelbulb-dettaglio": {
+      "at": "2026-11-16T07:45:04.549Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 34092.89999999106,
+      "average": 52.68951612951294,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "reticolo-giunzioni": {
+      "at": "2026-11-16T07:47:53.154Z",
+      "duration": 16,
+      "video": true,
+      "firstFrame": 4711.100000008941,
+      "average": 336.9630165287286,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 4
+    },
+    "impulsi-sottili": {
+      "at": "2026-11-16T07:47:56.918Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 1299.9000000059605,
+      "average": 16.505645160953843,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "nodo-laccato": {
+      "at": "2026-11-16T07:48:11.138Z",
+      "duration": 4.35,
+      "video": true,
+      "firstFrame": 6559.100000008941,
+      "average": 53.520000000353214,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "lamelle-asimmetriche": {
+      "at": "2026-11-16T07:49:01.037Z",
+      "duration": 8,
+      "video": true,
+      "firstFrame": 6352.399999991059,
+      "average": 176.58155737664612,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 4
+    },
+    "pellicola-spettrale": {
+      "at": "2026-11-16T07:49:11.482Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 3494,
+      "average": 52.545967741959515,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0.0000323486328125,
+        "max": 1
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "guscio-ottico": {
+      "at": "2026-11-16T07:49:23.649Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 4340.70000000298,
+      "average": 59.90483870970145,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "percorsi-fibre": {
+      "at": "2026-11-16T07:53:23.616Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 559.8000000119209,
+      "average": 17.453225806595817,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "trama-nebulosa": {
+      "at": "2026-11-16T07:53:29.129Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 2756.2000000029802,
+      "average": 17.2798387091006,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "fibre-traslucide": {
+      "at": "2026-11-16T07:53:34.059Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 2321.699999988079,
+      "average": 17.123387096990502,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "bolla-su-granelli": {
+      "at": "2026-11-16T07:54:03.735Z",
+      "duration": 8,
+      "video": true,
+      "firstFrame": 5882,
+      "average": 95.47786885255672,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "segni-mosaico": {
+      "at": "2026-11-16T07:54:28.451Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 15174.20000000298,
+      "average": 72.12822580553832,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "mosaico-finestre": {
+      "at": "2026-11-16T07:54:37.993Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 115.59999999403954,
+      "average": 72.14354838647189,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "distorsione-e-ricircolo": {
+      "at": "2026-11-16T07:54:50.192Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 277.1000000089407,
+      "average": 71.42515723304179,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0.000020751953125,
+        "max": 1
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "liquido-sulla-forma": {
+      "at": "2026-11-16T07:55:14.150Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 7091.800000011921,
+      "average": 72.39732142883751,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0.20944091796875,
+        "max": 3
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "rifrazione-scene": {
+      "at": "2026-11-16T07:57:27.729Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 81939.20000000298,
+      "average": 412.8064516130234,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "cellule-istanze": {
+      "at": "2026-11-16T07:57:31.310Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 758.6000000089407,
+      "average": 17.116129032426304,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "impronte-moto": {
+      "at": "2026-11-16T07:58:37.030Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 46172.29999999702,
+      "average": 71.17695167344964,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 6.103515625e-7,
+        "max": 1
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "membrana-contatto": {
+      "at": "2026-11-16T07:58:53.346Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 922.7999999970198,
+      "average": 120.8806451615547,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "trama-reazione": {
+      "at": "2026-11-16T07:59:09.704Z",
+      "duration": 4,
+      "video": true,
+      "firstFrame": 5102.199999988079,
+      "average": 69.8649350652447,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0.0001617431640625,
+        "max": 1
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    },
+    "trama-estrusa": {
+      "at": "2026-11-16T07:59:30.403Z",
+      "duration": 8,
+      "video": true,
+      "firstFrame": 7266.600000008941,
+      "average": 51.517622950379966,
+      "gpu": "ANGLE (NVIDIA, NVIDIA GeForce RTX 5090 Laptop GPU (0x00002C58) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "codec": "native",
+      "loop": {
+        "mean": 0,
+        "max": 0
+      },
+      "errors": [],
+      "quality": "full",
+      "samples": 2
+    }
+  },
+  "openIssues": [
+    {
+      "case": "nacre-traslucida",
+      "issue": "Full first-frame preparation exceeded 200-second guard; prior media retained. Renderer isolation under investigation."
+    },
+    {
+      "case": "rifrazione-scene",
+      "issue": "Full shader first frame remains slow (82 seconds)."
+    }
+  ],
+  "geometryChecks": {
+    "analyticHitPass": "6 cases: sphere, thin shell, 13 entries, minimum drape, compressed drape and tiny drape; all pass, including resource reset",
+    "continuousFan": "12 rendered intermediate/control states, nonempty throughout, count 8/12/16 changes output",
+    "cpuGpuAgreement": "29372 fan samples, max error 0.0000515; 5370 network samples, max error 0.000233"
+  },
+  "integration": {
+    "editor": "desktop and mobile; no overflow or runtime errors",
+    "mp4": "480x480, 30 fps, 15 frames; decoded dimensions and duration verified",
+    "wallpaper": "standalone bundled HTML executed without errors"
+  },
+  "notes": [
+    "Loop pixel differences measure closure, not resemblance to source motion.",
+    "Full exports use 2 or 4 antialias samples, not interactive preview frame rate.",
+    "Four references are still images and one case has only an internal functional target."
+  ]
+}

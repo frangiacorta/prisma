@@ -1,16 +1,16 @@
-import {Dynamics,disposeDynamics} from './dynamics.js?v=0049c9863913';
-import {motionPeriod} from './animation-clock.js?v=0049c9863913';
-import {animationPhase} from './animation-clock.js?v=0049c9863913';
-import {ScanlinePass} from './finish-scanlines.js?v=0049c9863913';
-import {FilamentPass} from './filament-renderer.js?v=0049c9863913';
-import {VeilTransition} from './veil-transition.js?v=0049c9863913';
-import {BodySamples} from './body-samples.js?v=0049c9863913';
-import {BodyComposite} from './body-composite.js?v=0049c9863913';
-import {cloudBody,cloudToBody,grainMix} from './body-layers.js?v=0049c9863913';
-import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=0049c9863913';
-import {ParticleRenderer} from './particle-renderer.js?v=0049c9863913';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=0049c9863913';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=0049c9863913';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=a55ab48fe9e6';
+import {motionPeriod} from './animation-clock.js?v=a55ab48fe9e6';
+import {animationPhase} from './animation-clock.js?v=a55ab48fe9e6';
+import {ScanlinePass} from './finish-scanlines.js?v=a55ab48fe9e6';
+import {FilamentPass} from './filament-renderer.js?v=a55ab48fe9e6';
+import {VeilTransition} from './veil-transition.js?v=a55ab48fe9e6';
+import {BodySamples} from './body-samples.js?v=a55ab48fe9e6';
+import {BodyComposite} from './body-composite.js?v=a55ab48fe9e6';
+import {cloudBody,cloudToBody,grainMix} from './body-layers.js?v=a55ab48fe9e6';
+import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=a55ab48fe9e6';
+import {ParticleRenderer} from './particle-renderer.js?v=a55ab48fe9e6';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=a55ab48fe9e6';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=a55ab48fe9e6';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
@@ -137,10 +137,13 @@ export class Renderer{
   const source=this.focusBody(s,p);
   if(!source)return true;
   this.focusPass??=new FocusPass(this.gl);
+  if(this.select(source).canUseImplicit(source,o))return true;
   return this.select(source)[async?'prepareAsync':'prepare'](source,p,{...focusOptions,cancelled:o?.cancelled});
  }
- applyFocus(s,p,w,h,plan){
+ applyFocus(s,p,w,h,plan,o={}){
   const source=this.focusBody(s,p,plan);if(!source)return;
+  const renderer=this.select(source),exact=renderer.exactDepth;
+  if(renderer.canUseImplicit(source,o)&&exact?.width===w&&exact?.height===h){this.focusPass.draw(s,w,h,exact.texture,true);return true;}
   const solid=this.select(source),scale=Math.min(.6,800/Math.max(w,h)),width=Math.max(1,Math.round(w*scale)),height=Math.max(1,Math.round(h*scale));
   this.focusDepthTarget??=new BodyComposite(this.gl);const layers=this.focusDepthTarget.target(width,height);
   solid.draw(source,p,width,height,{...focusOptions,layers});
@@ -163,6 +166,7 @@ export class Renderer{
  finish(s,o={},phase=0,timeline=phase){
   if(finishingOff(s,o)){this.feedbackFinishing?.release();return false;}
   const values={...FINISH_DEFAULTS,...s},order=normalizeFinishOrder(s.finishOrder),w=this.canvas.width,h=this.canvas.height;
+  if(s.motions?.finishPrintNegative?.enabled)values.finishPrintNegative=sampleFrame(s,phase).finishPrintNegative;
   const active={feedback:values.finishFeedback&&values.finishFeedbackMix>0,scan:values.finishScan&&values.finishScanMix>0,warp:values.finishWarp&&values.finishWarpMix>0,glass:values.finishGlass&&values.finishGlassMix>0,mosaic:values.finishMosaic&&values.finishMosaicMix>0,rgb:values.finishRgb&&values.finishRgbMix>0,edge:values.finishEdge&&values.finishEdgeMix>0,glyph:values.finishGlyph&&values.finishGlyphMix>0,glitch:values.finishGlitch&&values.finishGlitchMix>0&&values.finishGlitchCoverage>0&&(values.finishGlitchAmount>0||values.finishGlitchSplit>0)};
   if(!active.feedback)this.feedbackFinishing?.release();
   let applied=false;
@@ -189,7 +193,7 @@ export class Renderer{
   this.pollGpuTime();const g=this.gl,q=o.preview&&o.trackTiming!==false&&this.frameTimer&&this.frameQueries.length<3?g.createQuery():null;
   if(q)g.beginQuery(this.frameTimer.TIME_ELAPSED_EXT,q);
   const inner={...printPreviewOptions(s,o),trackTiming:false,deferCompletion:true};let completed=false;
-  try{const plan=this.layerPlan(s,p);if(!this.prepareFocus(s,p,o))return false;if(plan){if(!this.prepareLayers(plan,p,inner)||!this.drawLayers(plan,p,w,h,inner))return false;this.applyFocus(s,p,w,h,plan);this.finish(s,o,p,timeline);if(o.liveDynamics)this.lastPreviewDynamicsFrame=s._dynamics||null;completed=true;return true;}const mix=this.transitionAmount(s,p);if(mix>0&&mix<1){const base=this.sourceState(s);if(!this.select(base).draw(finishingSource(base,o),p,w,h,inner))return false;this.veilTransition??=new VeilTransition(this.gl);this.veilTransition.capture(0,w,h);}s=this.endpoint(s,p);const ok=this.select(s).draw(finishingSource(s,o),p,w,h,inner);if(ok){if(mix>0&&mix<1)this.veilTransition.draw(w,h,mix);this.filaments(s,p,w,h,o);this.applyFocus(s,p,w,h,null);this.finish(s,o,p,timeline);if(o.liveDynamics)this.lastPreviewDynamicsFrame=s._dynamics||null;completed=true;}return ok;}
+  try{const plan=this.layerPlan(s,p);if(!this.prepareFocus(s,p,o))return false;if(plan){if(!this.prepareLayers(plan,p,inner)||!this.drawLayers(plan,p,w,h,inner))return false;this.applyFocus(s,p,w,h,plan,o);this.finish(s,o,p,timeline);if(o.liveDynamics)this.lastPreviewDynamicsFrame=s._dynamics||null;completed=true;return true;}const mix=this.transitionAmount(s,p);if(mix>0&&mix<1){const base=this.sourceState(s);if(!this.select(base).draw(finishingSource(base,o),p,w,h,inner))return false;this.veilTransition??=new VeilTransition(this.gl);this.veilTransition.capture(0,w,h);}s=this.endpoint(s,p);const ok=this.select(s).draw(finishingSource(s,o),p,w,h,inner);if(ok){if(mix>0&&mix<1)this.veilTransition.draw(w,h,mix);this.filaments(s,p,w,h,o);this.applyFocus(s,p,w,h,null,o);this.finish(s,o,p,timeline);if(o.liveDynamics)this.lastPreviewDynamicsFrame=s._dynamics||null;completed=true;}return ok;}
   finally{if(q){g.endQuery(this.frameTimer.TIME_ELAPSED_EXT);this.frameQueries.push(q);}if(completed)this.fence();else if(q)g.flush();}
  }
  async drawWithTransition(method,s,p,w,h,o){
@@ -217,7 +221,7 @@ export class Renderer{
    if(filaments&&!await this.filaments(s,p,w,h,o,true))return false;
    drawsAfterBase=filaments||transition;
   }
-  const focus=this.applyFocus(s,p,w,h,plan),filters=this.finish(s,o,p,timeline);
+  const focus=this.applyFocus(s,p,w,h,plan,o),filters=this.finish(s,o,p,timeline);
   // Base passes already wait for their frame. A second fence is necessary
   // only when a later pass modified the canvas.
   if(drawsAfterBase||focus||filters){this.fence();if(!await this.waitForGpu(o))return false;}

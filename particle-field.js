@@ -1,8 +1,8 @@
-import {bodySampleGLSL} from './body-samples.js?v=0049c9863913';
-import {DYNAMICS_GLSL} from './dynamics.js?v=0049c9863913';
+import {bodySampleGLSL} from './body-samples.js?v=a55ab48fe9e6';
+import {DYNAMICS_GLSL} from './dynamics.js?v=a55ab48fe9e6';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=0049c9863913';
-import {forceBarrierGLSL} from './particle-forces.js?v=0049c9863913';
+import {guideGLSL} from './particle-path-field.js?v=a55ab48fe9e6';
+import {forceBarrierGLSL} from './particle-forces.js?v=a55ab48fe9e6';
 export const grainSizingGLSL=`
 uniform vec2 uNodeStyle,uLargeGrains,uGrainDistribution;
 float grainDiameter(vec4 seed,int index){
@@ -120,7 +120,8 @@ vec3 shape(vec4 r,float t,float family){
  }
  return p;
 }
-vec3 cloudRestPoint(vec4 r){return mix(shape(r,0.,uShape.x),shape(r,0.,uShape.y),uDynamics.w);}
+// Shape families share the same continuous sphere/ring kernel. Evaluate it once.
+vec3 cloudRestPoint(vec4 r){return shape(r,0.,uShape.x);}
 vec3 restPoint(vec4 r){return uStudioBody.x>0.?studioRestPoint(r):cloudRestPoint(r);}
 // Repulsive volumes have priority over positive routes. Final depth escape
 // resolves intersections between point spheres and path tubes without undoing either.
@@ -140,7 +141,7 @@ vec3 cloudMotion(vec4 r,float phase,vec3 rest){
  float global=clockAt(phase*uClock.x),c=1.+floor(r.z*3.)*step(1.-uClock.w,r.w);
  float seedPhase=(uMotionSeed-417.)*.013;
  float t=global*c+(r.w-.5)*uFlow.y*TAU+seedPhase+uOrbit.w*r.z*TAU-uMotionQuality.y*r.x*2.;
- vec3 p=mix(shape(r,t,uShape.x),shape(r,t,uShape.y),uDynamics.w);
+ vec3 p=shape(r,t,uShape.x);
  p=mix(rest,p,uDynamics.z);
  // Ellipses and rotating orbital planes affect the existing trajectories.
  p.xz*=vec2(1.+uOrbit.x*.45,1.-uOrbit.x*.65);
@@ -195,9 +196,15 @@ vec3 cloudMotion(vec4 r,float phase,vec3 rest){
   force+=(delta/max(.15,d)*(uPoles.y-uPoles.x)*.48+cross(normalize(vec3(.3,1.,.2)),delta)*uPoles.z*.55)*weight;
  }
  p+=force;
- if(r.w>.86){float branch=floor(r.x*uOuter.z),q=global+r.y*TAU,exc=pow(.5+.5*sin(q),2.);float a=branch/uOuter.z*TAU+uSeed+uDynamics.x*.3*cos(q);
-  vec3 jet=vec3(cos(a),sin(a)*.85,sin(a*2.)*.3)*(1.+exc*uOuter.y)+.18*vec3(sin(q*2.),cos(q),sin(q));
-  p=mix(p,jet,uOuter.x*smoothstep(0.,.4,exc));
+ if(r.w>.86){
+  float branch=floor(r.x*uOuter.z),q=global+branch/uOuter.z*TAU+(r.y-.5)*.55;
+  float excursion=pow(.5+.5*sin(q),2.5),a=branch/uOuter.z*TAU+uSeed+sin(branch*7.17+uSeed)*.36+uDynamics.x*.07*cos(q);
+  vec3 direction=normalize(vec3(cos(a),sin(a)*.85,sin(a*2.)*.3));
+  float radius=.2+excursion*uOuter.y;
+  vec3 transverse=cross(direction,vec3(0.,0.,1.));
+  vec3 jet=direction*radius+transverse*(sin(radius*1.8+q)*.045+(r.z-.5)*.11)*radius;
+  jet.z+=(r.y-.5)*.08*radius;
+  p=mix(p,jet,uOuter.x);
  }
  return p;
 }
@@ -255,6 +262,11 @@ vec3 particleColor(vec4 r,vec3 p){
  base=prismaKnotBands(p,prismaColorLayers(uColor.x>2.5?p:rest,base));
  base*=mix(1.,.25+r.z*1.5,uColor.z)*mix(1.,.2+.8*smoothstep(-2.,2.,p.z),uColor.w);
  float wave=pow(.5+.5*sin(r.y*TAU-clockAt(uPhase*uClock.x)*uLife.y-r.x*TAU*uLife.w),8.);
+ if(r.w>.86&&uOuter.x>0.){
+  float branch=floor(r.x*uOuter.z),event=clockAt(uPhase*uClock.x)+branch/uOuter.z*TAU*uLife.w;
+  float surge=pow(.5+.5*sin(event),10.);
+  wave=mix(wave,.025+surge*4.,uOuter.x);
+ }
  base*=mix(1.,.2+wave*4.,uLife.z);
  return base;
 }

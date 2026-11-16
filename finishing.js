@@ -1,12 +1,13 @@
 // One final image pass, after the complete frame (including tiled/accumulated exports).
 export const FINISH_DEFAULTS={finishEnabled:true,finishTone:true,finishRgb:false,finishMosaic:false,finishCompare:false,finishRgbR:8,finishRgbG:0,finishRgbB:-8,finishRgbAngle:0,finishRgbMix:1,finishCellX:12,finishCellY:12,finishMosaicMix:1};
 export const FINISH_META={finishRgbR:['Spostamento rosso',-60,60,.1],finishRgbG:['Spostamento verde',-60,60,.1],finishRgbB:['Spostamento blu',-60,60,.1],finishRgbAngle:['Direzione RGB',-180,180,1],finishRgbMix:['Intensità RGB',0,1,.01],finishCellX:['Larghezza celle',1,160,1],finishCellY:['Altezza celle',1,160,1],finishMosaicMix:['Intensità mosaico',0,1,.01]};
-Object.assign(FINISH_DEFAULTS,{finishFeedback:false,finishFeedbackMix:1,finishFeedbackMemory:.7,finishFeedbackZoom:.03,finishFeedbackAngle:3,finishFeedbackThreshold:.28,finishFeedbackInk:0,finishFeedbackLumen:0,finishPrintLife:.24,finishPrintOverlap:.55,finishPrintSoftness:.12,finishPrintOnly:false,finishBrushRadius:.11,finishBrushStrength:.65,finishBrushStrokes:[]});
+Object.assign(FINISH_DEFAULTS,{finishFeedback:false,finishFeedbackMix:1,finishFeedbackMemory:.7,finishFeedbackZoom:.03,finishFeedbackAngle:3,finishFeedbackThreshold:.28,finishFeedbackInk:0,finishFeedbackLumen:0,finishPrintLife:.24,finishPrintOverlap:.55,finishPrintSoftness:.12,finishPrintNegative:0,finishPrintOnly:false,finishBrushRadius:.11,finishBrushStrength:.65,finishBrushStrokes:[]});
 Object.assign(FINISH_META,{
  finishFeedbackMix:['Mix persistenza',0,1,.01],finishFeedbackMemory:['Persistenza dei fotogrammi',0,.98,.01],
  finishFeedbackZoom:['Zoom a ogni passaggio',-.15,.15,.001],finishFeedbackAngle:['Rotazione a ogni passaggio',-25,25,.1],
  finishFeedbackThreshold:['Soglia delle impronte',0,1,.01],finishFeedbackInk:['Diffusione liquida',0,1,.01],finishFeedbackLumen:['Impronte luminose',0,1,.01],
  finishPrintLife:['Dimezzamento della luce · s',0,1.2,.01],finishPrintOverlap:['Accumulo nelle sovrapposizioni',0,1,.01],finishPrintSoftness:['Sfumatura della soglia',.01,.5,.01],
+ finishPrintNegative:['Negativo delle impronte',0,1,.01],
  finishBrushRadius:['Raggio del pennello',.02,.38,.005],finishBrushStrength:['Forza del pennello',0,1,.01],
 });
 export function luminousPrintEnabled(s){return s.finishFeedbackLumen>0&&s.finishPrintLife>0;}
@@ -113,9 +114,10 @@ export class FinishingPass{
 
 const FOCUS_FRAGMENT=`#version 300 es
 precision highp float;
-uniform sampler2D uImage,uDepth;uniform vec2 uSize,uFocus;out vec4 color;
+uniform sampler2D uImage,uDepth;uniform vec2 uSize,uFocus;uniform float uExactDepth;out vec4 color;
 vec2 depthAt(vec2 uv){
  vec4 packed=texture(uDepth,uv);
+ if(uExactDepth>.5)return vec2(4.8-packed.a,packed.a>=0.?1.:0.);
  return vec2(16.-32.*(packed.x+packed.y/255.),packed.z);
 }
 float unfocused(float depth){return uFocus.x*smoothstep(.07,1.25,abs(depth-uFocus.y));}
@@ -136,8 +138,8 @@ void main(){
  vec4 result=sum/total;color=vec4(result.rgb/max(.00001,result.a),result.a);
 }`;
 export class FocusPass extends FinishingPass{
- constructor(gl){super(gl,FOCUS_FRAGMENT,['uImage','uDepth','uSize','uFocus']);}
- draw(s,w,h,depth){
+ constructor(gl){super(gl,FOCUS_FRAGMENT,['uImage','uDepth','uSize','uFocus','uExactDepth']);}
+ draw(s,w,h,depth,exact=false){
   const g=this.gl,u=this.uniforms;g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE0);
   if(!this.texture){
    this.texture=g.createTexture();g.bindTexture(g.TEXTURE_2D,this.texture);
@@ -147,7 +149,7 @@ export class FocusPass extends FinishingPass{
   if(this.width!==w||this.height!==h){g.texImage2D(g.TEXTURE_2D,0,g.RGBA8,w,h,0,g.RGBA,g.UNSIGNED_BYTE,null);this.width=w;this.height=h;}
   g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,depth);
   g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.SCISSOR_TEST);g.viewport(0,0,w,h);g.bindVertexArray(this.vao);g.useProgram(this.program);
-  g.uniform1i(u.uImage,0);g.uniform1i(u.uDepth,1);g.uniform2f(u.uSize,w,h);g.uniform2f(u.uFocus,s.focusBlur,s.focusDepth||0);
+  g.uniform1i(u.uImage,0);g.uniform1i(u.uDepth,1);g.uniform2f(u.uSize,w,h);g.uniform2f(u.uFocus,s.focusBlur,s.focusDepth||0);g.uniform1f(u.uExactDepth,+exact);
   g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);g.activeTexture(g.TEXTURE0);
  }
 }
@@ -363,6 +365,7 @@ uniform vec4 uFeedback;
 uniform vec3 uInk;
 uniform vec4 uPrint;
 uniform vec2 uPrintTime;
+uniform vec2 uInkTime;
 uniform int uPass,uPrintOnly;
 uniform bool uBrushActive;
 out vec4 color;
@@ -386,6 +389,9 @@ void main(){
    if(uPrintOnly==1)result=imprints;
    else if(uPrintOnly==2)result=vec4(imprints.rgb,1.);
    else result=result+imprints*(1.-result);
+   // Invert premultiplied colour: transparent pixels keep zero coverage.
+   // The complement of accumulated light behaves as subtractive printed ink.
+   result.rgb=mix(result.rgb,max(vec3(0.),vec3(result.a)-result.rgb),uPrint.w*clamp(uPrint.x*uFeedback.w,0.,1.));
   }
   color=vec4(result.rgb/max(.00001,result.a),result.a);
   return;
@@ -411,13 +417,21 @@ void main(){
   return;
  }
  vec2 p=historyUV(uv,1.);
- p+=uInk.x*.004*vec2(sin(p.y*18.+p.x*5.),cos(p.x*20.-p.y*7.))-brush*.055;
+ // A curl field carries neighbouring pigment together instead of repeatedly
+ // expanding/compressing it. Its phase is periodic; its step uses elapsed time.
+ vec2 q=p*vec2(uSize.x/uSize.y,1.);
+ float phase=uInkTime.x;
+ vec2 a=q*9.+vec2(sin(phase),cos(phase))*.8;
+ vec2 b=q*19.+vec2(cos(phase),-sin(phase))*.6;
+ vec2 flow=vec2(sin(a.x)*cos(a.y),-cos(a.x)*sin(a.y))
+   +.32*vec2(sin(b.x+1.7)*cos(b.y),-cos(b.x+1.7)*sin(b.y));
+ p+=uInk.x*.004*flow*vec2(uSize.y/uSize.x,1.)*uInkTime.y-brush*.055;
  vec2 pixel=vec2(1.)/uSize;
  vec4 previous=sampleAt(uHistory,p);
  if(uInk.x>0.){
   vec4 diffusion=sampleAt(uHistory,p+pixel)+sampleAt(uHistory,p-pixel)
    +sampleAt(uHistory,p+vec2(pixel.x,-pixel.y))+sampleAt(uHistory,p+vec2(-pixel.x,pixel.y));
-  previous=mix(previous,diffusion*.25,uInk.x*.85);
+  previous=mix(previous,diffusion*.25,uInk.x*.025*min(1.,uInkTime.y));
  }
  current.rgb*=current.a;
  float luma=dot(current.rgb,vec3(.2126,.7152,.0722));
@@ -425,12 +439,16 @@ void main(){
  vec3 stamp=current.rgb*(1.+uInk.y*key*.45);
  vec3 trail=previous.rgb*uFeedback.x*(1.-luma*.55);
  trail*=mix(1.,smoothstep(max(0.,uInk.z-.09),uInk.z+.08,dot(previous.rgb,vec3(.2126,.7152,.0722))),uInk.y);
- color=vec4(max(stamp,trail),max(current.a,previous.a*uFeedback.x));
+ vec4 luminous=vec4(max(stamp,trail),max(current.a,previous.a*uFeedback.x));
+ // Ink mixes premultiplied pigment, allowing dark paint to displace light paint.
+ // The zero-ink path retains the original luminous persistence exactly.
+ vec4 paint=mix(current,previous,uFeedback.x);
+ color=mix(luminous,paint,uInk.x);
 }`;
 
 export class FeedbackPass extends FinishingPass{
  constructor(gl){
-  super(gl,FEEDBACK_FRAGMENT,['uImage','uHistory','uBrush','uBrushActive','uSize','uFeedback','uInk','uPrint','uPrintOnly','uPrintTime','uPrintHistory','uPass']);
+  super(gl,FEEDBACK_FRAGMENT,['uImage','uHistory','uBrush','uBrushActive','uSize','uFeedback','uInk','uInkTime','uPrint','uPrintOnly','uPrintTime','uPrintHistory','uPass']);
   this.printFormat=gl.getExtension('EXT_color_buffer_float')?gl.RGBA16F:gl.RGBA8;
  }
  makeTexture(w,h,format=this.gl.RGBA8){
@@ -506,11 +524,12 @@ export class FeedbackPass extends FinishingPass{
   const memory=enabled&&this.phase!==undefined?values.finishFeedbackMemory:0;
   gl.uniform4f(u.uFeedback,memory,values.finishFeedbackZoom,values.finishFeedbackAngle*Math.PI/180,values.finishFeedbackMix);
   gl.uniform3f(u.uInk,values.finishFeedbackInk,prints?0:values.finishFeedbackLumen,values.finishFeedbackThreshold);
-  gl.uniform4f(u.uPrint,prints?values.finishFeedbackLumen:0,values.finishPrintOverlap,values.finishPrintSoftness,0);
+  gl.uniform4f(u.uPrint,prints?values.finishFeedbackLumen:0,values.finishPrintOverlap,values.finishPrintSoftness,Math.max(0,Math.min(1,values.finishPrintNegative||0)));
   gl.uniform1i(u.uPrintOnly,values.finishPrintOnly?(values.bgMode==='transparent'?1:2):0);
   const delta=enabled&&this.phase!==undefined?Math.max(0,Math.min(.3,secondsPerFrame??gap*((values.duration||10)/(values.speed||1))/(Math.PI*2))):0;
   const decay=prints&&enabled&&this.phase!==undefined?2**(-delta/values.finishPrintLife):0;
   gl.uniform2f(u.uPrintTime,delta,decay);
+  gl.uniform2f(u.uInkTime,phase,Math.min(3.,delta*60.));
   gl.uniform1i(u.uPrintHistory,prints?3:0);
   if(prints){gl.activeTexture(gl.TEXTURE3);gl.bindTexture(gl.TEXTURE_2D,this.printPrevious);}
   gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,this.previous);

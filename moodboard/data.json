@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-11-15",
+  "updated": "2026-11-16",
   "items": [
     {
       "id": "s01-01",
@@ -23326,7 +23326,7 @@
       "engine": "solid",
       "resultPreset": "previews/nacre-traslucida.prisma.json",
       "compareNote": "Le spine si ritirano e ricrescono mentre le cellule cambiano volume. I riflessi sono rosa e verde acqua. La distribuzione delle cellule e la direzione delle spine differiscono dalla fonte.",
-      "comparisonOutcome": "vicino",
+      "comparisonOutcome": "parziale",
       "comparisonRef": "s04-01",
       "comparisonDate": "2026-11-16"
     },

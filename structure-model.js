@@ -1,4 +1,4 @@
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=0049c9863913';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=a55ab48fe9e6';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,
@@ -13,10 +13,10 @@ export const STRUCTURE_DEFAULTS={
 export const STRUCTURE_META={
  ...FILAMENT_META,
  loopBands:['Intensità fasce',0,1,.01],loopBandCount:['Ripetizioni delle fasce',1,36,1],loopBandAxis:['Orientamento delle fasce',0,1,.01],
- loopAmount:['Apertura ad anello',0,1,.01],loopKnot:['Intreccio del nodo',0,1,.01],loopRadius:['Raggio del percorso',.6,1.6,.01],loopTube:['Spessore del tubo',.06,.6,.005],loopFlat:['Appiattimento a nastro',0,1,.01],loopTwist:['Torsione del nastro',-2,2,.01],loopWave:['Variazione di spessore',0,.35,.005],loopPhase:['Scorrimento',0,1,.001],
+ loopAmount:['Apertura ad anello',0,1,.01],loopKnot:['Intreccio del nodo',0,1,.01],loopRadius:['Raggio del percorso',.38,1.6,.01],loopTube:['Spessore del tubo',.06,.6,.005],loopFlat:['Appiattimento a nastro',0,1,.01],loopTwist:['Torsione del nastro',-2,2,.01],loopWave:['Variazione di spessore',0,.35,.005],loopPhase:['Scorrimento',0,1,.001],
  loopTurns:['Avvolgimenti del nodo',3,11,2],
- structShell:['Svuotamento · pieno → membrana',0,1,.01],structThickness:['Spessore della membrana',.035,.4,.005],
- structFibres:['Separazione in fibre',0,1,.01],structWeft:['Fili trasversali · tessitura',0,1,.01],structDensity:['Fili intorno alla forma',6,48,1],structThreadWidth:['Larghezza dei fili',.15,.9,.01],structWeave:['Intreccio sopra / sotto',0,.16,.005],
+ structShell:['Svuotamento · pieno → membrana',0,1,.01],structThickness:['Spessore della membrana',.005,.4,.001],
+ structFibres:['Separazione in fibre',0,1,.01],structWeft:['Fili trasversali · tessitura',0,1,.01],structDensity:['Fili intorno alla forma',3,256,1],structThreadWidth:['Larghezza dei fili',.15,.9,.01],structWeave:['Intreccio sopra / sotto',0,.16,.005],
  structWeaveVariation:['Irregolarità del reticolo',0,1,.01],structWeaveNodes:['Rilievo alle giunzioni',0,1,.01],structWeaveMembrane:['Membrana fra i rami',0,1,.01],structWeaveGrowth:['Crescita degli steli',0,1,.01],structWeaveCup:['Apertura delle coppe',0,1,.01],
  structSlices:['Separazione in lamelle',0,1,.01],structSliceCount:['Numero di lamelle',2,12,1],structSliceWidth:['Spessore relativo delle lamelle',.12,.85,.01],structFan:['Lamine curve',0,1,.01],structFanBias:['Apertura in due direzioni',0,1,.01],
  structRadial:['Separazione radiale',0,1,.01],structPetalCount:['Divisioni radiali',3,20,1],structPetalWidth:['Larghezza delle divisioni',.1,.95,.01],
@@ -74,32 +74,71 @@ export function structureWarp(s,p){
  return q;
 }
 
-// The saddle widens the junction into the branch axes. Two offset families
-// of fibres open small pores without breaking the network's main ribs.
-function weaveSaddle(x,y,z,radius,amount,shift){
- const span=radius*(1.8+4.9*amount)*(1+.23*shift);
- const extent=(Math.abs(x)*.85+Math.abs(y)+2.1*Math.sqrt(Math.abs(x*y)))/span;
- const height=radius*.23+(.23*x*x-.39*y*y)/Math.max(.035,span);
- const membrane=Math.max((extent-1)*span*.48,Math.abs(z-height)-Math.max(.007,radius*.205)*(1-.23*Math.min(1,extent)));
- const frequency=12/Math.max(.045,span),u=x*frequency,v=y*frequency;
- const first=Math.abs(Math.sin(u+.66*v+1.08*Math.sin(v*.36+shift*2.)));
- const second=Math.abs(Math.sin(-u*.63+v+.95*Math.sin(u*.42-shift*4.)));
- const fibres=(Math.min(first,second)-.34-.34*amount)/frequency;
+// A hexagonal Voronoi diagram has exactly three edges at each vertex. Warp
+// its coordinates smoothly, rather than crossing two families of ribbons:
+// adjacent cells still share the same junction and all of its budding sites.
+function weaveSite(x,y,density,corner=0){
+ const k=density*1.73205080757/(Math.PI*2);
+ const ax=x-1.73205080757*Math.floor(x/1.73205080757+.5),ay=y-Math.floor(y+.5);
+ const bx=x-1.73205080757*(Math.floor(x/1.73205080757)+.5),by=y-(Math.floor(y)+.5);
+ const qx=ax*ax+ay*ay<bx*bx+by*by?ax:bx,qy=ax*ax+ay*ay<bx*bx+by*by?ay:by;
+ const edge=(.5-Math.max(Math.abs(qx)*.86602540378+Math.abs(qy)*.5,Math.abs(qy)))/k;
+ const sector=Math.floor(Math.atan2(qy,qx)*3/Math.PI)+corner,turn=sector*Math.PI/3;
+ const nx=x-qx+Math.cos(turn)*.57735026919,ny=y-qy+Math.sin(turn)*.57735026919;
+ const wrap=density*1.73205080757,hx=nx-wrap*Math.floor(nx/wrap+.5);
+ const shift=.5+.5*Math.sin(hx*23.71+ny*16.13);
+ const side=Math.abs(qy)>Math.abs(qx)*.86602540378+Math.abs(qy)*.5;
+ return [edge,(x-nx)/k,(y-ny)/k,((sector%2+2)%2)*Math.PI/3,shift,side?0:Math.sign(qx)*.86602540378,Math.sign(qy)*(side?1:.5),nx,ny];
+}
+// The network chart controls placement, never the physical roundness of a
+// nodule. Undo its shear Jacobian before measuring tube and bud distances.
+function weaveMetric(phi,theta,r,density,variation,phase,seed){
+ const k=density*1.73205080757/(Math.PI*2),u=phi*k+variation*(.42*Math.sin(theta*3+seed)+.17*Math.sin(theta*7+.12*Math.sin(phase)));
+ const v=theta*k+variation*(.3*Math.sin(u*3/k+seed*.7)+.13*Math.sin(u*7/k));
+ const f=variation/k*(1.26*Math.cos(theta*3+seed)+1.19*Math.cos(theta*7+.12*Math.sin(phase)));
+ const g=variation/k*(.9*Math.cos(u*3/k+seed*.7)+.91*Math.cos(u*7/k)),h=variation*.378/k*Math.cos(v*2.1/k);
+ const a=1+h*g,b=f+h*(1+g*f),d=1+g*f,sine=Math.max(.12,Math.sin(theta)),radius=Math.max(.2,r);
+ return [sine*d*radius,-sine*b*radius,-g*radius,a*radius,u+variation*.18*Math.sin(v*2.1/k),v];
+}
+function weaveNodeAngles(x,y,density,variation,phase,seed){
+ const k=density*1.73205080757/(Math.PI*2),u=x-variation*.18*Math.sin(y*2.1/k);
+ const theta=(y-variation*(.3*Math.sin(u*3/k+seed*.7)+.13*Math.sin(u*7/k)))/k;
+ const phi=(u-variation*(.42*Math.sin(theta*3+seed)+.17*Math.sin(theta*7+.12*Math.sin(phase))))/k;
+ return [phi,theta];
+}
+// A thin, porous three-lobed sheet widens each Y junction without filling
+// the surrounding cells. The finer strands are geometry, not painted holes.
+function weaveSaddle(x,y,z,radius,amount,shift,turn,density){
+ const span=Math.max(radius*(2.7+3.3*amount),(.15+.15*amount)*Math.PI*2/(density*1.73205080757))*(1+.2*shift),r=Math.hypot(x,y),a=Math.atan2(y,x)-turn;
+ const reach=span*(.39+.61*(.5+.5*Math.cos(3*a))**.72);
+ const height=radius*.12+(.1*x*x-.15*y*y)/Math.max(.035,span);
+ const membrane=Math.max((r-reach)*.62,Math.abs(z-height)-Math.max(.0026,radius*.14));
+ if(membrane>span*.012)return membrane;
+ const frequency=28/Math.max(.045,span);let u=x*frequency,v=y*frequency;
+ u+=.55*Math.sin(v*1.63+shift*6)+.22*Math.sin(v*4.21);v+=.48*Math.sin(u*1.47+shift*2.2);u+=.28*Math.sin(v*2.36);
+ const ax=u-1.73205080757*Math.floor(u/1.73205080757+.5),ay=v-Math.floor(v+.5);
+ const bx=u-1.73205080757*(Math.floor(u/1.73205080757)+.5),by=v-(Math.floor(v)+.5);
+ const qx=ax*ax+ay*ay<bx*bx+by*by?ax:bx,qy=ax*ax+ay*ay<bx*bx+by*by?ay:by;
+ const edge=.5-Math.max(Math.abs(qx)*.86602540378+Math.abs(qy)*.5,Math.abs(qy));
+ const fibreWidth=(.055+.1*Math.max(0,1-r/span))*(.65+.35*Math.sin(u*.13+v*.21+shift*6)**2);
+ const fibres=(edge-fibreWidth)/frequency;
  return Math.max(membrane,fibres);
 }
 
-// A raised junction is a tapered stem bent in its tangent plane, with a
-// hollow ellipsoidal tip. The same field is sampled by geometry and granules.
-function weaveSprout(x,y,z,phase,shift,turn,radius,growth,opening){
- const height=growth*(.21+.23*shift),hub=radius*(1.25+.35*shift),cap=hub*(.68+.24*growth+.39*opening*growth);
+// Each persistent sphere becomes the end of a curved tapered stem. Opening
+// subtracts an offset inner ellipsoid and leaves an actual rounded cup rim.
+function weaveSprout(x,y,z,phase,shift,turn,radius,growth,opening,density){
+ const height=growth*(.19+.28*shift),cap=radius*(.83+.38*growth+.3*opening*growth);
  const axisZ=Math.max(0,Math.min(height,z)),slope=axisZ/Math.max(.0001,height);
- const swing=(.12+.04*Math.sin(phase+turn))*growth*slope*slope,dx=Math.cos(turn),dy=Math.sin(turn);
- const stem=(Math.hypot(x-dx*swing,y-dy*swing,z-axisZ)-hub*(.31+.28*(1-slope)**3))*.71;
- const tip=(.12+.04*Math.sin(phase+turn))*growth;
- const rx=x-dx*(tip+(z-height)*.27),ry=y-dy*(tip+(z-height)*.27),rz=(z-height)*1.36;
+ const tip=(.13+.035*Math.sin(phase+turn))*growth*Math.min(1,5/density),dx=Math.cos(turn),dy=Math.sin(turn);
+ const stem=(Math.hypot(x-dx*tip*slope*slope,y-dy*tip*slope*slope,z-axisZ)-radius*(.24+.24*(1-slope)**2))*.71;
+ const rx=x-dx*(tip+(z-height)*.23),ry=y-dy*(tip+(z-height)*.23),rz=(z-height)*1.12;
  const bowl=Math.hypot(rx,ry,rz)-cap;
- const cavity=opening*growth<=.001?bowl:Math.max(bowl,-Math.hypot(rx,ry,rz-cap*.62)+cap*(.32+.49*opening*growth));
- return Math.min(stem,Math.max(cavity,z-height-cap*(.57-.25*opening*growth))*.71);
+ const aperture=opening*Math.max(0,Math.min(1,growth*3.5));
+ const innerCut=-Math.hypot(rx,ry,rz-cap*.36)+cap*(.12+.82*aperture);
+ const cavity=aperture<=.001?bowl:Math.max(bowl,innerCut);
+ const stemFloor=aperture<=.001?stem:Math.max(stem,innerCut*.71);
+ return Math.min(growth>.005?stemFloor:10,cavity*.78);
 }
 
 // A fan's axes and profile coefficients depend on the pose, never on the
@@ -111,12 +150,12 @@ function fanProfile(s,phase){
   const variant=Math.sin(index*19.71+seed*1.4),lift=Math.sin(index*5.37+seed);
   const localPhase=phase+index*2.03,side=index%2,rank=(Math.floor(index/2)+.5)/Math.ceil(count/2);
   const uniformAngle=index*tau/count;
-  const foldedAngle=Math.PI*(.5+side)+(rank-.5)*(1.37+s.structStagger*.36)+side*.17;
+  const foldedAngle=Math.PI*(.5+side)+(rank-.5)*(.86+s.structStagger*.48)+side*.17;
   const angle=uniformAngle+(foldedAngle-uniformAngle)*s.structFanBias+s.structStagger*(variant*.42+.18*Math.sin(localPhase));
-  const reach=(1+variant*(.12+s.structStagger*.38))*(1+s.structFanBias*(.26-.55*rank+.13*lift));
+  const reach=(1+variant*(.12+s.structStagger*.25))*(1+.48*s.structStagger*Math.cos(uniformAngle-.55))*(1+s.structFanBias*(.26-.55*rank+.13*lift));
   const width=(.31+s.structPetalWidth*.52)*(1-.5*s.structRadial)*(1+lift*.24*s.structStagger)*(1+s.structFanBias*(.28-.36*rank));
   axes.push(Math.cos(angle),Math.sin(angle),reach,width);
-  profiles.push(s.structSpiral*.43+.16*lift,lift*.18+s.structFanBias*(rank-.45)*.58,variant,localPhase);
+  profiles.push(s.structSpiral*.76+.11*lift,lift*.18+s.structFanBias*(rank-.45)*.58,variant,localPhase);
  }
  return {axes,profiles};
 }
@@ -126,32 +165,83 @@ function fanData(s,phase){
  if(key!==lastFanProfileKey){lastFanProfileKey=key;lastFanProfile=fanProfile(s,phase);}
  return lastFanProfile;
 }
+// A ruled membrane joins two flared lobes through a narrow, twisting waist.
+// Bias changes the radial fan continuously into this single connected sheet.
+function drapeCoordinates(s,p,phase){
+ const t=p[1]/1.12,centreX=(.12+.25*Math.abs(s.structCurl))*Math.sin(t*2.6+phase)*(.5+.5*Math.min(1,Math.abs(t)));
+ const centreZ=.14*Math.sin(t*2.7-phase)*(1+.4*s.structStagger);
+ const angle=t*(.65+1.7*s.structSpiral)+(.42+.9*Math.abs(s.structCurl))*Math.atan(t*2.8)+.22*Math.sin(phase+t*2.1)+.5*s.structFlap*Math.sin(phase-t);
+ const c=Math.cos(angle),sn=Math.sin(angle),x=p[0]-centreX,z=p[2]-centreZ,planeX=c*x+sn*z,planeZ=-sn*x+c*z;
+ const side=t/Math.sqrt(.06+t*t),curvature=(.35+3.3*s.structFold)*side+.32*s.structCurl+.15*Math.sin(phase+t*3);
+ const denominator=1-curvature*planeZ,bendRadius=Math.hypot(curvature*planeX,denominator),ratio=denominator>0?curvature*planeX/denominator:1,v2=ratio*ratio;
+ const across=denominator>0&&Math.abs(ratio)<.2?planeX/denominator*(1-v2*(1/3-v2*(1/5-v2/7))):Math.atan2(curvature*planeX,denominator)/curvature;
+ const normal=(2*planeZ-curvature*(planeX*planeX+planeZ*planeZ))/(1+bendRadius);
+ const waist=.28+(.5+s.structPetalWidth*.45)*(1-Math.exp(-t*t*4))*(1+.13*t/Math.sqrt(.111+t*t));
+ const radial=Math.hypot(across/waist,t);
+ const edge=Math.max(0,Math.min(1,(radial-.35)/.65));
+ const sheet=s.structFold*.5*(.65*Math.sin(across*(4.1+s.structPetalCount*.22)/waist+phase-t*2)+.35*Math.sin(t*9-phase+across/waist))*(.5+.5*Math.min(1,Math.abs(t)*2))
+  +s.structRuffle*.5*edge*Math.sin(across*23+t*13-phase);
+ return [across/waist,t,normal-sheet,waist];
+}
+function drapeField(s,p,phase){
+ const q=drapeCoordinates(s,p,phase),radial=Math.hypot(q[0],q[1]),edge=Math.max(0,Math.min(1,(radial-.35)/.65));
+ const edgeAngle=Math.atan2(q[1],q[0]),edgeWave=s.structFold*(.36*Math.sin(edgeAngle*7+phase)+.15*Math.sin(edgeAngle*4-phase));
+ const outline=(radial-1-edgeWave)*Math.min(.36,q[3]),thickness=s.structThickness*(.22-.16*s.structTaper*edge);
+ return Math.max(outline,Math.abs(q[2])-thickness)*.43;
+}
+function fanDrapeBlend(s){
+ const bias=Math.max(0,Math.min(1,(s.structFanBias-.3)/.65)),count=Math.max(0,Math.min(1,(s.structPetalCount-4)/4));
+ return bias*bias*(3-2*bias)*(1-count*count*(3-2*count));
+}
+function fanDrapeCoordinates(s,p,phase){
+ const blend=fanDrapeBlend(s);if(blend<=0)return [...p,1];
+ const size=Math.sqrt(blend),q=drapeCoordinates(s,p.map(value=>value/size),phase);q[2]*=size;q[3]*=size;return q;
+}
 function fanField(s,p,phase){
+ const blend=fanDrapeBlend(s),drapeSize=Math.sqrt(blend),fanSize=Math.sqrt(1-blend);
+ const drape=blend>0?drapeField(s,p.map(value=>value/drapeSize),phase)*drapeSize:10;if(blend>=1)return drape;
+ p=p.map(value=>value/fanSize);
  const {axes,profiles}=fanData(s,phase);
  let distance=Math.max(Math.hypot(p[0],p[1])-.115*(1-s.structFanBias*.82),Math.abs(p[2])-s.structThickness*.58);
  for(let index=0;index<axes.length;index+=4){
   const c=axes[index],t=axes[index+1],reach=axes[index+2],halfWidth=axes[index+3];
   const offset=profiles[index],lift=profiles[index+1],variant=profiles[index+2],localPhase=profiles[index+3];
   const u=c*p[0]+t*p[1],v=-t*p[0]+c*p[1],along=Math.max(0,Math.min(1.2,u/reach)),across=v-along*along*offset;
-  const outline=(Math.hypot((u-.56*reach)/(.61*reach),across/halfWidth)-1)*halfWidth
-   +s.structFanBias*s.structRuffle*(.43*Math.sin(u*23+across*31+localPhase)+.19*Math.sin(u*62-across*51+localPhase*2));
-  const sheet=along*(lift+Math.sin(localPhase-along*2.4)*s.structFlap*.42)+across*along*(.8*variant+s.structCurl*.74)+across*across*(.45+.26*variant);
+  const flare=Math.max(0,Math.min(1,along/.75)),width=halfWidth*(.58+.42*flare*flare*(3-2*flare));
+  const outline=(Math.hypot((u-.43*reach)/(.63*reach),across/width)-1)*Math.min(.3,width)
+   +s.structRuffle*(.4*Math.sin(u*17+across*22+localPhase)+.16*Math.sin(u*41-across*37+localPhase*2));
+  const sheet=along*(lift+Math.sin(localPhase-along*2.4)*s.structFlap*.42)+across*along*(.8*variant+s.structCurl*.74)+across*across*(.45+.26*variant)
+   +s.structFanBias*Math.pow(along,1.25)*s.structFold*Math.sin(across*(3.2+s.structFoldCount*.7)-along*2.1+localPhase)*.58;
   const edge=Math.max(0,Math.min(1,1+outline/(.6*halfWidth)));
   const thickness=s.structThickness*(.33-.25*s.structTaper*edge);
   distance=Math.min(distance,Math.max(outline,Math.abs(p[2]-sheet)-thickness)*.59);
  }
- return distance;
+ distance*=fanSize;if(blend<=0)return distance;
+ const rounding=.015*Math.sin(Math.PI*blend),h=Math.max(0,rounding-Math.abs(distance-drape))/Math.max(.0000001,rounding);
+ return Math.min(distance,drape)-h*h*rounding*.25;
 }
 export function structureField(s,d,p){
- const v={...STRUCTURE_DEFAULTS,...s},r=Math.hypot(...p),phi=Math.atan2(p[1],p[0]),theta=Math.acos(Math.max(-1,Math.min(1,p[2]/Math.max(r,1e-6)))),tau=Math.PI*2;
+ const v={...STRUCTURE_DEFAULTS,...s},r=Math.hypot(...p),tau=Math.PI*2;
+ const networkOnly=v.structWeaveVariation*v.structShell*v.structFibres*v.structWeft===1;
+ const thickness=v.structThickness*(1-v.structTaper*.85*Math.min(1,Math.hypot(p[0],p[1])));
+ let midSurface=d+thickness*.5;
+ // Every rib, porous saddle and terminal cup lies inside this radial band.
+ // Skip chart/Jacobian evaluations only beyond a generous empty-space margin;
+ // the underlying shape's distance still supplies the conservative step.
+ if(networkOnly&&v.structFan===0){
+  const baseRadius=Math.max(v.structThickness*.13,Math.min(v.structThickness*.36,v.structThreadWidth*1.25/v.structDensity));
+  const radius=baseRadius*(1-.52*v.structWeaveGrowth),span=v.structWeaveMembrane>0?Math.max(radius*6,.3*tau/(v.structDensity*1.73205080757))*1.2:0;
+  const slack=Math.abs(v.structWeave)*.42+.01,lower=-(2.3*baseRadius+.16*span+slack),upper=.47*v.structWeaveGrowth+.85*radius+2.2*baseRadius+.12*span+slack;
+  const empty=Math.max(lower-midSurface,midSurface-upper);
+  if(empty>.025)return empty*.45;
+ }
+ const phi=Math.atan2(p[1],p[0]),theta=Math.acos(Math.max(-1,Math.min(1,p[2]/Math.max(r,1e-6))));
  let a=phi*v.structDensity,b=theta*v.structDensity;
  const phase=v.structFlowPhase*tau,variation=v.structWeaveVariation*Math.sin(theta);
- if(variation>0){
+ if(variation>0&&!networkOnly){
   a+=variation*(2.2*Math.sin(4*phi+2.3*Math.sin(theta*6))+1.12*Math.sin(13*phi-theta*7));
   b+=variation*(1.9*Math.sin(5*phi-theta*3)+1.26*Math.sin(11*phi+theta*8));
  }
- const thickness=v.structThickness*(1-v.structTaper*.85*Math.min(1,Math.hypot(p[0],p[1])));
- let midSurface=d+thickness*.5;
  if(v.structShell>0)d=Math.max(d,-d-thickness-(1-thickness)*(1-v.structShell));
  if(v.structFan>0){
   const baseline=Math.max(d,-d-(1-v.structFan));
@@ -159,60 +249,55 @@ export function structureField(s,d,p){
   midSurface+=(d-midSurface)*v.structFan;
  }
  if(v.structFibres>0){
-  const width=1+(v.structThreadWidth-1)*v.structFibres,warp=(Math.abs(Math.sin(a*.5))-width)/v.structDensity*2;
-  const weft=(Math.abs(Math.sin(b*.5))-width*v.structWeft)/v.structDensity*2;
-  d=Math.max(d,v.structWeft>0?Math.min(warp,weft):warp);
-  const junction=Math.pow((.5+.5*Math.cos(a))*(.5+.5*Math.cos(b)),3);
-  d+=v.structFibres*(v.structWeave*Math.cos(a)*Math.cos(b)*Math.cos(phase)-v.structWeaveNodes*v.structWeft*junction*.095);
+  const width=1+(v.structThreadWidth-1)*v.structFibres;
+  if(!networkOnly){
+   let scaleA=1,scaleB=1;
+   const drapeBlend=v.structFan*fanDrapeBlend(v);
+   if(drapeBlend>0){
+    const q=fanDrapeCoordinates(v,p,phase);a+=(q[0]*v.structDensity*Math.PI-a)*drapeBlend;b+=(q[1]*v.structDensity*Math.PI-b)*drapeBlend;
+    scaleA+=(Math.max(.02,Math.min(.1,q[3]*.18))-1)*drapeBlend;scaleB+=(.2*Math.sqrt(fanDrapeBlend(v))-1)*drapeBlend;
+   }
+   const warp=(Math.abs(Math.sin(a*.5))-width)/v.structDensity*2*scaleA,weft=(Math.abs(Math.sin(b*.5))-width*v.structWeft)/v.structDensity*2*scaleB;
+   d=Math.max(d,v.structWeft>0?Math.min(warp,weft):warp);
+   const junction=Math.pow((.5+.5*Math.cos(a))*(.5+.5*Math.cos(b)),3);
+   d+=v.structFibres*(v.structWeave*Math.cos(a)*Math.cos(b)*Math.cos(phase)-v.structWeaveNodes*v.structWeft*junction*.095);
+  }
   const sprouts=v.structWeaveGrowth*v.structWeft*v.structFibres;
   if((v.structWeaveVariation>0||sprouts>0||v.structWeaveMembrane>0)&&v.structShell>0){
-   const across=warp+width/v.structDensity*2,along=weft+width*v.structWeft/v.structDensity*2;
-   const radius=Math.max(thickness*.16,Math.min(thickness*.68,width*1.8/v.structDensity));
-   const ribs=Math.hypot(midSurface,across)-radius;
-   const cross=v.structWeft>0?Math.hypot(midSurface,along)-radius*v.structWeft:10;
+   const seed=((v.seed||0)%1000)*.013,metric=weaveMetric(phi,theta,r,v.structDensity,v.structWeaveVariation,phase,seed),det=metric[0]*metric[3]-metric[1]*metric[2];
+   const site=weaveSite(metric[4],metric[5],v.structDensity);
+   const edgeSlope=Math.hypot(metric[3]*site[5]-metric[2]*site[6],-metric[1]*site[5]+metric[0]*site[6])/det;
+   const baseRadius=Math.max(thickness*.13,Math.min(thickness*.36,width*1.25/v.structDensity)),radius=baseRadius*(1-.52*sprouts);
+   const z=midSurface-v.structWeave*.42*Math.sin(phi*4+theta*3+phase);
+   const ribs=Math.hypot(z,site[0]/Math.max(.1,edgeSlope))-radius;
+   const growth=v.structWeaveNodes,web=v.structWeaveMembrane;
    let node=10,sprout=10,membrane=10;
-   if(v.structWeft>0&&(v.structWeaveNodes>0||sprouts>0||v.structWeaveMembrane>0)){
-    const growth=v.structWeaveNodes,cellA=Math.floor(a/tau+.5),cellB=Math.floor(b/tau+.5);
-    const x=(a-cellA*tau)/v.structDensity,y=(b-cellB*tau)/v.structDensity,z=midSurface;
-    const shift=.5+.5*Math.sin(23.71*cellA+16.13*cellB),space=radius*(.82+.34*shift);
-    node=Math.hypot(z,x,y)-radius*(.96+.32*growth);
-    const web=v.structWeaveMembrane;
-    if(web>0)membrane=weaveSaddle(x,y,z,radius,web,shift);
-    if(web>0&&growth>.2&&Math.abs(x)+Math.abs(y)<radius*5){
-     const spawn=radius*(.32+.33*growth);
-     for(let index=0;index<6;index++){
-      const angle=index*2.39996+shift*4,offset=radius*(.62+index*.34);
-      const elevation=radius*(.82+.31*Math.sin(index*1.91+shift*6)+sprouts*(1-index*.11));
-      const bud=Math.hypot(x-Math.cos(angle)*offset,y-Math.sin(angle)*offset*.84,z-elevation)-spawn*(1-.06*index)*web;
-      node=Math.min(node,bud);
-     }
-    }
-    if(growth>.25&&Math.abs(x)+Math.abs(y)<radius*5){
-     const buds=Math.min(
-      Math.hypot(x-space,y+.37*space,z-1.12*space)-radius*(.22+.31*growth),
-      Math.hypot(x+.72*space,y-.57*space,z-1.16*space)-radius*(.2+.26*growth),
-      Math.hypot(x-.18*space,y-1.06*space,z-.76*space)-radius*(.18+.21*growth),
-      Math.hypot(x+.48*space,y+.72*space,z-.99*space)-radius*(.18+.23*growth)
-     );
-     node+=Math.min(0,buds-node)*Math.min(1,(growth-.25)*4);
-    }
-    if(sprouts>0&&Math.abs(x)+Math.abs(y)<.33&&z>-.19&&shift>.22){
-     const turn=6.13*Math.sin(cellA*62.02+cellB*28.37),localGrowth=sprouts*Math.max(.07,Math.min(1,(shift-.22)*1.8));
-     const base=Math.hypot(x*.62,y*.78,z*3.1)-radius*(1.49+localGrowth*.94);
-     sprout=Math.min(base,weaveSprout(x,y,z,phase,shift,turn,radius,localGrowth,v.structWeaveCup));
-     if(web>0){
-      for(let i=0;i<2;i++){
-       const branch=turn+(i===0?2.17:4.3),offset=radius*(.67+.27*i);
-       const branchGrowth=localGrowth*web*(i===0?.92:.71);
-       const stem=weaveSprout(x-Math.cos(branch)*offset,y-Math.sin(branch)*offset,z-radius*.26,phase,1-shift*.58,branch,radius*(1-i*.16),branchGrowth,v.structWeaveCup);
-       sprout=Math.min(sprout,stem);
+   for(let corner=0;corner<2;corner++){
+    const current=corner?weaveSite(metric[4],metric[5],v.structDensity,1):site;
+    const x=current[1],y=current[2],turn=current[3],shift=current[4];
+    const [nodePhi,nodeTheta]=weaveNodeAngles(current[7],current[8],v.structDensity,v.structWeaveVariation,phase,seed);
+    const sinePhi=Math.sin(nodePhi),cosinePhi=Math.cos(nodePhi),sineTheta=Math.sin(nodeTheta),cosineTheta=Math.cos(nodeTheta);
+    const tangentX=-sinePhi*p[0]+cosinePhi*p[1],tangentY=cosineTheta*(cosinePhi*p[0]+sinePhi*p[1])-sineTheta*p[2];
+    node=Math.min(node,Math.hypot(tangentX,tangentY,z)-radius*(.86+.35*growth));
+    if(v.structWeft>0&&(growth>0||sprouts>0||web>0)){
+     if(web>0)membrane=Math.min(membrane,weaveSaddle(x,y,z,radius,web*(1-.38*sprouts),shift,turn,v.structDensity));
+     if((growth>.05||sprouts>0)&&Math.hypot(tangentX,tangentY)<radius*2.2+baseRadius*2.2+.17*sprouts+.03&&z>-baseRadius*2.3){
+      const nodeMetric=weaveMetric(nodePhi,nodeTheta,1,v.structDensity,v.structWeaveVariation,phase,seed);
+      for(let index=0;index<6;index++){
+       const angle=turn+(index%3)*tau/3+.3*Math.sin(index*1.7+shift*4),offset=radius*(.65+Math.floor(index/3)*1.55);
+       const budRadius=baseRadius*(1.05+.4*Math.sin(index*2.17+shift*5)**2)*(.3+.7*growth);
+       const localGrowth=sprouts*(.36+.64*shift)*(index<3?1:.47);
+       const dx=nodeMetric[0]*Math.cos(angle)+nodeMetric[1]*Math.sin(angle),dy=nodeMetric[2]*Math.cos(angle)+nodeMetric[3]*Math.sin(angle);
+       const directionLength=Math.max(.0001,Math.hypot(dx,dy)),rootX=dx/directionLength*offset,rootY=dy/directionLength*offset,rootZ=radius*(.7+.12*Math.sin(index*1.91+shift*6));
+       sprout=Math.min(sprout,weaveSprout(tangentX-rootX,tangentY-rootY,z-rootZ,phase,shift,Math.atan2(dy,dx),budRadius,localGrowth,v.structWeaveCup,v.structDensity));
       }
      }
     }
    }
-   d+=(Math.min(ribs,cross,node)-d)*v.structWeaveVariation*v.structShell*v.structFibres;
-   d+=(Math.min(d,sprout)-d)*Math.min(1,3*sprouts)*v.structShell;
-   d+=(Math.min(d,membrane)-d)*Math.min(1,1.45*v.structWeaveMembrane)*v.structShell*v.structWeft*v.structFibres;
+   const blend=v.structWeaveVariation*v.structShell*v.structFibres*v.structWeft;
+   d+=(Math.min(ribs,node)-d)*blend;
+   d+=(Math.min(d,sprout)-d)*Math.min(1,3*(growth+sprouts))*v.structShell*v.structWeft*v.structFibres;
+   d+=(Math.min(d,membrane)-d)*Math.min(1,1.45*web)*v.structShell*v.structWeft*v.structFibres;
   }
  }
  if(v.structSlices>0)d=Math.max(d,(Math.abs(Math.sin(p[2]*v.structSliceCount*Math.PI)) -(1+(v.structSliceWidth-1)*v.structSlices))/ (v.structSliceCount*Math.PI));
@@ -271,58 +356,141 @@ vec3 structureWarp(vec3 p){
  p.z-=falloff*(uStructureG.z*.6*sin(angle*uStructureC.w+rr*2.+phase)+uStructureG.w*sin(angle*(uStructureC.w*3.)+phase-rr*6.));
  return p;
 }
+vec4 weaveSite(vec2 p,float corner,out float shift,out vec2 edgeNormal,out vec2 node){
+ float k=uStructureB.x*1.73205080757/6.28318530718;
+ vec2 period=vec2(1.73205080757,1.);
+ vec2 a=p-period*floor(p/period+.5),b=p-period*(floor(p/period)+.5);
+ vec2 q=dot(a,a)<dot(b,b)?a:b;
+ edgeNormal=abs(q.y)>dot(abs(q),vec2(.86602540378,.5))?vec2(0.,sign(q.y)):sign(q)*vec2(.86602540378,.5);
+ float edge=(.5-max(dot(abs(q),vec2(.86602540378,.5)),abs(q.y)))/k;
+ float sector=floor(atan(q.y,q.x)*3./3.14159265359)+corner,turn=sector*3.14159265359/3.;
+ node=p-q+vec2(cos(turn),sin(turn))*.57735026919;
+ float wrap=uStructureB.x*1.73205080757;vec2 identity=vec2(node.x-wrap*floor(node.x/wrap+.5),node.y);
+ shift=.5+.5*sin(dot(identity,vec2(23.71,16.13)));
+ return vec4(edge,(p-node)/k,mod(sector,2.)*3.14159265359/3.);
+}
+mat2 weaveMetric(float phi,float theta,float r,out vec2 chart){
+ float k=uStructureB.x*1.73205080757/6.28318530718,phase=uStructureF.z*6.28318530718;
+ float u=phi*k+uStructureH.y*(.42*sin(theta*3.+uSeed)+.17*sin(theta*7.+.12*sin(phase)));
+ float v=theta*k+uStructureH.y*(.3*sin(u*3./k+uSeed*.7)+.13*sin(u*7./k));
+ float f=uStructureH.y/k*(1.26*cos(theta*3.+uSeed)+1.19*cos(theta*7.+.12*sin(phase)));
+ float g=uStructureH.y/k*(.9*cos(u*3./k+uSeed*.7)+.91*cos(u*7./k)),h=uStructureH.y*.378/k*cos(v*2.1/k);
+ float a=1.+h*g,b=f+h*(1.+g*f),d=1.+g*f,sine=max(.12,sin(theta));
+ chart=vec2(u+uStructureH.y*.18*sin(v*2.1/k),v);
+ return mat2(sine*d,-g,-sine*b,a)*max(.2,r);
+}
+vec2 weaveNodeAngles(vec2 node){
+ float k=uStructureB.x*1.73205080757/6.28318530718,phase=uStructureF.z*6.28318530718;
+ float u=node.x-uStructureH.y*.18*sin(node.y*2.1/k);
+ float theta=(node.y-uStructureH.y*(.3*sin(u*3./k+uSeed*.7)+.13*sin(u*7./k)))/k;
+ float phi=(u-uStructureH.y*(.42*sin(theta*3.+uSeed)+.17*sin(theta*7.+.12*sin(phase))))/k;
+ return vec2(phi,theta);
+}
 #ifdef WEAVE_DETAIL
-float weaveSaddle(vec3 q,float radius,float amount,float shift){
- float span=radius*(1.8+4.9*amount)*(1.+.23*shift);
- vec2 a=abs(q.xy);
- float extent=(a.x*.85+a.y+2.1*sqrt(a.x*a.y))/span;
- float height=radius*.23+(.23*q.x*q.x-.39*q.y*q.y)/max(.035,span);
- float membrane=max((extent-1.)*span*.48,abs(q.z-height)-max(.007,radius*.205)*(1.-.23*min(1.,extent)));
- float frequency=12./max(.045,span);vec2 p=q.xy*frequency;
- float first=abs(sin(p.x+.66*p.y+1.08*sin(p.y*.36+shift*2.)));
- float second=abs(sin(-p.x*.63+p.y+.95*sin(p.x*.42-shift*4.)));
- return max(membrane,(min(first,second)-.34-.34*amount)/frequency);
+float weaveSaddle(vec3 q,float radius,float amount,float shift,float turn){
+ float span=max(radius*(2.7+3.3*amount),(.15+.15*amount)*6.28318530718/(uStructureB.x*1.73205080757))*(1.+.2*shift),r=length(q.xy),a=atan(q.y,q.x)-turn;
+ float reach=span*(.39+.61*pow(.5+.5*cos(3.*a),.72));
+ float height=radius*.12+(.1*q.x*q.x-.15*q.y*q.y)/max(.035,span);
+ float membrane=max((r-reach)*.62,abs(q.z-height)-max(.0026,radius*.14));
+ if(membrane>span*.012)return membrane;
+ float frequency=28./max(.045,span);vec2 p=q.xy*frequency;
+ p.x+=.55*sin(p.y*1.63+shift*6.)+.22*sin(p.y*4.21);p.y+=.48*sin(p.x*1.47+shift*2.2);p.x+=.28*sin(p.y*2.36);
+ vec2 period=vec2(1.73205080757,1.),first=p-period*floor(p/period+.5),second=p-period*(floor(p/period)+.5);
+ vec2 cell=dot(first,first)<dot(second,second)?first:second;
+ float edge=.5-max(dot(abs(cell),vec2(.86602540378,.5)),abs(cell.y));
+ float fibreWidth=(.055+.1*max(0.,1.-r/span))*(.65+.35*pow(sin(p.x*.13+p.y*.21+shift*6.),2.));
+ return max(membrane,(edge-fibreWidth)/frequency);
 }
 float weaveSprout(vec3 q,float phase,float shift,float turn,float radius,float growth,float opening){
- float height=growth*(.21+.23*shift),hub=radius*(1.25+.35*shift),cap=hub*(.68+.24*growth+.39*opening*growth);
+ float height=growth*(.19+.28*shift),cap=radius*(.83+.38*growth+.3*opening*growth);
  float axisZ=clamp(q.z,0.,height),slope=axisZ/max(.0001,height);
  vec2 axis=vec2(cos(turn),sin(turn));
- float tip=(.12+.04*sin(phase+turn))*growth;
- float stem=(length(vec3(q.xy-axis*tip*slope*slope,q.z-axisZ))-hub*(.31+.28*pow(1.-slope,3.)))*.71;
- vec3 tipPoint=vec3(q.xy-axis*(tip+(q.z-height)*.27),(q.z-height)*1.36);
+ float tip=(.13+.035*sin(phase+turn))*growth*min(1.,5./uStructureB.x);
+ float stem=(length(vec3(q.xy-axis*tip*slope*slope,q.z-axisZ))-radius*(.24+.24*pow(1.-slope,2.)))*.71;
+ vec3 tipPoint=vec3(q.xy-axis*(tip+(q.z-height)*.23),(q.z-height)*1.12);
  float bowl=length(tipPoint)-cap;
- float cavity=opening*growth<=.001?bowl:max(bowl,-length(tipPoint-vec3(0.,0.,cap*.62))+cap*(.32+.49*opening*growth));
- return min(stem,max(cavity,q.z-height-cap*(.57-.25*opening*growth))*.71);
+ float aperture=opening*clamp(growth*3.5,0.,1.);
+ float innerCut=-length(tipPoint-vec3(0.,0.,cap*.36))+cap*(.12+.82*aperture);
+ float cavity=aperture<=.001?bowl:max(bowl,innerCut);
+ float stemFloor=aperture<=.001?stem:max(stem,innerCut*.71);
+ return min(growth>.005?stemFloor:10.,cavity*.78);
 }
 #endif
 #ifdef FAN_FIELD
 uniform vec4 uFanAxes[20],uFanProfiles[20];
+vec4 drapeCoordinates(vec3 p){
+ float phase=uStructureF.z*6.28318530718,t=p.y/1.12;
+ float centreX=(.12+.25*abs(uStructureE.y))*sin(t*2.6+phase)*(.5+.5*min(1.,abs(t)));
+ float centreZ=.14*sin(t*2.7-phase)*(1.+.4*uStructureG.z);
+ float angle=t*(.65+1.7*uStructureG.y)+(.42+.9*abs(uStructureE.y))*atan(t*2.8)+.22*sin(phase+t*2.1)+.5*uStructureF.y*sin(phase-t);
+ float c=cos(angle),s=sin(angle);vec2 q=p.xz-vec2(centreX,centreZ);
+ float planeX=c*q.x+s*q.y,planeZ=-s*q.x+c*q.y;
+ float side=t/sqrt(.06+t*t),curvature=(.35+3.3*uStructureE.z)*side+.32*uStructureE.y+.15*sin(phase+t*3.);
+ float denominator=1.-curvature*planeZ,bendRadius=length(vec2(curvature*planeX,denominator)),ratio=denominator>0.?curvature*planeX/denominator:1.,v2=ratio*ratio;
+ float across=denominator>0.&&abs(ratio)<.2?planeX/denominator*(1.-v2*(1./3.-v2*(1./5.-v2/7.))):atan(curvature*planeX,denominator)/curvature;
+ float normal=(2.*planeZ-curvature*(planeX*planeX+planeZ*planeZ))/(1.+bendRadius);
+ float waist=.28+(.5+uStructureD.x*.45)*(1.-exp(-t*t*4.))*(1.+.13*t/sqrt(.111+t*t));
+ float radial=length(vec2(across/waist,t));
+ float edge=clamp((radial-.35)/.65,0.,1.);
+ float sheet=uStructureE.z*.5*(.65*sin(across*(4.1+uStructureC.w*.22)/waist+phase-t*2.)+.35*sin(t*9.-phase+across/waist))*(.5+.5*min(1.,abs(t)*2.))
+  +uStructureG.w*.5*edge*sin(across*23.+t*13.-phase);
+ return vec4(across/waist,t,normal-sheet,waist);
+}
+float drapeField(vec3 p){
+ vec4 q=drapeCoordinates(p);float radial=length(q.xy),edge=clamp((radial-.35)/.65,0.,1.);
+ float phase=uStructureF.z*6.28318530718,edgeAngle=atan(q.y,q.x),edgeWave=uStructureE.z*(.36*sin(edgeAngle*7.+phase)+.15*sin(edgeAngle*4.-phase));
+ float outline=(radial-1.-edgeWave)*min(.36,q.w),thickness=uStructureA.y*(.22-.16*uStructureH.x*edge);
+ return max(outline,abs(q.z)-thickness)*.43;
+}
+float fanDrapeBlend(){return smoothstep(.3,.95,uFanBias)*(1.-smoothstep(4.,8.,uStructureC.w));}
+vec4 fanDrapeCoordinates(vec3 p){
+ float blend=fanDrapeBlend();if(blend<=0.)return vec4(p,1.);
+ float size=sqrt(blend);vec4 q=drapeCoordinates(p/size);q.zw*=size;return q;
+}
 float fanField(vec3 p){
+ float blend=fanDrapeBlend(),drapeSize=sqrt(blend),fanSize=sqrt(1.-blend);
+ float drape=blend>0.?drapeField(p/drapeSize)*drapeSize:10.;if(blend>=1.)return drape;
+ p/=fanSize;
  float d=max(length(p.xy)-.115*(1.-uFanBias*.82),abs(p.z)-uStructureA.y*.58);
  for(int i=0;i<int(uStructureC.w+.5);i++){
   vec4 axis=uFanAxes[i],profile=uFanProfiles[i];
   vec2 plane=vec2(dot(p.xy,axis.xy),dot(p.xy,vec2(-axis.y,axis.x)));
   float reach=axis.z,halfWidth=axis.w,along=clamp(plane.x/reach,0.,1.2);
   float across=plane.y-along*along*profile.x;
-  float outline=(length(vec2((plane.x-.56*reach)/(.61*reach),across/halfWidth))-1.)*halfWidth
-   +uFanBias*uStructureG.w*(.43*sin(plane.x*23.+across*31.+profile.w)+.19*sin(plane.x*62.-across*51.+profile.w*2.));
-  float sheet=along*(profile.y+sin(profile.w-along*2.4)*uStructureF.y*.42)+across*along*(.8*profile.z+uStructureE.y*.74)+across*across*(.45+.26*profile.z);
+  float width=halfWidth*(.58+.42*smoothstep(0.,.75,along));
+  float outline=(length(vec2((plane.x-.43*reach)/(.63*reach),across/width))-1.)*min(.3,width)
+   +uStructureG.w*(.4*sin(plane.x*17.+across*22.+profile.w)+.16*sin(plane.x*41.-across*37.+profile.w*2.));
+  float sheet=along*(profile.y+sin(profile.w-along*2.4)*uStructureF.y*.42)+across*along*(.8*profile.z+uStructureE.y*.74)+across*across*(.45+.26*profile.z)
+   +uFanBias*pow(along,1.25)*uStructureE.z*sin(across*(3.2+uStructureE.w*.7)-along*2.1+profile.w)*.58;
   float edge=clamp(1.+outline/(.6*halfWidth),0.,1.);
   float thickness=uStructureA.y*(.33-.25*uStructureH.x*edge);
   d=min(d,max(outline,abs(p.z-sheet)-thickness)*.59);
  }
- return d;
+ d*=fanSize;if(blend<=0.)return d;
+ float rounding=.015*sin(3.14159265359*blend),h=max(0.,rounding-abs(d-drape))/max(.0000001,rounding);
+ return min(d,drape)-h*h*rounding*.25;
 }
 #endif
 float structureField(float d,vec3 p){
- float r=length(p),phi=atan(p.y,p.x),theta=acos(clamp(p.z/max(r,.000001),-1.,1.)),a=phi*uStructureB.x,b=theta*uStructureB.x;
+ float r=length(p);bool networkOnly=uStructureH.y*uStructureA.x*uStructureA.z*uStructureA.w==1.;
+ float thickness=uStructureA.y*(1.-uStructureH.x*.85*min(1.,length(p.xy))),midSurface=d+thickness*.5;
+ if(networkOnly&&uStructureFan==0.){
+  float sprouts=0.,web=0.;
+#ifdef WEAVE_DETAIL
+  sprouts=uWeaveGrowth.x;web=uWeaveGrowth.z;
+#endif
+  float baseRadius=max(uStructureA.y*.13,min(uStructureA.y*.36,uStructureB.y*1.25/uStructureB.x));
+  float radius=baseRadius*(1.-.52*sprouts),span=web>0.?max(radius*6.,.3*6.28318530718/(uStructureB.x*1.73205080757))*1.2:0.;
+  float slack=abs(uStructureB.z)*.42+.01,lower=-(2.3*baseRadius+.16*span+slack),upper=.47*sprouts+.85*radius+2.2*baseRadius+.12*span+slack;
+  float empty=max(lower-midSurface,midSurface-upper);
+  if(empty>.025)return empty*.45;
+ }
+ float phi=atan(p.y,p.x),theta=acos(clamp(p.z/max(r,.000001),-1.,1.)),a=phi*uStructureB.x,b=theta*uStructureB.x;
  float variation=uStructureH.y*sin(theta);
- if(variation>0.){
+ if(variation>0.&&!networkOnly){
   a+=variation*(2.2*sin(4.*phi+2.3*sin(theta*6.))+1.12*sin(13.*phi-theta*7.));
   b+=variation*(1.9*sin(5.*phi-theta*3.)+1.26*sin(11.*phi+theta*8.));
  }
- float thickness=uStructureA.y*(1.-uStructureH.x*.85*min(1.,length(p.xy)));
- float midSurface=d+thickness*.5;
  if(uStructureA.x>0.)d=max(d,-d-thickness-(1.-thickness)*(1.-uStructureA.x));
 #ifdef FAN_FIELD
  if(uStructureFan>0.){
@@ -331,60 +499,58 @@ float structureField(float d,vec3 p){
  }
 #endif
  if(uStructureA.z>0.){
-  float width=mix(1.,uStructureB.y,uStructureA.z),warp=(abs(sin(a*.5))-width)/uStructureB.x*2.;
-  float weft=(abs(sin(b*.5))-width*uStructureA.w)/uStructureB.x*2.;
-  d=max(d,uStructureA.w>0.?min(warp,weft):warp);
-  float junction=pow((.5+.5*cos(a))*(.5+.5*cos(b)),3.);
-  d+=uStructureA.z*(uStructureB.z*cos(a)*cos(b)*cos(uStructureF.z*6.28318530718)-uStructureH.z*uStructureA.w*junction*.095);
+  float width=mix(1.,uStructureB.y,uStructureA.z);
+  if(!networkOnly){
+   float scaleA=1.,scaleB=1.;
+#ifdef FAN_FIELD
+   float drapeBlend=uStructureFan*fanDrapeBlend();
+   if(drapeBlend>0.){
+    vec4 q=fanDrapeCoordinates(p);a=mix(a,q.x*uStructureB.x*3.14159265359,drapeBlend);b=mix(b,q.y*uStructureB.x*3.14159265359,drapeBlend);
+    scaleA=mix(1.,clamp(q.w*.18,.02,.1),drapeBlend);scaleB=mix(1.,.2*sqrt(fanDrapeBlend()),drapeBlend);
+   }
+#endif
+   float warp=(abs(sin(a*.5))-width)/uStructureB.x*2.*scaleA,weft=(abs(sin(b*.5))-width*uStructureA.w)/uStructureB.x*2.*scaleB;
+   d=max(d,uStructureA.w>0.?min(warp,weft):warp);
+   float junction=pow((.5+.5*cos(a))*(.5+.5*cos(b)),3.);
+   d+=uStructureA.z*(uStructureB.z*cos(a)*cos(b)*cos(uStructureF.z*6.28318530718)-uStructureH.z*uStructureA.w*junction*.095);
+  }
   float sprouts=0.,web=0.;
 #ifdef WEAVE_DETAIL
   sprouts=uWeaveGrowth.x*uStructureA.w*uStructureA.z;web=uWeaveGrowth.z;
 #endif
   if((uStructureH.y>0.||sprouts>0.||web>0.)&&uStructureA.x>0.){
-   float across=warp+width/uStructureB.x*2.,along=weft+width*uStructureA.w/uStructureB.x*2.;
-   float radius=max(thickness*.16,min(thickness*.68,width*1.8/uStructureB.x));
-   float ribs=length(vec2(midSurface,across))-radius;
-   float crossbar=uStructureA.w>0.?length(vec2(midSurface,along))-radius*uStructureA.w:10.;
-   float node=10.,sprout=10.,membrane=10.;
+   float shift;vec2 edgeNormal,nodeChart,chart;mat2 metric=weaveMetric(phi,theta,r,chart);
+   vec4 site=weaveSite(chart,0.,shift,edgeNormal,nodeChart);
+   float edgeSlope=length(vec2(metric[1][1]*edgeNormal.x-metric[0][1]*edgeNormal.y,-metric[1][0]*edgeNormal.x+metric[0][0]*edgeNormal.y))/determinant(metric);
+   float baseRadius=max(thickness*.13,min(thickness*.36,width*1.25/uStructureB.x)),radius=baseRadius*(1.-.52*sprouts);
+   float z=midSurface-uStructureB.z*.42*sin(phi*4.+theta*3.+uStructureF.z*6.28318530718);
+   float ribs=length(vec2(z,site.x/max(.1,edgeSlope)))-radius;
+   float growth=uStructureH.z,node=10.,sprout=10.,membrane=10.;
+   for(int corner=0;corner<int(min(uRuntime.z+uRuntime.w,2.));corner++){
+    if(corner==1)site=weaveSite(chart,1.,shift,edgeNormal,nodeChart);
+    vec3 q=vec3(site.yz,z);float turn=site.w;
+    vec2 nodeAngle=weaveNodeAngles(nodeChart),sine=sin(nodeAngle),cosine=cos(nodeAngle);
+    vec3 physical=vec3(dot(p.xy,vec2(-sine.x,cosine.x)),cosine.y*dot(p.xy,vec2(cosine.x,sine.x))-sine.y*p.z,q.z);
+    node=min(node,length(physical)-radius*(.86+.35*growth));
 #ifdef WEAVE_DETAIL
-   float growth=uStructureH.z;const float tau=6.28318530718;
    if(uStructureA.w>0.&&(growth>0.||sprouts>0.||web>0.)){
-    vec2 cell=floor(vec2(a,b)/tau+.5);
-    vec3 q=vec3((vec2(a,b)-cell*tau)/uStructureB.x,midSurface);
-    float shift=.5+.5*sin(dot(cell,vec2(23.71,16.13))),space=radius*(.82+.34*shift);
-    node=length(q)-radius*(.96+.32*growth);
-    if(web>0.)membrane=weaveSaddle(q,radius,web,shift);
-    if(web>0.&&growth>.2&&abs(q.x)+abs(q.y)<radius*5.){
-     float spawn=radius*(.32+.33*growth);
+    if(web>0.)membrane=min(membrane,weaveSaddle(q,radius,web*(1.-.38*sprouts),shift,turn));
+    if((growth>.05||sprouts>0.)&&length(physical.xy)<radius*2.2+baseRadius*2.2+.17*sprouts+.03&&q.z>-baseRadius*2.3){
+     vec2 unusedChart;mat2 nodeMetric=weaveMetric(nodeAngle.x,nodeAngle.y,1.,unusedChart);
      for(int i=0;i<int(min(uRuntime.z*3.+uRuntime.w,6.));i++){
-      float index=float(i),angle=index*2.39996+shift*4.,offset=radius*(.62+index*.34);
-      float elevation=radius*(.82+.31*sin(index*1.91+shift*6.)+sprouts*(1.-index*.11));
-      vec3 center=vec3(vec2(cos(angle),sin(angle)*.84)*offset,elevation);
-      node=min(node,length(q-center)-spawn*(1.-.06*index)*web);
-     }
-    }
-    if(growth>.25&&abs(q.x)+abs(q.y)<radius*5.){
-     float buds=min(min(length(q+space*vec3(-1.,.37,-1.12))-radius*(.22+.31*growth),length(q+space*vec3(.72,-.57,-1.16))-radius*(.2+.26*growth)),
-      min(length(q+space*vec3(-.18,-1.06,-.76))-radius*(.18+.21*growth),length(q+space*vec3(.48,.72,-.99))-radius*(.18+.23*growth)));
-     node=mix(node,min(buds,node),min(1.,(growth-.25)*4.));
-    }
-    if(sprouts>0.&&abs(q.x)+abs(q.y)<.33&&q.z>-.19&&shift>.22){
-     float turn=6.13*sin(dot(cell,vec2(62.02,28.37))),localGrowth=sprouts*clamp((shift-.22)*1.8,.07,1.);
-     float base=length(q*vec3(.62,.78,3.1))-radius*(1.49+localGrowth*.94);
-     sprout=min(base,weaveSprout(q,uStructureF.z*tau,shift,turn,radius,localGrowth,uWeaveGrowth.y));
-     if(web>0.){
-      for(int i=0;i<int(min(uRuntime.w+uRuntime.z,2.));i++){
-       float branch=turn+(i==0?2.17:4.3),offset=radius*(.67+.27*float(i));
-       float branchGrowth=localGrowth*web*(i==0?.92:.71);
-       vec3 root=vec3(vec2(cos(branch),sin(branch))*offset,radius*.26);
-       sprout=min(sprout,weaveSprout(q-root,uStructureF.z*tau,1.-shift*.58,branch,radius*(1.-float(i)*.16),branchGrowth,uWeaveGrowth.y));
-      }
+      float index=float(i),angle=turn+mod(index,3.)*6.28318530718/3.+.3*sin(index*1.7+shift*4.),offset=radius*(.65+floor(index/3.)*1.55);
+      float budRadius=baseRadius*(1.05+.4*pow(sin(index*2.17+shift*5.),2.))*(.3+.7*growth);
+      float localGrowth=sprouts*(.36+.64*shift)*(i<3?1.:.47);
+      vec2 direction=nodeMetric*vec2(cos(angle),sin(angle));
+      vec3 root=vec3(normalize(direction)*offset,radius*(.7+.12*sin(index*1.91+shift*6.)));
+      sprout=min(sprout,weaveSprout(physical-root,uStructureF.z*6.28318530718,shift,atan(direction.y,direction.x),budRadius,localGrowth,uWeaveGrowth.y));
      }
     }
    }
 #endif
-   d=mix(d,min(ribs,min(crossbar,node)),uStructureH.y*uStructureA.x*uStructureA.z);
-   d=mix(d,min(d,sprout),min(1.,3.*sprouts)*uStructureA.x);
+   }
+   d=mix(d,min(ribs,node),uStructureH.y*uStructureA.x*uStructureA.z*uStructureA.w);
+   d=mix(d,min(d,sprout),min(1.,3.*(growth+sprouts))*uStructureA.x*uStructureA.w*uStructureA.z);
    d=mix(d,min(d,membrane),min(1.,1.45*web)*uStructureA.x*uStructureA.w*uStructureA.z);
   }
  }

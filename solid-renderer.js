@@ -1,9 +1,11 @@
-import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=0049c9863913';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=0049c9863913';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=0049c9863913';
-import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=0049c9863913';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=0049c9863913';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=0049c9863913';
+import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=a55ab48fe9e6';
+import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=a55ab48fe9e6';
+import {ImplicitHitPass,IMPLICIT_HIT_MAIN} from './implicit-hit-pass.js?v=a55ab48fe9e6';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=a55ab48fe9e6';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=a55ab48fe9e6';
+import {STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=a55ab48fe9e6';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=a55ab48fe9e6';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=a55ab48fe9e6';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -44,7 +46,7 @@ vec3 coatingContrast(vec3 film){
 `;
 const TAU=Math.PI*2;
 const CELLULAR_LIMITS=Object.fromEntries(Object.entries(CELLULAR_META).map(([key,m])=>[key,m.slice(1,3)]));
-const MOTION_LIMITS={sceneGrains:[0,1],grainDispersal:[0,1],...Object.fromEntries(Object.entries(FRACTAL_META).map(([key,m])=>[key,m.slice(1,3)])),...Object.fromEntries(Object.entries(STRUCTURE_META).map(([k,v])=>[k,v.slice(1,3)])),pCellAmount:[0,1],pCellAspect:[-1,1],pCellRelief:[0,1],pCellLight:[-1,1],pVeilStyle:[0,2],pVeilMorph:[0,1],pVeilSpread:[0,1],volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:FIGURE_SCALE,positionX:[-1.5,1.5],positionY:[-1.5,1.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWeave:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
+const MOTION_LIMITS={finishPrintNegative:[0,1],sceneGrains:[0,1],grainDispersal:[0,1],...Object.fromEntries(Object.entries(FRACTAL_META).map(([key,m])=>[key,m.slice(1,3)])),...Object.fromEntries(Object.entries(STRUCTURE_META).map(([k,v])=>[k,v.slice(1,3)])),pCellAmount:[0,1],pCellAspect:[-1,1],pCellRelief:[0,1],pCellLight:[-1,1],pVeilStyle:[0,2],pVeilMorph:[0,1],pVeilSpread:[0,1],volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:FIGURE_SCALE,positionX:[-4.5,4.5],positionY:[-4.5,4.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWeave:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
 function motionCycles(value,source){const n=Math.max(.1,Number(value)||1);return source?.perfectLoop===false?n:Math.max(1,Math.round(n));}
 export function motionClock(t,phase,source){
  const raw=phase/TAU*motionCycles(t.cycles,source)+(t.phase||0)/360*(t.direction||1),whole=Math.floor(raw);let u=raw-whole;
@@ -725,19 +727,30 @@ vec3 reliefNormal(vec3 original,vec3 geometricNormal,vec3 rd,vec3 gradient){
 `+'\nvec4 shade(');
 MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometricNormal,vec3 rd,bool hit,out float issue){
  issue=0.;vec3 local=transform(p),n=geometricNormal;
+ float fibreWeight=0.,fibreDensity=1.;vec3 fibreTangent=vec3(0.,1.,0.);
  float textureFilter=1.-smoothstep(.28,.65,84.*3.4/min(uResolution.x,uResolution.y)/(2.*PI));
  #ifdef FAN_FIELD
  if(uStructureFan>0.&&uTexture.z>.001){
-  vec2 plane=local.xy/axes().xy;
+  vec3 sampleLocal=structureWarp(local/axes());vec2 plane=sampleLocal.xy;
+  vec4 drape=fanDrapeCoordinates(sampleLocal);float drapeWeight=fanDrapeBlend();
   float r=length(plane),a=atan(plane.y,plane.x);
-  float frequency=clamp(40.+18.*uMaterialDetail.y,40.,310.);
+  float frequency=clamp(160.+35.*uMaterialDetail.y,160.,900.);
   float strands=a*floor(frequency)+2.6*sin(a*21.+r*6.)+1.3*sin(r*8.-a*13.);
   float weft=r*frequency*.62+sin(a*14.+r*7.)*1.5;
-  float antialias=1.-smoothstep(1.2,3.7,max(fwidth(strands),fwidth(weft)));
-  vec3 fibre=vec3(-plane.y,plane.x,0.)/max(.01,r);
+  strands=mix(strands,drape.x*frequency+1.2*sin(drape.x*12.+drape.y*5.),drapeWeight);
+  weft=mix(weft,drape.y*frequency*.4+sin(drape.x*8.-drape.y*3.),drapeWeight);
+  // Derivatives inside a varying-depth layer loop are undefined. An analytic
+  // footprint keeps microscopic strands stable while the sheet turns.
+  float footprint=3.4/(min(uResolution.x,uResolution.y)*max(.001,uFrame.x*min(axes().x,axes().y)));
+  float antialias=1.-smoothstep(1.1,3.1,frequency*footprint/max(.1,mix(r,drape.w,drapeWeight)));
+  fibreWeight=uStructureFan*uTexture.x*uTexture.z;
+  fibreDensity=mix(.76,.64+.36*pow(.5+.5*cos(strands),3.),antialias);
+  fibreTangent=normalize(mix(vec3(plane,.001),vec3(.2*sin(drape.y*2.6+uStructureF.z*6.28318530718),1.,.3*cos(drape.y*2.7-uStructureF.z*6.28318530718)),drapeWeight));
+  fibreTangent.yz=rot(-uOther.y)*fibreTangent.yz;fibreTangent.xz=rot(-uOther.x)*fibreTangent.xz;fibreTangent.xy=rot(-uExtraShape3.z)*fibreTangent.xy;
+  vec3 fibre=normalize(mix(vec3(-plane.y,plane.x,0.)/max(.01,r),vec3(1.,0.,.15),drapeWeight));
   fibre.yz=rot(-uOther.y)*fibre.yz;fibre.xz=rot(-uOther.x)*fibre.xz;fibre.xy=rot(-uExtraShape3.z)*fibre.xy;
   float ripple=(sin(strands)*.8+sin(strands+weft)*.2)*smoothstep(.04,.18,r);
-  n=normalize(n+fibre*uTexture.z*.083*antialias*ripple);
+  n=normalize(n+fibre*uTexture.z*.014*antialias*ripple);
  }else
  #endif
  if(uTexture.z>.001)n=normalize(n+vec3(sin(local.y*84.),cos(local.x*71.),sin(local.z*69.))*uTexture.z*.045*textureFilter);
@@ -749,27 +762,35 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  #ifdef WEAVE_DETAIL
  if(uWeaveGrowth.z*uTexture.z>.0001){
   vec3 samplePoint=local/axes();
-  float theta=acos(clamp(samplePoint.z/max(.001,length(samplePoint)),-1.,1.));
-  float a=atan(samplePoint.y,samplePoint.x),frequency=ceil(28.+27.*uMaterialDetail.y);
-  float bend=4.1*sin(a*12.+theta*19.)+2.2*sin(a*23.-theta*16.);
-  float warp=a*frequency+theta*frequency*.29+bend;
-  float weft=a*floor(frequency*.69)-theta*frequency*.71+3.7*sin(a*19.-theta*21.+bend*.34);
-  float range=max(fwidth(warp),fwidth(weft));
-  float lines=max(pow(.5+.5*cos(warp),9.),pow(.5+.5*cos(weft),11.));
-  float mesh=.47+.53*smoothstep(-.68,.83,sin(theta*31.+a*9.+bend*.83));
+  float frequency=220.+34.*uMaterialDetail.y;
+  float bend=1.8*sin(dot(samplePoint,vec3(41.,27.,-13.)))+.9*sin(dot(samplePoint,vec3(-23.,38.,17.)));
+  float warp=dot(samplePoint,vec3(1.,.57,.23))*frequency+bend;
+  float weft=dot(samplePoint,vec3(-.61,1.,.37))*frequency*.81+bend*.63;
+  float footprint=3.4/(min(uResolution.x,uResolution.y)*max(.001,uFrame.x*min(min(axes().x,axes().y),axes().z))*max(.2,abs(dot(geometricNormal,-rd))));
+  float range=frequency*footprint*1.2;
+  float lines=max(pow(.5+.5*cos(warp),12.),pow(.5+.5*cos(weft),14.));
+  float mesh=.58+.42*smoothstep(-.68,.83,sin(dot(samplePoint,vec3(57.,39.,31.))+bend*.83));
   float scatter=uWeaveGrowth.z*uTexture.z*mesh*(1.-smoothstep(.8,3.2,range));
-  base*=1.+scatter*(lines*.91-.09);
-  specular+=lines*scatter*.034;
+  base*=1.+scatter*(lines*.2-.025);
+  specular+=lines*scatter*.012;
  }
  #endif
  vec3 dielectricF=fresnel(facing,1.,max(1.,uMat.y),local),diffuseLight=environment(n,p,1.)*.14;
  for(int i=0;i<uLightCount;i++){
   vec3 off=uLights[i].xyz-p;float cosine=max(dot(n,normalize(off)),0.);
   diffuseLight+=uLightColors[i]*cosine*uLights[i].w*.35/(1.+dot(off,off)*.08);
+  float fibreCosine=sqrt(max(0.,1.-pow(dot(fibreTangent,normalize(off)),2.)));
+  diffuseLight+=uLightColors[i]*fibreWeight*fibreCosine*uLights[i].w*.28/(1.+dot(off,off)*.12);
  }
  vec3 diffuse=base*diffuseLight*(1.-uMat.z*(1.-uMat.x));
  if(uTransport.x>.001)diffuse=mix(diffuse,subsurfaceLight(p,geometricNormal,base),uTransport.x);
- float transmission=clamp(uMat.x,0.,1.);vec4 glass=vec4(0.);float unused;
+ float transmission=clamp(uMat.x,0.,1.);
+ transmission=1.-(1.-transmission)*mix(1.,fibreDensity,fibreWeight*transmission);
+ // A grazing view crosses a longer path through the same fibres. Use that
+ // optical depth for both transmitted light and diffuse fibre visibility.
+ transmission=pow(transmission,mix(1.,1./max(.14,facing),fibreWeight));
+ specular*=1.-fibreWeight*.54;
+ vec4 glass=vec4(0.);float unused;
  if(transmission>.0001){
   vec4 straight=sceneRay(vec3(p.xy,4.8),rd,unused);
   vec3 beta=exp(-absorptionCoefficient(base)*max(.003,wallDepth())*4./max(.1,facing));
@@ -834,14 +855,17 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
     +.62*pow(max(0.,dot(reflected,normalize(vec3(.61,.36,.70)))),85.)
     +.53*pow(max(0.,dot(reflected,normalize(vec3(-.52,-.53,.66)))),72.);
   vec3 milk=mix(vec3(.75,.85,.96),base,.54)*diffuseLight;
-  vec3 pearl=milk*(.54+.45*facing)+gloss*(vec3(.18)+tint*(.30+.89*rim))
-    +(.09+.17*rim)*tint+glints*mix(vec3(1.,.93,.83),tint,.33)*1.3;
-  below=mix(below,pearl,nacre*.94);
+  // Clarity keeps the existing transmitted ray visible through the pearlescent
+  // coating. Previously even clear cells replaced 94% of it with opaque milk.
+  float clearCell=clamp(uCellOptics.w,0.,1.);
+  vec3 pearl=milk*(.54+.45*facing)*mix(1.,.38,clearCell)+gloss*(vec3(.18)+tint*(.30+.89*rim))
+    +(.09+.17*rim)*tint+glints*mix(vec3(1.,.93,.83),tint,.33)*2.;
+  below=mix(below,pearl,nacre*mix(.94,.46,clearCell));
   float unusedBackground;vec4 backdrop=sceneRay(vec3(p.xy,4.8),rd,unusedBackground);
   vec3 cellRay=normalize((transform(p+rd)-local)/axes());
   vec3 interior=cellularInterior(cellPoint,cellRay);
   below=mix(below,backdrop.rgb*mix(vec3(1.),tint,.25),clarity)
-    +interior*uCellOptics.w*(.32+.45*facing);
+    +interior*uCellOptics.w*(.14+.26*facing);
   alpha=mix(alpha,backdrop.a,clarity);
  }
  return vec4(below,clamp(alpha,0.,1.));
@@ -909,8 +933,10 @@ MODERN_FRAG=MODERN_FRAG.replace('straight.rgb*=beta;','beta*=filmPigment(base,fa
 MODERN_FRAG=MODERN_FRAG.replace('straight.rgb*=beta;', 'beta*=exp(-structureCore(local)*5.);straight.rgb*=beta;');
 // The centre tint is part of the existing material, under the same lights.
 MODERN_FRAG=MODERN_FRAG.replace('vec3 base=palette(pos),specular=', 'vec3 base=palette(pos)*(1.-structureCore(local)),specular=');
-// A flattened 3D membrane still needs its traced silhouette, not a slice at z=0.
-MODERN_FRAG=MODERN_FRAG.replace('float flatGeometry=1.-smoothstep(.1,.45,uShape.x)', 'float flatGeometry=(uStructureFan+dot(abs(uStructureA.xzw),vec3(1.))+abs(uStructureB.w)+abs(uStructureC.z)+abs(uStructureD.y)+dot(abs(uStructureE.xyz),vec3(1.))+dot(abs(uStructureF.xy),vec2(1.))+dot(abs(uStructureG),vec4(1.))>.000001)?0.:1.-smoothstep(.1,.45,uShape.x)');
+// Flattening a procedural sculpture keeps its projected silhouette. Sampling
+// only z=0 would silently erase offset petals, stems, cells and growing layers.
+// Preserve the original flat treatment for the unadorned base form.
+MODERN_FRAG=MODERN_FRAG.replace('float flatGeometry=1.-smoothstep(.1,.45,uShape.x)', 'float flatGeometry=(uPetals.x+uStem.x+uCellMorph+uFractal.x+dot(uGrowthGeometry,vec2(1.))+uStructureFan+dot(abs(uStructureA.xzw),vec3(1.))+abs(uStructureB.w)+abs(uStructureC.z)+abs(uStructureD.y)+dot(abs(uStructureE.xyz),vec3(1.))+dot(abs(uStructureF.xy),vec2(1.))+dot(abs(uStructureG),vec4(1.))>.000001)?0.:1.-smoothstep(.1,.45,uShape.x)');
 // Thin membranes transmit straight through all visible layers. This shares the
 // current field, palette and lights; it is not a separate surface or preset.
 MODERN_FRAG=MODERN_FRAG.replace('vec4 shade(',`vec4 structureBehind(vec3 first,vec3 rd){
@@ -1665,12 +1691,27 @@ function rootOccupancy(s,geometry,bits){
 }
 export function geometryRadius(s,growthRadius=0){
  if(rootWeight(s)>0&&!growthRadius)growthRadius=rootRadiusBound(s);
- if(['deform','asymmetry','twist','waves','taper','bendX','bendY','lobeAmount','pinch'].some(k=>Math.abs(s[k]||0)>.000001))return Math.max(4.5,cellularBounds(s)*1.2)*structureBounds(s);
  const width=(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55),length=s.petalLength??1.05;
  const flower=.17+(s.petalOpen??.65)*.25+length+width+.15,hedge=.62+(s.petalOpen??.65)*.14+length+width+.2;
  let radius=1.;if((s.petalAmount||0)>.000001){if(rootWeight(s)>.999999)radius=Math.max(radius,growthRadius);else{if((s.petalCoverage||0)<.9999)radius=Math.max(radius,flower);if((s.petalCoverage||0)>.0001)radius=Math.max(radius,hedge,growthRadius);if(rootWeight(s)>0)radius=Math.max(radius,growthRadius);}}
  if((s.stemAmount||0)>.000001)radius=Math.max(radius,s.stemAmount*3+Math.abs(s.stemBend||0)*.55+(s.stemRadius??.09)+.25);
- return (Math.max(radius+.02,cellularBounds(s),fractalBounds(s))+(growthGeometryEnabled(s)?.23:0))*structureBounds(s);
+ radius=Math.max(radius+.02,cellularBounds(s),fractalBounds(s))+(growthGeometryEnabled(s)?.23:0);
+ // A small displacement must not dilute the field into a 4.5-radius atlas.
+ // Bound the inverse deformations in reverse order. Twist preserves length;
+ // waves/noise have bounded amplitude. Retain the conservative legacy bound
+ // for strongly nonlinear warps whose inverse may approach a singularity.
+ const warp=['asymmetry','taper','bendX','bendY','pinch'];
+ if(warp.some(k=>Math.abs(s[k]||0)>.45))return Math.max(4.5,radius*1.2)*structureBounds(s);
+ radius+=Math.abs(s.deform||0)+Math.abs(s.waves||0)*.17+Math.abs(s.lobeAmount||0);
+ const exponent=2+(s.roundness||0)*6;
+ radius*=Math.pow(3,Math.max(0,.5-1/exponent));
+ const original=radius,stretch=1+Math.abs(s.taper||0)*original*.45;
+ const pinching=Math.max(.05,1+Math.min(0,s.pinch||0));
+ const shear=Math.max(.2,1-Math.abs(s.asymmetry||0)*original*.18);
+ radius*=Math.max(1,stretch/pinching/shear);
+ const dy=Math.abs(s.bendY||0)*(radius*radius+.3),y=original+dy;
+ const dx=Math.abs(s.asymmetry||0)*(y*y+.25)+Math.abs(s.bendX||0)*(y*y+.3);
+ return (radius+Math.hypot(dx,dy))*structureBounds(s);
 }
 const CELLULAR_ENABLED=16777216,FRACTAL_ENABLED=33554432,STUDIO_LAYERS=67108864,WEAVE_DETAIL=134217728,FOCUS_DEPTH=268435456,SHELL_FIELD=536870912,FAN_FIELD=1073741824;
 const GROWTH_GEOMETRY=1<<31;
@@ -1716,7 +1757,7 @@ function rendererVariant(s,options={},source=s){
   // optical path once, instead of switching programs at that crossing.
   const transmitting=motionInterval(source,'transparency')[1]>.0001;
   const scattering=(source.scattering||0)+(source.translucency||0)+(source.subsurface||0)>.0001&&transmitting&&source.thinShell<.999;
-  return 8+4096+ATLAS_PREVIEW+(s.thinShell>=.999?16:0)+ +scattering+((s.subsurface||0)>.0001?2:0)+(transmitting?2048:0)+(hasSolidForces(s)?SCULPT_ENABLED:0);
+  return 8+4096+ATLAS_PREVIEW+(s.thinShell>=.999?16:0)+ +scattering+((s.subsurface||0)>.0001?2:0)+(transmitting?2048:0)+(hasSolidForces(s)?SCULPT_ENABLED:0)+(cellular?CELLULAR_ENABLED:0);
  }
  const originalPetals=petals&&rootWeight(s)<.999999;
  return (modern?8+loopVariant(source):0)+(exactFan?SIMPLE_LOOP_FIELD:0)+(modern&&s.thinShell>=.999?16:0)+(modern&&analytic?32:0)+(crown?64:0)+ +volume+((s.subsurface||0)>.0001&&(!modern?transmission<.999:true)?2:0)+((s.dispersion||0)>.005?4:0)
@@ -1752,6 +1793,10 @@ const FILM_TRACE=`bool traceStructurePrimary(vec3 origin,vec3 direction,float ma
 }`;
 function compactFilmOptics(source){
  source=shaderFunction(source,'traceStructurePrimary',FILM_TRACE);
+ // This variant is selected only when the complete animation range excludes
+ // cellular geometry. Do not compile the inactive cellular transport graph.
+ source=source.replace('if(max(uCellOptics.x,uCellOptics.w)>.0001){','if(false){');
+ source=shaderFunction(source,'cellularInterior','vec3 cellularInterior(vec3 p,vec3 ray){return vec3(0.);}');
  // Diffusion through a thin sheet can use its local optical thickness
  // instead of broad occupancy probes that often step over the sheet.
  source=shaderFunction(source,'subsurfaceLight',`vec3 subsurfaceLight(vec3 p,vec3 n,vec3 tint){
@@ -1801,6 +1846,10 @@ function variantSource(key,floatAtlas=false){
  if(key&ATLAS_BAKE)return BAKE_FRAG.replace('#version 300 es','#version 300 es\n'+defines+fields);
  if(key&8)defines+='\n#define TRACE_STEPS '+(key&ATLAS_PREVIEW?128:key&4096?128:224)+'\n#define INTERFACE_STEPS '+(key&ATLAS_PREVIEW?4:key&4096?8:32)+'\n#define LENGTH_SAMPLES '+(key&4096?8:16)+'\n#define SCATTER_SAMPLES '+(key&4096?2:4)+'\n#define SPECTRAL_SAMPLES '+(key&4096?3:5);
  let source=key&ATLAS_PREVIEW?(key&SCULPT_ENABLED?SCULPT_PREVIEW_FRAG:PREVIEW_FRAG):key&8?(key&SCULPT_ENABLED?SCULPT_FRAG:MODERN_FRAG):FRAG;
+ if(key&8&&!(key&CELLULAR_ENABLED)){
+  source=source.replace('if(max(uCellOptics.x,uCellOptics.w)>.0001){','if(false){');
+  source=shaderFunction(source,'cellularInterior','vec3 cellularInterior(vec3 p,vec3 ray){return vec3(0.);}');
+ }
  if(key&ATLAS_PREVIEW&&key&WEAVE_DETAIL&&key&16)source=compactLayerTrace(source);
  if(key&8&&!(key&ATLAS_PREVIEW)){
   if(!(key&LOOP_ENABLED))source=shaderFunction(source,'loopBlend','float loopBlend(float d,vec3 p){return d;}');
@@ -1843,6 +1892,43 @@ uniform float uStudioOpacity;`)
  studioDepth=vec4(focusPacked,hit?1.:0.,1.);fragColor=vec4(0.);return;`);
  return source.replace('#version 300 es','#version 300 es\n'+defines+fields);
 }
+// Geometry and transport can compile separately while sharing the exact field
+// and the same frame uniforms. No cached distance volume is used by this pass.
+export function implicitGeometryKey(source){
+ let key=(bakeVariant(source)&~ATLAS_BAKE)|8|64|65536|loopVariant(source)|Math.round(source.baseForm||0)*131072;
+ if(compactFan(source))key|=SIMPLE_LOOP_FIELD;
+ if(source.thinShell>=.999)key|=16;
+ if(hasSolidForces(source))key|=SCULPT_ENABLED;
+ return key;
+}
+export function implicitGeometrySource(source,{main,floatAtlas=true}={}){
+ const shader=variantSource(implicitGeometryKey(source),floatAtlas);
+ return main?shaderFunction(shader,'main',main):shader;
+}
+const IMPLICIT_MATERIAL_SWITCHES=['textureWrinkles','textureFolds','textureWear','textureRipples','textureRandomness','textureWarp','texturePatch','growthAmount'];
+const materialMayUse=(source,key)=>Math.abs(source[key]||0)>0||source.motions?.[key]?.enabled;
+function implicitMaterialKey(source){return implicitGeometryKey(source)+':'+IMPLICIT_MATERIAL_SWITCHES.map(key=>+!!materialMayUse(source,key)).join('');}
+export function implicitSurfaceSource(source,{accumulate=false}={}){
+ let shader=variantSource(implicitGeometryKey(source)|16|2048);
+ shader=compactFilmOptics(shader);
+ // Compile only the material operators that can run anywhere in this scene's
+ // animation. Enabling one changes this signature before the next frame.
+ for(const [index,key] of ['textureWrinkles','textureFolds','textureWear','textureRipples'].entries())if(!materialMayUse(source,key))shader=shader.replace(`if(uMaterialLayers.${'xyzw'[index]}>.000001){`,'if(false){');
+ if(!['textureRandomness','textureWarp','texturePatch'].some(key=>materialMayUse(source,key)))shader=shader.replace('if(uOrganicDetail.x+uOrganicDetail.y+uOrganicDetail.w>0.){','if(false){');
+ if(!materialMayUse(source,'growthAmount'))shader=shader.replaceAll('if(uGrowthShape.x>0.){','if(false){');
+ if(!['textureWrinkles','textureFolds','textureWear','textureRipples','growthAmount'].some(key=>materialMayUse(source,key)))shader=shader.replace('bool reliefActive=dot(uMaterialLayers,vec4(1.))>.000001||uGrowthShape.x>0.;','bool reliefActive=false;');
+ shader=shader.replace('out vec4 fragColor;','out vec4 fragColor;\n'+IMPLICIT_SURFACE_UNIFORMS);
+ shader=shaderFunction(shader,'structureBehind','vec4 structureBehind(vec3 first,vec3 rd){return implicitBehind;}');
+ if(accumulate){
+  shader=shader.replace('vec4 straight=sceneRay(vec3(p.xy,4.8),rd,unused);','vec4 straight=implicitBehind;');
+  shader=shader.replace('straight.rgb*=beta;','implicitTransmission=beta*transmission;straight.rgb*=beta;');
+  shader=shader.replace('below=below*(vec3(1.)-metalF)+specular*metalF;','implicitTransmission*=vec3(1.)-metalF;below=below*(vec3(1.)-metalF)+specular*metalF;');
+  shader=shader.replace('below=below*(vec3(1.)-filmF)+specular*filmF;','implicitTransmission*=vec3(1.)-filmF;below=below*(vec3(1.)-filmF)+specular*filmF;');
+  shader=shader.replace('below=below*(vec3(1.)-coatF)+environment','implicitTransmission*=vec3(1.)-coatF;below=below*(vec3(1.)-coatF)+environment');
+ }
+ shader=shader.replace('out vec4 fragColor;','layout(location=0) out vec4 fragColor;');
+ return shaderFunction(shader,'main',accumulate?IMPLICIT_ACCUMULATE_MAIN:IMPLICIT_SURFACE_MAIN);
+}
 export class Renderer{
  constructor(canvas){
  this.canvas=canvas;const gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!gl)throw new Error('Questo browser non supporta WebGL 2. Prova un browser aggiornato con accelerazione grafica attiva.');this.gl=gl;this.programs=new Map();this.programClock=0;this.disposed=false;this.parallelExtension=gl.getExtension('KHR_parallel_shader_compile');this.recoveryExtension=gl.getExtension('WEBGL_lose_context');this.vertexShader=this.compileShader(gl.VERTEX_SHADER,VERT);this.timerExtension=gl.getExtension('EXT_disjoint_timer_query_webgl2');this.timerQueries=[];this.gpuMilliseconds=null;this.gpuSample=0;this.completedFrames=0;
@@ -1854,9 +1940,9 @@ export class Renderer{
  endGpuTimer(q){if(!q)return;this.gl.endQuery(this.timerExtension.TIME_ELAPSED_EXT);this.timerQueries.push(q);}
  assertAvailable(){if(this.disposed||this.gl.isContextLost())throw new Error('La grafica è temporaneamente sospesa. La creazione è conservata.');}
  compileShader(type,source){const g=this.gl,shader=g.createShader(type);g.shaderSource(shader,source);g.compileShader(shader);if(!g.getShaderParameter(shader,g.COMPILE_STATUS)){const message=g.getShaderInfoLog(shader);g.deleteShader(shader);throw new Error(message||'Impossibile preparare questo effetto.');}return shader;}
- variant(key){
+ variant(key,sourceCode){
   this.assertAvailable();let v=this.programs.get(key);const g=this.gl;
-  if(!v){const fragment=g.createShader(g.FRAGMENT_SHADER),program=g.createProgram();g.shaderSource(fragment,variantSource(key,!!g.getExtension('EXT_color_buffer_float')));g.compileShader(fragment);g.attachShader(program,this.vertexShader);g.attachShader(program,fragment);g.linkProgram(program);v={program,fragment,ready:false,used:0};this.programs.set(key,v);}
+  if(!v){const fragment=g.createShader(g.FRAGMENT_SHADER),program=g.createProgram();g.shaderSource(fragment,sourceCode??variantSource(key,!!g.getExtension('EXT_color_buffer_float')));g.compileShader(fragment);g.attachShader(program,this.vertexShader);g.attachShader(program,fragment);g.linkProgram(program);v={program,fragment,ready:false,used:0};this.programs.set(key,v);}
   v.used=++this.programClock;
   if(this.programs.size>12){const candidates=[...this.programs].filter(([k,x])=>k!==key&&x.program!==this.program).sort((a,b)=>a[1].used-b[1].used);while(this.programs.size>12&&candidates.length){const [k,x]=candidates.shift();if(x.fragment)g.deleteShader(x.fragment);g.deleteProgram(x.program);this.programs.delete(k);}}
   return v;
@@ -1868,11 +1954,102 @@ export class Renderer{
   for(let i=0;i<count;i++){const u=g.getActiveUniform(v.program,i);v.locations[u.name.replace('[0]','')]=g.getUniformLocation(v.program,u.name);}v.ready=true;
  }
  prepare(source,phase=0,options={}){
+  if(this.canUseImplicit(source,options))return this.prepareImplicit(source,phase,options);
   const growthReady=prepareGrowth(source);
   const frame=sampleFrame(source,phase),key=renderKey(frame,options,source),programs=[this.variant(key)];
   // Prepare the field kernel only when this frame needs procedural geometry.
   if(key&ATLAS_PREVIEW||options.bodyField&&!analyticShape(frame))programs.push(this.variant(bakeVariant(source)));
   let ready=growthReady;for(const v of programs){if(!v.ready&&this.parallelExtension&&!this.gl.getProgramParameter(v.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}this.finishVariant(v);}return ready;
+ }
+ canUseImplicit(source,options={}){
+  const opaque=motionInterval(source,'transparency')[1]===0;
+  return options.exactLayers!==false&&source.renderVersion>=2&&(motionInterval(source,'thinShell')[0]>=.999||opaque)&&
+   (fanVariant(source)||weaveVariant(source)||growthGeometryEnabled(source)||source.thinShell>=.999)&&!cellularMayChange(source)&&!fractalMayChange(source)&&
+   !options.focusDepthOnly&&!options.diagnostic&&!options.normalDiagnostic&&!!this.gl.getExtension('EXT_color_buffer_float');
+ }
+ prepareImplicit(source,phase,options){
+  const key=implicitGeometryKey(source),g=this.gl;
+  if(this.implicitKey!==key){
+   this.implicitHit?.dispose();this.implicitHit=new ImplicitHitPass(g,implicitGeometrySource(source,{main:IMPLICIT_HIT_MAIN}));
+   this.implicitKey=key;
+  }
+  const materialKey=this.implicitMaterialKey=implicitMaterialKey(source);
+  const variants=[['implicit-accum:',true],['implicit-resolve:',false]].map(([prefix,accumulate])=>this.programs.get(prefix+materialKey)||this.variant(prefix+materialKey,implicitSurfaceSource(source,{accumulate})));
+  let ready=this.implicitHit.ready()&&prepareGrowth(source);
+  if(options.bodyField)ready=this.prepareBodyField(source,phase)&&ready;
+  for(const material of variants){if(!material.ready){
+   if(this.parallelExtension&&!g.getProgramParameter(material.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}
+   this.finishVariant(material);}
+  }
+  return ready;
+ }
+ implicitTargets(width,height){
+  const g=this.gl;
+  if(this.implicitBuffers?.width===width&&this.implicitBuffers?.height===height)return this.implicitBuffers.banks;
+  this.disposeImplicitTargets();
+  const banks=[];
+  for(let bank=0;bank<2;bank++){
+   const framebuffer=g.createFramebuffer(),textures=[];g.bindFramebuffer(g.DRAW_FRAMEBUFFER,framebuffer);g.activeTexture(g.TEXTURE0);
+   for(let index=0;index<2;index++){
+    const texture=g.createTexture();g.bindTexture(g.TEXTURE_2D,texture);g.texStorage2D(g.TEXTURE_2D,1,g.RGBA16F,width,height);
+    g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.NEAREST);
+    g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);
+    g.framebufferTexture2D(g.DRAW_FRAMEBUFFER,g.COLOR_ATTACHMENT0+index,g.TEXTURE_2D,texture,0);textures.push(texture);
+   }
+   g.drawBuffers([g.COLOR_ATTACHMENT0,g.COLOR_ATTACHMENT1]);
+   if(g.checkFramebufferStatus(g.DRAW_FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE)throw new Error('Impossibile preparare gli strati trasparenti.');
+   banks.push({framebuffer,textures});
+  }
+  this.implicitBuffers={width,height,banks};return banks;
+ }
+ disposeImplicitTargets(){
+  if(!this.implicitBuffers)return;const g=this.gl;
+  for(const bank of this.implicitBuffers.banks){for(const texture of bank.textures)g.deleteTexture(texture);g.deleteFramebuffer(bank.framebuffer);}
+  this.implicitBuffers=null;
+ }
+ drawImplicit(source,phase,width,height,options={}){
+  if(!this.prepareImplicit(source,phase,options))return false;
+  const s=sampleFrame(source,phase),g=this.gl,key=this.implicitKey;
+  if(!options.keepCanvas&&(this.canvas.width!==width||this.canvas.height!==height)){this.canvas.width=width;this.canvas.height=height;}
+  const target=options.layers?.framebuffer||g.getParameter(g.DRAW_FRAMEBUFFER_BINDING),blend=g.isEnabled(g.BLEND),scissor=g.isEnabled(g.SCISSOR_TEST),dither=g.isEnabled(g.DITHER);
+  const timer=options.preview&&options.trackTiming!==false?this.beginGpuTimer():null;
+  const banks=this.implicitTargets(width,height),bind=(material)=>{
+   g.useProgram(material.program);this.program=material.program;this.locations=material.locations;
+   this.bindFrame(source,s,phase,width,height,options,key|16|2048,false);
+   g.uniform1f(this.locations.uStudioOpacity,options.layerOpacity??1);
+   g.bindVertexArray(null);g.bindBuffer(g.ARRAY_BUFFER,this.buffer);g.enableVertexAttribArray(0);g.vertexAttribPointer(0,2,g.FLOAT,false,0,0);
+  },textures=(bank)=>{
+   for(let i=0;i<2;i++){g.activeTexture(g.TEXTURE5+i);g.bindTexture(g.TEXTURE_2D,bank.textures[i]);g.uniform1i(this.locations[i?'uImplicitThrough':'uImplicitColor'],5+i);}
+  };
+  // Front-to-back transport carries the accumulated radiance and remaining
+  // transmission between batches. Geometry never truncates after four sheets.
+  const batches=s.transparency===0?1:Math.max(4,Math.ceil(((s.structFan||0)>0?(s.structPetalCount||12)+4:16)/4));
+  const sheetScale=s.scale*Math.min(s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ));
+  const featureSize=(s.structFan||0)>0?sheetScale*s.structThickness*.06:(s.structShell||0)>0?sheetScale*s.structThickness*.15:Infinity;
+  let hits=null,last=null;
+  try{
+   g.disable(g.BLEND);g.disable(g.SCISSOR_TEST);g.disable(g.DITHER);
+   for(let batch=0;batch<batches;batch++){
+    hits=this.implicitHit.draw(width,height,{startTexture:hits?.textures[3],maxLayers:s.transparency===0?1:4,budget:1800,safety:.32,epsilon:.000025*s.scale,normalOffset:.00016*s.scale,featureSize,jitter:options.jitter||[0,0],
+     upload:(gl,locations,program)=>{this.program=program;this.locations=locations;this.bindFrame(source,s,phase,width,height,options,key,false);}});
+    if(!hits)return false;
+    const bank=banks[batch%2],previous=banks[1-batch%2];g.bindFramebuffer(g.DRAW_FRAMEBUFFER,bank.framebuffer);g.viewport(0,0,width,height);
+    bind(this.programs.get('implicit-accum:'+this.implicitMaterialKey));textures(previous);g.uniform1f(this.locations.uImplicitContinue,+!!batch);
+    for(let i=0;i<4;i++){g.activeTexture(g.TEXTURE9+i);g.bindTexture(g.TEXTURE_2D,hits.textures[i]);g.uniform1i(this.locations['uImplicitHit'+i],9+i);}
+    g.drawArrays(g.TRIANGLES,0,3);last=bank;
+   }
+   g.bindFramebuffer(g.DRAW_FRAMEBUFFER,target);g.viewport(0,0,width,height);
+   bind(this.programs.get('implicit-resolve:'+this.implicitMaterialKey));textures(last);g.activeTexture(g.TEXTURE0);
+   g[blend?'enable':'disable'](g.BLEND);g[scissor?'enable':'disable'](g.SCISSOR_TEST);g[dither?'enable':'disable'](g.DITHER);
+   g.drawArrays(g.TRIANGLES,0,3);
+   this.exactDepth={texture:last.textures[0],width,height,phase,source};
+  }finally{
+   g.bindFramebuffer(g.DRAW_FRAMEBUFFER,target);g.activeTexture(g.TEXTURE0);
+   g[blend?'enable':'disable'](g.BLEND);g[scissor?'enable':'disable'](g.SCISSOR_TEST);g[dither?'enable':'disable'](g.DITHER);
+   this.endGpuTimer(timer);
+  }
+  if(!options.deferCompletion){if(this.completionSync)g.deleteSync(this.completionSync);this.completionSync=g.fenceSync(g.SYNC_GPU_COMMANDS_COMPLETE,0);g.flush();}
+  return true;
  }
  async prepareAsync(source,phase=0,options={}){
   // Driver compilation is not the video duration or a failed render. Keep a
@@ -1989,7 +2166,10 @@ export class Renderer{
  }
  pollCompletion(){const g=this.gl;if(this.completionSync&&!g.isContextLost()){if(g.getSyncParameter(this.completionSync,g.SYNC_STATUS)===g.SIGNALED){g.deleteSync(this.completionSync);this.completionSync=null;this.completedFrames++;return true;}}return false;}
  async waitForGpu(options={}){const start=Date.now();let polls=0;while(this.completionSync){this.assertAvailable();if(this.pollCompletion())break;if(options.cancelled?.())return false;if(Date.now()-start>120000)throw new Error('Il calcolo richiede troppo tempo. La creazione è conservata.');if(polls++<12&&globalThis.scheduler?.yield)await globalThis.scheduler.yield();else await new Promise(r=>setTimeout(r,4));}return !options.cancelled?.();}
- draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();const s=sampleFrame(source,phase),key=renderKey(s,options,source),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(!options.keepCanvas&&(c.width!==width||c.height!==height)){c.width=width;c.height=height}if(options.layers?.framebuffer)g.bindFramebuffer(g.FRAMEBUFFER,options.layers.framebuffer);g.viewport(0,0,width,height);let analytic=!!(key&32)||analyticShape(s);const timer=options.preview&&options.trackTiming!==false?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW){this.ensurePreviewField(s,options,source,phase);analytic=this.cachedShapeAnalytic;}this.useVariant(key);bindGrowth(g,this.program,s,phase);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(s.renderVersion>=2&&hasSolidForces(s)){uploadSolidForces(this,s);if(hasSolidForces(s))analytic=false;}if(key&512)this.uploadGrowth(s);if(key&32768){this.uploadRoots(s);this.bindRootOccupancy(s,!options.preview&&options.conservativeAtlas!==false);}const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
+ draw(source,phase=0,width=this.canvas.width,height=this.canvas.height,options={}){this.assertAvailable();if(this.canUseImplicit(source,options))return this.drawImplicit(source,phase,width,height,options);const s=sampleFrame(source,phase),key=renderKey(s,options,source),c=this.canvas,g=this.gl;if(options.preview&&!this.prepare(source,phase,options))return false;if(!options.keepCanvas&&(c.width!==width||c.height!==height)){c.width=width;c.height=height}if(options.layers?.framebuffer)g.bindFramebuffer(g.FRAMEBUFFER,options.layers.framebuffer);g.viewport(0,0,width,height);let analytic=!!(key&32)||analyticShape(s);const timer=options.preview&&options.trackTiming!==false?this.beginGpuTimer():null;if(key&ATLAS_PREVIEW){this.ensurePreviewField(s,options,source,phase);analytic=this.cachedShapeAnalytic;}this.useVariant(key);this.bindFrame(source,s,phase,width,height,options,key,analytic);
+ if(options.scissors){for(const rect of options.scissors){g.scissor(...rect);g.drawArrays(g.TRIANGLES,0,3);}}else g.drawArrays(g.TRIANGLES,0,3);
+ this.endGpuTimer(timer);if(!options.deferCompletion){if(this.completionSync)g.deleteSync(this.completionSync);this.completionSync=g.fenceSync(g.SYNC_GPU_COMMANDS_COMPLETE,0);g.flush();}return true;}
+ bindFrame(source,s,phase,width,height,options,key,analytic=false){const g=this.gl;bindGrowth(g,this.program,s,phase);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(s.renderVersion>=2&&hasSolidForces(s)){uploadSolidForces(this,s);if(hasSolidForces(s))analytic=false;}if(key&512)this.uploadGrowth(s);if(key&32768){this.uploadRoots(s);this.bindRootOccupancy(s,!options.preview&&options.conservativeAtlas!==false);}const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
  if(s.renderVersion>=2){uploadCellular(s,g,this.locations,!!(key&CELLULAR_ENABLED));uploadFractal(s,u);u('uBudget',key&ATLAS_PREVIEW?(options.quality==='fast'?[hasSolidForces(s)?384:structureMayChange(source)?512:this.fieldResolution>=96?128:96,3,4,1]:[hasSolidForces(s)?512:structureMayChange(source)?768:128,4,8,2]):key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
  if(s.renderVersion>=2){baseFormUniforms(s,g,this.locations);structureUniforms(s,u,(name,values)=>g.uniform4fv(this.locations[name],values));u('uFilmPattern',[s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5]);u('uFilmAccent',[s.filmChroma||0,s.filmDuo||0]);u('uMaterialDetail',[s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad]);u('uMaterialLayers',[s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0]);u('uOrganicDetail',[s.textureRandomness||0,s.textureWarp||0,s.textureLink||0,s.texturePatch||0]);f('uTextureSeed',s.textureSeed||0);u('uColorLayers',[s.colorLayers||0,s.colorLayerScale??1,s.colorLayerShift||0,s.colorLayerMix??.5]);u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);f('uNormalSamples',6);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,24]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
@@ -2001,10 +2181,11 @@ export class Renderer{
  const palette=s.palette.slice(0,12);const average=palette.map(rgb).reduce((sum,c)=>sum.map((v,i)=>v+c[i]/Math.max(1,palette.length)),[0,0,0]);u('uPaletteMean',average);while(palette.length<12)palette.push(palette[palette.length-1]||'#ffffff');g.uniform3fv(this.locations.uPalette,palette.flatMap(rgb));g.uniform1i(this.locations.uPaletteCount,Math.max(1,Math.min(12,s.palette.length)));
  const active=s.lights.filter(l=>l.enabled).slice(0,8),pos=[],colors=[],props=[],extra=[];const types={circle:0,bar:1,spot:2,diffuser:3,grid:4,ring:5,orb:6};for(let i=0;i<8;i++){const l=active[i];pos.push(...(l?[l.x,l.y,l.z,l.power]:[0,0,0,0]));colors.push(...rgb(l?.color||'#000000'));props.push(...(l?[l.size,l.length,l.roll*rad,types[l.type]??0]:[1,1,0,0]));extra.push(...(l?[l.softness,Math.tan(l.cone*rad),l.grid,+!!l.visible]:[.3,1,4,0]))}g.uniform4fv(this.locations.uLights,pos);g.uniform3fv(this.locations.uLightColors,colors);g.uniform4fv(this.locations.uLightProps,props);g.uniform4fv(this.locations.uLightExtra,extra);g.uniform1i(this.locations.uLightCount,active.length);
  u('uBg',rgb(s.background));u('uBg2',rgb(s.background2));u('uBackdrop',[s.bgHeight??-.65,s.bgSoftness??1.1,s.bgWash??.12,s.bgShade??.06]);f('uBgMode',{solid:0,gradient:1,transparent:2,studio:3}[s.bgMode]??0);f('uBgAngle',s.bgAngle*rad);f('uSeed',(s.seed%1000)*.013);
- if(options.scissors){for(const rect of options.scissors){g.scissor(...rect);g.drawArrays(g.TRIANGLES,0,3);}}else g.drawArrays(g.TRIANGLES,0,3);
- this.endGpuTimer(timer);if(!options.deferCompletion){if(this.completionSync)g.deleteSync(this.completionSync);this.completionSync=g.fenceSync(g.SYNC_GPU_COMMANDS_COMPLETE,0);g.flush();}return true;}
+ }
+
  pixels(){const {gl,canvas}=this,raw=new Uint8Array(canvas.width*canvas.height*4);gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,raw);const flipped=new Uint8Array(raw.length),row=canvas.width*4;for(let y=0;y<canvas.height;y++)flipped.set(raw.subarray(y*row,(y+1)*row),(canvas.height-y-1)*row);return flipped}
 async drawTiled(source,phase,width,height,options={}){
+  if(this.canUseImplicit(source,options)){if(!this.drawImplicit(source,phase,width,height,options))return false;return await this.waitForGpu(options);}
   const g=this.gl,key=renderKey(sampleFrame(source,phase),options,source);
   const roots=!!(key&32768),volume=(source.scattering||0)+(source.translucency||0)+(source.subsurface||0)>.0001;
   const software=this.hardwareInfo().software;
@@ -2073,7 +2254,7 @@ async drawTiled(source,phase,width,height,options={}){
    const batch=!options.forceTiled&&(!this.hardwareInfo().software)&&(key&32)&&!(key&2048)&&samples<=4&&width*height<=2400000;
    for(let n=0;n<samples;n++){
     if(options.cancelled?.())return false;
-    const settings={jitter:jitterSample(n),accumulate:true,weight:1/samples,preview:options.preview,alphaPreview:options.alphaPreview,quality:options.quality,cancelled:options.cancelled,tileSize:options.tileSize,forceTiled:options.forceTiled,trackTiming:options.trackTiming,adaptiveTiles:options.adaptiveTiles,conservativeAtlas:options.conservativeAtlas,compactStructure:options.compactStructure,layerOpacity:options.layerOpacity,tileProgress:f=>options.progress?.((n+f)/samples)};
+    const settings={exactLayers:options.exactLayers,jitter:jitterSample(n),accumulate:true,weight:1/samples,preview:options.preview,alphaPreview:options.alphaPreview,quality:options.quality,cancelled:options.cancelled,tileSize:options.tileSize,forceTiled:options.forceTiled,trackTiming:options.trackTiming,adaptiveTiles:options.adaptiveTiles,conservativeAtlas:options.conservativeAtlas,compactStructure:options.compactStructure,layerOpacity:options.layerOpacity,tileProgress:f=>options.progress?.((n+f)/samples)};
     const ok=batch?this.draw(stable,phase,width,height,{...settings,deferCompletion:true}):await this.drawTiled(stable,phase,width,height,settings);
     if(!ok)return false;
     options.progress?.((n+1)/samples);
@@ -2091,9 +2272,10 @@ async drawTiled(source,phase,width,height,options={}){
   if(this.completionSync&&!this.pollCompletion())return false;
   const g=this.gl;g.bindFramebuffer(g.FRAMEBUFFER,null);g.disable(g.BLEND);g.disable(g.SCISSOR_TEST);
   if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);this.accumulation=null;}
+  this.disposeImplicitTargets();this.implicitHit?.releaseTargets?.();this.exactDepth=null;
   this.canvas.width=1;this.canvas.height=1;g.viewport(0,0,1,1);return true;
  }
- dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}disposeGrowth(g);for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.sculptTexture)g.deleteTexture(this.sculptTexture);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.rootTexture)g.deleteTexture(this.rootTexture);if(this.rootOccupancyTexture)g.deleteTexture(this.rootOccupancyTexture);if(this.fieldTexture)g.deleteTexture(this.fieldTexture);if(this.fieldFramebuffer)g.deleteFramebuffer(this.fieldFramebuffer);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
+ dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}this.implicitHit?.dispose();this.disposeImplicitTargets();disposeGrowth(g);for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.sculptTexture)g.deleteTexture(this.sculptTexture);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.rootTexture)g.deleteTexture(this.rootTexture);if(this.rootOccupancyTexture)g.deleteTexture(this.rootOccupancyTexture);if(this.fieldTexture)g.deleteTexture(this.fieldTexture);if(this.fieldFramebuffer)g.deleteFramebuffer(this.fieldFramebuffer);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
 }
 // Included verbatim in exported HTML: no imports, network or application state.
 export function startWallpaper(canvas,source){

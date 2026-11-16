@@ -1,9 +1,9 @@
 const dependencies=[
- './vendor/xpbd/distance.js?v=0049c9863913','./dynamics.js?v=0049c9863913','./animation-clock.js?v=0049c9863913','./growth-material.js?v=0049c9863913',
- './particle-paths.js?v=0049c9863913','./solid-forces.js?v=0049c9863913','./base-forms.js?v=0049c9863913','./filament-model.js?v=0049c9863913',
- './cellular-form.js?v=0049c9863913','./fractal-form.js?v=0049c9863913','./structure-model.js?v=0049c9863913','./solid-renderer.js?v=0049c9863913',
- './finishing.js?v=0049c9863913','./finish-scanlines.js?v=0049c9863913','./particle-optics.js?v=0049c9863913','./particle-shading.js?v=0049c9863913',
- './filament-renderer.js?v=0049c9863913','./body-composite.js?v=0049c9863913','./body-layers.js?v=0049c9863913','./renderer.js?v=0049c9863913'
+ './vendor/xpbd/distance.js?v=a55ab48fe9e6','./dynamics.js?v=a55ab48fe9e6','./animation-clock.js?v=a55ab48fe9e6','./growth-material.js?v=a55ab48fe9e6',
+ './particle-paths.js?v=a55ab48fe9e6','./solid-forces.js?v=a55ab48fe9e6','./base-forms.js?v=a55ab48fe9e6','./filament-model.js?v=a55ab48fe9e6',
+ './cellular-form.js?v=a55ab48fe9e6','./fractal-form.js?v=a55ab48fe9e6','./structure-model.js?v=a55ab48fe9e6','./implicit-hit-pass.js?v=a55ab48fe9e6','./implicit-surface-pass.js?v=a55ab48fe9e6','./solid-renderer.js?v=a55ab48fe9e6',
+ './finishing.js?v=a55ab48fe9e6','./finish-scanlines.js?v=a55ab48fe9e6','./particle-optics.js?v=a55ab48fe9e6','./particle-shading.js?v=a55ab48fe9e6',
+ './filament-renderer.js?v=a55ab48fe9e6','./body-composite.js?v=a55ab48fe9e6','./body-layers.js?v=a55ab48fe9e6','./renderer.js?v=a55ab48fe9e6'
 ];
 const withoutImports=source=>source.replace(/^import .*;$/gm,'');
 const isolated=(names,source)=>`const {${names}}=(()=>{${source.replace(/^export /gm,'')}\nreturn {${names}};})();`;
@@ -14,14 +14,14 @@ export async function createWallpaper(snapshot){
   if(!response.ok)throw Error('Impossibile preparare il wallpaper.');
   return withoutImports(await response.text());
  }));
- const [distance,dynamics,clock,growth,paths,forces,forms,filaments,cellular,fractal,structure,solid,
+ const [distance,dynamics,clock,growth,paths,forces,forms,filaments,cellular,fractal,structure,implicitHit,implicitSurface,solid,
   finishing,scanlines,optics,shading,filamentPass,bodyComposite,bodyLayers,renderer]=parts;
  const source=[
   isolated('Dynamics,DYNAMICS_GLSL,bindDynamics,disposeDynamics',distance+'\n'+dynamics),clock,growth,
   isolated('samplePath',paths),forces,forms,filaments,
   isolated('CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular',cellular),
   isolated('FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal',fractal),structure,
-  solid.replace('export class Renderer','export class SolidRenderer'),finishing,
+  implicitHit,implicitSurface,solid.replace('export class Renderer','export class SolidRenderer'),finishing,
   isolated('ScanlinePass',scanlines),isolated('opticalGLSL',optics),shading,isolated('FilamentPass',filamentPass),
   bodyComposite,bodyLayers,renderer.replace(/^export \{fieldAt,sampleFrame\}.*;$/gm,'')
  ].join('\n');
