@@ -1,4 +1,4 @@
-import {PALETTE_DEFAULTS,PALETTE_META} from './finish-palette.js?v=d35f7f15a5e5';
+import {PALETTE_DEFAULTS,PALETTE_META} from './finish-palette.js?v=5df1bbb9094d';
 // One final image pass, after the complete frame (including tiled/accumulated exports).
 export const FINISH_DEFAULTS={finishEnabled:true,finishTone:true,finishRgb:false,finishMosaic:false,finishCompare:false,finishRgbR:8,finishRgbG:0,finishRgbB:-8,finishRgbAngle:0,finishRgbMix:1,finishCellX:12,finishCellY:12,finishMosaicMix:1};
 export const FINISH_META={finishRgbR:['Spostamento rosso',-60,60,.1],finishRgbG:['Spostamento verde',-60,60,.1],finishRgbB:['Spostamento blu',-60,60,.1],finishRgbAngle:['Direzione RGB',-180,180,1],finishRgbMix:['Intensità RGB',0,1,.01],finishCellX:['Larghezza celle',1,160,1],finishCellY:['Altezza celle',1,160,1],finishMosaicMix:['Intensità mosaico',0,1,.01]};
@@ -180,8 +180,8 @@ vec2 p=(fract(pixel/uCell)-.5-vec2(glyphHash(cell+31.)-.5,glyphHash(cell+41.)-.5
 float angle=(glyphHash(cell+8.)*2.-1.)*uLayout.y;p=mat2(cos(angle),-sin(angle),sin(angle),cos(angle))*p+.5;
 vec2 q=p-.5;float mask=0.;
 if(uStyle==0){float index=mix(density,animated,uRandom.x)*(uCount-1.),i=floor(index),f=fract(index);float width=max(.001,uSoft*.58);float blend=mix(smoothstep(.5-width,.5+width,f),f,min(1.,uSoft*.72));mask=mix(glyph(i,p,font),glyph(i+1.,p,font),blend);}
-else if(uStyle==1){float halfLength=.43*sqrt(density);float d=min(abs(q.x-q.y),abs(q.x+q.y))*.707107;float aa=max(.004,fwidth(q.x));mask=(1.-smoothstep(.025,.025+aa,d))*(1.-smoothstep(halfLength-aa,halfLength,max(abs(q.x),abs(q.y))));}
-else {float radius=.46*sqrt(density),aa=max(.004,fwidth(q.x));mask=1.-smoothstep(max(0.,radius-aa),radius+aa,length(q));}
+else if(uStyle==1){float halfLength=.43*sqrt(density);float d=min(abs(q.x-q.y),abs(q.x+q.y))*.707107;float aa=max(.004,(abs(cos(angle))+abs(sin(angle)))/max(.0001,uCell*size));mask=(1.-smoothstep(.025,.025+aa,d))*(1.-smoothstep(halfLength-aa,halfLength,max(abs(q.x),abs(q.y))));}
+else {float radius=.46*sqrt(density),aa=max(.004,1./max(.0001,uCell*size));mask=1.-smoothstep(max(0.,radius-aa),radius+aa,length(q));}
 mask*=smoothstep(0.,.025,density);vec3 ink=mix(uInk,sampleColor.rgb,uSource);float alpha=clamp(mask*sampleColor.a,0.,1.);color=vec4(ink*alpha,alpha);}`;
 const GLYPH_BLUR=`#version 300 es
 precision highp float;uniform sampler2D uImage;uniform vec2 uStep;uniform vec2 uSize;out vec4 color;

@@ -86,7 +86,7 @@ float fanTransportField(float base,vec3 p){
 export const INDEPENDENT_FAN_HIT_MAIN=`
 uniform vec4 uHitBudget;
 uniform vec2 uHitJitter;
-uniform sampler2D uHitPrevious;
+uniform sampler2D uHitPrevious,uHitThrough;
 uniform float uHitContinue;
 uniform int uHitCount;
 layout(location=1) out vec4 hitLayer1;
@@ -99,13 +99,18 @@ void main(){
  vec3 origin=vec3(uv,4.8),direction=vec3(0.,0.,-1.);
  vec2 interval=objectInterval(origin,direction);
  float t=max(0.,interval.x),end=min(40.,interval.y),epsilon=uHitBudget.z;
- float previousT=t,previousD=0.,a=t,b=t,da=0.,db=0.,hitT=t,hitD=0.,rejectUntil=-1.,closest=10.;
+ float previousT=t,previousD=0.,a=t,b=t,da=0.,db=0.,hitT=t,hitD=0.,rejectUntil=-1.,closest=10.,lastAccepted=-1.;
  fanQuery=-1;fanNearestId=-1;fanInsideMask=0u;fanIgnoreMask=0u;fanBoundaryEpsilon=epsilon;
- if(uHitContinue>.5){vec4 continuation=texelFetch(uHitPrevious,ivec2(gl_FragCoord.xy),0);float last=continuation.w;fanInsideMask=uint(continuation.z+.5);if(last<0.)t=end+1.;else t=max(t,last);}
+ if(uHitContinue>.5){
+  vec4 continuation=texelFetch(uHitPrevious,ivec2(gl_FragCoord.xy),0);fanInsideMask=uint(continuation.z+.5);
+  if(continuation.w<=-100.){t=max(t,continuation.y);lastAccepted=continuation.x>=0.?continuation.x:-1.;closest=continuation.x<0.?max(0.,-continuation.x-1.):0.;fanIgnoreMask=uint(round(-continuation.w-100.));}
+  else if(continuation.w<0.)t=end+1.;else{t=max(t,continuation.w);lastAccepted=continuation.w;}
+ }
+ if(uHitContinue>.5){vec3 through=texelFetch(uHitThrough,ivec2(gl_FragCoord.xy),0).rgb;if(max(max(through.r,through.g),through.b)<.001)t=end+1.;}
  vec3 samplePoint=origin+direction*t,gradient=vec3(0.),entryNormal=vec3(0.,0.,1.);
  int mode=0,refinement=0,normalSample=0,layer=0,previousComponent=-1,hitComponent=-1;
  bool previousValid=false;
- for(int step=0;step<int(uHitBudget.x);step++){
+ for(int step=0;step<int(uHitBudget.x)||mode!=0;step++){
   if(t>end||layer>=uHitCount)break;
   fanQuery=mode==0?-1:hitComponent;float distance=field(samplePoint);int component=fanNearestId;
   if(mode==0){
@@ -148,12 +153,18 @@ void main(){
   }else{
    // Confirm the interior of this component, then retain its mask until its
    // exit. Return to the exact entry depth so coincident leaves are retained.
-   if(distance<-epsilon*.1){fanInsideMask|=1u<<uint(hitComponent);vec3 oct=entryNormal/(abs(entryNormal.x)+abs(entryNormal.y)+abs(entryNormal.z));hits[layer]=vec4(2.*float(hitComponent)+.5*(oct.x+1.),oct.y,float(fanInsideMask),hitT);layer++;}else fanIgnoreMask|=1u<<uint(hitComponent);
+   if(distance<-epsilon*.1){fanInsideMask|=1u<<uint(hitComponent);vec3 oct=entryNormal/(abs(entryNormal.x)+abs(entryNormal.y)+abs(entryNormal.z));hits[layer]=vec4(2.*float(hitComponent)+.5*(oct.x+1.),oct.y,float(fanInsideMask),hitT);lastAccepted=hitT;layer++;}else fanIgnoreMask|=1u<<uint(hitComponent);
    t=hitT;
    rejectUntil=t+epsilon*3.;previousValid=false;mode=0;samplePoint=origin+direction*t;
   }
  }
- if(hits[0].w<0.)hits[0].w=-1.-closest;
+ // An exhausted query is resumable, not an empty ray. Ordinary misses
+ // retain their existing representation; the sentinel has a disjoint range.
+ if(t<=end&&layer<uHitCount){
+  float resumeT=previousValid?previousT:t;
+  for(int i=layer;i<4;i++)hits[i]=vec4(lastAccepted>=0.?lastAccepted:-1.-closest,resumeT,float(fanInsideMask),-100.-float(fanIgnoreMask));
+ }
+ if(hits[0].w<0.&&hits[0].w>-100.)hits[0].w=-1.-closest;
  fragColor=hits[0];hitLayer1=hits[1];hitLayer2=hits[2];hitLayer3=hits[3];
 }
 `;
@@ -167,7 +178,12 @@ void main(){
  ivec2 pixel=ivec2(gl_FragCoord.xy);vec4 first=implicitLayer(0,pixel);
  vec4 color=uImplicitContinue>.5?texelFetch(uImplicitColor,pixel,0):vec4(0.,0.,0.,first.w);
  vec4 through=uImplicitContinue>.5?texelFetch(uImplicitThrough,pixel,0):vec4(1.,1.,1.,first.w>=0.?1.:0.);
- float lastDepth=uImplicitContinue>.5?texelFetch(uImplicitPreviousHit,pixel,0).w:-1.;
+ vec4 previousHit=uImplicitContinue>.5?texelFetch(uImplicitPreviousHit,pixel,0):vec4(0.,0.,0.,-1.);
+ float lastDepth=previousHit.w<=-100.?max(-1.,previousHit.x):previousHit.w;
+ if(through.a<.5){
+  if(first.w>=0.){color.a=first.w;through.a=1.;}
+  else color.a=max(color.a,first.w<=-100.?min(-1.,first.x):first.w);
+ }
  for(int layer=0;layer<int(min(4.,uRuntime.w*.25));layer++){
   vec4 intersection=implicitLayer(layer,pixel);if(intersection.w<0.||max(max(through.r,through.g),through.b)<.001)break;
   fanSurfaceId=int(floor(intersection.x*.5));

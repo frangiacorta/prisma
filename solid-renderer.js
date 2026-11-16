@@ -1,12 +1,13 @@
-import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=d35f7f15a5e5';
-import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=d35f7f15a5e5';
-import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=d35f7f15a5e5';
-import {ImplicitHitPass,IMPLICIT_HIT_MAIN} from './implicit-hit-pass.js?v=d35f7f15a5e5';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=d35f7f15a5e5';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=d35f7f15a5e5';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=d35f7f15a5e5';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=d35f7f15a5e5';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=d35f7f15a5e5';
+import {ImplicitRayStatus} from './implicit-ray-status.js?v=5df1bbb9094d';
+import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=5df1bbb9094d';
+import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=5df1bbb9094d';
+import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=5df1bbb9094d';
+import {ImplicitHitPass,IMPLICIT_HIT_MAIN} from './implicit-hit-pass.js?v=5df1bbb9094d';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=5df1bbb9094d';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=5df1bbb9094d';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=5df1bbb9094d';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=5df1bbb9094d';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=5df1bbb9094d';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -284,7 +285,7 @@ void main(){
  float flatGeometry=1.-smoothstep(.1,.45,uShape.x),flatBlend=flatGeometry*(1.-uSurface.z)*(1.-uMat.x);
  if(flatGeometry>.001){float normalization=max(.025,min(min(uShape.y,uShape.z),uShape.x*uShape.w)*uFrame.x*.5),flatD=field(vec3(uv,0.))/normalization;float flatAlpha=1.-smoothstep(-max(.008,uCut.w*1.6),max(.008,uCut.w*1.6),flatD);vec3 p=transform(vec3(uv,0.));vec3 flatColor=palette(dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*uGradient.y*.3+uGradient.z);surface.rgb=mix(surface.rgb,flatColor,flatBlend);coverage=mix(coverage,flatAlpha,flatGeometry);halo*=1.-flatGeometry;}
  if(hit){vec4 foreground=sceneEmitters(origin,direction,distance,unused);surface.rgb=surface.rgb*(1.-foreground.a)+foreground.rgb;surface.a=surface.a*(1.-foreground.a)+foreground.a;}
- coverage*=uFilCore;vec3 glow=palette(atan(uv.y,uv.x)/(2.*PI)+.5)*halo,linear=mix(back.rgb,surface.rgb,coverage)+glow;float alpha=clamp(mix(back.a,surface.a,coverage)+halo,0.,1.);float grain=(hash(floor(gl_FragCoord.xy/max(.5,uPhoto3.z))+uSeed)-.5)*uFrame.w;
+ coverage*=uFilCore;halo*=uFilCore;vec3 glow=palette(atan(uv.y,uv.x)/(2.*PI)+.5)*halo,linear=mix(back.rgb,surface.rgb,coverage)+glow;float alpha=clamp(mix(back.a,surface.a,coverage)+halo,0.,1.);float grain=(hash(floor(gl_FragCoord.xy/max(.5,uPhoto3.z))+uSeed)-.5)*uFrame.w;
  if(uRuntime.z>1.5){fragColor=vec4(normal*.5+.5,hit?1.:0.);return;}
  if(uRuntime.z>.5){fragColor=vec4(issue,hit?1.:0.,0.,1.);return;}
  if(transparentExport()){
@@ -1936,7 +1937,7 @@ export function implicitGeometryKey(source){
  if(hasSolidForces(source))key|=SCULPT_ENABLED;
  return key;
 }
-function independentFanMode(source){return !!fanVariant(source);}
+export function independentFanMode(source){return !!fanVariant(source);}
 function independentFanCompact(source){return compactFan(source)&&!['structShell','structRadial'].some(key=>materialMayUse(source,key));}
 export function implicitGeometrySource(source,{main,floatAtlas=true,independentFan=false}={}){
  let shader=variantSource(implicitGeometryKey(source),floatAtlas);
@@ -2026,7 +2027,8 @@ export class Renderer{
   }
   const materialKey=this.implicitMaterialKey=implicitMaterialKey(source);
   const variants=[['implicit-accum:',true],['implicit-resolve:',false]].map(([prefix,accumulate])=>this.programs.get(prefix+materialKey)||this.variant(prefix+materialKey,implicitSurfaceSource(source,{accumulate,independentFan})));
-  let ready=this.implicitHit.ready()&&prepareGrowth(source);
+  if(independentFan)this.implicitRayStatus??=new ImplicitRayStatus(g);
+  let ready=this.implicitHit.ready()&&prepareGrowth(source)&&(!independentFan||this.implicitRayStatus.prepare());
   if(options.bodyField)ready=this.prepareBodyField(source,phase)&&ready;
   for(const material of variants){if(!material.ready){
    if(this.parallelExtension&&!g.getProgramParameter(material.program,this.parallelExtension.COMPLETION_STATUS_KHR)){ready=false;continue;}
@@ -2059,6 +2061,14 @@ export class Renderer{
   this.implicitBuffers=null;
  }
  drawImplicit(source,phase,width,height,options={}){
+  const steps=this.drawImplicitSteps(source,phase,width,height,options);let step;
+  try{step=steps.next();while(!step.done){const q=step.value,start=performance.now(),pending=this.implicitRayStatus.pendingSync(q.hit,q.through,width,height);this.implicitStatusReadbackMs+=performance.now()-start;step=steps.next(pending);}return step.value;}finally{if(!step?.done)steps.return();}
+ }
+ async drawImplicitAsync(source,phase,width,height,options={}){
+  const steps=this.drawImplicitSteps(source,phase,width,height,options);let step;
+  try{step=steps.next();while(!step.done){const q=step.value,check=q.singleEntry||(q.batch+1)%4===0,pending=check?await this.implicitRayStatus.pendingAsync(q.hit,q.through,q.framebuffer,width,height,options):true;if(pending===null)return false;step=steps.next(pending);}return step.value;}finally{if(!step?.done)steps.return();}
+ }
+ *drawImplicitSteps(source,phase,width,height,options={}){
   if(!this.prepareImplicit(source,phase,options))return false;
   const s=sampleFrame(source,phase),g=this.gl,key=this.implicitKey;
   if(!options.keepCanvas&&(this.canvas.width!==width||this.canvas.height!==height)){this.canvas.width=width;this.canvas.height=height;}
@@ -2075,7 +2085,8 @@ export class Renderer{
   // Front-to-back transport carries the accumulated radiance and remaining
   // transmission between batches. Geometry never truncates after four sheets.
   const singleEntry=cellSurfaceMode(source)||s.transparency===0;
-  const batches=singleEntry?1:Math.max(4,Math.ceil(((s.structFan||0)>0?2*((s.structPetalCount||12)+2):16)/4));
+  const independent=independentFanMode(source),batches=independent?256:singleEntry?1:Math.max(4,Math.ceil(((s.structFan||0)>0?2*((s.structPetalCount||12)+2):16)/4));
+  const continuationStarted=performance.now();this.implicitContinuationStats=[];this.implicitStatusReadbackMs=0;
   const sheetScale=s.scale*Math.min(s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ));
   const featureSize=(s.structFan||0)>0?sheetScale*s.structThickness*.06:(s.structShell||0)>0?sheetScale*s.structThickness*.15:(s.petalAmount||0)>0?sheetScale*Math.max(.0015,(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55)*(1-(s.petalSharp||0)*.58)*(.9*(1-(s.petalSharp||0))+.008*(s.petalSharp||0)))*.5:Infinity;
   let hits=null,last=null;
@@ -2084,13 +2095,14 @@ export class Renderer{
    for(let batch=0;batch<batches;batch++){
     const previousHit=hits?.textures[3]||null;
     hits=this.implicitHit.draw(width,height,{startTexture:previousHit,maxLayers:singleEntry?1:4,budget:1800,safety:.32,epsilon:.000025*s.scale,normalOffset:growthNormalOffset(s),featureSize,jitter:options.jitter||[0,0],
-     upload:(gl,locations,program)=>{this.program=program;this.locations=locations;this.bindFrame(source,s,phase,width,height,options,key,false);}});
+     upload:(gl,locations,program)=>{this.program=program;this.locations=locations;this.bindFrame(source,s,phase,width,height,options,key,false);if(independent){gl.activeTexture(gl.TEXTURE14);gl.bindTexture(gl.TEXTURE_2D,last?.textures[1]||banks[0].textures[1]);gl.uniform1i(locations.uHitThrough,14);}}});
     if(!hits)return false;
     const bank=banks[batch%2],previous=banks[1-batch%2];g.bindFramebuffer(g.DRAW_FRAMEBUFFER,bank.framebuffer);g.viewport(0,0,width,height);
     bind(this.programs.get('implicit-accum:'+this.implicitMaterialKey));textures(previous);g.uniform1f(this.locations.uImplicitContinue,+!!batch);
     if(independentFanMode(source)){g.activeTexture(g.TEXTURE13);g.bindTexture(g.TEXTURE_2D,previousHit||this.implicitHit.emptyTexture);g.uniform1i(this.locations.uImplicitPreviousHit,13);}
     for(let i=0;i<4;i++){g.activeTexture(g.TEXTURE9+i);g.bindTexture(g.TEXTURE_2D,hits.textures[i]);g.uniform1i(this.locations['uImplicitHit'+i],9+i);}
     g.drawArrays(g.TRIANGLES,0,3);last=bank;
+    if(independent){const pending=yield{hit:hits.textures[3],through:bank.textures[1],framebuffer:previous.framebuffer,batch,singleEntry};this.implicitContinuationStats.push({batch,pending,elapsed:performance.now()-continuationStarted});if(!pending)break;if(options.cancelled?.())return false;if(batch===batches-1||performance.now()-continuationStarted>90000)throw Error('Il calcolo delle pieghe non è ancora completo. La creazione è conservata.');}
    }
    g.bindFramebuffer(g.DRAW_FRAMEBUFFER,target);g.viewport(0,0,width,height);
    bind(this.programs.get('implicit-resolve:'+this.implicitMaterialKey));textures(last);g.activeTexture(g.TEXTURE0);
@@ -2239,7 +2251,7 @@ export class Renderer{
 
  pixels(){const {gl,canvas}=this,raw=new Uint8Array(canvas.width*canvas.height*4);gl.readPixels(0,0,canvas.width,canvas.height,gl.RGBA,gl.UNSIGNED_BYTE,raw);const flipped=new Uint8Array(raw.length),row=canvas.width*4;for(let y=0;y<canvas.height;y++)flipped.set(raw.subarray(y*row,(y+1)*row),(canvas.height-y-1)*row);return flipped}
 async drawTiled(source,phase,width,height,options={}){
-  if(this.canUseImplicit(source,options)){if(!this.drawImplicit(source,phase,width,height,options))return false;return await this.waitForGpu(options);}
+  if(this.canUseImplicit(source,options)){if(!await this.drawImplicitAsync(source,phase,width,height,options))return false;return await this.waitForGpu(options);}
   const g=this.gl,key=renderKey(sampleFrame(source,phase),options,source);
   const roots=!!(key&32768),volume=(source.scattering||0)+(source.translucency||0)+(source.subsurface||0)>.0001;
   const software=this.hardwareInfo().software;
@@ -2305,7 +2317,7 @@ async drawTiled(source,phase,width,height,options={}){
    const stable={...source,grain:0},key=renderKey(sampleFrame(stable,phase),options,source);
    // Submit inexpensive samples together. Long optical and root passes retain
    // the tiled path so a cancelled export can give up before another tile.
-   const batch=!options.forceTiled&&(!this.hardwareInfo().software)&&(key&32)&&!(key&2048)&&samples<=4&&width*height<=2400000;
+   const batch=!this.canUseImplicit(source,options)&&!options.forceTiled&&(!this.hardwareInfo().software)&&(key&32)&&!(key&2048)&&samples<=4&&width*height<=2400000;
    for(let n=0;n<samples;n++){
     if(options.cancelled?.())return false;
     const settings={exactLayers:options.exactLayers,jitter:jitterSample(n),accumulate:true,weight:1/samples,preview:options.preview,alphaPreview:options.alphaPreview,quality:options.quality,cancelled:options.cancelled,tileSize:options.tileSize,forceTiled:options.forceTiled,trackTiming:options.trackTiming,adaptiveTiles:options.adaptiveTiles,conservativeAtlas:options.conservativeAtlas,compactStructure:options.compactStructure,layerOpacity:options.layerOpacity,tileProgress:f=>options.progress?.((n+f)/samples)};
@@ -2326,10 +2338,10 @@ async drawTiled(source,phase,width,height,options={}){
   if(this.completionSync&&!this.pollCompletion())return false;
   const g=this.gl;g.bindFramebuffer(g.FRAMEBUFFER,null);g.disable(g.BLEND);g.disable(g.SCISSOR_TEST);
   if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);this.accumulation=null;}
-  this.disposeImplicitTargets();this.implicitHit?.releaseTargets?.();this.exactDepth=null;
+  this.disposeImplicitTargets();this.implicitHit?.releaseTargets?.();this.implicitRayStatus?.releaseTargets();this.exactDepth=null;
   this.canvas.width=1;this.canvas.height=1;g.viewport(0,0,1,1);return true;
  }
- dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}this.implicitHit?.dispose();this.disposeImplicitTargets();disposeGrowth(g);for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.sculptTexture)g.deleteTexture(this.sculptTexture);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.rootTexture)g.deleteTexture(this.rootTexture);if(this.rootOccupancyTexture)g.deleteTexture(this.rootOccupancyTexture);if(this.fieldTexture)g.deleteTexture(this.fieldTexture);if(this.fieldFramebuffer)g.deleteFramebuffer(this.fieldFramebuffer);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
+ dispose({loseContext=true}={}){if(this.disposed)return;this.disposed=true;this.canvas.removeEventListener('webglcontextlost',this.onContextLost);const g=this.gl;if(this.contextWasLost||g.isContextLost()){this.timerQueries=[];this.programs.clear();return;}this.implicitHit?.dispose();this.implicitRayStatus?.dispose();this.disposeImplicitTargets();disposeGrowth(g);for(const q of this.timerQueries)g.deleteQuery(q);this.timerQueries=[];if(this.completionSync)g.deleteSync(this.completionSync);if(this.sculptTexture)g.deleteTexture(this.sculptTexture);if(this.growthTexture)g.deleteTexture(this.growthTexture);if(this.rootTexture)g.deleteTexture(this.rootTexture);if(this.rootOccupancyTexture)g.deleteTexture(this.rootOccupancyTexture);if(this.fieldTexture)g.deleteTexture(this.fieldTexture);if(this.fieldFramebuffer)g.deleteFramebuffer(this.fieldFramebuffer);if(this.accumulation){g.deleteTexture(this.accumulation.texture);g.deleteFramebuffer(this.accumulation.framebuffer);}if(this.resolveProgram)g.deleteProgram(this.resolveProgram);g.deleteBuffer(this.buffer);for(const {program,fragment} of this.programs.values()){if(fragment)g.deleteShader(fragment);g.deleteProgram(program);}this.programs.clear();g.deleteShader(this.vertexShader);if(loseContext)this.recoveryExtension?.loseContext();}
 }
 // Included verbatim in exported HTML: no imports, network or application state.
 export function startWallpaper(canvas,source,RendererClass=Renderer){

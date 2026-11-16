@@ -1,9 +1,9 @@
-import {Renderer} from './renderer.js?v=d35f7f15a5e5';
-import {FlowDirector} from './playground-flow.js?v=d35f7f15a5e5';
-import {PlaygroundMixer} from './playground-mixer.js?v=d35f7f15a5e5';
-import {normalizeCreation} from './creative-model.js?v=d35f7f15a5e5';
-import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=d35f7f15a5e5';
-import {filterOverlay,mutationBetween} from './playground-performance.js?v=d35f7f15a5e5';
+import {Renderer} from './renderer.js?v=5df1bbb9094d';
+import {FlowDirector} from './playground-flow.js?v=5df1bbb9094d';
+import {PlaygroundMixer} from './playground-mixer.js?v=5df1bbb9094d';
+import {normalizeCreation} from './creative-model.js?v=5df1bbb9094d';
+import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=5df1bbb9094d';
+import {filterOverlay,mutationBetween} from './playground-performance.js?v=5df1bbb9094d';
 
 export class PlaygroundEngine{
  constructor(canvas,config,notify=()=>{}){
@@ -49,7 +49,7 @@ export class PlaygroundEngine{
  nextBeat(){return this.clock+(1-this.beats%1)*60/this.config.bpm;}
  async startAudio(file,host){
   const token=this.audioRevision=(this.audioRevision||0)+1;
-  const {OrbAudioInput}=await import('./vendor/orb/orb-audio.js?v=d35f7f15a5e5');
+  const {OrbAudioInput}=await import('./vendor/orb/orb-audio.js?v=5df1bbb9094d');
   if(this.closed||token!==this.audioRevision)return false;
   this.audio??=new OrbAudioInput();
   this.audio.attack=.055;this.audio.release=.2;
@@ -110,7 +110,7 @@ export class PlaygroundEngine{
   d.mutation={...values,start:Infinity,waiting:middle?[middle,target]:[target],seconds:transitionSeconds(this.config),position:0,requested:this.clock};
   this.notify('change',id);return true;
  }
- mutationPosition(id,value,manual=true){
+ mutationPosition(id,value,manual=true){if(manual)this.decks[id]?.renderer.cancelCooperative();
   const d=this.decks[id],job=d?.mutation;if(!job)return false;
   const t=clamp(value);job.position=t;
   if(manual){job.start=Infinity;job.waiting=[];job.fallback=false;this.mixer.variantMix[id==='A'?0:1]=1;}
@@ -134,7 +134,7 @@ export class PlaygroundEngine{
   }catch(e){if(!cancelled()){this.pending[id]=false;this.notify('error',id,e.message);}return false;}
   finally{if(!cancelled())this.pending[id]=false;if(r&&this.decks[id]?.renderer!==r)r.dispose();}
  }
- refresh(id){const d=this.decks[id];if(!d)return;d.dirty=true;d.revision++;this.notify('change',id);}
+ refresh(id){const d=this.decks[id];if(!d)return;d.renderer.cancelCooperative();d.dirty=true;d.revision++;this.notify('change',id);}
  setParameter(id,path,value){const d=this.decks[id];if(!d)return false;const entry=d.catalog.find(x=>x.path===path);if(!writeParameter(d.state,entry,value))return false;if(path==='pLiving')d.catalog=parameterCatalog(d.state);this.refresh(id);return true;}
  macro(index,value){
   const m=this.config.macros[index];if(!m)return;m.value=clamp(value);

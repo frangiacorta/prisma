@@ -1,9 +1,9 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=d35f7f15a5e5';
-import {BASE_FORM_GLSL} from './base-forms.js?v=d35f7f15a5e5';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=d35f7f15a5e5';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=d35f7f15a5e5';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=d35f7f15a5e5';
-import {materialCavity} from './particle-shading.js?v=d35f7f15a5e5';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=5df1bbb9094d';
+import {BASE_FORM_GLSL} from './base-forms.js?v=5df1bbb9094d';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=5df1bbb9094d';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=5df1bbb9094d';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=5df1bbb9094d';
+import {materialCavity} from './particle-shading.js?v=5df1bbb9094d';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.

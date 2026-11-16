@@ -1,5 +1,5 @@
-import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=d35f7f15a5e5';
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=d35f7f15a5e5';
+import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=5df1bbb9094d';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=5df1bbb9094d';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,
