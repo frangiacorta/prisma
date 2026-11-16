@@ -1,8 +1,8 @@
-import {FIGURE_SCALE} from './base-forms.js?v=cdd6d085dad9';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META} from './structure-model.js?v=cdd6d085dad9';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META} from './cellular-form.js?v=cdd6d085dad9';
-import {FRACTAL_DEFAULTS,FRACTAL_META} from './fractal-form.js?v=cdd6d085dad9';
-import {PARTICLE_DEFAULTS,PARTICLE_META} from './particle-model.js?v=cdd6d085dad9';
+import {FIGURE_SCALE} from './base-forms.js?v=3382c134fb2d';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META} from './structure-model.js?v=3382c134fb2d';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META} from './cellular-form.js?v=3382c134fb2d';
+import {FRACTAL_DEFAULTS,FRACTAL_META} from './fractal-form.js?v=3382c134fb2d';
+import {PARTICLE_DEFAULTS,PARTICLE_META} from './particle-model.js?v=3382c134fb2d';
 
 export const BODY_LAYER_META = {
  sceneGrains:['Superficie ↔ granelli',0,1,.001],

@@ -92,8 +92,29 @@ void main(){
  color=vec4(vPigment*kernel,kernel)*uSurfaceDepositScale;
 }`;
 
-// Bridge only short gaps bounded on both sides by projected grains. This fills
-// the interior without the outward expansion of a dilation or blur.
+// Filter the 3D position density before finding its surface. Smoothing normals
+// alone would still leave separate bulges and gaps in the geometry.
+const densityFilterFragment=`#version 300 es
+${precision}
+uniform sampler2D uDensitySource;
+uniform ivec3 uDensityAxis;
+out vec4 color;
+vec4 cell(ivec3 voxel){
+ if(any(lessThan(voxel,ivec3(0)))||any(greaterThanEqual(voxel,ivec3(${RESOLUTION}))))return vec4(0.);
+ ivec2 tile=ivec2(voxel.z%${COLUMNS},voxel.z/${COLUMNS});
+ return texelFetch(uDensitySource,tile*${PITCH}+voxel.xy+1,0);
+}
+void main(){
+ ivec2 pixel=ivec2(gl_FragCoord.xy),tile=pixel/${PITCH};
+ ivec3 voxel=ivec3(pixel-tile*${PITCH}-1,tile.x+tile.y*${COLUMNS});
+ if(any(lessThan(voxel,ivec3(0)))||any(greaterThanEqual(voxel,ivec3(${RESOLUTION})))){color=vec4(0.);return;}
+ color=cell(voxel)*.36;
+ color+=(cell(voxel-uDensityAxis)+cell(voxel+uDensityAxis))*.22;
+ color+=(cell(voxel-2*uDensityAxis)+cell(voxel+2*uDensityAxis))*.10;
+}`;
+
+// A continuous estimate of projected density keeps the boundary in the cloud's
+// silhouette without hard masking each output pixel by a single point sprite.
 const footprintFragment=`#version 300 es
 ${precision}
 uniform sampler2D uFootprintSource;
@@ -101,26 +122,22 @@ uniform ivec2 uFootprintStep;
 uniform int uFootprintRadius;
 uniform float uFootprintRaw,uFootprintGain;
 out vec4 color;
-vec2 footprint(ivec2 pixel){
- if(any(lessThan(pixel,ivec2(0)))||any(greaterThanEqual(pixel,textureSize(uFootprintSource,0))))return vec2(0.);
+float footprint(ivec2 pixel){
+ if(any(lessThan(pixel,ivec2(0)))||any(greaterThanEqual(pixel,textureSize(uFootprintSource,0))))return 0.;
  vec4 value=texelFetch(uFootprintSource,pixel,0);
- if(uFootprintRaw<.5)return value.rg;
- float light=max(value.r,max(value.g,value.b));
- float present=smoothstep(.0009,.006,max(light,value.a*.12)*uFootprintGain);
- return vec2(present);
+ if(uFootprintRaw<.5)return value.r;
+ return smoothstep(.001,.018,value.a*uFootprintGain);
 }
 void main(){
  ivec2 pixel=ivec2(gl_FragCoord.xy);
- vec2 center=footprint(pixel);
- float left=0.,right=0.,density=center.y*float(uFootprintRadius+1);
- for(int offset=1;offset<=5;offset++){
+ float density=footprint(pixel)*float(uFootprintRadius+1);
+ for(int offset=1;offset<=14;offset++){
   if(offset>uFootprintRadius)break;
-  vec2 a=footprint(pixel-uFootprintStep*offset),b=footprint(pixel+uFootprintStep*offset);
-  left=max(left,a.x);right=max(right,b.x);
-  density+=(a.y+b.y)*float(uFootprintRadius+1-offset);
+  float a=footprint(pixel-uFootprintStep*offset),b=footprint(pixel+uFootprintStep*offset);
+  density+=(a+b)*float(uFootprintRadius+1-offset);
  }
  float width=float(uFootprintRadius+1);
- color=vec4(max(center.x,min(left,right)),density/(width*width),0.,1.);
+ color=vec4(density/(width*width),0.,0.,1.);
 }`;
 
 const marchFragment=(grainGLSL,linear)=>`#version 300 es
@@ -189,9 +206,9 @@ void main(){
  float footprint=1.;
  if(uSurfacePass<.5){
   ivec2 pixel=ivec2(gl_FragCoord.xy-uSurfaceViewport.xy);
-  grains=texelFetch(uGrainImage,pixel,0)*uGrainImageGain;
-  vec2 support=texelFetch(uGrainFootprint,pixel,0).rg;
-  footprint=support.x*smoothstep(.28,.78,support.y);
+  grains=texelFetch(uGrainImage,pixel,0)*(uGrainImageGain*(1.-uSurfaceAmount));
+  float support=texelFetch(uGrainFootprint,pixel,0).r;
+  footprint=smoothstep(.10,.17,support);
   if(footprint<=.001){
    if(grains.a<=0.)discard;
    color=grains;gl_FragDepth=1.;return;
@@ -220,11 +237,11 @@ void main(){
  }
  gl_FragDepth=footprint<.4?1.:clamp(project(hit).z*.5+.5,0.,1.);
  if(uSurfacePass>.5){float a=1.-exp(-alpha);color=vec4(vec3(a),a);return;}
- vec3 e=vec3(uSurfaceVoxel*.5,0.,0.);
+ vec3 e=vec3(uSurfaceVoxel*1.45,0.,0.);
  vec3 gradient=vec3(surfaceField(hit+e.xyy).a-surfaceField(hit-e.xyy).a,surfaceField(hit+e.yxy).a-surfaceField(hit-e.yxy).a,surfaceField(hit+e.yyx).a-surfaceField(hit-e.yyx).a);
  vec3 normal=-gradient/max(1.e-10,length(gradient));
  vec4 field=surfaceField(hit);vec3 base=field.rgb/max(1.e-20,field.a);
- color=grains*(1.-alpha)+vec4(shadeParticle(base,hit,normal)*alpha,alpha);
+ color=grains+vec4(shadeParticle(base,hit,normal)*alpha,alpha);
 }`;
 
 // Pure planning helper: no camera-origin guess and no omission of distant jets.
@@ -243,7 +260,8 @@ export function particleSurfaceGrid(low,high,maxRadius,state={}){
  // this automatic cohesion, never the authored size/thickness or grain count.
  const cohesion=Math.min(10*initialVoxel,2*.8*spacing*radiusScale);
  const physical=Math.max(Math.max(0,maxRadius)*radiusScale,cohesion)+thickness;
- const voxel=Math.max((span+2*physical)/(RESOLUTION-5),1.e-6);
+ // Reserve four cells per side for the volume filter as well as the splat support.
+ const voxel=Math.max((span+2*physical)/(RESOLUTION-13),1.e-6);
  const minimumKernelVoxels=Math.max(1.6,(cohesion+thickness)/voxel);
  const support=Math.max(minimumKernelVoxels*voxel,physical),side=voxel*(RESOLUTION-1);
  const center=low.map((v,i)=>(v+high[i])*.5),minimum=center.map(v=>v-side*.5),maximum=center.map(v=>v+side*.5);
@@ -264,24 +282,25 @@ export class ParticleSurface{
   this.sampleProgram=owner.program(screen,sampleFragment(grainGLSL));
   this.reduceProgram=owner.program(screen,reduceFragment);
   this.splatProgram=owner.program(splatVertex,splatFragment);
+  this.densityFilterProgram=owner.program(screen,densityFilterFragment);
   this.footprintProgram=owner.program(screen,footprintFragment);
   this.marchProgram=owner.program(screen,marchFragment(grainGLSL,this.linear),null,true);
  }
- get programs(){return [this.sampleProgram,this.reduceProgram,this.splatProgram,this.footprintProgram,this.marchProgram];}
+ get programs(){return [this.sampleProgram,this.reduceProgram,this.splatProgram,this.densityFilterProgram,this.footprintProgram,this.marchProgram];}
  prepare(){return this.programs;}
  target(width,height,formats,linear=false){
   const g=this.gl,fbo=g.createFramebuffer(),textures=[];g.bindFramebuffer(g.FRAMEBUFFER,fbo);
   for(let i=0;i<formats.length;i++){
    const texture=g.createTexture();textures.push(texture);g.bindTexture(g.TEXTURE_2D,texture);
-   const format=formats[i],type=format===g.RG8?g.UNSIGNED_BYTE:format===g.RGBA16F?g.HALF_FLOAT:g.FLOAT;
-   g.texImage2D(g.TEXTURE_2D,0,format,width,height,0,format===g.RG8?g.RG:g.RGBA,type,null);
+   const format=formats[i],type=format===g.R8?g.UNSIGNED_BYTE:format===g.RGBA16F?g.HALF_FLOAT:g.FLOAT;
+   g.texImage2D(g.TEXTURE_2D,0,format,width,height,0,format===g.R8?g.RED:g.RGBA,type,null);
    for(const key of [g.TEXTURE_MIN_FILTER,g.TEXTURE_MAG_FILTER])g.texParameteri(g.TEXTURE_2D,key,linear?g.LINEAR:g.NEAREST);
    for(const key of [g.TEXTURE_WRAP_S,g.TEXTURE_WRAP_T])g.texParameteri(g.TEXTURE_2D,key,g.CLAMP_TO_EDGE);
    g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0+i,g.TEXTURE_2D,texture,0);
   }
   g.drawBuffers(textures.map((_,i)=>g.COLOR_ATTACHMENT0+i));
   if(g.checkFramebufferStatus(g.FRAMEBUFFER)!==g.FRAMEBUFFER_COMPLETE){for(const t of textures)g.deleteTexture(t);g.deleteFramebuffer(fbo);throw Error('Buffer superficie dei granelli non disponibile.');}
-  const result={fbo,textures,texture:textures[0],w:width,h:height,bytes:width*height*formats.reduce((n,f)=>n+(f===g.RG8?2:f===g.RGBA16F?8:16),0)};this.targets.push(result);return result;
+  const result={fbo,textures,texture:textures[0],w:width,h:height,bytes:width*height*formats.reduce((n,f)=>n+(f===g.R8?1:f===g.RGBA16F?8:16),0)};this.targets.push(result);return result;
  }
  allocate(count){
   const g=this.gl,width=Math.min(1024,g.getParameter(g.MAX_TEXTURE_SIZE)),height=Math.ceil(count/width);
@@ -291,12 +310,13 @@ export class ParticleSurface{
   let w=width,h=height;
   do{w=Math.max(1,Math.ceil(w/2));h=Math.max(1,Math.ceil(h/2));this.reductions.push(this.target(w,h,[g.RGBA32F,g.RGBA32F]));}while(w>1||h>1);
   this.density=this.target(PITCH*COLUMNS,PITCH*ROWS,[this.floatBlend?g.RGBA32F:g.RGBA16F],this.linear);
+  this.densityScratch=this.target(PITCH*COLUMNS,PITCH*ROWS,[this.floatBlend?g.RGBA32F:g.RGBA16F],this.linear);
  }
  projectFootprint(width,height,opacity,drawGrains){
   const o=this.owner,g=this.gl;
   if(!this.grainImage){
    this.grainImage=this.target(width,height,[g.RGBA16F]);
-   this.footprintTargets=[this.target(width,height,[g.RG8]),this.target(width,height,[g.RG8])];
+   this.footprintTargets=[this.target(width,height,[g.R8]),this.target(width,height,[g.R8])];
   }
   // A small reference opacity keeps the footprint usable for materials whose
   // grain opacity is zero. Only the authored opacity reaches the final image.
@@ -304,7 +324,7 @@ export class ParticleSurface{
   o.bind(this.grainImage);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);
   g.enable(g.BLEND);g.blendEquation(g.FUNC_ADD);g.blendFunc(g.ONE,g.ONE);
   drawGrains(reference);
-  const radius=Math.max(1,Math.min(5,Math.round(Math.min(width,height)/144)));
+  const radius=Math.max(3,Math.min(14,Math.round(Math.min(width,height)/60)));
   const program=this.footprintProgram;
   g.disable(g.BLEND);g.bindVertexArray(o.empty);g.useProgram(program.program);
   for(const [axis,destination] of this.footprintTargets.entries()){
@@ -316,6 +336,18 @@ export class ParticleSurface{
    g.drawArrays(g.TRIANGLES,0,3);
   }
   return opacity/reference;
+ }
+ smoothDensity(){
+  const o=this.owner,g=this.gl,p=this.densityFilterProgram;
+  let input=this.density,output=this.densityScratch;
+  g.disable(g.BLEND);g.useProgram(p.program);
+  for(const axis of [[2,0,0],[0,2,0],[0,0,2]]){
+   o.bind(output);o.tex(p,'uDensitySource',input.texture,0);
+   g.uniform3i(o.loc(p,'uDensityAxis'),...axis);
+   g.drawArrays(g.TRIANGLES,0,3);
+   [input,output]=[output,input];
+  }
+  return input.texture;
  }
  draw(s,phase,options={},drawGrains){
   const amount=options.particleSurfaceMix??s._cloudSurfaceMix??1,count=Math.max(0,Math.round(s.pCount||0));
@@ -351,15 +383,14 @@ export class ParticleSurface{
    g.uniform1i(o.loc(splat,'uSurfaceSliceCount'),grid.sliceCount);g.uniform1i(o.loc(splat,'uSurfaceSliceHalf'),grid.sliceHalf);
    o.u(splat,'uSurfaceDepositScale',depositScale);
    g.drawArraysInstanced(g.TRIANGLES,0,6,count*grid.sliceCount);
+   const smoothDensity=this.smoothDensity();
    g.bindFramebuffer(g.DRAW_FRAMEBUFFER,previous.draw);g.viewport(...previous.viewport);g.enable(g.DEPTH_TEST);g.depthFunc(g.LEQUAL);g.depthMask(true);g.disable(g.BLEND);
    const march=this.marchProgram;
    o.settings(march,s,phase);
-   o.tex(march,'uSurfaceDensity',this.density.texture,3);
+   o.tex(march,'uSurfaceDensity',smoothDensity,3);
    o.u(march,'uSurfaceMin',...grid.minimum);o.u(march,'uSurfaceMax',...grid.maximum);
    o.u(march,'uSurfaceVoxel',grid.voxel);o.u(march,'uSurfaceAmount',amount);
-   // A nearly full kernel contribution is needed to form a surface. Isolated
-   // grains remain in the projected grain image instead of becoming spheres.
-   o.u(march,'uSurfaceIso',.92*depositScale);
+   o.u(march,'uSurfaceIso',.38*depositScale);
    o.u(march,'uSurfaceViewport',...previous.viewport);
    o.u(march,'uSurfacePass',o.shadowPass?(o.shadowPass.mode||1):0);o.u(march,'uSurfaceShadowHeight',s.pShadowHeight??-1.6);const light=o.shadowPass?.light;o.u(march,'uSurfaceShadowLight',light?.x||0,light?.y||0,light?.z||0);
    o.tex(march,'uGrainImage',this.grainImage?.texture||this.density.texture,0);
@@ -370,6 +401,6 @@ export class ParticleSurface{
    g.bindFramebuffer(g.DRAW_FRAMEBUFFER,previous.draw);g.bindFramebuffer(g.READ_FRAMEBUFFER,previous.read);g.readBuffer(previous.readBuffer);g.viewport(...previous.viewport);g.bindVertexArray(previous.vao);g.useProgram(previous.program);toggle(g.DEPTH_TEST,previous.depth);g.depthFunc(previous.depthFunc);g.depthMask(previous.depthMask);toggle(g.BLEND,previous.blend);g.blendFuncSeparate(previous.srcRGB,previous.dstRGB,previous.srcAlpha,previous.dstAlpha);g.blendEquationSeparate(previous.equationRGB,previous.equationAlpha);toggle(g.CULL_FACE,previous.cull);toggle(g.SCISSOR_TEST,previous.scissor);g.colorMask(...previous.mask);g.activeTexture(previous.activeTexture);
   }
  }
- release(){const g=this.gl;for(const target of this.targets){for(const t of target.textures)g.deleteTexture(t);g.deleteFramebuffer(target.fbo);}this.targets=[];this.reductions=[];this.sampleTarget=this.density=this.samples=this.grainImage=this.footprintTargets=null;}
+ release(){const g=this.gl;for(const target of this.targets){for(const t of target.textures)g.deleteTexture(t);g.deleteFramebuffer(target.fbo);}this.targets=[];this.reductions=[];this.sampleTarget=this.density=this.densityScratch=this.samples=this.grainImage=this.footprintTargets=null;}
  dispose(){this.release();for(const p of this.programs){this.owner.pendingPrograms.delete(p);this.gl.deleteProgram(p.program);}}
 }

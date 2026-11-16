@@ -1,6 +1,6 @@
-import {FILM_PATTERN_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,FRACTAL_PARTICLE_PALETTE_GLSL} from './solid-renderer.js?v=cdd6d085dad9';
-import {LOOP_PALETTE_GLSL} from './structure-model.js?v=cdd6d085dad9';
-import {opticalGLSL} from './particle-optics.js?v=cdd6d085dad9';
+import {FILM_PATTERN_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,FRACTAL_PARTICLE_PALETTE_GLSL} from './solid-renderer.js?v=3382c134fb2d';
+import {LOOP_PALETTE_GLSL} from './structure-model.js?v=3382c134fb2d';
+import {opticalGLSL} from './particle-optics.js?v=3382c134fb2d';
 export const materialCavity=s=>Math.max(0,Math.min(1,(s.hollow||0)*(1-(s.wallThickness??.08))));
 
 export const prismaPaletteGLSL=`
