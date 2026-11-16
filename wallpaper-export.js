@@ -1,6 +1,6 @@
 // Keep native module scopes and collect every local dependency, including particles.
 const moduleRoot=new URL('./',import.meta.url);
-const entries=['renderer.js?v=00f94f9b4def','solid-renderer.js?v=00f94f9b4def'].map(path=>new URL(path,moduleRoot).href);
+const entries=['renderer.js?v=f9c4c37d093c','solid-renderer.js?v=f9c4c37d093c'].map(path=>new URL(path,moduleRoot).href);
 const imports=/^([ \t]*(?:import\s+(?:[\w$*,{}\s]+?\s+from\s+)?|export\s+(?:\*|\{[^}]*\})(?:\s+as\s+\w+)?\s+from\s+))(['"])([^'"\r\n]+)\2/gm;
 const safeJSON=value=>JSON.stringify(value).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
 

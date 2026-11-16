@@ -1,0 +1,117 @@
+{
+  "rows": [
+    {
+      "mix": 0,
+      "motion": {
+        "mean": 1.7001252350983795,
+        "max": 161
+      },
+      "seam": {
+        "mean": 0,
+        "max": 0
+      },
+      "latent": {
+        "mean": 0,
+        "max": 0
+      },
+      "ms": 1918,
+      "light": 21861
+    },
+    {
+      "mix": 0.5,
+      "motion": {
+        "mean": 1.5410133644386574,
+        "max": 155
+      },
+      "seam": {
+        "mean": 0,
+        "max": 0
+      },
+      "latent": {
+        "mean": 0,
+        "max": 0
+      },
+      "ms": 11,
+      "light": 20908
+    },
+    {
+      "mix": 1,
+      "motion": {
+        "mean": 1.6214870876736112,
+        "max": 153
+      },
+      "seam": {
+        "mean": 0,
+        "max": 0
+      },
+      "latent": {
+        "mean": 0,
+        "max": 0
+      },
+      "ms": 9,
+      "light": 19806
+    }
+  ],
+  "variants": [
+    {
+      "name": "sphere",
+      "motion": {
+        "mean": 1.7162679036458333,
+        "max": 157
+      },
+      "ms": 11
+    },
+    {
+      "name": "transparent",
+      "motion": {
+        "mean": 1.1769816080729167,
+        "max": 145
+      },
+      "ms": 7
+    },
+    {
+      "name": "living",
+      "motion": {
+        "mean": 1.6029753508391205,
+        "max": 173
+      },
+      "ms": 715
+    },
+    {
+      "name": "dense",
+      "motion": {
+        "mean": 1.7290604202835649,
+        "max": 150
+      },
+      "ms": 82
+    },
+    {
+      "name": "legacy",
+      "motion": {
+        "mean": 1.7001252350983795,
+        "max": 161
+      },
+      "ms": 20
+    }
+  ],
+  "startedSolid": false,
+  "version": 95,
+  "scope": "Orbital cloud representation and explicit source conversion",
+  "fixes": [
+    "Surface samples the same orbital position field, phase, forces and material as the grains",
+    "Surface slider no longer consults latent solid geometry",
+    "Explicit source conversion transfers compatible geometry/tracks, with reversible source geometry memory",
+    "UI separates origin, geometry, representation and particle details"
+  ],
+  "verification": {
+    "cpuSourceContracts": 9,
+    "uiOriginSwitchAndRestore": true,
+    "mobilePreviewCompletes": true,
+    "coreMaterialRegressionCases": 4
+  },
+  "limitations": [
+    "Latest user preset not accessible in available browser session; tests use constructed regression scenes",
+    "Orbital surface is the parametric outer envelope, not reconstruction or union of each scattered grain",
+    "Changing generator remains an approximate conversion; use representation slider to preserve the current orbital field"
+  ]
+}

@@ -7,7 +7,8 @@
   },
   "scripts": {
     "start": "node pc/server.mjs",
-    "test:render": "node tests/core-material.mjs && node tests/fractal-material.mjs && node tests/fractal-resume.mjs"
+    "test:render": "node tests/core-material.mjs && node tests/fractal-material.mjs && node tests/fractal-resume.mjs",
+    "test:sources": "node tests/cloud-source-v95.mjs && node tests/cloud-surface-v95.mjs && node tests/cloud-source-ui-v95.mjs"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

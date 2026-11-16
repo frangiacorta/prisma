@@ -9,19 +9,34 @@ import {particleCreation} from '../particle-model.js';
 import {presetDocument,readPreset} from '../preset-files.js';
 
 const input=particleCreation(newCreation());
-Object.assign(input,{pOpening:.48,pLobeDepth:.5,pLobes:7,pCellAmount:.3,bgMode:'gradient',duration:16,
+Object.assign(input,{grainSource:'cloud',pOpening:.48,pLobeDepth:.5,pLobes:7,pCellAmount:.3,bgMode:'gradient',duration:16,
  palette:['#245aba','#f04bc2'],finishRgb:true,finishRgbMix:.34});
+Object.assign(input.motions.pOpening,{enabled:true,amplitude:.12,cycles:2,phase:30});
+Object.assign(input.motions.pCellAmount,{enabled:true,amplitude:.1});
 const surface=cloudToBody(input);
-for(const key of ['palette','lights','bgMode','duration','finishRgb','finishRgbMix','motions'])assert.deepEqual(surface[key],input[key]);
+// Explicit source conversion preserves common appearance, not the entire
+// source-specific motion map. The representation slider no longer uses it.
+for(const key of ['palette','lights','bgMode','duration','finishRgb','finishRgbMix'])assert.deepEqual(surface[key],input[key]);
+assert.deepEqual(surface.motions.rotateY,input.motions.rotateY);
+assert.deepEqual(surface.motions.loopAmount,input.motions.pOpening);
+assert.equal(surface.motions.pOpening.enabled,false);
+assert.equal(surface.motions.pCellAmount.enabled,false);
+assert.equal(surface.cellMorph,0); // Grouped grains are not Nacre cells/spines.
 assert.equal(surface.loopAmount,.48);
 assert.equal(surface.lobes,7);
 assert.equal(grainMix(normalizeCreation(input)),1);
 const mixed={...input,sceneGrains:.46};
-changeGrainSource(mixed,'body');
+const conversion=changeGrainSource(mixed,'body');
+assert.equal(conversion.lossy,true);
+assert.ok(conversion.unmapped.includes('pCellAmount'));
+assert.ok(conversion.unmapped.includes('motions.pCellAmount'));
 const roundtrip=readPreset(JSON.stringify(presetDocument({state:mixed,name:'Corpo e granelli'}))).state;
 assert.equal(roundtrip.sceneGrains,.46);
 assert.equal(roundtrip.grainSource,'body');
 assert.equal(roundtrip.loopAmount,.48);
+assert.deepEqual(roundtrip.motions.loopAmount,mixed.motions.loopAmount);
+
+if(process.argv.includes('--cpu-only')){console.log('CPU SOURCE CONVERSION PASS');process.exit(0);}
 
 const server=await startCreativeServer(0),browser=await chromium.launch({channel:'chrome',headless:true});
 const page=await browser.newPage({viewport:{width:1280,height:880}});
@@ -90,6 +105,9 @@ try{
  await page.goto(server.url);
  const mix=page.locator('#controls [data-param=sceneGrains]');
  await mix.waitFor();
+ const origin=page.locator('#controls [data-grain-source]');
+ assert.deepEqual(await origin.locator('option').allTextContents(),['Corpo parametrico','Campo orbitale']);
+ assert(await page.evaluate(()=>!!(document.querySelector('#controls [data-grain-source]').compareDocumentPosition(document.querySelector('#controls [data-param=sceneGrains]'))&Node.DOCUMENT_POSITION_FOLLOWING)));
  assert.equal(await page.locator('#controls [data-param=sceneGrains]').count(),1);
  await mix.evaluate(el=>{el.focus();el.value='0.67';for(const type of ['input','change'])el.dispatchEvent(new Event(type,{bubbles:true}));});
  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('prisma-current-v2')||'{}').state?.sceneGrains===.67);
