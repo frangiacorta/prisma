@@ -1,22 +1,22 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=3382c134fb2d';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=3382c134fb2d';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=3382c134fb2d';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=3382c134fb2d';
-import {knotTurns} from './structure-model.js?v=3382c134fb2d';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=3382c134fb2d';
-import {shadowLight} from './particle-shadow.js?v=3382c134fb2d';
-import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=3382c134fb2d';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=3382c134fb2d';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=3382c134fb2d';
-import {ParticleLinks} from './particle-links.js?v=3382c134fb2d';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=3382c134fb2d';
-import {LayeredVeils} from './layered-veils.js?v=3382c134fb2d';
-import {LivingStructures} from './living-structures.js?v=3382c134fb2d';
-import {ParticleSurface} from './particle-surface.js?v=3382c134fb2d';
-import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=3382c134fb2d';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=3382c134fb2d';
-import {forceBarrierGLSL} from './particle-forces.js?v=3382c134fb2d';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=3382c134fb2d';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=df487c245b09';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=df487c245b09';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=df487c245b09';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=df487c245b09';
+import {knotTurns} from './structure-model.js?v=df487c245b09';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=df487c245b09';
+import {shadowLight} from './particle-shadow.js?v=df487c245b09';
+import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=df487c245b09';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=df487c245b09';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=df487c245b09';
+import {ParticleLinks} from './particle-links.js?v=df487c245b09';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=df487c245b09';
+import {LayeredVeils} from './layered-veils.js?v=df487c245b09';
+import {LivingStructures} from './living-structures.js?v=df487c245b09';
+import {ParticleSurface} from './particle-surface.js?v=df487c245b09';
+import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=df487c245b09';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=df487c245b09';
+import {forceBarrierGLSL} from './particle-forces.js?v=df487c245b09';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=df487c245b09';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec2 uFocus;
 float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
@@ -180,7 +180,7 @@ precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage,uMedium
 vec4 bloomSource(vec2 p){return texture(uImage,p)+texture(uMedium,p)*uMediumBloom;}
 void main(){vec4 c=bloomSource(uv)*.227027;c+=bloomSource(uv+uStep*1.384615)*.316216;c+=bloomSource(uv-uStep*1.384615)*.316216;c+=bloomSource(uv+uStep*3.230769)*.070270;c+=bloomSource(uv-uStep*3.230769)*.070270;color=c;}`;
 const composeFrag=`#version 300 es
-precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage,uBloom,uShadow,uCausticMap;uniform float uCausticOn,uShadowStrength;uniform float uGlow,uBgMode,uPhotoAll,uVeilCompose;
+precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage,uBloom,uShadow,uCausticMap;uniform float uCausticOn,uShadowStrength;uniform float uGlow,uBgMode,uPhotoAll,uVeilCompose,uSurfaceEdgeAA;
 uniform vec4 uGrade,uPhoto,uTone,uLens,uBg;uniform vec3 uBackground,uBackground2;
 uniform float uBgShade;uniform vec2 uOutputSize;
 uniform highp sampler2D uStudioSurface;
@@ -189,8 +189,21 @@ uniform highp sampler2D uMedium;
 uniform vec2 uMediumMix;
 ${volumeResolveGLSL}
 vec3 grade(vec3 c){c=(c*exp2(uGrade.x)+uGrade.y-.5)*uGrade.z+.5;float grey=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(grey),c,uGrade.w);c*=vec3(1.+uPhoto.x*.25,1.+uPhoto.y*.2,1.-uPhoto.x*.25);c+=uTone.x*pow(1.-clamp(c,0.,1.),vec3(2.))+uTone.y*pow(clamp(c,0.,1.),vec3(2.));return pow(max(c,0.),vec3(1./max(.1,uPhoto.z)));}
+vec4 surfaceImage(vec2 p){
+ vec4 center=texture(uImage,p);
+ if(uSurfaceEdgeAA<=.001)return center;
+ // Resolve pixel edges after depth composition, so a grazing foreground face
+ // cannot punch a dark line through another part of the same surface.
+ vec2 pixel=1./uOutputSize;
+ vec4 a=texture(uImage,p+vec2(pixel.x,0.)),b=texture(uImage,p-vec2(pixel.x,0.));
+ vec4 c=texture(uImage,p+vec2(0.,pixel.y)),d=texture(uImage,p-vec2(0.,pixel.y));
+ float low=min(center.a,min(min(a.a,b.a),min(c.a,d.a)));
+ float high=max(center.a,max(max(a.a,b.a),max(c.a,d.a)));
+ if(low>uSurfaceEdgeAA*.15||high<uSurfaceEdgeAA*.75)return center;
+ return mix(center,(a+b+c+d)*.25,.34);
+}
 void main(){vec2 p=uv-.5,world=p*uOutputSize/min(uOutputSize.x,uOutputSize.y)*3.4;
- vec2 q=.5+p*(1.+uLens.x*mix(dot(p,p),dot(world,world)*.18,uStudioCamera));vec4 src=texture(uImage,q),bloom=texture(uBloom,q);
+ vec2 q=.5+p*(1.+uLens.x*mix(dot(p,p),dot(world,world)*.18,uStudioCamera));vec4 src=surfaceImage(q),bloom=texture(uBloom,q);
  // Compress accumulated light with a shared scale: channel-by-channel clipping
  // used to wash different palettes into the same pink/white highlights.
  vec4 mist=viewVolume(q);
@@ -486,6 +499,7 @@ export class ParticleRenderer{
   for(const [dst,src,step]of [[a,scene,[2/w,0]],[b,a,[0,1/a.h]],[a,b,[1/a.w,0]]]){this.bind(dst);this.tex(this.blur,'uImage',src.texture,0);this.tex(this.blur,'uMedium',medium||scene.texture,1);this.u(this.blur,'uMediumBloom',medium&&src===scene?continuum*(this.studioLayer?.grainMix??1):0);this.u(this.blur,'uStep',...step);gl.drawArrays(gl.TRIANGLES,0,3);}
   this.bind(null);const c=this.compose;gl.useProgram(c.program);this.tex(c,'uImage',scene.texture,0);this.tex(c,'uBloom',a.texture,1);this.tex(c,'uShadow',shadowTexture||scene.texture,4);this.u(c,'uShadowStrength',shadowTexture?this.shadow.strength:0);this.tex(c,'uCausticMap',causticTexture||scene.texture,5);this.u(c,'uCausticOn',causticTexture?1:0);this.u(c,'uGlow',s.glow);this.u(c,'uVeilCompose',s.pLiving===4?1:0);
   this.u(c,'uGrade',s.exposure,s.brightness,s.contrast,s.saturation);this.u(c,'uPhoto',s.temperature,s.photoTint,s.gamma,s.vignette);this.u(c,'uTone',s.blacks,s.highlights,0,0);this.u(c,'uLens',s.lensDistortion,s.grain,s.grainSize,0);this.u(c,'uPhotoAll',+s.photoAll);
+  this.u(c,'uSurfaceEdgeAA',s.pLiving>0?0:(s._cloudSurfaceMix||0)*(1-s.transparency));
   this.u(c,'uBackground',...rgb(s.background));this.u(c,'uBackground2',...rgb(s.background2));this.u(c,'uBgMode',['solid','gradient','studio','transparent'].indexOf(s.bgMode));this.u(c,'uBg',s.bgAngle*rad,s.bgHeight,s.bgSoftness,s.bgWash);
   this.tex(c,'uStudioSurface',this.studioLayer?.color||scene.texture,13);this.u(c,'uStudioComposite',this.studioLayer?.color?1:0);this.u(c,'uStudioCamera',this.studioLayer?.attachment?1:0);
   this.tex(c,'uMedium',medium||scene.texture,14);this.u(c,'uMediumMix',medium?continuum:0,this.studioLayer?.grainMix??1);

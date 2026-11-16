@@ -1,8 +1,8 @@
-import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=3382c134fb2d';
-import {RhythmClock,TapTempo} from './audio-rhythm.js?v=3382c134fb2d';
-import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=3382c134fb2d';
-import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=3382c134fb2d';
-import {META} from './model.js?v=3382c134fb2d';
+import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=df487c245b09';
+import {RhythmClock,TapTempo} from './audio-rhythm.js?v=df487c245b09';
+import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=df487c245b09';
+import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=df487c245b09';
+import {META} from './model.js?v=df487c245b09';
 
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountAudioReactive({getState,remember,mark,renderControls,showTab,toast,invalidate,setPlaying}) {

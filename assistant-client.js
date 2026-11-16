@@ -1,5 +1,5 @@
-import {onlineDirector} from './director-connection.js?v=3382c134fb2d';
-import {sameAssistantSource} from './assistant-model.js?v=3382c134fb2d';
+import {onlineDirector} from './director-connection.js?v=df487c245b09';
+import {sameAssistantSource} from './assistant-model.js?v=df487c245b09';
 const local=()=>['127.0.0.1','localhost','[::1]'].includes(location.hostname);
 export function mountCreativeAssistant({getState,applyPlan,quickCommand,setPlaying,importCreation,getSnapshot}){
  const $=id=>document.getElementById(id),status=$('description-status'),mode=$('description-engine'),submit=$('description-apply'),cancel=$('assistant-cancel'),connect=$('assistant-retry'),pc=$('assistant-open-pc');
