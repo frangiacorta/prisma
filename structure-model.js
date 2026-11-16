@@ -1,4 +1,5 @@
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=a55ab48fe9e6';
+import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=d35f7f15a5e5';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=d35f7f15a5e5';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,
@@ -70,7 +71,10 @@ export function structureWarp(s,p){
  const envelope=1-v.structScallop*.62*(1-petal);
  if(v.structScallop||v.structSpiral||v.structStagger){q[0]=Math.cos(angle)*rr/envelope;q[1]=Math.sin(angle)*rr/envelope;}
  q[2]-=falloff*(v.structCurl+v.structFold*Math.sin(a*v.structFoldCount+phase-rr*v.structDelay*Math.PI)+v.structFlap*Math.cos(rr*v.structDelay*Math.PI));
- q[2]-=falloff*(v.structStagger*.6*Math.sin(angle*v.structPetalCount+rr*2+phase)+v.structRuffle*Math.sin(angle*(v.structPetalCount*3)+phase-rr*6));
+ // Fan staggering already positions each leaf independently. Attenuate its
+ // global polar ripple as those leaves emerge, rather than folding every
+ // individual leaf once for every other leaf in the arrangement.
+ q[2]-=falloff*(v.structStagger*(1-v.structFan)*.6*Math.sin(angle*v.structPetalCount+rr*2+phase)+v.structRuffle*Math.sin(angle*(v.structPetalCount*3)+phase-rr*6));
  return q;
 }
 
@@ -127,10 +131,10 @@ function weaveSaddle(x,y,z,radius,amount,shift,turn,density){
 
 // Each persistent sphere becomes the end of a curved tapered stem. Opening
 // subtracts an offset inner ellipsoid and leaves an actual rounded cup rim.
-function weaveSprout(x,y,z,phase,shift,turn,radius,growth,opening,density){
+function weaveSprout(x,y,z,phaseSine,phaseCosine,shift,dx,dy,radius,growth,opening,density){
  const height=growth*(.19+.28*shift),cap=radius*(.83+.38*growth+.3*opening*growth);
  const axisZ=Math.max(0,Math.min(height,z)),slope=axisZ/Math.max(.0001,height);
- const tip=(.13+.035*Math.sin(phase+turn))*growth*Math.min(1,5/density),dx=Math.cos(turn),dy=Math.sin(turn);
+ const tip=(.13+.035*(phaseSine*dx+phaseCosine*dy))*growth*Math.min(1,5/density);
  const stem=(Math.hypot(x-dx*tip*slope*slope,y-dy*tip*slope*slope,z-axisZ)-radius*(.24+.24*(1-slope)**2))*.71;
  const rx=x-dx*(tip+(z-height)*.23),ry=y-dy*(tip+(z-height)*.23),rz=(z-height)*1.12;
  const bowl=Math.hypot(rx,ry,rz)-cap;
@@ -197,31 +201,54 @@ function fanDrapeCoordinates(s,p,phase){
  const blend=fanDrapeBlend(s);if(blend<=0)return [...p,1];
  const size=Math.sqrt(blend),q=drapeCoordinates(s,p.map(value=>value/size),phase);q[2]*=size;q[3]*=size;return q;
 }
-function fanField(s,p,phase){
+function fanSheetCoordinates(s,p,axes,profiles,index,out){
+ const c=axes[index],t=axes[index+1],reach=axes[index+2],halfWidth=axes[index+3];
+ const offset=profiles[index],lift=profiles[index+1],variant=profiles[index+2],localPhase=profiles[index+3];
+ const u=c*p[0]+t*p[1],v=-t*p[0]+c*p[1],along=Math.max(0,Math.min(1.2,u/reach)),across=v-along*along*offset;
+ const flare=Math.max(0,Math.min(1,along/.75)),width=halfWidth*(.58+.42*flare*flare*(3-2*flare));
+ const sheet=along*(lift+Math.sin(localPhase-along*2.4)*s.structFlap*.42)+across*along*(.8*variant+s.structCurl*.74)+across*across*(.45+.26*variant)
+  +s.structFanBias*Math.pow(along,1.25)*s.structFold*Math.sin(across*(3.2+s.structFoldCount*.7)-along*2.1+localPhase)*.58;
+ out[0]=u;out[1]=across;out[2]=p[2]-sheet;out[3]=width;return out;
+}
+function fanField(s,p,phase,component=-1){
  const blend=fanDrapeBlend(s),drapeSize=Math.sqrt(blend),fanSize=Math.sqrt(1-blend);
- const drape=blend>0?drapeField(s,p.map(value=>value/drapeSize),phase)*drapeSize:10;if(blend>=1)return drape;
+ const drape=blend>0?drapeField(s,p.map(value=>value/drapeSize),phase)*drapeSize:10;if(blend>=1)return component<0||component===21?drape:10000.;
  p=p.map(value=>value/fanSize);
  const {axes,profiles}=fanData(s,phase);
  let distance=Math.max(Math.hypot(p[0],p[1])-.115*(1-s.structFanBias*.82),Math.abs(p[2])-s.structThickness*.58);
+ let selected=component===20?distance:component===21?drape/fanSize:10000.;const coordinates=[0,0,0,0];
  for(let index=0;index<axes.length;index+=4){
-  const c=axes[index],t=axes[index+1],reach=axes[index+2],halfWidth=axes[index+3];
-  const offset=profiles[index],lift=profiles[index+1],variant=profiles[index+2],localPhase=profiles[index+3];
-  const u=c*p[0]+t*p[1],v=-t*p[0]+c*p[1],along=Math.max(0,Math.min(1.2,u/reach)),across=v-along*along*offset;
-  const flare=Math.max(0,Math.min(1,along/.75)),width=halfWidth*(.58+.42*flare*flare*(3-2*flare));
+  if(component>=0&&component!==index/4&&blend<=0)continue;
+  const reach=axes[index+2],halfWidth=axes[index+3],localPhase=profiles[index+3];
+  const [u,across,normal,width]=fanSheetCoordinates(s,p,axes,profiles,index,coordinates);
   const outline=(Math.hypot((u-.43*reach)/(.63*reach),across/width)-1)*Math.min(.3,width)
    +s.structRuffle*(.4*Math.sin(u*17+across*22+localPhase)+.16*Math.sin(u*41-across*37+localPhase*2));
-  const sheet=along*(lift+Math.sin(localPhase-along*2.4)*s.structFlap*.42)+across*along*(.8*variant+s.structCurl*.74)+across*across*(.45+.26*variant)
-   +s.structFanBias*Math.pow(along,1.25)*s.structFold*Math.sin(across*(3.2+s.structFoldCount*.7)-along*2.1+localPhase)*.58;
   const edge=Math.max(0,Math.min(1,1+outline/(.6*halfWidth)));
   const thickness=s.structThickness*(.33-.25*s.structTaper*edge);
-  distance=Math.min(distance,Math.max(outline,Math.abs(p[2]-sheet)-thickness)*.59);
+  const leaf=Math.max(outline,Math.abs(normal)-thickness)*.59;
+  distance=Math.min(distance,leaf);if(component===index/4)selected=leaf;
  }
- distance*=fanSize;if(blend<=0)return distance;
+ distance*=fanSize;selected*=fanSize;if(blend<=0)return component>=0?selected:distance;
  const rounding=.015*Math.sin(Math.PI*blend),h=Math.max(0,rounding-Math.abs(distance-drape))/Math.max(.0000001,rounding);
- return Math.min(distance,drape)-h*h*rounding*.25;
+ return (component>=0?selected:Math.min(distance,drape))-h*h*rounding*.25;
 }
+// Shells and porous networks act on each leaf before their union. Ordinary
+// cuts are monotone and retain the cheaper union evaluation.
 export function structureField(s,d,p){
- const v={...STRUCTURE_DEFAULTS,...s},r=Math.hypot(...p),tau=Math.PI*2;
+ const v={...STRUCTURE_DEFAULTS,...s};
+ if(v.structFan>0&&v.structShell>0){
+  const blend=fanDrapeBlend(v),count=Math.round(v.structPetalCount);let result=10000;
+  for(let slot=0;slot<count+2;slot++){
+   const id=slot<count?slot:20+slot-count;
+   if((id===21&&blend<=0)||(id!==21&&blend>=1))continue;
+   result=Math.min(result,structureComponentField(v,d,p,id));
+  }
+  return result;
+ }
+ return structureComponentField(v,d,p,-1);
+}
+function structureComponentField(v,d,p,component){
+ const r=Math.hypot(...p),tau=Math.PI*2;
  const networkOnly=v.structWeaveVariation*v.structShell*v.structFibres*v.structWeft===1;
  const thickness=v.structThickness*(1-v.structTaper*.85*Math.min(1,Math.hypot(p[0],p[1])));
  let midSurface=d+thickness*.5;
@@ -242,12 +269,12 @@ export function structureField(s,d,p){
   a+=variation*(2.2*Math.sin(4*phi+2.3*Math.sin(theta*6))+1.12*Math.sin(13*phi-theta*7));
   b+=variation*(1.9*Math.sin(5*phi-theta*3)+1.26*Math.sin(11*phi+theta*8));
  }
- if(v.structShell>0)d=Math.max(d,-d-thickness-(1-thickness)*(1-v.structShell));
  if(v.structFan>0){
-  const baseline=Math.max(d,-d-(1-v.structFan));
-  d=baseline+(fanField(v,p,phase)-baseline)*v.structFan;
+  const baseline=d;
+  d=baseline+(fanField(v,p,phase,component)-baseline)*v.structFan;
   midSurface+=(d-midSurface)*v.structFan;
  }
+ if(v.structShell>0)d=Math.max(d,-d-thickness-(1-thickness)*(1-v.structShell));
  if(v.structFibres>0){
   const width=1+(v.structThreadWidth-1)*v.structFibres;
   if(!networkOnly){
@@ -270,7 +297,7 @@ export function structureField(s,d,p){
    const baseRadius=Math.max(thickness*.13,Math.min(thickness*.36,width*1.25/v.structDensity)),radius=baseRadius*(1-.52*sprouts);
    const z=midSurface-v.structWeave*.42*Math.sin(phi*4+theta*3+phase);
    const ribs=Math.hypot(z,site[0]/Math.max(.1,edgeSlope))-radius;
-   const growth=v.structWeaveNodes,web=v.structWeaveMembrane;
+   const growth=v.structWeaveNodes,web=v.structWeaveMembrane,phaseSine=Math.sin(phase),phaseCosine=Math.cos(phase);
    let node=10,sprout=10,membrane=10;
    for(let corner=0;corner<2;corner++){
     const current=corner?weaveSite(metric[4],metric[5],v.structDensity,1):site;
@@ -288,8 +315,8 @@ export function structureField(s,d,p){
        const budRadius=baseRadius*(1.05+.4*Math.sin(index*2.17+shift*5)**2)*(.3+.7*growth);
        const localGrowth=sprouts*(.36+.64*shift)*(index<3?1:.47);
        const dx=nodeMetric[0]*Math.cos(angle)+nodeMetric[1]*Math.sin(angle),dy=nodeMetric[2]*Math.cos(angle)+nodeMetric[3]*Math.sin(angle);
-       const directionLength=Math.max(.0001,Math.hypot(dx,dy)),rootX=dx/directionLength*offset,rootY=dy/directionLength*offset,rootZ=radius*(.7+.12*Math.sin(index*1.91+shift*6));
-       sprout=Math.min(sprout,weaveSprout(tangentX-rootX,tangentY-rootY,z-rootZ,phase,shift,Math.atan2(dy,dx),budRadius,localGrowth,v.structWeaveCup,v.structDensity));
+       const directionLength=Math.max(.0001,Math.hypot(dx,dy)),axisX=dx/directionLength,axisY=dy/directionLength,rootX=axisX*offset,rootY=axisY*offset,rootZ=radius*(.7+.12*Math.sin(index*1.91+shift*6));
+       sprout=Math.min(sprout,weaveSprout(tangentX-rootX,tangentY-rootY,z-rootZ,phaseSine,phaseCosine,shift,axisX,axisY,budRadius,localGrowth,v.structWeaveCup,v.structDensity));
       }
      }
     }
@@ -353,7 +380,7 @@ vec3 structureWarp(vec3 p){
  float petal=.5+.5*cos(angle*uStructureC.w),envelope=1.-uStructureG.x*.62*(1.-petal);
  if(abs(uStructureG.x)+abs(uStructureG.y)+abs(uStructureG.z)>.000001)p.xy=vec2(cos(angle),sin(angle))*rr/envelope;
  p.z-=falloff*(uStructureE.y+uStructureE.z*sin(a*uStructureE.w+phase-rr*uStructureF.w*3.14159265359)+uStructureF.y*cos(rr*uStructureF.w*3.14159265359));
- p.z-=falloff*(uStructureG.z*.6*sin(angle*uStructureC.w+rr*2.+phase)+uStructureG.w*sin(angle*(uStructureC.w*3.)+phase-rr*6.));
+ p.z-=falloff*(uStructureG.z*(1.-uStructureFan)*.6*sin(angle*uStructureC.w+rr*2.+phase)+uStructureG.w*sin(angle*(uStructureC.w*3.)+phase-rr*6.));
  return p;
 }
 vec4 weaveSite(vec2 p,float corner,out float shift,out vec2 edgeNormal,out vec2 node){
@@ -401,11 +428,10 @@ float weaveSaddle(vec3 q,float radius,float amount,float shift,float turn){
  float fibreWidth=(.055+.1*max(0.,1.-r/span))*(.65+.35*pow(sin(p.x*.13+p.y*.21+shift*6.),2.));
  return max(membrane,(edge-fibreWidth)/frequency);
 }
-float weaveSprout(vec3 q,float phase,float shift,float turn,float radius,float growth,float opening){
+float weaveSprout(vec3 q,vec2 cycle,float shift,vec2 axis,float radius,float growth,float opening){
  float height=growth*(.19+.28*shift),cap=radius*(.83+.38*growth+.3*opening*growth);
  float axisZ=clamp(q.z,0.,height),slope=axisZ/max(.0001,height);
- vec2 axis=vec2(cos(turn),sin(turn));
- float tip=(.13+.035*sin(phase+turn))*growth*min(1.,5./uStructureB.x);
+ float tip=(.13+.035*dot(cycle,axis))*growth*min(1.,5./uStructureB.x);
  float stem=(length(vec3(q.xy-axis*tip*slope*slope,q.z-axisZ))-radius*(.24+.24*pow(1.-slope,2.)))*.71;
  vec3 tipPoint=vec3(q.xy-axis*(tip+(q.z-height)*.23),(q.z-height)*1.12);
  float bowl=length(tipPoint)-cap;
@@ -447,31 +473,9 @@ vec4 fanDrapeCoordinates(vec3 p){
  float blend=fanDrapeBlend();if(blend<=0.)return vec4(p,1.);
  float size=sqrt(blend);vec4 q=drapeCoordinates(p/size);q.zw*=size;return q;
 }
-float fanField(vec3 p){
- float blend=fanDrapeBlend(),drapeSize=sqrt(blend),fanSize=sqrt(1.-blend);
- float drape=blend>0.?drapeField(p/drapeSize)*drapeSize:10.;if(blend>=1.)return drape;
- p/=fanSize;
- float d=max(length(p.xy)-.115*(1.-uFanBias*.82),abs(p.z)-uStructureA.y*.58);
- for(int i=0;i<int(uStructureC.w+.5);i++){
-  vec4 axis=uFanAxes[i],profile=uFanProfiles[i];
-  vec2 plane=vec2(dot(p.xy,axis.xy),dot(p.xy,vec2(-axis.y,axis.x)));
-  float reach=axis.z,halfWidth=axis.w,along=clamp(plane.x/reach,0.,1.2);
-  float across=plane.y-along*along*profile.x;
-  float width=halfWidth*(.58+.42*smoothstep(0.,.75,along));
-  float outline=(length(vec2((plane.x-.43*reach)/(.63*reach),across/width))-1.)*min(.3,width)
-   +uStructureG.w*(.4*sin(plane.x*17.+across*22.+profile.w)+.16*sin(plane.x*41.-across*37.+profile.w*2.));
-  float sheet=along*(profile.y+sin(profile.w-along*2.4)*uStructureF.y*.42)+across*along*(.8*profile.z+uStructureE.y*.74)+across*across*(.45+.26*profile.z)
-   +uFanBias*pow(along,1.25)*uStructureE.z*sin(across*(3.2+uStructureE.w*.7)-along*2.1+profile.w)*.58;
-  float edge=clamp(1.+outline/(.6*halfWidth),0.,1.);
-  float thickness=uStructureA.y*(.33-.25*uStructureH.x*edge);
-  d=min(d,max(outline,abs(p.z-sheet)-thickness)*.59);
- }
- d*=fanSize;if(blend<=0.)return d;
- float rounding=.015*sin(3.14159265359*blend),h=max(0.,rounding-abs(d-drape))/max(.0000001,rounding);
- return min(d,drape)-h*h*rounding*.25;
-}
+${FAN_COMPONENT_GLSL}
 #endif
-float structureField(float d,vec3 p){
+float structureComponentField(float d,vec3 p){
  float r=length(p);bool networkOnly=uStructureH.y*uStructureA.x*uStructureA.z*uStructureA.w==1.;
  float thickness=uStructureA.y*(1.-uStructureH.x*.85*min(1.,length(p.xy))),midSurface=d+thickness*.5;
  if(networkOnly&&uStructureFan==0.){
@@ -491,13 +495,13 @@ float structureField(float d,vec3 p){
   a+=variation*(2.2*sin(4.*phi+2.3*sin(theta*6.))+1.12*sin(13.*phi-theta*7.));
   b+=variation*(1.9*sin(5.*phi-theta*3.)+1.26*sin(11.*phi+theta*8.));
  }
- if(uStructureA.x>0.)d=max(d,-d-thickness-(1.-thickness)*(1.-uStructureA.x));
 #ifdef FAN_FIELD
  if(uStructureFan>0.){
-  d=mix(max(d,-d-(1.-uStructureFan)),fanField(p),uStructureFan);
+  d=mix(d,fanField(p),uStructureFan);
   midSurface=mix(midSurface,d,uStructureFan);
  }
 #endif
+ if(uStructureA.x>0.)d=max(d,-d-thickness-(1.-thickness)*(1.-uStructureA.x));
  if(uStructureA.z>0.){
   float width=mix(1.,uStructureB.y,uStructureA.z);
   if(!networkOnly){
@@ -526,6 +530,7 @@ float structureField(float d,vec3 p){
    float z=midSurface-uStructureB.z*.42*sin(phi*4.+theta*3.+uStructureF.z*6.28318530718);
    float ribs=length(vec2(z,site.x/max(.1,edgeSlope)))-radius;
    float growth=uStructureH.z,node=10.,sprout=10.,membrane=10.;
+   vec2 growthCycle=vec2(sin(uStructureF.z*6.28318530718),cos(uStructureF.z*6.28318530718));
    for(int corner=0;corner<int(min(uRuntime.z+uRuntime.w,2.));corner++){
     if(corner==1)site=weaveSite(chart,1.,shift,edgeNormal,nodeChart);
     vec3 q=vec3(site.yz,z);float turn=site.w;
@@ -541,9 +546,9 @@ float structureField(float d,vec3 p){
       float index=float(i),angle=turn+mod(index,3.)*6.28318530718/3.+.3*sin(index*1.7+shift*4.),offset=radius*(.65+floor(index/3.)*1.55);
       float budRadius=baseRadius*(1.05+.4*pow(sin(index*2.17+shift*5.),2.))*(.3+.7*growth);
       float localGrowth=sprouts*(.36+.64*shift)*(i<3?1.:.47);
-      vec2 direction=nodeMetric*vec2(cos(angle),sin(angle));
-      vec3 root=vec3(normalize(direction)*offset,radius*(.7+.12*sin(index*1.91+shift*6.)));
-      sprout=min(sprout,weaveSprout(physical-root,uStructureF.z*6.28318530718,shift,atan(direction.y,direction.x),budRadius,localGrowth,uWeaveGrowth.y));
+      vec2 direction=normalize(nodeMetric*vec2(cos(angle),sin(angle)));
+      vec3 root=vec3(direction*offset,radius*(.7+.12*sin(index*1.91+shift*6.)));
+      sprout=min(sprout,weaveSprout(physical-root,growthCycle,shift,direction,budRadius,localGrowth,uWeaveGrowth.y));
      }
     }
    }
@@ -560,6 +565,23 @@ float structureField(float d,vec3 p){
  if(uStructureD.y>0.)d=max(d,(abs(sin(r*uStructureD.z*3.14159265359))-mix(1.,uStructureD.w,uStructureD.y))/(uStructureD.z*3.14159265359));
  return d;
 }
+float structureField(float d,vec3 p){
+#ifdef FAN_FIELD
+ // A single callsite avoids duplicating the complete network evaluator in
+ // both the component loop and the ordinary union path during compilation.
+ int requested=fanQuery,count=int(uStructureC.w+.5);
+ bool separate=uStructureFan>0.&&uStructureA.x>0.&&requested<0;
+ float result=10000.;int iterations=separate?count+2:1;
+ for(int slot=0;slot<iterations;slot++){
+  if(separate){int id=slot<count?slot:20+slot-count;if(!fanComponentIncluded(id))continue;fanQuery=id;}
+  result=min(result,structureComponentField(d,p));
+ }
+ fanQuery=requested;return result;
+#else
+ return structureComponentField(d,p);
+#endif
+}
+
 `;
 export function structurePanel(tab,s,{slider,details,section}){
  const sliders=keys=>keys.map(k=>slider(k)).join('');

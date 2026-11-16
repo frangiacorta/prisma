@@ -1,8 +1,8 @@
 {
   "prismaProject": 2,
   "name": "Bolla e anello",
-  "createdAt": "2026-11-16T07:43:39.308Z",
-  "exportedAt": "2026-11-16T07:43:39.308Z",
+  "createdAt": "2026-11-16T08:24:56.870Z",
+  "exportedAt": "2026-11-16T08:24:56.870Z",
   "state": {
     "dynAmount": 0,
     "dynMass": 1,
@@ -2015,12 +2015,16 @@
         "mode": "wave"
       },
       "filmThickness": {
-        "enabled": true,
-        "amplitude": 37,
-        "phase": 16,
+        "enabled": false,
+        "amplitude": 0,
         "cycles": 1,
-        "mode": "wave",
-        "curve": "sine"
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
       }
     },
     "renderVersion": 2,

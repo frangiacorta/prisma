@@ -1,16 +1,16 @@
-import {fieldAt,geometryRadius} from './solid-renderer.js?v=a55ab48fe9e6';
-import {extractVeilSurface} from './veil-surface.js?v=a55ab48fe9e6';
-import {makeVeilMesh,veilPoint} from './veil-geometry.js?v=a55ab48fe9e6';
+import {prepareFieldQuery,geometryRadius} from './solid-renderer.js?v=d35f7f15a5e5';
+import {extractVeilSurface} from './veil-surface.js?v=d35f7f15a5e5';
+import {makeVeilMesh,veilPoint} from './veil-geometry.js?v=d35f7f15a5e5';
 // A regular sheet atlas receives the full source surface during opening.
 // The atlas alone retains the outer profile at the completely open endpoint.
 export const VEIL_SOURCE_KEYS=['seed','renderVersion','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','rimRound','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','petalDirectionSpread','petalWeave','petalWeaveTurns','petalFlow','petalFlowPhase','petalOrbitPhase','petalCollision','petalSphereCollision','petalContactGap','petalContactStiffness','petalContactPasses','stemAmount','stemRadius','stemBend'];
 const TAU=Math.PI*2;
 const localState=s=>({...s,scale:1,volume:1,stretchX:1,stretchY:1,stretchZ:1,positionX:0,positionY:0,rotateX:0,rotateY:0,rotateZ:0});
 export function extractVeilSource(s,resolution=32){
- const local=localState(s),columns=resolution*3,rows=resolution*2,radii=new Float32Array((columns+1)*(rows+1)),valid=new Float32Array(radii.length);
+ const local=localState(s),query=prepareFieldQuery(local),columns=resolution*3,rows=resolution*2,radii=new Float32Array((columns+1)*(rows+1)),valid=new Float32Array(radii.length);
  const radius=Math.max(1.7,geometryRadius(local)),steps=64;
  for(let y=0;y<=rows;y++)for(let x=0;x<columns;x++){
-  const theta=x/columns*TAU,phi=y/rows*Math.PI,d=[Math.sin(phi)*Math.cos(theta),Math.sin(phi)*Math.sin(theta),Math.cos(phi)],at=r=>fieldAt(local,d.map(v=>v*r)),index=y*(columns+1)+x;
+  const theta=x/columns*TAU,phi=y/rows*Math.PI,d=[Math.sin(phi)*Math.cos(theta),Math.sin(phi)*Math.sin(theta),Math.cos(phi)],at=r=>query(d.map(v=>v*r)),index=y*(columns+1)+x;
   let outer=radius,previous=at(outer),hit=false;
   for(let k=1;k<=steps;k++){const inner=radius*(1-k/steps),value=at(inner);if(previous>=0&&value<0){let a=inner,b=outer;for(let n=0;n<9;n++){const mid=(a+b)/2;if(at(mid)<0)a=mid;else b=mid;}radii[index]=(a+b)/2;valid[index]=1;hit=true;break;}outer=inner;previous=value;}
   if(!hit)radii[index]=0;

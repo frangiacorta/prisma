@@ -1,17 +1,20 @@
-import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=a55ab48fe9e6';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=a55ab48fe9e6';
-import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=a55ab48fe9e6';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=a55ab48fe9e6';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=a55ab48fe9e6';
-import {PARTICLE_CELL_TRACKS,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=a55ab48fe9e6';
-import {BODY_LAYER_META} from './body-layers.js?v=a55ab48fe9e6';
+import {PALETTE_TRACKS} from './finish-palette.js?v=d35f7f15a5e5';
+import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=d35f7f15a5e5';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=d35f7f15a5e5';
+import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=d35f7f15a5e5';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=d35f7f15a5e5';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=d35f7f15a5e5';
+import {PARTICLE_CELL_TRACKS,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=d35f7f15a5e5';
+import {BODY_LAYER_META} from './body-layers.js?v=d35f7f15a5e5';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
 export function track(amplitude=1,enabled=false,mode='wave'){return{enabled,amplitude,cycles:1,phase:0,direction:1,curve:'sine',pace:0,pacePhase:0,hold:0,mode}}
 export const SHAPE_TRACKS=[...Object.keys(STRUCTURE_TRACKS),...Object.keys(FRACTAL_TRACKS),...CELLULAR_FIELD_KEYS.filter(key=>CELLULAR_TRACKS[key]),'petalFlowPhase','petalOrbitPhase','petalWeave','volume','deform','twist','waves','hole','cut','petalOpen','petalCurl','petalInflate','petalSharp','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemBend'];
 export const TRACK_META={
+ ...PALETTE_TRACKS,
  finishPrintNegative:['Negativo delle impronte',0,1,.01],
+ filmIslands:['Distribuzione della pellicola',0,1,.01],
  ...BODY_LAYER_META,
  ...STRUCTURE_TRACKS,
  ...CELLULAR_TRACKS,
@@ -176,10 +179,10 @@ Object.assign(EXTRA_META,{fullness:['Spessore',0,1,.001],environmentAngle:['Rota
 
 Object.assign(EXTRA_BASE,{...MODERN_BASE,renderVersion:1});
 
-export const INTERFERENCE_BASE={filmPattern:0,filmPatternScale:1.5,filmPatternWarp:.8,filmPatternDetail:.5,filmChroma:0,filmDuo:0};
+export const INTERFERENCE_BASE={filmIslands:0,filmPattern:0,filmPatternScale:1.5,filmPatternWarp:.8,filmPatternDetail:.5,filmChroma:0,filmDuo:0};
 Object.assign(EXTRA_BASE,INTERFERENCE_BASE);
 Object.assign(EXTRA_META,{
- filmPattern:['Venature di interferenza',0,1,.01],filmPatternScale:['Densità delle venature',.2,6,.01],
+ filmIslands:['Distribuzione della pellicola',0,1,.01],filmPattern:['Venature di interferenza',0,1,.01],filmPatternScale:['Densità delle venature',.2,6,.01],
  filmPatternWarp:['Distorsione delle venature',0,2,.01],filmPatternDetail:['Dettaglio delle venature',0,1,.01],
  filmChroma:['Contrasto dell’interferenza',0,1,.01],filmDuo:['Accento cobalto e oro',0,1,.01]
 });

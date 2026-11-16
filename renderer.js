@@ -1,16 +1,17 @@
-import {Dynamics,disposeDynamics} from './dynamics.js?v=a55ab48fe9e6';
-import {motionPeriod} from './animation-clock.js?v=a55ab48fe9e6';
-import {animationPhase} from './animation-clock.js?v=a55ab48fe9e6';
-import {ScanlinePass} from './finish-scanlines.js?v=a55ab48fe9e6';
-import {FilamentPass} from './filament-renderer.js?v=a55ab48fe9e6';
-import {VeilTransition} from './veil-transition.js?v=a55ab48fe9e6';
-import {BodySamples} from './body-samples.js?v=a55ab48fe9e6';
-import {BodyComposite} from './body-composite.js?v=a55ab48fe9e6';
-import {cloudBody,cloudToBody,grainMix} from './body-layers.js?v=a55ab48fe9e6';
-import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=a55ab48fe9e6';
-import {ParticleRenderer} from './particle-renderer.js?v=a55ab48fe9e6';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=a55ab48fe9e6';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=a55ab48fe9e6';
+import {PaletteFinishPass} from './finish-palette.js?v=d35f7f15a5e5';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=d35f7f15a5e5';
+import {motionPeriod} from './animation-clock.js?v=d35f7f15a5e5';
+import {animationPhase} from './animation-clock.js?v=d35f7f15a5e5';
+import {ScanlinePass} from './finish-scanlines.js?v=d35f7f15a5e5';
+import {FilamentPass} from './filament-renderer.js?v=d35f7f15a5e5';
+import {VeilTransition} from './veil-transition.js?v=d35f7f15a5e5';
+import {BodySamples} from './body-samples.js?v=d35f7f15a5e5';
+import {BodyComposite} from './body-composite.js?v=d35f7f15a5e5';
+import {cloudBody,cloudToBody,grainMix} from './body-layers.js?v=d35f7f15a5e5';
+import {sampleFrame,Renderer as SolidRenderer} from './solid-renderer.js?v=d35f7f15a5e5';
+import {ParticleRenderer} from './particle-renderer.js?v=d35f7f15a5e5';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=d35f7f15a5e5';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=d35f7f15a5e5';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
@@ -90,6 +91,10 @@ export class Renderer{
  }
  drawGrains(plan,frame,p,w,h,o,async=false){
   const {surface,solid,studioLayer}=frame;
+  if(surface.focusBlur>0){
+   const g=this.gl;g.bindFramebuffer(g.READ_FRAMEBUFFER,frame.layers.framebuffer);g.readBuffer(g.COLOR_ATTACHMENT0);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,null);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.FRAMEBUFFER,null);
+   this.applyFocus(surface,p,w,h,null,{...o,beforeFilaments:true});frame.layers.captureColor();
+  }
   const ok=this.select(plan.grains).draw(finishingSource(plan.grains,o),p,w,h,{...o,studioLayer});
   if(ok&&this.needsFilaments(surface,p)){
    return this.filamentPass[async?'drawAsync':'draw']({...sampleFrame(surface,p),filCore:(surface.filCore??1)*(1-plan.mix)},p,w,h,solid,o);
@@ -142,6 +147,7 @@ export class Renderer{
  }
  applyFocus(s,p,w,h,plan,o={}){
   const source=this.focusBody(s,p,plan);if(!source)return;
+  if(!o.beforeFilaments&&(plan?.grains||this.needsFilaments(source,p)))return;
   const renderer=this.select(source),exact=renderer.exactDepth;
   if(renderer.canUseImplicit(source,o)&&exact?.width===w&&exact?.height===h){this.focusPass.draw(s,w,h,exact.texture,true);return true;}
   const solid=this.select(source),scale=Math.min(.6,800/Math.max(w,h)),width=Math.max(1,Math.round(w*scale)),height=Math.max(1,Math.round(h*scale));
@@ -155,24 +161,27 @@ export class Renderer{
  prepareFilaments(s,p){if(!this.needsFilaments(s,p))return true;this.filamentPass??=new FilamentPass(this.gl);return this.filamentPass.prepare(!!(s.filWrap||s.motions?.filWrap?.enabled));}
  filaments(s,p,w,h,o,async=false){
   if(this.kind!=='solid'||sampleFrame(s,p).filLength<=0)return true;
+  this.applyFocus(s,p,w,h,null,{...o,beforeFilaments:true});
   this.filamentPass??=new FilamentPass(this.gl);
   return this.filamentPass[async?'drawAsync':'draw'](sampleFrame(finishingSource(s,o),p),p,w,h,this.impl,o);
  }
  prepareFilter(kind){
-  const constructors={mosaic:['finishing',FinishingPass],rgb:['finishing',FinishingPass],warp:['opticalFinishing',OpticalPass],glass:['opticalFinishing',OpticalPass],feedback:['feedbackFinishing',FeedbackPass],scan:['scanFinishing',ScanlinePass],glyph:['glyphFinishing',GlyphPass],edge:['detailFinishing',DetailPass],glitch:['detailFinishing',DetailPass]};
+  const constructors={palette:['paletteFinishing',PaletteFinishPass],mosaic:['finishing',FinishingPass],rgb:['finishing',FinishingPass],warp:['opticalFinishing',OpticalPass],glass:['opticalFinishing',OpticalPass],feedback:['feedbackFinishing',FeedbackPass],scan:['scanFinishing',ScanlinePass],glyph:['glyphFinishing',GlyphPass],edge:['detailFinishing',DetailPass],glitch:['detailFinishing',DetailPass]};
   const descriptor=constructors[kind];
   if(descriptor){const [key,Pass]=descriptor;this[key]??=new Pass(this.gl);}
  }
  finish(s,o={},phase=0,timeline=phase){
-  if(finishingOff(s,o)){this.feedbackFinishing?.release();return false;}
+  if(finishingOff(s,o)){this.feedbackFinishing?.release();this.paletteFinishing?.release();return false;}
   const values={...FINISH_DEFAULTS,...s},order=normalizeFinishOrder(s.finishOrder),w=this.canvas.width,h=this.canvas.height;
-  if(s.motions?.finishPrintNegative?.enabled)values.finishPrintNegative=sampleFrame(s,phase).finishPrintNegative;
-  const active={feedback:values.finishFeedback&&values.finishFeedbackMix>0,scan:values.finishScan&&values.finishScanMix>0,warp:values.finishWarp&&values.finishWarpMix>0,glass:values.finishGlass&&values.finishGlassMix>0,mosaic:values.finishMosaic&&values.finishMosaicMix>0,rgb:values.finishRgb&&values.finishRgbMix>0,edge:values.finishEdge&&values.finishEdgeMix>0,glyph:values.finishGlyph&&values.finishGlyphMix>0,glitch:values.finishGlitch&&values.finishGlitchMix>0&&values.finishGlitchCoverage>0&&(values.finishGlitchAmount>0||values.finishGlitchSplit>0)};
+  for(const key of ['finishPrintNegative','finishPaletteMap','finishPaletteScale','finishPaletteOffset','finishPaletteBlur'])if(s.motions?.[key]?.enabled)values[key]=sampleFrame(s,phase)[key];
+  const active={palette:values.finishPalette&&values.finishPaletteMap>0,feedback:values.finishFeedback&&values.finishFeedbackMix>0,scan:values.finishScan&&values.finishScanMix>0,warp:values.finishWarp&&values.finishWarpMix>0,glass:values.finishGlass&&values.finishGlassMix>0,mosaic:values.finishMosaic&&values.finishMosaicMix>0,rgb:values.finishRgb&&values.finishRgbMix>0,edge:values.finishEdge&&values.finishEdgeMix>0,glyph:values.finishGlyph&&values.finishGlyphMix>0,glitch:values.finishGlitch&&values.finishGlitchMix>0&&values.finishGlitchCoverage>0&&(values.finishGlitchAmount>0||values.finishGlitchSplit>0)};
   if(!active.feedback)this.feedbackFinishing?.release();
+  if(!active.palette)this.paletteFinishing?.release();
   let applied=false;
   for(let i=0;i<order.length;i++){
    const kind=order[i];if(!active[kind])continue;applied=true;this.prepareFilter(kind);
-   if(kind==='mosaic'||kind==='rgb'){
+   if(kind==='palette'){this.paletteFinishing.draw(values,w,h);}
+   else if(kind==='mosaic'||kind==='rgb'){
     // Preserve the legacy fused pass when the two active filters remain adjacent.
     const fused=kind==='mosaic'&&order[i+1]==='rgb'&&active.rgb;
     this.finishing.draw({...values,finishMosaic:kind==='mosaic',finishRgb:kind==='rgb'||fused},w,h);if(fused)i++;
@@ -232,6 +241,6 @@ export class Renderer{
  fence(){if(this.impl?.completionSync)this.gl.deleteSync(this.impl.completionSync);this.impl.completionSync=this.gl.fenceSync(this.gl.SYNC_GPU_COMMANDS_COMPLETE,0);this.gl.flush();}
  pollGpuTime(){this.impl?.pollGpuTime();const g=this.gl,e=this.frameTimer;if(!e||g.isContextLost())return;const disjoint=g.getParameter(e.GPU_DISJOINT_EXT);while(this.frameQueries.length&&(disjoint||g.getQueryParameter(this.frameQueries[0],g.QUERY_RESULT_AVAILABLE))){const q=this.frameQueries.shift();if(!disjoint){const ms=g.getQueryParameter(q,g.QUERY_RESULT)/1e6;if(Number.isFinite(ms)&&ms>0){this.frameGpuMs=ms;this.frameGpuSample++;}}g.deleteQuery(q);}if(disjoint)this.frameGpuMs=null;}pollCompletion(){return this.impl?.pollCompletion();}async waitForGpu(o){return this.impl?this.impl.waitForGpu(o):true;}
  hardwareInfo(){if(this.impl)return this.impl.hardwareInfo();const gl=this.gl,e=gl.getExtension('WEBGL_debug_renderer_info'),name=gl.getParameter(e?e.UNMASKED_RENDERER_WEBGL:gl.RENDERER);return {name,software:/swiftshader|llvmpipe/i.test(name)};}
- pixels(){return this.impl.pixels();}releaseSurface(){const ok=this.impl?.releaseSurface()??true;if(ok){this.focusPass?.release();this.focusDepthTarget?.release();this.bodyComposite?.release();this.filamentPass?.release();this.feedbackFinishing?.release();this.finishing?.release();this.glyphFinishing?.release();this.detailFinishing?.release();this.opticalFinishing?.release();this.scanFinishing?.release();}return ok;}
- dispose(o){disposeDynamics(this.gl);if(!this.gl.isContextLost())for(const q of this.frameQueries)this.gl.deleteQuery(q);this.frameQueries=[];this.focusPass?.dispose();this.focusDepthTarget?.release();this.bodyComposite?.release();this.bodySamples?.dispose();this.bodySamples=null;this.filamentPass?.dispose();this.filamentPass=null;this.veilTransition?.dispose();this.veilTransition=null;this.scanFinishing?.dispose();this.scanFinishing=null;this.opticalFinishing?.dispose();this.opticalFinishing=null;this.detailFinishing?.dispose();this.detailFinishing=null;this.feedbackFinishing?.dispose();this.feedbackFinishing=null;this.finishing?.dispose();this.finishing=null;this.glyphFinishing?.dispose();this.glyphFinishing=null;const implementations=new Set([...Object.values(this.implementations||{}),this.impl].filter(Boolean));for(const renderer of implementations)renderer.dispose({loseContext:false});if(o?.loseContext!==false)this.recoveryExtension?.loseContext();this.implementations={};this.impl=null;this.kind=null;}
+ pixels(){return this.impl.pixels();}releaseSurface(){const ok=this.impl?.releaseSurface()??true;if(ok){this.focusPass?.release();this.focusDepthTarget?.release();this.bodyComposite?.release();this.filamentPass?.release();this.feedbackFinishing?.release();this.finishing?.release();this.glyphFinishing?.release();this.detailFinishing?.release();this.opticalFinishing?.release();this.scanFinishing?.release();this.paletteFinishing?.release();}return ok;}
+ dispose(o){disposeDynamics(this.gl);if(!this.gl.isContextLost())for(const q of this.frameQueries)this.gl.deleteQuery(q);this.frameQueries=[];this.focusPass?.dispose();this.focusDepthTarget?.release();this.bodyComposite?.release();this.bodySamples?.dispose();this.bodySamples=null;this.filamentPass?.dispose();this.filamentPass=null;this.veilTransition?.dispose();this.veilTransition=null;this.scanFinishing?.dispose();this.scanFinishing=null;this.paletteFinishing?.dispose();this.paletteFinishing=null;this.opticalFinishing?.dispose();this.opticalFinishing=null;this.detailFinishing?.dispose();this.detailFinishing=null;this.feedbackFinishing?.dispose();this.feedbackFinishing=null;this.finishing?.dispose();this.finishing=null;this.glyphFinishing?.dispose();this.glyphFinishing=null;const implementations=new Set([...Object.values(this.implementations||{}),this.impl].filter(Boolean));for(const renderer of implementations)renderer.dispose({loseContext:false});if(o?.loseContext!==false)this.recoveryExtension?.loseContext();this.implementations={};this.impl=null;this.kind=null;}
 }

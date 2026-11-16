@@ -1,8 +1,8 @@
 {
   "prismaProject": 2,
   "name": "Accumulo della luminanza",
-  "createdAt": "2026-11-16T07:43:39.324Z",
-  "exportedAt": "2026-11-16T07:43:39.324Z",
+  "createdAt": "2026-11-16T10:07:45.737Z",
+  "exportedAt": "2026-11-16T10:07:45.737Z",
   "state": {
     "dynAmount": 0,
     "dynMass": 1,
@@ -462,6 +462,16 @@
     "finishGlassMotion": 0,
     "finishGlassCycles": 1,
     "finishRegionGlass": true,
+    "finishPalette": false,
+    "finishPaletteMap": 1,
+    "finishPaletteScale": 1,
+    "finishPaletteOffset": 0,
+    "finishPaletteBlur": 0,
+    "finishPaletteColors": [
+      "#10131c",
+      "#697a9d",
+      "#f5eee5"
+    ],
     "finishScan": false,
     "finishScanMix": 1,
     "finishScanSpacing": 18,
@@ -487,7 +497,8 @@
       "warp",
       "glass",
       "feedback",
-      "scan"
+      "scan",
+      "palette"
     ],
     "finishEdge": false,
     "finishEdgeWidth": 2,
@@ -2003,6 +2014,18 @@
         "mode": "wave"
       },
       "transparency": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "cellCore": {
         "enabled": false,
         "amplitude": 0.2,
         "cycles": 1,

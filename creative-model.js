@@ -1,17 +1,18 @@
-import {normalizePlayground} from './playground-model.js?v=a55ab48fe9e6';
-import {hasGrainLayer,normalizeBodyLayers} from './body-layers.js?v=a55ab48fe9e6';
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=a55ab48fe9e6';
-import {FRACTAL_META} from './fractal-form.js?v=a55ab48fe9e6';
-import {CELLULAR_META} from './cellular-form.js?v=a55ab48fe9e6';
-import {normalizeFinishRegions,normalizeFinishOrder,normalizeBrushStrokes} from './finishing.js?v=a55ab48fe9e6';
-import {normalizeAudioClip} from './audio-recording.js?v=a55ab48fe9e6';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=a55ab48fe9e6';
-import {normalizeAudio} from './audio-model.js?v=a55ab48fe9e6';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=a55ab48fe9e6';
-import {normalizeForcePaths} from './particle-paths.js?v=a55ab48fe9e6';
-import {normalizeForcePoints} from './particle-forces.js?v=a55ab48fe9e6';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=a55ab48fe9e6';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META,syncMaterialControl} from './studio-model.js?v=a55ab48fe9e6';
+import {normalizeFinishPalette} from './finish-palette.js?v=d35f7f15a5e5';
+import {normalizePlayground} from './playground-model.js?v=d35f7f15a5e5';
+import {hasGrainLayer,normalizeBodyLayers} from './body-layers.js?v=d35f7f15a5e5';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=d35f7f15a5e5';
+import {FRACTAL_META} from './fractal-form.js?v=d35f7f15a5e5';
+import {CELLULAR_META} from './cellular-form.js?v=d35f7f15a5e5';
+import {normalizeFinishRegions,normalizeFinishOrder,normalizeBrushStrokes} from './finishing.js?v=d35f7f15a5e5';
+import {normalizeAudioClip} from './audio-recording.js?v=d35f7f15a5e5';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=d35f7f15a5e5';
+import {normalizeAudio} from './audio-model.js?v=d35f7f15a5e5';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=d35f7f15a5e5';
+import {normalizeForcePaths} from './particle-paths.js?v=d35f7f15a5e5';
+import {normalizeForcePoints} from './particle-forces.js?v=d35f7f15a5e5';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=d35f7f15a5e5';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META,syncMaterialControl} from './studio-model.js?v=d35f7f15a5e5';
 
 export function setFullness(s,value){s.fullness=value;syncMaterialControl(s,'fullness');}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -129,6 +130,7 @@ export function normalizeCreation(raw){
  const s=preset(0);s.playground=normalizePlayground(raw.playground);s.layerMemory={};for(const key of ['pLinks','pTrailCount','pLiving'])if(Number.isFinite(raw.layerMemory?.[key]))s.layerMemory[key]=Math.max(0,Math.min(key==='pLinks'?1:key==='pLiving'?4:60000,raw.layerMemory[key]));s.controlLocks=Array.isArray(raw.controlLocks)?[...new Set(raw.controlLocks.map(k=>({pLargeSize:'pSizeRatio',pLinkNodeSize:'pNodeRatio'}[k]||k)).filter(k=>typeof k==='string'&&(META[k]||PARTICLE_META[k])))].slice(0,1000):[];s.audioClip=normalizeAudioClip(raw.audioClip);s.audioReactive=normalizeAudio(raw.audioReactive,raw.engine);s.bodyTracking=normalizeBodyTracking(raw.bodyTracking);s.forcePoints=normalizeForcePoints(raw.forcePoints);s.forcePaths=normalizeForcePaths(raw.forcePaths);s.keepMotionSpeed=raw.keepMotionSpeed!==false;s.motionPeriod=Number.isFinite(raw.motionPeriod)&&raw.motionPeriod>0?Math.max(2,Math.min(300,raw.motionPeriod)):0;s.perfectLoop=raw.perfectLoop!==false;for(const [k,meta] of Object.entries(META)){if(Number.isFinite(raw[k]))s[k]=clamp(k,raw[k]);}
  for(const k of ['finishGlitchAttack','finishGlitchRelease'])if(!Number.isFinite(raw[k]))s[k]=Number.isFinite(raw.finishGlitchSoftness)?Math.max(0,Math.min(1,raw.finishGlitchSoftness)):.35;
  for(const k of ['background','background2','internalColor','sssColor','finishGlyphColor','finishEdgeColor','finishScanColor'])if(/^#[0-9a-f]{6}$/i.test(raw[k]||''))s[k]=raw[k];
+ s.finishPaletteColors=normalizeFinishPalette(raw.finishPaletteColors);
  if(Array.isArray(raw.palette)&&raw.palette.length&&raw.palette.every(c=>/^#[0-9a-f]{6}$/i.test(c)))s.palette=raw.palette.slice(0,12);
  if(['solid','gradient','transparent','studio'].includes(raw.bgMode))s.bgMode=raw.bgMode;
  Object.assign(s,{...MODERN_BASE,renderVersion:raw.renderVersion>=2?2:1});
@@ -142,7 +144,7 @@ export function normalizeCreation(raw){
  for(const k of ['internalColor','sssColor'])if(!/^#[0-9a-f]{6}$/i.test(s[k]||''))s[k]=k==='internalColor'?'#e6f5ff':'#ffc49b';
  for(const k of ['photoAll','environmentRotate'])s[k]=raw[k]===true;
  for(const k of ['finishEnabled','finishTone'])s[k]=raw[k]!==false;
- for(const k of ['finishGlitchFlash','finishScan','finishScanSource','finishScanAnimate','finishRgb','finishMosaic','finishGlyph','finishGlitch','finishEdge','finishEdgeSource','finishEdgeOnly','finishWarp','finishGlass','finishFeedback','finishPrintOnly'])s[k]=raw[k]===true;
+ for(const k of ['finishPalette','finishGlitchFlash','finishScan','finishScanSource','finishScanAnimate','finishRgb','finishMosaic','finishGlyph','finishGlitch','finishEdge','finishEdgeSource','finishEdgeOnly','finishWarp','finishGlass','finishFeedback','finishPrintOnly'])s[k]=raw[k]===true;
  if(raw.finishFeedbackLumen>0&&!Object.hasOwn(raw,'finishPrintLife'))s.finishPrintLife=0;
  for(const k of ['finishScanOnly','finishRegionScan','finishGlitchAnimate','finishRegionEdge','finishRegionGlitch','finishRegionWarp','finishRegionGlass'])s[k]=raw[k]!==false;for(const k of ['finishGlitchCycles','finishGlitchSeed'])s[k]=Math.round(s[k]);
  for(const k of ['finishScanCycles','finishGlyphFont','finishGlyphSet','finishGlyphSeed','finishGlitchShape','finishWarpLayers','finishWarpCycles','finishWarpSeed','finishGlassShape','finishGlassCycles'])s[k]=Math.round(s[k]);s.finishGlyphChars=typeof raw.finishGlyphChars==='string'?Array.from(raw.finishGlyphChars.replace(/[\x00-\x1f\x7f]/g,'')).slice(0,64).join('')||' .:-=+*#%@':' .:-=+*#%@';

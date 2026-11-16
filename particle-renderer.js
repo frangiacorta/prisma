@@ -1,20 +1,20 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=a55ab48fe9e6';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=a55ab48fe9e6';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=a55ab48fe9e6';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=a55ab48fe9e6';
-import {knotTurns} from './structure-model.js?v=a55ab48fe9e6';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=a55ab48fe9e6';
-import {shadowLight} from './particle-shadow.js?v=a55ab48fe9e6';
-import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=a55ab48fe9e6';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=a55ab48fe9e6';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=a55ab48fe9e6';
-import {ParticleLinks} from './particle-links.js?v=a55ab48fe9e6';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=a55ab48fe9e6';
-import {LayeredVeils} from './layered-veils.js?v=a55ab48fe9e6';
-import {LivingStructures} from './living-structures.js?v=a55ab48fe9e6';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=a55ab48fe9e6';
-import {forceBarrierGLSL} from './particle-forces.js?v=a55ab48fe9e6';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=a55ab48fe9e6';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=d35f7f15a5e5';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=d35f7f15a5e5';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=d35f7f15a5e5';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=d35f7f15a5e5';
+import {knotTurns} from './structure-model.js?v=d35f7f15a5e5';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=d35f7f15a5e5';
+import {shadowLight} from './particle-shadow.js?v=d35f7f15a5e5';
+import {sampleFrame,FILM_SPECTRUM} from './solid-renderer.js?v=d35f7f15a5e5';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=d35f7f15a5e5';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=d35f7f15a5e5';
+import {ParticleLinks} from './particle-links.js?v=d35f7f15a5e5';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=d35f7f15a5e5';
+import {LayeredVeils} from './layered-veils.js?v=d35f7f15a5e5';
+import {LivingStructures} from './living-structures.js?v=d35f7f15a5e5';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=d35f7f15a5e5';
+import {forceBarrierGLSL} from './particle-forces.js?v=d35f7f15a5e5';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=d35f7f15a5e5';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec2 uFocus;
 float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
@@ -58,7 +58,7 @@ const pointVert=`#version 300 es
 precision highp float;
 layout(location=0) in vec4 aRandom;
 ${grainGLSL}
-out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity,vCellLight;out vec2 vSpriteUV;uniform float uPointQuad;
+out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity,vCellLight,vRadius;out vec2 vSpriteUV;uniform float uPointQuad;
 uniform int uSeedOffset;
 void main(){
  int index=uPointQuad>.5?gl_InstanceID:gl_VertexID;
@@ -70,6 +70,7 @@ void main(){
  #endif
  vec3 p=attachedPosition(seed,uPhase);gl_Position=project(p);
  float trueSize=grainDiameter(seed,index)*uResolution.y/1080.;
+ vRadius=trueSize*mix(max(2.,7.5-p.z)/(2.6*uResolution.y),1.7/min(uResolution.x,uResolution.y),uStudioPerspective);
  float px=trueSize+particleDefocus(p);
  vSpriteUV=vec2(0.);
  if(uPointQuad>.5){
@@ -83,7 +84,7 @@ void main(){
 }`;
 const pointFrag=`#version 300 es
 precision highp float;
-in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vOpacity,vCellLight;in vec2 vSpriteUV;uniform float uPointQuad;out vec4 color;
+in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vOpacity,vCellLight,vRadius;in vec2 vSpriteUV;uniform float uPointQuad,uSphereGrain;out vec4 color;
 ${prismaShadingGLSL}
 ${forceBarrierGLSL}
 ${guideGLSL}
@@ -99,7 +100,10 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
  float a=coverage*profile*vOpacity*livingVisibility(vPosition.z)*particleWallCoverage(d);
  vec3 micro=vec3(xy.x,-xy.y,sqrt(max(.01,1.-d*d)));
  vec3 n=normalize(normalize(vPosition-uShadeOrigin+vec3(0.,0.,.0001))+micro*.28);
- color=vec4(shadeParticle(vColor,vPosition,n)*(a*vCellLight),a);
+ // The local sphere normal remains stable as visibility and edge softness vary.
+ vec3 world=vPosition;
+ if(uSphereGrain>.5){vec3 sphere=vec3(xy.x,-xy.y,sqrt(max(0.,1.-d*d)));n=normalize(sphere);world+=sphere*vRadius;}
+ color=vec4(shadeParticle(vColor,world,n)*(a*vCellLight),a);
 }`;
 const trailVert=`#version 300 es
 precision highp float;
@@ -354,7 +358,7 @@ export class ParticleRenderer{
   this.u(p,'uDynamics',s.pVortex,s.pReentry,s.pTravel,s.pMorph);this.u(p,'uPoles',s.pAttract,s.pRepel,s.pMagnet,s.pPoles);this.u(p,'uPoleRadius',s.pRadius);this.u(p,'uPoleField',s.pField);this.u(p,'uBreath',s.pBreath);
   const repeat=v=>s.perfectLoop===false?v:Math.max(1,Math.round(v||1));
   this.u(p,'uOuter',s.pOuter,s.pReach,s.pBranches,0);this.u(p,'uClock',repeat(s.pCycles),s.pRhythm,s.pPause,s.pSpeedSpread);
-  this.u(p,'uSpacing',s.pGrainSpacing??1,s.pGroupSpacing??1,s.pDistributionCells??4);this.u(p,'uPoints',s.pSize,s.pSizeVar,s.pOpacity,s.pSoftness);this.u(p,'uSprite',s.pSprite);this.u(p,'uLargeGrains',s.pLargeCount||0,grainDiameters(s).large);this.u(p,'uGrainDistribution',s.pSizeSpread||0,s.pSizeBias||0);this.u(p,'uNodeStyle',s.pLinks>0?s.pLinkNodes:0,grainDiameters(s).node);
+  this.u(p,'uSpacing',s.pGrainSpacing??1,s.pGroupSpacing??1,s.pDistributionCells??4);this.u(p,'uPoints',s.pSize,s.pSizeVar,s.pOpacity,s.pSoftness);this.u(p,'uSprite',s.pSprite);this.u(p,'uSphereGrain',+(!this.shadowPass&&s.pSprite>.5&&s.pSprite<1.5));this.u(p,'uLargeGrains',s.pLargeCount||0,grainDiameters(s).large);this.u(p,'uGrainDistribution',s.pSizeSpread||0,s.pSizeBias||0);this.u(p,'uNodeStyle',s.pLinks>0?s.pLinkNodes:0,grainDiameters(s).node);
   this.u(p,'uTrails',s.pTrailLength*s.pDirection,s.pTrailWidth,s.pTrailOpacity,0);this.u(p,'uTail',s.pTrailFade,s.pTrailTaper,0,s.pTrailScatter);
   this.u(p,'uFiber',s.pTrailPersistence,s.pTrailSoftness,s.pTrailCoherence,Math.pow(trailLightCompensation(s),s.pTrailDensity*.8));
   this.u(p,'uFiberLight',s.pFiberSheen,s.pFiberSpread);this.u(p,'uTrailLine',s.pTrailStraighten||0);
@@ -369,7 +373,7 @@ export class ParticleRenderer{
   this.u(p,'uForm',s.stretchX,s.stretchY,s.stretchZ,s.volume);this.u(p,'uWarp',s.deform,s.twist,s.waves,s.waveScale);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uRotation',s.rotateX*rad,s.rotateY*rad,s.rotateZ*rad,0);
   this.u(p,'uMaterial',s.metal,s.roughness,s.gloss,s.iridescence);this.u(p,'uFinish',s.emission,s.pLighting,1-s.transparency,1.-Math.min(1,s.pSize/8));
   this.u(p,'uParticleOptical',s.refraction??1.5,s.thickness??1,s.dispersion||0,materialCavity(s));
-  this.u(p,'uFilmPattern',s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5);this.u(p,'uFilmAccent',s.filmChroma||0,s.filmDuo||0);
+  this.u(p,'uFilmPattern',s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5);this.u(p,'uFilmAccent',s.filmChroma||0,s.filmDuo||0,s.filmIslands||0);
   this.u(p,'uFilmLayer',s.pFilm,s.pFilmScale,s.pFilmVariation,0);
   const filmCycles=s.perfectLoop!==false?Math.max(1,Math.round(s.filmCycles||1)):(s.filmCycles||1);
   this.u(p,'uParticleFilmMotion',phase*Math.PI*2*filmCycles,s.filmFlow||0,s.filmSwirl||0,0);

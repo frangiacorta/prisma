@@ -40,7 +40,7 @@ export const CELLULAR_DEFAULTS=Object.fromEntries(Object.entries(parameters).map
 export const CELLULAR_META=Object.fromEntries(Object.entries(parameters).map(([key,m])=>[key,m.slice(0,4)]));
 export const CELLULAR_FIELD_KEYS=[...Object.keys(CELLULAR_SHAPE),...Object.keys(CELLULAR_POSE)];
 export const CELLULAR_TRACKS=Object.fromEntries([
- 'cellMorph','cellBubbles','cellExposure','cellSpines','cellSpineLength','cellSpineBend','cellBreathPhase','cellSpinePhase','cellFilm',
+ 'cellMorph','cellCore','cellBubbles','cellExposure','cellSpines','cellSpineLength','cellSpineBend','cellBreathPhase','cellSpinePhase','cellFilm',
 ].map(key=>[key,[CELLULAR_META[key][0],0,...CELLULAR_META[key].slice(2)]]));
 export const CELLULAR_PHASES=['cellBreathPhase','cellSpinePhase'];
 
@@ -98,7 +98,10 @@ function cellularGeometry(s){
    const axis=direction(i,count,v.cellSpread,spineSeed);
    const tangentScale=Math.hypot(axis[0],axis[2]);
    const tangent=[-axis[2]/tangentScale,0,axis[0]/tangentScale];
-   const cross=[axis[1]*tangent[2],tangentScale,-axis[1]*tangent[0]];
+   // Both bend directions must be perpendicular to the spine axis: the field
+   // derives its curve parameter from that axis projection. An axial bend can
+   // otherwise disconnect the tapered middle from its still-visible tip.
+   const cross=[-axis[1]*tangent[2],tangentScale,axis[1]*tangent[0]];
    const angle=hash(spineSeed,i+24)*TAU,offset=i*GOLDEN_ANGLE;
    const length=v.cellSpineLength*spineGrowth*mix(1,.37+hash(spineSeed,i+38)*.95,v.cellSpineVariation)
      *(1+v.cellFlex*.30*Math.sin(phase+offset));
@@ -213,8 +216,8 @@ vec3 cellularInterference(vec3 p,float facing){
  return mix(vec3(.35),.5+.5*wave,.55+uCellOptics.z*.45);
 }
 
-// A cheap single-scatter approximation adds the contours of the other
-// cells along the view ray. The intersected ellipsoids are the actual volumes.
+// A single-scatter approximation uses actual ellipsoid intersections for
+// soft internal contours and small highlights, without a second SDF march.
 vec3 cellularInterior(vec3 p,vec3 ray){
  vec3 scattered=vec3(0.);
  for(int i=0;i<uCellCounts.x;i++){
@@ -227,17 +230,24 @@ vec3 cellularInterior(vec3 p,vec3 ray){
   float distance=sqrt(max(0.,dot(q,q)-axis.w*qr*qr+b*depth))/max(.001,bubble.w);
   if(distance>1.05)continue;
   float contour=smoothstep(.68,.96,distance)*(1.-smoothstep(.96,1.05,distance));
-  float body=(1.-smoothstep(.3,1.,distance))*.16;
+  float body=(1.-smoothstep(.3,1.,distance))*.20;
+  float entry=depth-sqrt(max(0.,1.-distance*distance))*bubble.w/sqrt(max(.001,a));
+  vec3 entryPoint=q+ray*entry;
+  vec3 normal=normalize(entryPoint-axis.xyz*axis.w*dot(entryPoint,axis.xyz));
+  vec3 reflected=reflect(ray,normal);
+  vec3 points=pow(max(0.,dot(reflected,normalize(vec3(-.52,.69,.49)))),240.)*vec3(.52,.78,1.)
+    +pow(max(0.,dot(reflected,normalize(vec3(.61,.36,.70)))),340.)*vec3(1.,.56,.72)
+    +pow(max(0.,dot(reflected,normalize(vec3(-.52,-.53,.66)))),280.)*vec3(1.,.84,.43);
   vec3 tint=cellularInterference(bubble.xyz,.22+max(0.,1.-distance)*.4);
-  scattered+=(contour*.63+body)*mix(vec3(.86,.93,1.),tint,.53)*exp(-depth*1.24);
+  scattered+=((contour*.18+body)*mix(vec3(.95,.94,.86),tint,.4)+points*3.5*step(distance,1.))*exp(-depth*.85);
  }
- return scattered/(1.+scattered);
+ return scattered/(1.+scattered*.45);
 }
 `;
 
 export const CELLULAR_HELP={
  cellMorph:'A zero mantiene la forma di base. Aumentandolo crescono cellule e spine e si riduce il nucleo. Puoi animare l’intero passaggio in Movimento.',
- cellCore:'Dimensione del corpo centrale da cui crescono cellule e spine, rispetto alla forma di partenza.',
+ cellCore:'Dimensione del corpo centrale da cui crescono cellule e spine. Puoi animarla indipendentemente dalla loro crescita, nel pannello Movimento.',
  cellBubbles:'Fa emergere gradualmente le cellule dal nucleo.',
  cellCount:'Numero di volumi cellulari distribuiti intorno al nucleo.',
  cellSize:'Dimensione media delle cellule rispetto al raggio della forma di partenza.',

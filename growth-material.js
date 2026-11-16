@@ -42,6 +42,19 @@ export function bakeGrowth(config){
 }
 const growthCache=new Map(),growthContexts=new WeakMap(),growthLocations=new WeakMap();let growthWorkerURL,previewEntry;
 function growthConfig(s){return {size:64,feed:s.growthFeed??.028,kill:s.growthKill??.058,diffusion:s.growthDiffusion??1,age:Math.round(s.growthAge??650),seed:Math.round(s.growthSeed??42)};}
+export function growthNormalOffset(s){
+ const base=.00016*s.scale,influence=Math.max(0,Math.min(1,(s.growthAmount||0)*Math.max(s.growthExtrusion||0,s.growthOpening||0)));
+ if(!influence)return base;
+ const config=growthConfig(s),resolution=growthCache.get(JSON.stringify(config))?.result?.size||config.size;
+ // Difference over one eighth of a volume texel, not an output pixel. Tiny
+ // subtexel differences amplify the filtered half-float volume's precision.
+ // The minimum world axis and the warp Jacobian bound limit smoothing;
+ // the hit pass separately clamps this offset to the smallest sheet feature.
+ const axes=s.scale*Math.min(s.stretchX??1,s.stretchY??1,Math.max(.06,(s.volume??1)*(s.stretchZ??1)));
+ const warpSlope=1+.035*(2*Math.PI+.6*(2*Math.PI)**2)*(s.growthWarp||0);
+ const texel=axes/(resolution*.45*(s.growthScale??1.1)*warpSlope);
+ return base+Math.max(0,texel/8-base)*influence;
+}
 function cancelGrowthEntry(e){if(!e||e.result||e.pins)return;clearTimeout(e.timer);e.worker?.terminate();e.worker=null;e.cancelled=true;growthCache.delete(e.key);}
 function startGrowthEntry(e){
  if(e.started||e.cancelled)return;e.started=true;clearTimeout(e.timer);const start=performance.now();
@@ -102,7 +115,7 @@ export function bindGrowth(gl,program,s,phase=0){
  let c=growthContexts.get(gl);if(!c){c={texture:gl.createTexture()};growthContexts.set(gl,c);gl.activeTexture(gl.TEXTURE7);gl.bindTexture(gl.TEXTURE_3D,c.texture);for(const p of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_3D,p,gl.LINEAR);for(const p of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T,gl.TEXTURE_WRAP_R])gl.texParameteri(gl.TEXTURE_3D,p,gl.REPEAT);gl.texImage3D(gl.TEXTURE_3D,0,gl.RGBA16F,1,1,1,0,gl.RGBA,gl.FLOAT,new Float32Array([0,.5,.5,.5]));}
  gl.activeTexture(gl.TEXTURE7);gl.bindTexture(gl.TEXTURE_3D,c.texture);let e=s.growthAmount>0?growthEntry(s):null;if(e?.result&&c.key!==e.key){const r=e.result;gl.texImage3D(gl.TEXTURE_3D,0,gl.RGBA16F,r.size,r.size,r.size,0,gl.RGBA,gl.FLOAT,r.data);c.key=e.key;}
  let u=growthLocations.get(program);if(!u){u=Object.fromEntries(['uGrowthVolume','uGrowthShape','uGrowthLook','uGrowthMotion','uGrowthGeometry','uGrowthShell'].map(n=>[n,gl.getUniformLocation(program,n)]));growthLocations.set(program,u);}
- const active=e?.result?s.growthAmount:0;gl.uniform1i(u.uGrowthVolume,7);gl.uniform4f(u.uGrowthShape,active,s.growthScale??1.1,s.growthDepth??.55,s.growthContrast??1.4);gl.uniform4f(u.uGrowthLook,s.growthColor??.7,s.growthCoverage??.5,s.growthRoughness??.2,s.growthWarp??.2);gl.uniform4f(u.uGrowthMotion,((phase%(2*Math.PI)+2*Math.PI)%(2*Math.PI))*Math.round(s.growthCycles||1),s.growthFlow||0,64,s.growthVeins||0);gl.activeTexture(gl.TEXTURE0);
+ const active=e?.result?s.growthAmount:0;gl.uniform1i(u.uGrowthVolume,7);gl.uniform4f(u.uGrowthShape,active,s.growthScale??1.1,s.growthDepth??.55,s.growthContrast??1.4);gl.uniform4f(u.uGrowthLook,s.growthColor??.7,s.growthCoverage??.5,s.growthRoughness??.2,s.growthWarp??.2);gl.uniform4f(u.uGrowthMotion,((phase%(2*Math.PI)+2*Math.PI)%(2*Math.PI))*Math.round(s.growthCycles||1),s.growthFlow||0,e?.result?.size||growthConfig(s).size,s.growthVeins||0);gl.activeTexture(gl.TEXTURE0);
  gl.uniform2f(u.uGrowthGeometry,(s.growthExtrusion||0)*active,(s.growthOpening||0)*active);
  gl.uniform4f(u.uGrowthShell,growthShell(s),s.structThickness??.09,s.baseForm===2?1:0,2+(s.roundness||0)*6);
 }

@@ -1,9 +1,9 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=a55ab48fe9e6';
-import {BASE_FORM_GLSL} from './base-forms.js?v=a55ab48fe9e6';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=a55ab48fe9e6';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=a55ab48fe9e6';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=a55ab48fe9e6';
-import {materialCavity} from './particle-shading.js?v=a55ab48fe9e6';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=d35f7f15a5e5';
+import {BASE_FORM_GLSL} from './base-forms.js?v=d35f7f15a5e5';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=d35f7f15a5e5';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL} from './solid-renderer.js?v=d35f7f15a5e5';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=d35f7f15a5e5';
+import {materialCavity} from './particle-shading.js?v=d35f7f15a5e5';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -155,7 +155,7 @@ void main(){
 }
 `;
 const hairVertex=(cached,wrap=false)=>HEADER+'#define AXIS_CACHE '+Number(cached)+'\n#define WRAPPED_STRANDS '+Number(wrap)+'\n'+SPACE+GROOM+`
-out vec3 vWorld,vTangent,vNormal,vRootLocal,vRootNormal;out vec2 vAcross;out float vAlong,vRandom,vCoverage,vJoin;
+out vec3 vWorld,vTangent,vNormal,vRootLocal,vRootNormal;out vec2 vAcross;out float vAlong,vRandom,vCoverage,vJoin,vBlur;
 #if AXIS_CACHE
 uniform highp sampler2D uAxisPoints,uAxisTangents;
 #endif
@@ -190,7 +190,7 @@ void main(){
  float rootRadius=uHairA.y*.5*min(1.,uHairA.x/.025),height=len*t-min(uHairA.y*.65,len*.08)*(1.-smoothstep(0.,.3,t));
  vJoin=uRootCore*uHairBase.w*smoothstep(0.,.15,uHairBase.x)*(1.-smoothstep(0.,max(.00001,baseHeight(len,rootRadius)),height));
  float pixel=2.*uCameraSize.y/uCameraSize.w,defocus=uFocus.x*smoothstep(.06,1.2,abs(p.z-uFocus.y))*.038;
- float aa=max(radius,pixel*.55)+defocus,coverage=min(1.,radius/max(pixel*.55,aa));
+ float sigma=defocus*.5,aa=max(radius,pixel*.55)+3.*sigma,coverage=min(1.,radius/max(pixel*.55,radius));vBlur=sigma;
  vRootNormal=normalWorld(nr.xyz);vRootLocal=root.xyz*uAxes.xyz;vNormal=vec3(0);vWorld=p;vTangent=tangent;vAcross=vec2(side,radius);vAlong=materialT;vRandom=rnd(float(id)+4.);vCoverage=coverage;
  if(branch)vJoin=0.;
  if(uTube>.5){
@@ -199,11 +199,11 @@ void main(){
   vec3 bx=rb+cross(v,rb)+cross(v,cross(v,rb))/max(.02,1.+dot(rn,tangent));bx=normalize(bx-tangent*dot(bx,tangent));vec3 by=cross(tangent,bx);
   float angle=edgeIndex*6.2831853/uSides;float thin=1.-.88*uHairD.z;vec3 radial=bx*cos(angle)+by*sin(angle)*thin;
   float lo=max(0.,materialT-.001),hi=min(1.,materialT+.001),slope=(strandRadius(hi,len)-strandRadius(lo,len))*branchTaper/max(.00001,(hi-lo)*len);
-  vNormal=normalize(bx*cos(angle)+by*sin(angle)/thin-tangent*slope);vec3 front=normalize(cross(right,tangent));vec3 offset=radial*radius;offset-=front*dot(offset,front)*(1.-uTubeDepth);vWorld=p+offset;vAcross=vec2(0.,radius);vCoverage=1.;gl_Position=project(vWorld);
+  vNormal=normalize(bx*cos(angle)+by*sin(angle)/thin-tangent*slope);vec3 front=normalize(cross(right,tangent));vec3 offset=radial*radius;if(defocus>0.){float extent=radius+3.*sigma,filtered=smoothstep(0.,pixel*.15,sigma);offset=radial*extent;offset-=front*dot(offset,front)*(1.-uTubeDepth*radius/max(.000001,extent));vAcross=vec2(dot(offset,right)/max(.000001,extent),radius);vCoverage=radius/max(.000001,radius+(1.-filtered)*3.*sigma);}else{offset-=front*dot(offset,front)*(1.-uTubeDepth);vAcross=vec2(0.,radius);vCoverage=1.;}vWorld=p+offset;if(defocus>0.){vec3 physicalOffset=radial*radius;physicalOffset-=front*dot(physicalOffset,front)*(1.-uTubeDepth);vWorld=p+physicalOffset;}gl_Position=project(p+offset);
  }else gl_Position=project(p+right*side*aa);}
 `;
 const HAIR_FRAG=HEADER+`
-in vec3 vWorld,vTangent,vNormal,vRootLocal,vRootNormal;uniform float uTube,uRepOpacity;in vec2 vAcross;in float vAlong,vRandom,vCoverage,vJoin;
+in vec3 vWorld,vTangent,vNormal,vRootLocal,vRootNormal;uniform float uTube,uRepOpacity;in vec2 vAcross;in float vAlong,vRandom,vCoverage,vJoin,vBlur;
 uniform sampler2D uCoreDepth;uniform vec2 uViewSize;
 uniform sampler2D uShadow;
 uniform vec3 uShadowX,uShadowY,uShadowZ;
@@ -261,11 +261,27 @@ vec4 strandMaterial(vec3 base,vec3 local,vec3 p,vec3 normal,vec3 tangent,float r
 }
 
 vec3 photoHair(vec3 c){c=max(vec3(0),c*exp2(uPhoto1.x));c=mat3(.59719,.076,.0284,.35458,.90834,.13383,.04823,.01566,.83777)*c;c=(c*(c+.0245786)-.000090537)/(c*(.983729*c+.432951)+.238081);c=clamp(mat3(1.60475,-.10208,-.00327,-.53108,1.10813,-.07276,-.07367,-.00605,1.07602)*c,0.,1.);c=mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(vec3(.0031308),c));c+=uPhoto1.y;float lum=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(lum),c,uPhoto1.w);c=(c-.5)*uPhoto1.z+.5;c+=uPhoto3.x*pow(max(0.,1.-lum),2.)+uPhoto3.y*pow(max(0.,lum),2.);c*=vec3(1.+uPhoto2.x*.18+uPhoto2.y*.08,1.-uPhoto2.y*.14,1.-uPhoto2.x*.18+uPhoto2.y*.08);return pow(max(c,vec3(0)),vec3(1./uPhoto4.x))*(1.-uPhoto2.z*smoothstep(.3,2.4,length(vWorld.xy)));}
-void main(){gl_FragDepth=gl_FragCoord.z;float barrier;sculptMap(vWorld,barrier);if(max(barrier,dynamicsBarrier(vWorld))>.0001)discard;float edge=1.-smoothstep(.7,1.,abs(vAcross.x)),baseAlpha=edge*vCoverage,alpha=1.-pow(max(.0001,1.-baseAlpha),uRepOpacity);
- if(alpha<.001)discard;if(uOpaquePass>.5&&(uHairColor.w>0.||vCoverage<.999))discard;if(uOpaquePass<.5&&uShadowPass<.5&&uHairColor.w<=0.&&vCoverage>=.999)discard;if(uShadowPass>.5){if(alpha*(1.-uHairColor.w)<.5)discard;color=vec4(1);return;}
+float gaussianErf(float x){float a=abs(x),t=1./(1.+.3275911*a);float y=1.-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-.284496736)*t+.254829592)*t*exp(-a*a);return sign(x)*y;}
+float focusCoverage(){
+ if(vBlur<=0.)return 1.-smoothstep(.7,1.,abs(vAcross.x));
+ float pixel=2.*uCameraSize.y/uCameraSize.w,r=uTube>.5?vAcross.y:max(vAcross.y,pixel*.55),extent=r+3.*vBlur;
+ float x=vAcross.x*extent,den=max(.0000001,1.41421356237*vBlur);
+ float profile=clamp(.5*(gaussianErf((x+r)/den)-gaussianErf((x-r)/den)),0.,1.);
+ // Below a fraction of one pixel the rasterizer owns edge coverage. Sampling
+ // an almost discontinuous Gaussian at pixel centers would erase covered MSAA
+ // samples, because their interpolated center can lie outside the primitive.
+ float filtered=smoothstep(0.,pixel*.15,vBlur);
+ if(uTube<.5){float old=1.-smoothstep(.7,1.,abs(vAcross.x));profile=mix(old,profile*.85,filtered);}
+ else profile=mix(1.,profile,filtered);
+ return profile;
+}
+// Tube indices have inward winding. Geometric facing, rather than interpolated
+// shading normals, keeps defocus coverage continuous across segment triangles.
+void main(){gl_FragDepth=gl_FragCoord.z;float barrier;sculptMap(vWorld,barrier);if(max(barrier,dynamicsBarrier(vWorld))>.0001)discard;float edge=focusCoverage(),backWeight=uTube>.5&&gl_FrontFacing?1.-smoothstep(0.,.35,vBlur/max(.000001,vAcross.y)):1.,baseAlpha=edge*vCoverage*backWeight,alpha=1.-pow(max(.0001,1.-baseAlpha),uRepOpacity);
+ if(alpha<.001)discard;if(uOpaquePass>.5&&(uHairColor.w>0.||vCoverage<.999||(vBlur>0.&&baseAlpha<.999)))discard;if(uOpaquePass<.5&&uShadowPass<.5&&uHairColor.w<=0.&&vCoverage>=.999&&(vBlur<=0.||baseAlpha>=.999))discard;if(uShadowPass>.5){if(alpha*(1.-uHairColor.w)<.5)discard;color=vec4(1);return;}
  vec3 view=vec3(0,0,1),right=normalize(cross(vTangent,view)+vec3(.000001,0,0)),radial=normalize(view-vTangent*dot(view,vTangent)+vec3(0,.000001,0));
  vec3 n=uTube>.5?normalize(vNormal):normalize(radial*sqrt(max(0.,1.-vAcross.x*vAcross.x))+right*vAcross.x);
- 
+
  float index=clamp(vAlong+(vRandom-.5)*uHairColor.y,0.,.99999)*float(max(1,uPaletteCount-1));int a=int(floor(index)),b=min(a+1,uPaletteCount-1);vec3 along=mix(uPalette[a],uPalette[b],fract(index));
  float attachment=clamp(vJoin,0.,1.);
  vec3 base=mix(surfacePalette(vRootLocal,palette(dot(vRootLocal,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z)),along,uHairColor.x*(1.-attachment));base*=mix(1.-uHairColor.z*.9*(1.-attachment),1.,smoothstep(0.,.85,vAlong));
@@ -380,12 +396,12 @@ export class FilamentPass{
   const physical=this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth-.006)/.006));
   const projected=camera.shadow&&!this.previewGeometry?0:Math.max(0,Math.min(1,(s.filWidth*.5*s.scale*h/(2*camera.ey)-.6)/.8));
   const ribbon=s.filRibbon>0&&projected>.05?Math.min(1,s.filRibbon+projected):0;
-  const x=s.focusBlur>0&&!camera.shadow?0:Math.max(physical,projected,ribbon);
+  const x=Math.max(physical,projected,ribbon);
   return x*x*(3-2*x);
  }
  *hair(s,camera,w,h,phase){const mix=this.tubeBlend(s,camera,h);if(s.transparency===0){const tube=mix>0;
   // Opaque tubes have full coverage and are already in the multisample color pass.
-  if(tube&&!camera.shadow&&!camera.opaque)return;
+  if(tube&&!camera.shadow&&!camera.opaque&&!(s.focusBlur>0))return;
   yield* this.hairPart(s,camera,w,h,phase,tube,1,mix);return;
  }if(mix<1)yield* this.hairPart(s,camera,w,h,phase,false,1-mix);if(mix>0)yield* this.hairPart(s,camera,w,h,phase,true,mix);}
  *hairPart(s,camera,w,h,phase,tube,opacity,tubeDepth=1){const g=this.gl;
@@ -399,7 +415,7 @@ export class FilamentPass{
  const rad=Math.PI/180;this.u(p,'uMat',s.transparency,s.refraction,s.metal,Math.min(1,s.roughness+(1-s.gloss)*.35));this.u(p,'uSurface',s.iridescence,s.thickness,s.gloss,s.emission);this.u(p,'uCoat',s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0);this.u(p,'uOptics',s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15);this.u(p,'uTexture',s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0);this.u(p,'uScatter',s.scatterDirection??.25,0,s.thinFilm||0,s.filmThickness??420);this.u(p,'uModern',s.thinShell||0,0,0,0);
  this.u(p,'uResolution',w,h);this.u(p,'uOther',s.rotateY*rad,s.rotateX*rad,0,0);this.u(p,'uExtraShape3',0,0,s.rotateZ*rad,0);this.u(p,'uRuntime',0,0,0,16);this.u(p,'uMaterialDetail',s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad);this.u(p,'uMaterialLayers',s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0);this.u(p,'uOrganicDetail',s.textureRandomness||0,s.textureWarp||0,s.textureLink||0,s.texturePatch||0);this.u(p,'uTextureSeed',s.textureSeed||0);this.u(p,'uSurfaceSeed',(s.seed%1000)*.013);
  this.u(p,'uTransport',s.subsurface||0,s.sssRadius??.35,0,0);this.u(p,'uSssColor',...rgb(s.sssColor||'#ffc49b'));this.u(p,'uInternalColor',...rgb(s.internalColor||'#e6f5ff'));
- this.u(p,'uFilmPattern',s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5);this.u(p,'uFilmAccent',s.filmChroma||0,s.filmDuo||0);this.u(p,'uFilmMotion',phase*(s.filmCycles||1),s.filmFlow||0,s.filmSwirl||0,24);g.uniform3fv(p.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(p.locations.uFilmWhite,FILM_SPECTRUM.white);
+ this.u(p,'uFilmPattern',s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5);this.u(p,'uFilmAccent',s.filmChroma||0,s.filmDuo||0,s.filmIslands||0);this.u(p,'uFilmMotion',phase*(s.filmCycles||1),s.filmFlow||0,s.filmSwirl||0,24);g.uniform3fv(p.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(p.locations.uFilmWhite,FILM_SPECTRUM.white);
  this.u(p,'uEnvironment',['studio','sunset','neon','sky','aquarium','aurora','city'].indexOf(s.environment),s.environmentAngle*rad,s.environmentPower,0);this.u(p,'uGradient',s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness);this.u(p,'uColorWave',s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1);this.u(p,'uColorAxis',s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0);this.u(p,'uColorLayers',s.colorLayers||0,s.colorLayerScale??1,s.colorLayerShift||0,s.colorLayerMix??.5);
  g.uniform1i(p.locations.uPaletteCount,s.palette.length);g.uniform3fv(p.locations.uPalette,s.palette.flatMap(rgb));this.u(p,'uPaletteMean',...s.palette.map(rgb).reduce((sum,c)=>sum.map((v,i)=>v+c[i]/s.palette.length),[0,0,0]));
  const lights=s.lights.filter(l=>l.enabled).slice(0,8),types={circle:0,bar:1,spot:2,diffuser:3,grid:4,ring:5,orb:6};g.uniform1i(p.locations.uLightCount,lights.length);if(lights.length){g.uniform4fv(p.locations.uLights,lights.flatMap(l=>[l.x,l.y,l.z,l.power]));g.uniform3fv(p.locations.uLightColors,lights.flatMap(l=>rgb(l.color)));g.uniform4fv(p.locations.uLightProps,lights.flatMap(l=>[l.size,l.length,l.roll*rad,types[l.type]??0]));g.uniform4fv(p.locations.uLightExtra,lights.flatMap(l=>[l.softness,Math.tan(l.cone*rad),l.grid,+!!l.visible]));}
@@ -470,7 +486,7 @@ export class FilamentPass{
  this.common(this.coreProgram,s,main,w,h);this.field(this.coreProgram,s,solid);this.tex(this.coreProgram,'uScene',this.scene,5);this.u(this.coreProgram,'uBound',extent);this.u(this.coreProgram,'uCore',s.filCore);this.u(this.coreProgram,'uDepthOnly',1);g.bindFramebuffer(g.FRAMEBUFFER,this.coreDepth.fbo);g.viewport(0,0,w,h);g.enable(g.DEPTH_TEST);g.depthFunc(g.ALWAYS);g.drawArrays(g.TRIANGLES,0,3);this.u(this.coreProgram,'uDepthOnly',0);
  for(const camera of light?[this.lightCamera,main]:[main]){const shadow=!!camera.shadow,cw=shadow?this.shadow.w:w,ch=shadow?this.shadow.h:h;g.bindFramebuffer(g.FRAMEBUFFER,shadow?this.shadow.fbo:this.fbo);g.viewport(0,0,cw,ch);g.enable(g.DEPTH_TEST);g.depthFunc(g.ALWAYS);g.clearDepth(1);g.clear(g.DEPTH_BUFFER_BIT);this.common(this.coreProgram,s,camera,cw,ch);this.field(this.coreProgram,s,solid);this.tex(this.coreProgram,'uScene',this.scene,5);this.u(this.coreProgram,'uBound',extent);this.u(this.coreProgram,'uCore',s.filCore*(1-s.transparency));g.drawArrays(g.TRIANGLES,0,3);g.depthFunc(g.LEQUAL);if(!shadow){if(s.transparency===0){g.enable(g.SAMPLE_ALPHA_TO_COVERAGE);yield* this.hair(s,{...camera,opaque:true},cw,ch,phase);g.disable(g.SAMPLE_ALPHA_TO_COVERAGE);}
   g.bindFramebuffer(g.READ_FRAMEBUFFER,this.fbo);
-  if(s.transparency===0&&s.bgMode!=='transparent'&&this.tubeBlend(s,camera,ch)>0){
+  if(s.transparency===0&&s.bgMode!=='transparent'&&this.tubeBlend(s,camera,ch)>0&&!(s.focusBlur>0)){
    // A fully covered opaque tube can resolve straight to the canvas.
    g.bindFramebuffer(g.DRAW_FRAMEBUFFER,null);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);
    g.bindFramebuffer(g.FRAMEBUFFER,null);g.disable(g.DEPTH_TEST);g.bindVertexArray(null);g.activeTexture(g.TEXTURE0);return;

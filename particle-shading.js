@@ -1,6 +1,6 @@
-import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=a55ab48fe9e6';
-import {LOOP_PALETTE_GLSL} from './structure-model.js?v=a55ab48fe9e6';
-import {opticalGLSL} from './particle-optics.js?v=a55ab48fe9e6';
+import {FILM_PATTERN_GLSL} from './solid-renderer.js?v=d35f7f15a5e5';
+import {LOOP_PALETTE_GLSL} from './structure-model.js?v=d35f7f15a5e5';
+import {opticalGLSL} from './particle-optics.js?v=d35f7f15a5e5';
 export const materialCavity=s=>Math.max(0,Math.min(1,(s.hollow||0)*(1-(s.wallThickness??.08))));
 
 export const prismaPaletteGLSL=`
@@ -16,7 +16,7 @@ vec3 prismaPaletteAt(float t){
  vec3 color=mix(uPalette[a],uPalette[b],blend);if(uColorSoftness>1.){vec3 mean=vec3(0.);for(int k=0;k<uPaletteCount;k++)mean+=uPalette[k];color=mix(color,mean/float(uPaletteCount),smoothstep(1.,3.,uColorSoftness));}return color;
 }vec3 prismaPaletteBase(vec3 p,vec3 original){
  if(uGradient.w<.5)return original;
- float theta=atan(p.y,p.x),radius=length(p.xy);
+ float theta=atan(p.y,p.x),radius=length(p);
  float waves=sin(dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*uColorWave.y+uColorWave.z+p.y*uColorWave2.x+radius*uColorWave2.y+theta*uColorWave2.z+sin(p.x*3.+p.y*2.)*uColorWave2.w);
  float t=fract(.5+dot(p.xy,vec2(cos(uGradient.x),sin(uGradient.x)))*.22*uGradient.y+uGradient.z+waves*uColorWave.x*.25);
  return prismaPaletteAt(t);

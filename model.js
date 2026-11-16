@@ -1,13 +1,13 @@
-import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=a55ab48fe9e6';
-import {GROWTH_DEFAULTS} from './growth-material.js?v=a55ab48fe9e6';
-import {FINISH_DEFAULTS} from './finishing.js?v=a55ab48fe9e6';
-import {FIGURE_SCALE} from './base-forms.js?v=a55ab48fe9e6';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=a55ab48fe9e6';
-import {FRACTAL_KEYS} from './fractal-form.js?v=a55ab48fe9e6';
-import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=a55ab48fe9e6';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=a55ab48fe9e6';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=a55ab48fe9e6';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=a55ab48fe9e6';
+import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=d35f7f15a5e5';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=d35f7f15a5e5';
+import {FINISH_DEFAULTS} from './finishing.js?v=d35f7f15a5e5';
+import {FIGURE_SCALE} from './base-forms.js?v=d35f7f15a5e5';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=d35f7f15a5e5';
+import {FRACTAL_KEYS} from './fractal-form.js?v=d35f7f15a5e5';
+import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=d35f7f15a5e5';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=d35f7f15a5e5';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=d35f7f15a5e5';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=d35f7f15a5e5';
 export const BASE = {
  ...DYNAMICS_DEFAULTS,...PARTICLE_DEFAULTS,engine:'solid',keepMotionSpeed:true,motionPeriod:0,
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -74,7 +74,7 @@ export const META = {
 };
 export const GROUPS={
  shape:['baseForm',...STRUCTURE_GROUPS.shape,'volume','stretchX','stretchY','stretchZ','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','cut','cutX','cutY','edge','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','rimRound','holeAspect','cutAspect'],
- material:['filmPattern','filmPatternScale','filmPatternWarp','filmPatternDetail','filmChroma','filmDuo','transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture','textureDepth','textureScale','textureOrganic','textureAngle','textureWrinkles','textureFolds','textureWear','textureRipples','hollow','wallThickness','translucency','scattering','scatterDirection','thinFilm','filmThickness','subsurface','sssRadius','sssColor','fullness','internalColor','thinShell','renderVersion'],
+ material:['filmIslands','filmPattern','filmPatternScale','filmPatternWarp','filmPatternDetail','filmChroma','filmDuo','transparency','refraction','thickness','metal','roughness','gloss','iridescence','emission','coat','coatRoughness','fresnel','iridShift','iridScale','dispersion','absorption','tintStrength','anisotropy','anisotropyAngle','surfaceTexture','textureDepth','textureScale','textureOrganic','textureAngle','textureWrinkles','textureFolds','textureWear','textureRipples','hollow','wallThickness','translucency','scattering','scatterDirection','thinFilm','filmThickness','subsurface','sssRadius','sssColor','fullness','internalColor','thinShell','renderVersion'],
  color:[...STRUCTURE_GROUPS.color,'palette','gradientAngle','gradientScale','gradientOffset','colorSoftness','glow'],
  light:['lights','environment','environmentAngle','environmentPower','environmentRefraction','environmentRotate','environmentCycles'],
  background:['background','background2','bgAngle','bgMode','bgHeight','bgSoftness','bgWash','bgShade'],
