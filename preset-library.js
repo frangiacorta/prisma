@@ -1,4 +1,4 @@
-import {PRESET_FAMILIES,familyName} from './preset-families.js?v=5df1bbb9094d';
+import {PRESET_FAMILIES,familyName} from './preset-families.js?v=93b0d9476f96';
 // Browsing only: selection keeps the existing preset handlers and undo history.
 const clean=value=>String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const memory={library:{query:'',category:'',family:''},saved:{query:'',engine:'',family:'',sort:'recent'}};

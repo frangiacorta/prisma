@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=5df1bbb9094d';
-import {EXTRA_HELP} from './control-help-extra.js?v=5df1bbb9094d';
-import {FRACTAL_HELP} from './fractal-form.js?v=5df1bbb9094d';
-import {CELLULAR_HELP} from './cellular-form.js?v=5df1bbb9094d';
-import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=5df1bbb9094d';
-import {trailLightCompensation} from './particle-model.js?v=5df1bbb9094d';
+import {AUDIO_HELP} from './audio-model.js?v=93b0d9476f96';
+import {EXTRA_HELP} from './control-help-extra.js?v=93b0d9476f96';
+import {FRACTAL_HELP} from './fractal-form.js?v=93b0d9476f96';
+import {CELLULAR_HELP} from './cellular-form.js?v=93b0d9476f96';
+import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=93b0d9476f96';
+import {trailLightCompensation} from './particle-model.js?v=93b0d9476f96';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishPalette:'Converte il chiaroscuro della scena in una palette ordinata da scuro a chiaro. La trasparenza resta invariata.',

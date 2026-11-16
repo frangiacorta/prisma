@@ -81,6 +81,69 @@ void main(){
 }
 `;
 
+// Opaque fractal intersections use true sign brackets, including an inside
+// camera, and retain the marching state until every primary ray is complete.
+export const FRACTAL_HIT_MAIN=`
+uniform vec4 uHitBudget;
+uniform vec2 uHitJitter;
+uniform sampler2D uHitPrevious,uHitStatePrevious;
+uniform float uHitContinue;
+uniform int uHitCount;
+layout(location=1) out vec4 hitLayer1;
+layout(location=2) out vec4 hitLayer2;
+layout(location=3) out vec4 hitLayer3;
+void main(){
+ vec4 result=vec4(0.,0.,1.,-1.);
+ vec2 originalUV=(gl_FragCoord.xy+uHitJitter-.5*uResolution)/min(uResolution.x,uResolution.y)*3.4;
+ vec2 uv=originalUV*(1.+uPhoto2.w*dot(originalUV,originalUV)*.18);
+ vec3 origin=vec3(uv,4.8),direction=vec3(0.,0.,-1.);
+ vec2 interval=objectInterval(origin,direction);
+ float t=max(0.,interval.x),end=min(40.,interval.y),a=t,b=t,da=0.,db=0.,hitT=t,closest=10.;
+ vec3 gradient=vec3(0.);
+ int mode=0,refinement=0,normalSample=0;bool previousValid=false;
+
+ if(uHitContinue>.5){
+  vec4 previous=texelFetch(uHitPrevious,ivec2(gl_FragCoord.xy),0);
+  if(previous.w>-100.){fragColor=previous;hitLayer1=texelFetch(uHitStatePrevious,ivec2(gl_FragCoord.xy),0);hitLayer2=vec4(1.,1.,1.,-1.);hitLayer3=vec4(0.);return;}
+  vec4 carry=texelFetch(uHitStatePrevious,ivec2(gl_FragCoord.xy),0);
+  t=carry.x;a=carry.y;da=carry.z;closest=carry.w;previousValid=true;
+ }
+ vec3 samplePoint=origin+direction*t;int used=0;
+ // Finish a bracket/normal once started, then yield only between ray steps.
+ for(int step=0;step<int(uHitBudget.x)+32;step++){
+  if(step>=int(uHitBudget.x)&&mode==0)break;used=step+1;
+  if(t>end)break;
+  float d=field(samplePoint);
+  if(mode==0){
+   closest=min(closest,abs(d));
+   if(previousValid&&da*d<=0.&&da!=0.){b=t;db=d;mode=1;refinement=0;t=.5*(a+b);samplePoint=origin+direction*t;continue;}
+   a=t;da=d;previousValid=true;
+   // The next representable travel grows with distance, particularly when
+   // the camera is inside a magnified structure. A fixed minimum can stall.
+   t+=clamp(abs(d)*uHitBudget.y,max(.00000035,abs(t)*.00000013),.02*uFrame.x);
+   samplePoint=origin+direction*t;
+  }else if(mode==1){
+   if(da*d<=0.){b=t;db=d;}else{a=t;da=d;}
+   float next=.5*(a+b);refinement++;
+   if(refinement>=20||next==a||next==b){
+    hitT=mix(a,b,clamp(da/(da-db),0.,1.));t=hitT;
+    gradient=vec3(0.);normalSample=0;mode=2;
+    samplePoint=origin+direction*hitT+vec3(uHitBudget.w,0.,0.);
+   }else{t=next;samplePoint=origin+direction*t;}
+  }else{
+   gradient[normalSample/2]+=d*(normalSample%2==0?1.:-1.);normalSample++;
+   if(normalSample>=6){result=vec4(length(gradient)>.00000001?normalize(gradient):vec3(0.,0.,1.),hitT);break;}
+   vec3 offset=vec3(0.);offset[normalSample/2]=(normalSample%2==0?1.:-1.)*uHitBudget.w;
+   samplePoint=origin+direction*hitT+offset;
+  }
+ }
+
+ bool pending=result.w<0.&&t<=end;
+ if(result.w<0.)result.w=pending?-101.:-1.-closest;
+ fragColor=result;hitLayer1=vec4(t,a,da,closest);
+ hitLayer2=vec4(1.,1.,1.,pending?-101.:-1.);hitLayer3=vec4(float(used),float(mode),end-t,float(pending));
+}`;
+
 const VERTEX=`#version 300 es
 void main(){vec2 p=vec2(float((gl_VertexID<<1)&2),float(gl_VertexID&2));gl_Position=vec4(p*2.-1.,0.,1.);}`;
 

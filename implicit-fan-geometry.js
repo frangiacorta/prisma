@@ -9,15 +9,34 @@ bool fanComponentIncluded(int id){
 }
 // The same unrolled coordinates drive the boundary and its material. The
 // first two values are longitudinal distance and across-sheet distance.
-vec4 fanSheetCoordinates(vec3 p,int id){
- vec4 axis=uFanAxes[id],profile=uFanProfiles[id];
- vec2 plane=vec2(dot(p.xy,axis.xy),dot(p.xy,vec2(-axis.y,axis.x)));
- float along=clamp(plane.x/axis.z,0.,1.2),across=plane.y-along*along*profile.x;
- float width=axis.w*(.58+.42*smoothstep(0.,.75,along));
- float sheet=along*(profile.y+sin(profile.w-along*2.4)*uStructureF.y*.42)+across*along*(.8*profile.z+uStructureE.y*.74)+across*across*(.45+.26*profile.z)
+vec2 fanHingeParameters(int id){float reach=uFanAxes[id].z,hinge=.45*reach,remaining=reach*(.61+.3402*tanh(3.*uStructureG.w)),raw=uStructureE.y*4.5+uStructureE.z*1.5*sin(uFanProfiles[id].w*.7),limit=min(2.7/remaining,.2/(.33*uStructureA.y));return vec2(hinge,limit*tanh(raw/limit));}
+float fanSheetHeight(float u,float across,int id,float k){
+ vec4 axis=uFanAxes[id],profile=uFanProfiles[id];float along=clamp(u/axis.z,0.,1.2);
+ float sheet=along*(profile.y+sin(profile.w-along*2.4)*uStructureF.y*.42)+across*along*.8*profile.z+across*across*(.45+.26*profile.z)
   +uFanBias*pow(along,1.25)*uStructureE.z*sin(across*(3.2+uStructureE.w*.7)-along*2.1+profile.w)*.58;
- return vec4(plane.x,across,p.z-sheet,width);
+ return sheet;
 }
+vec4 fanSheetCoordinates(vec3 p,int id,out float metric,out float domain,out float leafDistance){
+ vec4 axis=uFanAxes[id],profile=uFanProfiles[id];vec2 plane=vec2(dot(p.xy,axis.xy),dot(p.xy,vec2(-axis.y,axis.x))),hk=fanHingeParameters(id);
+ float k=hk.y,shift=fanSheetHeight(hk.x,plane.y-.45*.45*profile.x,id,k),z=p.z-shift,x=plane.x-hk.x,den=1.-k*z,radius=length(vec2(k*x,den)),absX=abs(x),absK=abs(k),ratio=den>0.?absK*absX/den:1.,v2=ratio*ratio;
+ float arcU=hk.x+(den>0.&&abs(ratio)<.2?absX/den*(1.-v2*(1./3.-v2*(1./5.-v2/7.))):atan(absK*absX,den)/absK),arcNormal=(2.*z-k*(x*x+z*z))/(1.+radius),best=10000.;vec4 result=vec4(0.);
+ for(int visit=0;visit<2;visit++){
+  int branch=x>=0.?1-visit:visit;float lower=(branch==1?-x:x)*(branch==1?clamp(radius,.08,1.):1.);if(lower>best)continue;
+  float u=branch==1?arcU:plane.x,normal=branch==1?arcNormal:z,m=branch==1?clamp(radius,.08,1.):1.,clip=branch==1?-x:x,along=clamp(u/axis.z,0.,1.2),across=plane.y-along*along*profile.x,width=axis.w*(.58+.42*smoothstep(0.,.75,along));
+  float height=fanSheetHeight(u,across,id,k)-shift;height/=1.+abs(k*height)/.7;
+  float angle=atan(across/width,(u-.43*axis.z)/(.63*axis.z)),rim=tanh(3.*uStructureG.w)*(.38*sin(angle*4.+profile.w)+.16*sin(angle*9.-profile.w)),outline=(length(vec2((u-.43*axis.z)/(.63*axis.z),across/width))-1.-rim)*min(.3,width),edge=clamp(1.+outline/(.6*axis.w),0.,1.),thickness=uStructureA.y*(.33-.25*uStructureH.x*edge),rawDistance=max(max(outline,abs(normal-height)-thickness),clip),distance=rawDistance*m;
+  if(distance<best||(distance==best&&branch==0)){best=distance;result=vec4(u,across,normal-height,width);metric=m;domain=clip;leafDistance=rawDistance;}
+ }
+ return result;
+}
+vec4 fanSheetCoordinates(vec3 p,int id,out float metric,out float domain){float leafDistance;return fanSheetCoordinates(p,id,metric,domain,leafDistance);}
+vec4 fanSheetCoordinates(vec3 p,int id,out float metric){float domain;return fanSheetCoordinates(p,id,metric,domain);}
+vec3 fanSheetPoint(vec2 uv,float normalOffset,int id){
+ vec4 axis=uFanAxes[id],profile=uFanProfiles[id];vec2 hk=fanHingeParameters(id);float u=uv.x,across=uv.y,k=hk.y,along=clamp(u/axis.z,0.,1.2),y=across+along*along*profile.x,shift=fanSheetHeight(hk.x,y-.45*.45*profile.x,id,k),height=fanSheetHeight(u,across,id,k)-shift,n=height/(1.+abs(k*height)/.7)+normalOffset,x=u,z=n;
+ if(u>hk.x){float du=u-hk.x,a=k*du,a2=a*a;bool small=abs(a)<.2;float sinc=small?1.-a2*(1./6.-a2*(1./120.-a2/5040.)):sin(a)/a,si=a*sinc,co=small?1.-a2*(.5-a2*(1./24.-a2/720.)):cos(a);x=hk.x+du*sinc-n*si;z=(small?.5*k*du*du*(1.-a2*(1./12.-a2*(1./360.-a2/20160.))):2.*pow(sin(a*.5),2.)/k)+n*co;}
+ return vec3(axis.x*x-axis.y*y,axis.y*x+axis.x*y,z+shift);
+}
+vec4 fanSheetCoordinates(vec3 p,int id){float metric;return fanSheetCoordinates(p,id,metric);}
 vec4 fanLeafCoordinates(vec3 p,int id){
  if(id==21)return fanDrapeCoordinates(p);
  if(id<0||id>=20)return vec4(p.xy,p.z,1.);
@@ -34,13 +53,8 @@ void fanSurfaces(vec3 p,out float fields[22]){
   if(fanQuery<0||fanQuery==20||blend>0.)fields[20]=max(length(p.xy)-.115*(1.-uFanBias*.82),abs(p.z)-uStructureA.y*.58)*fanSize;
   for(int i=0;i<int(uStructureC.w+.5);i++){
    if(fanQuery>=0&&fanQuery!=i&&blend<=0.)continue;
-   vec4 axis=uFanAxes[i],profile=uFanProfiles[i],q=fanSheetCoordinates(p,i);
-   float reach=axis.z,halfWidth=axis.w;
-   float outline=(length(vec2((q.x-.43*reach)/(.63*reach),q.y/q.w))-1.)*min(.3,q.w)
-    +uStructureG.w*(.4*sin(q.x*17.+q.y*22.+profile.w)+.16*sin(q.x*41.-q.y*37.+profile.w*2.));
-   float edge=clamp(1.+outline/(.6*halfWidth),0.,1.);
-   float thickness=uStructureA.y*(.33-.25*uStructureH.x*edge);
-   fields[i]=max(outline,abs(q.z)-thickness)*.59*fanSize;
+   float sheetMetric,sheetDomain,leafDistance;fanSheetCoordinates(p,i,sheetMetric,sheetDomain,leafDistance);
+   fields[i]=leafDistance*.59*sheetMetric*fanSize;
   }
  }
  if(blend>0.&&blend<1.){

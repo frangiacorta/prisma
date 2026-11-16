@@ -1,5 +1,5 @@
-import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=5df1bbb9094d';
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=5df1bbb9094d';
+import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=93b0d9476f96';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=93b0d9476f96';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,
@@ -70,11 +70,11 @@ export function structureWarp(s,p){
  const petal=.5+.5*Math.cos(angle*v.structPetalCount);
  const envelope=1-v.structScallop*.62*(1-petal);
  if(v.structScallop||v.structSpiral||v.structStagger){q[0]=Math.cos(angle)*rr/envelope;q[1]=Math.sin(angle)*rr/envelope;}
- q[2]-=falloff*(v.structCurl+v.structFold*Math.sin(a*v.structFoldCount+phase-rr*v.structDelay*Math.PI)+v.structFlap*Math.cos(rr*v.structDelay*Math.PI));
+ q[2]-=falloff*(1-v.structFan)*(v.structCurl+v.structFold*Math.sin(a*v.structFoldCount+phase-rr*v.structDelay*Math.PI)+v.structFlap*Math.cos(rr*v.structDelay*Math.PI));
  // Fan staggering already positions each leaf independently. Attenuate its
  // global polar ripple as those leaves emerge, rather than folding every
  // individual leaf once for every other leaf in the arrangement.
- q[2]-=falloff*(v.structStagger*(1-v.structFan)*.6*Math.sin(angle*v.structPetalCount+rr*2+phase)+v.structRuffle*Math.sin(angle*(v.structPetalCount*3)+phase-rr*6));
+ q[2]-=falloff*(v.structStagger*(1-v.structFan)*.6*Math.sin(angle*v.structPetalCount+rr*2+phase)+v.structRuffle*(1-v.structFan)*Math.sin(angle*(v.structPetalCount*3)+phase-rr*6));
  return q;
 }
 
@@ -171,21 +171,26 @@ function fanData(s,phase){
 }
 // A ruled membrane joins two flared lobes through a narrow, twisting waist.
 // Bias changes the radial fan continuously into this single connected sheet.
-function drapeCoordinates(s,p,phase){
- const t=p[1]/1.12,centreX=(.12+.25*Math.abs(s.structCurl))*Math.sin(t*2.6+phase)*(.5+.5*Math.min(1,Math.abs(t)));
- const centreZ=.14*Math.sin(t*2.7-phase)*(1+.4*s.structStagger);
- const angle=t*(.65+1.7*s.structSpiral)+(.42+.9*Math.abs(s.structCurl))*Math.atan(t*2.8)+.22*Math.sin(phase+t*2.1)+.5*s.structFlap*Math.sin(phase-t);
- const c=Math.cos(angle),sn=Math.sin(angle),x=p[0]-centreX,z=p[2]-centreZ,planeX=c*x+sn*z,planeZ=-sn*x+c*z;
- const side=t/Math.sqrt(.06+t*t),curvature=(.35+3.3*s.structFold)*side+.32*s.structCurl+.15*Math.sin(phase+t*3);
- const denominator=1-curvature*planeZ,bendRadius=Math.hypot(curvature*planeX,denominator),ratio=denominator>0?curvature*planeX/denominator:1,v2=ratio*ratio;
- const across=denominator>0&&Math.abs(ratio)<.2?planeX/denominator*(1-v2*(1/3-v2*(1/5-v2/7))):Math.atan2(curvature*planeX,denominator)/curvature;
- const normal=(2*planeZ-curvature*(planeX*planeX+planeZ*planeZ))/(1+bendRadius);
+function drapeProfile(s,t,phase){
+ const centreX=(.12+.25*Math.abs(s.structCurl))*Math.sin(t*2.6+phase)*(.5+.5*Math.min(1,Math.abs(t))),centreZ=.14*Math.sin(t*2.7-phase)*(1+.4*s.structStagger);
+ const angle=t*(.65+1.7*s.structSpiral)+(.42+.9*Math.abs(s.structCurl))*Math.atan(t*2.8)+.22*Math.sin(phase+t*2.1)+.5*s.structFlap*Math.sin(phase-t),side=t/Math.sqrt(.06+t*t),curvature=(.35+3.3*s.structFold)*side+.32*s.structCurl+.15*Math.sin(phase+t*3);
  const waist=.28+(.5+s.structPetalWidth*.45)*(1-Math.exp(-t*t*4))*(1+.13*t/Math.sqrt(.111+t*t));
- const radial=Math.hypot(across/waist,t);
- const edge=Math.max(0,Math.min(1,(radial-.35)/.65));
- const sheet=s.structFold*.5*(.65*Math.sin(across*(4.1+s.structPetalCount*.22)/waist+phase-t*2)+.35*Math.sin(t*9-phase+across/waist))*(.5+.5*Math.min(1,Math.abs(t)*2))
+ return [centreX,centreZ,angle,curvature,waist];
+}
+function drapeHeight(s,across,t,waist,phase){
+ const radial=Math.hypot(across/waist,t),edge=Math.max(0,Math.min(1,(radial-.35)/.65));
+ return s.structFold*.5*(.65*Math.sin(across*(4.1+s.structPetalCount*.22)/waist+phase-t*2)+.35*Math.sin(t*9-phase+across/waist))*(.5+.5*Math.min(1,Math.abs(t)*2))
   +s.structRuffle*.5*edge*Math.sin(across*23+t*13-phase);
- return [across/waist,t,normal-sheet,waist];
+}
+function drapeCoordinates(s,p,phase){
+ const t=p[1]/1.12,[centreX,centreZ,angle,curvature,waist]=drapeProfile(s,t,phase),c=Math.cos(angle),sn=Math.sin(angle),x=p[0]-centreX,z=p[2]-centreZ,planeX=c*x+sn*z,planeZ=-sn*x+c*z;
+ const denominator=1-curvature*planeZ,bendRadius=Math.hypot(curvature*planeX,denominator),ratio=denominator>0?curvature*planeX/denominator:1,v2=ratio*ratio;
+ const across=denominator>0&&Math.abs(ratio)<.2?planeX/denominator*(1-v2*(1/3-v2*(1/5-v2/7))):Math.atan2(curvature*planeX,denominator)/curvature,normal=(2*planeZ-curvature*(planeX*planeX+planeZ*planeZ))/(1+bendRadius);
+ return [across/waist,t,normal-drapeHeight(s,across,t,waist,phase),waist];
+}
+export function drapePoint(s,u,t,normalOffset=0,phase=s.structFlowPhase*Math.PI*2){
+ const [cx,cz,angle,k,waist]=drapeProfile(s,t,phase),across=u*waist,n=drapeHeight(s,across,t,waist,phase)+normalOffset,a=k*across,a2=a*a,small=Math.abs(a)<.2,sinc=small?1-a2*(1/6-a2*(1/120-a2/5040)):Math.sin(a)/a,si=a*sinc,co=small?1-a2*(.5-a2*(1/24-a2/720)):Math.cos(a),x=across*sinc-n*si,z=(small?.5*k*across*across*(1-a2*(1/12-a2*(1/360-a2/20160))):2*Math.sin(a*.5)**2/k)+n*co,c=Math.cos(angle),sn=Math.sin(angle);
+ return [cx+c*x-sn*z,t*1.12,cz+sn*x+c*z];
 }
 function drapeField(s,p,phase){
  const q=drapeCoordinates(s,p,phase),radial=Math.hypot(q[0],q[1]),edge=Math.max(0,Math.min(1,(radial-.35)/.65));
@@ -201,14 +206,36 @@ function fanDrapeCoordinates(s,p,phase){
  const blend=fanDrapeBlend(s);if(blend<=0)return [...p,1];
  const size=Math.sqrt(blend),q=drapeCoordinates(s,p.map(value=>value/size),phase);q[2]*=size;q[3]*=size;return q;
 }
+function fanHingeParameters(s,reach,phase){
+ const hinge=.45*reach,remaining=reach*(.61+.3402*Math.tanh(3*s.structRuffle)),raw=s.structCurl*4.5+s.structFold*1.5*Math.sin(phase*.7);
+ const limit=Math.min(2.7/remaining,.2/(.33*s.structThickness));
+ return [hinge,limit*Math.tanh(raw/limit)];
+}
+function fanSheetHeight(s,u,across,reach,lift,variant,phase,k){
+ const along=Math.max(0,Math.min(1.2,u/reach));
+ let sheet=along*(lift+Math.sin(phase-along*2.4)*s.structFlap*.42)+across*along*.8*variant+across*across*(.45+.26*variant)
+  +s.structFanBias*Math.pow(along,1.25)*s.structFold*Math.sin(across*(3.2+s.structFoldCount*.7)-along*2.1+phase)*.58;
+ return sheet;
+}
 function fanSheetCoordinates(s,p,axes,profiles,index,out){
- const c=axes[index],t=axes[index+1],reach=axes[index+2],halfWidth=axes[index+3];
- const offset=profiles[index],lift=profiles[index+1],variant=profiles[index+2],localPhase=profiles[index+3];
- const u=c*p[0]+t*p[1],v=-t*p[0]+c*p[1],along=Math.max(0,Math.min(1.2,u/reach)),across=v-along*along*offset;
- const flare=Math.max(0,Math.min(1,along/.75)),width=halfWidth*(.58+.42*flare*flare*(3-2*flare));
- const sheet=along*(lift+Math.sin(localPhase-along*2.4)*s.structFlap*.42)+across*along*(.8*variant+s.structCurl*.74)+across*across*(.45+.26*variant)
-  +s.structFanBias*Math.pow(along,1.25)*s.structFold*Math.sin(across*(3.2+s.structFoldCount*.7)-along*2.1+localPhase)*.58;
- out[0]=u;out[1]=across;out[2]=p[2]-sheet;out[3]=width;return out;
+ const c=axes[index],t=axes[index+1],reach=axes[index+2],halfWidth=axes[index+3],offset=profiles[index],lift=profiles[index+1],variant=profiles[index+2],phase=profiles[index+3];
+ const rawU=c*p[0]+t*p[1],v=-t*p[0]+c*p[1],[hinge,k]=fanHingeParameters(s,reach,phase),shift=fanSheetHeight(s,hinge,v-.45*.45*offset,reach,lift,variant,phase,k),z=p[2]-shift,x=rawU-hinge,den=1-k*z,radius=Math.hypot(k*x,den),absX=Math.abs(x),absK=Math.abs(k),ratio=den>0?absK*absX/den:1,v2=ratio*ratio;
+ const arcU=hinge+(den>0&&Math.abs(ratio)<.2?absX/den*(1-v2*(1/3-v2*(1/5-v2/7))):Math.atan2(absK*absX,den)/absK),arcNormal=(2*z-k*(x*x+z*z))/(1+radius);
+ let best=Infinity;
+ for(let visit=0;visit<2;visit++){
+  const branch=x>=0?1-visit:visit,lower=(branch?-x:x)*(branch?Math.max(.08,Math.min(1,radius)):1);if(lower>best)continue;
+  const u=branch?arcU:rawU,normal=branch?arcNormal:z,metric=branch?Math.max(.08,Math.min(1,radius)):1,domain=branch?-x:x,along=Math.max(0,Math.min(1.2,u/reach)),across=v-along*along*offset,flare=Math.max(0,Math.min(1,along/.75)),width=halfWidth*(.58+.42*flare*flare*(3-2*flare));
+  let height=fanSheetHeight(s,u,across,reach,lift,variant,phase,k)-shift;height/=1+Math.abs(k*height)/.7;
+  const angle=Math.atan2(across/width,(u-.43*reach)/(.63*reach)),rim=Math.tanh(3*s.structRuffle)*(.38*Math.sin(angle*4+phase)+.16*Math.sin(angle*9-phase)),outline=(Math.hypot((u-.43*reach)/(.63*reach),across/width)-1-rim)*Math.min(.3,width),edge=Math.max(0,Math.min(1,1+outline/(.6*halfWidth))),thickness=s.structThickness*(.33-.25*s.structTaper*edge),rawDistance=Math.max(outline,Math.abs(normal-height)-thickness,domain),distance=rawDistance*metric;
+  if(distance<best||(distance===best&&branch===0)){best=distance;out[0]=u;out[1]=across;out[2]=normal-height;out[3]=width;out[4]=metric;out[5]=domain;out[6]=rawDistance;}
+ }
+ return out;
+}
+function fanSheetPoint(s,u,across,axes,profiles,index,normalOffset=0){
+ const c=axes[index],t=axes[index+1],reach=axes[index+2],offset=profiles[index],lift=profiles[index+1],variant=profiles[index+2],phase=profiles[index+3];
+ const [hinge,k]=fanHingeParameters(s,reach,phase),along=Math.max(0,Math.min(1.2,u/reach)),y=across+along*along*offset,shift=fanSheetHeight(s,hinge,y-.45*.45*offset,reach,lift,variant,phase,k),height=fanSheetHeight(s,u,across,reach,lift,variant,phase,k)-shift,n=height/(1+Math.abs(k*height)/.7)+normalOffset;
+ let x=u,z=n;if(u>hinge){const du=u-hinge,a=k*du,a2=a*a,small=Math.abs(a)<.2,sinc=small?1-a2*(1/6-a2*(1/120-a2/5040)):Math.sin(a)/a,si=a*sinc,co=small?1-a2*(.5-a2*(1/24-a2/720)):Math.cos(a);x=hinge+du*sinc-n*si;z=(small?.5*k*du*du*(1-a2*(1/12-a2*(1/360-a2/20160))):2*Math.sin(a*.5)**2/k)+n*co;}
+ return[c*x-t*y,t*x+c*y,z+shift];
 }
 function fanField(s,p,phase,component=-1){
  const blend=fanDrapeBlend(s),drapeSize=Math.sqrt(blend),fanSize=Math.sqrt(1-blend);
@@ -219,19 +246,43 @@ function fanField(s,p,phase,component=-1){
  let selected=component===20?distance:component===21?drape/fanSize:10000.;const coordinates=[0,0,0,0];
  for(let index=0;index<axes.length;index+=4){
   if(component>=0&&component!==index/4&&blend<=0)continue;
-  const reach=axes[index+2],halfWidth=axes[index+3],localPhase=profiles[index+3];
-  const [u,across,normal,width]=fanSheetCoordinates(s,p,axes,profiles,index,coordinates);
-  const outline=(Math.hypot((u-.43*reach)/(.63*reach),across/width)-1)*Math.min(.3,width)
-   +s.structRuffle*(.4*Math.sin(u*17+across*22+localPhase)+.16*Math.sin(u*41-across*37+localPhase*2));
-  const edge=Math.max(0,Math.min(1,1+outline/(.6*halfWidth)));
-  const thickness=s.structThickness*(.33-.25*s.structTaper*edge);
-  const leaf=Math.max(outline,Math.abs(normal)-thickness)*.59;
+  fanSheetCoordinates(s,p,axes,profiles,index,coordinates);
+  const leaf=coordinates[6]*.59*coordinates[4];
   distance=Math.min(distance,leaf);if(component===index/4)selected=leaf;
  }
  distance*=fanSize;selected*=fanSize;if(blend<=0)return component>=0?selected:distance;
  const rounding=.015*Math.sin(Math.PI*blend),h=Math.max(0,rounding-Math.abs(distance-drape))/Math.max(.0000001,rounding);
  return (component>=0?selected:Math.min(distance,drape))-h*h*rounding*.25;
 }
+
+// This inverse is exact for the Fan=1 structural warp when its radial map
+// is certified monotone. Ambiguous maps return a continuation seed, marked
+// invalid, so callers can project it onto the implicit field explicitly.
+export function structureUnwarpFanInfo(s,q){
+ const v={...STRUCTURE_DEFAULTS,...s},angle=Math.hypot(q[0],q[1])>1e-12?Math.atan2(q[1],q[0]):0,envelope=1-v.structScallop*.62*(.5-.5*Math.cos(angle*v.structPetalCount)),rr=Math.hypot(q[0],q[1])*envelope,k=v.structDelay*Math.PI,b=v.structBreath,g=1+v.structGrowth;
+ let lo=rr*(g-Math.abs(b)),hi=rr*(g+Math.abs(b)),r=rr*g,minSin=Math.min(Math.sin(lo*k),Math.sin(hi*k)),maxSin=Math.max(Math.sin(lo*k),Math.sin(hi*k));if(Math.ceil((lo*k-Math.PI*1.5)/(Math.PI*2))<=Math.floor((hi*k-Math.PI*1.5)/(Math.PI*2)))minSin=-1;if(Math.ceil((lo*k-Math.PI*.5)/(Math.PI*2))<=Math.floor((hi*k-Math.PI*.5)/(Math.PI*2)))maxSin=1;
+ const minimumDerivative=1+rr*b*k*(b>=0?minSin:maxSin),unique=Math.abs(v.structFan-1)<1e-8&&minimumDerivative>1e-4;
+ if(b!==0){if(unique){for(let i=0;i<40;i++){r=(lo+hi)*.5;if(r-rr*(g+b*Math.cos(r*k))>0)hi=r;else lo=r;}r=(lo+hi)*.5;}else{for(let stage=1;stage<=8;stage++)for(let j=0;j<4;j++){const breath=b*stage/8,f=r-rr*(g+breath*Math.cos(r*k)),d=1+rr*breath*k*Math.sin(r*k);if(Math.abs(d)>.08)r=Math.max(lo,Math.min(hi,r-f/d));}}}
+ const a=angle+v.structSpiral*2.8*rr+v.structStagger*q[2]*2,point=[Math.cos(a)*r,Math.sin(a)*r,q[2]];
+ if(unique)for(let j=0;j<3;j++){const back=structureWarp(v,point),ex=back[0]-q[0],ey=back[1]-q[1];if(Math.hypot(ex,ey)<1e-6)break;const e=.0005*Math.max(1,Math.hypot(point[0],point[1])),xp=structureWarp(v,[point[0]+e,point[1],point[2]]),xm=structureWarp(v,[point[0]-e,point[1],point[2]]),yp=structureWarp(v,[point[0],point[1]+e,point[2]]),ym=structureWarp(v,[point[0],point[1]-e,point[2]]),a=(xp[0]-xm[0])/(2*e),b=(yp[0]-ym[0])/(2*e),c=(xp[1]-xm[1])/(2*e),d=(yp[1]-ym[1])/(2*e),det=a*d-b*c;if(Math.abs(det)<1e-5)break;point[0]-=(d*ex-b*ey)/det;point[1]-=(-c*ex+a*ey)/det;}
+ const back=structureWarp(v,point),residual=Math.hypot(...back.map((x,i)=>x-q[i]));
+ return {point,residual,unique,minimumDerivative,valid:unique&&residual<2e-5};
+}
+function drapeForwardCondition(s,u,t,normalOffset,phase){
+ const profile=drapeProfile(s,t,phase),k=profile[3],waist=profile[4],across=u*waist;
+ return 1-k*(drapeHeight(s,across,t,waist,phase)+normalOffset);
+}
+export function forwardSheetPointInfo(s,u,v,normalOffset=0,component=0){
+ const state={...STRUCTURE_DEFAULTS,...s},phase=state.structFlowPhase*Math.PI*2,blend=fanDrapeBlend(state),size=Math.sqrt(component===21?blend:1-blend),included=component===21?blend>0:component>=0&&component<Math.round(state.structPetalCount)&&blend<1;
+ if(!included||size<=0)return {point:[0,0,0],valid:false,unique:false,residual:10000,chartResidual:10000};
+ let p,q;if(component===21){p=drapePoint(state,u,v,normalOffset,phase);q=drapeCoordinates(state,p,phase);}else{const {axes,profiles}=fanData(state,phase);p=fanSheetPoint(state,u,v,axes,profiles,component*4,normalOffset);q=fanSheetCoordinates(state,p,axes,profiles,component*4,[]);}
+ let cu=u,cv=v,cn=normalOffset;for(let j=0;j<3;j++){const error=Math.max(Math.abs(q[0]-u),Math.abs(q[1]-v),Math.abs(q[2]-normalOffset));if(error<1e-6||error>.01)break;cu+=u-q[0];cv+=v-q[1];cn+=normalOffset-q[2];if(component===21){p=drapePoint(state,cu,cv,cn,phase);q=drapeCoordinates(state,p,phase);}else{const {axes,profiles}=fanData(state,phase);p=fanSheetPoint(state,cu,cv,axes,profiles,component*4,cn);q=fanSheetCoordinates(state,p,axes,profiles,component*4,[]);}}
+ const chartResidual=Math.max(Math.abs(q[0]-u),Math.abs(q[1]-v),Math.abs(q[2]-normalOffset)),result=structureUnwarpFanInfo(state,p.map(x=>x*size));
+ const chartCondition=component===21?drapeForwardCondition(state,u,v,normalOffset,phase):1;
+ return {...result,warpResidual:result.residual,residual:Math.max(result.residual,chartResidual),chartResidual,chartCondition,valid:result.valid&&chartResidual<2e-5&&chartCondition>.04};
+}
+export function forwardSheetPoint(s,u,v,normalOffset=0,component=0){return forwardSheetPointInfo(s,u,v,normalOffset,component).point;}
+
 // Shells and porous networks act on each leaf before their union. Ordinary
 // cuts are monotone and retain the cheaper union evaluation.
 export function structureField(s,d,p){
@@ -379,8 +430,8 @@ vec3 structureWarp(vec3 p){
  float angle=a-uStructureG.y*2.8*rr-uStructureG.z*p.z*2.;
  float petal=.5+.5*cos(angle*uStructureC.w),envelope=1.-uStructureG.x*.62*(1.-petal);
  if(abs(uStructureG.x)+abs(uStructureG.y)+abs(uStructureG.z)>.000001)p.xy=vec2(cos(angle),sin(angle))*rr/envelope;
- p.z-=falloff*(uStructureE.y+uStructureE.z*sin(a*uStructureE.w+phase-rr*uStructureF.w*3.14159265359)+uStructureF.y*cos(rr*uStructureF.w*3.14159265359));
- p.z-=falloff*(uStructureG.z*(1.-uStructureFan)*.6*sin(angle*uStructureC.w+rr*2.+phase)+uStructureG.w*sin(angle*(uStructureC.w*3.)+phase-rr*6.));
+ p.z-=falloff*(1.-uStructureFan)*(uStructureE.y+uStructureE.z*sin(a*uStructureE.w+phase-rr*uStructureF.w*3.14159265359)+uStructureF.y*cos(rr*uStructureF.w*3.14159265359));
+ p.z-=falloff*(uStructureG.z*(1.-uStructureFan)*.6*sin(angle*uStructureC.w+rr*2.+phase)+uStructureG.w*(1.-uStructureFan)*sin(angle*(uStructureC.w*3.)+phase-rr*6.));
  return p;
 }
 vec4 weaveSite(vec2 p,float corner,out float shift,out vec2 edgeNormal,out vec2 node){
@@ -444,23 +495,28 @@ float weaveSprout(vec3 q,vec2 cycle,float shift,vec2 axis,float radius,float gro
 #endif
 #ifdef FAN_FIELD
 uniform vec4 uFanAxes[20],uFanProfiles[20];
-vec4 drapeCoordinates(vec3 p){
- float phase=uStructureF.z*6.28318530718,t=p.y/1.12;
- float centreX=(.12+.25*abs(uStructureE.y))*sin(t*2.6+phase)*(.5+.5*min(1.,abs(t)));
- float centreZ=.14*sin(t*2.7-phase)*(1.+.4*uStructureG.z);
- float angle=t*(.65+1.7*uStructureG.y)+(.42+.9*abs(uStructureE.y))*atan(t*2.8)+.22*sin(phase+t*2.1)+.5*uStructureF.y*sin(phase-t);
- float c=cos(angle),s=sin(angle);vec2 q=p.xz-vec2(centreX,centreZ);
- float planeX=c*q.x+s*q.y,planeZ=-s*q.x+c*q.y;
- float side=t/sqrt(.06+t*t),curvature=(.35+3.3*uStructureE.z)*side+.32*uStructureE.y+.15*sin(phase+t*3.);
- float denominator=1.-curvature*planeZ,bendRadius=length(vec2(curvature*planeX,denominator)),ratio=denominator>0.?curvature*planeX/denominator:1.,v2=ratio*ratio;
- float across=denominator>0.&&abs(ratio)<.2?planeX/denominator*(1.-v2*(1./3.-v2*(1./5.-v2/7.))):atan(curvature*planeX,denominator)/curvature;
- float normal=(2.*planeZ-curvature*(planeX*planeX+planeZ*planeZ))/(1.+bendRadius);
- float waist=.28+(.5+uStructureD.x*.45)*(1.-exp(-t*t*4.))*(1.+.13*t/sqrt(.111+t*t));
- float radial=length(vec2(across/waist,t));
- float edge=clamp((radial-.35)/.65,0.,1.);
- float sheet=uStructureE.z*.5*(.65*sin(across*(4.1+uStructureC.w*.22)/waist+phase-t*2.)+.35*sin(t*9.-phase+across/waist))*(.5+.5*min(1.,abs(t)*2.))
+void drapeProfile(float t,float phase,out vec2 centre,out float angle,out float curvature,out float waist){
+ centre=vec2((.12+.25*abs(uStructureE.y))*sin(t*2.6+phase)*(.5+.5*min(1.,abs(t))),.14*sin(t*2.7-phase)*(1.+.4*uStructureG.z));
+ angle=t*(.65+1.7*uStructureG.y)+(.42+.9*abs(uStructureE.y))*atan(t*2.8)+.22*sin(phase+t*2.1)+.5*uStructureF.y*sin(phase-t);
+ float side=t/sqrt(.06+t*t);curvature=(.35+3.3*uStructureE.z)*side+.32*uStructureE.y+.15*sin(phase+t*3.);
+ waist=.28+(.5+uStructureD.x*.45)*(1.-exp(-t*t*4.))*(1.+.13*t/sqrt(.111+t*t));
+}
+float drapeHeight(float across,float t,float waist,float phase){
+ float radial=length(vec2(across/waist,t)),edge=clamp((radial-.35)/.65,0.,1.);
+ return uStructureE.z*.5*(.65*sin(across*(4.1+uStructureC.w*.22)/waist+phase-t*2.)+.35*sin(t*9.-phase+across/waist))*(.5+.5*min(1.,abs(t)*2.))
   +uStructureG.w*.5*edge*sin(across*23.+t*13.-phase);
- return vec4(across/waist,t,normal-sheet,waist);
+}
+vec4 drapeCoordinates(vec3 p){
+ float phase=uStructureF.z*6.28318530718,t=p.y/1.12,angle,curvature,waist;vec2 centre;drapeProfile(t,phase,centre,angle,curvature,waist);
+ float c=cos(angle),s=sin(angle);vec2 q=p.xz-centre;float planeX=c*q.x+s*q.y,planeZ=-s*q.x+c*q.y;
+ float denominator=1.-curvature*planeZ,bendRadius=length(vec2(curvature*planeX,denominator)),ratio=denominator>0.?curvature*planeX/denominator:1.,v2=ratio*ratio;
+ float across=denominator>0.&&abs(ratio)<.2?planeX/denominator*(1.-v2*(1./3.-v2*(1./5.-v2/7.))):atan(curvature*planeX,denominator)/curvature,normal=(2.*planeZ-curvature*(planeX*planeX+planeZ*planeZ))/(1.+bendRadius);
+ return vec4(across/waist,t,normal-drapeHeight(across,t,waist,phase),waist);
+}
+vec3 drapePoint(vec2 uv,float normalOffset){
+ float phase=uStructureF.z*6.28318530718,angle,k,waist;vec2 centre;drapeProfile(uv.y,phase,centre,angle,k,waist);
+ float across=uv.x*waist,n=drapeHeight(across,uv.y,waist,phase)+normalOffset,a=k*across,a2=a*a;bool small=abs(a)<.2;float sinc=small?1.-a2*(1./6.-a2*(1./120.-a2/5040.)):sin(a)/a,si=a*sinc,co=small?1.-a2*(.5-a2*(1./24.-a2/720.)):cos(a),x=across*sinc-n*si,z=(small?.5*k*across*across*(1.-a2*(1./12.-a2*(1./360.-a2/20160.))):2.*pow(sin(a*.5),2.)/k)+n*co,c=cos(angle),s=sin(angle);
+ return vec3(centre.x+c*x-s*z,uv.y*1.12,centre.y+s*x+c*z);
 }
 float drapeField(vec3 p){
  vec4 q=drapeCoordinates(p);float radial=length(q.xy),edge=clamp((radial-.35)/.65,0.,1.);
@@ -474,6 +530,31 @@ vec4 fanDrapeCoordinates(vec3 p){
  float size=sqrt(blend);vec4 q=drapeCoordinates(p/size);q.zw*=size;return q;
 }
 ${FAN_COMPONENT_GLSL}
+
+vec3 structureUnwarpFan(vec3 q,out float residual,out bool unique){
+ float angle=length(q.xy)>1e-12?atan(q.y,q.x):0.,envelope=1.-uStructureG.x*.62*(.5-.5*cos(angle*uStructureC.w)),rr=length(q.xy)*envelope,k=uStructureF.w*3.14159265359,b=uStructureF.x,g=1.+uStructureE.x,lo=rr*(g-abs(b)),hi=rr*(g+abs(b)),r=rr*g,minSin=min(sin(lo*k),sin(hi*k)),maxSin=max(sin(lo*k),sin(hi*k));
+ if(ceil((lo*k-4.71238898038)/6.28318530718)<=floor((hi*k-4.71238898038)/6.28318530718))minSin=-1.;
+ if(ceil((lo*k-1.57079632679)/6.28318530718)<=floor((hi*k-1.57079632679)/6.28318530718))maxSin=1.;
+ unique=abs(uStructureFan-1.)<1e-8&&1.+rr*b*k*(b>=0.?minSin:maxSin)>1e-4;
+ if(b!=0.){if(unique){for(int i=0;i<32;i++){r=(lo+hi)*.5;if(r-rr*(g+b*cos(r*k))>0.)hi=r;else lo=r;}r=(lo+hi)*.5;}else{for(int stage=1;stage<=8;stage++)for(int j=0;j<4;j++){float breath=b*float(stage)/8.,f=r-rr*(g+breath*cos(r*k)),d=1.+rr*breath*k*sin(r*k);if(abs(d)>.08)r=clamp(r-f/d,lo,hi);}}}
+ float a=angle+uStructureG.y*2.8*rr+uStructureG.z*q.z*2.;vec3 p=vec3(cos(a)*r,sin(a)*r,q.z);
+ if(unique)for(int j=0;j<3;j++){vec2 error=structureWarp(p).xy-q.xy;if(length(error)<.000001)break;float e=.0005*max(1.,length(p.xy));vec2 dx=(structureWarp(p+vec3(e,0.,0.)).xy-structureWarp(p-vec3(e,0.,0.)).xy)/(2.*e),dy=(structureWarp(p+vec3(0.,e,0.)).xy-structureWarp(p-vec3(0.,e,0.)).xy)/(2.*e);float determinant=dx.x*dy.y-dy.x*dx.y;if(abs(determinant)<.00001)break;p.xy-=vec2(dy.y*error.x-dy.x*error.y,-dx.y*error.x+dx.x*error.y)/determinant;}
+ residual=length(structureWarp(p)-q);return p;
+}
+float drapeForwardCondition(vec2 uv,float normalOffset){
+ float phase=uStructureF.z*6.28318530718,angle,k,waist;vec2 centre;drapeProfile(uv.y,phase,centre,angle,k,waist);
+ return 1.-k*(drapeHeight(uv.x*waist,uv.y,waist,phase)+normalOffset);
+}
+vec3 fanGuidePoint(vec2 uv,float normalOffset,int id,out float residual,out bool valid){
+ float blend=fanDrapeBlend(),size=sqrt(id==21?blend:1.-blend);bool included=id==21?blend>0.:(id>=0&&id<int(uStructureC.w+.5)&&blend<1.);
+ if(!included||size<=0.){residual=10000.;valid=false;return vec3(0.);}
+ vec3 raw;vec4 back;if(id==21){raw=drapePoint(uv,normalOffset);back=drapeCoordinates(raw);}else{raw=fanSheetPoint(uv,normalOffset,id);back=fanSheetCoordinates(raw,id);}vec2 correctedUV=uv;float correctedOffset=normalOffset;
+ for(int j=0;j<3;j++){float error=max(max(abs(back.x-uv.x),abs(back.y-uv.y)),abs(back.z-normalOffset));if(error<.000001||error>.01)break;correctedUV+=uv-back.xy;correctedOffset+=normalOffset-back.z;if(id==21){raw=drapePoint(correctedUV,correctedOffset);back=drapeCoordinates(raw);}else{raw=fanSheetPoint(correctedUV,correctedOffset,id);back=fanSheetCoordinates(raw,id);}}
+ float chartError=max(max(abs(back.x-uv.x),abs(back.y-uv.y)),abs(back.z-normalOffset));bool unique;vec3 p=structureUnwarpFan(raw*size,residual,unique);residual=max(residual,chartError);valid=unique&&residual<.00002&&(id!=21||drapeForwardCondition(uv,normalOffset)>.04);return p;
+}
+float fanGuideResidual=0.;bool fanGuideValid=false;
+vec3 fanGuidePoint(vec2 uv,float normalOffset,int id){return fanGuidePoint(uv,normalOffset,id,fanGuideResidual,fanGuideValid);}
+
 #endif
 float structureComponentField(float d,vec3 p){
  float r=length(p);bool networkOnly=uStructureH.y*uStructureA.x*uStructureA.z*uStructureA.w==1.;

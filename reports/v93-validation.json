@@ -1,0 +1,289 @@
+{
+  "release": "prisma-studio-93",
+  "updatedAt": "2026-11-16T15:33:46.476Z",
+  "sourceVisualParity": false,
+  "sourceMotionParity": false,
+  "scope": "Validated rendering and partial visual improvements. The implemented reference collection still has unresolved appearance and motion differences.",
+  "fractalContinuation": {
+    "productionChanged": true,
+    "reference": "Strict sign bracket with262144 monolithic step allowance; same fields/materials/resolution",
+    "comparisons": [
+      {
+        "variant": "resume4096",
+        "name": "bulb-blend",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 8,
+        "ms": 2729.7000000029802
+      },
+      {
+        "variant": "resume4096",
+        "name": "menger-extreme",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 16,
+        "ms": 131.1000000089407
+      },
+      {
+        "variant": "resume4096",
+        "name": "menger-macro",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 4,
+        "ms": 44.1000000089407
+      },
+      {
+        "variant": "resume4096",
+        "name": "box-blend",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 4,
+        "ms": 38.20000000298023
+      },
+      {
+        "variant": "resume4096",
+        "name": "box-sheet",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 4,
+        "ms": 11159.09999999404
+      },
+      {
+        "variant": "resume4096",
+        "name": "reference",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 4,
+        "ms": 77.90000000596046
+      },
+      {
+        "variant": "resume512",
+        "name": "bulb-blend",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 36,
+        "ms": 3012.800000011921
+      },
+      {
+        "variant": "resume512",
+        "name": "menger-extreme",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 104,
+        "ms": 548.9000000059605
+      },
+      {
+        "variant": "resume512",
+        "name": "menger-macro",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 4,
+        "ms": 38.29999999701977
+      },
+      {
+        "variant": "resume512",
+        "name": "box-blend",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 16,
+        "ms": 103
+      },
+      {
+        "variant": "resume512",
+        "name": "box-sheet",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 28,
+        "ms": 8744.09999999404
+      },
+      {
+        "variant": "resume512",
+        "name": "reference",
+        "imageMax": 0,
+        "imageMean": 0,
+        "hitMax": 0,
+        "hitPresence": 0,
+        "complete": true,
+        "gl": 0,
+        "batches": 20,
+        "ms": 132.40000000596046
+      }
+    ]
+  },
+  "fractalLifecycle": {
+    "enteredQuery": true,
+    "cancelled": true,
+    "cancelMs": 2.5,
+    "queryReleased": true,
+    "restoreMax": 0,
+    "recreateMax": 0,
+    "gl": 0,
+    "recreatedGl": 0,
+    "complete": true
+  },
+  "veilScheduling": {
+    "measurements": {
+      "velo-fibre": {
+        "wallPresentation": {
+          "baseline": {
+            "count": 36,
+            "meanMs": 73.43888888839219,
+            "medianMs": 62.44999999552965
+          },
+          "frame8": {
+            "count": 45,
+            "meanMs": 59.65777777764532,
+            "medianMs": 54.80000001192093
+          }
+        },
+        "distinctLiveFrames": 8,
+        "errors": [],
+        "resolution": [
+          480,
+          480
+        ],
+        "workload": 1
+      },
+      "lamelle-asimmetriche": {
+        "wallPresentation": {
+          "baseline": {
+            "count": 26,
+            "meanMs": 105.05384615350228,
+            "medianMs": 106.00000000745058
+          },
+          "frame8": {
+            "count": 25,
+            "meanMs": 105.14800000011921,
+            "medianMs": 104.70000000298023
+          }
+        },
+        "distinctLiveFrames": 8,
+        "resolution": [
+          480,
+          480
+        ],
+        "workload": 1,
+        "errors": []
+      }
+    },
+    "limitations": [
+      "Wall/presentation timings, not GPU times",
+      "No general claim for every effect or hardware",
+      "No visual parity claim"
+    ],
+    "pixelComparisons": 72,
+    "pixelMaxDifference": 0
+  },
+  "nativeVideos": [
+    {
+      "name": "mandelbulb-dettaglio",
+      "width": 640,
+      "height": 366,
+      "fps": 30,
+      "duration": 4,
+      "frames": 120,
+      "samples": 4,
+      "glErrors": [],
+      "seam": {
+        "mean": 0,
+        "max": 0
+      },
+      "warmupFrames": 0
+    },
+    {
+      "name": "impronte-moto",
+      "width": 640,
+      "height": 640,
+      "fps": 30,
+      "duration": 4,
+      "frames": 120,
+      "samples": 4,
+      "glErrors": [],
+      "seam": {
+        "mean": 0.0015435791015625,
+        "max": 4
+      },
+      "warmupFrames": 29
+    },
+    {
+      "name": "lamelle-asimmetriche",
+      "width": 640,
+      "height": 640,
+      "fps": 30,
+      "duration": 8,
+      "frames": 240,
+      "samples": 4,
+      "glErrors": [],
+      "seam": {
+        "mean": 0,
+        "max": 0
+      },
+      "warmupFrames": 0
+    },
+    {
+      "name": "velo-fibre",
+      "width": 640,
+      "height": 640,
+      "fps": 30,
+      "duration": 4,
+      "frames": 120,
+      "samples": 4,
+      "glErrors": [],
+      "seam": {
+        "mean": 0,
+        "max": 0
+      },
+      "warmupFrames": 0
+    }
+  ],
+  "remaining": [
+    "Reference silhouettes, fine fibre distribution and motion cadence",
+    "Guide fibres on deformed sheets",
+    "Ordered combination of all particle producers with camera focus",
+    "Classic Mandelbulb formula and recursive material research"
+  ]
+}

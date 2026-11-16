@@ -2,7 +2,7 @@
   "prismaProject": 2,
   "name": "Mandelbulb · dettaglio",
   "createdAt": "2026-11-16T07:43:39.284Z",
-  "exportedAt": "2026-11-16T07:43:39.284Z",
+  "exportedAt": "2026-11-16T13:23:27.056Z",
   "state": {
     "dynAmount": 0,
     "dynMass": 1,
@@ -230,7 +230,7 @@
     "motionPeriod": 4,
     "volume": 1,
     "stretchX": 1,
-    "stretchY": 1,
+    "stretchY": 0.9,
     "stretchZ": 1,
     "deform": 0,
     "asymmetry": 0,
@@ -281,12 +281,12 @@
     "background2": "#080b0b",
     "bgMode": "solid",
     "bgAngle": 35,
-    "scale": 1.5,
+    "scale": 1.9,
     "positionX": 0,
     "positionY": 0,
     "rotateX": 78,
-    "rotateY": 4,
-    "animateRotation": false,
+    "rotateY": 22,
+    "animateRotation": true,
     "animateShape": false,
     "animateColor": false,
     "animateLight": false,
@@ -407,9 +407,9 @@
     "fractalAmount": 1,
     "fractalKind": 0,
     "fractalPower": 8,
-    "fractalLevels": 10,
+    "fractalLevels": 8,
     "fractalFold": 1,
-    "fractalDetail": 0.001,
+    "fractalDetail": 0.006,
     "finishEnabled": true,
     "finishTone": true,
     "finishRgb": false,
@@ -463,6 +463,16 @@
     "finishGlassMotion": 0,
     "finishGlassCycles": 1,
     "finishRegionGlass": true,
+    "finishPalette": false,
+    "finishPaletteMap": 1,
+    "finishPaletteScale": 1,
+    "finishPaletteOffset": 0,
+    "finishPaletteBlur": 0,
+    "finishPaletteColors": [
+      "#10131c",
+      "#697a9d",
+      "#f5eee5"
+    ],
     "finishScan": false,
     "finishScanMix": 1,
     "finishScanSpacing": 18,
@@ -488,7 +498,8 @@
       "warp",
       "glass",
       "feedback",
-      "scan"
+      "scan",
+      "palette"
     ],
     "finishEdge": false,
     "finishEdgeWidth": 2,
@@ -659,7 +670,67 @@
     "focusBlur": 0,
     "focusDepth": 0,
     "motions": {
+      "finishPaletteMap": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "finishPaletteScale": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "finishPaletteOffset": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "finishPaletteBlur": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
       "finishPrintNegative": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "filmIslands": {
         "enabled": false,
         "amplitude": 0.2,
         "cycles": 1,
@@ -1283,6 +1354,18 @@
         "hold": 0,
         "mode": "wave"
       },
+      "cellCore": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
       "cellBubbles": {
         "enabled": false,
         "amplitude": 0.2,
@@ -1825,7 +1908,7 @@
       },
       "rotateY": {
         "enabled": true,
-        "amplitude": 32,
+        "amplitude": 8,
         "cycles": 1,
         "phase": 0,
         "direction": 1,
@@ -1837,7 +1920,7 @@
       },
       "rotateX": {
         "enabled": true,
-        "amplitude": 8,
+        "amplitude": 2,
         "cycles": 1,
         "phase": 90,
         "direction": 1,
@@ -2030,6 +2113,7 @@
     "filmSwirl": 0,
     "filmCycles": 1,
     "grounding": 0,
+    "filmIslands": 0,
     "filmPattern": 0.52,
     "filmPatternScale": 3.6,
     "filmPatternWarp": 0.8,
@@ -2302,6 +2386,6 @@
     "forcePaths": [],
     "particleVersion": 14
   },
-  "ratio": 1,
-  "phase": 0.42
+  "ratio": 1.7486338797814207,
+  "phase": 0
 }
