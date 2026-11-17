@@ -645,12 +645,16 @@
       "id": "s01-05",
       "name": "Crescita botanica",
       "kind": "video",
-      "related": [],
+      "related": [
+        "roadmap-filament-planets"
+      ],
       "state": "reference",
       "priority": false,
       "author": "danhprt",
       "summary": "Da uno stelo sottile si sviluppano rami e un'infiorescenza con molti piccoli elementi rosa e viola; la crescita e progressiva. La registrazione inizia con la pianta gia sviluppata, poi mostra il riavvio della sequenza.",
-      "sources": [],
+      "sources": [
+        "https://www.instagram.com/danhprt/"
+      ],
       "sections": [
         {
           "title": "Cosa vediamo",
@@ -738,6 +742,15 @@
               "value": "La crescita non è reversibile per natura: animare la pianta completa oppure progettare esplicitamente un ciclo di crescita e dissoluzione."
             }
           ]
+        },
+        {
+          "title": "Estratto dall’album 3D",
+          "fields": [
+            {
+              "label": "observed",
+              "value": "Da uno stelo verde nascono rami sottili e grappoli di fiori lilla. Il nuovo estratto mostra il riempimento graduale del volume."
+            }
+          ]
         }
       ],
       "families": [
@@ -755,6 +768,11 @@
         "reference\\video-series-01.json"
       ],
       "media": [
+        {
+          "src": "media/album-3d-fioritura-ramificata.webp",
+          "width": 264,
+          "height": 440
+        },
         {
           "src": "media/8d3321a60563dc85.webp",
           "width": 296,
@@ -785,16 +803,18 @@
           "available": true
         }
       ],
-      "duration": 18.75,
-      "clip": "media/s01-05-study.mp4",
-      "clipNote": "Estratto di studio, massimo 10 s, senza audio. Non dimostra un loop.",
+      "duration": 17.4,
+      "clip": "media/album-3d-fioritura-ramificata-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
       "completedProjects": [],
       "aliases": [],
       "topics": [
         "growth"
       ],
       "category": "form",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "collection": "Album 3D",
+      "capturedOn": "2026-11-15"
     },
     {
       "id": "s01-06",
@@ -13339,7 +13359,8 @@
       "name": "Frattali 3D",
       "kind": "project",
       "related": [
-        "s12-01"
+        "s12-01",
+        "album-3d-icosaedro-dischi"
       ],
       "state": "implemented",
       "priority": false,
@@ -13476,7 +13497,13 @@
         "img-s16-rootstock",
         "reuse-three-attractors",
         "s03-04",
-        "roadmap-body-interaction"
+        "roadmap-body-interaction",
+        "album-3d-immagine-nuvola",
+        "album-3d-velo-particellare-blu",
+        "album-3d-morfologia-polpo",
+        "album-3d-giglio-punti",
+        "album-3d-gather",
+        "album-3d-rilievo-immagini"
       ],
       "state": "implemented",
       "priority": false,
@@ -13574,7 +13601,8 @@
         "s16-01",
         "s03-04",
         "roadmap-particles",
-        "archive-calibration-20261009"
+        "archive-calibration-20261009",
+        "album-3d-segmentazione-orso"
       ],
       "state": "partial",
       "priority": false,
@@ -13693,7 +13721,8 @@
         "reuse-sndviz",
         "reuse-meyda",
         "tool-13",
-        "img-s18-form-vision"
+        "img-s18-form-vision",
+        "album-3d-shaderkick"
       ],
       "state": "partial",
       "priority": false,
@@ -13947,7 +13976,8 @@
         "s16-01",
         "reuse-tdxmorph",
         "img-tdxmorph",
-        "img-s18-form-vision"
+        "img-s18-form-vision",
+        "album-3d-morfologia-polpo"
       ],
       "state": "partial",
       "priority": false,
@@ -14142,7 +14172,10 @@
         "reuse-three-attractors",
         "s18-05",
         "roadmap-electric-filaments",
-        "dense-cloud"
+        "dense-cloud",
+        "album-3d-espansione-radiale",
+        "album-3d-hokkori",
+        "album-3d-granuli-diffusione"
       ],
       "state": "partial",
       "priority": false,
@@ -14375,7 +14408,10 @@
         "s18-04",
         "roadmap-layered-veils",
         "project-cobalto-oro",
-        "project-pellicola-viva"
+        "project-pellicola-viva",
+        "album-3d-gusci-ottici",
+        "album-3d-strati-contorno",
+        "album-3d-impatto-viscoso"
       ],
       "state": "implemented",
       "priority": false,
@@ -14551,7 +14587,9 @@
         "roadmap-electric-filaments",
         "project-trama-viva",
         "project-fibre-setose",
-        "soleil"
+        "soleil",
+        "album-3d-botanica-traslucida",
+        "album-3d-onde-superficie"
       ],
       "state": "implemented",
       "priority": false,
@@ -14717,7 +14755,12 @@
         "s03-01",
         "reuse-xpbd",
         "project-living-extensions",
-        "project-trama-viva"
+        "project-trama-viva",
+        "album-3d-reticolo-fiore",
+        "album-3d-lichtenberg",
+        "album-3d-velo-particellare-blu",
+        "album-3d-colonna-fumo",
+        "album-3d-reticoli-figure"
       ],
       "state": "implemented",
       "priority": false,
@@ -14968,7 +15011,8 @@
       "kind": "project",
       "related": [
         "img-20261010-03",
-        "cellular-instancing"
+        "cellular-instancing",
+        "album-3d-icosaedro-dischi"
       ],
       "state": "implemented",
       "priority": false,
@@ -15246,7 +15290,8 @@
       "kind": "project",
       "related": [
         "img-20261010-03",
-        "liquid-painting"
+        "liquid-painting",
+        "album-3d-impatto-viscoso"
       ],
       "state": "implemented",
       "priority": false,
@@ -15831,7 +15876,11 @@
         "s05-02",
         "s16-02",
         "s16-03",
-        "roadmap-soft-knots"
+        "roadmap-soft-knots",
+        "album-3d-radial-bloom",
+        "album-3d-onde-superficie",
+        "album-3d-arco-luminoso",
+        "s01-05"
       ],
       "state": "partial",
       "priority": false,
@@ -16268,7 +16317,9 @@
         "prisma-image-particles",
         "roadmap-optical-glass",
         "s01-01",
-        "prisma-contour-frequency"
+        "prisma-contour-frequency",
+        "album-3d-lantern-lights",
+        "album-3d-falsi-colori-coniglio"
       ],
       "state": "implemented",
       "priority": false,
@@ -16435,7 +16486,15 @@
         "roadmap-membrane",
         "project-pellicola-viva",
         "s18-04",
-        "s17-02"
+        "s17-02",
+        "album-3d-rose-macro",
+        "album-3d-hokkori",
+        "album-3d-gusci-ottici",
+        "album-3d-strati-contorno",
+        "album-3d-botanica-traslucida",
+        "album-3d-arco-luminoso",
+        "album-3d-giglio-punti",
+        "album-3d-fola"
       ],
       "state": "partial",
       "priority": true,
@@ -16638,7 +16697,8 @@
         "s18-03",
         "roadmap-recursive-warp",
         "tool-s18-noise",
-        "tool-s18-bloom"
+        "tool-s18-bloom",
+        "album-3d-espansione-radiale"
       ],
       "state": "partial",
       "priority": false,
@@ -16787,7 +16847,8 @@
         "roadmap-particle-volume",
         "tool-s18-noise",
         "tool-s18-bloom",
-        "s03-03"
+        "s03-03",
+        "album-3d-lichtenberg"
       ],
       "state": "partial",
       "priority": false,
@@ -17136,7 +17197,10 @@
         "img-20261010-02",
         "roadmap-tissue",
         "roadmap-fibre-motion",
-        "dense-cloud"
+        "dense-cloud",
+        "album-3d-reticolo-fiore",
+        "album-3d-granuli-diffusione",
+        "album-3d-reticoli-figure"
       ],
       "state": "implemented",
       "priority": false,
@@ -19270,7 +19334,11 @@
         "img-s16-mosaic",
         "img-s16-rgb",
         "roadmap-image-treatments",
-        "roadmap-optical-glass"
+        "roadmap-optical-glass",
+        "album-3d-lantern-lights",
+        "album-3d-ionized",
+        "album-3d-falsi-colori-coniglio",
+        "album-3d-segmentazione-orso"
       ],
       "state": "implemented",
       "priority": false,
@@ -22927,7 +22995,8 @@
       "engine": "solid",
       "related": [
         "roadmap-cellular",
-        "roadmap-recursive-warp"
+        "roadmap-recursive-warp",
+        "album-3d-colonna-fumo"
       ],
       "state": "implemented",
       "priority": false,
@@ -23252,7 +23321,8 @@
       "name": "Cellule madreperlacee",
       "kind": "project",
       "related": [
-        "s04-01"
+        "s04-01",
+        "album-3d-botanica-traslucida"
       ],
       "state": "implemented",
       "priority": false,
@@ -23344,7 +23414,9 @@
         "growth"
       ],
       "related": [
-        "roadmap-organic-growth"
+        "roadmap-organic-growth",
+        "album-3d-radial-bloom",
+        "album-3d-fola"
       ],
       "media": [],
       "sections": [],
@@ -23363,6 +23435,1543 @@
       "resultImage": "../previews/trama-estrusa.webp",
       "resultVideo": "../previews/trama-estrusa.mp4",
       "resultUrl": "../previews/verifica-visiva.html#trama-estrusa"
+    },
+    {
+      "id": "album-3d-espansione-radiale",
+      "name": "Espansione radiale con nucleo luminoso",
+      "kind": "video",
+      "author": "thomas__blanchard",
+      "summary": "Anelli di granuli blu si raccolgono attorno a un punto intenso. Il passaggio a tonalità calde mette in risalto i pennacchi che si allontanano dal centro.",
+      "sources": [
+        "https://www.instagram.com/thomas__blanchard/"
+      ],
+      "related": [
+        "roadmap-luminous-vortex",
+        "roadmap-particle-volume"
+      ],
+      "families": [
+        "cloud",
+        "motion"
+      ],
+      "topics": [
+        "points",
+        "paths",
+        "gradients"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-espansione-radiale.webp",
+          "width": 296,
+          "height": 402
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Separare velocità radiale, rotazione locale e intensità del nucleo per conservare la trama durante l’espansione."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-26",
+      "duration": 23.95,
+      "clip": "media/album-3d-espansione-radiale-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-lantern-lights",
+      "name": "Lantern Lights · palette a falsi colori",
+      "kind": "video",
+      "author": "hellopersonality",
+      "summary": "La strada e la vegetazione virano al rosso mentre il cielo resta blu. La luce frontale crea una zona magenta più intensa durante l’avanzamento.",
+      "sources": [
+        "https://www.instagram.com/hellopersonality/"
+      ],
+      "related": [
+        "project-finishing",
+        "roadmap-image-treatments"
+      ],
+      "families": [
+        "graphic",
+        "film"
+      ],
+      "topics": [
+        "post",
+        "gradients"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-lantern-lights.webp",
+          "width": 260,
+          "height": 438
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Provare una mappa colore con più ancore, contrasto locale e un fascio centrale graduato."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-26",
+      "duration": 10.25,
+      "clip": "media/album-3d-lantern-lights-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "filters",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-reticolo-fiore",
+      "name": "Reticolo triangolato a densità variabile",
+      "kind": "video",
+      "author": "adrianaonen",
+      "summary": "Una figura vegetale fitta lascia spazio a una trama di triangoli larghi e torna a ricomporsi in una massa più minuta.",
+      "sources": [
+        "https://www.instagram.com/adrianaonen/"
+      ],
+      "related": [
+        "roadmap-tissue",
+        "project-trama-viva"
+      ],
+      "families": [
+        "fibre",
+        "cloud"
+      ],
+      "topics": [
+        "fibres",
+        "points"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-reticolo-fiore.webp",
+          "width": 260,
+          "height": 412
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Far condividere ai due livelli gli stessi nodi e variare densità e raggio dei legami durante il passaggio."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-27",
+      "duration": 10.84,
+      "clip": "media/album-3d-reticolo-fiore-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-rose-macro",
+      "name": "Rose in macro · pieghe e luce radente",
+      "kind": "video",
+      "author": "adrianaonen",
+      "summary": "Fiori bianchi e verdi su fondo nero. L’avvicinamento fa emergere i bordi increspati dei petali e le diverse profondità del mazzo.",
+      "sources": [
+        "https://www.instagram.com/adrianaonen/"
+      ],
+      "related": [
+        "roadmap-layered-veils"
+      ],
+      "families": [
+        "film",
+        "growth"
+      ],
+      "topics": [
+        "materials",
+        "surfaces"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-rose-macro.webp",
+          "width": 264,
+          "height": 304
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Usare la reference per graduare spessore del bordo, pieghe, luce radente e profondità di campo di una corolla."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-27",
+      "duration": 23.04,
+      "clip": "media/album-3d-rose-macro-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "appearance",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-hokkori",
+      "name": "HOKKORI · volute di luce azzurra",
+      "kind": "video",
+      "author": "studio_onen · adrianaonen",
+      "summary": "Una massa luminosa si allunga in nastri azzurri sovrapposti. Il nucleo ambra affiora fra pieghe trasparenti di diversa intensità.",
+      "sources": [
+        "https://www.instagram.com/studio_onen/"
+      ],
+      "related": [
+        "roadmap-layered-veils",
+        "roadmap-particle-volume"
+      ],
+      "families": [
+        "motion",
+        "film"
+      ],
+      "topics": [
+        "fluids",
+        "materials",
+        "gradients"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-hokkori.webp",
+          "width": 260,
+          "height": 448
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Separare scorrimento del campo tridimensionale, densità delle lamine e colore emissivo del nucleo."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-27",
+      "duration": 14.79,
+      "clip": "media/album-3d-hokkori-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "movement",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-immagine-nuvola",
+      "name": "Da una foto a una nuvola di punti",
+      "kind": "video",
+      "author": "be.of.dao",
+      "summary": "La dimostrazione mostra figure dense di punti che si disperdono, cambiano inquadratura e si ricompongono. L’autore descrive un passaggio da una foto alla profondità nel browser.",
+      "sources": [
+        "https://be-of-dao.com/",
+        "https://www.patreon.com/beofdao/posts/gather-ju-v16-1-173379492"
+      ],
+      "related": [
+        "album-3d-gather",
+        "roadmap-particles",
+        "album-3d-rilievo-immagini"
+      ],
+      "families": [
+        "cloud",
+        "workflow"
+      ],
+      "topics": [
+        "points",
+        "tools"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-immagine-nuvola.webp",
+          "width": 274,
+          "height": 386
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Studiare come separare la stima della profondità dalla dispersione procedurale e dalla luce in scena."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-29",
+      "duration": 22.97,
+      "clip": "media/album-3d-immagine-nuvola-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-ionized",
+      "name": "Ionized · aloni cromatici sfocati",
+      "kind": "video",
+      "author": "mnaumanndesign",
+      "summary": "Macchie morbide si incastrano in regioni scure. Anelli di verde, ciano e magenta cambiano larghezza insieme alla sagoma.",
+      "sources": [
+        "https://www.instagram.com/mnaumanndesign/"
+      ],
+      "related": [
+        "project-finishing"
+      ],
+      "families": [
+        "graphic",
+        "film"
+      ],
+      "topics": [
+        "gradients",
+        "post"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-ionized.webp",
+          "width": 296,
+          "height": 374
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Compensare separatamente raggio della sfocatura, distanza fra le bande cromatiche e deformazione dell’alone."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-29",
+      "duration": 23.0,
+      "clip": "media/album-3d-ionized-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "appearance",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-radial-bloom",
+      "name": "Radial Bloom · crescita differenziale radiale",
+      "kind": "video",
+      "author": "zakoyanhayk",
+      "summary": "Un’apertura circolare resta leggibile mentre le propaggini crescono verso l’esterno. Il carosello mostra ramificazioni, palette e gradi di espansione diversi.",
+      "sources": [
+        "https://www.instagram.com/zakoyanhayk/"
+      ],
+      "related": [
+        "roadmap-filament-planets",
+        "album-3d-fola",
+        "roadmap-growth-geometry"
+      ],
+      "families": [
+        "growth",
+        "fibre"
+      ],
+      "topics": [
+        "growth",
+        "strands",
+        "surfaces"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-radial-bloom.webp",
+          "width": 296,
+          "height": 292
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Ancorare l’apertura, poi variare crescita locale, lunghezza e repulsione tra i rami lungo l’anello."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-30",
+      "duration": 49.98,
+      "clip": "media/album-3d-radial-bloom-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-gusci-ottici",
+      "name": "Gusci ottici intrecciati",
+      "kind": "video",
+      "author": "forside_art · Jang Yeonjeong",
+      "summary": "Lamine azzurre trasparenti si ripiegano in curve ampie. I bordi, i riflessi bianchi e le cavità interne rivelano più spessori sovrapposti.",
+      "sources": [
+        "https://www.instagram.com/forside_art/"
+      ],
+      "related": [
+        "roadmap-membrane",
+        "roadmap-layered-veils"
+      ],
+      "families": [
+        "film",
+        "fibre"
+      ],
+      "topics": [
+        "surfaces",
+        "materials",
+        "strands"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-gusci-ottici.webp",
+          "width": 256,
+          "height": 394
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Far seguire alle linee la curvatura dei gusci. Regolare indipendentemente torsione, separazione fra strati e risposta ottica."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-30",
+      "duration": 29.51,
+      "clip": "media/album-3d-gusci-ottici-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-strati-contorno",
+      "name": "Strati di contorno blu · sezioni deformate",
+      "kind": "video",
+      "author": "forside_art · Jang Yeonjeong",
+      "summary": "Bande azzurre e lattiginose seguono il profilo di masse irregolari, con ripiegamenti più scuri all’interno. La registrazione passa fra varianti del carosello.",
+      "sources": [
+        "https://www.instagram.com/forside_art/"
+      ],
+      "related": [
+        "roadmap-layered-veils",
+        "roadmap-membrane"
+      ],
+      "families": [
+        "film",
+        "growth"
+      ],
+      "topics": [
+        "surfaces",
+        "gradients"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-strati-contorno.webp",
+          "width": 296,
+          "height": 330
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Costruire strati a distanza regolabile dal contorno e modulare colore e ondulazione lungo la profondità."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-31",
+      "duration": 23.84,
+      "clip": "media/album-3d-strati-contorno-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-botanica-traslucida",
+      "name": "Botanica traslucida · steli e nervature",
+      "kind": "video",
+      "author": "forside_art · Jang Yeonjeong",
+      "summary": "Steli sottili portano corolle a goccia, capsule e gruppi di piccole sfere. Le nervature seguono il bordo delle lamine e lasciano trasparire l’interno.",
+      "sources": [
+        "https://www.instagram.com/forside_art/"
+      ],
+      "related": [
+        "roadmap-fibre-motion",
+        "roadmap-layered-veils",
+        "project-cellular-nacre"
+      ],
+      "families": [
+        "fibre",
+        "growth",
+        "film"
+      ],
+      "topics": [
+        "strands",
+        "surfaces",
+        "materials"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-botanica-traslucida.webp",
+          "width": 296,
+          "height": 362
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Legare i fili alle lamine curva per curva e mantenere stelo, trasparenza e spessore delle nervature indipendenti."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-31",
+      "duration": 30.77,
+      "clip": "media/album-3d-botanica-traslucida-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-granuli-diffusione",
+      "name": "Granuli in diffusione ciano e ambra",
+      "kind": "video",
+      "author": "infinite_mantra · Lindsay Kokoska",
+      "summary": "Volumi morbidi arancioni e azzurri si attraversano. Nei vuoti neri si distinguono granuli minuti e gradienti di densità.",
+      "sources": [
+        "https://www.infinitemantra.ca/"
+      ],
+      "related": [
+        "roadmap-particle-volume",
+        "project-trama-viva"
+      ],
+      "families": [
+        "cloud",
+        "motion",
+        "film"
+      ],
+      "topics": [
+        "points",
+        "gradients",
+        "fluids"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-granuli-diffusione.webp",
+          "width": 296,
+          "height": 370
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Variare concentrazione, dimensione dei granelli e diffusione del colore lungo il campo di moto."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-31",
+      "duration": 19.77,
+      "clip": "media/album-3d-granuli-diffusione-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-lichtenberg",
+      "name": "POPtober giorno 21 · scariche ramificate",
+      "kind": "video",
+      "author": "darien.brito · Darien Brito",
+      "summary": "Dentro un riquadro scuro crescono pochi rami principali chiari e molte diramazioni più minute. Densità e direzione cambiano fra le sequenze.",
+      "sources": [
+        "https://darienbrito.com/work/generative-design-in-pops/",
+        "https://www.instagram.com/darien.brito/"
+      ],
+      "related": [
+        "roadmap-electric-filaments",
+        "roadmap-tissue"
+      ],
+      "families": [
+        "growth",
+        "fibre"
+      ],
+      "topics": [
+        "electric",
+        "fibres"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-lichtenberg.webp",
+          "width": 234,
+          "height": 274
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Regolare separatamente raggio delle biforcazioni, spessore dei rami principali e persistenza delle scie."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-02",
+      "duration": 11.69,
+      "clip": "media/album-3d-lichtenberg-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "movement",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-onde-superficie",
+      "name": "Onde di filamenti su cavità",
+      "kind": "video",
+      "author": "vvirdev",
+      "summary": "File di curve luminose seguono un profilo concavo. Il fascio si addensa sui bordi e scorre passando da una forma all’altra del carosello.",
+      "sources": [
+        "https://www.instagram.com/vvirdev/"
+      ],
+      "related": [
+        "roadmap-filament-planets",
+        "roadmap-fibre-motion"
+      ],
+      "families": [
+        "fibre",
+        "motion"
+      ],
+      "topics": [
+        "strands",
+        "paths",
+        "surfaces"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-onde-superficie.webp",
+          "width": 292,
+          "height": 334
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Ancorare le traiettorie alla superficie e variare fase, distanza e luminosità fra gruppi di fibre."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-03",
+      "duration": 25.69,
+      "clip": "media/album-3d-onde-superficie-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-arco-luminoso",
+      "name": "Arco di fibre iridescenti su scala ambientale",
+      "kind": "video",
+      "author": "marisdreaming",
+      "summary": "Una colonna di tracce sottili si piega in un arco sopra un paesaggio scuro. Riflessi rosa e verdi scorrono lungo strati sovrapposti.",
+      "sources": [
+        "https://www.instagram.com/marisdreaming/"
+      ],
+      "related": [
+        "roadmap-filament-planets",
+        "roadmap-layered-veils"
+      ],
+      "families": [
+        "fibre",
+        "film"
+      ],
+      "topics": [
+        "strands",
+        "materials",
+        "paths"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-arco-luminoso.webp",
+          "width": 264,
+          "height": 442
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Usare curve guida comuni su più scale, con filamenti sottili e riflessi orientati lungo la direzione di flusso."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-05",
+      "duration": 14.0,
+      "clip": "media/album-3d-arco-luminoso-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-impatto-viscoso",
+      "name": "Impatto viscoso con spruzzi radiali",
+      "kind": "video",
+      "author": "silphere",
+      "summary": "Una massa nera riflettente si appiattisce all’impatto e si apre in lembi irregolari. Filamenti e gocce si sollevano attorno al centro.",
+      "sources": [
+        "https://www.instagram.com/silphere/"
+      ],
+      "related": [
+        "roadmap-liquid-painting",
+        "roadmap-membrane"
+      ],
+      "families": [
+        "motion",
+        "film"
+      ],
+      "topics": [
+        "fluids",
+        "materials"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-impatto-viscoso.webp",
+          "width": 260,
+          "height": 350
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Studiare inerzia, ritorno elastico e distacco delle parti insieme alla sola risposta speculare del materiale."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-05",
+      "duration": 16.54,
+      "clip": "media/album-3d-impatto-viscoso-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "movement",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-velo-particellare-blu",
+      "name": "Velo particellare blu con traiettorie lunghe",
+      "kind": "video",
+      "author": "holotx",
+      "summary": "Una forma puntiforme blu si avvolge e lascia tra i lembi alcune tracce sottili molto lunghe. Le varianti alternano gusci raccolti e pieghe allungate.",
+      "sources": [
+        "https://www.instagram.com/holotx/",
+        "https://www.patreon.com/cw/holotx"
+      ],
+      "related": [
+        "roadmap-particles",
+        "roadmap-tissue"
+      ],
+      "families": [
+        "cloud",
+        "fibre"
+      ],
+      "topics": [
+        "points",
+        "fibres",
+        "paths"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-velo-particellare-blu.webp",
+          "width": 296,
+          "height": 352
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Campionare velo e collegamenti dallo stesso campo, con lunghezza delle scie e densità della superficie indipendenti."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-07",
+      "duration": 29.66,
+      "clip": "media/album-3d-velo-particellare-blu-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-morfologia-polpo",
+      "name": "Morfologia di un polpo su campo di punti",
+      "kind": "video",
+      "author": "adotcreates",
+      "summary": "Una figura tentacolare passa fra sagome e colori diversi sopra un terreno di granuli. Il finale della registrazione attribuisce lo studio a TouchDesigner.",
+      "sources": [
+        "https://www.instagram.com/adotcreates/"
+      ],
+      "related": [
+        "roadmap-particles",
+        "roadmap-preset-morphing"
+      ],
+      "families": [
+        "motion",
+        "cloud"
+      ],
+      "topics": [
+        "paths",
+        "points",
+        "surfaces"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-morfologia-polpo.webp",
+          "width": 260,
+          "height": 390
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Tenere identificabili gli attacchi delle appendici mentre cambiano lunghezza, apertura, silhouette e pigmento."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-07",
+      "duration": 13.79,
+      "clip": "media/album-3d-morfologia-polpo-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "movement",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-falsi-colori-coniglio",
+      "name": "Falsi colori e contorni su un coniglio",
+      "kind": "video",
+      "author": "adotcreates",
+      "summary": "La silhouette del coniglio resta leggibile mentre alternano tracce chiare, riflessi cangianti e spettro di falsi colori. Il fondale mostra bordi evidenziati.",
+      "sources": [
+        "https://www.instagram.com/adotcreates/"
+      ],
+      "related": [
+        "roadmap-image-treatments",
+        "project-finishing"
+      ],
+      "families": [
+        "graphic",
+        "film"
+      ],
+      "topics": [
+        "post",
+        "gradients"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-falsi-colori-coniglio.webp",
+          "width": 260,
+          "height": 446
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Modulare mappa colore, rilevamento dei bordi e trattamento del fondo come passaggi indipendenti."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-07",
+      "duration": 4.85,
+      "clip": "media/album-3d-falsi-colori-coniglio-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "filters",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-segmentazione-orso",
+      "name": "Separazione del soggetto e del fondale",
+      "kind": "video",
+      "author": "adotcreates",
+      "summary": "Un orso blu rimane riconoscibile sopra diversi trattamenti di colore e contorno. Nel post l’autore cita un esperimento con RF-DETR.",
+      "sources": [
+        "https://www.instagram.com/adotcreates/"
+      ],
+      "related": [
+        "roadmap-body-interaction",
+        "project-finishing"
+      ],
+      "families": [
+        "interaction",
+        "graphic"
+      ],
+      "topics": [
+        "tracking",
+        "post",
+        "gradients"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-segmentazione-orso.webp",
+          "width": 262,
+          "height": 432
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Valutare una maschera temporale stabile e livelli separati per il soggetto e per i trattamenti del fondale."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-07",
+      "duration": 13.67,
+      "clip": "media/album-3d-segmentazione-orso-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "interaction",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-colonna-fumo",
+      "name": "Colonna di fumo con rete cellulare",
+      "kind": "video",
+      "author": "eparizi",
+      "summary": "Un filamento verde sottile si gonfia in camere collegate tra loro e poi in una rete organica. La didascalia indica Houdini e uno studio basato sul fumo.",
+      "sources": [
+        "https://www.instagram.com/eparizi/"
+      ],
+      "related": [
+        "roadmap-tissue",
+        "roadmap-organic-growth"
+      ],
+      "families": [
+        "motion",
+        "fibre",
+        "growth"
+      ],
+      "topics": [
+        "fluids",
+        "fibres",
+        "growth"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-colonna-fumo.webp",
+          "width": 258,
+          "height": 428
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Derivare i contorni da un campo di densità. Far variare separatamente advezione, spessore dei bordi e velocità di espansione."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-07",
+      "duration": 19.29,
+      "clip": "media/album-3d-colonna-fumo-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "movement",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-giglio-punti",
+      "name": "Digital Traces of a Lily · giglio in granuli",
+      "kind": "video",
+      "author": "adrianaonen",
+      "summary": "Petali e foglie di un giglio sono attraversati da punti luminosi. Una parte del fiore si sfalda in una scia mentre lo stelo resta leggibile.",
+      "sources": [
+        "https://www.instagram.com/adrianaonen/"
+      ],
+      "related": [
+        "roadmap-particles",
+        "roadmap-layered-veils"
+      ],
+      "families": [
+        "cloud",
+        "fibre"
+      ],
+      "topics": [
+        "points",
+        "strands",
+        "post"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-giglio-punti.webp",
+          "width": 296,
+          "height": 330
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Usare distacco progressivo lungo il bordo delle lamine, con granulometria, persistenza e direzione della scia indipendenti."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-14",
+      "duration": 18.1,
+      "clip": "media/album-3d-giglio-punti-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-gather",
+      "name": "Gather v17 · strumenti per nuvole di punti",
+      "kind": "video",
+      "author": "be.of.dao",
+      "summary": "La presentazione di v17 mostra mappe di profondità, ritaglio dello sfondo, simmetria tridimensionale e registrazione di una performance.",
+      "sources": [
+        "https://be-of-dao.com/",
+        "https://www.patreon.com/beofdao/posts/gather-ju-v16-1-173379492"
+      ],
+      "related": [
+        "album-3d-immagine-nuvola",
+        "roadmap-particles"
+      ],
+      "families": [
+        "workflow",
+        "cloud"
+      ],
+      "topics": [
+        "tools",
+        "points",
+        "presets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-gather.webp",
+          "width": 296,
+          "height": 386
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Riferimento per organizzare importazione, simmetria, navigazione e registrazione in un progetto 3D."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-15",
+      "duration": 75.8,
+      "clip": "media/album-3d-gather-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "workflow",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-icosaedro-dischi",
+      "name": "Icosaedro appiattito con dischi ricorsivi",
+      "kind": "video",
+      "author": "ylegall",
+      "summary": "Dischi di diverse dimensioni riempiono le facce di un icosaedro schiacciato. La rotazione fa scorrere accenti caldi sulle superfici blu.",
+      "sources": [
+        "https://www.threads.com/@ylegall"
+      ],
+      "related": [
+        "roadmap-fractals",
+        "roadmap-cellular"
+      ],
+      "families": [
+        "growth",
+        "film"
+      ],
+      "topics": [
+        "fractals",
+        "growth",
+        "materials"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-icosaedro-dischi.webp",
+          "width": 182,
+          "height": 160
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Distribuire celle su una mesh a facce con raggi ricorsivi, poi variare schiacciamento, rilievo e illuminazione."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-15",
+      "duration": 7.25,
+      "clip": "media/album-3d-icosaedro-dischi-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-rilievo-immagini",
+      "name": "Rilievo da immagine con punti e griglia",
+      "kind": "video",
+      "author": "timhosqo",
+      "summary": "Figure diverse appaiono come rilievi puntiformi, con griglie e indicatori grafici. Il video mostra controlli visibili per profondità e dispersione.",
+      "sources": [
+        "https://www.instagram.com/timhosqo/"
+      ],
+      "related": [
+        "roadmap-particles",
+        "album-3d-immagine-nuvola"
+      ],
+      "families": [
+        "cloud",
+        "workflow"
+      ],
+      "topics": [
+        "points",
+        "tools"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-rilievo-immagini.webp",
+          "width": 260,
+          "height": 422
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Studiare l’escursione della profondità, la densità dei punti e una sovrapposizione grafica separata."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-15",
+      "duration": 16.12,
+      "clip": "media/album-3d-rilievo-immagini-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-fola",
+      "name": "Fola · crescita differenziale verticale",
+      "kind": "video",
+      "author": "zakoyanhayk · TouchDesigner",
+      "summary": "Da una base stretta si apre un ventaglio verticale di lamelle arricciate. Il repost di TouchDesigner descrive suddivisione e repulsione.",
+      "sources": [
+        "https://www.instagram.com/zakoyanhayk/",
+        "https://www.instagram.com/touchdesigner/"
+      ],
+      "related": [
+        "album-3d-radial-bloom",
+        "roadmap-growth-geometry",
+        "roadmap-layered-veils"
+      ],
+      "families": [
+        "growth",
+        "fibre"
+      ],
+      "topics": [
+        "growth",
+        "surfaces",
+        "strands"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-fola.webp",
+          "width": 296,
+          "height": 264
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Separare crescita in altezza, repulsione locale e piega del profilo per passare gradualmente da stelo a corolla."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-15",
+      "duration": 30.61,
+      "clip": "media/album-3d-fola-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-reticoli-figure",
+      "name": "Reticoli cromatici su figure in moto",
+      "kind": "video",
+      "author": "andreiongd",
+      "summary": "Fili rossi, verdi e blu marcano masse semitrasparenti. Nel carosello il reticolo si distribuisce anche su figure riconoscibili in movimento.",
+      "sources": [
+        "https://www.instagram.com/andreiongd/"
+      ],
+      "related": [
+        "roadmap-tissue",
+        "project-trama-viva"
+      ],
+      "families": [
+        "fibre",
+        "cloud"
+      ],
+      "topics": [
+        "fibres",
+        "points",
+        "gradients"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-reticoli-figure.webp",
+          "width": 296,
+          "height": 358
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "Conservare i collegamenti durante la deformazione e modulare il colore per distanza dal corpo e velocità locale."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-11-16",
+      "duration": 17.8,
+      "clip": "media/album-3d-reticoli-figure-study.mp4",
+      "clipNote": "Estratto di studio ritagliato, senza audio.",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "form",
+      "detailsSource": [
+        "Album 3D"
+      ]
+    },
+    {
+      "id": "album-3d-shaderkick",
+      "name": "ShaderKick · shader e tracce audio in DAW",
+      "kind": "image",
+      "author": "Le TOROE",
+      "summary": "La scheda del VST3 mostra una scena shader che convive con controlli di effetto, zoom e velocità. Il prodotto rende shader in tempo reale all’interno di una DAW.",
+      "sources": [
+        "https://payhip.com/LeTOROE",
+        "https://www.kvraudio.com/product/shaderkick-free-by-le-toroe/details"
+      ],
+      "related": [
+        "roadmap-audio-interaction"
+      ],
+      "families": [
+        "workflow",
+        "interaction"
+      ],
+      "topics": [
+        "tools",
+        "audio",
+        "presets"
+      ],
+      "state": "reference",
+      "priority": false,
+      "completedProjects": [],
+      "assets": [],
+      "media": [
+        {
+          "src": "media/album-3d-shaderkick.webp",
+          "width": 720,
+          "height": 403
+        }
+      ],
+      "sections": [
+        {
+          "title": "Studio per Prisma",
+          "fields": [
+            {
+              "label": "method",
+              "value": "La disposizione dei controlli è una reference per il Playground. Conservare accesso rapido ai parametri visivi durante una performance."
+            }
+          ]
+        }
+      ],
+      "capturedOn": "2026-10-31",
+      "collection": "Album 3D",
+      "addedOn": "2026-11-17",
+      "category": "workflow",
+      "detailsSource": [
+        "Album 3D"
+      ]
     }
   ],
   "families": [
@@ -23579,13 +25188,13 @@
     "Segnare realizzato solo il risultato verificato"
   ],
   "stats": {
-    "records": 194,
-    "videos": 61,
-    "images": 23,
+    "records": 223,
+    "videos": 88,
+    "images": 24,
     "tools": 73,
-    "projects": 34,
+    "projects": 35,
     "attachments": 132,
-    "clips": 61,
+    "clips": 88,
     "missing": 10
   },
   "categories": [
