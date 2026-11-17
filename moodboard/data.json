@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-11-16",
+  "updated": "2026-11-17",
   "items": [
     {
       "id": "s01-01",
@@ -16733,9 +16733,9 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Materiale → Volume dei granelli · Movimento → Pulsazione",
+      "where": "Movimento → Animazioni · Materiale → Volume dei granelli",
       "platform": "",
-      "next": "Restano flare indipendente e confronto dei lembi luminosi in movimento con le reference.",
+      "next": "Avvicinare la ramificazione delle scie e la posizione dei picchi di luce durante le aperture.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -16768,9 +16768,9 @@
       "engine": "particles",
       "resultImage": "../previews/ricircolo-luminoso.webp",
       "resultUrl": "../previews/verifica-visiva.html#ricircolo-luminoso",
-      "compareNote": "Filamenti tridimensionali si contraggono verso un nucleo in movimento e si riaprono con impulsi sfalsati. I percorsi dei rami e la cadenza rimangono diversi dalla fonte.",
+      "compareNote": "Loop di 14 s, con partenza allineata all’estratto. Posizione, scala, rotazioni, contrazione e lampi sono regolabili per punti nel tempo. Nei rami e nella distribuzione della luce restano differenze visibili.",
       "comparisonRef": "s18-05",
-      "comparisonDate": "2026-11-16",
+      "comparisonDate": "2026-11-17",
       "resultPreset": "previews/ricircolo-luminoso.prisma.json",
       "resultVideo": "../previews/ricircolo-luminoso.mp4",
       "comparisonOutcome": "parziale",

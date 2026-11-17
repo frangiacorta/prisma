@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=df487c245b09';
-import {EXTRA_HELP} from './control-help-extra.js?v=df487c245b09';
-import {FRACTAL_HELP} from './fractal-form.js?v=df487c245b09';
-import {CELLULAR_HELP} from './cellular-form.js?v=df487c245b09';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=df487c245b09';
-import {trailLightCompensation} from './particle-model.js?v=df487c245b09';
+import {AUDIO_HELP} from './audio-model.js?v=79c81404468e';
+import {EXTRA_HELP} from './control-help-extra.js?v=79c81404468e';
+import {FRACTAL_HELP} from './fractal-form.js?v=79c81404468e';
+import {CELLULAR_HELP} from './cellular-form.js?v=79c81404468e';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=79c81404468e';
+import {trailLightCompensation} from './particle-model.js?v=79c81404468e';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishPalette:'Converte il chiaroscuro della scena in una palette ordinata da scuro a chiaro. La trasparenza resta invariata.',
@@ -375,7 +375,7 @@ export function controlCondition(s,key){
  if(key.startsWith('petal')&&key!=='petalAmount'&&!positive('petalAmount'))return 'Aumenta Appendici in Forma → Petali e radici.';
  if(key==='petalDirectionSpread'&&!['petalCoil','petalReentry','petalCurl','petalWander'].some(positive))return 'Aggiungi una curva, una deviazione o un avvolgimento al percorso.';
  if(key==='focusDepth'&&!positive('focusBlur'))return 'Aumenta la sfocatura fuori fuoco.';
- if(key==='motion'&&!Object.values(s.motions||{}).some(t=>t.enabled&&t.mode!=='cycle'&&Math.abs(t.amplitude)>1e-6)&&!s.lights?.some(l=>l.pulse?.enabled||l.orbit?.enabled&&l.orbit.mode!=='cycle'))return 'Attiva una traccia in oscillazione: l’ampiezza generale non modifica i giri completi.';
+ if(key==='motion'&&!Object.values(s.motions||{}).some(t=>t.enabled&&t.mode!=='cycle'&&t.mode!=='points'&&Math.abs(t.amplitude)>1e-6)&&!s.lights?.some(l=>l.pulse?.enabled||l.orbit?.enabled&&l.orbit.mode!=='cycle'))return 'Attiva una traccia in oscillazione per usare l’ampiezza generale. I punti nel tempo usano i valori impostati nella traccia.';
  return '';
 }
 // Changes suggested inline are opt-in edits. The same values are useful for

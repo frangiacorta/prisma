@@ -1,7 +1,7 @@
-import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=df487c245b09';
-import {beginVeilTransform} from './veil-model.js?v=df487c245b09';
-import {cloudBody} from './body-layers.js?v=df487c245b09';
-import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=df487c245b09';
+import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=79c81404468e';
+import {beginVeilTransform} from './veil-model.js?v=79c81404468e';
+import {cloudBody} from './body-layers.js?v=79c81404468e';
+import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=79c81404468e';
 export function applyLivingStyle(s,style){
  if(!cloudBody(s)){
   const values={off:STRUCTURE_DEFAULTS,fibres:{structShell:1,structFibres:1},tissue:{structShell:1,structFibres:1,structWeft:1},membrane:{structShell:1},veils:{structShell:1,structRadial:.65,structCurl:.4}}[style];

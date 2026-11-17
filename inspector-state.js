@@ -1,6 +1,7 @@
-import {controlCondition,conditionActivation} from './control-help.js?v=df487c245b09';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=df487c245b09';
-import {syncMaterialControl} from './studio-model.js?v=df487c245b09';
+import {controlCondition,conditionActivation} from './control-help.js?v=79c81404468e';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=79c81404468e';
+import {syncMaterialControl} from './studio-model.js?v=79c81404468e';
+import {hasMotionPoints} from './motion-keyframes.js?v=79c81404468e';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pCloudCore','pCloudHalo','pCellAmount','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
@@ -11,13 +12,14 @@ export function simplifyShape(state,amount=0){
  for(const k of ['volume','stretchX','stretchY','stretchZ',...(state.engine==='particles'?['pGrainSpacing','pGroupSpacing']:[])])if(Number.isFinite(state[k]))state[k]=1+(state[k]-1)*amount;
  if(amount===0){state.pLiving=0;state.pLivingBlend=0;state.pSurfaceBind=0;}
  if(state.engine==='particles'&&amount===0){state.pTrailCount=0;state.pLinks=0;state.pFill=1;state.pSymmetry=1;}
- for(const [k,t] of Object.entries(state.motions||{}))if(keys.includes(k)||['volume','stretchX','stretchY','stretchZ'].includes(k)){if(amount===0)t.enabled=false;else if(Number.isFinite(t.amplitude))t.amplitude*=amount;}
+ for(const [k,t] of Object.entries(state.motions||{}))if(keys.includes(k)||['volume','stretchX','stretchY','stretchZ'].includes(k)){if(amount===0)t.enabled=false;else if(hasMotionPoints(t))t.points=t.points.map(point=>({...point,offset:point.offset*amount}));else if(Number.isFinite(t.amplitude))t.amplitude*=amount;}
  if(amount===0)for(const p of [...state.forcePoints||[],...state.forcePaths||[]])p.enabled=false;
  return state;
 }
 export function simplifyMotion(state,amount=0){
  for(const t of [...Object.values(state.motions||{}),...(state.lights||[]).flatMap(l=>[l.orbit,l.pulse]).filter(Boolean)]){
   if(amount===0)t.enabled=false;
+  else if(hasMotionPoints(t))t.points=t.points.map(point=>({...point,offset:point.offset*amount}));
   else if(t.enabled&&Number.isFinite(t.amplitude)&&t.mode!=='cycle')t.amplitude*=amount;
  }
  for(const k of MOTION_ZERO)if(Number.isFinite(state[k]))state[k]*=amount;

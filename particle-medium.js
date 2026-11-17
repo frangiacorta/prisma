@@ -1,6 +1,7 @@
-import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=df487c245b09';
-import {prismaPaletteGLSL} from './particle-shading.js?v=df487c245b09';
-import {simplex3DGLSL} from './vendor/webgl-noise/simplex-3d.js?v=df487c245b09';
+import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=79c81404468e';
+import {prismaPaletteGLSL} from './particle-shading.js?v=79c81404468e';
+import {simplex3DGLSL} from './vendor/webgl-noise/simplex-3d.js?v=79c81404468e';
+import {hasMotionPoints} from './motion-keyframes.js?v=79c81404468e';
 
 const header=`#version 300 es
 precision highp float;
@@ -15,12 +16,21 @@ const bounds=`
 uniform vec3 uFogMin,uFogMax;
 uniform vec4 uFogAtlas;
 `;
+const ringField=`
+vec2 closedFlow(vec3 p,float time,float contraction){
+ vec2 plane=vec2(p.x,p.y*1.1);
+ float angle=atan(plane.y,plane.x+1.e-8);
+ float radius=(.51+.05*cos(angle*3.+time)+.045*sin(angle*2.-time))*(1.-contraction*.27);
+ return vec2(length(plane)-radius,p.z+.13*cos(angle*2.+time)+.05*sin(angle*3.-time));
+}
+`;
 
 // Bake the moving, three-dimensional density once per scene sample. View and
 // light rays then reuse the same density, so shadows follow the smoke detail.
-const bake=header+bounds+bodyFieldGLSL+simplex3DGLSL+`
+const bake=header+bounds+bodyFieldGLSL+simplex3DGLSL+ringField+`
 uniform vec4 uFogShape,uFogMotion,uFogPattern,uFogLight;
 uniform vec2 uFogCut;
+uniform float uFogContraction,uFogCounterflow;
 uniform float uHasBody,uFogSeed;
 float cloudDistance(vec3 p){
  float d=length(p)-uFogShape.y;
@@ -64,6 +74,7 @@ void main(){
  vec2 orbit=vec2(cos(time),sin(time));
  vec3 bend=p+vec3(orbit.y,orbit.x,orbit.x-orbit.y)*uFogMotion.y*.21;
  float turn=uFogMotion.z*(p.y*.52+orbit.y*.2);
+ if(uFogContraction>=0.)turn+=uFogCounterflow*orbit.y*(smoothstep(.15,uFogShape.y,length(p))-.5)*.44;
  bend.xz=mat2(cos(turn),-sin(turn),sin(turn),cos(turn))*bend.xz;
  vec3 q=bend*frequency+vec3(uFogSeed*.83,uFogSeed,-uFogSeed*.65);
  vec3 curl=vec3(snoise(q*.5),snoise(q*.5+vec3(13.,7.,3.)),snoise(q*.5+vec3(2.,15.,5.)));
@@ -89,11 +100,19 @@ void main(){
   float localPhase=rhythm-sin(rhythm)*(.21+.65*uFogLight.w);
   float swell=pow(.5+.5*cos(localPhase-.29),2.35)*min(1.,uFogShape.w*3.);
   swell*=1.-uFogLight.z*.8*(1.-pow(.5+.5*cos(time),.7));
+  bool authoredContraction=uFogContraction>=0.;
+  if(authoredContraction)swell=uFogContraction;
   vec3 center=vec3(orbit.y*.46+.16*sin(time*2.),orbit.x*.43+.13*sin(time*3.),orbit.y*.23)*(.36+.64*uFogMotion.w);
   vec3 axis=normalize(vec3(.57+orbit.y*.55,-.63+.23*orbit.x,.34));
   vec3 offset=p-center,along=axis*dot(offset,axis),across=offset-along;
   vec3 current=bend-center+coherentFlow(bend,time)*(.27+turbulence*.37);
-  current+=across*(swell*2.3)-along*(.12+.18*orbit.x);
+  if(authoredContraction){
+   // Shrink the same domain along all three axes, with more room for the
+   // outflow along its long axis. Local curl and shell continue to move.
+   current*=1.+swell*.75;
+   current+=across*(swell*.52)-along*(.12+.18*orbit.x);
+   current+=coherentFlow(bend*2.45,time*3.)*turbulence*.12;
+  }else current+=across*(swell*2.3)-along*(.12+.18*orbit.x);
   vec3 cells=current*vec3(.88,.95,1.19)*(.85+frequency*.62)+curl*(.12+.23*turbulence);
   cells+=vec3(uFogSeed*.85,-uFogSeed*.28,uFogSeed*.63);
   // Signed fields retain their zero crossings under atlas interpolation.
@@ -103,6 +122,17 @@ void main(){
   float branchA=snoise(cells*.91+vec3(19.,3.,5.));
   float branchB=snoise(cells*1.53+vec3(-7.,13.,31.));
   float lineB=branchA*branchB/max(.12,length(vec2(branchA,branchB)));
+  if(authoredContraction){
+   float fork=smoothstep(.05,.55,snoise(cells*.39+vec3(13.,-5.,2.)));
+   lineB=mix(branchA,lineB,fork*.34);
+  }
+  float closure=authoredContraction&&uHasBody<.5?smoothstep(.12,.86,uFogShape.x):0.;
+  vec2 ring=vec2(0.);
+  if(closure>0.){
+   ring=closedFlow(p-center,time,swell);
+   lineA=mix(lineA,ring.x*2.35,closure);
+   lineB=mix(lineB,ring.y*2.35,closure);
+  }
   float filament=exp(-length(vec2(lineA,lineB))*24.);
   float haze=exp(-length(vec2(lineA,lineB))*7.);
   float contraction=length(across)*swell*1.8;
@@ -112,9 +142,23 @@ void main(){
   float supportDistance=mix(d+contraction,freeSpace,.46+.53*turbulence);
   float envelope=(1.-smoothstep(-.19,.19,supportDistance))*cloudFillSupport(supportDistance);
   if(uHasBody>.5)envelope*=1.-smoothstep(-.025,.1,d);
+  if(authoredContraction){
+   vec3 lip=normalize(vec3(.24+orbit.y*.39,.9,orbit.x*.36));
+   float lifted=smoothstep(-.025,.042,dot(offset,lip)+.08);
+   envelope*=mix(1.,lifted,smoothstep(.17,.67,swell)*(.93-closure*.75));
+  }
   float cluster=smoothstep(-.2,.62,.35+fold*.4+coarse*.58);
   float clusterWeight=mix(.36+.64*cluster,.04+.96*pow(cluster,2.2),uFogShape.z);
   float band=exp(-pow((p.z-center.z-curl.z*.21)*mix(2.8,1.02,uFogPattern.w),2.));
+  if(authoredContraction){
+   float membrane=offset.z-.29*coarse-.17*fold;
+   band*=.12+.88*exp(-pow(membrane*mix(5.7,2.8,swell),2.));
+  }
+  if(closure>0.){
+   envelope=mix(envelope,exp(-8.*dot(ring,ring)),closure);
+   clusterWeight=mix(clusterWeight,1.,closure);
+   band=mix(band,1.,closure);
+  }
   ridge=web*envelope*filament*clusterWeight*band;
   strands=vec3(lineA*.5+.5,lineB*.5+.5,envelope*clusterWeight*band);
   cloud=mix(cloud,.0015*cloud+envelope*haze*.009*band+ridge*.012,web);
@@ -125,7 +169,7 @@ void main(){
  color=vec4(clamp(cloud*hollow*(.65+uFogPattern.w*.5)+edge*ridge*.025,0.,1.),strands.xy,strands.z*hollow);
 }`;
 
-const march=header+bounds+prismaPaletteGLSL+`
+const march=header+bounds+prismaPaletteGLSL+ringField+`
 in vec2 uv;
 uniform sampler2D uDensity,uSurfaceDepth;
 uniform int uSteps,uLightCount;
@@ -134,7 +178,8 @@ uniform vec3 uObjectPosition,uObjectTurn,uObjectScale;
 uniform vec4 uFogMaterial,uFogOptics;
 uniform vec4 uLights[8];uniform vec3 uLightColors[8];
 uniform float uOrthographic,uSurface,uPerspectiveCloud,uFogWeb;
-uniform vec4 uFogFlare;uniform vec2 uFogWave;
+uniform vec4 uFogFlare;uniform vec2 uFogWave,uFogCoreLight;
+uniform vec3 uFogClosure;
 vec4 tileField(vec3 p){
  vec3 outside=max(uFogMin-p,p-uFogMax);
  if(max(outside.x,max(outside.y,outside.z))>0.)return vec4(0.,.5,.5,0.);
@@ -154,7 +199,7 @@ float erfApprox(float value){
 // Integrate a narrow Gaussian around the signed-field intersection. Unlike
 // point samples, a ray segment cannot miss a strand between two atlas slices.
 float strandIntegral(vec2 a,vec2 b){
- const float inverseWidth=18.;
+ float inverseWidth=uFogCoreLight.y>0.?22.:18.;
  vec2 delta=(b-a)*inverseWidth; a*=inverseWidth;
  float span=length(delta);
  if(span<.0001)return exp(-dot(a,a));
@@ -206,6 +251,7 @@ void main(){
   float t=span.x+(float(index)+.5)*stride;
   vec3 p=origin+t*ray;
   vec3 density;
+  float coreEmission=0.,rimEmission=0.,rimHalo=0.;
   if(uFogWeb>.001){
    vec4 next=tileField(p+ray*stride*.5),average=(previous+next)*.5;
    float filament=strandIntegral(previous.gb*2.-1.,next.gb*2.-1.)*average.a*uFogWeb*3.5;
@@ -213,9 +259,24 @@ void main(){
    float front=exp(-abs(radius-uFogWave.x)*14.);
    float illumination=.045+uFogFlare.w*mix(exp(-radius*9.),front,uFogWave.y*.82);
    density=vec3(average.r,filament,filament*illumination);
+   if(uFogCoreLight.x>0.){
+    vec3 delta=(p-uFogFlare.xyz)*vec3(1.12,.92,1.3);
+    float size=uFogCoreLight.y;
+    float distance=dot(delta,delta)/(size*size);
+    float support=exp(-distance)*filament*(.38+.62*smoothstep(.01,.22,filament));
+    coreEmission=support*uFogCoreLight.x*(1.-uFogClosure.x*.96);
+    if(uFogClosure.x>0.){
+     vec3 local=p-uFogFlare.xyz;
+     vec2 ring=closedFlow(local,uFogClosure.y,uFogClosure.z);
+     float square=dot(ring,ring),azimuth=atan(local.y,local.x+1.e-8);
+     float arc=.44+.56*pow(.5+.5*cos(azimuth*2.+uFogClosure.y),2.);
+     rimEmission=exp(-square*1900.)*arc*uFogClosure.x*(.055*uFogCoreLight.x);
+     rimHalo=exp(-square*205.)*uFogClosure.x*(.004*uFogCoreLight.x);
+    }
+   }
    previous=next;
   }else density=vec3(tileField(p).r,0.,0.);
-  if(density.r<.001&&density.g<.001)continue;
+  if(density.r<.001&&density.g<.001&&coreEmission+rimEmission+rimHalo<.001)continue;
   vec3 world=worldOrigin+worldRay*t;
   float visible=1.-surface.b*smoothstep(.004,.04,nearSurface-world.z);
   if(visible<.001)continue;
@@ -233,8 +294,19 @@ void main(){
   vec3 tint=exp(-uFogOptics.x*depth*(1.-pigment));
   float opacity=(1.-exp(-depth))*visible;
   float heat=1.-exp(-density.b*3.8);
-  vec3 emissionColor=mix(pigment,mix(vec3(1.),normalize(pigment+vec3(.1)),.28),heat);
+  vec3 hotPigment=mix(vec3(1.),normalize(pigment+vec3(.1)),.28);
+  if(uFogCoreLight.y>0.)hotPigment=mix(uPalette[uPaletteCount/2],hotPigment,.44);
+  vec3 emissionColor=mix(pigment,hotPigment,heat);
   vec3 glow=emissionColor*localStep*(density.g*uFogMaterial.w+density.b*uFogOptics.w);
+  if(coreEmission>.001){
+   vec3 sourceTint=mix(pigment,uPalette[uPaletteCount/2],.74);
+   vec3 sourceLight=mix(sourceTint,vec3(1.),.83*(1.-exp(-coreEmission*.09)));
+   glow+=sourceLight*localStep*coreEmission;
+  }
+  if(rimEmission+rimHalo>.001){
+   vec3 rose=mix(uPalette[0],uPalette[uPaletteCount/2],.54);
+   glow+=localStep*(mix(rose,vec3(1.,.93,.83),.72)*rimEmission+rose*rimHalo);
+  }
   radiance+=transmission*(pigment*tint*(irradiance+uFogMaterial.z)*opacity+glow*visible);
   transmission*=1.-max(opacity,min(.9,localStep*density.g*.36)*visible);
   if(transmission<.009)break;
@@ -264,7 +336,8 @@ export class ParticleMedium{
   const frequency=Math.min(8,1.7+s.pFrequency*.7),speed=s.perfectLoop===false?s.pCycles:Math.round(s.pCycles);
   const angle=phase*(Math.PI*2)*Math.max(1,speed)*(s.pDirection||1)+((s.pMotionSeed??417)-417)*.013;
   const motion=[s.pTravel>0||Math.abs(s.pVortex)>0||s.pVolumeFilaments*s.pSignal>0?angle:0,s.pTravel,s.pVortex,s.pPropagation];
-  const key=[resolution,field?.key,field?.inner,...low,...high,s.seed,...motion,s.pOpening,s.pFill,s.pClumps,s.pBreath,s.pVolumeTurbulence,s.pVolumeFilaments,frequency,s.pPulse,s.pSignal,s.pSpeedSpread,s.pRhythm,s.structCoreDark,s.structCoreRadius].join('|');
+  const contraction=hasMotionPoints(s.motions?.pBreath)?s.pBreath:-1;
+  const key=[resolution,field?.key,field?.inner,...low,...high,s.seed,...motion,s.pOpening,s.pFill,s.pClumps,s.pBreath,contraction,contraction>=0?s.pCounterflow:0,s.pVolumeTurbulence,s.pVolumeFilaments,frequency,s.pPulse,s.pSignal,s.pSpeedSpread,s.pRhythm,s.structCoreDark,s.structCoreRadius].join('|');
   g.disable(g.DEPTH_TEST);g.disable(g.BLEND);g.disable(g.SCISSOR_TEST);g.bindVertexArray(o.empty);
   const common=p=>{o.u(p,'uFogAtlas',...atlas);o.u(p,'uFogMin',...low);o.u(p,'uFogMax',...high);};
   if(this.key!==key){
@@ -274,6 +347,8 @@ export class ParticleMedium{
    o.u(p,'uFogPattern',s.pVolumeTurbulence,s.pVolumeFilaments,frequency,s.pFill);
    o.u(p,'uFogSeed',(s.seed%1601)*.013);o.u(p,'uFogMotion',...motion);
    o.u(p,'uFogCut',s.structCoreDark||0,s.structCoreRadius??.3);
+   o.u(p,'uFogContraction',contraction);
+   o.u(p,'uFogCounterflow',s.pCounterflow||0);
    o.u(p,'uFogLight',Math.max(1,Math.round(s.pPulse||1)),s.pSignal||0,s.pSpeedSpread||0,s.pRhythm||0);
    g.drawArrays(g.TRIANGLES,0,3);this.key=key;
   }
@@ -285,14 +360,19 @@ export class ParticleMedium{
   const rhythm=angle*Math.max(1,Math.round(s.pPulse||1))-1.7+Math.sin(angle-.5)*(s.pSpeedSpread||0)*2.3;
   const localPhase=rhythm-Math.sin(rhythm)*(.21+.65*(s.pRhythm||0));
   const variation=1-(s.pLumaVar||0)*(.82-.82*Math.pow(.5+.5*Math.cos(angle),.7));
-  const flare=Math.pow(.5+.5*Math.cos(localPhase),9.5)*(s.pSignal||0)*variation;
+  const authoredFlash=hasMotionPoints(s.motions?.pSignal);
+  const flare=authoredFlash?s.pSignal:Math.pow(.5+.5*Math.cos(localPhase),9.5)*(s.pSignal||0)*variation;
   const centerScale=.36+.64*s.pPropagation;
-  o.u(p,'uFogFlare',(Math.sin(angle)*.46+.16*Math.sin(angle*2))*centerScale,(Math.cos(angle)*.43+.13*Math.sin(angle*3))*centerScale,Math.sin(angle)*.23*centerScale,flare*70);
-  o.u(p,'uFogWave',.06+(.25+.25*Math.sin(localPhase))*(s.pPropagation||0),s.pPropagation||0);
+  o.u(p,'uFogFlare',(Math.sin(angle)*.46+.16*Math.sin(angle*2))*centerScale,(Math.cos(angle)*.43+.13*Math.sin(angle*3))*centerScale,Math.sin(angle)*.23*centerScale,flare*(authoredFlash?16:70));
+  o.u(p,'uFogCoreLight',authoredFlash?Math.pow(flare,1.7)*950:0,authoredFlash?.105+.30*s.pPropagation+.075*Math.max(0,contraction):0);
+  const opening=Math.max(0,Math.min(1,(s.pOpening-.12)/.74));
+  o.u(p,'uFogClosure',contraction>=0&&!field?opening*opening*(3-2*opening):0,angle,Math.max(0,contraction));
+  const authoredFront=authoredFlash&&hasMotionPoints(s.motions?.pPropagation);
+  o.u(p,'uFogWave',authoredFront?.06+.5*s.pPropagation:.06+(.25+.25*Math.sin(localPhase))*(s.pPropagation||0),s.pPropagation||0);
   o.u(p,'uOutputSize',w,h);o.u(p,'uObjectPosition',s.positionX,s.positionY,0);
   o.u(p,'uObjectTurn',s.rotateX*degrees,s.rotateY*degrees,s.rotateZ*degrees);
   o.u(p,'uObjectScale',s.scale*s.stretchX,s.scale*s.stretchY,s.scale*Math.max(.06,s.stretchZ*s.volume));
-  o.u(p,'uFogMaterial',(.65+8*s.scattering+2*s.subsurface+1.7*s.translucency)*Math.sqrt(s.thickness??1),s.environmentPower,s.emission*.16,.9+s.glow*1.85);
+  o.u(p,'uFogMaterial',(.65+8*s.scattering+2*s.subsurface+1.7*s.translucency)*Math.sqrt(s.thickness??1),s.environmentPower,s.emission*.16,authoredFlash?.55+s.glow*1.45:.9+s.glow*1.85);
   o.u(p,'uFogOptics',s.absorption,s.pVolumeShadow,s.scatterDirection,9+s.emission*17);
   g.uniform1i(o.loc(p,'uSteps'),fast?Math.round((48+48*web)*interactiveScale):options.preview?Math.round(72+56*web):Math.round(128+64*web));
   g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);

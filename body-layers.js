@@ -1,8 +1,9 @@
-import {FIGURE_SCALE} from './base-forms.js?v=df487c245b09';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META} from './structure-model.js?v=df487c245b09';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META} from './cellular-form.js?v=df487c245b09';
-import {FRACTAL_DEFAULTS,FRACTAL_META} from './fractal-form.js?v=df487c245b09';
-import {PARTICLE_DEFAULTS,PARTICLE_META} from './particle-model.js?v=df487c245b09';
+import {FIGURE_SCALE} from './base-forms.js?v=79c81404468e';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META} from './structure-model.js?v=79c81404468e';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META} from './cellular-form.js?v=79c81404468e';
+import {FRACTAL_DEFAULTS,FRACTAL_META} from './fractal-form.js?v=79c81404468e';
+import {PARTICLE_DEFAULTS,PARTICLE_META} from './particle-model.js?v=79c81404468e';
+import {hasMotionPoints,normalizeMotionPoints} from './motion-keyframes.js?v=79c81404468e';
 
 export const BODY_LAYER_META = {
  sceneGrains:['Superficie ↔ granelli',0,1,.001],
@@ -76,25 +77,28 @@ export function grainFrame(source,phaseRadians,sampleFrame){
  // Freeze internal geometry/kinematics, not the common scene's camera, shape
  // transform, material, lights, dynamics or representation crossfade.
  for(const key of [...cloudKeys,'pFill','grainDispersal'])if(Object.hasOwn(internal,key))common[key]=internal[key];
+ if(hasMotionPoints(internal.motions?.pSignal))common.pSignal=internal.pSignal;
  return common;
 }
 const sourceKeys=[...new Set([...Object.keys(bodyDefaults),...cloudKeys,'scale'])];
 const limits={...STRUCTURE_META,...CELLULAR_META,...FRACTAL_META,...PARTICLE_META,scale:['',...FIGURE_SCALE,.01],lobeAmount:['',0,.4,.01],lobes:['',2,12,1],baseForm:['',0,6,1]};
 function safeNumber(k,v){if(!Number.isFinite(v))return undefined;const m=limits[k];return m?clamp(v,m[1],m[2]):clamp(v,-10000,10000);}
-function safeTrack(t){
+function safeTrack(t,key){
  if(!t||typeof t!=='object'||Array.isArray(t))return null;
  const out={enabled:t.enabled===true,amplitude:clamp(Number(t.amplitude)||0,0,360),cycles:clamp(Number(t.cycles)||1,.1,8),phase:clamp(Number(t.phase)||0,0,360),direction:t.direction===-1?-1:1,curve:['sine','soft','triangle'].includes(t.curve)?t.curve:'sine',pace:clamp(Number(t.pace)||0,0,.95),pacePhase:clamp(Number(t.pacePhase)||0,0,360),hold:clamp(Number(t.hold)||0,0,.8),mode:t.mode==='cycle'?'cycle':'wave'};
+ const points=normalizeMotionPoints(t.points,limits[key]);
+ if(points.length>1){out.points=points;if(t.mode==='points')out.mode='points';}
  return out;
 }
 function capture(s){
  const values={},motions={};
- for(const k of sourceKeys){const v=safeNumber(k,s[k]);if(v!==undefined)values[k]=v;if(s.motions?.[k])motions[k]=safeTrack(s.motions[k]);}
+ for(const k of sourceKeys){const v=safeNumber(k,s[k]);if(v!==undefined)values[k]=v;if(s.motions?.[k])motions[k]=safeTrack(s.motions[k],k);}
  return {values,motions};
 }
 function cleanSnapshot(raw){
  if(!raw||typeof raw!=='object'||!raw.values||!raw.motions)return null;
  const out={values:{},motions:{}};
- for(const k of sourceKeys){const v=safeNumber(k,raw.values[k]);if(v!==undefined)out.values[k]=v;const t=safeTrack(raw.motions[k]);if(t)out.motions[k]=t;}
+ for(const k of sourceKeys){const v=safeNumber(k,raw.values[k]);if(v!==undefined)out.values[k]=v;const t=safeTrack(raw.motions[k],k);if(t)out.motions[k]=t;}
  return Object.keys(out.values).length?out:null;
 }
 function readMemory(raw){
@@ -107,10 +111,13 @@ function restore(s,snapshot){Object.assign(s,snapshot.values);s.motions??={};for
 function clearTracks(s,keys){s.motions??={};for(const k of keys)if(s.motions[k])s.motions[k]={...s.motions[k],enabled:false};}
 function transferTrack(s,input,from,to,factor,report){
  const t=input.motions?.[from];if(!t?.enabled)return;
- s.motions[to]={...t,amplitude:(t.amplitude||0)*factor};
+ const mapped={...t,amplitude:(t.amplitude||0)*factor};
+ if(Array.isArray(t.points))mapped.points=normalizeMotionPoints(t.points.map(point=>({at:point?.at,offset:point?.offset*factor})),limits[to]);
+ s.motions[to]=mapped;
  report.mappedTracks.push({from,to,factor});
- const range=limits[to],amplitude=s.motions[to].amplitude*(input.motion??.3)/.3;
- if(range&&((s[to]??0)-amplitude<range[1]||(s[to]??0)+amplitude>range[2]))report.clipped.push('motions.'+to);
+ const range=limits[to],amplitude=mapped.amplitude*(input.motion??.3)/.3;
+ const offsets=hasMotionPoints(mapped)?mapped.points.map(point=>point.offset):[-amplitude,amplitude];
+ if(range&&offsets.some(offset=>{const value=(s[to]??0)+offset;return value<range[1]||value>range[2];}))report.clipped.push('motions.'+to);
 }
 function cloudExtent(s){const x=clamp((s.pOpening||0)/.45,0,1),open=x*x*(3-2*x),tube=s.pThickness??.5;return 2*tube*(1-open)+(.36+(s.pOpening||0)*.8+tube)*open;}
 function bodyExtent(s){const opening=clamp(s.loopAmount||0,0,1);return 1-opening+opening*((s.loopRadius??.8)+(s.loopTube??.22));}

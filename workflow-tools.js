@@ -1,10 +1,12 @@
-import {organizeWorkspace} from './workspace-layout.js?v=df487c245b09';
-import {mountPresetLibrary} from './preset-library.js?v=df487c245b09';
-import {newCreation,material} from './creative-model.js?v=df487c245b09';
-import {addHelp} from './inspector-ui.js?v=df487c245b09';
-import {MOODS} from './model.js?v=df487c245b09';
-import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=df487c245b09';
-import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=df487c245b09';
+import {organizeWorkspace} from './workspace-layout.js?v=79c81404468e';
+import {mountPresetLibrary} from './preset-library.js?v=79c81404468e';
+import {newCreation,material} from './creative-model.js?v=79c81404468e';
+import {addHelp} from './inspector-ui.js?v=79c81404468e';
+import {META,MOODS} from './model.js?v=79c81404468e';
+import {animationPhase} from './animation-clock.js?v=79c81404468e';
+import {MAX_MOTION_POINTS,isMotionAngle,motionPointOffset,motionPointValue,normalizeMotionPoints,supportsMotionPoints} from './motion-keyframes.js?v=79c81404468e';
+import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=79c81404468e';
+import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=79c81404468e';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){
@@ -14,7 +16,7 @@ export function mountWorkflowTools(api){
  const presets=document.getElementById('presets'),presetHome=presets.parentElement;let thumbnailObserver=null;const materialThumbs=new Map();document.body.classList.add('unified-library');
  const pinned=get('prisma-pinned-controls',[]),recent=get('prisma-recent-controls',[]);
  let quickControlsOpen=false;
- let popup=null,popupRequest=null,popupAdvanced=false;
+ let popup=null,popupRequest=null,popupAdvanced=false,popupPointScroll=0;
  const savedLevel=get('prisma-control-level','expert');
  let level=['simple','complete','expert'].includes(savedLevel)?savedLevel:'expert',lastAction='Modifica',comparison=null;
  const mode=document.createElement('select');mode.id='control-level';mode.setAttribute('aria-label','Livello dei controlli');mode.innerHTML='<option value="simple">Essenziali</option><option value="complete">Avanzati</option><option value="expert">Esperto</option>';mode.value=level;head.append(mode);mode.onchange=()=>{level=mode.value;put('prisma-control-level',level);renderControls();};
@@ -61,8 +63,58 @@ export function mountWorkflowTools(api){
  separator.onpointerdown=e=>{if(e.button!==0)return;resizeStart={x:e.clientX,width:width()};separator.setPointerCapture(e.pointerId);};
  separator.onpointermove=e=>{if(resizeStart)setWidth(resizeStart.width+resizeStart.x-e.clientX,false);};
  separator.onlostpointercapture=()=>{if(resizeStart){resizeStart=null;setWidth(width(),true);}};
- function closeEditor(){popupRequest=null;popupAdvanced=false;popup?.close?.();popup?.remove();popup=null;}
+ function closeEditor(){popupRequest=null;popupAdvanced=false;popupPointScroll=0;popup?.close?.();popup?.remove();popup=null;}
+ function motionPointEditor(key,track){
+  const state=getState(),range=META[key],base=state[key]??0;
+  const box=document.createElement('div');box.className='motion-points';
+  const note=document.createElement('p');note.className='help';
+  note.textContent='Fissa i valori lungo il ciclo. Il cursore del parametro sposta tutti i punti insieme.';
+  const list=document.createElement('div');list.className='motion-point-list';
+  list.setAttribute('role','group');list.setAttribute('aria-label','Valori nel tempo');
+  box.append(note,list);
+  const points=track.points;
+  const commit=(patch,label)=>{
+   const next=normalizeMotionPoints(patch,range);
+   if(next.length!==patch.length){toast('Scegli un tempo diverso per ogni punto.');renderControls();return;}
+   remember(undefined,label);track.points=next;mark();renderControls();
+  };
+  const field=(caption,min,max,value)=>{
+   const label=document.createElement('label'),input=document.createElement('input');
+   label.textContent=caption;input.type='number';input.min=min;input.max=max;
+   input.step='any';input.value=Number(value.toFixed(4));label.append(input);
+   return {label,input};
+  };
+  for(const [i,point] of points.entries()){
+   const row=document.createElement('div');row.className='motion-point';
+   const time=field('Tempo %',0,99.9999,point.at*100);
+   const value=field('Valore',range[1],range[2],motionPointValue(key,base,point.offset,range));
+   const update=()=>{
+    if(!time.input.checkValidity()||!value.input.checkValidity()||!Number.isFinite(time.input.valueAsNumber)||!Number.isFinite(value.input.valueAsNumber)){
+     toast('Controlla il tempo e il valore del punto.');renderControls();return;
+    }
+    const next=points.slice();next[i]={at:time.input.valueAsNumber/100,offset:value.input.valueAsNumber-base};
+    commit(next,'Modifica punto di animazione');
+   };
+   const change=event=>{event.stopPropagation();update();};
+   time.input.onchange=change;value.input.onchange=change;
+   const remove=button('','×',()=>commit(points.filter((_,index)=>index!==i),'Elimina punto di animazione'));
+   remove.setAttribute('aria-label',`Elimina punto ${i+1}`);remove.disabled=points.length<=2;
+   row.append(time.label,value.label,remove);list.append(row);
+  }
+  const add=button('','Aggiungi al tempo corrente',()=>{
+   const turns=animationPhase(state,api.getSnapshot().phase)/(2*Math.PI);
+   const at=Math.round((turns-Math.floor(turns))*1e6)/1e6%1;
+   if(points.some(point=>Math.abs(point.at-at)<.000001)){
+    toast('C’è già un punto qui. Sposta la testina nel ciclo.');return;
+   }
+   const offset=motionPointOffset(points,at,isMotionAngle(key));
+   commit([...points,{at,offset:motionPointValue(key,base,offset,range)-base}],'Aggiungi punto di animazione');
+  });
+  add.classList.add('outline');add.disabled=points.length>=MAX_MOTION_POINTS;box.append(add);
+  return box;
+ }
  function openEditor(request){
+  if(popupRequest?.path!==request.path)popupPointScroll=0;
   popup?.remove();popup=null;popupRequest=request;
   const inline=!!request.path;
   const d=document.createElement(inline?'section':'dialog');if(inline)d.classList.add('parameter-animation');d.id='animation-editor';d.classList.add('animation-editor');d.setAttribute('aria-label','Regola il parametro');const header=document.createElement('div');header.className='dialog-head';const title=document.createElement('h2'),close=button('','×',closeEditor);close.setAttribute('aria-label','Chiudi editor');header.append(title,close);const body=document.createElement('div');body.className='dialog-body';d.append(header,body);
@@ -70,20 +122,36 @@ export function mountWorkflowTools(api){
   if(request.path){
    const source=document.createElement('div');source.innerHTML=animationMarkup(request.path,raw);const track=source.firstElementChild;if(!track){popupRequest=null;toast('Questo movimento è sospeso dai vincoli della forma.');return;}
    title.textContent=CONTROL_NAMES[request.path.split('.')[1]]||request.label||track.querySelector('summary')?.textContent||'Animazione';
+   const key=request.path.startsWith('motions.')?request.path.slice(8):null;
+   const pointTrack=supportsMotionPoints(key)?getState().motions[key]:null;
+   const pointsActive=pointTrack?.mode==='points'&&pointTrack.points?.length>1;
    const advanced=document.createElement('details');advanced.className='animation-advanced';advanced.innerHTML='<summary>Regola andamento e fase</summary>';advanced.open=popupAdvanced;
    for(const e of [...track.querySelectorAll('input:not(.number),select')]){
     const path=e.dataset.path||e.dataset.pathCheck||e.dataset.pathSelect;if(!path)continue;const row=e.closest('.param,.field,.check');if(!row)continue;
+    if(pointsActive&&!/\.(enabled|mode)$/.test(path))continue;
     const basic=/\.(enabled|mode|amplitude|cycles)$/.test(path);(basic?body:advanced).append(row);
     const label=row.querySelector('label');if(label&&path.endsWith('.amplitude'))label.textContent='Ampiezza';if(label&&path.endsWith('.cycles'))label.textContent='Ripetizioni nel loop';
-    if(path.endsWith('.mode')){for(const n of row.childNodes)if(n.nodeType===3)n.textContent='Stile';for(const o of e.options)o.textContent=o.value==='wave'?'Va e torna':request.path.endsWith('.orbit')||/rotate/.test(request.path)?'Giro continuo':'Scorrimento continuo';}
+    if(path.endsWith('.mode')){
+     for(const n of row.childNodes)if(n.nodeType===3)n.textContent='Stile';
+     for(const o of e.options)o.textContent=o.value==='points'?'Punti nel tempo':o.value==='wave'?'Va e torna':request.path.endsWith('.orbit')||/rotate/.test(request.path)?'Giro continuo':'Scorrimento continuo';
+     if(pointTrack){
+      e.removeAttribute('data-path-select');
+      e.onchange=()=>{
+       remember(undefined,'Stile del movimento');
+       if(e.value==='points'&&!(pointTrack.points?.length>1))pointTrack.points=[{at:0,offset:0},{at:.5,offset:0}];
+       pointTrack.mode=e.value;mark();renderControls();
+      };
+     }
+    }
    }
+   if(pointsActive)body.append(motionPointEditor(key,pointTrack));
    if(advanced.querySelector('input,select'))body.append(advanced);advanced.addEventListener('toggle',()=>popupAdvanced=advanced.open);
   }else if(request.group!==undefined){const group=motionGroups(raw)[request.group];if(!group)return;title.textContent=group.querySelector('summary').textContent;group.querySelector('summary').remove();body.append(...group.childNodes);for(const details of body.querySelectorAll('details'))details.open=false;
   }else if(request.omitted){title.textContent='Altri parametri modificati';for(const item of root.omittedControls||[])if(item.changed){const b=button('',item.label,()=>openEditor({key:item.key,expert:item.expert,label:item.label,markup:item.html}));b.className='animation-link';body.append(b);}
   }else{title.textContent=request.label||'Parametro';const current=document.createElement('div');current.innerHTML=composePanel(api.getTab(),raw,getState());const value=request.key?current.querySelector('[data-param="'+request.key+'"]'):null;body.innerHTML=value?.closest('.param')?.outerHTML||request.markup||'';const note=document.createElement('p');note.className='help';note.textContent='Questo controllo appartiene ai livelli avanzati. Il valore resta nel preset anche in Essenziali.';body.prepend(note);const higher=button('','Mostra in '+(request.expert?'Esperto':'Avanzati'),()=>{closeEditor();mode.value=request.expert?'expert':'complete';mode.dispatchEvent(new Event('change'));const el=root.querySelector('[data-param="'+request.key+'"]');if(el){let d=el.closest('details');while(d){d.open=true;d=d.parentElement.closest('details');}el.scrollIntoView({block:'center'});}});body.append(higher);}
   if(level!=='expert'&&request.group!==undefined)for(const e of body.querySelectorAll('[data-param]'))if(EXPERT_KEYS.has(e.dataset.param)||/Seed$|Contact|Collision|Octaves/.test(e.dataset.param))e.closest('.param')?.remove();
   addHelp(body);
-  popup=d;if(inline){const trigger=[...root.querySelectorAll('[data-animate-path]')].find(b=>b.dataset.animatePath===request.path);const row=trigger?.closest('.param')||trigger;if(row)row.after(d);else root.prepend(d);for(let parent=d.parentElement.closest('details');parent;parent=parent.parentElement.closest('details'))parent.open=true;return;}
+  popup=d;if(inline){const trigger=[...root.querySelectorAll('[data-animate-path]')].find(b=>b.dataset.animatePath===request.path);const row=trigger?.closest('.param')||trigger;if(row)row.after(d);else root.prepend(d);for(let parent=d.parentElement.closest('details');parent;parent=parent.parentElement.closest('details'))parent.open=true;const list=d.querySelector('.motion-point-list');if(list)list.scrollTop=popupPointScroll;return;}
   root.append(d);d.addEventListener('cancel',()=>{popupRequest=null;popupAdvanced=false;});d.addEventListener('click',e=>{if(e.target===d){const r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeEditor();}});d.showModal();
  }
  function revealControl(entry){
@@ -166,12 +234,12 @@ export function mountWorkflowTools(api){
    thumbnailObserver=new IntersectionObserver(entries=>{for(const entry of entries){if(!entry.isIntersecting)continue;const card=entry.target;thumbnailObserver?.unobserve(card);const id=(card.dataset.material!==undefined?'material:':'palette:')+(card.dataset.material??card.dataset.mood);const img=document.createElement('img');img.className='library-thumb';img.alt='';card.prepend(img);if(materialThumbs.has(id)){img.src=materialThumbs.get(id);continue;}const state=newCreation();if(card.dataset.material!==undefined)material(state,Number(card.dataset.material));else state.palette=[...MOODS[Number(card.dataset.mood)].colors];api.thumbnail(state,0,1,()=>!card.isConnected).then(url=>{if(url&&card.isConnected){materialThumbs.set(id,url);img.src=url;}else img.remove();}).catch(()=>img.remove());}},{root:panel});for(const card of panel.querySelectorAll('button[data-material],button[data-mood]'))thumbnailObserver.observe(card);
    mountPresetLibrary(panel,WORK_TABS);
   }
-  
+
   if(api.getTab()==='background'){
    const target=panel.querySelector('[data-color=background]');if(target){const pipette=button('background-eyedropper','Preleva colore dallo schermo',async()=>{if(!window.EyeDropper){toast('La pipetta non è disponibile in questo browser. Usa il selettore colore.');return;}try{const result=await new EyeDropper().open();remember(undefined,'Colore prelevato');getState().background=result.sRGBHex;mark();renderControls();}catch{}});target.closest('.color-field').after(pipette);}
   }
  }
- function beforeRender(){sectionHome.append(...sectionButtons);if(popup){if(popup.tagName==='DIALOG'&&!popup.open)popupRequest=null;popup.remove();popup=null;}thumbnailObserver?.disconnect();thumbnailObserver=null;if(presets.isConnected)presetHome.append(presets);}
+ function beforeRender(){sectionHome.append(...sectionButtons);if(popup){popupPointScroll=popup.querySelector('.motion-point-list')?.scrollTop||0;if(popup.tagName==='DIALOG'&&!popup.open)popupRequest=null;popup.remove();popup=null;}thumbnailObserver?.disconnect();thumbnailObserver=null;if(presets.isConnected)presetHome.append(presets);}
  function afterRender(){if(popupRequest)openEditor(popupRequest);}
  return {beforeRender,afterRender,revealControl,closeEditor,get level(){return level;},get lastAction(){return lastAction;},get lockedKeys(){return getState().controlLocks||[];},decorate,dirty:()=>{status.textContent='Salvataggio…';},saved:()=>{status.textContent='Sessione salvata in questo browser';},saveFailed:()=>{status.textContent='Salvataggio locale non riuscito · esporta un preset';},refreshStatus:()=>{status.textContent='Sessione locale · preset salvati in I miei preset';}};
 }
