@@ -1,5 +1,5 @@
-import {PANEL_GUIDES} from './workspace-layout.js?v=60eb7092f3ba';
-import {SECTION_NAMES} from './control-vocabulary.js?v=60eb7092f3ba';
+import {PANEL_GUIDES} from './workspace-layout.js?v=2ed2af454163';
+import {SECTION_NAMES} from './control-vocabulary.js?v=2ed2af454163';
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
  {id:'shape',label:'Forma',tabs:[['shape','Forma','shape']]},

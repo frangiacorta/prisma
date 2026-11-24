@@ -1,15 +1,15 @@
-import {ImplicitRayStatus} from './implicit-ray-status.js?v=60eb7092f3ba';
-import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=60eb7092f3ba';
-import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=60eb7092f3ba';
-import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=60eb7092f3ba';
-import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=60eb7092f3ba';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=60eb7092f3ba';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=60eb7092f3ba';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=60eb7092f3ba';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=60eb7092f3ba';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=60eb7092f3ba';
-import {META} from './model.js?v=60eb7092f3ba';
-import {hasMotionPoints,isMotionAngle,motionPointOffset,motionPointValue} from './motion-keyframes.js?v=60eb7092f3ba';
+import {ImplicitRayStatus} from './implicit-ray-status.js?v=2ed2af454163';
+import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=2ed2af454163';
+import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=2ed2af454163';
+import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=2ed2af454163';
+import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=2ed2af454163';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=2ed2af454163';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=2ed2af454163';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=2ed2af454163';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=2ed2af454163';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=2ed2af454163';
+import {META} from './model.js?v=2ed2af454163';
+import {hasMotionPoints,isMotionAngle,motionPointOffset,motionPointValue} from './motion-keyframes.js?v=2ed2af454163';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -770,7 +770,7 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  issue=0.;vec3 local=transform(p),n=geometricNormal;
  float fibreWeight=0.,fibreDensity=1.;vec3 fibreTangent=vec3(0.,1.,0.);
  float branches=0.,weaveTip=0.,weaveThroat=0.,weaveRelease=0.,weaveStriae=0.,weaveSpeckle=0.;
- float cupDiffusion=0.,cupSeed=0.,cupHeight=0.,weaveDepth=1.;
+ float cupDiffusion=0.,cupSeed=0.,cupHeight=0.,weaveDepth=1.,tissue=0.,tissueFilm=0.,tissueFibre=0.,tissuePulp=0.,cupGlow=0.,wallCloud=0.;
  #if defined(WEAVE_DETAIL) && !defined(WEAVE_BANDS_ONLY)
  branches=uWeaveNetwork.x*uStructureA.x*uStructureA.z*uStructureA.w;
  #endif
@@ -864,6 +864,76 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
   vec2 speck=fract(wallCell)-(.20+.60*dotSeed);
   float shimmer=smoothstep(.49,.95,glowSeed)*exp(-dot(speck,speck)*25.);
   weaveSpeckle+=weaveTip*textureLock*shimmer*(1.-.81*aperture)*(1.-smoothstep(.63,2.8,ring*footprint*4.));
+  tissue=uWeaveTension*branches;
+  if(tissue>0.){
+   float k=.78+.23*sqrt(uStructureB.x);
+   vec2 chart=tissueChart(domain,k);
+   float y=mod(chart.y+.48,1.65)-.48;
+   float along=mod(chart.x-tissueSpine(y)+.61,1.22)-.61;
+   float label=weaveLitTip.x;
+   float sheath=label<.5?weaveLitTip.y:0.;
+   tissueFilm=max(sheath,1.-step(.45,abs(label-1.)))*tissue*(1.-.74*smoothstep(.20,.73,release));
+   weaveTip=mix(weaveTip,clamp((label-2.)/12.,0.,1.),tissue);
+   float juvenile=1.-smoothstep(.12,.63,release);
+   // At a young insertion the axial bundle is embedded in the membrane.
+   // Keep its fibres and scattering continuous until the membrane withdraws.
+   tissueFilm=max(tissueFilm,.86*tissue*juvenile*(1.-weaveTip)*uWeaveGrowth.z);
+   float across=tissueFilm>.001?tissueTransverse(chart):0.;
+   float fineScale=uWeaveNetwork.y*310.;
+   float pull=mix(chart.x*.67+chart.y*.55,3.8*abs(along)*across+.115*chart.x+.21*chart.y,uWeaveDetail.z);
+   float a=pull*fineScale+2.10*sin(17.*chart.y-23.*chart.x)+.69*sin(49.*chart.x+87.*chart.y);
+   float b=(pull*.64+.21*chart.x-.16*chart.y)*fineScale+1.38*sin(31.*chart.y+17.*chart.x)-.83*sin(68.*chart.x-41.*chart.y);
+   float fibreAA=1.-smoothstep(1.,4.5,fineScale*footprint);
+   float fibrils=max(pow(.5+.5*cos(a),8.),.87*pow(.5+.5*cos(b),6.));
+   float coarse=.5+.5*sin(a*.23+1.69*sin(16.*chart.x+7.*chart.y));
+   tissueFibre=mix(.27,fibrils,fibreAA)*(.44+.56*coarse);
+   vec2 drift=.014*vec2(sin(chart.y*28.+chart.x*13.),sin(chart.x*27.-chart.y*18.))
+             +.005*vec2(sin(chart.x*62.+chart.y*47.),cos(chart.y*71.-chart.x*51.));
+   vec2 strand=vec2(chart.x*.88+chart.y*.51,pull*1.16+chart.y*.18);
+   float freq=44.*uWeaveNetwork.y;
+   float filigree=tissueLace((strand+drift)*vec2(.59,1.6)*freq,clamp(freq*footprint,.02,.43));
+   float crossed=tissueLace((mat2(.64,.77,-.77,.64)*chart+drift*.59+vec2(.71,.18))*freq*vec2(.76,1.24),clamp(freq*footprint,.02,.43));
+   tissueFibre=max(tissueFibre*.76,max(filigree*.83,crossed*.53)*(.56+.44*coarse));
+   // Longitudinal filaments turn with the local tangent, including where
+   // a side shoot arcs away from the spine. Integer winding closes the seam.
+   float circum=weaveLitTip.z*6.2831853,arc=weaveLitTip.y;
+   float turns=floor(7.+11.*uWeaveNetwork.y);
+   float bundlePhase=circum*turns+1.7*sin(3.*circum+9.*arc)+.81*sin(13.*arc-circum)+.53*sin(4.*circum-19.*arc);
+   float axialFibre=pow(.5+.5*cos(bundlePhase),5.)*(.72+.28*cos(4.*circum-7.*arc));
+   float axAA=1.-smoothstep(.025,.13,footprint*turns);
+   tissueFibre=mix(tissueFibre,mix(.23,axialFibre,axAA),uWeaveDetail.z*(1.-tissueFilm)*(1.-weaveTip));
+   float pore=tissuePore(chart,abs(along),across);
+   float bundle=1.-smoothstep(-.006,.006,pore);
+   tissuePulp=mix(.21,.44+.56*bundle,weaveLitTip.y)*(.21+.79*tissueFibre);
+   striae=mix(striae,mix(tissueFibre,spoke,weaveTip),tissue);
+   // Granules are carried on the wall; their footprint widens as they
+   // become subpixel so a moving cup doesn't flash individual dots.
+   vec2 dust=vec2(weaveLitTip.z*83.+.81*sin(13.*cupHeight+5.*cupAngle),cupHeight*39.+.35*cos(5.*cupAngle));
+   vec2 dustId=floor(dust);dustId.x=mod(dustId.x,83.);
+   vec2 grainSite=fract(sin(vec2(dot(dustId,vec2(41.31,93.67)),dot(dustId,vec2(61.13,28.79)))+uSeed)*21547.61);
+   vec2 grainDistance=fract(dust)-(.18+.64*grainSite);
+   float variance=.023+min(.085,footprint*7.);
+   float dustGlow=smoothstep(.31,.92,grainSite.x)*exp(-.5*dot(grainDistance,grainDistance)/variance)*.023/variance;
+   // A thin suspension of fibres follows the wall. Using a cylinder in
+   // material space keeps both grain and haze continuous across the seam.
+   vec3 shellCoord=vec3(cos(cupAngle),sin(cupAngle),2.7*cupHeight);
+   float waviness=sin(dot(shellCoord,vec3(2.,3.,4.))+uSeed);
+   float density=.50+.23*sin(dot(shellCoord,vec3(4.,-2.,3.))+1.8*waviness)
+                    +.16*sin(dot(shellCoord,vec3(-6.,5.,4.))+waviness)
+                    +.10*cos(dot(shellCoord,vec3(13.,8.,-10.))+2.*waviness);
+   wallCloud=smoothstep(.12,.85,density)*weaveTip*tissue*uTexture.z;
+   weaveSpeckle=mix(weaveSpeckle,weaveTip*(.10*shimmer+dustGlow*(.48+.95*density))*(1.-.57*aperture),tissue);
+   float radiusAtHeight=.083+1.01*smoothstep(0.,1.,cupHeight)+.12*sin(cupHeight*3.14159265);
+   float side=cos(cupAngle)*radiusAtHeight;
+   float centre=cupHeight-.35-.035*cos(cupAngle);
+   vec2 pupil=vec2(side/.235,centre/.143);
+   float chord=sqrt(max(0.,1.-dot(pupil,pupil)));
+   cupGlow=weaveTip*(.70*chord+.30*exp(-.50*dot(pupil,pupil)));
+   weaveThroat=mix(weaveThroat,weaveTip*exp(-side*side*3.7-centre*centre*14.),tissue);
+   cupDiffusion=uWeaveDetail.w*branches*weaveTip*max(smoothstep(.17,.66,release),aperture*smoothstep(.045,.43,uWeaveGrowth.x));
+   float farLight=mix(1.,.46,smoothstep(.22,.74,release));
+   weaveDepth*=mix(1.,farLight+(1.-farLight)*exp(-1.3*max(0.,distanceFromFocus-.40)),tissue*uWeaveFocus.x);
+  }
   #endif
   weaveStriae=striae;
   vec3 inner=uInternalColor/max(.18,dot(uInternalColor,vec3(.2126,.7152,.0722)));
@@ -897,7 +967,7 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
   diffuseLight+=uLightColors[i]*cosine*uLights[i].w*.35/(1.+dot(off,off)*.08);
   float fibreCosine=sqrt(max(0.,1.-pow(dot(fibreTangent,normalize(off)),2.)));
   diffuseLight+=uLightColors[i]*fibreWeight*fibreCosine*uLights[i].w*.28/(1.+dot(off,off)*.12);
-  if(cupDiffusion>0.)cupLight+=uLightColors[i]*uLights[i].w*(.67+.33*abs(dot(geometricNormal,normalize(off))))/(1.+dot(off,off)*.11);
+  if(cupDiffusion>0.||tissue>0.)cupLight+=uLightColors[i]*uLights[i].w*(.67+.33*abs(dot(geometricNormal,normalize(off))))/(1.+dot(off,off)*.11);
  }
  vec3 diffuse=base*diffuseLight*(1.-uMat.z*(1.-uMat.x));
  if(uTransport.x>.001)diffuse=mix(diffuse,subsurfaceLight(p,geometricNormal,base),uTransport.x);
@@ -913,6 +983,14 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  // A grazing view crosses a longer path through the same fibres. Use that
  // optical depth for both transmitted light and diffuse fibre visibility.
  transmission=pow(transmission,mix(1.,1./max(.14,facing),fibreWeight));
+ #ifdef WEAVE_HIT_TAG
+ if(tissueFilm>0.){
+  float gap=clamp(weaveLitTip.y*(1.-tissueFibre),0.,1.);
+  float depth=mix(1.56,.21,smoothstep(.12,.98,gap))*(.80+.43*tissuePulp);
+  if(transmission>0.)transmission=mix(transmission,pow(transmission,depth),tissueFilm*smoothstep(0.,.15,uMat.x));
+  diffuse*=1.+tissueFilm*(.17+.48*tissueFibre);
+ }
+ #endif
  specular*=1.-fibreWeight*.54;
  vec4 glass=vec4(0.);float unused;
  if(transmission>.0001){
@@ -944,12 +1022,42 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  float wetRim=pow(1.-facing,1.75);
  float veil=branches*weaveRelease*transmission;
  vec3 fibreLight=base*(vec3(.23,.29,.35)+diffuseLight*.13);
- below+=fibreLight*veil*(wetRim*(.48+.72*weaveTip)+weaveStriae*.22+weaveSpeckle*.55+weaveThroat*.82)*(.18+.82*uTexture.z);
+ below+=fibreLight*veil*(wetRim*(.48+.72*weaveTip)+weaveStriae*.22+weaveSpeckle*.55+weaveThroat*.82*(1.-tissue))*(.18+.82*uTexture.z);
  float neck=exp(-43.*pow(cupHeight-.16,2.));
  float rimVisibility=wetRim*smoothstep(.13,.71,cupHeight);
  float capTransport=.001+.056*rimVisibility+.096*neck+.019*weaveStriae+.108*weaveSpeckle;
  vec3 cupTint=mix(uInternalColor,vec3(.88,.97,1.),clamp(.41*neck+.84*cupSeed,0.,1.));
  below+=cupTint*cupLight*cupDiffusion*(capTransport*mix(.57,1.,transmission)+cupSeed*.57);
+ #ifdef WEAVE_HIT_TAG
+ if(tissue>0.){
+  float opening=smoothstep(.22,.92,uWeaveGrowth.y);
+  float closedShell=weaveTip*tissue*transmission*smoothstep(.40,.67,weaveRelease)*(1.-opening);
+  float pathAtEdge=exp(-6.5*facing*facing);
+  below*=1.-closedShell*(.80-.74*pathAtEdge);
+  below+=mix(uInternalColor,base,.30+.45*pathAtEdge)*cupLight*closedShell*(.32*pathAtEdge+.10*weaveSpeckle+.13*wallCloud)*(.72+.28*geometricNormal.y);
+  float collar=opening*(.27*weaveThroat+1.26*cupGlow+.047*wallCloud)+wetRim*.36+weaveSpeckle*(.33+.63*wetRim);
+  below+=mix(uInternalColor,cupTint,.41+.55*cupGlow)*cupLight*cupDiffusion*tissue*collar;
+  float suspended=weaveTip*weaveRelease*tissue*(1.-.90*opening);
+  below=mix(below,below*mix(vec3(.63,.79,.98),vec3(1.),wetRim)+uInternalColor*(.15*wetRim+.13*weaveSpeckle),clamp(suspended,0.,1.));
+  float stem=(1.-weaveTip)*(1.-tissueFilm)*tissue;
+  float clearStem=transmission*weaveRelease*stem;
+  below*=1.-clearStem*(.77-.28*tissueFibre)*pow(facing,.72);
+  below+=mix(base,uInternalColor,.69)*cupLight*clearStem*(.009+.119*pow(1.-facing,.94)+.075*tissueFibre*uTexture.z);
+  // A short path through suspended fibres scatters white light through the
+  // feet and the plump nodes. Let the hue still follow the palette and lamps.
+  float milk=1.-smoothstep(.19,.69,weaveRelease);
+  vec3 milkTint=mix(base,vec3(dot(base,vec3(.2126,.7152,.0722))),.48);
+  float packed=tissueFilm*(.23+.46*tissuePulp+.40*tissueFibre);
+  below+=milkTint*cupLight*tissue*milk*(packed+weaveTip*(.36+.24*facing))*(.22+.78*uTexture.z);
+  below+=fibreLight*tissueFilm*tissueFibre*(.23+.19*transmission)*(.16+.84*uTexture.z);
+  below+=base*cupLight*tissueFilm*(.012+.084*tissueFibre*tissueFibre)*(.22+.78*uTexture.z);
+  below+=base*cupLight*tissue*weaveTip*(1.-weaveRelease)*(.12+.083*wetRim);
+  // On the rounded wall the grazing path remains visible during the
+  // transition from a closed vesicle to an open, backlit bell.
+  below+=mix(uInternalColor,base,.55)*cupLight*cupDiffusion*tissue*
+         (pathAtEdge*(.17+.19*wallCloud)+wallCloud*.085)*(.35+.65*transmission);
+ }
+ #endif
  float alpha=(1.-transmission)+glass.a*transmission;
  vec3 surfaceF=dielectricF*max(.1,uSurface.z);
  surfaceF*=1.-clamp(uModern.x,0.,1.);
@@ -2125,9 +2233,17 @@ function weaveKernel(source){
  return ranges.every(([min])=>min===1)?'network':'mixed';
 }
 const weaveHitTag=(source,independentFan)=>weaveKernel(source)!=='bands'&&!independentFan&&!fractalMayChange(source);
+function tissueKernel(source){
+ const [min,max]=motionInterval(source,'structWeaveTension');
+ return min>=1?'WEAVE_TISSUE_ONLY':max<=0?'WEAVE_GRID_ONLY':'';
+}
+function specializeTissue(shader,source){
+ const mode=tissueKernel(source);
+ return mode?shader.replace('#version 300 es','#version 300 es\n#define '+mode+' 1'):shader;
+}
 const addWeaveHitTag=(shader)=>shader.replace('#version 300 es','#version 300 es\n#define WEAVE_HIT_TAG 1');
 export function implicitGeometrySource(source,{main,floatAtlas=true,independentFan=false}={}){
- let shader=variantSource(implicitGeometryKey(source),floatAtlas,weaveKernel(source));
+ let shader=specializeTissue(variantSource(implicitGeometryKey(source),floatAtlas,weaveKernel(source)),source);
  if(main===IMPLICIT_HIT_MAIN&&weaveHitTag(source,independentFan))shader=addWeaveHitTag(shader);
  if(independentFan)shader=independentFanGeometry(shader,independentFanCompact(source));
  return main?shaderFunction(shader,'main',main):shader;
@@ -2140,10 +2256,10 @@ function cellSurfaceMode(source){
  return cellularMayChange(source)&&!structureMayChange(source)&&!growthGeometryEnabled(source)&&!fractalMayChange(source)&&
   !['petalAmount','stemAmount'].some(key=>motionInterval(source,key)[1]>.000001);
 }
-function implicitMaterialKey(source){return implicitGeometryKey(source)+':'+IMPLICIT_MATERIAL_SWITCHES.map(key=>+!!materialMayUse(source,key)).join('')+':'+Number(independentFanMode(source))+':'+weaveKernel(source);}
+function implicitMaterialKey(source){return implicitGeometryKey(source)+':'+IMPLICIT_MATERIAL_SWITCHES.map(key=>+!!materialMayUse(source,key)).join('')+':'+Number(independentFanMode(source))+':'+weaveKernel(source)+':'+tissueKernel(source);}
 export function implicitSurfaceSource(source,{accumulate=false,independentFan=false}={}){
  const transmitting=motionInterval(source,'transparency')[1]>.0001;
- let shader=variantSource(implicitGeometryKey(source)|16|(fractalMayChange(source)&&!transmitting?0:2048),false,weaveKernel(source));
+ let shader=specializeTissue(variantSource(implicitGeometryKey(source)|16|(fractalMayChange(source)&&!transmitting?0:2048),false,weaveKernel(source)),source);
  if(accumulate&&weaveHitTag(source,independentFan))shader=addWeaveHitTag(shader);
  if(independentFan)shader=independentFanMaterialPoint(shader);
  if(!cellSurfaceMode(source))shader=compactFilmOptics(shader);
@@ -2251,7 +2367,7 @@ export class Renderer{
  }
  prepareImplicit(source,phase,options){
   const key=implicitGeometryKey(source),g=this.gl,independentFan=independentFanMode(source);
-  const family=key+':'+(independentFan?(independentFanCompact(source)?'fan-compact':'fan-complete'):'union')+':'+weaveKernel(source);
+  const family=key+':'+(independentFan?(independentFanCompact(source)?'fan-compact':'fan-complete'):'union')+':'+weaveKernel(source)+':'+tissueKernel(source);
   if(this.implicitFamily!==family){
    this.implicitHit?.dispose();this.implicitHit=new ImplicitHitPass(g,implicitGeometrySource(source,{main:independentFan?INDEPENDENT_FAN_HIT_MAIN:fractalMayChange(source)?FRACTAL_HIT_MAIN:IMPLICIT_HIT_MAIN,independentFan}));
    this.implicitKey=key;this.implicitFamily=family;

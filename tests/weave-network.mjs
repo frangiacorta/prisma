@@ -92,7 +92,7 @@ try{
    const result=[];
    for(const seconds of [0,2,7,12,15,18,24]){
     const queried=sampleFrame(state,seconds/state.duration*tau);
-    const frame=seconds===12?{...queried,structWeaveBranching:.49}:queried;
+    const frame=seconds===12?{...queried,structWeaveBranching:.49,structWeaveTension:.46}:queried;
     structureUniforms(frame,(name,value)=>gl['uniform'+value.length+'fv'](gl.getUniformLocation(program,name),value));
     gl.uniform1f(gl.getUniformLocation(program,'uSeed'),(frame.seed%1000)*.013);
     gl.drawArrays(gl.TRIANGLES,0,3);gl.readPixels(0,0,n,1,gl.RGBA,gl.FLOAT,out);
@@ -126,6 +126,13 @@ try{
   const cups={...sampleFrame(state,24/state.duration*tau),motions:{}};
   const trials=[
    ['ramificazione',bridge,'structWeaveBranching',.34],
+   ['tensione delle giunzioni',bridge,'structWeaveTension',.30],
+   ['passo longitudinale',bridge,'structWeavePitch',1.52],
+   ['disposizione posteriore X',bridge,'structWeaveRearX',bridge.structWeaveRearX>.3?-.62:.72],
+   ['disposizione posteriore Y',bridge,'structWeaveRearY',bridge.structWeaveRearY>.3?-.68:.73],
+   ['scarto della base',bridge,'structWeaveRootBend',.41],
+   ['scarto della biforcazione',bridge,'structWeaveTipBend',-.46],
+   ['posizione della germinazione',sprout,'structWeaveFront',sprout.structWeaveFront>.5?.07:.92],
    ['gerarchia',bridge,'structWeaveHierarchy',0],
    ['fibre',bridge,'structWeaveFinesse',.42],
    ['direzione microfibre',bridge,'structWeaveAlignment',0],
@@ -133,11 +140,12 @@ try{
    ['giunzioni',bridge,'structWeaveNodes',.2],
    ['ritiro',cups,'structWeaveRelease',.43],
    ['crescita',sprout,'structWeaveGrowth',.13],
-   ['sfasamento della crescita',emerging,'structDelay',.95],
+   ['sfasamento della crescita',emerging,'structDelay',emerging.structDelay>.5?.05:.95],
    ['lunghezza',sprout,'structWeaveReach',.48],
    ['apertura laterale',cups,'structWeaveSpread',.51],
    ['coppe',cups,'structWeaveCup',.17],
    ['diametro coppe',cups,'structWeaveCupSize',.52],
+   ['svasatura coppe',{...cups,structDelay:.24},'structWeaveFlare',0],
    ['apertura indipendente dal ritiro',sprout,'structWeaveCup',1],
    ['trasparenza',cups,'transparency',.22],
    ['luce interna',cups,'structWeaveCupLight',0],
@@ -167,7 +175,7 @@ try{
  await page.goto('http://localhost:8242/?preset='+encodeURIComponent(path.slice(1)));
  await page.waitForFunction(()=>window.prismaReady&&JSON.parse(localStorage.getItem('prisma-current-v2'))?.state?.structWeaveBranching===1,null,{timeout:30000});
  await page.waitForFunction(()=>document.getElementById('render-error').hidden,null,{timeout:80000});
- const controls=['structWeaveBranching','structWeaveFinesse','structWeaveReach','structWeaveRelease','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupSize'];
+ const controls=['structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY','structWeaveBranching','structWeaveTension','structWeaveFront','structWeaveFinesse','structWeaveReach','structWeaveRelease','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupSize','structWeaveFlare'];
  await page.locator('[data-tab="shape"]').click();
  for(const key of controls)assert.equal(await page.locator('[data-number="'+key+'"]').count(),1,key);
  await page.locator('[data-tab="material"]').click();

@@ -1,3 +1,5 @@
+import {junctionField,JUNCTION_GLSL} from './weave-junction.js?v=2ed2af454163';
+
 const TAU = Math.PI * 2;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const mix = (a, b, t) => a + (b - a) * t;
@@ -98,7 +100,7 @@ function shootDistance(x, y, z, a, b, c, radius, rim, growth, release, open, ind
  return result;
 }
 
-export function weaveNetworkField(s, field, p, thickness) {
+function gridNetworkField(s, field, p, thickness) {
  const {structWeaveRelease:release,structWeaveGrowth:growth,structWeaveReach:reach,
   structWeaveNodes:nodes,structWeaveMembrane:web,structWeaveCup:open}=s;
  const phase = s.structFlowPhase*TAU, spacing=1.02+.30*Math.sqrt(s.structDensity);
@@ -225,6 +227,13 @@ export function weaveNetworkField(s, field, p, thickness) {
  return distance/spacing*.66;
 }
 
+export function weaveNetworkField(s,field,p,thickness){
+ const tension=s.structWeaveTension||0;
+ if(tension<=0)return gridNetworkField(s,field,p,thickness);
+ const tissue=junctionField(s,field,p,thickness);
+ return tension>=1?tissue:mix(gridNetworkField(s,field,p,thickness),tissue,tension);
+}
+
 // Same shell, chart and branch kernel as the CPU field. The material samples
 // the chart independently so subpixel fibres retain stable optical coverage.
 export const WEAVE_NETWORK_GLSL = `
@@ -253,6 +262,9 @@ vec3 weaveSurface;
 #ifdef WEAVE_HIT_TAG
 bool weaveEvaluateMaterial=false;
 #endif
+#endif
+${JUNCTION_GLSL}
+#ifdef WEAVE_DETAIL
 float networkShoot(vec3 q,vec3 span,float radius,float rim,float growth,float release,float open,float index,float bend,float web,float hierarchy,float nodes,out vec3 detail){
  float length2=dot(span,span);
  float longitudinal=hierarchy*smoothstep(.25,.79,release),curvature=bend-.83*span.x*longitudinal;
@@ -330,7 +342,7 @@ float networkShoot(vec3 q,vec3 span,float radius,float rim,float growth,float re
 #endif
  return result;
 }
-float weaveNetworkField(float field,vec3 p,float wall){
+float gridNetworkField(float field,vec3 p,float wall){
  float phase=uStructureF.z*6.28318530718,release=uWeaveNetwork.z,growth=uWeaveGrowth.x,reach=uWeaveNetwork.w,nodes=uStructureH.z;
  float hierarchy=uWeaveDetail.x,alignment=uWeaveDetail.z;
  float spacing=1.02+.30*sqrt(uStructureB.x),z=(field+wall*.19)*spacing;
@@ -438,6 +450,20 @@ float weaveNetworkField(float field,vec3 p,float wall){
   }
  }
  return distance/spacing*.66;
+}
+float weaveNetworkField(float field,vec3 p,float wall){
+ #ifdef WEAVE_GRID_ONLY
+ return gridNetworkField(field,p,wall);
+ #elif defined(WEAVE_TISSUE_ONLY)
+ return tissueField(field,p,wall,weaveSurface);
+ #else
+ if(uWeaveTension<=0.)return gridNetworkField(field,p,wall);
+ vec3 detail;float tissue=tissueField(field,p,wall,detail);
+ if(uWeaveTension>=1.){weaveSurface=detail;return tissue;}
+ float grid=gridNetworkField(field,p,wall);
+ if(uWeaveTension>=.5)weaveSurface=detail;
+ return mix(grid,tissue,uWeaveTension);
+ #endif
 }
 #endif
 `;

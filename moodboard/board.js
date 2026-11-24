@@ -130,6 +130,10 @@ document.addEventListener('click',async e=>{
  if(e.target.closest('[data-clip]'))replaceHero(videoHtml(current.clip,current.media?.[0]?.src),current.clipNote);
  if(e.target.closest('[data-result]'))replaceHero(videoHtml(current.resultVideo,current.resultImage),'Risultato Prisma · loop esportato.');
  if(e.target.closest('[data-compare]')){
+  if(current.comparisonClip){
+   replaceHero(videoHtml(current.comparisonClip),'Reference a sinistra, Prisma a destra. I due video mostrano lo stesso intervallo.');
+   return;
+  }
   const ref=current.kind==='project'?byId.get(current.comparisonRef):current;
   if(!ref&&!current.comparisonSource)return;
   const original=ref?(ref.clip?videoHtml(ref.clip,ref.media?.[0]?.src):imageHtml(ref)):`<a class="comparison-source" href="${esc(safeUrl(current.comparisonSource))}" target="_blank" rel="noopener">Apri fonte ↗</a>`;
@@ -156,10 +160,11 @@ $('#import').onchange=async e=>{try{const file=e.target.files[0];if(!file)return
 window.addEventListener('popstate',()=>{const id=decodeURIComponent(location.hash.slice(1));if(byId?.has(id))openDetail(id,false);else if($('#detail').open){stopVideos();$('#detail').close();document.body.classList.remove('modal-open');current=null;}});
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!$('#detail').open){e.preventDefault();$('#search').focus();}});
 try{
- const response=await fetch('data.json?v=60eb7092f3ba');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
- for(const item of data.items)if(item.kind==='project'){
+ const response=await fetch('data.json?v=2ed2af454163');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
+ for(const item of data.items)if(item.kind==='project'||item.comparisonClip){
   item.resultImage=projectMedia(item.resultImage);
   item.resultVideo=projectMedia(item.resultVideo);
+  item.comparisonClip=projectMedia(item.comparisonClip);
  }
  byId=new Map(data.items.map(r=>[r.id,r]));
  $('#archive-count').textContent=`${data.stats.videos} video · ${data.stats.images} immagini · ${data.stats.tools} strumenti · ${data.stats.projects} progetti`;

@@ -1,14 +1,15 @@
-import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=60eb7092f3ba';
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=60eb7092f3ba';
-import {WEAVE_NETWORK_GLSL,weaveNetworkField} from './weave-network.js?v=60eb7092f3ba';
-import {hasMotionPoints} from './motion-keyframes.js?v=60eb7092f3ba';
+import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=2ed2af454163';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=2ed2af454163';
+import {WEAVE_NETWORK_GLSL,weaveNetworkField} from './weave-network.js?v=2ed2af454163';
+import {junctionUniforms} from './weave-junction.js?v=2ed2af454163';
+import {hasMotionPoints} from './motion-keyframes.js?v=2ed2af454163';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,
  loopAmount:0,loopKnot:0,loopTurns:3,loopRadius:.8,loopTube:.22,loopFlat:0,loopTwist:0,loopWave:0,loopPhase:0,loopBands:0,loopBandCount:6,loopBandAxis:0,
  structShell:0,structThickness:.09,structFibres:0,structWeft:0,structDensity:20,structThreadWidth:.32,structWeave:0,structWeaveVariation:0,structWeaveNodes:0,structWeaveMembrane:0,structWeaveGrowth:0,structWeaveCup:.65,
  structWeaveBranching:0,structWeaveFinesse:1,structWeaveRelease:0,structWeaveReach:1,
- structWeaveHierarchy:0,structWeaveSpread:1,structWeaveAlignment:0,structWeaveCupLight:0,structWeaveCupSize:1,
+ structWeavePitch:1,structWeaveRootBend:0,structWeaveTipBend:0,structWeaveRearX:0,structWeaveRearY:0,structWeaveFront:.5,structWeaveTension:0,structWeaveHierarchy:0,structWeaveSpread:1,structWeaveAlignment:0,structWeaveCupLight:0,structWeaveCupSize:1,structWeaveFlare:1,
  structSlices:0,structSliceCount:6,structSliceWidth:.24,structRadial:0,structFan:0,structFanBias:0,structPetalCount:8,structPetalWidth:.45,
  structLayers:0,structLayerCount:3,structLayerWidth:.22,
  structGrowth:0,structCurl:0,structFold:0,structFoldCount:5,structBreath:0,structFlap:0,structFlowPhase:0,structDelay:.35,
@@ -25,9 +26,11 @@ export const STRUCTURE_META={
  structWeaveVariation:['Irregolarità del reticolo',0,1,.01],structWeaveNodes:['Rilievo alle giunzioni',0,1,.01],structWeaveMembrane:['Membrana fra i rami',0,1,.01],structWeaveGrowth:['Crescita degli steli',0,1,.01],structWeaveCup:['Apertura delle coppe',0,1,.01],
  structWeaveBranching:['Ramificazione del reticolo',0,1,.01],structWeaveFinesse:['Densità delle microfibre',.35,2.4,.01],
  structWeaveRelease:['Ritiro dei ponti',0,1,.01],structWeaveReach:['Lunghezza degli steli',.35,1.45,.01],
- structWeaveHierarchy:['Gerarchia dei rami',0,1,.01],structWeaveSpread:['Apertura laterale',.4,1.45,.01],
+ structWeavePitch:['Passo lungo i rami',.55,1.8,.01],structWeaveRootBend:['Scarto della base',-.65,.65,.01],structWeaveTipBend:['Scarto della biforcazione',-.65,.65,.01],
+ structWeaveRearX:['Rami posteriori · X',-1,1,.01],structWeaveRearY:['Rami posteriori · Y',-1,1,.01],
+ structWeaveFront:['Posizione della germinazione',0,1,.01],structWeaveTension:['Tensione delle giunzioni',0,1,.01],structWeaveHierarchy:['Gerarchia dei rami',0,1,.01],structWeaveSpread:['Apertura laterale',.4,1.45,.01],
  structWeaveAlignment:['Allineamento delle microfibre',0,1,.01],structWeaveCupLight:['Luce interna delle coppe',0,1.6,.01],
- structWeaveCupSize:['Diametro delle coppe',.4,1.7,.01],
+ structWeaveCupSize:['Diametro delle coppe',.4,1.7,.01],structWeaveFlare:['Svasatura delle coppe',0,1,.01],
  structSlices:['Separazione in lamelle',0,1,.01],structSliceCount:['Numero di lamelle',2,12,1],structSliceWidth:['Spessore relativo delle lamelle',.12,.85,.01],structFan:['Lamine curve',0,1,.01],structFanBias:['Apertura in due direzioni',0,1,.01],
  structRadial:['Separazione radiale',0,1,.01],structPetalCount:['Divisioni radiali',3,20,1],structPetalWidth:['Larghezza delle divisioni',.1,.95,.01],
  structLayers:['Gusci concentrici',0,1,.01],structLayerCount:['Numero di strati concentrici',2,6,1],structLayerWidth:['Spessore relativo degli strati',.15,.85,.01],
@@ -37,7 +40,7 @@ export const STRUCTURE_META={
  structCoreDark:['Oscurità del nucleo',0,1,.01],structCoreRadius:['Estensione del nucleo',.05,.8,.01]
 };
 export const STRUCTURE_GROUPS={shape:Object.keys(STRUCTURE_DEFAULTS).filter(k=>!['filPhase','filWind','filColor','filColorScatter','filRootShade','filBaseBlend','filPulse','filPulseCycles','filPulseWidth','loopBands','loopBandCount','loopBandAxis','loopPhase','structBreath','structFlap','structFlowPhase','structDelay','structCoreDark','structCoreRadius','structWeaveCupLight'].includes(k)),motion:['filPhase','filWind','filPulse','filPulseCycles','filPulseWidth','loopPhase','structBreath','structFlap','structFlowPhase','structDelay'],color:['filColor','filColorScatter','filRootShade','filBaseBlend','loopBands','loopBandCount','loopBandAxis','structCoreDark','structCoreRadius']};
-export const WEAVE_TRACKS=['structWeaveBranching','structWeaveHierarchy','structWeaveNodes','structWeaveMembrane','structWeaveFinesse','structWeaveAlignment','structWeaveGrowth','structDelay','structWeaveReach','structWeaveSpread','structWeaveRelease','structWeaveCup','structWeaveCupSize','structWeaveCupLight'];
+export const WEAVE_TRACKS=['structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY','structWeaveBranching','structWeaveTension','structWeaveFront','structWeaveHierarchy','structWeaveNodes','structWeaveMembrane','structWeaveFinesse','structWeaveAlignment','structWeaveGrowth','structDelay','structWeaveReach','structWeaveSpread','structWeaveRelease','structWeaveCup','structWeaveCupSize','structWeaveFlare','structWeaveCupLight'];
 const weaveAmplitudes=Object.fromEntries(WEAVE_TRACKS.map(key=>[key,STRUCTURE_META[key][2]-STRUCTURE_META[key][1]]));
 export const STRUCTURE_TRACKS={...FILAMENT_TRACKS,...Object.fromEntries(['loopAmount','loopKnot','loopRadius','loopTube','loopFlat','loopTwist','loopWave','loopPhase','loopBandAxis','structShell','structFibres','structWeft','structSlices','structRadial','structFan','structFanBias','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structFlowPhase','structScallop','structSpiral','structStagger','structRuffle',...WEAVE_TRACKS].map(k=>[k,[STRUCTURE_META[k][0],0,k==='structBreath'?.3:k==='structFlap'?.6:k==='structFold'?.4:k==='loopTwist'?2:k==='loopWave'?.35:k==='loopTube'?.6:weaveAmplitudes[k]??1,.01]]))};
 export const STRUCTURE_FIELD_KEYS=Object.keys(STRUCTURE_DEFAULTS).filter(k=>!k.startsWith('structCore')&&!k.startsWith('fil')&&!k.startsWith('loopBand')&&k!=='structWeaveCupLight');
@@ -45,7 +48,11 @@ export function hasStructure(s){return ['loopAmount','structShell','structFibres
 export function structureMayChange(s){return hasStructure(s)||STRUCTURE_FIELD_KEYS.some(k=>s.motions?.[k]?.enabled&&(s.motions[k].amplitude||s.motions[k].mode==='cycle'||hasMotionPoints(s.motions[k])));}
 export function structureBounds(s){
  const torus=(s.loopAmount||0)>0?(s.loopRadius??.8)+.36*(s.loopKnot||0)+(s.loopTube??.22)*(1+(s.loopWave||0)):1;
- const roots=.64*(s.structWeaveGrowth||0)+.16*(s.structWeaveBranching||0)*(s.structShell||0);
+ const network=(s.structWeaveBranching||0)*(s.structShell||0);
+ const release=s.structWeaveRelease||0;
+ const openReach=Math.max(0,(release-.73)/.27)*(s.structWeaveReach||0);
+ const tangentReach=network*(s.structWeaveTension||0)*(.20+.46*release+.69*openReach);
+ const roots=Math.max(.64*(s.structWeaveGrowth||0)+.16*network,tangentReach);
  const growth=1+Math.abs(s.structGrowth||0)+Math.abs(s.structBreath||0)+roots*(s.structWeft||0)*(s.structFibres||0)+.96*(s.structFan||0);
  const warp=1+Math.abs(s.structCurl||0)+Math.abs(s.structFold||0)+Math.abs(s.structFlap||0)+Math.abs(s.structRuffle||0)*2+Math.abs(s.structStagger||0)*.6;
  return Math.max(1,torus)*growth*warp;
@@ -65,7 +72,8 @@ export function structureUniforms(s,u,uploadFan){
  u('uWeaveGrowth',[v.structWeaveGrowth,v.structWeaveCup,v.structWeaveMembrane]);
  u('uWeaveNetwork',[v.structWeaveBranching,v.structWeaveFinesse,v.structWeaveRelease,v.structWeaveReach]);
  u('uWeaveDetail',[v.structWeaveHierarchy,v.structWeaveSpread,v.structWeaveAlignment,v.structWeaveCupLight]);
- u('uWeaveCupSize',[v.structWeaveCupSize]);
+ u('uWeaveCupSize',[v.structWeaveCupSize]);u('uWeaveTension',[v.structWeaveTension]);
+ junctionUniforms(v,u,uploadFan);
  u('uStructureFan',[v.structFan]);u('uFanBias',[v.structFanBias]);
  if(v.structFan>0&&uploadFan){const {axes,profiles}=fanData(v,v.structFlowPhase*Math.PI*2);uploadFan('uFanAxes',axes);uploadFan('uFanProfiles',profiles);}
  u('uStructureColor',[v.structCoreDark,v.structCoreRadius]);u('uLoopColor',[v.loopBands,v.loopBandCount,v.loopBandAxis]);
@@ -702,7 +710,7 @@ export function structurePanel(tab,s,{slider,details,section}){
  const sliders=keys=>keys.map(k=>slider(k)).join('');
  if(tab==='shape')return filamentPanel(tab,s,{slider,details})+ details('Curve toroidali e nodi',sliders(['loopAmount','loopRadius','loopTube','loopKnot','loopTurns','loopFlat','loopTwist','loopWave'])+'<p class="help">Apertura 0 mantiene la forma iniziale; 1 la trasforma in un anello. Intreccio separa il percorso. Avvolgimenti aumenta le ripiegature del nodo. Appiattimento e torsione modellano il nastro. Spessore elevato può unire i passaggi del nodo.</p>')+section('Proprietà',(s.structureOriginal?'<p class="help">La struttura precedente è stata adattata alle proprietà comuni. Il risultato può cambiare; i dati originali sono conservati nel preset.</p><button class="quiet" data-structure-original="true">Scarica anche il preset originale</button>':'')+'<p class="help">Combina le proprietà sulla forma attuale. Profilo, ritagli e materia restano attivi.</p>')
  +details('Guscio e spessore',sliders(['structShell','structThickness','structTaper']))
- +details('Reticolo di fibre',sliders(['structFibres','structWeft','structWeaveBranching','structWeaveHierarchy'])+details('Trama e giunzioni',sliders(['structDensity','structThreadWidth','structWeave','structWeaveVariation','structWeaveNodes','structWeaveMembrane','structWeaveFinesse','structWeaveAlignment']))+details('Steli e coppe',sliders(['structWeaveGrowth','structWeaveReach','structWeaveSpread','structWeaveRelease','structWeaveCup','structWeaveCupSize'])+'<p class="help">I noduli crescono dalle giunzioni. Puoi far ritirare i ponti mentre gli steli crescono e le coppe si aprono.</p>')+'<p class="help">Svuotamento, fibre e tessitura aprono la forma. La ramificazione modifica i ponti e le giunzioni.</p>')
+ +details('Reticolo di fibre',sliders(['structFibres','structWeft','structWeaveBranching','structWeaveHierarchy','structWeaveTension'])+details('Andamento dei rami',sliders(['structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY']))+details('Trama e giunzioni',sliders(['structDensity','structThreadWidth','structWeave','structWeaveVariation','structWeaveNodes','structWeaveMembrane','structWeaveFinesse','structWeaveAlignment']))+details('Steli e coppe',sliders(['structWeaveGrowth','structWeaveFront','structWeaveReach','structWeaveSpread','structWeaveRelease','structWeaveCup','structWeaveCupSize','structWeaveFlare'])+'<p class="help">I noduli crescono dalle giunzioni. Puoi far ritirare i ponti mentre gli steli crescono e le coppe si aprono.</p>')+'<p class="help">Svuotamento, fibre e tessitura aprono la forma. La ramificazione modifica i ponti e le giunzioni.</p>')
  +details('Suddivisione radiale e strati',sliders(['structFan','structFanBias','structScallop','structPetalCount','structRadial','structPetalWidth','structSlices','structSliceCount','structSliceWidth','structLayers','structLayerCount','structLayerWidth'])+'<p class="help">Lamine curve apre la forma in fogli sovrapposti. Larghezza, sfasamento e arricciamento ne cambiano i lembi. Gli strati interni diventano visibili con trasparenza o ritagli.</p>')
  +details('Piegatura e curvatura',sliders(['structGrowth','structCurl','structSpiral','structStagger','structFold','structFoldCount','structRuffle'])+'<p class="help">La posa e la sua animazione si regolano in Movimento. Trasparenza e rifrazione sono in Materia.</p>');
  if(tab==='color')return filamentPanel(tab,s,{slider,details})+ details('Fasce dell’anello',sliders(['loopBands','loopBandCount','loopBandAxis'])+'<p class="help">L’orientamento passa da fasce trasversali a strisce che seguono il percorso. Aumenta Apertura ad anello in Forma.</p>')+details('Nucleo scuro',sliders(['structCoreDark','structCoreRadius'])+(s.engine==='particles'?'<p class="help">Scurisce granelli e fili vicino all’asse centrale della forma, anche con pellicola e riflessi attivi. Estensione regola l’area; non aggiunge una sfera piena fra i granelli.</p>':''));

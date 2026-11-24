@@ -1,4 +1,4 @@
-import {PALETTE_DEFAULTS,PALETTE_META} from './finish-palette.js?v=60eb7092f3ba';
+import {PALETTE_DEFAULTS,PALETTE_META} from './finish-palette.js?v=2ed2af454163';
 // One final image pass, after the complete frame (including tiled/accumulated exports).
 export const FINISH_DEFAULTS={finishEnabled:true,finishTone:true,finishRgb:false,finishMosaic:false,finishCompare:false,finishRgbR:8,finishRgbG:0,finishRgbB:-8,finishRgbAngle:0,finishRgbMix:1,finishCellX:12,finishCellY:12,finishMosaicMix:1};
 export const FINISH_META={finishRgbR:['Spostamento rosso',-60,60,.1],finishRgbG:['Spostamento verde',-60,60,.1],finishRgbB:['Spostamento blu',-60,60,.1],finishRgbAngle:['Direzione RGB',-180,180,1],finishRgbMix:['Intensità RGB',0,1,.01],finishCellX:['Larghezza celle',1,160,1],finishCellY:['Altezza celle',1,160,1],finishMosaicMix:['Intensità mosaico',0,1,.01]};
@@ -129,12 +129,20 @@ void main(){
  float radius=depth.y>.5?unfocused(depth.x):uFocus.x*.72;
  if(radius<=.004){color=center;return;}
  float scale=min(uSize.x,uSize.y)*.033;
- vec4 sum=vec4(center.rgb*center.a,center.a)*2.;float total=2.;
- for(int i=0;i<14;i++){
-  float index=float(i),angle=index*2.39996323;
-  vec2 p=uv+vec2(cos(angle),sin(angle))*sqrt((index+.5)/14.)*radius*scale/uSize;
+ float pixelRadius=radius*scale;
+ int taps=int(clamp(ceil(3.5*pixelRadius),8.,48.));
+ vec4 sum=vec4(center.rgb*center.a,center.a);float total=1.;
+ for(int i=0;i<48;i++){
+  if(i>=taps)break;
+  float index=float(i),angle=index*2.39996323,r2=(index+.5)/float(taps),dist=sqrt(r2)*pixelRadius;
+  vec2 p=uv+vec2(cos(angle),sin(angle))*dist/uSize;
   vec2 sampleDepth=depthAt(p);
-  float acceptance=depth.y>.5||sampleDepth.y<.5?1.:smoothstep(radius*.16,radius*.85,unfocused(sampleDepth.x));
+  // A nearer fibre in focus cannot contribute through the aperture to
+  // another pixel on a distant sheet. A defocused fibre can.
+  float nearer=sampleDepth.y*(depth.y>.5?smoothstep(.045,.35,sampleDepth.x-depth.x):1.);
+  float sourceRadius=unfocused(sampleDepth.x)*scale;
+  float spread=1.-smoothstep(sourceRadius*.73+.25,sourceRadius+1.,dist);
+  float acceptance=mix(1.,spread,nearer)*exp(-1.3*r2);
   vec4 a=texture(uImage,p);sum+=vec4(a.rgb*a.a,a.a)*acceptance;total+=acceptance;
  }
  vec4 result=sum/total;color=vec4(result.rgb/max(.00001,result.a),result.a);

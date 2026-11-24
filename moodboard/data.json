@@ -4621,7 +4621,8 @@
       "summary": "Macrostruttura bianca con rami, ponti porosi e noduli sferici. Dalle giunzioni emergono ramificazioni; il tessuto evolve in steli con piccole coppe trasparenti. È la reference più esplicita di questo gruppo per il passaggio tra trama, nodo e crescita.",
       "sources": [
         "https://github.com/InteractiveComputerGraphics/PositionBasedDynamics",
-        "https://raw.githubusercontent.com/InteractiveComputerGraphics/PositionBasedDynamics/master/PositionBasedDynamics/XPBD.cpp"
+        "https://raw.githubusercontent.com/InteractiveComputerGraphics/PositionBasedDynamics/master/PositionBasedDynamics/XPBD.cpp",
+        "https://www.art-magazine.ai/artists/forside"
       ],
       "sections": [
         {
@@ -4765,7 +4766,12 @@
         "fibres"
       ],
       "category": "form",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "resultPreset": "previews/reticolo-giunzioni.prisma.json",
+      "resultImage": "../previews/reticolo-giunzioni.webp",
+      "resultVideo": "../previews/reticolo-giunzioni.mp4",
+      "comparisonClip": "../previews/reticolo-giunzioni-confronto.mp4",
+      "resultUrl": "../previews/reticolo-giunzioni-confronto.mp4"
     },
     {
       "id": "s07-06",
@@ -14765,7 +14771,7 @@
       "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Rami portanti e germogli crescono dalle stesse giunzioni, con crescita sfasata e ponti a microfibre orientabili. Diametro, apertura e diffusione luminosa delle coppe si regolano separatamente.",
+      "summary": "Una rete di fibre si tende fra i rami. I noduli germogliano lungo la rete e si aprono in coppe cave. Puoi regolare la distanza fra gli innesti, la curva dei rami, la svasatura e la luce delle coppe.",
       "sources": [
         "https://frangiacorta.github.io/prisma/previews/tessuto-connesso.html"
       ],
@@ -14832,7 +14838,7 @@
       "result": "reticolo-giunzioni",
       "where": "Forma → Costruzione → Reticolo di fibre · Materiale → Ottica del reticolo · Movimento → Struttura",
       "platform": "",
-      "next": "Allineare il profilo degli steli nella crescita e la cadenza di apertura delle coppe.",
+      "next": "Confrontare i singoli germogli nel primo cambio di inquadratura e i profili sottili dei calici a fine crescita.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -14870,7 +14876,7 @@
         "Fedeltà alle reference e fluidità su telefono fisico da verificare con l’utente."
       ],
       "integration": "Proprietà combinabili sulla forma corrente; nessun selettore esclusivo di membrane, tessuti o veli in Forme.",
-      "resultVersion": "102",
+      "resultVersion": "103",
       "evidence": "reports/structure/source.json; reports/structure/source-ui.json; reports/structure/export.json",
       "checks": [
         "26 controlli con impatto sui pixel",
@@ -14900,15 +14906,16 @@
       "engine": "solid",
       "procedure": {
         "name": "Reticolo sulla superficie",
-        "description": "Il reticolo segue il campo della forma. I rami si biforcano e conservano gli ancoraggi mentre si ritirano i ponti. Le pareti delle coppe ricevono la luce della scena e il nucleo emerge nella cavità.",
+        "description": "In Andamento dei rami regola il passo e la curvatura delle biforcazioni. La posizione della germinazione e lo sfasamento fanno emergere gli steli in successione. In Steli e coppe regola apertura, diametro e svasatura. La luce interna risponde ai fari della scena.",
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/reticolo-giunzioni.prisma.json",
-      "compareNote": "Confrontata in movimento su 25,6 secondi. Il nodo principale, le biforcazioni e le aperture delle coppe hanno una disposizione più vicina alla reference. Restano differenze nei profili degli steli, nella densità delle microfibre e nella cadenza dell’apertura.",
+      "compareNote": "Il video affiancato mostra lo stesso passaggio dal secondo 7,84 al 17,84. Nel confronto completo di 25,6 s, le differenze più visibili riguardano il percorso dei germogli, la finezza delle fibre tra i rami e il profilo delle ultime coppe.",
       "comparisonRef": "s07-05",
       "comparisonDate": "2026-11-24",
-      "comparisonOutcome": "parziale"
+      "comparisonOutcome": "parziale",
+      "comparisonClip": "../previews/reticolo-giunzioni-confronto.mp4"
     },
     {
       "id": "roadmap-4d",

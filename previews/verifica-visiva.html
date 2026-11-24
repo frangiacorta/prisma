@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it" data-release="60eb7092f3ba">
+<html lang="it" data-release="2ed2af454163">
 <head>
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -42,6 +42,7 @@
     const body=document.createElement('div'),heading=text('h2',item.name),note=text('p',item.compareNote||'');
     body.append(heading,text('small',outcomes[item.comparisonOutcome]||'Verifica'),note,link('Apri preset','../?preset='+encodeURIComponent(item.resultPreset)),
      document.createTextNode(' · '),link('Confronta nella moodboard','../moodboard/#'+encodeURIComponent(item.id)));
+    if(item.comparisonClip)body.append(document.createTextNode(' · '),link('Video affiancati',asset(item.comparisonClip)));
     article.append(video,body);grid.append(article);
    }
    loading.hidden=true;
