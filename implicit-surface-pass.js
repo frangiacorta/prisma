@@ -25,6 +25,9 @@ void main(){
  for(int layer=0;layer<int(min(4.,uRuntime.w*.25));layer++){
   vec4 intersection=implicitLayer(layer,pixel);if(intersection.w<0.||max(max(through.r,through.g),through.b)<.001)break;
   vec3 p=origin+direction*intersection.w,n=normalize(intersection.xyz);if(dot(n,direction)>0.)n=-n;
+#ifdef WEAVE_HIT_TAG
+  weaveLitTip=clamp(length(intersection.xyz)-1.,0.,2.);
+#endif
   implicitBehind=vec4(0.);implicitTransmission=vec3(0.);float issue;
   vec4 surface=shade(p,n,direction,true,issue);
   color.rgb+=through.rgb*surface.rgb;through.rgb*=implicitTransmission;

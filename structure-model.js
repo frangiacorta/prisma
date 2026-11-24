@@ -1,10 +1,13 @@
-import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=79c81404468e';
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=79c81404468e';
+import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=de5c2d2312c1';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=de5c2d2312c1';
+import {WEAVE_NETWORK_GLSL,weaveNetworkField} from './weave-network.js?v=de5c2d2312c1';
+import {hasMotionPoints} from './motion-keyframes.js?v=de5c2d2312c1';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,
  loopAmount:0,loopKnot:0,loopTurns:3,loopRadius:.8,loopTube:.22,loopFlat:0,loopTwist:0,loopWave:0,loopPhase:0,loopBands:0,loopBandCount:6,loopBandAxis:0,
  structShell:0,structThickness:.09,structFibres:0,structWeft:0,structDensity:20,structThreadWidth:.32,structWeave:0,structWeaveVariation:0,structWeaveNodes:0,structWeaveMembrane:0,structWeaveGrowth:0,structWeaveCup:.65,
+ structWeaveBranching:0,structWeaveFinesse:1,structWeaveRelease:0,structWeaveReach:1,
  structSlices:0,structSliceCount:6,structSliceWidth:.24,structRadial:0,structFan:0,structFanBias:0,structPetalCount:8,structPetalWidth:.45,
  structLayers:0,structLayerCount:3,structLayerWidth:.22,
  structGrowth:0,structCurl:0,structFold:0,structFoldCount:5,structBreath:0,structFlap:0,structFlowPhase:0,structDelay:.35,
@@ -19,6 +22,8 @@ export const STRUCTURE_META={
  structShell:['Svuotamento · pieno → membrana',0,1,.01],structThickness:['Spessore della membrana',.005,.4,.001],
  structFibres:['Separazione in fibre',0,1,.01],structWeft:['Fili trasversali · tessitura',0,1,.01],structDensity:['Fili intorno alla forma',3,256,1],structThreadWidth:['Larghezza dei fili',.15,.9,.01],structWeave:['Intreccio sopra / sotto',0,.16,.005],
  structWeaveVariation:['Irregolarità del reticolo',0,1,.01],structWeaveNodes:['Rilievo alle giunzioni',0,1,.01],structWeaveMembrane:['Membrana fra i rami',0,1,.01],structWeaveGrowth:['Crescita degli steli',0,1,.01],structWeaveCup:['Apertura delle coppe',0,1,.01],
+ structWeaveBranching:['Ramificazione del reticolo',0,1,.01],structWeaveFinesse:['Densità delle microfibre',.35,2.4,.01],
+ structWeaveRelease:['Ritiro dei ponti',0,1,.01],structWeaveReach:['Lunghezza degli steli',.35,1.45,.01],
  structSlices:['Separazione in lamelle',0,1,.01],structSliceCount:['Numero di lamelle',2,12,1],structSliceWidth:['Spessore relativo delle lamelle',.12,.85,.01],structFan:['Lamine curve',0,1,.01],structFanBias:['Apertura in due direzioni',0,1,.01],
  structRadial:['Separazione radiale',0,1,.01],structPetalCount:['Divisioni radiali',3,20,1],structPetalWidth:['Larghezza delle divisioni',.1,.95,.01],
  structLayers:['Gusci concentrici',0,1,.01],structLayerCount:['Numero di strati concentrici',2,6,1],structLayerWidth:['Spessore relativo degli strati',.15,.85,.01],
@@ -28,11 +33,18 @@ export const STRUCTURE_META={
  structCoreDark:['Oscurità del nucleo',0,1,.01],structCoreRadius:['Estensione del nucleo',.05,.8,.01]
 };
 export const STRUCTURE_GROUPS={shape:Object.keys(STRUCTURE_DEFAULTS).filter(k=>!['filPhase','filWind','filColor','filColorScatter','filRootShade','filBaseBlend','filPulse','filPulseCycles','filPulseWidth','loopBands','loopBandCount','loopBandAxis','loopPhase','structBreath','structFlap','structFlowPhase','structDelay','structCoreDark','structCoreRadius'].includes(k)),motion:['filPhase','filWind','filPulse','filPulseCycles','filPulseWidth','loopPhase','structBreath','structFlap','structFlowPhase','structDelay'],color:['filColor','filColorScatter','filRootShade','filBaseBlend','loopBands','loopBandCount','loopBandAxis','structCoreDark','structCoreRadius']};
-export const STRUCTURE_TRACKS={...FILAMENT_TRACKS,...Object.fromEntries(['loopAmount','loopKnot','loopRadius','loopTube','loopFlat','loopTwist','loopWave','loopPhase','loopBandAxis','structShell','structFibres','structWeft','structSlices','structRadial','structFan','structFanBias','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structFlowPhase','structScallop','structSpiral','structStagger','structRuffle','structWeaveMembrane','structWeaveGrowth','structWeaveCup'].map(k=>[k,[STRUCTURE_META[k][0],0,k==='structBreath'?.3:k==='structFlap'?.6:k==='structFold'?.4:k==='loopTwist'?2:k==='loopWave'?.35:k==='loopTube'?.6:1,.01]]))};
+export const WEAVE_TRACKS=['structWeaveBranching','structWeaveNodes','structWeaveMembrane','structWeaveFinesse','structWeaveGrowth','structWeaveReach','structWeaveRelease','structWeaveCup'];
+export const STRUCTURE_TRACKS={...FILAMENT_TRACKS,...Object.fromEntries(['loopAmount','loopKnot','loopRadius','loopTube','loopFlat','loopTwist','loopWave','loopPhase','loopBandAxis','structShell','structFibres','structWeft','structSlices','structRadial','structFan','structFanBias','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structFlowPhase','structScallop','structSpiral','structStagger','structRuffle',...WEAVE_TRACKS].map(k=>[k,[STRUCTURE_META[k][0],0,k==='structBreath'?.3:k==='structFlap'?.6:k==='structFold'?.4:k==='loopTwist'?2:k==='loopWave'?.35:k==='loopTube'?.6:k==='structWeaveFinesse'?2.05:1,.01]]))};
 export const STRUCTURE_FIELD_KEYS=Object.keys(STRUCTURE_DEFAULTS).filter(k=>!k.startsWith('structCore')&&!k.startsWith('fil')&&!k.startsWith('loopBand'));
 export function hasStructure(s){return ['loopAmount','structShell','structFibres','structSlices','structRadial','structFan','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle'].some(k=>Math.abs(s[k]||0)>1e-6);}
-export function structureMayChange(s){return hasStructure(s)||STRUCTURE_FIELD_KEYS.some(k=>s.motions?.[k]?.enabled&&(s.motions[k].amplitude||s.motions[k].mode==='cycle'));}
-export function structureBounds(s){return Math.max(1,(s.loopAmount||0)>0?(s.loopRadius??.8)+.36*(s.loopKnot||0)+(s.loopTube??.22)*(1+(s.loopWave||0)):1)*(1+Math.abs(s.structGrowth||0)+Math.abs(s.structBreath||0)+.64*(s.structWeaveGrowth||0)*(s.structWeft||0)*(s.structFibres||0)+.96*(s.structFan||0))*(1+Math.abs(s.structCurl||0)+Math.abs(s.structFold||0)+Math.abs(s.structFlap||0)+Math.abs(s.structRuffle||0)*2+Math.abs(s.structStagger||0)*.6);}
+export function structureMayChange(s){return hasStructure(s)||STRUCTURE_FIELD_KEYS.some(k=>s.motions?.[k]?.enabled&&(s.motions[k].amplitude||s.motions[k].mode==='cycle'||hasMotionPoints(s.motions[k])));}
+export function structureBounds(s){
+ const torus=(s.loopAmount||0)>0?(s.loopRadius??.8)+.36*(s.loopKnot||0)+(s.loopTube??.22)*(1+(s.loopWave||0)):1;
+ const roots=.64*(s.structWeaveGrowth||0)+.16*(s.structWeaveBranching||0)*(s.structShell||0);
+ const growth=1+Math.abs(s.structGrowth||0)+Math.abs(s.structBreath||0)+roots*(s.structWeft||0)*(s.structFibres||0)+.96*(s.structFan||0);
+ const warp=1+Math.abs(s.structCurl||0)+Math.abs(s.structFold||0)+Math.abs(s.structFlap||0)+Math.abs(s.structRuffle||0)*2+Math.abs(s.structStagger||0)*.6;
+ return Math.max(1,torus)*growth*warp;
+}
 export const knotTurns=s=>3+2*Math.max(0,Math.min(4,Math.round(((s.loopTurns??3)-3)/2)));
 export function structureUniforms(s,u,uploadFan){
  const v={...STRUCTURE_DEFAULTS,...s};
@@ -46,6 +58,7 @@ export function structureUniforms(s,u,uploadFan){
  u('uStructureG',[v.structScallop,v.structSpiral,v.structStagger,v.structRuffle]);
  u('uStructureH',[v.structTaper,v.structWeaveVariation,v.structWeaveNodes,knotTurns(v)]);
  u('uWeaveGrowth',[v.structWeaveGrowth,v.structWeaveCup,v.structWeaveMembrane]);
+ u('uWeaveNetwork',[v.structWeaveBranching,v.structWeaveFinesse,v.structWeaveRelease,v.structWeaveReach]);
  u('uStructureFan',[v.structFan]);u('uFanBias',[v.structFanBias]);
  if(v.structFan>0&&uploadFan){const {axes,profiles}=fanData(v,v.structFlowPhase*Math.PI*2);uploadFan('uFanAxes',axes);uploadFan('uFanProfiles',profiles);}
  u('uStructureColor',[v.structCoreDark,v.structCoreRadius]);u('uLoopColor',[v.loopBands,v.loopBandCount,v.loopBandAxis]);
@@ -300,7 +313,8 @@ export function structureField(s,d,p){
 }
 function structureComponentField(v,d,p,component){
  const r=Math.hypot(...p),tau=Math.PI*2;
- const networkOnly=v.structWeaveVariation*v.structShell*v.structFibres*v.structWeft===1;
+ const branching=v.structWeaveBranching*v.structShell*v.structFibres*v.structWeft;
+ const networkOnly=branching===0&&v.structWeaveVariation*v.structShell*v.structFibres*v.structWeft===1;
  const thickness=v.structThickness*(1-v.structTaper*.85*Math.min(1,Math.hypot(p[0],p[1])));
  let midSurface=d+thickness*.5;
  // Every rib, porous saddle and terminal cup lies inside this radial band.
@@ -325,8 +339,9 @@ function structureComponentField(v,d,p,component){
   d=baseline+(fanField(v,p,phase,component)-baseline)*v.structFan;
   midSurface+=(d-midSurface)*v.structFan;
  }
+ const sourceField=d;
  if(v.structShell>0)d=Math.max(d,-d-thickness-(1-thickness)*(1-v.structShell));
- if(v.structFibres>0){
+ if(v.structFibres>0&&branching<1){
   const width=1+(v.structThreadWidth-1)*v.structFibres;
   if(!networkOnly){
    let scaleA=1,scaleB=1;
@@ -378,6 +393,7 @@ function structureComponentField(v,d,p,component){
    d+=(Math.min(d,membrane)-d)*Math.min(1,1.45*web)*v.structShell*v.structWeft*v.structFibres;
   }
  }
+ if(branching>0){const branchField=weaveNetworkField(v,sourceField,p,thickness);d=branching===1?branchField:d+(branchField-d)*branching;}
  if(v.structSlices>0)d=Math.max(d,(Math.abs(Math.sin(p[2]*v.structSliceCount*Math.PI)) -(1+(v.structSliceWidth-1)*v.structSlices))/ (v.structSliceCount*Math.PI));
  const separation=v.structRadial*(1-v.structFan);
  if(separation>0)d=Math.max(d,(Math.abs(Math.sin(phi*v.structPetalCount*.5))-(1+(v.structPetalWidth-1)*separation))*Math.hypot(p[0],p[1])/v.structPetalCount);
@@ -408,6 +424,7 @@ uniform vec4 uStructureA,uStructureB,uStructureC,uStructureD,uStructureE,uStruct
 uniform vec2 uStructureColor;
 uniform vec4 uStructureH;
 uniform vec3 uWeaveGrowth;
+ ${WEAVE_NETWORK_GLSL}
 uniform float uStructureFan,uFanBias;
 uniform vec4 uLoopA,uLoopB;
 uniform vec3 uLoopColor;
@@ -557,8 +574,11 @@ vec3 fanGuidePoint(vec2 uv,float normalOffset,int id){return fanGuidePoint(uv,no
 
 #endif
 float structureComponentField(float d,vec3 p){
- float r=length(p);bool networkOnly=uStructureH.y*uStructureA.x*uStructureA.z*uStructureA.w==1.;
+ float branching=uWeaveNetwork.x*uStructureA.x*uStructureA.z*uStructureA.w;
+ float r=length(p),phi=atan(p.y,p.x);
  float thickness=uStructureA.y*(1.-uStructureH.x*.85*min(1.,length(p.xy))),midSurface=d+thickness*.5;
+#ifndef WEAVE_NETWORK_ONLY
+ bool networkOnly=branching==0.&&uStructureH.y*uStructureA.x*uStructureA.z*uStructureA.w==1.;
  if(networkOnly&&uStructureFan==0.){
   float sprouts=0.,web=0.;
 #ifdef WEAVE_DETAIL
@@ -570,20 +590,23 @@ float structureComponentField(float d,vec3 p){
   float empty=max(lower-midSurface,midSurface-upper);
   if(empty>.025)return empty*.45;
  }
- float phi=atan(p.y,p.x),theta=acos(clamp(p.z/max(r,.000001),-1.,1.)),a=phi*uStructureB.x,b=theta*uStructureB.x;
+ float theta=acos(clamp(p.z/max(r,.000001),-1.,1.)),a=phi*uStructureB.x,b=theta*uStructureB.x;
  float variation=uStructureH.y*sin(theta);
  if(variation>0.&&!networkOnly){
   a+=variation*(2.2*sin(4.*phi+2.3*sin(theta*6.))+1.12*sin(13.*phi-theta*7.));
   b+=variation*(1.9*sin(5.*phi-theta*3.)+1.26*sin(11.*phi+theta*8.));
  }
+#endif
 #ifdef FAN_FIELD
  if(uStructureFan>0.){
   d=mix(d,fanField(p),uStructureFan);
   midSurface=mix(midSurface,d,uStructureFan);
  }
 #endif
+ float sourceField=d;
  if(uStructureA.x>0.)d=max(d,-d-thickness-(1.-thickness)*(1.-uStructureA.x));
- if(uStructureA.z>0.){
+#ifndef WEAVE_NETWORK_ONLY
+ if(uStructureA.z>0.&&branching<1.){
   float width=mix(1.,uStructureB.y,uStructureA.z);
   if(!networkOnly){
    float scaleA=1.,scaleB=1.;
@@ -640,6 +663,10 @@ float structureComponentField(float d,vec3 p){
    d=mix(d,min(d,membrane),min(1.,1.45*web)*uStructureA.x*uStructureA.w*uStructureA.z);
   }
  }
+#endif
+#if defined(WEAVE_DETAIL) && !defined(WEAVE_BANDS_ONLY)
+ if(branching>0.)d=mix(d,weaveNetworkField(sourceField,p,thickness),branching);
+#endif
  if(uStructureB.w>0.)d=max(d,(abs(sin(p.z*uStructureC.x*3.14159265359))-mix(1.,uStructureC.y,uStructureB.w))/(uStructureC.x*3.14159265359));
  float separation=uStructureC.z*(1.-uStructureFan);
  if(separation>0.)d=max(d,(abs(sin(phi*uStructureC.w*.5))-mix(1.,uStructureD.x,separation))*length(p.xy)/uStructureC.w);
@@ -668,7 +695,7 @@ export function structurePanel(tab,s,{slider,details,section}){
  const sliders=keys=>keys.map(k=>slider(k)).join('');
  if(tab==='shape')return filamentPanel(tab,s,{slider,details})+ details('Curve toroidali e nodi',sliders(['loopAmount','loopRadius','loopTube','loopKnot','loopTurns','loopFlat','loopTwist','loopWave'])+'<p class="help">Apertura 0 mantiene la forma iniziale; 1 la trasforma in un anello. Intreccio separa il percorso. Avvolgimenti aumenta le ripiegature del nodo. Appiattimento e torsione modellano il nastro. Spessore elevato può unire i passaggi del nodo.</p>')+section('Proprietà',(s.structureOriginal?'<p class="help">La struttura precedente è stata adattata alle proprietà comuni. Il risultato può cambiare; i dati originali sono conservati nel preset.</p><button class="quiet" data-structure-original="true">Scarica anche il preset originale</button>':'')+'<p class="help">Combina le proprietà sulla forma attuale. Profilo, ritagli e materia restano attivi.</p>')
  +details('Guscio e spessore',sliders(['structShell','structThickness','structTaper']))
- +details('Reticolo di fibre',sliders(['structFibres','structWeft','structDensity','structThreadWidth','structWeave','structWeaveVariation','structWeaveNodes','structWeaveMembrane'])+details('Crescita del reticolo',sliders(['structWeaveGrowth','structWeaveCup'])+'<p class="help">Gli steli crescono dalle giunzioni. L’apertura svuota le punte. Per animarli, usa le loro tracce in Movimento.</p>')+'<p class="help">Separazione apre gli spazi fra i fili. Tessitura aggiunge i fili trasversali. Irregolarità curva i fili e Rilievo ingrossa le giunzioni. Lo svuotamento limita la trama alla pelle.</p>')
+ +details('Reticolo di fibre',sliders(['structFibres','structWeft','structWeaveBranching'])+details('Trama e giunzioni',sliders(['structDensity','structThreadWidth','structWeave','structWeaveVariation','structWeaveNodes','structWeaveMembrane','structWeaveFinesse']))+details('Steli e coppe',sliders(['structWeaveGrowth','structWeaveReach','structWeaveRelease','structWeaveCup'])+'<p class="help">I noduli crescono dalle giunzioni. Puoi far ritirare i ponti mentre gli steli crescono e le coppe si aprono.</p>')+'<p class="help">Svuotamento, fibre e tessitura aprono la forma. La ramificazione modifica i ponti e le giunzioni.</p>')
  +details('Suddivisione radiale e strati',sliders(['structFan','structFanBias','structScallop','structPetalCount','structRadial','structPetalWidth','structSlices','structSliceCount','structSliceWidth','structLayers','structLayerCount','structLayerWidth'])+'<p class="help">Lamine curve apre la forma in fogli sovrapposti. Larghezza, sfasamento e arricciamento ne cambiano i lembi. Gli strati interni diventano visibili con trasparenza o ritagli.</p>')
  +details('Piegatura e curvatura',sliders(['structGrowth','structCurl','structSpiral','structStagger','structFold','structFoldCount','structRuffle'])+'<p class="help">La posa e la sua animazione si regolano in Movimento. Trasparenza e rifrazione sono in Materia.</p>');
  if(tab==='color')return filamentPanel(tab,s,{slider,details})+ details('Fasce dell’anello',sliders(['loopBands','loopBandCount','loopBandAxis'])+'<p class="help">L’orientamento passa da fasce trasversali a strisce che seguono il percorso. Aumenta Apertura ad anello in Forma.</p>')+details('Nucleo scuro',sliders(['structCoreDark','structCoreRadius'])+(s.engine==='particles'?'<p class="help">Scurisce granelli e fili vicino all’asse centrale della forma, anche con pellicola e riflessi attivi. Estensione regola l’area; non aggiunge una sfera piena fra i granelli.</p>':''));

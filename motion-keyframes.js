@@ -3,7 +3,8 @@ export const MAX_MOTION_POINTS = 48;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const wrap = (value, period) => value - Math.floor((value + period/2)/period)*period;
 const parameters = new Set(['scale','positionX','positionY','rotateX','rotateY','rotateZ','stretchX','stretchY','stretchZ',
- 'pBreath','pSignal','pPropagation','pOpening','pTravel','pVortex','exposure']);
+ 'pBreath','pSignal','pPropagation','pOpening','pTravel','pVortex','exposure','transparency','roughness','focusBlur','focusDepth',
+ 'structWeaveBranching','structWeaveNodes','structWeaveMembrane','structWeaveFinesse','structWeaveGrowth','structWeaveReach','structWeaveRelease','structWeaveCup']);
 
 export const supportsMotionPoints = key => parameters.has(key);
 export const isMotionAngle = key => ['rotateX','rotateY','rotateZ'].includes(key);

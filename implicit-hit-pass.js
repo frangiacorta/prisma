@@ -25,6 +25,9 @@ void main(){
  bool previousValid=false;
  for(int step=0;step<int(uHitBudget.x);step++){
   if(t>end||layer>=uHitCount)break;
+#ifdef WEAVE_HIT_TAG
+  weaveSurface=0.;
+#endif
   float distance=field(samplePoint);
   if(mode==0){
    closest=min(closest,abs(distance));
@@ -72,7 +75,15 @@ void main(){
    // A near-zero distance alone is insufficient: a shallow field can stay
    // in that tolerance band for many steps on the same sheet. Confirm an
    // actual interior, then ignore all candidates until its next exit.
-   if(distance<-epsilon*.1){hits[layer]=vec4(entryNormal,hitT);layer++;awaitExit=true;sawInside=true;}
+   if(distance<-epsilon*.1){
+    // The length carries the terminal coverage. The material normalizes
+    // the direction again before shading the same geometric intersection.
+    float material=1.;
+#ifdef WEAVE_HIT_TAG
+    material+=weaveSurface;
+#endif
+    hits[layer]=vec4(entryNormal*material,hitT);layer++;awaitExit=true;sawInside=true;
+   }
    rejectUntil=t+epsilon*3.;previousValid=false;mode=0;samplePoint=origin+direction*t;
   }
  }

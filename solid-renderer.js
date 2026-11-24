@@ -1,15 +1,15 @@
-import {ImplicitRayStatus} from './implicit-ray-status.js?v=79c81404468e';
-import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=79c81404468e';
-import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=79c81404468e';
-import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=79c81404468e';
-import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=79c81404468e';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=79c81404468e';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=79c81404468e';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=79c81404468e';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=79c81404468e';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=79c81404468e';
-import {META} from './model.js?v=79c81404468e';
-import {hasMotionPoints,isMotionAngle,motionPointOffset,motionPointValue} from './motion-keyframes.js?v=79c81404468e';
+import {ImplicitRayStatus} from './implicit-ray-status.js?v=de5c2d2312c1';
+import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=de5c2d2312c1';
+import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=de5c2d2312c1';
+import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=de5c2d2312c1';
+import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=de5c2d2312c1';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=de5c2d2312c1';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=de5c2d2312c1';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=de5c2d2312c1';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=de5c2d2312c1';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=de5c2d2312c1';
+import {META} from './model.js?v=de5c2d2312c1';
+import {hasMotionPoints,isMotionAngle,motionPointOffset,motionPointValue} from './motion-keyframes.js?v=de5c2d2312c1';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -56,7 +56,7 @@ vec3 coatingContrast(vec3 film){
 `;
 const TAU=Math.PI*2;
 const CELLULAR_LIMITS=Object.fromEntries(Object.entries(CELLULAR_META).map(([key,m])=>[key,m.slice(1,3)]));
-const EXTRA_MOTION_LIMITS=Object.fromEntries(['pBreath','pSignal','pPropagation','pVortex','pTravel','stretchX','stretchY','stretchZ','exposure'].map(key=>[key,META[key].slice(1,3)]));
+const EXTRA_MOTION_LIMITS=Object.fromEntries(['pBreath','pSignal','pPropagation','pVortex','pTravel','stretchX','stretchY','stretchZ','exposure','focusBlur','focusDepth'].map(key=>[key,META[key].slice(1,3)]));
 const MOTION_LIMITS={pOpening:[0,1],pThickness:[.02,1],pLobeDepth:[0,1],lobeAmount:[0,.4],filmIslands:[0,1],finishPaletteMap:[0,1],finishPaletteScale:[0,4],finishPaletteOffset:[-1,1],finishPaletteBlur:[0,1],finishPrintNegative:[0,1],sceneGrains:[0,1],grainDispersal:[0,1],...Object.fromEntries(Object.entries(FRACTAL_META).map(([key,m])=>[key,m.slice(1,3)])),...Object.fromEntries(Object.entries(STRUCTURE_META).map(([k,v])=>[k,v.slice(1,3)])),pCellAmount:[0,1],pCellAspect:[-1,1],pCellRelief:[0,1],pCellLight:[-1,1],pVeilStyle:[0,2],pVeilMorph:[0,1],pVeilSpread:[0,1],volume:[.08,1.5],deform:[0,.75],twist:[-2.5,2.5],waves:[0,.4],hole:[0,.95],cut:[0,1.6],scale:FIGURE_SCALE,positionX:[-4.5,4.5],positionY:[-4.5,4.5],iridescence:[0,1],roughness:[0,1],transparency:[0,1],petalOpen:[0,1],petalCurl:[-1,1],petalInflate:[0,1],petalSharp:[0,1],petalBlend:[0,1],petalRoot:[0,1],petalRandom:[0,1],petalGrowth:[0,1],petalWeave:[0,1],petalWander:[0,1],petalCoil:[-1,1],petalReentry:[0,1],petalKnots:[0,1],petalRidges:[0,1],petalDisorder:[0,1],stemBend:[-1,1]};
 function motionCycles(value,source){const n=Math.max(.1,Number(value)||1);return source?.perfectLoop===false?n:Math.max(1,Math.round(n));}
 export function motionClock(t,phase,source){
@@ -746,6 +746,9 @@ vec4 materialRelief(vec3 local,vec3 geometricNormal,vec3 rd){
  gradient*=min(1.,1.05/max(.000001,length(gradient)))*smoothstep(.035,.28,view);
  return vec4(gradient,roughening);
 }
+#ifdef WEAVE_HIT_TAG
+float weaveLitTip;
+#endif
 vec3 reliefNormal(vec3 original,vec3 geometricNormal,vec3 rd,vec3 gradient){
  vec3 n=normalize(original-gradient);
  if(dot(reflect(rd,n),geometricNormal)<.001)n=normalize(mix(n,geometricNormal,.75));
@@ -763,6 +766,10 @@ vec3 reliefNormal(vec3 original,vec3 geometricNormal,vec3 rd,vec3 gradient){
 MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometricNormal,vec3 rd,bool hit,out float issue){
  issue=0.;vec3 local=transform(p),n=geometricNormal;
  float fibreWeight=0.,fibreDensity=1.;vec3 fibreTangent=vec3(0.,1.,0.);
+ float branches=0.,weaveTip=0.,weaveThroat=0.,weaveRelease=0.,weaveStriae=0.,weaveSpeckle=0.;
+ #if defined(WEAVE_DETAIL) && !defined(WEAVE_BANDS_ONLY)
+ branches=uWeaveNetwork.x*uStructureA.x*uStructureA.z*uStructureA.w;
+ #endif
  float textureFilter=1.-smoothstep(.28,.65,84.*3.4/min(uResolution.x,uResolution.y)/(2.*PI));
  #ifdef FAN_FIELD
  if(uStructureFan>0.&&uTexture.z>.001){
@@ -789,13 +796,50 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
   n=normalize(n+mix(genericBump,fibre*uTexture.z*.014*antialias*ripple,uStructureFan));
  }else
  #endif
- if(uTexture.z>.001)n=normalize(n+vec3(sin(local.y*84.),cos(local.x*71.),sin(local.z*69.))*uTexture.z*.045*textureFilter);
+ if(uTexture.z>.001)n=normalize(n+vec3(sin(local.y*84.),cos(local.x*71.),sin(local.z*69.))*uTexture.z*.045*textureFilter*(1.-branches*.96));
  float localRoughness=uMat.w,coatRoughness=uCoat.y;
  bool reliefActive=dot(uMaterialLayers,vec4(1.))>.000001||uGrowthShape.x>0.;
  if(reliefActive){vec4 detail=materialRelief(local,geometricNormal,rd);n=reliefNormal(n,geometricNormal,rd,detail.xyz);localRoughness=clamp(localRoughness+detail.w*(1.-localRoughness),0.,1.);coatRoughness=clamp(coatRoughness+detail.w*.25,0.,1.);}
  float facing=max(dot(n,-rd),0.),pos=dot(local,vec3(cos(uGradient.x),sin(uGradient.x),.35))*uGradient.y*.3+uGradient.z;
  vec3 base=palette(pos),specular=environment(reflect(rd,n),p,localRoughness);
  #ifdef WEAVE_DETAIL
+ #ifndef WEAVE_BANDS_ONLY
+ if(branches>.0001){
+  float release=uWeaveNetwork.z,edge=pow(1.-facing,2.1);
+  vec3 domain=structureWarp(local/axes());
+  vec2 uv=weaveNetworkChart(domain,uStructureF.z*6.28318530718);
+  float frequency=104.*uWeaveNetwork.y;
+  float footprint=4.8/(min(uResolution.x,uResolution.y)*max(.001,uFrame.x*min(axes().x,axes().y)));
+  float antialias=1.-smoothstep(.65,2.5,frequency*footprint);
+  float drift=1.21*sin(uv.y*20.+uv.x*7.)+.62*sin(uv.y*55.-uv.x*9.);
+  float fibre=pow(.5+.5*cos(uv.x*frequency+drift),6.);
+  float secondary=pow(.5+.5*cos((uv.x*.75+uv.y*.64)*frequency-drift),8.);
+  float scatter=branches*uTexture.z*(.25+.75*max(uWeaveGrowth.z,release));
+  #ifdef WEAVE_HIT_TAG
+  weaveTip=step(.75,weaveLitTip);
+  weaveThroat=weaveTip*pow(1.-clamp(weaveLitTip-1.,0.,1.),3.);
+  #endif
+  weaveRelease=release;
+  float spokes=floor(21.+13.*uWeaveNetwork.y);
+  float fine=(1.-smoothstep(.8,2.9,spokes*footprint*4.9))*smoothstep(.10,.54,length(geometricNormal.xy));
+  float spoke=.19+fine*(pow(.5+.5*cos(atan(geometricNormal.y,geometricNormal.x)*spokes+2.3*sin(domain.y*13.)),5.)-.19);
+  float striae=mix(mix(.21,max(fibre,.56*secondary),antialias),spoke,weaveTip);
+  vec3 grains=domain*139.;
+  vec3 cell=floor(grains),offset=fract(grains)-.5;
+  float random=fract(sin(dot(cell,vec3(127.1,311.7,147.39)))*43758.5453);
+  float cluster=smoothstep(.48,.83,random);
+  float grainAA=1.-smoothstep(.42,1.39,footprint*139.);
+  weaveSpeckle=cluster*exp(-dot(offset,offset)*18.)*grainAA;
+  weaveStriae=striae;
+  vec3 inner=uInternalColor/max(.18,dot(uInternalColor,vec3(.2126,.7152,.0722)));
+  base*=mix(vec3(1.),clamp(inner,vec3(.4),vec3(1.8)),branches*release*.61);
+  base*=1.+scatter*(striae*.17-.023)*(1.-weaveTip*(1.-release));
+  specular+=base*scatter*(striae*.048+weaveSpeckle*.042+release*edge*.24);
+  fibreWeight=max(fibreWeight,scatter*(.20+.31*release)*(1.-.75*weaveTip));
+  fibreDensity=mix(fibreDensity,.72+.28*striae,scatter);
+  fibreTangent.yz=rot(-uOther.y)*fibreTangent.yz;fibreTangent.xz=rot(-uOther.x)*fibreTangent.xz;fibreTangent.xy=rot(-uExtraShape3.z)*fibreTangent.xy;
+ }else
+ #endif
  if(uWeaveGrowth.z*uTexture.z>.0001){
   vec3 samplePoint=local/axes();
   float frequency=220.+34.*uMaterialDetail.y;
@@ -821,6 +865,8 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  vec3 diffuse=base*diffuseLight*(1.-uMat.z*(1.-uMat.x));
  if(uTransport.x>.001)diffuse=mix(diffuse,subsurfaceLight(p,geometricNormal,base),uTransport.x);
  float transmission=clamp(uMat.x,0.,1.);
+ transmission*=1.-branches*weaveTip*(1.-weaveRelease)*.61;
+ transmission+=transmission*(1.-transmission)*branches*weaveTip*smoothstep(.42,.85,weaveRelease)*pow(facing,.7)*.96;
  transmission=1.-(1.-transmission)*mix(1.,fibreDensity,fibreWeight*transmission);
  // A grazing view crosses a longer path through the same fibres. Use that
  // optical depth for both transmitted light and diffuse fibre visibility.
@@ -853,6 +899,10 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
   }
  }
  vec3 below=(vec3(1.)-dielectricF)*diffuse*(1.-transmission)+glass.rgb*transmission;
+ float wetRim=pow(1.-facing,1.75);
+ float veil=branches*weaveRelease*transmission;
+ vec3 fibreLight=base*(vec3(.23,.29,.35)+diffuseLight*.13);
+ below+=fibreLight*veil*(wetRim*(.48+.72*weaveTip)+weaveStriae*.22+weaveSpeckle*.55+weaveThroat*.82)*(.18+.82*uTexture.z);
  float alpha=(1.-transmission)+glass.a*transmission;
  vec3 surfaceF=dielectricF*max(.1,uSurface.z);
  surfaceF*=1.-clamp(uModern.x,0.,1.);
@@ -1438,13 +1488,17 @@ function crownRotationReusable(s){
  return !(s.baseForm>0)&&!['deform','asymmetry','waves','roundness','bendX','bendY','lobeAmount','pinch','hole','cut','stemAmount'].some(k=>Math.abs(s[k]||0)>.000001||s.motions?.[k]?.enabled&&(s.motions[k].amplitude||0)>0);
 }
 function motionInterval(s,key){
- const base=s[key]??0,t=s.motions?.[key],amplitude=t?.enabled?(t.amplitude||0)*(s.motion??.3)/.3:0,limits=MOTION_LIMITS[key]||[-Infinity,Infinity];
+ const base=s[key]??0,t=s.motions?.[key],amplitude=t?.enabled?(t.amplitude||0)*(s.motion??.3)/.3:0,limits=MOTION_LIMITS[key]||EXTRA_MOTION_LIMITS[key]||[-Infinity,Infinity];
+ if(hasMotionPoints(t)&&META[key]){
+  const values=t.points.map(point=>motionPointValue(key,base,point.offset,META[key]));
+  return [Math.min(...values),Math.max(...values)];
+ }
  return [Math.max(limits[0],base-amplitude),Math.min(limits[1],base+amplitude)];
 }
 function previewPlan(source){
  const reactionGeometry=growthGeometryEnabled(source),reactionKeys=reactionGeometry?GROWTH_GEOMETRY_KEYS:[];
  const rotateCrown=!structureMayChange(source)&&crownRotationReusable(source),reuseTwist=!structureMayChange(source),keys=FIELD_KEYS.concat(GROWTH_KEYS,reactionKeys).filter(k=>(reuseTwist?k!=='twist':true)&&!(rotateCrown&&k==='petalPhase'));
- const cellular=cellularMayChange(source),moving=keys.filter(k=>(cellular||!CELLULAR_FIELD_KEYS.includes(k))&&source.motions?.[k]?.enabled&&((source.motions[k].amplitude||0)>0||CELLULAR_PHASES.includes(k)&&source.motions[k].mode==='cycle')),dynamic=moving.length>0||(reactionGeometry&&source.growthFlow>0);
+ const cellular=cellularMayChange(source),moving=keys.filter(k=>(cellular||!CELLULAR_FIELD_KEYS.includes(k))&&source.motions?.[k]?.enabled&&((source.motions[k].amplitude||0)>0||hasMotionPoints(source.motions[k])||CELLULAR_PHASES.includes(k)&&source.motions[k].mode==='cycle')),dynamic=moving.length>0||(reactionGeometry&&source.growthFlow>0);
  const cullSafe=!(source.edge>0||source.glow>0||motionInterval(source,'volume')[0]<.2);
  const descriptor=keys.map(k=>[source[k]??0,source.motions?.[k]?.enabled?JSON.stringify(source.motions[k]):'off'].join(':')).join('|')+'|'+(source.motion??.3)+'|'+rotateCrown+'|'+cullSafe+'|'+(source.perfectLoop!==false);
  const fractal=fractalMayChange(source);
@@ -1807,7 +1861,7 @@ const GROWTH_GEOMETRY=1<<31;
 const fanVariant=source=>motionInterval(source,'structFan')[1]>.000001?FAN_FIELD:0;
 const raisedWeave=source=>motionInterval(source,'structWeaveGrowth')[1]>.000001;
 const growthVariant=source=>source.renderVersion>=2&&growthGeometryEnabled(source)?GROWTH_GEOMETRY:0;
-const weaveVariant=source=>raisedWeave(source)||motionInterval(source,'structWeaveMembrane')[1]>.000001||
+const weaveVariant=source=>raisedWeave(source)||motionInterval(source,'structWeaveBranching')[1]>.000001||motionInterval(source,'structWeaveMembrane')[1]>.000001||
  motionInterval(source,'structWeaveNodes')[1]>.000001&&motionInterval(source,'structWeaveVariation')[1]>.000001?WEAVE_DETAIL:0;
 function bakeVariant(source){
  const petals=motionInterval(source,'petalAmount')[1]>.000001,stem=motionInterval(source,'stemAmount')[1]>.000001;
@@ -1942,8 +1996,9 @@ function withFractalMaterialDomain(source,sculpt){
  }
  return shaderFunction(source,'fractalMaterialPoint','vec3 fractalMaterialPoint(vec3 world){'+mapping+FRACTAL_MATERIAL_DOMAIN+'return p;}');
 }
-function variantSource(key,floatAtlas=false){
- const fields=(key&FAN_FIELD?'\n#define FAN_FIELD 1':'')+(key&GROWTH_GEOMETRY?'\n#define GROWTH_GEOMETRY 1':'')+(key&WEAVE_DETAIL?'\n#define WEAVE_DETAIL 1':'');
+function variantSource(key,floatAtlas=false,weave='mixed'){
+ const fields=(key&FAN_FIELD?'\n#define FAN_FIELD 1':'')+(key&GROWTH_GEOMETRY?'\n#define GROWTH_GEOMETRY 1':'')+(key&WEAVE_DETAIL?'\n#define WEAVE_DETAIL 1':'')+
+  (weave==='network'?'\n#define WEAVE_NETWORK_ONLY 1':weave==='bands'?'\n#define WEAVE_BANDS_ONLY 1':'');
  const flags={ANALYTIC_SHAPE:32,THIN_SHELL_ENABLED:16,CROWN_ENABLED:64,FLOWER_ENABLED:128,LEGACY_HEDGE_ENABLED:256,ORGANIC_ENABLED:512,STEM_ENABLED:1024,TRANSMISSION_ENABLED:2048,PREVIEW_ENABLED:4096,VOLUME_ENABLED:1,SSS_ENABLED:2,DISPERSION_ENABLED:4,ROOTS_ENABLED:32768,STRUCTURE_ENABLED:65536};
  let defines='#define FLOAT_ATLAS '+ +floatAtlas+'\n#define FRACTAL_ENABLED '+ +!!(key&FRACTAL_ENABLED)+'\n#define CELLULAR_GEOMETRY '+ +(!!(key&CELLULAR_ENABLED))+'\n#define BASE_FORM_KIND '+(key&(ATLAS_PREVIEW|ATLAS_BAKE)?-1:(Math.floor(key/131072)&7))+'\n'+Object.entries(flags).map(([name,bit])=>'#define '+name+' '+ +!!(key&bit)).join('\n');
  if(key&ATLAS_BAKE)return BAKE_FRAG.replace('#version 300 es','#version 300 es\n'+defines+fields);
@@ -2016,8 +2071,16 @@ export function implicitGeometryKey(source){
 }
 export function independentFanMode(source){return !!fanVariant(source)&&!fractalMayChange(source);}
 function independentFanCompact(source){return compactFan(source)&&!['structShell','structRadial'].some(key=>materialMayUse(source,key));}
+function weaveKernel(source){
+ const ranges=['structWeaveBranching','structShell','structFibres','structWeft'].map(key=>motionInterval(source,key));
+ if(ranges.some(([,max])=>max<=0))return 'bands';
+ return ranges.every(([min])=>min===1)?'network':'mixed';
+}
+const weaveHitTag=(source,independentFan)=>weaveKernel(source)!=='bands'&&!independentFan&&!fractalMayChange(source);
+const addWeaveHitTag=(shader)=>shader.replace('#version 300 es','#version 300 es\n#define WEAVE_HIT_TAG 1');
 export function implicitGeometrySource(source,{main,floatAtlas=true,independentFan=false}={}){
- let shader=variantSource(implicitGeometryKey(source),floatAtlas);
+ let shader=variantSource(implicitGeometryKey(source),floatAtlas,weaveKernel(source));
+ if(main===IMPLICIT_HIT_MAIN&&weaveHitTag(source,independentFan))shader=addWeaveHitTag(shader);
  if(independentFan)shader=independentFanGeometry(shader,independentFanCompact(source));
  return main?shaderFunction(shader,'main',main):shader;
 }
@@ -2029,10 +2092,11 @@ function cellSurfaceMode(source){
  return cellularMayChange(source)&&!structureMayChange(source)&&!growthGeometryEnabled(source)&&!fractalMayChange(source)&&
   !['petalAmount','stemAmount'].some(key=>motionInterval(source,key)[1]>.000001);
 }
-function implicitMaterialKey(source){return implicitGeometryKey(source)+':'+IMPLICIT_MATERIAL_SWITCHES.map(key=>+!!materialMayUse(source,key)).join('')+':'+Number(independentFanMode(source));}
+function implicitMaterialKey(source){return implicitGeometryKey(source)+':'+IMPLICIT_MATERIAL_SWITCHES.map(key=>+!!materialMayUse(source,key)).join('')+':'+Number(independentFanMode(source))+':'+weaveKernel(source);}
 export function implicitSurfaceSource(source,{accumulate=false,independentFan=false}={}){
  const transmitting=motionInterval(source,'transparency')[1]>.0001;
- let shader=variantSource(implicitGeometryKey(source)|16|(fractalMayChange(source)&&!transmitting?0:2048));
+ let shader=variantSource(implicitGeometryKey(source)|16|(fractalMayChange(source)&&!transmitting?0:2048),false,weaveKernel(source));
+ if(accumulate&&weaveHitTag(source,independentFan))shader=addWeaveHitTag(shader);
  if(independentFan)shader=independentFanMaterialPoint(shader);
  if(!cellSurfaceMode(source))shader=compactFilmOptics(shader);
  // Compile only the material operators that can run anywhere in this scene's
@@ -2139,7 +2203,7 @@ export class Renderer{
  }
  prepareImplicit(source,phase,options){
   const key=implicitGeometryKey(source),g=this.gl,independentFan=independentFanMode(source);
-  const family=key+':'+(independentFan?(independentFanCompact(source)?'fan-compact':'fan-complete'):'union');
+  const family=key+':'+(independentFan?(independentFanCompact(source)?'fan-compact':'fan-complete'):'union')+':'+weaveKernel(source);
   if(this.implicitFamily!==family){
    this.implicitHit?.dispose();this.implicitHit=new ImplicitHitPass(g,implicitGeometrySource(source,{main:independentFan?INDEPENDENT_FAN_HIT_MAIN:fractalMayChange(source)?FRACTAL_HIT_MAIN:IMPLICIT_HIT_MAIN,independentFan}));
    this.implicitKey=key;this.implicitFamily=family;
@@ -2204,7 +2268,15 @@ export class Renderer{
   // Front-to-back transport carries the accumulated radiance and remaining
   // transmission between batches. Geometry never truncates after four sheets.
   const singleEntry=cellSurfaceMode(source)||s.transparency===0;
-  const independent=independentFanMode(source),batches=independent?256:singleEntry?1:Math.max(4,Math.ceil(((s.structFan||0)>0?2*((s.structPetalCount||12)+2):16)/4));
+  const independent=independentFanMode(source),network=weaveKernel(source)==='network';
+  const layers=Math.max(4,Math.ceil(((s.structFan||0)>0?2*((s.structPetalCount||12)+2):16)/4));
+  // For a reticle the tip transmission can increase only by this fraction.
+  // Skip passes whose largest possible contribution has already dropped
+  // below the imager's precision. The transparent cups keep all layers.
+  const release=s.structWeaveRelease||0;
+  const through=s.transparency+(release>.42?s.transparency*(1-s.transparency)*.96:0);
+  const networkBatches=through>=.99999?layers:Math.max(1,Math.ceil(Math.log(.00025)/Math.log(Math.max(.001,through))/4));
+  const batches=independent?256:singleEntry?1:network?Math.min(layers,networkBatches):layers;
   const continuationStarted=performance.now();this.implicitContinuationStats=[];this.implicitStatusReadbackMs=0;
   const sheetScale=s.scale*Math.min(s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ));
   const featureSize=(s.structFan||0)>0?sheetScale*s.structThickness*.06:(s.structShell||0)>0?sheetScale*s.structThickness*.15:(s.petalAmount||0)>0?sheetScale*Math.max(.0015,(s.petalWidth??.24)*(.65+(s.petalInflate??.6)*.55)*(1-(s.petalSharp||0)*.58)*(.9*(1-(s.petalSharp||0))+.008*(s.petalSharp||0)))*.5:Infinity;
@@ -2230,7 +2302,7 @@ export class Renderer{
       previous=hits;
      }
     }else{
-     hits=this.implicitHit.draw(width,height,{startTexture:previousHit,maxLayers:singleEntry?1:4,budget:1800,safety:.32,epsilon:.000025*s.scale,normalOffset:growthNormalOffset(s),featureSize,jitter:options.jitter||[0,0],
+     hits=this.implicitHit.draw(width,height,{startTexture:previousHit,maxLayers:singleEntry?1:4,budget:1800,safety:network?.60:.32,epsilon:.000025*s.scale,normalOffset:growthNormalOffset(s),featureSize,jitter:options.jitter||[0,0],
       upload:(gl,locations,program)=>{this.program=program;this.locations=locations;this.bindFrame(source,s,phase,width,height,options,key,false);if(independent){gl.activeTexture(gl.TEXTURE14);gl.bindTexture(gl.TEXTURE_2D,last?.textures[1]||banks[0].textures[1]);gl.uniform1i(locations.uHitThrough,14);}}});
     }
     if(!hits)return false;

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-11-17",
+  "updated": "2026-11-24",
   "items": [
     {
       "id": "s01-01",
@@ -14765,7 +14765,7 @@
       "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Svuotamento, fibre, tessitura, lamelle, strati e deformazioni combinabili sulla stessa forma.",
+      "summary": "Rami portanti, ponti di microfibre, noduli e coppe crescono dalla stessa forma. Materia, luce e inquadratura sono regolabili.",
       "sources": [
         "https://frangiacorta.github.io/prisma/previews/tessuto-connesso.html"
       ],
@@ -14829,8 +14829,8 @@
         "fibre"
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
-      "result": "tessuto-connesso",
-      "where": "Forma → Costruzione → Reticolo di fibre",
+      "result": "reticolo-giunzioni",
+      "where": "Forma → Costruzione → Reticolo di fibre · Movimento → Struttura",
       "platform": "",
       "next": "",
       "keep": "",
@@ -14870,7 +14870,7 @@
         "Fedeltà alle reference e fluidità su telefono fisico da verificare con l’utente."
       ],
       "integration": "Proprietà combinabili sulla forma corrente; nessun selettore esclusivo di membrane, tessuti o veli in Forme.",
-      "resultVersion": "36",
+      "resultVersion": "101",
       "evidence": "reports/structure/source.json; reports/structure/source-ui.json; reports/structure/export.json",
       "checks": [
         "26 controlli con impatto sui pixel",
@@ -14878,8 +14878,8 @@
         "Passaggi intermedi continui, loop ripetibile, preset e dati originali conservati",
         "Interfaccia a 390 px e wallpaper autonomo verificati"
       ],
-      "resultPreview": "previews/structure-combinations-4s.mp4",
-      "resultDuration": 4,
+      "resultPreview": "previews/reticolo-giunzioni.mp4",
+      "resultDuration": 30,
       "remaining": [
         "Confronto visivo con le reference e feedback sul nuovo comportamento",
         "Prova delle combinazioni più fitte su telefono fisico"
@@ -14900,14 +14900,14 @@
       "engine": "solid",
       "procedure": {
         "name": "Reticolo sulla superficie",
-        "description": "In Forme il campo geometrico separa fili longitudinali e trasversali; in Particelle una superficie connessa usa vincoli di distanza.",
+        "description": "Un reticolo deformato segue il campo della forma. I rami e le terminazioni condividono gli ancoraggi durante il ritiro dei ponti.",
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/reticolo-giunzioni.prisma.json",
-      "compareNote": "Noduli, ponti porosi e steli con coppe crescono dalle stesse giunzioni in macro. Restano diversi la finezza delle fibre e il modo in cui il tessuto si allunga.",
+      "compareNote": "I noduli crescono dalle giunzioni, i ponti di microfibre si ritirano e le terminazioni cave si aprono. Il confronto in movimento copre la registrazione di 25,7 secondi. Restano differenze nella disposizione dei rami, nelle fibre più fini e nella luce dentro le coppe.",
       "comparisonRef": "s07-05",
-      "comparisonDate": "2026-11-16",
+      "comparisonDate": "2026-11-24",
       "comparisonOutcome": "parziale"
     },
     {
@@ -23806,7 +23806,7 @@
         }
       ],
       "capturedOn": "2026-10-29",
-      "duration": 23.0,
+      "duration": 23,
       "clip": "media/album-3d-ionized-study.mp4",
       "clipNote": "Estratto di studio ritagliato, senza audio.",
       "collection": "Album 3D",
@@ -24249,7 +24249,7 @@
         }
       ],
       "capturedOn": "2026-11-05",
-      "duration": 14.0,
+      "duration": 14,
       "clip": "media/album-3d-arco-luminoso-study.mp4",
       "clipNote": "Estratto di studio ritagliato, senza audio.",
       "collection": "Album 3D",

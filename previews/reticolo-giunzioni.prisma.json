@@ -1,8 +1,8 @@
 {
   "prismaProject": 2,
-  "name": "Reticolo con giunzioni",
-  "createdAt": "2026-11-16T07:43:39.289Z",
-  "exportedAt": "2026-11-16T07:43:39.289Z",
+  "name": "Reticolo di fibre · germinazione",
+  "createdAt": "2026-11-24T18:19:21.350Z",
+  "exportedAt": "2026-11-24T18:19:21.350Z",
   "state": {
     "dynAmount": 0,
     "dynMass": 1,
@@ -207,7 +207,7 @@
     "pRhythm": 0.6,
     "pPause": 0,
     "pSpeedSpread": 0.3,
-    "pTrailCount": 0,
+    "pTrailCount": 700,
     "pTrailLength": 0.085,
     "pTrailWidth": 0.55,
     "pTrailOpacity": 0.3,
@@ -227,16 +227,16 @@
     "pLighting": 0.65,
     "engine": "solid",
     "keepMotionSpeed": true,
-    "motionPeriod": 16,
-    "volume": 0.76,
+    "motionPeriod": 30,
+    "volume": 0.86,
     "stretchX": 1,
-    "stretchY": 0.8,
+    "stretchY": 1.06,
     "stretchZ": 1,
-    "deform": 0,
-    "asymmetry": 0,
+    "deform": 0.021,
+    "asymmetry": 0.036,
     "twist": 0,
-    "waves": 0,
-    "waveScale": 3,
+    "waves": 0.011,
+    "waveScale": 3.5,
     "hole": 0,
     "holeX": 0,
     "holeY": 0,
@@ -245,25 +245,24 @@
     "cutX": 0.7,
     "cutY": 0.1,
     "edge": 0,
-    "transparency": 0.52,
-    "refraction": 1.5,
+    "transparency": 0.38,
+    "refraction": 1.22,
     "thickness": 1,
     "metal": 0,
-    "roughness": 0.72,
-    "gloss": 0.14,
+    "roughness": 0.59,
+    "gloss": 0.31,
     "iridescence": 0,
-    "emission": 0.4,
+    "emission": 0.14,
     "palette": [
-      "#b7d9f2",
-      "#e9f7ff",
-      "#c4e3f8",
-      "#effaff"
+      "#ccd4dc",
+      "#e8f0f5",
+      "#eff2f5"
     ],
     "gradientAngle": 35,
     "gradientScale": 1,
     "gradientOffset": 0.1,
     "colorSoftness": 0.85,
-    "glow": 0.018,
+    "glow": 0,
     "grain": 0,
     "lightAngle": -35,
     "lightHeight": 40,
@@ -276,26 +275,29 @@
     "light2Power": 1.1,
     "light2Size": 0.45,
     "light2Color": "#b9a1ff",
-    "background": "#080d13",
-    "background2": "#02050a",
+    "background": "#06080c",
+    "background2": "#06080c",
     "bgMode": "solid",
     "bgAngle": 35,
-    "scale": 3.4439999999999995,
-    "positionX": 2.139125252875525,
-    "positionY": -1.3099103511058243,
-    "rotateX": 82,
-    "rotateY": 2.2,
+    "scale": 4.19324,
+    "positionX": 0.8387022222222222,
+    "positionY": 0.0948,
+    "rotateX": -0.7986666666666662,
+    "rotateY": 2.848888888888889,
     "animateRotation": false,
-    "animateShape": false,
+    "animateShape": true,
     "animateColor": false,
     "animateLight": false,
     "motion": 0.3,
-    "duration": 16,
+    "duration": 30,
     "speed": 1,
     "perfectLoop": true,
     "seed": 2408,
     "baseForm": 0,
     "grainDispersal": 0,
+    "grainMotion": true,
+    "grainMotionPhase": 0,
+    "grainMotionOffset": 0,
     "filLength": 0,
     "filCore": 1,
     "filCount": 18000,
@@ -340,17 +342,21 @@
     "loopBandCount": 6,
     "loopBandAxis": 0,
     "structShell": 1,
-    "structThickness": 0.085,
+    "structThickness": 0.103,
     "structFibres": 1,
     "structWeft": 1,
     "structDensity": 3,
-    "structThreadWidth": 0.24,
-    "structWeave": 0.008,
-    "structWeaveVariation": 1,
-    "structWeaveNodes": 1,
-    "structWeaveMembrane": 0.7,
-    "structWeaveGrowth": 0.48,
-    "structWeaveCup": 0.58,
+    "structThreadWidth": 0.34,
+    "structWeave": 0.004,
+    "structWeaveVariation": 0.33,
+    "structWeaveNodes": 0.86,
+    "structWeaveMembrane": 0.89,
+    "structWeaveGrowth": 0.22,
+    "structWeaveCup": 0,
+    "structWeaveBranching": 1,
+    "structWeaveFinesse": 1.61,
+    "structWeaveRelease": 0.02,
+    "structWeaveReach": 1.12,
     "structSlices": 0,
     "structSliceCount": 6,
     "structSliceWidth": 0.24,
@@ -363,12 +369,12 @@
     "structLayerCount": 3,
     "structLayerWidth": 0.22,
     "structGrowth": 0,
-    "structCurl": 0.025,
-    "structFold": 0.035,
-    "structFoldCount": 4,
+    "structCurl": 0,
+    "structFold": 0,
+    "structFoldCount": 5,
     "structBreath": 0,
     "structFlap": 0,
-    "structFlowPhase": 0.5,
+    "structFlowPhase": 0.05,
     "structDelay": 0.35,
     "structScallop": 0,
     "structSpiral": 0,
@@ -462,6 +468,16 @@
     "finishGlassMotion": 0,
     "finishGlassCycles": 1,
     "finishRegionGlass": true,
+    "finishPalette": false,
+    "finishPaletteMap": 1,
+    "finishPaletteScale": 1,
+    "finishPaletteOffset": 0,
+    "finishPaletteBlur": 0,
+    "finishPaletteColors": [
+      "#10131c",
+      "#697a9d",
+      "#f5eee5"
+    ],
     "finishScan": false,
     "finishScanMix": 1,
     "finishScanSpacing": 18,
@@ -487,7 +503,8 @@
       "warp",
       "glass",
       "feedback",
-      "scan"
+      "scan",
+      "palette"
     ],
     "finishEdge": false,
     "finishEdgeWidth": 2,
@@ -565,9 +582,9 @@
     "petalFlow": 0,
     "petalFlowPhase": 0,
     "petalOrbitPhase": 0,
-    "textureDepth": 0.06,
-    "textureScale": 5.6,
-    "textureOrganic": 0.95,
+    "textureDepth": 0.35,
+    "textureScale": 1,
+    "textureOrganic": 0.65,
     "textureAngle": 0,
     "textureWrinkles": 0,
     "textureFolds": 0,
@@ -620,29 +637,29 @@
     "rimRound": 0,
     "holeAspect": 1,
     "cutAspect": 1,
-    "rotateZ": -21,
+    "rotateZ": -9.600000000000001,
     "coat": 0,
     "coatRoughness": 0.06,
-    "fresnel": 1,
+    "fresnel": 1.14,
     "iridShift": 0,
     "iridScale": 1,
     "dispersion": 0,
-    "absorption": 0.06,
-    "tintStrength": 0.22,
+    "absorption": 0.031,
+    "tintStrength": 0.18,
     "anisotropy": 0,
     "anisotropyAngle": 0,
-    "surfaceTexture": 0.65,
+    "surfaceTexture": 0.86,
     "hollow": 0,
     "wallThickness": 1,
-    "translucency": 0.9,
-    "scattering": 0.4,
-    "scatterDirection": 0.2,
+    "translucency": 0.35,
+    "scattering": 0.05,
+    "scatterDirection": 0.25,
     "thinFilm": 0,
     "filmThickness": 420,
-    "subsurface": 0.82,
-    "sssRadius": 0.22,
-    "sssColor": "#d2eaff",
-    "exposure": 0.85,
+    "subsurface": 0,
+    "sssRadius": 0.55,
+    "sssColor": "#ffd0ac",
+    "exposure": -0.2925925925925926,
     "brightness": 0,
     "contrast": 1,
     "saturation": 1,
@@ -655,10 +672,118 @@
     "lensDistortion": 0,
     "grainSize": 1,
     "photoAll": false,
-    "focusBlur": 0.23,
-    "focusDepth": 1.95,
+    "focusBlur": 0.95,
+    "focusDepth": 3.65,
     "motions": {
+      "finishPaletteMap": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "finishPaletteScale": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "finishPaletteOffset": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "finishPaletteBlur": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "pOpening": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "pThickness": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "pLobeDepth": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "lobeAmount": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
       "finishPrintNegative": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "filmIslands": {
         "enabled": false,
         "amplitude": 0.2,
         "cycles": 1,
@@ -1175,16 +1300,16 @@
         "mode": "wave"
       },
       "structFlowPhase": {
-        "enabled": true,
-        "amplitude": 0.22,
+        "enabled": false,
+        "amplitude": 0.2,
         "cycles": 1,
-        "phase": 72,
+        "phase": 0,
         "direction": 1,
         "curve": "sine",
         "pace": 0,
         "pacePhase": 0,
         "hold": 0,
-        "mode": "wave"
+        "mode": "cycle"
       },
       "structScallop": {
         "enabled": false,
@@ -1234,11 +1359,283 @@
         "hold": 0,
         "mode": "wave"
       },
+      "structWeaveBranching": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "structWeaveNodes": {
+        "enabled": true,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": 0.050000000000000044
+          },
+          {
+            "at": 0.056,
+            "offset": 0.06000000000000005
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": 0.040000000000000036
+          },
+          {
+            "at": 0.107,
+            "offset": 0.08999999999999997
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": 0.09999999999999998
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": 0.14
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": 0.14
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": 0.14
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": 0.14
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 0.14
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 0.14
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0.14
+          },
+          {
+            "at": 0.412,
+            "offset": 0.14
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 0.14
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 0.14
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": 0.14
+          },
+          {
+            "at": 0.584,
+            "offset": 0.14
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": 0.14
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": 0.14
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": 0.14
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": 0.14
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": 0.14
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": 0.14
+          },
+          {
+            "at": 0.854,
+            "offset": 0.13
+          },
+          {
+            "at": 0.89,
+            "offset": 0.12
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": 0.08999999999999997
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": 0.050000000000000044
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": 0.020000000000000018
+          }
+        ]
+      },
       "structWeaveMembrane": {
         "enabled": true,
-        "amplitude": 0.28,
+        "amplitude": 0.2,
         "cycles": 1,
-        "phase": 100,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": 0.040000000000000036
+          },
+          {
+            "at": 0.056,
+            "offset": 0.04999999999999993
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": 0.030000000000000027
+          },
+          {
+            "at": 0.107,
+            "offset": 0.05999999999999994
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": 0.040000000000000036
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": 0.06999999999999995
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": 0.10999999999999999
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": 0.10999999999999999
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": 0.09999999999999998
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 0.10999999999999999
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 0.10999999999999999
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0.10999999999999999
+          },
+          {
+            "at": 0.412,
+            "offset": 0.020000000000000018
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": -0.030000000000000027
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": -0.17000000000000004
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": -0.29000000000000004
+          },
+          {
+            "at": 0.584,
+            "offset": -0.35
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": -0.41000000000000003
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": -0.5800000000000001
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": -0.7
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": -0.81
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": -0.85
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": -0.875
+          },
+          {
+            "at": 0.854,
+            "offset": -0.865
+          },
+          {
+            "at": 0.89,
+            "offset": -0.5700000000000001
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": -0.27
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": -0.12
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": -0.020000000000000018
+          }
+        ]
+      },
+      "structWeaveFinesse": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
         "direction": 1,
         "curve": "sine",
         "pace": 0,
@@ -1248,21 +1645,529 @@
       },
       "structWeaveGrowth": {
         "enabled": true,
-        "amplitude": 0.45,
+        "amplitude": 0.2,
         "cycles": 1,
-        "phase": 281,
+        "phase": 0,
         "direction": 1,
         "curve": "sine",
         "pace": 0,
         "pacePhase": 0,
         "hold": 0,
-        "mode": "wave"
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": 0.24000000000000002
+          },
+          {
+            "at": 0.056,
+            "offset": 0.64
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": 0.78
+          },
+          {
+            "at": 0.107,
+            "offset": 0.62
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": 0.19999999999999998
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": -0.175
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": -0.185
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": -0.187
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": -0.09
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 0.30000000000000004
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 0.21
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0.12999999999999998
+          },
+          {
+            "at": 0.412,
+            "offset": 0.30000000000000004
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 0.52
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 0.65
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": 0.7100000000000001
+          },
+          {
+            "at": 0.584,
+            "offset": 0.72
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": 0.73
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": 0.76
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": 0.78
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": 0.78
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": 0.78
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": 0.78
+          },
+          {
+            "at": 0.854,
+            "offset": 0.77
+          },
+          {
+            "at": 0.89,
+            "offset": 0.63
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": 0.4600000000000001
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": 0.24000000000000002
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": 0.03
+          }
+        ]
+      },
+      "structWeaveReach": {
+        "enabled": true,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": 0.029999999999999805
+          },
+          {
+            "at": 0.056,
+            "offset": 0.11999999999999988
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": 0.25
+          },
+          {
+            "at": 0.107,
+            "offset": 0.1399999999999999
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": -0.020000000000000018
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": -0.15000000000000013
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": -0.15000000000000013
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": -0.13000000000000012
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": -0.08000000000000007
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 0.029999999999999805
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": -0.020000000000000018
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0.04999999999999982
+          },
+          {
+            "at": 0.412,
+            "offset": 0.10999999999999988
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 0.1299999999999999
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 0.16999999999999993
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": 0.16999999999999993
+          },
+          {
+            "at": 0.584,
+            "offset": 0.17999999999999994
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": 0.18999999999999995
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": 0.20999999999999996
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": 0.21999999999999997
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": 0.15999999999999992
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": 0.10999999999999988
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": 0.08999999999999986
+          },
+          {
+            "at": 0.854,
+            "offset": 0.09999999999999987
+          },
+          {
+            "at": 0.89,
+            "offset": 0.06999999999999984
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": 0.039999999999999813
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": 0.009999999999999787
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": 0
+          }
+        ]
+      },
+      "structWeaveRelease": {
+        "enabled": true,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": 0.009999999999999998
+          },
+          {
+            "at": 0.056,
+            "offset": 0.024999999999999998
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": 0.030000000000000002
+          },
+          {
+            "at": 0.107,
+            "offset": 0.030000000000000002
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": 0
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": -0.02
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": -0.02
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": -0.02
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": -0.0020000000000000018
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 0.030000000000000002
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 0.06999999999999999
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0.11
+          },
+          {
+            "at": 0.412,
+            "offset": 0.26
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 0.53
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 0.7
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": 0.75
+          },
+          {
+            "at": 0.584,
+            "offset": 0.77
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": 0.78
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": 0.88
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": 0.9349999999999999
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": 0.965
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": 0.98
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": 0.98
+          },
+          {
+            "at": 0.854,
+            "offset": 0.971
+          },
+          {
+            "at": 0.89,
+            "offset": 0.79
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": 0.59
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": 0.36
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": 0.06
+          }
+        ]
       },
       "structWeaveCup": {
         "enabled": true,
-        "amplitude": 0.4,
+        "amplitude": 0.2,
         "cycles": 1,
-        "phase": 260,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": 0
+          },
+          {
+            "at": 0.056,
+            "offset": 0
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": 0
+          },
+          {
+            "at": 0.107,
+            "offset": 0
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": 0
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": 0
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": 0
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": 0
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": 0
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 0
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 0
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0
+          },
+          {
+            "at": 0.412,
+            "offset": 0
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 0
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 0
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": 0
+          },
+          {
+            "at": 0.584,
+            "offset": 0.0005668934240362823
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": 0.002539682539682545
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": 0.13714285714285712
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": 0.3819444444444442
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": 0.6670634920634918
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": 0.88
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": 0.99
+          },
+          {
+            "at": 0.854,
+            "offset": 0.92
+          },
+          {
+            "at": 0.89,
+            "offset": 0.014693877551020433
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": 0
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": 0
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": 0
+          }
+        ]
+      },
+      "cellMorph": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
         "direction": 1,
         "curve": "sine",
         "pace": 0,
@@ -1270,7 +2175,7 @@
         "hold": 0,
         "mode": "wave"
       },
-      "cellMorph": {
+      "cellCore": {
         "enabled": false,
         "amplitude": 0.2,
         "cycles": 1,
@@ -1509,6 +2414,492 @@
         "pacePhase": 0,
         "hold": 0,
         "mode": "wave"
+      },
+      "pBreath": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "pSignal": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "pPropagation": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "pVortex": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "pTravel": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "stretchX": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "stretchY": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "stretchZ": {
+        "enabled": false,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "wave"
+      },
+      "exposure": {
+        "enabled": true,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": -0.03940740740740739
+          },
+          {
+            "at": 0.056,
+            "offset": 0.06059259259259259
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": 0.0805925925925926
+          },
+          {
+            "at": 0.107,
+            "offset": 0.040592592592592625
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": -0.00940740740740742
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": -0.00940740740740742
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": -0.00940740740740742
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": -0.00940740740740742
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": 0.020977720771555575
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 0.08536712962962961
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 0.1412337119869629
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0.17599098399802415
+          },
+          {
+            "at": 0.412,
+            "offset": 0.24161683177331636
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 0.5143421413989688
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 0.5958575925925926
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": 0.6074026585310736
+          },
+          {
+            "at": 0.584,
+            "offset": 0.6163499586163996
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": 0.6577925925925927
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": 0.7116550925925925
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": 0.9251079367043513
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": 1.165138646059896
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": 1.2323685925925925
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": 1.2523685925925925
+          },
+          {
+            "at": 0.854,
+            "offset": 1.1548485925925926
+          },
+          {
+            "at": 0.89,
+            "offset": 0.31709146562039137
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": 0.24255513504187887
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": 0.1525925925925926
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": 0.12171854046639224
+          }
+        ]
+      },
+      "focusBlur": {
+        "enabled": true,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": -0.019999999999999907
+          },
+          {
+            "at": 0.056,
+            "offset": -0.039999999999999925
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": -0.04999999999999993
+          },
+          {
+            "at": 0.107,
+            "offset": -0.039999999999999925
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": -0.029999999999999916
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": -0.010000000000000009
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": 0
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": 0
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": -0.019999999999999907
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": -0.039999999999999925
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": -0.04999999999999993
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": -0.06999999999999995
+          },
+          {
+            "at": 0.412,
+            "offset": -0.05999999999999994
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": -0.039999999999999925
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": -0.029999999999999916
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": -0.010000000000000009
+          },
+          {
+            "at": 0.584,
+            "offset": -0.010000000000000009
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": -0.010000000000000009
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": 0.010000000000000009
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": -0.010000000000000009
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": -0.019999999999999907
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": -0.029999999999999916
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": -0.039999999999999925
+          },
+          {
+            "at": 0.854,
+            "offset": -0.05999999999999994
+          },
+          {
+            "at": 0.89,
+            "offset": -0.019999999999999907
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": -0.010000000000000009
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": -0.010000000000000009
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": 0
+          }
+        ]
+      },
+      "focusDepth": {
+        "enabled": true,
+        "amplitude": 0.2,
+        "cycles": 1,
+        "phase": 0,
+        "direction": 1,
+        "curve": "sine",
+        "pace": 0,
+        "pacePhase": 0,
+        "hold": 0,
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": 0.010000000000000231
+          },
+          {
+            "at": 0.056,
+            "offset": 0.03000000000000025
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": 0.20999999999999996
+          },
+          {
+            "at": 0.107,
+            "offset": 0.3599999999999999
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": 0.31000000000000005
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": 0.3400000000000003
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": 0.29000000000000004
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": 0.29000000000000004
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": 0.31000000000000005
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 0.4700000000000002
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 0.56
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0.5900000000000003
+          },
+          {
+            "at": 0.412,
+            "offset": 0.5100000000000002
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 0.33000000000000007
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 0.0900000000000003
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": -0.08999999999999986
+          },
+          {
+            "at": 0.584,
+            "offset": -0.41999999999999993
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": -0.48
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": -0.5299999999999998
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": -0.6999999999999997
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": -0.8999999999999999
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": -1
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": -1
+          },
+          {
+            "at": 0.854,
+            "offset": -1.1099999999999999
+          },
+          {
+            "at": 0.89,
+            "offset": -1.0299999999999998
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": -0.69
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": -0.33000000000000007
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": -0.08000000000000007
+          }
+        ]
       },
       "fractalAmount": {
         "enabled": false,
@@ -1824,18 +3215,136 @@
       },
       "rotateY": {
         "enabled": true,
-        "amplitude": 4,
+        "amplitude": 360,
         "cycles": 1,
-        "phase": 323,
+        "phase": 0,
         "direction": 1,
         "curve": "sine",
         "pace": 0,
         "pacePhase": 0,
         "hold": 0,
-        "mode": "wave"
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": 3.930594909090909
+          },
+          {
+            "at": 0.056,
+            "offset": 7.943279838383839
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": 6.775281505105422
+          },
+          {
+            "at": 0.107,
+            "offset": 4.297676966683008
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": 1.9027003957383868
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": -1.3729579546880237
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": -1.483848925183286
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": 1.0188267292388256
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": 1.951111111111111
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 2.951111111111111
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 1.5511111111111116
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 1.2511111111111108
+          },
+          {
+            "at": 0.412,
+            "offset": 0.951111111111111
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": -0.548888888888889
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": -1.2488888888888887
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": -1.7488888888888887
+          },
+          {
+            "at": 0.584,
+            "offset": -2.6488888888888886
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": -4.348888888888888
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": -5.848888888888888
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": -6.848888888888888
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": -4.848888888888888
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": -2.348888888888889
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": -0.6488888888888886
+          },
+          {
+            "at": 0.854,
+            "offset": 3.71719111111111
+          },
+          {
+            "at": 0.89,
+            "offset": 4.11507805325987
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": 4.151761689623509
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": 3.151111111111111
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": 2.334412115226336
+          }
+        ]
       },
       "rotateX": {
-        "enabled": false,
+        "enabled": true,
         "amplitude": 30,
         "cycles": 1,
         "phase": 0,
@@ -1844,10 +3353,128 @@
         "pace": 0,
         "pacePhase": 0,
         "hold": 0,
-        "mode": "wave"
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": -3.546800568595042
+          },
+          {
+            "at": 0.056,
+            "offset": -6.282258384573003
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": -7.359156060606063
+          },
+          {
+            "at": 0.107,
+            "offset": -3.166207920418636
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": -1.6880054615658189
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": 1.2507651599451275
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": -1.1410958312045918
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": -0.17228784691246135
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": 0.7034678569322255
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 2.268927670482917
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 6.058862328588106
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 8.021128436788795
+          },
+          {
+            "at": 0.412,
+            "offset": 8.169267812519903
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 10.984437944051987
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 10.868666666666666
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": 13.571301138566799
+          },
+          {
+            "at": 0.584,
+            "offset": 16.451510328034395
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": 16.618536002704243
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": 12.798666666666666
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": 5.490672973089124
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": 1.3713030420215495
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": 1.3782081066666634
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": 5.332683174166666
+          },
+          {
+            "at": 0.854,
+            "offset": 4.842626666666668
+          },
+          {
+            "at": 0.89,
+            "offset": 7.312550964187329
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": 6.797663691460054
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": 4.798666666666666
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": 4.069177758024687
+          }
+        ]
       },
       "rotateZ": {
-        "enabled": false,
+        "enabled": true,
         "amplitude": 30,
         "cycles": 1,
         "phase": 0,
@@ -1856,10 +3483,128 @@
         "pace": 0,
         "pacePhase": 0,
         "hold": 0,
-        "mode": "wave"
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": -4.956070082644628
+          },
+          {
+            "at": 0.056,
+            "offset": -17.189781157024793
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": -18.53315852742299
+          },
+          {
+            "at": 0.107,
+            "offset": -9.622258998648586
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": 0.7423212843653602
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": 16.854424518451744
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": 16.577860957897038
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": 13.272964026215323
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": 12.269729322123846
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 12.705955146813643
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 11.35277327751917
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 12.927194120793018
+          },
+          {
+            "at": 0.412,
+            "offset": 15.181106362961389
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 21.46177127303067
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 24
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": 22.67306067606028
+          },
+          {
+            "at": 0.584,
+            "offset": 21.17510208876321
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": 18.203467871630338
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": 12.524000000000001
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": 8.676094358209681
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": 3.853036781342536
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": 6.765857825715887
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": 14.012587151136406
+          },
+          {
+            "at": 0.854,
+            "offset": 2.860256949623836
+          },
+          {
+            "at": 0.89,
+            "offset": 10.651557883650439
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": 5.600024569733229
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": 0.6000000000000014
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": -1.3813688888888862
+          }
+        ]
       },
       "volume": {
-        "enabled": false,
+        "enabled": true,
         "amplitude": 0.12,
         "cycles": 1,
         "phase": 0,
@@ -1871,7 +3616,7 @@
         "mode": "wave"
       },
       "deform": {
-        "enabled": false,
+        "enabled": true,
         "amplitude": 0.048,
         "cycles": 1,
         "phase": 0,
@@ -1932,18 +3677,136 @@
       },
       "scale": {
         "enabled": true,
-        "amplitude": 0.084,
+        "amplitude": 0.2,
         "cycles": 1,
-        "phase": 320,
+        "phase": 0,
         "direction": 1,
         "curve": "sine",
         "pace": 0,
         "pacePhase": 0,
         "hold": 0,
-        "mode": "wave"
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": 0.015967064388012098
+          },
+          {
+            "at": 0.056,
+            "offset": -0.16985809816378694
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": -0.05680879072160483
+          },
+          {
+            "at": 0.107,
+            "offset": 0.19029512744068455
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": 0.03542659569948281
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": -0.09345895321442388
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": -0.19292409511349184
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": -0.20833999999999975
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": -0.16592106594184575
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": -0.05973047880775084
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 0.1379142132442892
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0.23789045287657284
+          },
+          {
+            "at": 0.412,
+            "offset": 0.26106055723005106
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 0.24016524200759015
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 0.1706599999999998
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": -0.045155983478139206
+          },
+          {
+            "at": 0.584,
+            "offset": -0.3200153289905874
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": -0.30318646562738616
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": -0.21247400000000027
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": -0.4007277872782229
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": -0.6448651824497782
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": -0.7364995870080007
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": -0.7095575363365008
+          },
+          {
+            "at": 0.854,
+            "offset": -0.9595323854659799
+          },
+          {
+            "at": 0.89,
+            "offset": -0.8228670528792015
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": -0.5432343373857567
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": -0.27324000000000037
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": -0.1523609220740738
+          }
+        ]
       },
       "positionX": {
-        "enabled": false,
+        "enabled": true,
         "amplitude": 0.2,
         "cycles": 1,
         "phase": 0,
@@ -1952,10 +3815,128 @@
         "pace": 0,
         "pacePhase": 0,
         "hold": 0,
-        "mode": "wave"
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": -0.02012539583203954
+          },
+          {
+            "at": 0.056,
+            "offset": 0.32310709754336764
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": 0.28366857888654073
+          },
+          {
+            "at": 0.107,
+            "offset": 0.034917816013170455
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": -0.15738092546765103
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": -0.29355309038839894
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": -0.28786438023734395
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": -0.2696533884235832
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": -0.27600073300148154
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": -0.188047962962963
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": -0.16592407090962957
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": -0.15987820822493592
+          },
+          {
+            "at": 0.412,
+            "offset": -0.11860137757354594
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": -0.6777096275949289
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": -0.6103822222222222
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": -0.6659616522466498
+          },
+          {
+            "at": 0.584,
+            "offset": -0.7898097477553462
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": -0.7506370026669038
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": -0.5475822222222222
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": -0.7223544710720664
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": -0.6491315255736297
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": -0.678878332046222
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": -0.7978178854442223
+          },
+          {
+            "at": 0.854,
+            "offset": -0.8687022222222223
+          },
+          {
+            "at": 0.89,
+            "offset": -0.45870222222222223
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": -0.36870222222222226
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": -0.23870222222222226
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": -0.13026488941563807
+          }
+        ]
       },
       "positionY": {
-        "enabled": false,
+        "enabled": true,
         "amplitude": 0.2,
         "cycles": 1,
         "phase": 0,
@@ -1964,7 +3945,125 @@
         "pace": 0,
         "pacePhase": 0,
         "hold": 0,
-        "mode": "wave"
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": -0.09859934060606058
+          },
+          {
+            "at": 0.056,
+            "offset": -0.5710729018181819
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": -0.5368396694214878
+          },
+          {
+            "at": 0.107,
+            "offset": -0.19788401163237312
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": -0.19976787379972566
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": -0.009428752592592612
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": -0.038124025898491065
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": 0.0011036212208053453
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": 0.013631029938989458
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 0.06065040021560847
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 0.12554063079230174
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0.14283409252917328
+          },
+          {
+            "at": 0.412,
+            "offset": 0.0575282471220781
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": -0.2528624254365689
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": -0.29547999999999996
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": -0.26053127780607804
+          },
+          {
+            "at": 0.584,
+            "offset": -0.20614230205575437
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": -0.20823221420281357
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": -0.33332000000000006
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": -0.37332
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": -0.24332
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": -0.14207919360000007
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": -0.034586705800000006
+          },
+          {
+            "at": 0.854,
+            "offset": -0.3357086399999999
+          },
+          {
+            "at": 0.89,
+            "offset": -0.1127596694214875
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": -0.16484586578512397
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": -0.20479999999999998
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": -0.18836540444444427
+          }
+        ]
       },
       "gradientOffset": {
         "enabled": false,
@@ -2004,31 +4103,150 @@
       },
       "transparency": {
         "enabled": true,
-        "amplitude": 0.27,
+        "amplitude": 0.2,
         "cycles": 1,
-        "phase": 281,
+        "phase": 0,
         "direction": 1,
         "curve": "sine",
         "pace": 0,
         "pacePhase": 0,
         "hold": 0,
-        "mode": "wave"
+        "mode": "points",
+        "points": [
+          {
+            "at": 0,
+            "offset": 0
+          },
+          {
+            "at": 0.02733333333333333,
+            "offset": -0.04999999999999999
+          },
+          {
+            "at": 0.056,
+            "offset": -0.09000000000000002
+          },
+          {
+            "at": 0.07666666666666666,
+            "offset": -0.14
+          },
+          {
+            "at": 0.107,
+            "offset": -0.09999999999999998
+          },
+          {
+            "at": 0.13333333333333333,
+            "offset": -0.030000000000000027
+          },
+          {
+            "at": 0.16066666666666668,
+            "offset": 0
+          },
+          {
+            "at": 0.18533333333333332,
+            "offset": 0
+          },
+          {
+            "at": 0.2573333333333333,
+            "offset": 0
+          },
+          {
+            "at": 0.29633333333333334,
+            "offset": 0.02999999999999997
+          },
+          {
+            "at": 0.32166666666666666,
+            "offset": 0.03999999999999998
+          },
+          {
+            "at": 0.35366666666666663,
+            "offset": 0.09999999999999998
+          },
+          {
+            "at": 0.38666666666666666,
+            "offset": 0.10999999999999999
+          },
+          {
+            "at": 0.412,
+            "offset": 0.17000000000000004
+          },
+          {
+            "at": 0.4483333333333333,
+            "offset": 0.29000000000000004
+          },
+          {
+            "at": 0.48466666666666663,
+            "offset": 0.45599999999999996
+          },
+          {
+            "at": 0.5253333333333333,
+            "offset": 0.506
+          },
+          {
+            "at": 0.584,
+            "offset": 0.5159999999999999
+          },
+          {
+            "at": 0.6146666666666667,
+            "offset": 0.5259999999999999
+          },
+          {
+            "at": 0.6549999999999999,
+            "offset": 0.5359999999999999
+          },
+          {
+            "at": 0.6886666666666666,
+            "offset": 0.5259999999999999
+          },
+          {
+            "at": 0.7243333333333334,
+            "offset": 0.5259999999999999
+          },
+          {
+            "at": 0.7526666666666666,
+            "offset": 0.5359999999999999
+          },
+          {
+            "at": 0.7936666666666666,
+            "offset": 0.5459999999999999
+          },
+          {
+            "at": 0.854,
+            "offset": 0.5559999999999999
+          },
+          {
+            "at": 0.89,
+            "offset": 0.33999999999999997
+          },
+          {
+            "at": 0.9193333333333332,
+            "offset": 0.19999999999999996
+          },
+          {
+            "at": 0.9496666666666667,
+            "offset": 0.08000000000000002
+          },
+          {
+            "at": 0.9813333333333334,
+            "offset": 0.020000000000000018
+          }
+        ]
       }
     },
     "renderVersion": 2,
     "environment": "studio",
     "environmentAngle": 0,
-    "environmentPower": 0.65,
+    "environmentPower": 0.31,
     "environmentRefraction": 0,
     "environmentRotate": false,
     "environmentCycles": 1,
-    "internalColor": "#9cc8f5",
+    "internalColor": "#aad1f9",
     "fullness": 1,
     "thinShell": 1,
     "filmFlow": 0,
     "filmSwirl": 0,
     "filmCycles": 1,
     "grounding": 0,
+    "filmIslands": 0,
     "filmPattern": 0,
     "filmPatternScale": 1.5,
     "filmPatternWarp": 0.8,
@@ -2067,13 +4285,13 @@
         "id": 1,
         "enabled": true,
         "visible": false,
-        "type": "circle",
-        "color": "#c4e6ff",
-        "x": -1.6,
-        "y": 1.9,
-        "z": 5,
-        "power": 3.4,
-        "size": 0.74,
+        "type": "diffuser",
+        "color": "#fffeff",
+        "x": -1.33,
+        "y": 2.09,
+        "z": 4.99,
+        "power": 5.8,
+        "size": 1.81,
         "length": 0.6,
         "roll": 0,
         "softness": 0.3,
@@ -2109,13 +4327,55 @@
         "id": 2,
         "enabled": true,
         "visible": false,
-        "type": "circle",
-        "color": "#f0f8ff",
-        "x": 2.3,
-        "y": -0.75,
-        "z": 2.1,
-        "power": 2.9,
-        "size": 1.24,
+        "type": "diffuser",
+        "color": "#dce8f8",
+        "x": 1.35,
+        "y": -1.35,
+        "z": 4.71,
+        "power": 2.6,
+        "size": 1.67,
+        "length": 0.6,
+        "roll": 0,
+        "softness": 0.3,
+        "cone": 30,
+        "grid": 5,
+        "orbit": {
+          "enabled": false,
+          "amplitude": 35,
+          "cycles": 1,
+          "phase": 0,
+          "direction": 1,
+          "curve": "sine",
+          "pace": 0,
+          "pacePhase": 0,
+          "hold": 0,
+          "mode": "wave",
+          "axis": "y"
+        },
+        "pulse": {
+          "enabled": false,
+          "amplitude": 0.3,
+          "cycles": 1,
+          "phase": 0,
+          "direction": 1,
+          "curve": "sine",
+          "pace": 0,
+          "pacePhase": 0,
+          "hold": 0,
+          "mode": "wave"
+        }
+      },
+      {
+        "id": 3,
+        "enabled": true,
+        "visible": false,
+        "type": "diffuser",
+        "color": "#cbe8ff",
+        "x": -1.85,
+        "y": 1.35,
+        "z": -1.7,
+        "power": 3.25,
+        "size": 1.78,
         "length": 0.6,
         "roll": 0,
         "softness": 0.3,
@@ -2299,8 +4559,10 @@
     },
     "forcePoints": [],
     "forcePaths": [],
-    "particleVersion": 14
+    "sceneGrains": 0,
+    "particleVersion": 14,
+    "grainMotionVersion": 1
   },
-  "ratio": 1,
-  "phase": 1.5707963267948966
+  "ratio": 0.75,
+  "phase": 1.4870205226991686
 }

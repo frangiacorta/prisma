@@ -1,23 +1,24 @@
-import {CooperativePreview} from './cooperative-preview.js?v=79c81404468e';
-import {PaletteFinishPass} from './finish-palette.js?v=79c81404468e';
-import {Dynamics,disposeDynamics} from './dynamics.js?v=79c81404468e';
-import {motionPeriod} from './animation-clock.js?v=79c81404468e';
-import {animationPhase} from './animation-clock.js?v=79c81404468e';
-import {ScanlinePass} from './finish-scanlines.js?v=79c81404468e';
-import {FilamentPass} from './filament-renderer.js?v=79c81404468e';
-import {VeilTransition} from './veil-transition.js?v=79c81404468e';
-import {BodySamples} from './body-samples.js?v=79c81404468e';
-import {BodyComposite} from './body-composite.js?v=79c81404468e';
-import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=79c81404468e';
-import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=79c81404468e';
-import {ParticleRenderer} from './particle-renderer.js?v=79c81404468e';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=79c81404468e';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=79c81404468e';
+import {CooperativePreview} from './cooperative-preview.js?v=de5c2d2312c1';
+import {PaletteFinishPass} from './finish-palette.js?v=de5c2d2312c1';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=de5c2d2312c1';
+import {motionPeriod} from './animation-clock.js?v=de5c2d2312c1';
+import {animationPhase} from './animation-clock.js?v=de5c2d2312c1';
+import {ScanlinePass} from './finish-scanlines.js?v=de5c2d2312c1';
+import {FilamentPass} from './filament-renderer.js?v=de5c2d2312c1';
+import {VeilTransition} from './veil-transition.js?v=de5c2d2312c1';
+import {BodySamples} from './body-samples.js?v=de5c2d2312c1';
+import {BodyComposite} from './body-composite.js?v=de5c2d2312c1';
+import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=de5c2d2312c1';
+import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=de5c2d2312c1';
+import {ParticleRenderer} from './particle-renderer.js?v=de5c2d2312c1';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=de5c2d2312c1';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=de5c2d2312c1';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
 const solidBody=s=>({...s,engine:'solid',pLiving:0});
 const focusOptions={layers:true,focusDepthOnly:true,preview:true,quality:'fast',trackTiming:false,deferCompletion:true,keepCanvas:true};
+const focusFrame=(s,p)=>s.motions?.focusBlur?.enabled||s.motions?.focusDepth?.enabled?sampleFrame(s,p):s;
 // A scene owns a clock, a simulation and a shared graphics context.
 export class Renderer{
  constructor(canvas){this.dynamics=new Dynamics(sampleFrame);this.liveDynamics=new Dynamics(sampleFrame,true);this.canvas=canvas;this.context=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!this.context)throw Error('WebGL 2 non disponibile.');this.frameTimer=this.context.getExtension('EXT_disjoint_timer_query_webgl2');this.frameQueries=[];this.frameGpuSample=0;this.frameGpuMs=null;}
@@ -109,7 +110,7 @@ export class Renderer{
  }
  drawGrains(plan,frame,p,w,h,o,async=false){
   const {surface,solid,studioLayer}=frame;
-  if(surface.focusBlur>0){
+  if(focusFrame(surface,p).focusBlur>0){
    const g=this.gl;g.bindFramebuffer(g.READ_FRAMEBUFFER,frame.layers.framebuffer);g.readBuffer(g.COLOR_ATTACHMENT0);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,null);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.FRAMEBUFFER,null);
    this.applyFocus(surface,p,w,h,null,{...o,beforeFilaments:true});frame.layers.captureColor();
   }
@@ -161,7 +162,7 @@ export class Renderer{
   return this.drawGrains(plan,frame,p,w,h,inner,true);
  }
  focusBody(s,p,plan=this.layerPlan(s,p)){
-  if(!(s.focusBlur>0))return null;
+  if(!(focusFrame(s,p).focusBlur>0))return null;
   const source=plan?plan.surface:this.endpoint(s,p);
   if(!source||source.engine==='particles'||source.pLiving>0)return null;
   return {...source,renderVersion:2};
@@ -177,11 +178,12 @@ export class Renderer{
   const source=this.focusBody(s,p,plan);if(!source)return;
   if(!o.beforeFilaments&&(plan?.grains||this.needsFilaments(source,p)))return;
   const renderer=this.select(source),exact=renderer.exactDepth;
-  if(renderer.canUseImplicit(source,o)&&exact?.width===w&&exact?.height===h){this.focusPass.draw(s,w,h,exact.texture,true);return true;}
+  const frame=focusFrame(s,p);
+  if(renderer.canUseImplicit(source,o)&&exact?.width===w&&exact?.height===h){this.focusPass.draw(frame,w,h,exact.texture,true);return true;}
   const solid=this.select(source),scale=Math.min(.6,800/Math.max(w,h)),width=Math.max(1,Math.round(w*scale)),height=Math.max(1,Math.round(h*scale));
   this.focusDepthTarget??=new BodyComposite(this.gl);const layers=this.focusDepthTarget.target(width,height);
   solid.draw(source,p,width,height,{...focusOptions,layers});
-  this.focusPass.draw(s,w,h,layers.depth);
+  this.focusPass.draw(frame,w,h,layers.depth);
   return true;
  }
  prepare(s,p,o){if(this.needsCooperative(s,p,o))return this.cooperative().prepare(s,p,o);p=animationPhase(s,p||0);s=this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o);if(!s)return false;const focusReady=this.prepareFocus(s,p,o);const plan=this.layerPlan(s,p);if(plan)return this.prepareLayers(plan,p,o||{})&&focusReady;s=this.endpoint(s,p);const ready=this.select(s).prepare(s,p,o),fil=this.prepareFilaments(s,p);return ready&&fil&&focusReady;}async prepareAsync(s,p,o){if(o?.preview&&this.needsCooperative(s,p,o))return this.cooperative().worker.prepareAsync(s,p,{...o,cooperative:false});p=animationPhase(s,p||0);s=await this.physicalState(s,p*motionPeriod(s)/(Math.PI*2),o,true);if(!s||!await this.prepareFocus(s,p,o,true))return false;const plan=this.layerPlan(s,p);if(plan)return this.prepareLayersAsync(plan,p,o||{});s=this.endpoint(s,p);const ready=await this.select(s).prepareAsync(s,p,o);if(!ready)return false;this.prepareFilaments(s,p);return this.needsFilaments(s,p)?this.filamentPass.prepareAsync(o):true;}
