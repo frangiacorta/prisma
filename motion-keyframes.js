@@ -5,7 +5,7 @@ const wrap = (value, period) => value - Math.floor((value + period/2)/period)*pe
 const parameters = new Set(['scale','positionX','positionY','rotateX','rotateY','rotateZ','stretchX','stretchY','stretchZ',
  'pBreath','pSignal','pPropagation','pOpening','pTravel','pVortex','exposure','transparency','roughness','focusBlur','focusDepth',
  'structWeaveBranching','structWeaveNodes','structWeaveMembrane','structWeaveFinesse','structWeaveGrowth','structWeaveReach','structWeaveRelease','structWeaveCup',
- 'structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY','structWeaveFront','structWeaveTension','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupLight','structWeaveCupSize','structWeaveFlare','structDelay','structFlowPhase']);
+ 'structWeaveCradle','structWeaveFlex','structWeaveSlope','structWeaveArch','structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY','structWeaveFront','structWeaveTension','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupLight','structWeaveCupSize','structWeaveFlare','structDelay','structFlowPhase']);
 
 export const supportsMotionPoints = key => parameters.has(key);
 export const isMotionAngle = key => ['rotateX','rotateY','rotateZ'].includes(key);

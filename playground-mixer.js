@@ -1,6 +1,6 @@
 // Fade / DirectionalWipe adapted from gl-transitions (gre), MIT.
 // Original shaders, license and pinned provenance: vendor/gl-transitions/.
-import {Renderer} from './renderer.js?v=2ed2af454163';
+import {Renderer} from './renderer.js?v=e537543adb5a';
 const vertex=`#version 300 es
 precision highp float;out vec2 uv;void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);uv=p;gl_Position=vec4(p*2.-1.,0.,1.);}`;
 const fragment=`#version 300 es

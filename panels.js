@@ -1,23 +1,23 @@
-import {paletteTonePanel} from './finish-palette-panel.js?v=2ed2af454163';
-import {dynamicsPanel} from './dynamics-panel.js?v=2ed2af454163';
-import {motionPeriod} from './animation-clock.js?v=2ed2af454163';
-import {GROWTH_STUDIES} from './growth-material.js?v=2ed2af454163';
-import {GLYPH_FONTS} from './finishing.js?v=2ed2af454163';
-import {BASE_FORMS} from './base-forms.js?v=2ed2af454163';
-import {structurePanel,STRUCTURE_TRACKS,WEAVE_TRACKS} from './structure-model.js?v=2ed2af454163';
-import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=2ed2af454163';
-import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=2ed2af454163';
-import {finishingOrderPanel} from './finishing-order.js?v=2ed2af454163';
-import {rootMotionSuspended} from './solid-renderer.js?v=2ed2af454163';
-import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=2ed2af454163';
-import {MOODS} from './model.js?v=2ed2af454163';
-import {supportsMotionPoints} from './motion-keyframes.js?v=2ed2af454163';
-import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=2ed2af454163';
+import {paletteTonePanel} from './finish-palette-panel.js?v=e537543adb5a';
+import {dynamicsPanel} from './dynamics-panel.js?v=e537543adb5a';
+import {motionPeriod} from './animation-clock.js?v=e537543adb5a';
+import {GROWTH_STUDIES} from './growth-material.js?v=e537543adb5a';
+import {GLYPH_FONTS} from './finishing.js?v=e537543adb5a';
+import {BASE_FORMS} from './base-forms.js?v=e537543adb5a';
+import {structurePanel,STRUCTURE_TRACKS,WEAVE_TRACKS} from './structure-model.js?v=e537543adb5a';
+import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=e537543adb5a';
+import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=e537543adb5a';
+import {finishingOrderPanel} from './finishing-order.js?v=e537543adb5a';
+import {rootMotionSuspended} from './solid-renderer.js?v=e537543adb5a';
+import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=e537543adb5a';
+import {MOODS} from './model.js?v=e537543adb5a';
+import {supportsMotionPoints} from './motion-keyframes.js?v=e537543adb5a';
+import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=e537543adb5a';
 export function pathValue(s,path){const parts=path.split('.');let value=s;for(let i=0;i<parts.length;i++){if(i===1&&parts[0]==='lights')value=value.find(l=>l.id===Number(parts[i]));else value=value?.[parts[i]];}return value}
 export function pathMeta(path,state){const parts=path.split('.'),last=parts.at(-1);if(last==='cycles')return state?.perfectLoop===false?['Ripetizioni nel ciclo',.1,8,.1]:['Ripetizioni nel loop',1,8,1];if(last==='pace')return['Accelerazione / decelerazione',0,.95,.01];if(last==='pacePhase')return['Punto di massima velocità',0,360,1];if(last==='hold')return['Pausa a ogni giro',0,.8,.01];if(last==='phase')return['Fase di partenza',0,360,1];if(last==='amplitude'){if(parts[0]==='motions'){const m=TRACK_META[parts[1]];return ['Ampiezza',m[1],m[2],m[3]]}return parts[2]==='orbit'?['Ampiezza orbita',0,180,1]:['Ampiezza pulsazione',0,1,.01]}return LIGHT_META[last]}
 export function writePath(s,path,value){const parts=path.split('.');let object=s;for(let i=0;i<parts.length-1;i++){if(i===1&&parts[0]==='lights')object=object.find(l=>l.id===Number(parts[i]));else object=object[parts[i]];}if(object)object[parts.at(-1)]=value}
-import {livingChooser} from './living-panel.js?v=2ed2af454163';
-import {particlePanel} from './particle-panel.js?v=2ed2af454163';
+import {livingChooser} from './living-panel.js?v=e537543adb5a';
+import {particlePanel} from './particle-panel.js?v=e537543adb5a';
 function uniqueControls(primary,extra){
  const main=document.createElement('div'),addition=document.createElement('div');
  main.innerHTML=primary;addition.innerHTML=extra;
@@ -37,7 +37,7 @@ function uniqueControls(primary,extra){
  for(const p of addition.querySelectorAll(':scope > p.help,:scope > p.control-intro'))p.remove();
  return main.innerHTML+addition.innerHTML;
 }
-import {cloudBody,grainMix} from './body-layers.js?v=2ed2af454163';
+import {cloudBody,grainMix} from './body-layers.js?v=e537543adb5a';
 export function buildPanel(tab,s,h,selectedLight){
  const cloud=cloudBody(s),base=(id=tab)=>sharedPanel(id,s,h,selectedLight),particles=(id=tab)=>particlePanel(id,s,{...h,cloud,grainMix:grainMix(s)},sharedPanel,selectedLight);
  if(tab==='shape'){

@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=2ed2af454163';
-import {EXTRA_HELP} from './control-help-extra.js?v=2ed2af454163';
-import {FRACTAL_HELP} from './fractal-form.js?v=2ed2af454163';
-import {CELLULAR_HELP} from './cellular-form.js?v=2ed2af454163';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=2ed2af454163';
-import {trailLightCompensation} from './particle-model.js?v=2ed2af454163';
+import {AUDIO_HELP} from './audio-model.js?v=e537543adb5a';
+import {EXTRA_HELP} from './control-help-extra.js?v=e537543adb5a';
+import {FRACTAL_HELP} from './fractal-form.js?v=e537543adb5a';
+import {CELLULAR_HELP} from './cellular-form.js?v=e537543adb5a';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=e537543adb5a';
+import {trailLightCompensation} from './particle-model.js?v=e537543adb5a';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishPalette:'Converte il chiaroscuro della scena in una palette ordinata da scuro a chiaro. La trasparenza resta invariata.',
@@ -296,7 +296,7 @@ export function controlCondition(s,key){
  if(key==='structWeaveCup'&&!positive('structWeaveGrowth'))return 'Aumenta Crescita degli steli.';
  if(key==='structWeaveBranching'&&(!positive('structFibres')||!positive('structWeft')||!positive('structShell')))return 'Aumenta fibre, tessitura e svuotamento.';
  if(['structWeaveTension','structWeaveFront','structWeaveFinesse','structWeaveRelease','structWeaveReach','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupLight','structWeaveCupSize'].includes(key)&&!positive('structWeaveBranching'))return 'Aumenta Ramificazione del reticolo.';
- if(['structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY'].includes(key)&&(!positive('structWeaveBranching')||!positive('structWeaveTension')))return 'Aumenta Ramificazione del reticolo e Tensione delle giunzioni.';
+ if(['structWeaveCradle','structWeaveFlex','structWeaveSlope','structWeaveArch','structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY'].includes(key)&&(!positive('structWeaveBranching')||!positive('structWeaveTension')))return 'Aumenta Ramificazione del reticolo e Tensione delle giunzioni.';
  if(key==='structWeaveFront'&&(!positive('structWeaveTension')||!positive('structDelay')))return 'Aumenta Tensione delle giunzioni e Sfasamento fra zone.';
  if(key==='structWeaveFlare'&&(!positive('structWeaveTension')||!positive('structWeaveGrowth')||!positive('structWeaveCup')))return 'Aumenta Tensione delle giunzioni, Crescita degli steli e Apertura delle coppe.';
  if(key==='structWeaveCupSize'&&(s.structWeaveRelease||0)<=.27&&(s.structWeaveCup||0)<=.10&&!s.motions?.structWeaveRelease?.enabled&&!s.motions?.structWeaveCup?.enabled)return 'Aumenta Apertura delle coppe o Ritiro dei ponti.';

@@ -160,7 +160,7 @@ $('#import').onchange=async e=>{try{const file=e.target.files[0];if(!file)return
 window.addEventListener('popstate',()=>{const id=decodeURIComponent(location.hash.slice(1));if(byId?.has(id))openDetail(id,false);else if($('#detail').open){stopVideos();$('#detail').close();document.body.classList.remove('modal-open');current=null;}});
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!$('#detail').open){e.preventDefault();$('#search').focus();}});
 try{
- const response=await fetch('data.json?v=2ed2af454163');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
+ const response=await fetch('data.json?v=e537543adb5a');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
  for(const item of data.items)if(item.kind==='project'||item.comparisonClip){
   item.resultImage=projectMedia(item.resultImage);
   item.resultVideo=projectMedia(item.resultVideo);

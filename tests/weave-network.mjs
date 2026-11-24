@@ -6,6 +6,7 @@ import { newCreation, normalizeCreation } from '../creative-model.js';
 import { sampleFrame } from '../solid-renderer.js';
 import { presetDocument, readPreset } from '../preset-files.js';
 import { structureField, STRUCTURE_DEFAULTS } from '../structure-model.js';
+import { slingPose } from '../weave-sling.js';
 
 const source=existsSync('web/studio/index.html')?'web/studio':'.';
 const path='/previews/reticolo-giunzioni.prisma.json';
@@ -15,6 +16,20 @@ const {state}=project;
 const tau=Math.PI*2;
 const at=seconds=>sampleFrame(state,seconds/state.duration*tau);
 const original=normalizeCreation(newCreation());
+// An incoming and outgoing fibre meet opposite shoulders. Pulling the
+// nodules apart takes up the threads' slack without moving either stitch.
+const ends=new Float32Array(18*4);
+for(let i=0;i<18;i++)ends[i*4+3]=.06;
+ends[6*4]=.12;
+const pouch=slingPose(ends,1,0,0,0,0,1).vertices;
+ends[6*4]=.75;
+const stretched=slingPose(ends,1,0,0,0,0,1).vertices;
+assert(pouch[2]>0&&pouch[6]<0);
+assert(stretched[3]<pouch[3]);
+assert.deepEqual(stretched.slice(0,3),pouch.slice(0,3));
+assert(Math.abs((stretched[4]-pouch[4])-.63)<1e-6);
+assert.equal(stretched[5],pouch[5]);
+assert.equal(stretched[6],pouch[6]);
 const dormant={...original,...STRUCTURE_DEFAULTS,structWeaveBranching:1};
 const opticsAt=at(24);
 for(const point of [[0,0,0],[1,0,0],[0,1.2,.86]]){
@@ -30,7 +45,7 @@ for(const [key,track] of Object.entries(state.motions).filter(([,track])=>track.
 assert(at(2).structWeaveGrowth>at(7).structWeaveGrowth+.6);
 assert(at(17).structWeaveRelease>at(11).structWeaveRelease+.5);
 assert(at(24).structWeaveCup>at(17).structWeaveCup+.6);
-assert(at(24).transparency>at(5).transparency+.4);
+assert(at(5).transparency<.55 && at(24).transparency>.65 && at(24).transparency>at(5).transparency+.25);
 assert(at(24).structWeaveCupLight>at(5).structWeaveCupLight+.2);
 assert.deepEqual(readPreset(JSON.stringify(presetDocument(project))).state.motions,state.motions);
 if(process.argv.includes('--model')){
@@ -110,10 +125,11 @@ try{
    gl.getExtension('WEBGL_lose_context')?.loseContext();return result;
   };
   const kernel=probe();
-  const draw=async (scene,phase=0)=>{
+  const draw=async (scene,phase=0,label='preset')=>{
    const start=performance.now();
    const ok=await renderer.drawAccumulated(scene,phase,168,224,{samples:1,quality:'full',cancelled:()=>performance.now()-start>45000});
-   if(!ok||g.getError())throw Error('Reticolo render failed');
+   const error=g.getError();
+   if(!ok||error)throw Error(label+' · render '+(ok?'ready':'incomplete')+', WebGL '+error+' after '+Math.round(performance.now()-start)+' ms');
    return renderer.pixels();
   };
   const difference=(a,b)=>{
@@ -132,6 +148,10 @@ try{
    ['disposizione posteriore Y',bridge,'structWeaveRearY',bridge.structWeaveRearY>.3?-.68:.73],
    ['scarto della base',bridge,'structWeaveRootBend',.41],
    ['scarto della biforcazione',bridge,'structWeaveTipBend',-.46],
+   ['inclinazione dei ponti',bridge,'structWeaveSlope',bridge.structWeaveSlope>.25?-.72:.81],
+   ['curvatura dei ponti',bridge,'structWeaveArch',bridge.structWeaveArch>.25?-.76:.83],
+   ['rete attorno ai noduli',bridge,'structWeaveCradle',0],
+   ['elasticità dei rami',sprout,'structWeaveFlex',0],
    ['posizione della germinazione',sprout,'structWeaveFront',sprout.structWeaveFront>.5?.07:.92],
    ['gerarchia',bridge,'structWeaveHierarchy',0],
    ['fibre',bridge,'structWeaveFinesse',.42],
@@ -155,8 +175,8 @@ try{
   const before=new Map();
   const changes=[];
   for(const [label,scene,key,value] of trials){
-   if(!before.has(scene))before.set(scene,await draw(scene));
-   changes.push({label,difference:difference(before.get(scene),await draw({...scene,[key]:value}))});
+   if(!before.has(scene))before.set(scene,await draw(scene,0,label+' (prima)'));
+   changes.push({label,difference:difference(before.get(scene),await draw({...scene,[key]:value},0,label))});
   }
   const first=await draw(state),last=await draw(state,tau);
   const after=await draw({...bridge,sceneGrains:.40,pCount:3200,pSize:.28,pOpacity:.55},0);
@@ -175,7 +195,7 @@ try{
  await page.goto('http://localhost:8242/?preset='+encodeURIComponent(path.slice(1)));
  await page.waitForFunction(()=>window.prismaReady&&JSON.parse(localStorage.getItem('prisma-current-v2'))?.state?.structWeaveBranching===1,null,{timeout:30000});
  await page.waitForFunction(()=>document.getElementById('render-error').hidden,null,{timeout:80000});
- const controls=['structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY','structWeaveBranching','structWeaveTension','structWeaveFront','structWeaveFinesse','structWeaveReach','structWeaveRelease','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupSize','structWeaveFlare'];
+ const controls=['structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY','structWeaveSlope','structWeaveArch','structWeaveCradle','structWeaveFlex','structWeaveBranching','structWeaveTension','structWeaveFront','structWeaveFinesse','structWeaveReach','structWeaveRelease','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupSize','structWeaveFlare'];
  await page.locator('[data-tab="shape"]').click();
  for(const key of controls)assert.equal(await page.locator('[data-number="'+key+'"]').count(),1,key);
  await page.locator('[data-tab="material"]').click();

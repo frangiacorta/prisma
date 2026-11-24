@@ -1,4 +1,4 @@
-import {junctionField,JUNCTION_GLSL} from './weave-junction.js?v=2ed2af454163';
+import {junctionField,JUNCTION_GLSL} from './weave-junction.js?v=e537543adb5a';
 
 const TAU = Math.PI * 2;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -457,11 +457,14 @@ float weaveNetworkField(float field,vec3 p,float wall){
  #elif defined(WEAVE_TISSUE_ONLY)
  return tissueField(field,p,wall,weaveSurface);
  #else
- if(uWeaveTension<=0.)return gridNetworkField(field,p,wall);
- vec3 detail;float tissue=tissueField(field,p,wall,detail);
- if(uWeaveTension>=1.){weaveSurface=detail;return tissue;}
- float grid=gridNetworkField(field,p,wall);
+ // A single call site per field also keeps the mixed slider position
+ // from compiling two copies of the complete grid ray intersection.
+ float grid=0.,tissue=0.;vec3 detail=vec3(0.);
+ if(uWeaveTension<1.)grid=gridNetworkField(field,p,wall);
+ if(uWeaveTension>0.)tissue=tissueField(field,p,wall,detail);
  if(uWeaveTension>=.5)weaveSurface=detail;
+ if(uWeaveTension<=0.)return grid;
+ if(uWeaveTension>=1.)return tissue;
  return mix(grid,tissue,uWeaveTension);
  #endif
 }

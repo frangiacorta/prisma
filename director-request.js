@@ -1,4 +1,4 @@
-import {DIRECTOR_BRIEF,directorBase,directorCatalog,directorStateSummary} from './director-model.js?v=2ed2af454163';
+import {DIRECTOR_BRIEF,directorBase,directorCatalog,directorStateSummary} from './director-model.js?v=e537543adb5a';
 export function prepareDirector(body){
  if(!body?.decks?.A?.state||!body?.decks?.B?.state||!Array.isArray(body.frames)||body.frames.length!==2)throw Error('Servono due scene e due immagini della performance.');
  if(typeof body.brief!=='string'||body.brief.length>4000||typeof body.memory!=='string'||body.memory.length>3000)throw Error('Indicazioni troppo lunghe.');
