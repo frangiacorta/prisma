@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=de5c2d2312c1';
-import {EXTRA_HELP} from './control-help-extra.js?v=de5c2d2312c1';
-import {FRACTAL_HELP} from './fractal-form.js?v=de5c2d2312c1';
-import {CELLULAR_HELP} from './cellular-form.js?v=de5c2d2312c1';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=de5c2d2312c1';
-import {trailLightCompensation} from './particle-model.js?v=de5c2d2312c1';
+import {AUDIO_HELP} from './audio-model.js?v=60eb7092f3ba';
+import {EXTRA_HELP} from './control-help-extra.js?v=60eb7092f3ba';
+import {FRACTAL_HELP} from './fractal-form.js?v=60eb7092f3ba';
+import {CELLULAR_HELP} from './cellular-form.js?v=60eb7092f3ba';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=60eb7092f3ba';
+import {trailLightCompensation} from './particle-model.js?v=60eb7092f3ba';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishPalette:'Converte il chiaroscuro della scena in una palette ordinata da scuro a chiaro. La trasparenza resta invariata.',
@@ -295,8 +295,11 @@ export function controlCondition(s,key){
  if(key==='structWeaveMembrane'&&(!positive('structFibres')||!positive('structWeft')||!positive('structShell')))return 'Aumenta fibre, tessitura e svuotamento per aprire la membrana fra i rami.';
  if(key==='structWeaveCup'&&!positive('structWeaveGrowth'))return 'Aumenta Crescita degli steli.';
  if(key==='structWeaveBranching'&&(!positive('structFibres')||!positive('structWeft')||!positive('structShell')))return 'Aumenta fibre, tessitura e svuotamento.';
- if(['structWeaveFinesse','structWeaveRelease','structWeaveReach'].includes(key)&&!positive('structWeaveBranching'))return 'Aumenta Ramificazione del reticolo.';
+ if(['structWeaveFinesse','structWeaveRelease','structWeaveReach','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupLight','structWeaveCupSize'].includes(key)&&!positive('structWeaveBranching'))return 'Aumenta Ramificazione del reticolo.';
+ if(key==='structWeaveCupSize'&&(s.structWeaveRelease||0)<=.27&&(s.structWeaveCup||0)<=.10&&!s.motions?.structWeaveRelease?.enabled&&!s.motions?.structWeaveCup?.enabled)return 'Aumenta Apertura delle coppe o Ritiro dei ponti.';
  if(key==='structWeaveReach'&&!positive('structWeaveGrowth'))return 'Aumenta Crescita degli steli.';
+ if(key==='structWeaveAlignment'&&!positive('structWeaveMembrane'))return 'Aumenta Membrana fra i rami.';
+ if(key==='structWeaveCupLight'&&!positive('structWeaveRelease')&&!positive('structWeaveCup'))return 'Aumenta Apertura delle coppe o Ritiro dei ponti.';
  if(key==='structWeaveGrowth'&&(!positive('structFibres')||!positive('structWeft')||!positive('structShell')))return 'Aumenta fibre, tessitura e svuotamento per creare le giunzioni.';
  if(key==='structWeaveNodes'&&!positive('structWeft'))return 'Aumenta i fili trasversali per creare giunzioni.';
  if(['pSelfShadowSoftness','pSelfShadowBias','pOpticalExtent'].includes(key)&&!positive('pSelfShadow')&&!positive('pCaustic'))return 'Attiva ombre reciproche o caustiche.';

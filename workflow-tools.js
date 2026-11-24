@@ -1,12 +1,12 @@
-import {organizeWorkspace} from './workspace-layout.js?v=de5c2d2312c1';
-import {mountPresetLibrary} from './preset-library.js?v=de5c2d2312c1';
-import {newCreation,material} from './creative-model.js?v=de5c2d2312c1';
-import {addHelp} from './inspector-ui.js?v=de5c2d2312c1';
-import {META,MOODS} from './model.js?v=de5c2d2312c1';
-import {animationPhase} from './animation-clock.js?v=de5c2d2312c1';
-import {MAX_MOTION_POINTS,isMotionAngle,motionPointOffset,motionPointValue,normalizeMotionPoints,supportsMotionPoints} from './motion-keyframes.js?v=de5c2d2312c1';
-import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=de5c2d2312c1';
-import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=de5c2d2312c1';
+import {organizeWorkspace} from './workspace-layout.js?v=60eb7092f3ba';
+import {mountPresetLibrary} from './preset-library.js?v=60eb7092f3ba';
+import {newCreation,material} from './creative-model.js?v=60eb7092f3ba';
+import {addHelp} from './inspector-ui.js?v=60eb7092f3ba';
+import {META,MOODS} from './model.js?v=60eb7092f3ba';
+import {animationPhase} from './animation-clock.js?v=60eb7092f3ba';
+import {MAX_MOTION_POINTS,isMotionAngle,motionPointOffset,motionPointValue,normalizeMotionPoints,supportsMotionPoints} from './motion-keyframes.js?v=60eb7092f3ba';
+import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=60eb7092f3ba';
+import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=60eb7092f3ba';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){

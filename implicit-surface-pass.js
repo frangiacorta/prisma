@@ -24,9 +24,15 @@ void main(){
  vec4 through=uImplicitContinue>.5?texelFetch(uImplicitThrough,pixel,0):vec4(1.,1.,1.,first.w>=0.?1.:0.);
  for(int layer=0;layer<int(min(4.,uRuntime.w*.25));layer++){
   vec4 intersection=implicitLayer(layer,pixel);if(intersection.w<0.||max(max(through.r,through.g),through.b)<.001)break;
-  vec3 p=origin+direction*intersection.w,n=normalize(intersection.xyz);if(dot(n,direction)>0.)n=-n;
+  vec3 p=origin+direction*intersection.w;
 #ifdef WEAVE_HIT_TAG
-  weaveLitTip=clamp(length(intersection.xyz)-1.,0.,2.);
+  vec2 oct=intersection.xy;
+  vec3 n=normalize(vec3(oct,max(0.,1.-abs(oct.x)-abs(oct.y))));
+  float region=floor(intersection.z/1048576.);
+  float packed=intersection.z-region*1048576.;
+  weaveLitTip=vec3(region,floor(packed/1024.)/1023.,mod(packed,1024.)/1023.);
+#else
+  vec3 n=normalize(intersection.xyz);if(dot(n,direction)>0.)n=-n;
 #endif
   implicitBehind=vec4(0.);implicitTransmission=vec3(0.);float issue;
   vec4 surface=shade(p,n,direction,true,issue);

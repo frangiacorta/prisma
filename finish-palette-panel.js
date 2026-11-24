@@ -1,4 +1,4 @@
-import {MAX_COLORS} from './studio-model.js?v=de5c2d2312c1';
+import {MAX_COLORS} from './studio-model.js?v=60eb7092f3ba';
 
 export function paletteTonePanel(s,h){
  const {details,slider,check}=h,colors=s.finishPaletteColors;

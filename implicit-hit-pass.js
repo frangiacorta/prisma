@@ -26,7 +26,8 @@ void main(){
  for(int step=0;step<int(uHitBudget.x);step++){
   if(t>end||layer>=uHitCount)break;
 #ifdef WEAVE_HIT_TAG
-  weaveSurface=0.;
+  weaveSurface=vec3(0.);
+  weaveEvaluateMaterial=mode==3;
 #endif
   float distance=field(samplePoint);
   if(mode==0){
@@ -76,13 +77,17 @@ void main(){
    // in that tolerance band for many steps on the same sheet. Confirm an
    // actual interior, then ignore all candidates until its next exit.
    if(distance<-epsilon*.1){
-    // The length carries the terminal coverage. The material normalizes
-    // the direction again before shading the same geometric intersection.
-    float material=1.;
 #ifdef WEAVE_HIT_TAG
-    material+=weaveSurface;
+    // Entry normals face the camera. Store their octahedral coordinates
+    // beside a 4-bit surface tag and two 10-bit material coordinates.
+    vec2 oct=entryNormal.xy/dot(abs(entryNormal),vec3(1.));
+    vec2 terminal=floor(weaveSurface.yz*1023.+.5);
+    float packed=weaveSurface.x*1048576.+terminal.x*1024.+terminal.y;
+    hits[layer]=vec4(oct,packed,hitT);
+#else
+    hits[layer]=vec4(entryNormal,hitT);
 #endif
-    hits[layer]=vec4(entryNormal*material,hitT);layer++;awaitExit=true;sawInside=true;
+    layer++;awaitExit=true;sawInside=true;
    }
    rejectUntil=t+epsilon*3.;previousValid=false;mode=0;samplePoint=origin+direction*t;
   }

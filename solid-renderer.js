@@ -1,15 +1,15 @@
-import {ImplicitRayStatus} from './implicit-ray-status.js?v=de5c2d2312c1';
-import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=de5c2d2312c1';
-import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=de5c2d2312c1';
-import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=de5c2d2312c1';
-import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=de5c2d2312c1';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=de5c2d2312c1';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=de5c2d2312c1';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=de5c2d2312c1';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=de5c2d2312c1';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=de5c2d2312c1';
-import {META} from './model.js?v=de5c2d2312c1';
-import {hasMotionPoints,isMotionAngle,motionPointOffset,motionPointValue} from './motion-keyframes.js?v=de5c2d2312c1';
+import {ImplicitRayStatus} from './implicit-ray-status.js?v=60eb7092f3ba';
+import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=60eb7092f3ba';
+import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=60eb7092f3ba';
+import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=60eb7092f3ba';
+import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=60eb7092f3ba';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=60eb7092f3ba';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=60eb7092f3ba';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=60eb7092f3ba';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=60eb7092f3ba';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=60eb7092f3ba';
+import {META} from './model.js?v=60eb7092f3ba';
+import {hasMotionPoints,isMotionAngle,motionPointOffset,motionPointValue} from './motion-keyframes.js?v=60eb7092f3ba';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -747,7 +747,10 @@ vec4 materialRelief(vec3 local,vec3 geometricNormal,vec3 rd){
  return vec4(gradient,roughening);
 }
 #ifdef WEAVE_HIT_TAG
-float weaveLitTip;
+vec3 weaveLitTip;
+#endif
+#if defined(WEAVE_DETAIL) && !defined(WEAVE_BANDS_ONLY)
+uniform vec2 uWeaveFocus;
 #endif
 vec3 reliefNormal(vec3 original,vec3 geometricNormal,vec3 rd,vec3 gradient){
  vec3 n=normalize(original-gradient);
@@ -767,6 +770,7 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  issue=0.;vec3 local=transform(p),n=geometricNormal;
  float fibreWeight=0.,fibreDensity=1.;vec3 fibreTangent=vec3(0.,1.,0.);
  float branches=0.,weaveTip=0.,weaveThroat=0.,weaveRelease=0.,weaveStriae=0.,weaveSpeckle=0.;
+ float cupDiffusion=0.,cupSeed=0.,cupHeight=0.,weaveDepth=1.;
  #if defined(WEAVE_DETAIL) && !defined(WEAVE_BANDS_ONLY)
  branches=uWeaveNetwork.x*uStructureA.x*uStructureA.z*uStructureA.w;
  #endif
@@ -815,21 +819,52 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
   float fibre=pow(.5+.5*cos(uv.x*frequency+drift),6.);
   float secondary=pow(.5+.5*cos((uv.x*.75+uv.y*.64)*frequency-drift),8.);
   float scatter=branches*uTexture.z*(.25+.75*max(uWeaveGrowth.z,release));
+  float normalAngle=atan(geometricNormal.y,geometricNormal.x),cupAngle=normalAngle;
+  float textureLock=max(uWeaveDetail.x,uWeaveDetail.z);
   #ifdef WEAVE_HIT_TAG
-  weaveTip=step(.75,weaveLitTip);
-  weaveThroat=weaveTip*pow(1.-clamp(weaveLitTip-1.,0.,1.),3.);
+  float terminal=min(1.,weaveLitTip.x/14.);
+  weaveTip=mix(step(.60,terminal),smoothstep(.18,.94,terminal),textureLock);
+  cupSeed=step(14.5,weaveLitTip.x);
+  cupHeight=weaveLitTip.y;
+  weaveThroat=weaveTip*pow(1.-cupHeight,3.);
+  cupAngle=weaveLitTip.z*6.28318530718;
+  #else
+  vec2 site=fract(uv+.5)-.5;
+  cupHeight=smoothstep(.10,.42,site.y);
+  weaveTip=smoothstep(.08,.25,abs(site.x))*cupHeight*.65*max(textureLock,clamp(uWeaveDetail.w,0.,1.));
+  weaveThroat=weaveTip*.24;
   #endif
   weaveRelease=release;
-  float spokes=floor(21.+13.*uWeaveNetwork.y);
-  float fine=(1.-smoothstep(.8,2.9,spokes*footprint*4.9))*smoothstep(.10,.54,length(geometricNormal.xy));
-  float spoke=.19+fine*(pow(.5+.5*cos(atan(geometricNormal.y,geometricNormal.x)*spokes+2.3*sin(domain.y*13.)),5.)-.19);
+  cupDiffusion=uWeaveDetail.w*branches*weaveTip*max(smoothstep(.24,.68,release),.70*smoothstep(.15,.72,uWeaveGrowth.y));
+  float distanceFromFocus=max(0.,uWeaveFocus.y-p.z);
+  weaveDepth=mix(1.,.13+.87*exp(-.59*distanceFromFocus),uWeaveDetail.x*uWeaveFocus.x);
+  float oldSpokes=floor(21.+13.*uWeaveNetwork.y);
+  float oldFine=(1.-smoothstep(.8,2.9,oldSpokes*footprint*4.9))*smoothstep(.10,.54,length(geometricNormal.xy));
+  float oldSpoke=.19+oldFine*(pow(.5+.5*cos(normalAngle*oldSpokes+2.3*sin(domain.y*13.)),5.)-.19);
+  float spokes=floor(26.+19.*uWeaveNetwork.y);
+  float fine=(1.-smoothstep(.69,2.45,spokes*footprint*4.6))*smoothstep(.035,.44,cupHeight);
+  float aperture=smoothstep(.10,.73,uWeaveGrowth.y);
+  float fibreDrift=2.1*sin(cupHeight*6.+5.*cupAngle)+1.15*sin(11.*cupAngle)+.53*sin(cupHeight*23.-7.*cupAngle);
+  float radialFibre=pow(.5+.5*cos(cupAngle*spokes+fibreDrift),8.);
+  float alignedSpoke=.19+(.28+.56*aperture)*fine*(radialFibre*(.78+.22*sin(7.*cupAngle+12.*cupHeight))-.19);
+  float spoke=mix(oldSpoke,alignedSpoke,textureLock);
   float striae=mix(mix(.21,max(fibre,.56*secondary),antialias),spoke,weaveTip);
   vec3 grains=domain*139.;
   vec3 cell=floor(grains),offset=fract(grains)-.5;
   float random=fract(sin(dot(cell,vec3(127.1,311.7,147.39)))*43758.5453);
   float cluster=smoothstep(.48,.83,random);
   float grainAA=1.-smoothstep(.42,1.39,footprint*139.);
-  weaveSpeckle=cluster*exp(-dot(offset,offset)*18.)*grainAA;
+  weaveSpeckle=cluster*exp(-dot(offset,offset)*18.)*grainAA*(1.+textureLock*weaveTip*(.64-1.09*aperture));
+  #ifdef WEAVE_HIT_TAG
+  float ring=spokes*2.;
+  vec2 wallCell=vec2(weaveLitTip.z*ring+.39*sin(cupHeight*41.),cupHeight*49.);
+  vec2 wallId=floor(wallCell);wallId.x=mod(wallId.x,ring);
+  vec2 dotSeed=fract(sin(vec2(dot(wallId,vec2(127.1,311.7))+uSeed,dot(wallId,vec2(269.5,183.3))+7.9))*43758.5453);
+  float glowSeed=dotSeed.x;
+  vec2 speck=fract(wallCell)-(.20+.60*dotSeed);
+  float shimmer=smoothstep(.49,.95,glowSeed)*exp(-dot(speck,speck)*25.);
+  weaveSpeckle+=weaveTip*textureLock*shimmer*(1.-.81*aperture)*(1.-smoothstep(.63,2.8,ring*footprint*4.));
+  #endif
   weaveStriae=striae;
   vec3 inner=uInternalColor/max(.18,dot(uInternalColor,vec3(.2126,.7152,.0722)));
   base*=mix(vec3(1.),clamp(inner,vec3(.4),vec3(1.8)),branches*release*.61);
@@ -856,17 +891,24 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  }
  #endif
  vec3 dielectricF=fresnel(facing,1.,max(1.,uMat.y),local),diffuseLight=environment(n,p,1.)*.14;
+ vec3 cupLight=vec3(0.);
  for(int i=0;i<uLightCount;i++){
   vec3 off=uLights[i].xyz-p;float cosine=max(dot(n,normalize(off)),0.);
   diffuseLight+=uLightColors[i]*cosine*uLights[i].w*.35/(1.+dot(off,off)*.08);
   float fibreCosine=sqrt(max(0.,1.-pow(dot(fibreTangent,normalize(off)),2.)));
   diffuseLight+=uLightColors[i]*fibreWeight*fibreCosine*uLights[i].w*.28/(1.+dot(off,off)*.12);
+  if(cupDiffusion>0.)cupLight+=uLightColors[i]*uLights[i].w*(.67+.33*abs(dot(geometricNormal,normalize(off))))/(1.+dot(off,off)*.11);
  }
  vec3 diffuse=base*diffuseLight*(1.-uMat.z*(1.-uMat.x));
  if(uTransport.x>.001)diffuse=mix(diffuse,subsurfaceLight(p,geometricNormal,base),uTransport.x);
  float transmission=clamp(uMat.x,0.,1.);
  transmission*=1.-branches*weaveTip*(1.-weaveRelease)*.61;
  transmission+=transmission*(1.-transmission)*branches*weaveTip*smoothstep(.42,.85,weaveRelease)*pow(facing,.7)*.96;
+ #if defined(WEAVE_DETAIL) && !defined(WEAVE_BANDS_ONLY)
+ float cupClear=uWeaveDetail.x*weaveTip*smoothstep(.48,.98,weaveRelease);
+ transmission+=cupClear*.28*transmission*(1.-transmission);
+ #endif
+ transmission*=1.-cupSeed*clamp(cupDiffusion*.66,0.,.82);
  transmission=1.-(1.-transmission)*mix(1.,fibreDensity,fibreWeight*transmission);
  // A grazing view crosses a longer path through the same fibres. Use that
  // optical depth for both transmitted light and diffuse fibre visibility.
@@ -903,6 +945,11 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  float veil=branches*weaveRelease*transmission;
  vec3 fibreLight=base*(vec3(.23,.29,.35)+diffuseLight*.13);
  below+=fibreLight*veil*(wetRim*(.48+.72*weaveTip)+weaveStriae*.22+weaveSpeckle*.55+weaveThroat*.82)*(.18+.82*uTexture.z);
+ float neck=exp(-43.*pow(cupHeight-.16,2.));
+ float rimVisibility=wetRim*smoothstep(.13,.71,cupHeight);
+ float capTransport=.001+.056*rimVisibility+.096*neck+.019*weaveStriae+.108*weaveSpeckle;
+ vec3 cupTint=mix(uInternalColor,vec3(.88,.97,1.),clamp(.41*neck+.84*cupSeed,0.,1.));
+ below+=cupTint*cupLight*cupDiffusion*(capTransport*mix(.57,1.,transmission)+cupSeed*.57);
  float alpha=(1.-transmission)+glass.a*transmission;
  vec3 surfaceF=dielectricF*max(.1,uSurface.z);
  surfaceF*=1.-clamp(uModern.x,0.,1.);
@@ -954,6 +1001,7 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
     +interior*uCellOptics.w*(.14+.26*facing);
   alpha=mix(alpha,backdrop.a,clarity);
  }
+ below*=weaveDepth;
  float coreVisibility=1.-structureCore(local);
  return vec4(below*coreVisibility,1.-(1.-clamp(alpha,0.,1.))*coreVisibility);
 }`);
@@ -2275,7 +2323,8 @@ export class Renderer{
   // below the imager's precision. The transparent cups keep all layers.
   const release=s.structWeaveRelease||0;
   const through=s.transparency+(release>.42?s.transparency*(1-s.transparency)*.96:0);
-  const networkBatches=through>=.99999?layers:Math.max(1,Math.ceil(Math.log(.00025)/Math.log(Math.max(.001,through))/4));
+  const networkThrough=through+(release>.48?.28*(s.structWeaveHierarchy||0)*through*(1-through):0);
+  const networkBatches=networkThrough>=.99999?layers:Math.max(1,Math.ceil(Math.log(.00025)/Math.log(Math.max(.001,networkThrough))/4));
   const batches=independent?256:singleEntry?1:network?Math.min(layers,networkBatches):layers;
   const continuationStarted=performance.now();this.implicitContinuationStats=[];this.implicitStatusReadbackMs=0;
   const sheetScale=s.scale*Math.min(s.stretchX,s.stretchY,Math.max(.06,s.volume*s.stretchZ));
@@ -2446,6 +2495,7 @@ export class Renderer{
  this.endGpuTimer(timer);if(!options.deferCompletion){if(this.completionSync)g.deleteSync(this.completionSync);this.completionSync=g.fenceSync(g.SYNC_GPU_COMMANDS_COMPLETE,0);g.flush();}return true;}
  bindFrame(source,s,phase,width,height,options,key,analytic=false){const g=this.gl;bindGrowth(g,this.program,s,phase);if(key&ATLAS_PREVIEW)this.bindPreviewField();if(s.renderVersion>=2&&hasSolidForces(s)){uploadSolidForces(this,s);if(hasSolidForces(s))analytic=false;}if(key&512)this.uploadGrowth(s);if(key&32768){this.uploadRoots(s);this.bindRootOccupancy(s,!options.preview&&options.conservativeAtlas!==false);}const u=(name,v)=>g['uniform'+v.length+'fv'](this.locations[name],v),f=(name,v)=>g.uniform1f(this.locations[name],v),rad=Math.PI/180;
  if(s.renderVersion>=2){uploadCellular(s,g,this.locations,!!(key&CELLULAR_ENABLED));uploadFractal(s,u);u('uBudget',key&ATLAS_PREVIEW?(options.quality==='fast'?[hasSolidForces(s)?384:structureMayChange(source)?512:this.fieldResolution>=96?128:96,3,4,1]:[hasSolidForces(s)?512:structureMayChange(source)?768:128,4,8,2]):key&4096?(options.quality==='fast'?[88,6,4,1]:[128,8,8,2]):[224,32,16,4]);f('uGeometryRadius',geometryRadius(s,this.growthRadius));}
+ if(this.locations.uWeaveFocus)u('uWeaveFocus',[s.focusBlur||0,s.focusDepth||0]);
  if(s.renderVersion>=2){baseFormUniforms(s,g,this.locations);structureUniforms(s,u,(name,values)=>g.uniform4fv(this.locations[name],values));u('uFilmPattern',[s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5]);u('uFilmAccent',[s.filmChroma||0,s.filmDuo||0,s.filmIslands||0]);u('uMaterialDetail',[s.textureDepth??.35,s.textureScale??1,s.textureOrganic??.65,(s.textureAngle||0)*rad]);u('uMaterialLayers',[s.textureWrinkles||0,s.textureFolds||0,s.textureWear||0,s.textureRipples||0]);u('uOrganicDetail',[s.textureRandomness||0,s.textureWarp||0,s.textureLink||0,s.texturePatch||0]);f('uTextureSeed',s.textureSeed||0);u('uColorLayers',[s.colorLayers||0,s.colorLayerScale??1,s.colorLayerShift||0,s.colorLayerMix??.5]);u('uEnvironment',[{studio:0,sunset:1,neon:2,sky:3,aquarium:4,aurora:5,city:6}[s.environment]??0,(s.environmentAngle||0)*rad,s.environmentPower??1,s.environmentRefraction??.12]);f('uNormalSamples',6);g.uniform3fv(this.locations.uFilmResponse,FILM_SPECTRUM.data);g.uniform3fv(this.locations.uFilmWhite,FILM_SPECTRUM.white);u('uFilmMotion',[phase*motionCycles(s.filmCycles,s),s.filmFlow||0,s.filmSwirl||0,24]);u('uModern',[s.thinShell||0,s.grounding||0,s.groundShadow??1,s.groundCaustic??1]);u('uSampling',[...(options.jitter||[0,0]),+!!options.accumulate,options.weight??1]);u('uInternalColor',rgb(s.internalColor||'#e6f5ff'));u('uPetals',[s.petalAmount||0,s.petalCount||12,s.petalOpen??.65,s.petalCurl||0]);u('uPetalTip',[s.petalLength??1.05,s.petalWidth??.24,s.petalInflate??.6,s.petalSharp||0]);u('uPetalSpread',[s.petalCoverage||0,s.petalRows||5,(((s.petalPhase||0)%360+360)%360)*rad,0]);u('uOrganic',[s.petalBlend||0,s.petalRoot||0,s.petalRandom||0,(s.seed>>>0)&16777215]);u('uStem',[s.stemAmount||0,s.stemRadius??.09,s.stemBend||0,0]);u('uColorWave',[s.colorWaveAmount||0,s.colorWaveBands??1,s.colorWaveWarp??.2,((s.colorWavePhase||0)%1+1)%1]);u('uColorAxis',[s.colorWaveHeight??1,s.colorWaveRadius||0,s.colorWaveSwirl||0,0]);}
 
  if(key&STUDIO_LAYERS)f('uStudioOpacity',options.layerOpacity??1); f('uFilCore',(s.filLength||0)>0?(s.filCore??1):1);u('uResolution',[width,height]);u('uShape',[s.volume,s.stretchX,s.stretchY,s.stretchZ]);u('uWarp',[s.deform,s.asymmetry,s.twist,s.waveScale]);u('uVoid',[s.hole,s.holeX,s.holeY,s.holeShape]);u('uCut',[s.cut,s.cutX,s.cutY,s.edge]);u('uMat',[s.transparency,s.refraction,s.metal,s.renderVersion>=2?Math.min(1,s.roughness+(1-s.gloss)*.35):s.roughness]);u('uSurface',[s.iridescence,s.thickness,s.gloss,s.emission]);u('uGradient',[s.gradientAngle*rad,s.gradientScale,s.gradientOffset,s.colorSoftness]);u('uFrame',[s.scale,s.positionX,s.positionY,s.grain]);u('uOther',[s.rotateY*rad,s.rotateX*rad,s.waves,s.glow]);u('uExtraShape',[s.roundness||0,s.taper||0,s.bendX||0,s.bendY||0]);u('uExtraShape2',[s.lobeAmount||0,s.lobes||5,s.pinch||0,s.rimRound||0]);u('uExtraShape3',[s.holeAspect||1,s.cutAspect||1,(s.rotateZ||0)*rad,0]);u('uCoat',[s.coat||0,s.coatRoughness||.1,s.fresnel??1,s.iridShift||0]);u('uOptics',[s.iridScale||1,s.dispersion||0,s.absorption||0,s.tintStrength??.15]);u('uTexture',[s.anisotropy||0,(s.anisotropyAngle||0)*rad,s.surfaceTexture||0,0]);

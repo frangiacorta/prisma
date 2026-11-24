@@ -1,6 +1,6 @@
-import {clockStatus} from './animation-clock.js?v=de5c2d2312c1';
-import {hasMotionPoints} from './motion-keyframes.js?v=de5c2d2312c1';
-import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=de5c2d2312c1';
+import {clockStatus} from './animation-clock.js?v=60eb7092f3ba';
+import {hasMotionPoints} from './motion-keyframes.js?v=60eb7092f3ba';
+import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=60eb7092f3ba';
 export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['library','Preset']];
 const html=s=>{const d=document.createElement('div');d.innerHTML=s;return d;};
 const section=(title,id)=>{const d=document.createElement('details');d.className='control-details';if(id)d.id=id;const h=document.createElement('summary');h.textContent=title;d.append(h);return d;};

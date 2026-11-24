@@ -9,16 +9,19 @@ import { structureField, STRUCTURE_DEFAULTS } from '../structure-model.js';
 
 const source=existsSync('web/studio/index.html')?'web/studio':'.';
 const path='/previews/reticolo-giunzioni.prisma.json';
-const raw=await readFile(source+path,'utf8');
+const raw=await readFile(process.argv.find(arg=>arg.startsWith('--preset='))?.slice(9)||source+path,'utf8');
 const project=readPreset(raw);
 const {state}=project;
 const tau=Math.PI*2;
 const at=seconds=>sampleFrame(state,seconds/state.duration*tau);
 const original=normalizeCreation(newCreation());
 const dormant={...original,...STRUCTURE_DEFAULTS,structWeaveBranching:1};
+const opticsAt=at(24);
 for(const point of [[0,0,0],[1,0,0],[0,1.2,.86]]){
  const d=Math.hypot(...point)-1;
  assert.equal(structureField(dormant,d,point),structureField(original,d,point));
+ assert.equal(structureField({...opticsAt,structWeaveCupLight:0},d,point),
+              structureField({...opticsAt,structWeaveCupLight:1.6},d,point));
 }
 for(const [key,track] of Object.entries(state.motions).filter(([,track])=>track.mode==='points')){
  assert(track.enabled&&track.points.length>=10,key);
@@ -28,6 +31,7 @@ assert(at(2).structWeaveGrowth>at(7).structWeaveGrowth+.6);
 assert(at(17).structWeaveRelease>at(11).structWeaveRelease+.5);
 assert(at(24).structWeaveCup>at(17).structWeaveCup+.6);
 assert(at(24).transparency>at(5).transparency+.4);
+assert(at(24).structWeaveCupLight>at(5).structWeaveCupLight+.2);
 assert.deepEqual(readPreset(JSON.stringify(presetDocument(project))).state.motions,state.motions);
 if(process.argv.includes('--model')){
  console.log('Reticolo · punti temporali, sezione disattivata e salvataggio verificati');
@@ -42,6 +46,7 @@ try{
  await page.route('http://localhost:8242/**',async route=>{
   const url=new URL(route.request().url());
   if(url.pathname==='/weave-check.html')return route.fulfill({contentType:'text/html',body:'<!doctype html>'});
+  if(url.pathname===path)return route.fulfill({contentType:'application/json',body:raw});
   const file=source+(url.pathname==='/'?'/index.html':url.pathname);
   return existsSync(file)?route.fulfill({path:file}):route.fulfill({status:404,body:'File unavailable'});
  });
@@ -117,18 +122,25 @@ try{
   };
   const bridge={...sampleFrame(state,7/state.duration*tau),motions:{}};
   const sprout={...sampleFrame(state,2/state.duration*tau),motions:{}};
+  const emerging={...sampleFrame(state,1/state.duration*tau),motions:{}};
   const cups={...sampleFrame(state,24/state.duration*tau),motions:{}};
   const trials=[
    ['ramificazione',bridge,'structWeaveBranching',.34],
+   ['gerarchia',bridge,'structWeaveHierarchy',0],
    ['fibre',bridge,'structWeaveFinesse',.42],
+   ['direzione microfibre',bridge,'structWeaveAlignment',0],
    ['ponti',bridge,'structWeaveMembrane',.24],
    ['giunzioni',bridge,'structWeaveNodes',.2],
    ['ritiro',cups,'structWeaveRelease',.43],
    ['crescita',sprout,'structWeaveGrowth',.13],
+   ['sfasamento della crescita',emerging,'structDelay',.95],
    ['lunghezza',sprout,'structWeaveReach',.48],
+   ['apertura laterale',cups,'structWeaveSpread',.51],
    ['coppe',cups,'structWeaveCup',.17],
+   ['diametro coppe',cups,'structWeaveCupSize',.52],
    ['apertura indipendente dal ritiro',sprout,'structWeaveCup',1],
    ['trasparenza',cups,'transparency',.22],
+   ['luce interna',cups,'structWeaveCupLight',0],
    ['fuoco',bridge,'focusDepth',1.7],
    ['luce',bridge,'lights',bridge.lights.map(light=>({...light,power:light.power*.23}))]
   ];
@@ -155,9 +167,11 @@ try{
  await page.goto('http://localhost:8242/?preset='+encodeURIComponent(path.slice(1)));
  await page.waitForFunction(()=>window.prismaReady&&JSON.parse(localStorage.getItem('prisma-current-v2'))?.state?.structWeaveBranching===1,null,{timeout:30000});
  await page.waitForFunction(()=>document.getElementById('render-error').hidden,null,{timeout:80000});
- const controls=['structWeaveBranching','structWeaveFinesse','structWeaveReach','structWeaveRelease'];
+ const controls=['structWeaveBranching','structWeaveFinesse','structWeaveReach','structWeaveRelease','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupSize'];
  await page.locator('[data-tab="shape"]').click();
  for(const key of controls)assert.equal(await page.locator('[data-number="'+key+'"]').count(),1,key);
+ await page.locator('[data-tab="material"]').click();
+ assert.equal(await page.locator('[data-number="structWeaveCupLight"]').count(),1);
  await page.locator('[data-tab="motion"]').click();
  await page.locator('[data-animate-path="motions.structWeaveRelease"]').click();
  const rows=page.locator('#animation-editor .motion-point');

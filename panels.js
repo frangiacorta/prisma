@@ -1,23 +1,23 @@
-import {paletteTonePanel} from './finish-palette-panel.js?v=de5c2d2312c1';
-import {dynamicsPanel} from './dynamics-panel.js?v=de5c2d2312c1';
-import {motionPeriod} from './animation-clock.js?v=de5c2d2312c1';
-import {GROWTH_STUDIES} from './growth-material.js?v=de5c2d2312c1';
-import {GLYPH_FONTS} from './finishing.js?v=de5c2d2312c1';
-import {BASE_FORMS} from './base-forms.js?v=de5c2d2312c1';
-import {structurePanel,STRUCTURE_TRACKS,WEAVE_TRACKS} from './structure-model.js?v=de5c2d2312c1';
-import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=de5c2d2312c1';
-import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=de5c2d2312c1';
-import {finishingOrderPanel} from './finishing-order.js?v=de5c2d2312c1';
-import {rootMotionSuspended} from './solid-renderer.js?v=de5c2d2312c1';
-import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=de5c2d2312c1';
-import {MOODS} from './model.js?v=de5c2d2312c1';
-import {supportsMotionPoints} from './motion-keyframes.js?v=de5c2d2312c1';
-import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=de5c2d2312c1';
+import {paletteTonePanel} from './finish-palette-panel.js?v=60eb7092f3ba';
+import {dynamicsPanel} from './dynamics-panel.js?v=60eb7092f3ba';
+import {motionPeriod} from './animation-clock.js?v=60eb7092f3ba';
+import {GROWTH_STUDIES} from './growth-material.js?v=60eb7092f3ba';
+import {GLYPH_FONTS} from './finishing.js?v=60eb7092f3ba';
+import {BASE_FORMS} from './base-forms.js?v=60eb7092f3ba';
+import {structurePanel,STRUCTURE_TRACKS,WEAVE_TRACKS} from './structure-model.js?v=60eb7092f3ba';
+import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=60eb7092f3ba';
+import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=60eb7092f3ba';
+import {finishingOrderPanel} from './finishing-order.js?v=60eb7092f3ba';
+import {rootMotionSuspended} from './solid-renderer.js?v=60eb7092f3ba';
+import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=60eb7092f3ba';
+import {MOODS} from './model.js?v=60eb7092f3ba';
+import {supportsMotionPoints} from './motion-keyframes.js?v=60eb7092f3ba';
+import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=60eb7092f3ba';
 export function pathValue(s,path){const parts=path.split('.');let value=s;for(let i=0;i<parts.length;i++){if(i===1&&parts[0]==='lights')value=value.find(l=>l.id===Number(parts[i]));else value=value?.[parts[i]];}return value}
 export function pathMeta(path,state){const parts=path.split('.'),last=parts.at(-1);if(last==='cycles')return state?.perfectLoop===false?['Ripetizioni nel ciclo',.1,8,.1]:['Ripetizioni nel loop',1,8,1];if(last==='pace')return['Accelerazione / decelerazione',0,.95,.01];if(last==='pacePhase')return['Punto di massima velocità',0,360,1];if(last==='hold')return['Pausa a ogni giro',0,.8,.01];if(last==='phase')return['Fase di partenza',0,360,1];if(last==='amplitude'){if(parts[0]==='motions'){const m=TRACK_META[parts[1]];return ['Ampiezza',m[1],m[2],m[3]]}return parts[2]==='orbit'?['Ampiezza orbita',0,180,1]:['Ampiezza pulsazione',0,1,.01]}return LIGHT_META[last]}
 export function writePath(s,path,value){const parts=path.split('.');let object=s;for(let i=0;i<parts.length-1;i++){if(i===1&&parts[0]==='lights')object=object.find(l=>l.id===Number(parts[i]));else object=object[parts[i]];}if(object)object[parts.at(-1)]=value}
-import {livingChooser} from './living-panel.js?v=de5c2d2312c1';
-import {particlePanel} from './particle-panel.js?v=de5c2d2312c1';
+import {livingChooser} from './living-panel.js?v=60eb7092f3ba';
+import {particlePanel} from './particle-panel.js?v=60eb7092f3ba';
 function uniqueControls(primary,extra){
  const main=document.createElement('div'),addition=document.createElement('div');
  main.innerHTML=primary;addition.innerHTML=extra;
@@ -37,7 +37,7 @@ function uniqueControls(primary,extra){
  for(const p of addition.querySelectorAll(':scope > p.help,:scope > p.control-intro'))p.remove();
  return main.innerHTML+addition.innerHTML;
 }
-import {cloudBody,grainMix} from './body-layers.js?v=de5c2d2312c1';
+import {cloudBody,grainMix} from './body-layers.js?v=60eb7092f3ba';
 export function buildPanel(tab,s,h,selectedLight){
  const cloud=cloudBody(s),base=(id=tab)=>sharedPanel(id,s,h,selectedLight),particles=(id=tab)=>particlePanel(id,s,{...h,cloud,grainMix:grainMix(s)},sharedPanel,selectedLight);
  if(tab==='shape'){
@@ -101,6 +101,7 @@ export function sharedPanel(tab,s,h,selectedLight){
   +details('Gambo',slider('stemAmount')+slider('stemRadius')+slider('stemBend'));
  if(tab==='material')return section('Materia',slider('transparency',['Opaca','Trasparente'])+check('thinShellMode','Lamine trasparenti · senza rifrazione')+slider('fullness',['Pellicola','Pieno'])+slider('gloss')+slider('roughness')+slider('metal')+colorField('internalColor','Colore interno')+details('Esempi di materia',`<label class="field">Applica una materia<select id="material-picker" aria-label="Materiale iniziale"><option value="">Scegli una materia</option>${MATERIAL_STYLES.map((m,i)=>`<option value="${i}">${m.name}</option>`).join('')}</select></label><p class="help">Modifica le proprietà della materia. Geometria, luci e movimento restano quelli della tua creazione.</p>`)+details('Materiali precedenti',`<div class="mood-grid">${LEGACY_MATERIAL_STYLES.map((m,i)=>`<button class="mood" data-legacy-material="${i}">${m.name}</button>`).join('')}</div>`))
  +details('Madreperla delle cellule',['cellPearl','cellFilm','cellColorSpread','cellClarity'].map(k=>slider(k)).join('')+'<button data-jump-tab="shape" data-jump-param="cellMorph">Regola lo sviluppo cellulare</button>')
+ +details('Ottica del reticolo',slider('structWeaveCupLight')+'<p class="help">La diffusione illumina pareti e nucleo delle coppe. Regola il colore con Colore interno e l’illuminazione nel pannello Luci.</p>')
  +details('Trasparenza e diffusione',slider('refraction')+slider('dispersion')+slider('absorption')+slider('tintStrength')+slider('translucency')+slider('scattering')+slider('scatterDirection')+slider('subsurface')+slider('sssRadius')+colorField('sssColor','Colore sottopelle')+`<button id="add-inside-light" class="outline">${icon('sun')}Una luce dentro la forma</button><p class="help">In Colori → Strati di colore puoi sovrapporre i colori della palette anche in profondità.</p>`)
  +details('Volume dei granelli',slider('pVolumeContinuity',['Granelli','Volume continuo'])+slider('pVolumeTurbulence')+slider('pVolumeFilaments')+'<p class="help">Aumenta Granelli in Forma → Rappresentazione. Diffusione interna regola la densità. Assorbimento della nube in Scena regola le ombre interne. Ampiezza, Ricircolo e Pulsazione in Movimento animano il volume.</p>')
  +details('Interferenza di pellicola',slider('iridescence',['Spenta','Intensa'])+slider('thinFilm',['Riflesso di palette','Interferenza ottica'])+slider('filmIslands',['Venature','Isole'])+['filmThickness','filmPattern','filmPatternScale','filmPatternWarp','filmPatternDetail','filmChroma','filmDuo'].map(k=>slider(k)).join('')+'<p class="help">I comandi funzionano su qualsiasi materia: aumenta Iridescenza per vedere i riflessi e Interferenza ottica per le bande della pellicola. Cobalto e oro è una combinazione facoltativa di questi valori.</p>'+details('Esempi di interferenza','<button class="outline" data-film-look="cobalt">Cobalto e oro · solo interferenza</button><p class="help">Conserva geometria, palette, trasparenza, rugosità, luci e movimenti.</p>'))

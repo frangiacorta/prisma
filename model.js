@@ -1,13 +1,13 @@
-import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=de5c2d2312c1';
-import {GROWTH_DEFAULTS} from './growth-material.js?v=de5c2d2312c1';
-import {FINISH_DEFAULTS} from './finishing.js?v=de5c2d2312c1';
-import {FIGURE_SCALE} from './base-forms.js?v=de5c2d2312c1';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=de5c2d2312c1';
-import {FRACTAL_KEYS} from './fractal-form.js?v=de5c2d2312c1';
-import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=de5c2d2312c1';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=de5c2d2312c1';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=de5c2d2312c1';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=de5c2d2312c1';
+import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=60eb7092f3ba';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=60eb7092f3ba';
+import {FINISH_DEFAULTS} from './finishing.js?v=60eb7092f3ba';
+import {FIGURE_SCALE} from './base-forms.js?v=60eb7092f3ba';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=60eb7092f3ba';
+import {FRACTAL_KEYS} from './fractal-form.js?v=60eb7092f3ba';
+import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=60eb7092f3ba';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=60eb7092f3ba';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=60eb7092f3ba';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=60eb7092f3ba';
 export const BASE = {
  ...DYNAMICS_DEFAULTS,...PARTICLE_DEFAULTS,engine:'solid',keepMotionSpeed:true,motionPeriod:0,
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -109,7 +109,7 @@ GROUPS.photo.push('finishOrder');
 GROUPS.motion.push(...STRUCTURE_GROUPS.motion);
 GROUPS.motion.push(...Object.keys(CELLULAR_POSE));
 
-GROUPS.material.push('textureRandomness','textureWarp','textureLink','texturePatch','textureSeed');
+GROUPS.material.push('textureRandomness','textureWarp','textureLink','texturePatch','textureSeed','structWeaveCupLight');
 GROUPS.color.push('colorLayers','colorLayerScale','colorLayerShift','colorLayerMix');
 
 for(const k of Object.keys(FINISH_DEFAULTS))if(!GROUPS.photo.includes(k))GROUPS.photo.push(k);
