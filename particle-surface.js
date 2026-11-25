@@ -293,7 +293,7 @@ export class ParticleSurface{
   this.grainImage??=this.target(width,height,[g.RGBA16F]);
   o.bind(this.grainImage);g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);
   g.enable(g.BLEND);g.blendEquation(g.FUNC_ADD);g.blendFunc(g.ONE,g.ONE);
-  drawGrains(opacity);
+  drawGrains(opacity,this.grainImage);
   g.bindVertexArray(o.empty);
  }
  filterVolume(start,spread=0,occupancy=null){

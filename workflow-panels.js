@@ -1,7 +1,7 @@
-import {VEIL_GROUPS} from './veil-model.js?v=30f747c2b880';
-import {clockStatus} from './animation-clock.js?v=30f747c2b880';
-import {hasMotionPoints} from './motion-keyframes.js?v=30f747c2b880';
-import {nameControls,CONTROL_NAMES,recipeKey,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=30f747c2b880';
+import {VEIL_GROUPS} from './veil-model.js?v=88d17b3ed245';
+import {clockStatus} from './animation-clock.js?v=88d17b3ed245';
+import {hasMotionPoints} from './motion-keyframes.js?v=88d17b3ed245';
+import {nameControls,CONTROL_NAMES,recipeKey,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=88d17b3ed245';
 export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['library','Preset']];
 const html=s=>{const d=document.createElement('div');d.innerHTML=s;return d;};
 const section=(title,id)=>{const d=document.createElement('details');d.className='control-details';if(id)d.id=id;const h=document.createElement('summary');h.textContent=title;d.append(h);return d;};

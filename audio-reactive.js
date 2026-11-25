@@ -1,9 +1,9 @@
-import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=30f747c2b880';
-import {RhythmClock,TapTempo} from './audio-rhythm.js?v=30f747c2b880';
-import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=30f747c2b880';
-import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=30f747c2b880';
-import {META} from './model.js?v=30f747c2b880';
-import {CONTROL_NAMES} from './control-vocabulary.js?v=30f747c2b880';
+import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=88d17b3ed245';
+import {RhythmClock,TapTempo} from './audio-rhythm.js?v=88d17b3ed245';
+import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=88d17b3ed245';
+import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=88d17b3ed245';
+import {META} from './model.js?v=88d17b3ed245';
+import {CONTROL_NAMES} from './control-vocabulary.js?v=88d17b3ed245';
 const targetName=key=>CONTROL_NAMES[key]||META[key][0];
 
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

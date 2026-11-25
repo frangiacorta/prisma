@@ -1,5 +1,5 @@
-import {shadowLight} from './particle-shadow.js?v=30f747c2b880';
-import {PALETTE_DEFAULTS,PALETTE_META} from './finish-palette.js?v=30f747c2b880';
+import {shadowLight} from './particle-shadow.js?v=88d17b3ed245';
+import {PALETTE_DEFAULTS,PALETTE_META} from './finish-palette.js?v=88d17b3ed245';
 // One final image pass, after the complete frame (including tiled/accumulated exports).
 export const FINISH_DEFAULTS={finishEnabled:true,finishTone:true,finishRgb:false,finishMosaic:false,finishCompare:false,finishRgbR:8,finishRgbG:0,finishRgbB:-8,finishRgbAngle:0,finishRgbMix:1,finishCellX:12,finishCellY:12,finishMosaicMix:1};
 export const FINISH_META={finishRgbR:['Spostamento rosso',-60,60,.1],finishRgbG:['Spostamento verde',-60,60,.1],finishRgbB:['Spostamento blu',-60,60,.1],finishRgbAngle:['Direzione RGB',-180,180,1],finishRgbMix:['Intensità RGB',0,1,.01],finishCellX:['Larghezza celle',1,160,1],finishCellY:['Altezza celle',1,160,1],finishMosaicMix:['Intensità mosaico',0,1,.01]};

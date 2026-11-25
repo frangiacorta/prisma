@@ -1,26 +1,26 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=30f747c2b880';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=30f747c2b880';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=30f747c2b880';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=30f747c2b880';
-import {knotTurns} from './structure-model.js?v=30f747c2b880';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=30f747c2b880';
-import {shadowLight} from './particle-shadow.js?v=30f747c2b880';
-import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=30f747c2b880';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=30f747c2b880';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=30f747c2b880';
-import {ParticleLinks} from './particle-links.js?v=30f747c2b880';
-import {SurfaceWeb} from './surface-web.js?v=30f747c2b880';
-import {surfaceWebStrength} from './surface-web-model.js?v=30f747c2b880';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=30f747c2b880';
-import {LayeredVeils} from './layered-veils.js?v=30f747c2b880';
-import {LivingStructures} from './living-structures.js?v=30f747c2b880';
-import {ParticleSurface} from './particle-surface.js?v=30f747c2b880';
-import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=30f747c2b880';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=30f747c2b880';
-import {forceBarrierGLSL} from './particle-forces.js?v=30f747c2b880';
-import {grainReliefGLSL,materialCavity,prismaShadingGLSL} from './particle-shading.js?v=30f747c2b880';
-import {focusSlope} from './finishing.js?v=30f747c2b880';
-import {fiberMaterialUniform} from './fiber-material.js?v=30f747c2b880';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=88d17b3ed245';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=88d17b3ed245';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=88d17b3ed245';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=88d17b3ed245';
+import {knotTurns} from './structure-model.js?v=88d17b3ed245';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=88d17b3ed245';
+import {shadowLight} from './particle-shadow.js?v=88d17b3ed245';
+import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=88d17b3ed245';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=88d17b3ed245';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=88d17b3ed245';
+import {ParticleLinks} from './particle-links.js?v=88d17b3ed245';
+import {SurfaceWeb} from './surface-web.js?v=88d17b3ed245';
+import {surfaceWebStrength} from './surface-web-model.js?v=88d17b3ed245';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=88d17b3ed245';
+import {LayeredVeils} from './layered-veils.js?v=88d17b3ed245';
+import {LivingStructures} from './living-structures.js?v=88d17b3ed245';
+import {ParticleSurface} from './particle-surface.js?v=88d17b3ed245';
+import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=88d17b3ed245';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=88d17b3ed245';
+import {forceBarrierGLSL} from './particle-forces.js?v=88d17b3ed245';
+import {foldIlluminationGLSL,grainReliefGLSL,materialCavity,prismaShadingGLSL} from './particle-shading.js?v=88d17b3ed245';
+import {focusSlope} from './finishing.js?v=88d17b3ed245';
+import {fiberMaterialUniform} from './fiber-material.js?v=88d17b3ed245';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec3 uFocus;
 float particleDefocus(vec3 p){
@@ -79,9 +79,13 @@ layout(location=0) in vec4 aRandom;
 #define RETURN_FLOW_NORMAL
 ${grainGLSL}
 ${grainReliefGLSL}
-out vec3 vColor,vPosition;flat out vec4 vForceSeed,vFlowNormal;flat out vec3 vScatterAxis;flat out float vFleece;out float vOpacity,vCellLight,vRadius;out vec2 vSpriteUV;uniform float uPointQuad;
+${foldIlluminationGLSL}
+out vec3 vColor,vPosition;flat out vec4 vForceSeed,vFlowNormal,vFoldLight;flat out vec3 vScatterAxis;flat out float vFleece;out float vOpacity,vCellLight,vRadius;out vec2 vSpriteUV;uniform float uPointQuad,uSphereGrain,uFoldScatter;
 uniform vec3 uGrainAnisotropy;
 uniform int uSeedOffset;
+uniform highp sampler2D uScatterSeeds;
+flat out vec2 vFoldDetail;
+flat out vec3 vFoldSpecular;
 void main(){
  int index=uPointQuad>.5?gl_InstanceID:gl_VertexID;
  #ifdef GENERATED_GRAINS
@@ -90,19 +94,86 @@ void main(){
  #else
  vec4 seed=aRandom;
  #endif
+ vec2 sampleRay=vec2(0.);vec3 channel=vec3(0.);
+ if(uFoldScatter>0.){
+  // Stratify over the full population, including large grains, nodes and
+  // procedurally generated IDs beyond the stored texture.
+  int wavelength=index%3;
+  index=int(floor((float(index/3)+.5)*uFoldScatter));
+  seed=grainSeed(uScatterSeeds,index);
+  uint key=hashGrain(uint(index)^uGrainSeed^0xc68e9da4u);
+  sampleRay=vec2(hashGrain(key)>>8u,hashGrain(key+1u)>>8u)*(1./16777216.);
+  channel=wavelength==0?vec3(1.,0.,0.):wavelength==1?vec3(0.,1.,0.):vec3(0.,0.,1.);
+ }
  vec3 p=attachedPosition(seed,uPhase);gl_Position=project(p);
  vFlowNormal=vec4(returnFlowNormal,returnFlowWeight*(1.-uSurfaceBind));
+ vec3 rayFlux,incoming;
+ float haloMass=uCloudShape.y>0.?clamp((seed.w-1.+uCloudShape.y)/uCloudShape.y,0.,1.):0.;
+ float detached=vFlowNormal.w*min(1.,uCloudShape.z)*haloMass*haloMass;
+ float connected=(1.-smoothstep(.009,.11,detached))*(1.-uSphereGrain);
+ vFoldLight=foldIllumination(p,vFlowNormal.xyz,vFlowNormal.w*connected,returnFlowCompression,seed.z,channel,rayFlux,incoming,vFoldSpecular);
+ vFoldDetail=vec2(1.,returnFlowCompression);
  float trueSize=grainDiameter(seed,index)*uResolution.y/1080.;
+ if(uFoldScatter>0.){
+  // A persistent sample of the light leaving this fold segment. Each
+  // wavelength travels through the same suspended material at a different
+  // refracted angle. The halo moves with its emitter, lights and camera.
+  float radiance=max(rayFlux.r,max(rayFlux.g,rayFlux.b)),power=length(incoming);
+  if(radiance<.001||power<.00001){gl_Position=vec4(2.,2.,2.,1.);gl_PointSize=1.;return;}
+  vec3 incidence=incoming/power;
+  vec3 n=faceforward(vFlowNormal.xyz,incidence,vFlowNormal.xyz);
+  float wavelength=channel.b-channel.r;
+  float dispersion=uParticleOptical.z,ior=max(1.001,uParticleOptical.x);
+  float indexOfRefraction=max(1.001,ior+(ior-1.)*dispersion*wavelength*.5);
+  float eta=dot(incidence,vFlowNormal.xyz)<0.?1./indexOfRefraction:indexOfRefraction;
+  vec3 direction=refract(incidence,n,eta);
+  vec3 center=uStudioBody.x>0.?studioTransform(vec3(0.)):vec3(uFrame.yz,0.);
+  if(dot(direction,direction)<.5){gl_Position=vec4(2.,2.,2.,1.);gl_PointSize=1.;return;}
+  float travel=sampleRay.y*sampleRay.y;
+  float suspended=1.-exp(-2.7*uCloudShape.y-2.*uSharedLightResponse.z);
+  vec3 radial=p-center;
+  float radius=length(radial),outward=dot(radial,direction);
+  float margin=abs(uFrame.x)*min(.11,.035*suspended+.12*uCloudShape.y*uCloudShape.z);
+  float chord=sqrt(outward*outward+margin*(2.*radius+margin))-outward;
+  float receiver=.12+.88*smoothstep(-.08,.45,-outward/max(.0001,radius));
+  float distance=abs(uFrame.x)*min(5.,uParticleOptical.y)*(.16+.24*uCloudShape.z+.10*suspended);
+  // A thicker scattering medium exposes a longer, lit chord in the cavity.
+  float interior=1.-exp(-uSharedLightResponse.z*uParticleOptical.y);
+  distance+=abs(uFrame.x)*interior*(.48+.24*min(4.,uParticleOptical.y));
+  float travelDistance=min(distance*(.25+.75*travel),chord*(.76+.20*interior));
+  vec3 endpoint=p+direction*travelDistance;
+  vec4 start=gl_Position,end=project(endpoint);
+  vec2 beam=(end.xy/end.w-start.xy/start.w)*(.5*uResolution);
+  float beamLength=length(beam);
+  vec2 axis=beamLength>.001?beam/beamLength:vec2(1.,0.),perpendicular=vec2(-axis.y,axis.x);
+  int vertex=gl_VertexID%6;
+  float along=vertex==1||vertex>=4?1.:0.,side=vertex==0||vertex==1||vertex==4?-1.:1.;
+  p=mix(p,endpoint,along);gl_Position=mix(start,end,along);
+  vPosition=p;vForceSeed=seed;vSpriteUV=vec2(along,side*.5+.5);
+  vFleece=0.;vRadius=0.;vCellLight=1.;vScatterAxis=vec3(1.,0.,1.);
+  vFoldDetail.y=3.4-2.45*interior+uGrainAbsorption.x*travelDistance/max(.01,abs(uFrame.x));
+  // Integrate the whole divergent beam back to its emitter. Its width and
+  // attenuation vary continuously; sampling fewer rays never detaches dots.
+  float rootWidth=max(1.5,6.*uResolution.y/1080.);
+  float tipWidth=rootWidth+(13.+19.*uMaterial.y+17.*travel)*uResolution.y/1080.;
+  vec2 offset=perpendicular*(side*mix(rootWidth,tipWidth,along))+axis*((along-.5)*rootWidth);
+  gl_Position.xy+=offset/uResolution*gl_Position.w*2.;
+  gl_PointSize=1.;
+  float area=(beamLength+rootWidth)*(.72*rootWidth+.28*tipWidth);
+  vOpacity=uPoints.z*min(1.,trueSize*trueSize/max(1.,area))*uFoldScatter
+    *suspended*receiver*min(3.,uParticleOptical.y)*radiance*(1.+interior);
+  vColor=15.*rayFlux/radiance;
+  return;
+ }
  vRadius=trueSize*mix(max(2.,7.5-p.z)/(2.6*uResolution.y),1.7/min(uResolution.x,uResolution.y),uStudioPerspective);
  bool isNode=float(index)<uNodeStyle.x;
  vFleece=isNode?uFiberPile.x*fiberGrowthWeight(0.):(uFiberPile.z<.5?uFiberPile.x:0.);
  float extent=vFleece*mix(.024,.23,uFiberPile.y);
  float px=trueSize*(1.+extent)+particleDefocus(p);
- float haloMass=uCloudShape.y>0.?clamp((seed.w-1.+uCloudShape.y)/uCloudShape.y,0.,1.):0.;
- float detached=vFlowNormal.w*min(1.,uCloudShape.z)*haloMass*haloMass;
  float blur=(22.*max(0.,uPoints.w-1.)+48.*detached)*uResolution.y/1080.;
  float footprintSquared=max(4.,px*px)+blur*blur;
  float footprint=sqrt(footprintSquared);
+ vFoldDetail.x=clamp((1.7+trueSize+particleDefocus(p))/footprint,.44,1.);
  float deposit=uGrainRelief.x+uGrainRelief.y>0.?grainReliefDepth(restPoint(seed)):1.;
  vScatterAxis=vec3(1.,0.,1.);
  if(uGrainAnisotropy.x>0.&&vFlowNormal.w>0.&&uPoints.w>1.){
@@ -142,7 +213,10 @@ void main(){
 }`;
 const pointFrag=`#version 300 es
 precision highp float;
-in vec3 vColor,vPosition;flat in vec4 vForceSeed,vFlowNormal;flat in vec3 vScatterAxis;flat in float vFleece;in float vOpacity,vCellLight,vRadius;in vec2 vSpriteUV;uniform float uPointQuad,uSphereGrain;out vec4 color;
+in vec3 vColor,vPosition;flat in vec4 vForceSeed,vFlowNormal,vFoldLight;flat in vec3 vScatterAxis;flat in float vFleece;in float vOpacity,vCellLight,vRadius;in vec2 vSpriteUV;uniform float uPointQuad,uSphereGrain,uFoldScatter;
+layout(location=0) out vec4 color;layout(location=1) out vec4 sheetLayer;
+flat in vec2 vFoldDetail;
+flat in vec3 vFoldSpecular;
 ${prismaShadingGLSL}
 ${forceBarrierGLSL}
 ${guideGLSL}
@@ -155,12 +229,20 @@ vec2 cubicWindow(vec2 axis){
  return mix(vec2(2./3.)-x*x+.5*x*x*x,tail*tail*tail/6.,step(vec2(1.),x));
 }
 void main(){vec2 xy=(uPointQuad>.5?vSpriteUV:gl_PointCoord)*2.-1.;
+ sheetLayer=vec4(0.);
  if(vScatterAxis.z>1.&&uPointQuad<.5){
   xy=vec2(dot(xy,vScatterAxis.xy),dot(xy,vec2(-vScatterAxis.y,vScatterAxis.x))*vScatterAxis.z*vScatterAxis.z);
   if(max(abs(xy.x),abs(xy.y))>1.)discard;
  }
  vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;
  float d=length(xy),aa=max(fwidth(d),.04);
+ if(uFoldScatter>0.){
+  float along=vSpriteUV.x,crossRay=abs(xy.y);
+  float extinction=exp(-along*vFoldDetail.y-crossRay*crossRay*3.1);
+  float edge=smoothstep(0.,.048,along)*(1.-smoothstep(.53,1.,along))*(1.-smoothstep(.7,1.,crossRay));
+  float a=vOpacity*extinction*edge*livingVisibility(vPosition.z);
+  color=vec4(vColor*a,a);sheetLayer=vec4(color.rgb,0.);return;
+ }
  float coverage=1.-smoothstep(1.-aa,1.,d);
  float fiberSample=0.;
  if(vFleece>0.){
@@ -182,7 +264,8 @@ void main(){vec2 xy=(uPointQuad>.5?vSpriteUV:gl_PointCoord)*2.-1.;
   vec2 kernel=cubicWindow(xy);
   signal=mix(signal,3.58*kernel.x*kernel.y,smoothstep(1.,1.45,uPoints.w));
  }
- float a=signal*vOpacity*livingVisibility(vPosition.z)*particleWallCoverage(d);
+ float opticalDepth=vOpacity*livingVisibility(vPosition.z)*particleWallCoverage(d);
+ float a=signal*opticalDepth;
  vec3 micro=vec3(xy.x,-xy.y,sqrt(max(.01,1.-d*d)));
  vec3 n=normalize(normalize(vPosition-uShadeOrigin+vec3(0.,0.,.0001))+micro*.28);
  if(vFlowNormal.w>0.){
@@ -192,39 +275,60 @@ void main(){vec2 xy=(uPointQuad>.5?vSpriteUV:gl_PointCoord)*2.-1.;
  // The local sphere normal remains stable as visibility and edge softness vary.
  vec3 world=vPosition;
  if(uSphereGrain>.5){vec3 sphere=vec3(xy.x,-xy.y,sqrt(max(0.,1.-d*d)));n=normalize(sphere);world+=sphere*vRadius;}
- vec3 shaded=shadeFiberMaterial(vColor,world,n,vec3(0.),0.,fiberSample,vFleece);
+ vec3 diffuseTransmittance=vec3(1.),crestTransmittance=vec3(1.);float path=0.,entryReflection=0.;
+ float wall=vFlowNormal.w*(1.-uSphereGrain)*(1.-uMaterial.x)*(1.-uFinish.z)*uFinish.y;
+ if(uGrainAbsorption.x>0.&&wall>0.){
+  vec3 view=normalize(vec3(0.,0.,7.5)-world);
+  float facing=abs(dot(vFlowNormal.xyz,view));
+  float eta=max(1.,uParticleOptical.x),r0=(eta-1.)/(eta+1.);
+  entryReflection=r0*r0+(1.-r0*r0)*pow(1.-facing,5.);
+  float inside=uParticleOptical.y*(1.-.8*uParticleOptical.w);
+  // Bound the grazing path by the curved sheet's finite extent. Light
+  // scattered beneath a fold crosses it twice; its first-surface reflection
+  // never travels through the absorbing layer.
+  path=wall*inside*(.37+.63*vFoldDetail.y)/sqrt(.044+facing*facing);
+  vec3 extinction=uGrainAbsorption.x*(vec3(.7)+(1.-uDiffusionPigment)*uGrainAbsorption.y*1.7);
+  diffuseTransmittance=mix(exp(-extinction*path),vec3(1.),entryReflection);
+  crestTransmittance=mix(exp(-extinction*(.32*path)),vec3(1.),entryReflection);
+ }
+ vec3 firstSurface;
+ vec3 shaded=shadeFiberMaterial(vColor,world,n,vec3(0.),0.,fiberSample,vFleece,diffuseTransmittance,firstSurface);
  if(vFlowNormal.w>0.&&uSphereGrain<.5){
   // The rolled sheet presents a longer optical path at grazing incidence.
   // Gradually transfer scattered light from face-on areas to the lip.
   vec3 view=normalize(vec3(0.,0.,7.5)-world);
-  vec3 incidence=dot(n,view)<0.?-n:n;
   float cosine=abs(dot(n,view));
   float rim=(1.-cosine)*(1.-cosine);
-  float lightSide=1.;
-  if(uLightCount>0){
-   vec3 light=normalize(uLights[0].xyz-world);
-   lightSide=.12+.88*smoothstep(-.25,.68,dot(incidence,light));
-  }
+  float lightSide=vFoldLight.a;
   float grazing=.34+(1.25+1.75*lightSide)*rim;
   // A rough membrane reflects diffusely. It does not keep a mirror-bright
   // silhouette where the rolled edge turns away from the illuminant.
   float diffuseRim=mix(1.,max(.08,cosine+lightSide*.38),rim*uMaterial.y*(1.-uMaterial.x));
-  shaded*=mix(1.,grazing,vFlowNormal.w*(1.-uFinish.z)*uFinish.y)
+  float gain=mix(1.,grazing,vFlowNormal.w*(1.-uFinish.z)*uFinish.y)
     *mix(1.,diffuseRim,vFlowNormal.w*uFinish.y);
-  // A folded transparent sheet can return transmitted light toward the eye.
-  // Resolve its narrow grazing lobe separately for the three wavelengths.
-  float spread=uParticleOptical.z;
-  if(spread>0.&&uLightCount>0){
-   vec3 eta=max(vec3(1.001),uParticleOptical.x+spread*vec3(-.115,0.,.18));
-   vec3 critical=sqrt(1.-1./(eta*eta));
-   vec3 width=(1.-cosine-critical)/(.025+.055*uMaterial.y);
-   vec3 lobe=exp(-width*width);
-   float transmission=.12+.88*smoothstep(-.15,.64,-dot(incidence,normalize(uLights[0].xyz-world)));
-   float spectral=vFlowNormal.w*(1.-uFinish.z)*uFinish.y*transmission*spread;
-   shaded*=max(vec3(0.),1.+(lobe-dot(lobe,vec3(.2126,.7152,.0722)))*(4.+6.*spread)*spectral);
-  }
+  shaded*=gain;firstSurface*=gain;
  }
- color=vec4(shaded*(a*vCellLight),a);
+ // A soft diffuse footprint can scatter over adjacent grains while a
+ // specular microfacet inside it still focuses light to a much finer spot.
+ float width=vFoldDetail.x;
+ vec2 opticalKernel=cubicWindow(xy/width);
+ float opticalSignal=3.58*opticalKernel.x*opticalKernel.y/(width*width);
+ vec3 transmission=vFoldLight.rgb*crestTransmittance*mix(signal,opticalSignal,.24);
+ color=vec4((shaded*a+(transmission+vFoldSpecular*opticalSignal)*opticalDepth)*vCellLight,a);
+ if(wall>0.&&(path>0.||uParticleOptical.z>0.)){
+  float spread=max(vFoldLight.r,max(vFoldLight.g,vFoldLight.b))-min(vFoldLight.r,min(vFoldLight.g,vFoldLight.b));
+  float strength=max(vFoldLight.r,max(vFoldLight.g,vFoldLight.b));
+  float chromaticity=spread/max(.0001,strength);
+  float flank=(1.-exp(-2.2*spread))*smoothstep(.025,.33,chromaticity);
+  // At the core of the specular lobe, the illuminated face is directly
+  // visible. Behind its two spectral flanks, the view crosses more matter.
+  float specular=max(vFoldSpecular.r,max(vFoldSpecular.g,vFoldSpecular.b));
+  float front=specular/(specular+.18*strength+.025);
+  vec3 visible=mix(firstSurface,shaded,max(entryReflection,.85*front));
+  float through=1.-entryReflection;
+  sheetLayer=vec4((visible*a+(vFoldSpecular*opticalSignal+mix(.12,1.,entryReflection)*transmission)*opticalDepth)*vCellLight,
+    a*path*uGrainAbsorption.x*(.06+2.9*flank)*through*through);
+ }
 }`;
 const trailVert=`#version 300 es
 precision highp float;
@@ -307,6 +411,8 @@ uniform float uBgShade;uniform vec2 uOutputSize;
 uniform highp sampler2D uStudioSurface;
 uniform float uStudioComposite,uStudioCamera,uWebActive;
 uniform highp sampler2D uWebLayer;
+uniform highp sampler2D uSheetLayer;uniform float uSheetResolve,uSheetPortion;
+uniform vec4 uSheetPrism;
 uniform highp sampler2D uMedium;
 uniform vec2 uMediumMix;
 ${volumeResolveGLSL}
@@ -324,6 +430,46 @@ vec4 surfaceImage(vec2 p){
  if(low>uSurfaceEdgeAA*.15||high<uSurfaceEdgeAA*.75)return center;
  return mix(center,(a+b+c+d)*.25,.34);
 }
+float foldFlux(vec2 at){
+ vec3 incoming=texture(uSheetLayer,at).rgb*uSheetPortion;
+ float achromatic=min(incoming.r,min(incoming.g,incoming.b));
+ return log(1.+achromatic);
+}
+vec3 splitFoldLight(vec2 p,vec3 radiance){
+ // The two spectral images must come from the same illuminated fold. Its
+ // local projected direction is estimated on the material-only light map.
+ float center=foldFlux(p);
+ if(center<.0002)return radiance;
+ float pixelScale=uOutputSize.y/1080.;
+ vec2 r=vec2(6.65*pixelScale)/uOutputSize;
+ float right=foldFlux(p+vec2(r.x,0.)),left=foldFlux(p-vec2(r.x,0.));
+ float top=foldFlux(p+vec2(0.,r.y)),bottom=foldFlux(p-vec2(0.,r.y));
+ float ne=foldFlux(p+r),sw=foldFlux(p-r);
+ float nw=foldFlux(p+vec2(-r.x,r.y)),se=foldFlux(p+vec2(r.x,-r.y));
+ float gx=(right-left)*.5+(ne+se-nw-sw)*.18,gy=(top-bottom)*.5+(ne+nw-se-sw)*.18;
+ float xx=right+left-2.*center,yy=top+bottom-2.*center,xy=(ne+sw-nw-se)*.25;
+ // Principal axis of the gradient/curvature tensor. Project the actual
+ // lighting direction onto it without ever choosing a discontinuous sign.
+ vec2 tensor=vec2(gx*gx-gy*gy+xx*xx-yy*yy,2.*(gx*gy+xy*(xx+yy)));
+ float anisotropy=length(tensor),trace=gx*gx+gy*gy+xx*xx+yy*yy+2.*xy*xy;
+ vec2 light=(uSheetPrism.zw-p)*uOutputSize;
+ light/=max(.001,length(light));
+ vec2 axis=.5*(light+mat2(tensor.x,tensor.y,tensor.y,-tensor.x)*light/max(.00001,anisotropy));
+ axis/=sqrt(dot(axis,axis)+.12);
+ vec2 offset=axis*(uSheetPrism.y*pixelScale)/uOutputSize;
+ // Average a short distance along the tangent: a lone point should not
+ // split like a continuous, optically thick crest.
+ vec2 tangent=vec2(-axis.y,axis.x)*(3.4*pixelScale)/uOutputSize;
+ float a=.60*foldFlux(p-offset)+.20*(foldFlux(p-offset+tangent)+foldFlux(p-offset-tangent));
+ float b=.60*foldFlux(p+offset)+.20*(foldFlux(p+offset+tangent)+foldFlux(p+offset-tangent));
+ float alignment=smoothstep(.15,.91,anisotropy/max(.00001,trace));
+ float slope=(a-b)/(.14+a+b+.25*center);
+ float crest=max(0.,center-.5*(a+b))/(.07+.5*(a+b));
+ float shift=clamp(slope*2.25,-.68,.68)*alignment*uSheetPrism.x*.33*(1.-smoothstep(.18,.80,crest));
+ vec3 split=radiance*exp(shift*vec3(-.87,-.06,1.02));
+ vec3 luma=vec3(.2126,.7152,.0722);
+ return split*(dot(radiance,luma)/max(.000001,dot(split,luma)));
+}
 void main(){vec2 p=uv-.5,world=p*uOutputSize/min(uOutputSize.x,uOutputSize.y)*3.4;
  vec2 q=.5+p*(1.+uLens.x*mix(dot(p,p),dot(world,world)*.18,uStudioCamera));vec4 src=surfaceImage(q),bloom=texture(uBloom,q);
  // Compress accumulated light with a shared scale: channel-by-channel clipping
@@ -331,6 +477,18 @@ void main(){vec2 p=uv-.5,world=p*uOutputSize/min(uOutputSize.x,uOutputSize.y)*3.
  vec4 mist=viewVolume(q);
  if(uMediumMix.x>0.)mist=mix(mist,texture(uMedium,q)*uMediumMix.y,uMediumMix.x);
  vec3 radiance=max(vec3(0.),src.rgb+bloom.rgb*uGlow*2.2)*(1.7-mist.a*.95)+mist.rgb;
+ if(uSheetResolve>0.){
+  // Integrate the incident path through overlapping grains before tone
+  // mapping. Reflections at the entry surface never traverse that path.
+  vec4 layer=texture(uSheetLayer,q)*uSheetPortion;
+  vec3 grains=src.rgb*(1.7-mist.a*.95),protectedLight=min(grains,layer.rgb*(1.7-mist.a*.95));
+  float tau=max(0.,layer.a)*uSheetResolve,transmittance=exp(-tau);
+  // The emitting grains are distributed along the path, while the far
+  // background crosses the full slab. A dense bright fold stays luminous.
+  float mixed=tau<.001?1.-.5*tau:(1.-transmittance)/tau;
+  radiance=protectedLight+(grains-protectedLight)*mixed+max(vec3(0.),radiance-grains)*transmittance;
+ }
+ if(uSheetPrism.x>0.)radiance=splitFoldLight(q,radiance);
  if(uVeilCompose>.5)radiance/=max(.00001,clamp(src.a,0.,1.));
  vec3 linear=radiance/(1.+max(radiance.r,max(radiance.g,radiance.b)));
  vec3 c=mix(linear*12.92,1.055*pow(linear,vec3(1./2.4))-.055,step(vec3(.0031308),linear));
@@ -385,6 +543,7 @@ const rad=Math.PI/180,rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255)
 const linearRgb=hex=>rgb(hex).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));
 const environments=['studio','sunset','neon','sky','aquarium','aurora','city'];
 const seedWidth=1024,seedHeight=293,storedGrains=seedWidth*seedHeight;
+const emptySheet=new Float32Array(4);
 const visibleGrains=s=>s.pLiving!==4&&s.pCount>0&&s.pOpacity>0;
 const visibleTrails=s=>s.pLiving!==4&&s.pTrailCount>0&&s.pTrailLength>0&&s.pTrailOpacity>0;
 function decorationOnly(s){
@@ -485,7 +644,7 @@ export class ParticleRenderer{
   if(this.float){this.pathTarget=this.target(segments+3,1024);gl.bindTexture(gl.TEXTURE_2D,this.pathTarget.texture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,segments+3,1024,0,gl.RGBA,gl.FLOAT,null);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.NEAREST);}
  }
  target(w,h){const gl=this.gl,texture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,texture);gl.texImage2D(gl.TEXTURE_2D,0,this.float?gl.RGBA16F:gl.RGBA8,w,h,0,gl.RGBA,this.float?gl.HALF_FLOAT:gl.UNSIGNED_BYTE,null);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.LINEAR);for(const k of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,k,gl.CLAMP_TO_EDGE);const fbo=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('Buffer grafico non disponibile.');return {texture,fbo,w,h};}
- releaseSurface(){this.surfaceWeb?.releaseLayer();this.volume?.release();this.medium?.release();this.optics?.release();this.shadow?.release();if(this.depthCopy){this.gl.deleteTexture(this.depthCopy.texture);this.gl.deleteFramebuffer(this.depthCopy.fbo);this.depthCopy=null;}for(const t of this.targets){this.gl.deleteTexture(t.texture);this.gl.deleteFramebuffer(t.fbo);if(t.depth)this.gl.deleteRenderbuffer(t.depth);}this.targets=[];this.width=0;this.height=0;this.canvas.width=1;this.canvas.height=1;return true;}
+ releaseSurface(){this.surfaceWeb?.releaseLayer();this.volume?.release();this.medium?.release();this.optics?.release();this.shadow?.release();if(this.depthCopy){this.gl.deleteTexture(this.depthCopy.texture);this.gl.deleteFramebuffer(this.depthCopy.fbo);this.depthCopy=null;}for(const t of this.targets){this.gl.deleteTexture(t.texture);this.gl.deleteFramebuffer(t.fbo);if(t.depth)this.gl.deleteRenderbuffer(t.depth);if(t.sheetLayer){this.gl.deleteTexture(t.sheetLayer.texture);this.gl.deleteFramebuffer(t.sheetLayer.fbo);}}this.targets=[];this.sheetResolve=null;this.width=0;this.height=0;this.canvas.width=1;this.canvas.height=1;return true;}
  resize(w,h){if(this.width===w&&this.height===h){if(this.canvas.width!==w)this.canvas.width=w;if(this.canvas.height!==h)this.canvas.height=h;return;}this.releaseSurface();this.width=w;this.height=h;this.canvas.width=w;this.canvas.height=h;this.targets=[this.target(w,h),this.target(Math.ceil(w/4),Math.ceil(h/4)),this.target(Math.ceil(w/4),Math.ceil(h/4))];}
  bind(t){const gl=this.gl;gl.bindFramebuffer(gl.FRAMEBUFFER,t?.fbo||null);gl.viewport(0,0,t?.w||this.width,t?.h||this.height);}
  tex(p,key,texture,unit){const gl=this.gl;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(this.loc(p,key),unit);}
@@ -533,6 +692,7 @@ export class ParticleRenderer{
   this.u(p,'uForm',s.stretchX,s.stretchY,s.stretchZ,s.volume);this.u(p,'uWarp',s.deform,s.twist,s.waves,s.waveScale);this.u(p,'uFrame',s.scale,s.positionX,s.positionY,0);this.u(p,'uRotation',s.rotateX*rad,s.rotateY*rad,s.rotateZ*rad,0);
   this.u(p,'uMaterial',s.metal,s.roughness,s.gloss,s.iridescence);this.u(p,'uFinish',s.emission,s.pLighting,1-s.transparency,1.-Math.min(1,s.pSize/8));
   this.u(p,'uParticleOptical',s.refraction??1.5,s.thickness??1,s.dispersion||0,materialCavity(s));
+  this.u(p,'uGrainAbsorption',s.absorption||0,s.tintStrength||0);
   this.u(p,'uFilmPattern',s.filmPattern||0,s.filmPatternScale??1.5,s.filmPatternWarp??.8,s.filmPatternDetail??.5);this.u(p,'uFilmAccent',s.filmChroma||0,s.filmDuo||0,s.filmIslands||0);
   this.u(p,'uFilmLayer',s.pFilm,s.pFilmScale,s.pFilmVariation,0);
   const filmCycles=s.perfectLoop!==false?Math.max(1,Math.round(s.filmCycles||1)):(s.filmCycles||1);
@@ -622,7 +782,7 @@ export class ParticleRenderer{
   }
   if(this.seed!==s.seed)this.geometry(s.seed);this.resize(w,h);this.guides.update(s);this.pollGpuTime();const query=options.trackTiming!==false&&this.timerExtension&&this.queries.length<3?gl.createQuery():null;
   if(query)gl.beginQuery(this.timerExtension.TIME_ELAPSED_EXT,query);
-  const [scene,a,b]=this.targets;let sceneDrawn=false;this.webLayer=null;
+  const [scene,a,b]=this.targets;let sceneDrawn=false;this.webLayer=null;this.sheetResolve=null;
   const transmission=s.pLiving===4?1-s.pVeilOpacity:s.transparency;
   const caustics=s.pCaustic>0&&transmission>0&&s.refraction>1&&s.metal<1;
   const volume=usesCloudAbsorption(s,this.float);
@@ -658,6 +818,16 @@ export class ParticleRenderer{
   this.u(c,'uBackground',...rgb(s.background));this.u(c,'uBackground2',...rgb(s.background2));this.u(c,'uBgMode',['solid','gradient','studio','transparent'].indexOf(s.bgMode));this.u(c,'uBg',s.bgAngle*rad,s.bgHeight,s.bgSoftness,s.bgWash);
   this.tex(c,'uStudioSurface',this.studioLayer?.color||scene.texture,13);this.u(c,'uStudioComposite',this.studioLayer?.color?1:0);this.u(c,'uStudioCamera',this.studioLayer?.attachment?1:0);
   this.tex(c,'uWebLayer',this.webLayer||scene.texture,7);this.u(c,'uWebActive',this.webLayer?1:0);
+  this.tex(c,'uSheetLayer',this.sheetResolve||scene.texture,2);this.u(c,'uSheetResolve',this.sheetResolve?Math.max(0,Math.min(1,(s.absorption-.015)/.055)):0);this.u(c,'uSheetPortion',this.sheetPortion??1);
+  const dispersion=this.sheetResolve&&s.refraction>1?s.dispersion||0:0;
+  let sourceX=0,sourceY=0,power=0;
+  if(dispersion>0)for(const light of s.lights.filter(l=>l.enabled).slice(0,8)){
+   const flux=light.power*(linearRgb(light.color).reduce((sum,value,i)=>sum+value*[.2126,.7152,.0722][i],0));
+   const projection=this.studioLayer?.attachment?Math.min(w,h)/1.7:2.6*h/Math.max(2,7.5-light.z);
+   sourceX+=light.x*projection/w*flux;sourceY+=light.y*projection/h*flux;power+=flux;
+  }
+  const split=power>0?dispersion*Math.min(1,(s.refraction-1)/.30)*this.sheetPortion:0;
+  this.u(c,'uSheetPrism',split,Math.min(20.7,2.95+4.72*s.thickness)*dispersion,.5+.5*sourceX/Math.max(.001,power),.5+.5*sourceY/Math.max(.001,power));
   this.tex(c,'uMedium',medium||scene.texture,14);this.u(c,'uMediumMix',medium?continuum:0,this.studioLayer?.grainMix??1);
   this.tex(c,'uViewDensity',mist?.texture||scene.texture,10);this.u(c,'uViewVolume',mist?mist.amount*(1+s.transparency*.6):0,mist?mist.amount*2.3:0,mist?.width||1,mist?.height||1);
   if(mist){const light=s.lights.find(l=>l.enabled);const aim=light?[light.x-s.positionX,light.y-s.positionY,light.z]:[-.5,.6,.6],length=Math.hypot(...aim)||1;this.u(c,'uVolumeLight',...aim.map(component=>component/length));}
@@ -671,7 +841,7 @@ export class ParticleRenderer{
   let surfaceMergedGrains=false;
   if(s._cloudSurfaceMix>0&&!(s.pLiving>0)){
    this.cloudSurface??=new ParticleSurface(this,grainGLSL);
-   const projectGrains=this.shadowPass?null:opacity=>this.drawGrainLayer({...s,pOpacity:opacity,pLinks:s._cloudGrainLinks},phase,options);
+   const projectGrains=this.shadowPass?null:(opacity,target)=>this.drawGrainLayer({...s,pOpacity:opacity,pLinks:s._cloudGrainLinks},phase,options,target,1-s._cloudSurfaceMix);
    const drewSurface=this.cloudSurface.draw(s,phase*s.pDirection,options,projectGrains);
    surfaceMergedGrains=drewSurface&&!!projectGrains;
   }
@@ -705,7 +875,7 @@ export class ParticleRenderer{
    }
   }else this.previewTrailCount=0;
   if(s.pLinks>0){this.connections??=new ParticleLinks(this,common);this.connections.draw(s,phase*s.pDirection);}
-  if(!surfaceMergedGrains&&visibleGrains(s))this.drawGrainLayer(s,phase,options);
+  if(!surfaceMergedGrains&&visibleGrains(s))this.drawGrainLayer(s,phase,options,scene);
   if(surfaceWebStrength(s)>0){
    this.surfaceWeb??=new SurfaceWeb(this,common);
    if(!this.shadowPass)this.webLayer=this.surfaceWeb.bindLayer(w,h);
@@ -713,7 +883,7 @@ export class ParticleRenderer{
    if(!this.shadowPass)this.bind(scene);
   }
  }
- drawGrainLayer(s,phase,options){
+ drawGrainLayer(s,phase,options,scene=null,portion=1){
   const cap=this.shadowPass?storedGrains:previewGrainLimit(options);
   const count=Math.min(Math.round(s.pCount),cap,Math.max(s.pLinks>0?s.pLinkNodes:256,Math.round(s.pCount*this.geometryBudget)));
   const points={...s,pLargeCount:s.pCount>storedGrains?Math.round(s.pLargeCount*count/s.pCount):s.pLargeCount,pOpacity:s.pOpacity*Math.min(16,s.pCount/count)};
@@ -729,11 +899,35 @@ export class ParticleRenderer{
   const scatterStretch=s.pReentry>1&&s.pSoftness>1&&s.pSprite<.5?1+2.9*(s.anisotropy||0):1;
   const quad=Math.hypot(size,blur)*scatterStretch*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
   this.opticalDrawState();
+  const capture=scene&&!this.shadowPass&&this.float&&(s.absorption>.015||(s.dispersion>0&&s.refraction>1))&&s.pReentry>1&&s.pSprite===0&&s.thickness>0&&s.transparency>0&&s.pLighting>0&&s.metal<1;
+  const gl=this.gl;
+  if(capture){
+   // Both render paths use the window-sized optical target. The intermediate
+   // reconstruction renders its grains to another FBO at the same resolution.
+   const screen=this.targets[0];screen.sheetLayer??=this.target(scene.w,scene.h);
+   this.bind(scene);
+   gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT1,gl.TEXTURE_2D,screen.sheetLayer.texture,0);
+   gl.drawBuffers([gl.COLOR_ATTACHMENT0,gl.COLOR_ATTACHMENT1]);
+   gl.clearBufferfv(gl.COLOR,1,emptySheet);
+   this.sheetResolve=screen.sheetLayer.texture;this.sheetPortion=portion;
+  }
   this.drawPoints(this.grainProgram(),points,phase,quad,Math.min(storedGrains,count),0);
   if(count>storedGrains)this.drawPoints(this.generatedPoints(),points,phase,quad,count-storedGrains,storedGrains);
+  if(count>0&&!this.shadowPass&&s.pReentry>1&&s.pSprite===0&&s.dispersion>0&&s.refraction>1&&s.thickness>0&&
+     s.transparency>0&&s.metal<1&&s.pLighting>0&&(s.pCloudHalo>0||s.scattering>0)&&
+     s.lights.filter(light=>light.enabled).slice(0,8).some(light=>light.power>0&&light.color!=='#000000')){
+   const samples=Math.min(14336,Math.ceil(count*.17));
+   this.drawPoints(this.grainProgram(),points,phase,true,samples*3,0,count/samples);
+  }
+  if(capture){
+   gl.drawBuffers([gl.COLOR_ATTACHMENT0]);
+   gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT1,gl.TEXTURE_2D,null,0);
+  }
  }
- drawPoints(program,s,phase,quad,count,offset){
+ drawPoints(program,s,phase,quad,count,offset,scatterWeight=0){
   const gl=this.gl;this.settings(program,s,phase*s.pDirection);this.u(program,'uPointQuad',quad?1:0);
+  this.u(program,'uFoldScatter',scatterWeight);
+  this.tex(program,'uScatterSeeds',this.seedTexture,2);
   if(offset)gl.uniform1i(this.loc(program,'uSeedOffset'),offset);
   gl.bindVertexArray(offset?this.empty:quad?this.quadVAO:this.pointVAO);
   if(quad)gl.drawArraysInstanced(gl.TRIANGLES,0,6,count);else gl.drawArrays(gl.POINTS,0,count);

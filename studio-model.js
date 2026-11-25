@@ -1,12 +1,12 @@
-import {VEIL_META,VEIL_TRACK_KEYS} from './veil-model.js?v=30f747c2b880';
-import {PALETTE_TRACKS} from './finish-palette.js?v=30f747c2b880';
-import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=30f747c2b880';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=30f747c2b880';
-import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=30f747c2b880';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=30f747c2b880';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=30f747c2b880';
-import {PARTICLE_CELL_TRACKS,PARTICLE_META,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=30f747c2b880';
-import {BODY_LAYER_META,GRAIN_MOTION_DEFAULTS} from './body-layers.js?v=30f747c2b880';
+import {VEIL_META,VEIL_TRACK_KEYS} from './veil-model.js?v=88d17b3ed245';
+import {PALETTE_TRACKS} from './finish-palette.js?v=88d17b3ed245';
+import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=88d17b3ed245';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=88d17b3ed245';
+import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=88d17b3ed245';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=88d17b3ed245';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=88d17b3ed245';
+import {PARTICLE_CELL_TRACKS,PARTICLE_META,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=88d17b3ed245';
+import {BODY_LAYER_META,GRAIN_MOTION_DEFAULTS} from './body-layers.js?v=88d17b3ed245';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
@@ -31,7 +31,7 @@ export const TRACK_META={
  pBreath:PARTICLE_META.pBreath,pSignal:PARTICLE_META.pSignal,pPropagation:PARTICLE_META.pPropagation,
  pFill:PARTICLE_META.pFill,pVortex:['Vorticità',0,2,.01],pTravel:PARTICLE_META.pTravel,pReentry:PARTICLE_META.pReentry,
  stretchX:['Larghezza',0,.6,.01],stretchY:['Altezza',0,.6,.01],stretchZ:['Profondità',0,.6,.01],
- exposure:['Esposizione',0,2,.01],
+ exposure:['Esposizione',0,2,.01],saturation:['Saturazione',0,2.5,.01],
  focusBlur:['Sfocatura fuori fuoco',0,1,.01],focusDepth:['Piano di fuoco',0,4.7,.01],focusTilt:['Inclinazione del fuoco (°)',0,60,.1],
  ...FRACTAL_TRACKS,
  ...Object.fromEntries(VEIL_TRACK_KEYS.map(key=>[key,VEIL_META[key]])),pVeilMorph:['Trasformazione forma / veli',0,1,.01],

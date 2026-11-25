@@ -1,9 +1,79 @@
-import {FILM_PATTERN_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,FRACTAL_PARTICLE_PALETTE_GLSL} from './solid-renderer.js?v=30f747c2b880';
-import {LOOP_PALETTE_GLSL} from './structure-model.js?v=30f747c2b880';
-import {opticalGLSL} from './particle-optics.js?v=30f747c2b880';
-import {FIBER_MATERIAL_GLSL} from './fiber-material.js?v=30f747c2b880';
-import {SURFACE_LIGHT_GLSL} from './surface-light.js?v=30f747c2b880';
+import {FILM_PATTERN_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,FRACTAL_PARTICLE_PALETTE_GLSL} from './solid-renderer.js?v=88d17b3ed245';
+import {LOOP_PALETTE_GLSL} from './structure-model.js?v=88d17b3ed245';
+import {opticalGLSL} from './particle-optics.js?v=88d17b3ed245';
+import {FIBER_MATERIAL_GLSL} from './fiber-material.js?v=88d17b3ed245';
+import {SURFACE_LIGHT_GLSL} from './surface-light.js?v=88d17b3ed245';
 export const materialCavity=s=>Math.max(0,Math.min(1,(s.hollow||0)*(1-(s.wallThickness??.08))));
+
+// Directional transmission through a folded sheet, evaluated once per grain.
+// The two sides of the grazing fold transmit different wavelengths toward
+// the eye. Outside this angular band the ordinary material supplies all light.
+export const foldIlluminationGLSL=`
+vec3 foldedSpectrum(vec3 energy,float coating,float signedBand){
+ // Overlapping optical primaries preserve neutral light when the three
+ // lobes coincide. Their isolated tails appear amber and blue-green.
+ vec3 amber=vec3(.76,.35,.14),green=vec3(.17,.29,.19),blue=vec3(.07,.36,.67);
+ // An iridescent layer selectively reflects the middle wavelengths, then
+ // red and blue together on the far tail. Keep the central white intact.
+ float fringe=coating*smoothstep(.15,.72,abs(signedBand));
+ green=mix(green,vec3(.04,.52,.08),fringe);
+ blue=mix(blue,vec3(.28,.19,.73),fringe*smoothstep(.55,1.1,signedBand));
+ return energy.r*amber+energy.g*green+energy.b*blue;
+}
+vec4 foldIllumination(vec3 world,vec3 normal,float weight,float crest,float facet,vec3 channel,out vec3 rayFlux,out vec3 incoming,out vec3 highlight){
+ rayFlux=vec3(0.);incoming=vec3(0.);highlight=vec3(0.);
+ if(weight<=0.||uFinish.y<=0.)return vec4(0.,0.,0.,1.);
+ vec3 view=mix(normalize(vec3(0.,0.,7.5)-world),vec3(0.,0.,1.),uStudioPerspective);
+ float signedView=dot(normal,view),edge=abs(signedView);
+ float total=0.,front=0.;
+ vec3 transmitted=vec3(0.),white=vec3(0.);
+ float dispersion=uParticleOptical.z,ior=max(1.,uParticleOptical.x);
+ float medium=(1.-uFinish.z)*(1.-uMaterial.x)*smoothstep(1.,1.22,ior);
+ float angularBand=1.-smoothstep(.22,.48,edge);
+ float width=.023+.046*uMaterial.y;
+ float deviation=dispersion*clamp((ior-1.)/(ior+1.),0.,.4)*1.43;
+ vec3 side=normal*signedView/sqrt(signedView*signedView+.0016);
+ for(int i=0;i<uLightCount;i++){
+  vec3 delta=uLights[i].xyz-world;
+  float d2=max(.001,dot(delta,delta));vec3 light=delta*inversesqrt(d2);
+  vec3 flux=uLightColors[i]*uLights[i].w/(1.+.045*d2);
+  float power=dot(flux,vec3(.2126,.7152,.0722));
+  total+=power;front+=power*smoothstep(-.25,.68,dot(side,light));
+  if(medium<=0.||angularBand<=0.)continue;
+  float cosLight=dot(normal,light);
+  float fromBehind=smoothstep(-.24,.75,-dot(view,light));
+  float across=smoothstep(.015,.8,-dot(side,light));
+  float back=(.025+.975*max(fromBehind,across))*(.28+.72*smoothstep(.08,.72,abs(cosLight)));
+  // Resolve the overlap of red and green on the warmer side and the
+  // shorter wavelengths on the other. The slit broadens with source size.
+  float footprint=width+.018*min(1.,uLightSizes[i]*inversesqrt(d2));
+  float tilt=dot(normal,light)*.105;
+  float center=(signedView-tilt)/(.006+footprint*.20);
+  float focus=.15+.85*smoothstep(.15,.86,abs(cosLight));
+  white+=flux*(back*focus*exp(-.5*center*center));
+  if(dispersion<=0.)continue;
+  vec3 separation=deviation*vec3(-.72,-.33,1.);
+  vec3 theta=(signedView-tilt-separation)/footprint;
+  vec3 narrow=exp(-.5*theta*theta);
+  vec3 scatter=exp(-.095*theta*theta);
+  vec3 band=narrow+.42*scatter;
+  float fringeCoordinate=(signedView-tilt)/max(.02,deviation);
+  float coating=uMaterial.w*smoothstep(.35,.85,dispersion);
+  transmitted+=flux*foldedSpectrum(band,coating,fringeCoordinate)*back;
+  if(dot(channel,vec3(1.))>0.){
+   vec3 spectralFlux=flux*foldedSpectrum(channel,coating,fringeCoordinate)*(back*dot(channel,band));
+   rayFlux+=spectralFlux;incoming-=light*dot(spectralFlux,vec3(.2126,.7152,.0722));
+  }
+ }
+ float illum=total>0.?.12+.88*front/total:1.;
+ float density=weight*uFinish.y*medium*angularBand/(1.+total*.16);
+ float folded=sqrt(clamp(crest,0.,1.));
+ rayFlux*=density*dispersion*(.17+.83*folded);
+ float polish=uMaterial.z*(1.-.57*uMaterial.y);
+ float microfacet=mix(.57,3.8,smoothstep(.72,.98,facet));
+ highlight=white*(density*polish*microfacet*(1.+7.*crest));
+ return vec4(transmitted*(density*dispersion*(2.3+9.8*folded)),illum);
+}`;
 
 // A material-space relief redistributes optical thickness across a sampled
 // sheet. Sampling the rest position keeps the pattern on the same grains and
@@ -91,6 +161,7 @@ ${opticalGLSL}
 ${FIBER_MATERIAL_GLSL}
 uniform vec4 uMaterial,uFinish,uEnvironment;
 uniform vec4 uParticleOptical;
+uniform vec2 uGrainAbsorption;
 float particleWallCoverage(float radius){
  float inner=uParticleOptical.w;
  if(inner<=0.||radius>=inner)return 1.;
@@ -180,7 +251,7 @@ vec3 livingFilm(vec3 world,float facing,float rough){
  film=coatingContrast(film);
  return mix(film,vec3(dot(film,vec3(.2126,.7152,.0722))),rough*rough*.7);
 }
-vec3 shadeFiberMaterial(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk,float fiberSample,float fleece){
+vec3 shadeFiberMaterial(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk,float fiberSample,float fleece,vec3 diffuseTransmittance,out vec3 firstSurface){
  float metal=uMaterial.x,rough=max(.04,uMaterial.y),gloss=uMaterial.z,irid=uMaterial.w;
  vec3 view=normalize(vec3(0.,0.,7.5)-p);if(dot(n,view)<0.)n=-n;
  float facing=clamp(dot(n,view),.001,1.);
@@ -206,7 +277,8 @@ vec3 shadeFiberMaterial(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk,float fi
    fresnel=vec3(1.);
  }
  vec3 pigment=base*mix(vec3(1.),exp(-max(0.,uParticleOptical.y-1.)*(1.-clamp(base,0.,1.))),crystal*.8);
- vec3 lit=pigment*(uFinish.x+(1.-metal)*uEnvironment.z*.22)*uFinish.z+reflection*fresnel*gloss;
+ firstSurface=reflection*fresnel*gloss;
+ vec3 lit=pigment*diffuseTransmittance*(uFinish.x+(1.-metal)*uEnvironment.z*.22)*uFinish.z+firstSurface;
  vec3 fiberLight=vec3(0.);
  if(fleece>0.)fiberLight=reflectedEnvironment(n,1.)*.42;
  // Sample transmitted light along the separate refraction angles. The green
@@ -242,7 +314,9 @@ vec3 shadeFiberMaterial(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk,float fi
    specular=mix(specular,film,coating);
    float visibility=opticalVisibility(p,i);if(visibility<1.)power*=visibility;
    if(fleece>0.)fiberLight+=power*(.10+.69*clamp((dot(n,l)+.52)/1.52,0.,1.));
-   lit+=power*(base*diffuse*(1.-metal)*.7*uFinish.z+specular*spec*gloss*2.);
+   vec3 reflected=power*specular*spec*gloss*2.;
+   firstSurface+=reflected;
+   lit+=power*base*diffuseTransmittance*diffuse*(1.-metal)*.7*uFinish.z+reflected;
    float thickness=uParticleOptical.y*(1.-.8*uParticleOptical.w);
    float transport=1.-exp(-(uSharedLightResponse.y+uSharedLightResponse.z)*max(.03,thickness));
    if(transport>0.||uSharedLightResponse.w>0.){
@@ -250,7 +324,7 @@ vec3 shadeFiberMaterial(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk,float fi
     vec3 scatter=mix(base,base*uDiffusionPigment,.56)*transport;
     float backPath=(.24+.76*max(0.,-dot(n,l)))*max(.05,thickness);
     vec3 subsurface=base*uParticleSssColor*uSharedLightResponse.w*exp(-backPath/max(.04,uDiffusionRadius));
-    lit+=power*(scatter+subsurface)*transmitted*(1.-metal)*.75;
+    lit+=power*diffuseTransmittance*(scatter+subsurface)*transmitted*(1.-metal)*.75;
    }
  }
  // Unlit is a usable palette view even with emission at zero.
@@ -259,7 +333,11 @@ vec3 shadeFiberMaterial(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk,float fi
   vec3 illuminated=mix(vec3(1.),fiberLight+uFinish.x,uFinish.y)*uFinish.z;
   result=fiberScatter(base,result,illuminated,facing,rough,fiberSample,fleece);
  }
- return result*particleCoreShade(p);
+ float shade=particleCoreShade(p);firstSurface*=uFinish.y*shade;
+ return result*shade;
+}
+vec3 shadeFiberMaterial(vec3 base,vec3 p,vec3 n,vec3 tangent,float silk,float fiberSample,float fleece){
+ vec3 firstSurface;return shadeFiberMaterial(base,p,n,tangent,silk,fiberSample,fleece,vec3(1.),firstSurface);
 }
 vec3 fiberGrainLocal(vec3 p){
  p.xz=filmRotate(-uFilmRotation.y)*p.xz;p.yz=filmRotate(-uFilmRotation.x)*p.yz;p.xy=filmRotate(-uFilmRotation.z)*p.xy;

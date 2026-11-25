@@ -1,6 +1,6 @@
-import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=30f747c2b880';
-import {livingAttachmentGLSL,livingOcclusionGLSL} from './living-composition.js?v=30f747c2b880';
-import {surfaceWebGraph,surfaceWebWeights} from './surface-web-model.js?v=30f747c2b880';
+import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=88d17b3ed245';
+import {livingAttachmentGLSL,livingOcclusionGLSL} from './living-composition.js?v=88d17b3ed245';
+import {surfaceWebGraph,surfaceWebWeights} from './surface-web-model.js?v=88d17b3ed245';
 
 // Three fibres meet on one actual surface patch. Sampling the same stable
 // anchor IDs for membranes, stalks and fruit keeps the junctions sewn in motion.

@@ -1,8 +1,8 @@
-import {bodySampleGLSL} from './body-samples.js?v=30f747c2b880';
-import {DYNAMICS_GLSL} from './dynamics.js?v=30f747c2b880';
+import {bodySampleGLSL} from './body-samples.js?v=88d17b3ed245';
+import {DYNAMICS_GLSL} from './dynamics.js?v=88d17b3ed245';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=30f747c2b880';
-import {forceBarrierGLSL} from './particle-forces.js?v=30f747c2b880';
+import {guideGLSL} from './particle-path-field.js?v=88d17b3ed245';
+import {forceBarrierGLSL} from './particle-forces.js?v=88d17b3ed245';
 export const grainSizingGLSL=`
 uniform vec2 uNodeStyle,uLargeGrains,uGrainDistribution;
 float grainDiameter(vec4 seed,int index){
@@ -218,7 +218,7 @@ vec3 cloudMotion(vec4 r,float phase,vec3 rest){
 }
 #ifdef RETURN_FLOW_NORMAL
 vec3 returnFlowNormal=vec3(0.,0.,1.);
-float returnFlowWeight=0.;
+float returnFlowWeight=0.,returnFlowCompression=0.;
 // Inverse-transpose of the local shear p += (f(y), g(z), h(x)), up to scale.
 vec3 shearNormal(vec3 n,vec3 slopes){
  vec3 jx=vec3(1.,0.,slopes.z),jy=vec3(slopes.x,1.,0.),jz=vec3(0.,slopes.y,1.);
@@ -312,6 +312,11 @@ vec3 rollReturnFlow(vec3 point,float phase,float mobility){
  float normalSize=length(normal);
  returnFlowNormal=normalSize>.00001?normal/normalSize:point/radius;
  returnFlowWeight=clamp(strength,0.,1.);
+ // Relative to an undeformed unit sphere cell (area cos(latitude)).
+ // A tight turning meridian can also focus light without losing total area.
+ float crowded=1.-smoothstep(.38,.98,normalSize/max(.01,side));
+ float turning=1.-smoothstep(.10,.76,abs(dLatitude.x));
+ returnFlowCompression=strength*smoothstep(.02,.10,side)*max(crowded,.76*turning);
 #endif
  return vec3(horizontal.x,height,horizontal.y);
 }

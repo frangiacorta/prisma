@@ -137,7 +137,7 @@ document.addEventListener('click',async e=>{
     const detail=document.createElement('a');
     detail.href=current.comparisonDetail;
     detail.className='source-link';
-    detail.textContent='Ingrandisci i noduli';
+    detail.textContent=current.comparisonDetailLabel||'Ingrandisci il dettaglio';
     $('#media-note').append(' ',detail);
    }
    return;
@@ -168,7 +168,7 @@ $('#import').onchange=async e=>{try{const file=e.target.files[0];if(!file)return
 window.addEventListener('popstate',()=>{const id=decodeURIComponent(location.hash.slice(1));if(byId?.has(id))openDetail(id,false);else if($('#detail').open){stopVideos();$('#detail').close();document.body.classList.remove('modal-open');current=null;}});
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!$('#detail').open){e.preventDefault();$('#search').focus();}});
 try{
- const response=await fetch('data.json?v=30f747c2b880');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
+ const response=await fetch('data.json?v=88d17b3ed245');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
  for(const item of data.items)if(item.kind==='project'||item.comparisonClip){
   item.resultImage=projectMedia(item.resultImage);
   item.resultVideo=projectMedia(item.resultVideo);

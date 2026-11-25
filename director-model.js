@@ -1,6 +1,6 @@
-import {newCreation,normalizeCreation} from './creative-model.js?v=30f747c2b880';
-import {particleCreation} from './particle-model.js?v=30f747c2b880';
-import {parameterCatalog,readParameter,writeParameter,sceneOnly,TRANSITIONS} from './playground-model.js?v=30f747c2b880';
+import {newCreation,normalizeCreation} from './creative-model.js?v=88d17b3ed245';
+import {particleCreation} from './particle-model.js?v=88d17b3ed245';
+import {parameterCatalog,readParameter,writeParameter,sceneOnly,TRANSITIONS} from './playground-model.js?v=88d17b3ed245';
 
 export const DIRECTOR_BRIEF='Esplora liberamente forma e particelle, materia, luce, colore e movimento. Sviluppa idee riconoscibili, cambia ritmo e scala, alterna dettagli e insieme. Usa sovrapposizioni intenzionali, non alternare meccanicamente i due motori. Parti dalla scena presente e valuta visivamente ogni risultato. Sfondo nero, composizioni leggibili, niente lampeggi rapidi.';
 const obj=properties=>({type:'object',properties,required:Object.keys(properties),additionalProperties:false});

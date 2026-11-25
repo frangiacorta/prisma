@@ -1,4 +1,4 @@
-import {VEIL_META,VEIL_TRACK_KEYS} from './veil-model.js?v=30f747c2b880';
+import {VEIL_META,VEIL_TRACK_KEYS} from './veil-model.js?v=88d17b3ed245';
 // The inspector follows the current geometry while the layers unfold.
 export function sharedVeilControls(tab,s,{slider,details,trackPanel}){
  if(s.pLiving===4)return '';

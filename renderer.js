@@ -1,19 +1,19 @@
-import {CooperativePreview} from './cooperative-preview.js?v=30f747c2b880';
-import {surfaceWebStrength} from './surface-web-model.js?v=30f747c2b880';
-import {PaletteFinishPass} from './finish-palette.js?v=30f747c2b880';
-import {Dynamics,disposeDynamics} from './dynamics.js?v=30f747c2b880';
-import {motionPeriod} from './animation-clock.js?v=30f747c2b880';
-import {animationPhase} from './animation-clock.js?v=30f747c2b880';
-import {ScanlinePass} from './finish-scanlines.js?v=30f747c2b880';
-import {FilamentPass} from './filament-renderer.js?v=30f747c2b880';
-import {VeilTransition} from './veil-transition.js?v=30f747c2b880';
-import {BodySamples} from './body-samples.js?v=30f747c2b880';
-import {BodyComposite} from './body-composite.js?v=30f747c2b880';
-import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=30f747c2b880';
-import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=30f747c2b880';
-import {ParticleRenderer} from './particle-renderer.js?v=30f747c2b880';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=30f747c2b880';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=30f747c2b880';
+import {CooperativePreview} from './cooperative-preview.js?v=88d17b3ed245';
+import {surfaceWebStrength} from './surface-web-model.js?v=88d17b3ed245';
+import {PaletteFinishPass} from './finish-palette.js?v=88d17b3ed245';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=88d17b3ed245';
+import {motionPeriod} from './animation-clock.js?v=88d17b3ed245';
+import {animationPhase} from './animation-clock.js?v=88d17b3ed245';
+import {ScanlinePass} from './finish-scanlines.js?v=88d17b3ed245';
+import {FilamentPass} from './filament-renderer.js?v=88d17b3ed245';
+import {VeilTransition} from './veil-transition.js?v=88d17b3ed245';
+import {BodySamples} from './body-samples.js?v=88d17b3ed245';
+import {BodyComposite} from './body-composite.js?v=88d17b3ed245';
+import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=88d17b3ed245';
+import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=88d17b3ed245';
+import {ParticleRenderer} from './particle-renderer.js?v=88d17b3ed245';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=88d17b3ed245';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=88d17b3ed245';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }

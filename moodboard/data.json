@@ -1378,7 +1378,7 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "Movimento → Animazioni → Orbite → Rotazione e ricircolo · Forma → Granelli · Materiale → Rilievo di superficie",
+      "where": "Movimento → Animazioni → Orbite → Rotazione e ricircolo · Forma → Granelli · Materiale → Rilievo di superficie e Dispersione cromatica · Luci",
       "platform": "",
       "next": "Avvicinare la biforcazione del lembo e la continuità dei riflessi nelle pieghe più strette.",
       "keep": "",
@@ -1439,21 +1439,23 @@
       ],
       "category": "form",
       "addedOn": "2026-10-10",
-      "compareNote": "Il lembo si ripiega e i granelli scorrono nella cavità. Nel confronto affiancato il bordo della reference si divide in fibre più sottili e irregolari, soprattutto durante l’apertura laterale.",
+      "compareNote": "Nel video completo osserva i riflessi a 8,1 e 12,75 secondi. Nel confronto affiancato li trovi a 4,0 e 8,6 secondi. Il bordo bianco prende luce tra il blu e l’ambra mentre il lembo ruota. Nella reference il ventaglio iridescente si prolunga più in basso nella cavità.",
       "comparisonOutcome": "parziale",
       "comparisonDate": "2026-11-25",
       "resultDuration": 20,
-      "resultVersion": "113",
+      "resultVersion": "114",
       "comparisonClip": "../previews/membrana-ricircolo-confronto.mp4",
       "procedure": {
         "name": "Ricircolo dei granelli su un guscio",
         "verification": "code-reviewed",
-        "description": "Parti da una sfera di granelli. Abbassa Riempimento del volume per distribuirli sul guscio. In Movimento alza Ampiezza del movimento e porta Rientro verso il nucleo oltre 1 per rivoltare il lembo. Anima il riempimento per far passare una velatura davanti alla cavità. Morbidezza granello fonde la polvere più fitta. Grinze, Pieghe e Dispersione cromatica regolano la luce che si raccoglie sul bordo."
+        "description": "Parti da una sfera di granelli. Abbassa Riempimento del volume per distribuirli sul guscio. In Movimento alza Ampiezza del movimento e porta Rientro verso il nucleo oltre 1 per rivoltare il lembo. Anima il riempimento per far passare una velatura davanti alla cavità. Morbidezza granello fonde la polvere più fitta. Orienta una luce di lato sul lembo. Lucentezza e Rugosità regolano il riflesso bianco. Dispersione cromatica separa ambra e blu. Spessore ottico e Diffusione interna estendono la luce nei granelli vicini. Con Assorbimento puoi scurire la parte colorata sotto il bordo."
       },
       "resultPreset": "previews/membrana-ricircolo.prisma.json",
       "resultImage": "../previews/membrana-ricircolo.webp",
       "resultVideo": "../previews/membrana-ricircolo.mp4",
-      "resultUrl": "../previews/verifica-visiva.html#membrana-ricircolo"
+      "resultUrl": "../previews/verifica-visiva.html#membrana-ricircolo",
+      "comparisonDetail": "../previews/membrana-ricircolo-riflessi.webp",
+      "comparisonDetailLabel": "Ingrandisci i riflessi"
     },
     {
       "id": "s02-02",
@@ -4787,7 +4789,8 @@
       "resultVideo": "../previews/reticolo-giunzioni.mp4",
       "comparisonClip": "../previews/reticolo-giunzioni-confronto.mp4",
       "resultUrl": "../previews/reticolo-giunzioni-confronto.mp4",
-      "comparisonDetail": "../previews/reticolo-noduli-cotone.jpg"
+      "comparisonDetail": "../previews/reticolo-noduli-cotone.jpg",
+      "comparisonDetailLabel": "Ingrandisci i noduli"
     },
     {
       "id": "s07-06",
@@ -14932,7 +14935,8 @@
       "comparisonDate": "2026-11-25",
       "comparisonOutcome": "parziale",
       "comparisonClip": "../previews/reticolo-giunzioni-confronto.mp4",
-      "comparisonDetail": "../previews/reticolo-noduli-cotone.jpg"
+      "comparisonDetail": "../previews/reticolo-noduli-cotone.jpg",
+      "comparisonDetailLabel": "Ingrandisci i noduli"
     },
     {
       "id": "roadmap-4d",

@@ -1,6 +1,6 @@
-import {newCreation,motionPreset} from './creative-model.js?v=30f747c2b880';
-import {particleCreation} from './particle-model.js?v=30f747c2b880';
-import {FLOW_PALETTES,flowTiming,flowChoice,normalizeFlow,flowPalette,flowProfile,flowTransition} from './flow-model.js?v=30f747c2b880';
+import {newCreation,motionPreset} from './creative-model.js?v=88d17b3ed245';
+import {particleCreation} from './particle-model.js?v=88d17b3ed245';
+import {FLOW_PALETTES,flowTiming,flowChoice,normalizeFlow,flowPalette,flowProfile,flowTransition} from './flow-model.js?v=88d17b3ed245';
 
 const names={volume:'Volume',ring:'Anello',layers:'Strati',fibres:'Fili',branches:'Ramificazioni',disc:'Disco',polyhedron:'Poliedro',ribbon:'Nastro',cells:'Cellule',shell:'Gusci'};
 export function flowScene(flow,ratio=16/9){

@@ -2,7 +2,7 @@
  "prismaProject": 2,
  "name": "Membrana particellare in ricircolo",
  "createdAt": "2026-11-25T15:27:54.620Z",
- "exportedAt": "2026-11-25T15:27:54.620Z",
+ "exportedAt": "2026-11-25T16:21:53.956Z",
  "state": {
   "dynAmount": 0,
   "dynMass": 1,
@@ -121,11 +121,11 @@
   "pLinkWidth": 0.45,
   "pLinkCurve": 0.12,
   "pLinkStretch": 4,
-  "pFilm": 0,
-  "pFilmScale": 1,
-  "pFilmVariation": 0.5,
-  "pFiberSheen": 0.28,
-  "pFiberSpread": 0.56,
+  "pFilm": 0.22,
+  "pFilmScale": 1.9,
+  "pFilmVariation": 0.13,
+  "pFiberSheen": 0.35,
+  "pFiberSpread": 0.42,
   "pLife": 0,
   "pPulse": 1,
   "pSignal": 0.29,
@@ -246,25 +246,25 @@
   "cutX": 0.7,
   "cutY": 0.1,
   "edge": 0,
-  "transparency": 0.42,
-  "refraction": 1.2,
-  "thickness": 1,
-  "metal": 0.04,
-  "roughness": 0.75,
-  "gloss": 0.32,
-  "iridescence": 0,
+  "transparency": 0.45922,
+  "refraction": 1.39,
+  "thickness": 2.04,
+  "metal": 0.055,
+  "roughness": 0.62067,
+  "gloss": 0.93,
+  "iridescence": 0.0,
   "emission": 0,
   "palette": [
-   "#28282d",
-   "#f1f1e9",
-   "#868581",
-   "#45464a"
+   "#24252a",
+   "#efeff1",
+   "#858587",
+   "#46454a"
   ],
   "gradientAngle": 76,
   "gradientScale": 1.28,
   "gradientOffset": 0,
   "colorSoftness": 0.86,
-  "glow": 0.035,
+  "glow": 0.024,
   "grain": 0,
   "lightAngle": -35,
   "lightHeight": 40,
@@ -442,7 +442,7 @@
   "fractalDetail": 0.005,
   "finishEnabled": true,
   "finishTone": true,
-  "finishRgb": true,
+  "finishRgb": false,
   "finishMosaic": false,
   "finishCompare": false,
   "finishRgbR": 12,
@@ -663,13 +663,13 @@
   "holeAspect": 1,
   "cutAspect": 1,
   "rotateZ": -51.28008,
-  "coat": 0,
-  "coatRoughness": 0.06,
+  "coat": 0.23,
+  "coatRoughness": 0.085,
   "fresnel": 1,
-  "iridShift": 0,
-  "iridScale": 1,
-  "dispersion": 0.06,
-  "absorption": 0.012,
+  "iridShift": 0.1,
+  "iridScale": 1.7,
+  "dispersion": 0.15553,
+  "absorption": 1.85,
   "tintStrength": 0.03,
   "anisotropy": 0.21,
   "anisotropyAngle": -17,
@@ -677,22 +677,22 @@
   "hollow": 0,
   "wallThickness": 1,
   "translucency": 0,
-  "scattering": 0,
+  "scattering": 0.5,
   "scatterDirection": 0.25,
-  "thinFilm": 0,
-  "filmThickness": 420,
+  "thinFilm": 0.22,
+  "filmThickness": 740,
   "subsurface": 0,
   "sssRadius": 0.55,
   "sssColor": "#ffd0ac",
-  "exposure": -0.16162,
+  "exposure": -0.10477,
   "brightness": 0,
-  "contrast": 1.025,
-  "saturation": 0.83,
+  "contrast": 1.05,
+  "saturation": 1.35,
   "temperature": 0,
   "photoTint": 0,
-  "gamma": 1,
+  "gamma": 0.78,
   "blacks": 0,
-  "highlights": 0.015,
+  "highlights": 0.264,
   "vignette": 0,
   "lensDistortion": 0,
   "grainSize": 1,
@@ -810,7 +810,7 @@
     "mode": "wave"
    },
    "finishRgbMix": {
-    "enabled": true,
+    "enabled": false,
     "amplitude": 0.2,
     "cycles": 1,
     "phase": 0,
@@ -930,48 +930,168 @@
     "mode": "points",
     "points": [
      {
-      "at": 0,
-      "offset": 0
+      "at": 0.0,
+      "offset": 0.0
      },
      {
-      "at": 0.12,
-      "offset": 0.12
+      "at": 0.03125,
+      "offset": 0.09686
      },
      {
-      "at": 0.25,
-      "offset": -0.019999999999999997
+      "at": 0.075,
+      "offset": 0.06602
      },
      {
-      "at": 0.33999999999999997,
-      "offset": 0.06
+      "at": 0.1,
+      "offset": 0.12737
      },
      {
-      "at": 0.43,
-      "offset": 0.48000000000000004
+      "at": 0.125,
+      "offset": 0.0521
      },
      {
-      "at": 0.505,
-      "offset": 0.3
+      "at": 0.15,
+      "offset": 0.13946
      },
      {
-      "at": 0.58,
-      "offset": 0.28
+      "at": 0.175,
+      "offset": 0.05815
      },
      {
-      "at": 0.636,
-      "offset": 0.94
+      "at": 0.2125,
+      "offset": 0.02193
      },
      {
-      "at": 0.6675,
-      "offset": 0.36
+      "at": 0.275,
+      "offset": -0.07868
      },
      {
-      "at": 0.7175,
-      "offset": 0.03
+      "at": 0.325,
+      "offset": 0.10568
      },
      {
-      "at": 0.8800000000000001,
-      "offset": -0.03
+      "at": 0.35625,
+      "offset": 0.1938
+     },
+     {
+      "at": 0.38125,
+      "offset": 0.23222
+     },
+     {
+      "at": 0.3875,
+      "offset": 0.21462
+     },
+     {
+      "at": 0.39375,
+      "offset": 0.2506
+     },
+     {
+      "at": 0.4,
+      "offset": 0.23857
+     },
+     {
+      "at": 0.40625,
+      "offset": 0.24261
+     },
+     {
+      "at": 0.4125,
+      "offset": 0.23117
+     },
+     {
+      "at": 0.41875,
+      "offset": 0.21539
+     },
+     {
+      "at": 0.43125,
+      "offset": 0.22248
+     },
+     {
+      "at": 0.4625,
+      "offset": 0.20076
+     },
+     {
+      "at": 0.5,
+      "offset": 0.04731
+     },
+     {
+      "at": 0.5375,
+      "offset": 0.19816
+     },
+     {
+      "at": 0.58125,
+      "offset": 0.13983
+     },
+     {
+      "at": 0.59375,
+      "offset": 0.22425
+     },
+     {
+      "at": 0.6,
+      "offset": 0.2849
+     },
+     {
+      "at": 0.60625,
+      "offset": 0.32753
+     },
+     {
+      "at": 0.6125,
+      "offset": 0.39213
+     },
+     {
+      "at": 0.61875,
+      "offset": 0.39057
+     },
+     {
+      "at": 0.625,
+      "offset": 0.38838
+     },
+     {
+      "at": 0.63125,
+      "offset": 0.39789
+     },
+     {
+      "at": 0.6375,
+      "offset": 0.45242
+     },
+     {
+      "at": 0.64375,
+      "offset": 0.36394
+     },
+     {
+      "at": 0.65,
+      "offset": 0.33242
+     },
+     {
+      "at": 0.65625,
+      "offset": 0.28466
+     },
+     {
+      "at": 0.6625,
+      "offset": 0.2544
+     },
+     {
+      "at": 0.7,
+      "offset": 0.13812
+     },
+     {
+      "at": 0.7375,
+      "offset": 0.10642
+     },
+     {
+      "at": 0.78125,
+      "offset": -0.12071
+     },
+     {
+      "at": 0.8375,
+      "offset": -0.12742
+     },
+     {
+      "at": 0.9,
+      "offset": 0.05539
+     },
+     {
+      "at": 0.95,
+      "offset": 0.01351
      }
     ]
    },
@@ -2704,52 +2824,168 @@
     "mode": "points",
     "points": [
      {
-      "at": 0,
-      "offset": 0
+      "at": 0.0,
+      "offset": -0.0
+     },
+     {
+      "at": 0.03125,
+      "offset": -0.1297
      },
      {
       "at": 0.075,
-      "offset": -0.31016
+      "offset": -0.10883
      },
      {
-      "at": 0.1625,
-      "offset": 0.09402000000000002
+      "at": 0.1,
+      "offset": -0.07865
      },
      {
-      "at": 0.2375,
-      "offset": 0.17267000000000002
+      "at": 0.125,
+      "offset": -0.00969
+     },
+     {
+      "at": 0.15,
+      "offset": -0.02689
+     },
+     {
+      "at": 0.175,
+      "offset": -0.01202
+     },
+     {
+      "at": 0.2125,
+      "offset": 0.04451
+     },
+     {
+      "at": 0.275,
+      "offset": -0.00309
      },
      {
       "at": 0.325,
-      "offset": 0.009330000000000005
+      "offset": -0.03643
+     },
+     {
+      "at": 0.35625,
+      "offset": -0.01996
+     },
+     {
+      "at": 0.38125,
+      "offset": -0.13755
+     },
+     {
+      "at": 0.3875,
+      "offset": -0.15178
+     },
+     {
+      "at": 0.39375,
+      "offset": -0.14403
      },
      {
       "at": 0.4,
-      "offset": 0.010040000000000021
+      "offset": -0.1355
      },
      {
-      "at": 0.475,
-      "offset": 0.13036
+      "at": 0.40625,
+      "offset": -0.11088
      },
      {
-      "at": 0.5625,
-      "offset": 0.02532000000000001
+      "at": 0.4125,
+      "offset": -0.11779
+     },
+     {
+      "at": 0.41875,
+      "offset": -0.09001
+     },
+     {
+      "at": 0.43125,
+      "offset": -0.03548
+     },
+     {
+      "at": 0.4625,
+      "offset": 0.04421
+     },
+     {
+      "at": 0.5,
+      "offset": -0.0202
+     },
+     {
+      "at": 0.5375,
+      "offset": -0.03723
+     },
+     {
+      "at": 0.58125,
+      "offset": 0.00643
+     },
+     {
+      "at": 0.59375,
+      "offset": -0.01776
+     },
+     {
+      "at": 0.6,
+      "offset": -0.03179
+     },
+     {
+      "at": 0.60625,
+      "offset": -0.03039
+     },
+     {
+      "at": 0.6125,
+      "offset": -0.03295
+     },
+     {
+      "at": 0.61875,
+      "offset": -0.0246
+     },
+     {
+      "at": 0.625,
+      "offset": -0.03002
+     },
+     {
+      "at": 0.63125,
+      "offset": -0.04739
      },
      {
       "at": 0.6375,
-      "offset": 0.02313000000000001
+      "offset": -0.06215
      },
      {
-      "at": 0.725,
-      "offset": -0.10107999999999998
+      "at": 0.64375,
+      "offset": -0.07902
      },
      {
-      "at": 0.8125,
-      "offset": 0.03471000000000002
+      "at": 0.65,
+      "offset": -0.0953
+     },
+     {
+      "at": 0.65625,
+      "offset": -0.09686
+     },
+     {
+      "at": 0.6625,
+      "offset": -0.10531
+     },
+     {
+      "at": 0.7,
+      "offset": -0.0322
+     },
+     {
+      "at": 0.7375,
+      "offset": -0.10814
+     },
+     {
+      "at": 0.78125,
+      "offset": -0.25558
+     },
+     {
+      "at": 0.8375,
+      "offset": -0.23459
      },
      {
       "at": 0.9,
-      "offset": 0.04488000000000002
+      "offset": -0.07048
+     },
+     {
+      "at": 0.95,
+      "offset": 0.08103
      }
     ]
    },
@@ -3824,44 +4060,168 @@
     "mode": "points",
     "points": [
      {
-      "at": 0,
-      "offset": 0
+      "at": 0.0,
+      "offset": 0.0
      },
      {
-      "at": 0.24,
-      "offset": 0
+      "at": 0.03125,
+      "offset": 0.08108
      },
      {
-      "at": 0.355,
-      "offset": 0.02
+      "at": 0.075,
+      "offset": 0.04654
      },
      {
-      "at": 0.43,
-      "offset": 0.2592
+      "at": 0.1,
+      "offset": 0.11525
      },
      {
-      "at": 0.5125,
-      "offset": 0.04
+      "at": 0.125,
+      "offset": 0.03095
      },
      {
-      "at": 0.5700000000000001,
-      "offset": 0.12
+      "at": 0.15,
+      "offset": 0.12879
+     },
+     {
+      "at": 0.175,
+      "offset": 0.03772
+     },
+     {
+      "at": 0.2125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.275,
+      "offset": 0.0
+     },
+     {
+      "at": 0.325,
+      "offset": 0.09095
+     },
+     {
+      "at": 0.35625,
+      "offset": 0.18965
+     },
+     {
+      "at": 0.38125,
+      "offset": 0.23269
+     },
+     {
+      "at": 0.3875,
+      "offset": 0.21296
+     },
+     {
+      "at": 0.39375,
+      "offset": 0.25326
+     },
+     {
+      "at": 0.4,
+      "offset": 0.2398
+     },
+     {
+      "at": 0.40625,
+      "offset": 0.24432
+     },
+     {
+      "at": 0.4125,
+      "offset": 0.2315
+     },
+     {
+      "at": 0.41875,
+      "offset": 0.21383
+     },
+     {
+      "at": 0.43125,
+      "offset": 0.22177
+     },
+     {
+      "at": 0.4625,
+      "offset": 0.19745
+     },
+     {
+      "at": 0.5,
+      "offset": 0.02558
+     },
+     {
+      "at": 0.5375,
+      "offset": 0.19454
+     },
+     {
+      "at": 0.58125,
+      "offset": 0.1292
+     },
+     {
+      "at": 0.59375,
+      "offset": 0.22375
+     },
+     {
+      "at": 0.6,
+      "offset": 0.29168
+     },
+     {
+      "at": 0.60625,
+      "offset": 0.33942
+     },
+     {
+      "at": 0.6125,
+      "offset": 0.41177
+     },
+     {
+      "at": 0.61875,
+      "offset": 0.41004
+     },
+     {
+      "at": 0.625,
+      "offset": 0.40758
+     },
+     {
+      "at": 0.63125,
+      "offset": 0.41824
      },
      {
       "at": 0.6375,
-      "offset": 0.54
+      "offset": 0.4793
      },
      {
-      "at": 0.6925,
-      "offset": 0.09
+      "at": 0.64375,
+      "offset": 0.38021
      },
      {
-      "at": 0.76,
-      "offset": 0
+      "at": 0.65,
+      "offset": 0.3449
+     },
+     {
+      "at": 0.65625,
+      "offset": 0.29142
+     },
+     {
+      "at": 0.6625,
+      "offset": 0.25752
+     },
+     {
+      "at": 0.7,
+      "offset": 0.12729
+     },
+     {
+      "at": 0.7375,
+      "offset": 0.09179
+     },
+     {
+      "at": 0.78125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.8375,
+      "offset": 0.0
      },
      {
       "at": 0.9,
-      "offset": 0
+      "offset": 0.03463
+     },
+     {
+      "at": 0.95,
+      "offset": 0.0
      }
     ]
    },
@@ -3878,49 +4238,173 @@
     "mode": "points",
     "points": [
      {
-      "at": 0,
-      "offset": 0
+      "at": 0.0,
+      "offset": 0.0
      },
      {
-      "at": 0.24,
-      "offset": 0
+      "at": 0.03125,
+      "offset": -0.0276
      },
      {
-      "at": 0.355,
-      "offset": -0.020000000000000018
+      "at": 0.075,
+      "offset": -0.01881
      },
      {
-      "at": 0.43,
-      "offset": -0.050000000000000044
+      "at": 0.1,
+      "offset": -0.0363
      },
      {
-      "at": 0.5125,
-      "offset": -0.010000000000000009
+      "at": 0.125,
+      "offset": -0.01484
      },
      {
-      "at": 0.5700000000000001,
-      "offset": -0.030000000000000027
+      "at": 0.15,
+      "offset": -0.03974
+     },
+     {
+      "at": 0.175,
+      "offset": -0.01657
+     },
+     {
+      "at": 0.2125,
+      "offset": -0.00625
+     },
+     {
+      "at": 0.275,
+      "offset": 0.02243
+     },
+     {
+      "at": 0.325,
+      "offset": -0.03011
+     },
+     {
+      "at": 0.35625,
+      "offset": -0.05523
+     },
+     {
+      "at": 0.38125,
+      "offset": -0.06618
+     },
+     {
+      "at": 0.3875,
+      "offset": -0.06116
+     },
+     {
+      "at": 0.39375,
+      "offset": -0.07142
+     },
+     {
+      "at": 0.4,
+      "offset": -0.06799
+     },
+     {
+      "at": 0.40625,
+      "offset": -0.06914
+     },
+     {
+      "at": 0.4125,
+      "offset": -0.06588
+     },
+     {
+      "at": 0.41875,
+      "offset": -0.06138
+     },
+     {
+      "at": 0.43125,
+      "offset": -0.0634
+     },
+     {
+      "at": 0.4625,
+      "offset": -0.05721
+     },
+     {
+      "at": 0.5,
+      "offset": -0.01348
+     },
+     {
+      "at": 0.5375,
+      "offset": -0.05647
+     },
+     {
+      "at": 0.58125,
+      "offset": -0.03985
+     },
+     {
+      "at": 0.59375,
+      "offset": -0.06391
+     },
+     {
+      "at": 0.6,
+      "offset": -0.08119
+     },
+     {
+      "at": 0.60625,
+      "offset": -0.09334
+     },
+     {
+      "at": 0.6125,
+      "offset": -0.11175
+     },
+     {
+      "at": 0.61875,
+      "offset": -0.11131
+     },
+     {
+      "at": 0.625,
+      "offset": -0.11068
+     },
+     {
+      "at": 0.63125,
+      "offset": -0.1134
      },
      {
       "at": 0.6375,
-      "offset": -0.10999999999999999
+      "offset": -0.12894
      },
      {
-      "at": 0.6925,
-      "offset": -0.020000000000000018
+      "at": 0.64375,
+      "offset": -0.10372
      },
      {
-      "at": 0.76,
-      "offset": 0
+      "at": 0.65,
+      "offset": -0.09473
+     },
+     {
+      "at": 0.65625,
+      "offset": -0.08113
+     },
+     {
+      "at": 0.6625,
+      "offset": -0.0725
+     },
+     {
+      "at": 0.7,
+      "offset": -0.03936
+     },
+     {
+      "at": 0.7375,
+      "offset": -0.03033
+     },
+     {
+      "at": 0.78125,
+      "offset": 0.03441
+     },
+     {
+      "at": 0.8375,
+      "offset": 0.03632
      },
      {
       "at": 0.9,
-      "offset": 0
+      "offset": -0.01578
+     },
+     {
+      "at": 0.95,
+      "offset": -0.00385
      }
     ]
    },
    "transparency": {
-    "enabled": false,
+    "enabled": true,
     "amplitude": 0.2,
     "cycles": 1,
     "phase": 0,
@@ -3929,13 +4413,349 @@
     "pace": 0,
     "pacePhase": 0,
     "hold": 0,
-    "mode": "wave"
+    "mode": "points",
+    "points": [
+     {
+      "at": 0.0,
+      "offset": -0.0
+     },
+     {
+      "at": 0.03125,
+      "offset": 0.02131
+     },
+     {
+      "at": 0.075,
+      "offset": 0.01452
+     },
+     {
+      "at": 0.1,
+      "offset": 0.02802
+     },
+     {
+      "at": 0.125,
+      "offset": 0.01146
+     },
+     {
+      "at": 0.15,
+      "offset": 0.03068
+     },
+     {
+      "at": 0.175,
+      "offset": 0.01279
+     },
+     {
+      "at": 0.2125,
+      "offset": 0.00482
+     },
+     {
+      "at": 0.275,
+      "offset": -0.01731
+     },
+     {
+      "at": 0.325,
+      "offset": 0.02325
+     },
+     {
+      "at": 0.35625,
+      "offset": 0.04263
+     },
+     {
+      "at": 0.38125,
+      "offset": 0.05109
+     },
+     {
+      "at": 0.3875,
+      "offset": 0.04721
+     },
+     {
+      "at": 0.39375,
+      "offset": 0.05513
+     },
+     {
+      "at": 0.4,
+      "offset": 0.05248
+     },
+     {
+      "at": 0.40625,
+      "offset": 0.05337
+     },
+     {
+      "at": 0.4125,
+      "offset": 0.05085
+     },
+     {
+      "at": 0.41875,
+      "offset": 0.04738
+     },
+     {
+      "at": 0.43125,
+      "offset": 0.04894
+     },
+     {
+      "at": 0.4625,
+      "offset": 0.04416
+     },
+     {
+      "at": 0.5,
+      "offset": 0.0104
+     },
+     {
+      "at": 0.5375,
+      "offset": 0.04359
+     },
+     {
+      "at": 0.58125,
+      "offset": 0.03076
+     },
+     {
+      "at": 0.59375,
+      "offset": 0.04933
+     },
+     {
+      "at": 0.6,
+      "offset": 0.06267
+     },
+     {
+      "at": 0.60625,
+      "offset": 0.07205
+     },
+     {
+      "at": 0.6125,
+      "offset": 0.08626
+     },
+     {
+      "at": 0.61875,
+      "offset": 0.08592
+     },
+     {
+      "at": 0.625,
+      "offset": 0.08544
+     },
+     {
+      "at": 0.63125,
+      "offset": 0.08753
+     },
+     {
+      "at": 0.6375,
+      "offset": 0.09953
+     },
+     {
+      "at": 0.64375,
+      "offset": 0.08006
+     },
+     {
+      "at": 0.65,
+      "offset": 0.07313
+     },
+     {
+      "at": 0.65625,
+      "offset": 0.06262
+     },
+     {
+      "at": 0.6625,
+      "offset": 0.05596
+     },
+     {
+      "at": 0.7,
+      "offset": 0.03038
+     },
+     {
+      "at": 0.7375,
+      "offset": 0.02341
+     },
+     {
+      "at": 0.78125,
+      "offset": -0.02656
+     },
+     {
+      "at": 0.8375,
+      "offset": -0.02803
+     },
+     {
+      "at": 0.9,
+      "offset": 0.01218
+     },
+     {
+      "at": 0.95,
+      "offset": 0.00297
+     }
+    ]
+   },
+   "saturation": {
+    "enabled": true,
+    "mode": "points",
+    "points": [
+     {
+      "at": 0.0,
+      "offset": 0.0
+     },
+     {
+      "at": 0.03125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.075,
+      "offset": 0.0
+     },
+     {
+      "at": 0.1,
+      "offset": 0.0
+     },
+     {
+      "at": 0.125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.15,
+      "offset": 0.0
+     },
+     {
+      "at": 0.175,
+      "offset": 0.0
+     },
+     {
+      "at": 0.2125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.275,
+      "offset": 0.0
+     },
+     {
+      "at": 0.325,
+      "offset": 0.0
+     },
+     {
+      "at": 0.35625,
+      "offset": 0.0
+     },
+     {
+      "at": 0.38125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.3875,
+      "offset": 0.0
+     },
+     {
+      "at": 0.39375,
+      "offset": 0.0
+     },
+     {
+      "at": 0.4,
+      "offset": 0.0
+     },
+     {
+      "at": 0.40625,
+      "offset": 0.0
+     },
+     {
+      "at": 0.4125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.41875,
+      "offset": 0.0
+     },
+     {
+      "at": 0.43125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.4625,
+      "offset": 0.0
+     },
+     {
+      "at": 0.5,
+      "offset": 0.0
+     },
+     {
+      "at": 0.5375,
+      "offset": 0.0
+     },
+     {
+      "at": 0.58125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.59375,
+      "offset": 0.0
+     },
+     {
+      "at": 0.6,
+      "offset": 0.0
+     },
+     {
+      "at": 0.60625,
+      "offset": 0.0
+     },
+     {
+      "at": 0.6125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.61875,
+      "offset": 0.0
+     },
+     {
+      "at": 0.625,
+      "offset": 0.0
+     },
+     {
+      "at": 0.63125,
+      "offset": 0.0
+     },
+     {
+      "at": 0.6375,
+      "offset": 0.0
+     },
+     {
+      "at": 0.64375,
+      "offset": 0.0
+     },
+     {
+      "at": 0.65,
+      "offset": 0.0
+     },
+     {
+      "at": 0.65625,
+      "offset": 0.0
+     },
+     {
+      "at": 0.6625,
+      "offset": 0.0
+     },
+     {
+      "at": 0.7,
+      "offset": 0.0
+     },
+     {
+      "at": 0.7375,
+      "offset": -0.23333333333333306
+     },
+     {
+      "at": 0.78125,
+      "offset": -0.7
+     },
+     {
+      "at": 0.8375,
+      "offset": -0.7
+     },
+     {
+      "at": 0.9,
+      "offset": -0.6222222222222227
+     },
+     {
+      "at": 0.95,
+      "offset": 0.0
+     }
+    ]
    }
   },
   "renderVersion": 2,
   "environment": "studio",
   "environmentAngle": 0,
-  "environmentPower": 0.36,
+  "environmentPower": 0.34,
   "environmentRefraction": 0,
   "environmentRotate": false,
   "environmentCycles": 1,
@@ -3956,7 +4776,7 @@
   "textureRandomness": 0.9,
   "textureWarp": 0.74,
   "textureLink": 0.96,
-  "texturePatch": 0.84,
+  "texturePatch": 0.85,
   "textureSeed": 1,
   "colorLayers": 0,
   "colorLayerScale": 1,
@@ -3986,15 +4806,15 @@
     "enabled": true,
     "visible": false,
     "type": "diffuser",
-    "color": "#f7f5eb",
-    "x": -1.25,
-    "y": 0.35,
-    "z": 0.2,
-    "power": 4.35,
-    "size": 0.7,
+    "color": "#fffdf9",
+    "x": 1.67,
+    "y": 0.51,
+    "z": 1.34,
+    "power": 4.7,
+    "size": 0.32,
     "length": 0.7,
     "roll": 0,
-    "softness": 0.65,
+    "softness": 0.38,
     "cone": 30,
     "grid": 5,
     "orbit": {
@@ -4011,52 +4831,112 @@
      "axis": "y",
      "points": [
       {
-       "at": 0,
-       "offset": -60
+       "at": 0.0,
+       "offset": -64
+      },
+      {
+       "at": 0.03125,
+       "offset": -56
       },
       {
        "at": 0.075,
-       "offset": -60
+       "offset": -40
       },
       {
-       "at": 0.1625,
-       "offset": -90
+       "at": 0.1,
+       "offset": -28
       },
       {
-       "at": 0.2375,
-       "offset": -90
+       "at": 0.125,
+       "offset": -20
+      },
+      {
+       "at": 0.15,
+       "offset": -12
+      },
+      {
+       "at": 0.175,
+       "offset": -4
+      },
+      {
+       "at": 0.2125,
+       "offset": 8
+      },
+      {
+       "at": 0.275,
+       "offset": 32
       },
       {
        "at": 0.325,
-       "offset": -90
+       "offset": 24
       },
       {
-       "at": 0.4,
-       "offset": -90
+       "at": 0.35625,
+       "offset": 9
       },
       {
-       "at": 0.475,
-       "offset": -60
+       "at": 0.38125,
+       "offset": -7
       },
       {
-       "at": 0.5625,
-       "offset": -30
+       "at": 0.40625,
+       "offset": -13
+      },
+      {
+       "at": 0.43125,
+       "offset": -17
+      },
+      {
+       "at": 0.4625,
+       "offset": -14
+      },
+      {
+       "at": 0.5,
+       "offset": 5
+      },
+      {
+       "at": 0.5375,
+       "offset": 27
+      },
+      {
+       "at": 0.58125,
+       "offset": 18
+      },
+      {
+       "at": 0.6125,
+       "offset": 5
       },
       {
        "at": 0.6375,
-       "offset": -30
+       "offset": 0
       },
       {
-       "at": 0.725,
-       "offset": -60
+       "at": 0.6625,
+       "offset": -5
       },
       {
-       "at": 0.8125,
-       "offset": -60
+       "at": 0.7,
+       "offset": -22
+      },
+      {
+       "at": 0.7375,
+       "offset": -40
+      },
+      {
+       "at": 0.78125,
+       "offset": -58
+      },
+      {
+       "at": 0.8375,
+       "offset": -72
       },
       {
        "at": 0.9,
-       "offset": -60
+       "offset": -74
+      },
+      {
+       "at": 0.95,
+       "offset": -70
       }
      ]
     },
@@ -4078,15 +4958,57 @@
     "enabled": true,
     "visible": false,
     "type": "diffuser",
-    "color": "#c5d5e0",
-    "x": 2.2,
-    "y": -0.6,
-    "z": -1.7,
-    "power": 0.55,
-    "size": 0.9,
+    "color": "#fff4e7",
+    "x": 1.34,
+    "y": -1.34,
+    "z": -2.0,
+    "power": 0.62,
+    "size": 0.38,
     "length": 0.7,
     "roll": 0,
-    "softness": 0.65,
+    "softness": 0.31,
+    "cone": 30,
+    "grid": 5,
+    "orbit": {
+     "enabled": false,
+     "amplitude": 35,
+     "cycles": 1,
+     "phase": 0,
+     "direction": 1,
+     "curve": "sine",
+     "pace": 0,
+     "pacePhase": 0,
+     "hold": 0,
+     "mode": "wave",
+     "axis": "y"
+    },
+    "pulse": {
+     "enabled": false,
+     "amplitude": 0.3,
+     "cycles": 1,
+     "phase": 0,
+     "direction": 1,
+     "curve": "sine",
+     "pace": 0,
+     "pacePhase": 0,
+     "hold": 0,
+     "mode": "wave"
+    }
+   },
+   {
+    "id": 3,
+    "enabled": true,
+    "visible": false,
+    "type": "bar",
+    "color": "#daebe8",
+    "x": -0.8,
+    "y": 0.15,
+    "z": 1.2,
+    "power": 0.22,
+    "size": 0.46,
+    "length": 0.62,
+    "roll": -10,
+    "softness": 0.31,
     "cone": 30,
     "grid": 5,
     "orbit": {
