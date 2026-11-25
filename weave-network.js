@@ -1,4 +1,4 @@
-import {junctionField,JUNCTION_GLSL} from './weave-junction.js?v=b3646b8af04a';
+import {junctionField,JUNCTION_GLSL} from './weave-junction.js?v=b4b76e9bdb82';
 
 const TAU = Math.PI * 2;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -261,6 +261,8 @@ vec3 measureShoot(vec3 q,vec4 shear,float determinant,float release,float hierar
 vec3 weaveSurface;
 #ifdef WEAVE_HIT_TAG
 bool weaveEvaluateMaterial=false;
+float weaveFacing=0.;
+float weaveContactShade=0.;
 #endif
 #endif
 ${JUNCTION_GLSL}

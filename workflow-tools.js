@@ -1,12 +1,13 @@
-import {organizeWorkspace} from './workspace-layout.js?v=b3646b8af04a';
-import {mountPresetLibrary} from './preset-library.js?v=b3646b8af04a';
-import {newCreation,material} from './creative-model.js?v=b3646b8af04a';
-import {addHelp} from './inspector-ui.js?v=b3646b8af04a';
-import {META,MOODS} from './model.js?v=b3646b8af04a';
-import {animationPhase} from './animation-clock.js?v=b3646b8af04a';
-import {MAX_MOTION_POINTS,isMotionAngle,motionPointOffset,motionPointValue,normalizeMotionPoints,supportsMotionPoints} from './motion-keyframes.js?v=b3646b8af04a';
-import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=b3646b8af04a';
-import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=b3646b8af04a';
+import {organizeWorkspace} from './workspace-layout.js?v=b4b76e9bdb82';
+import {mountPresetLibrary} from './preset-library.js?v=b4b76e9bdb82';
+import {newCreation,material} from './creative-model.js?v=b4b76e9bdb82';
+import {addHelp} from './inspector-ui.js?v=b4b76e9bdb82';
+import {META,MOODS} from './model.js?v=b4b76e9bdb82';
+import {animationPhase} from './animation-clock.js?v=b4b76e9bdb82';
+import {MAX_MOTION_POINTS,LIGHT_ORBIT_RANGE,isMotionAngle,motionPointOffset,motionPointValue,normalizeMotionPoints,supportsMotionPoints} from './motion-keyframes.js?v=b4b76e9bdb82';
+import {pathValue} from './panels.js?v=b4b76e9bdb82';
+import {CONTROL_NAMES,EXPERT_KEYS} from './control-vocabulary.js?v=b4b76e9bdb82';
+import {animationMarkup,motionGroups,composePanel,WORK_TABS} from './workflow-panels.js?v=b4b76e9bdb82';
 const get=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
 const put=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value));}catch{}};
 export function mountWorkflowTools(api){
@@ -65,10 +66,10 @@ export function mountWorkflowTools(api){
  separator.onlostpointercapture=()=>{if(resizeStart){resizeStart=null;setWidth(width(),true);}};
  function closeEditor(){popupRequest=null;popupAdvanced=false;popupPointScroll=0;popup?.close?.();popup?.remove();popup=null;}
  function motionPointEditor(key,track){
-  const state=getState(),range=META[key],base=state[key]??0;
+  const state=getState(),orbit=key==='orbit',range=orbit?LIGHT_ORBIT_RANGE:META[key],base=orbit?0:(state[key]??0);
   const box=document.createElement('div');box.className='motion-points';
   const note=document.createElement('p');note.className='help';
-  note.textContent='Fissa i valori lungo il ciclo. Il cursore del parametro sposta tutti i punti insieme.';
+  note.textContent=orbit?'Imposta gli angoli rispetto alla posizione della luce. A 0° torna nella posizione di partenza.':'Fissa i valori lungo il ciclo. Il cursore del parametro sposta tutti i punti insieme.';
   const list=document.createElement('div');list.className='motion-point-list';
   list.setAttribute('role','group');list.setAttribute('aria-label','Valori nel tempo');
   box.append(note,list);
@@ -87,7 +88,7 @@ export function mountWorkflowTools(api){
   for(const [i,point] of points.entries()){
    const row=document.createElement('div');row.className='motion-point';
    const time=field('Tempo %',0,99.9999,point.at*100);
-   const value=field('Valore',range[1],range[2],motionPointValue(key,base,point.offset,range));
+   const value=field(orbit?'Angolo (°)':'Valore',range[1],range[2],motionPointValue(key,base,point.offset,range));
    const update=()=>{
     if(!time.input.checkValidity()||!value.input.checkValidity()||!Number.isFinite(time.input.valueAsNumber)||!Number.isFinite(value.input.valueAsNumber)){
      toast('Controlla il tempo e il valore del punto.');renderControls();return;
@@ -122,14 +123,14 @@ export function mountWorkflowTools(api){
   if(request.path){
    const source=document.createElement('div');source.innerHTML=animationMarkup(request.path,raw);const track=source.firstElementChild;if(!track){popupRequest=null;toast('Questo movimento è sospeso dai vincoli della forma.');return;}
    title.textContent=CONTROL_NAMES[request.path.split('.')[1]]||request.label||track.querySelector('summary')?.textContent||'Animazione';
-   const key=request.path.startsWith('motions.')?request.path.slice(8):null;
-   const pointTrack=supportsMotionPoints(key)?getState().motions[key]:null;
+   const key=request.path.split('.').at(-1);
+   const pointTrack=supportsMotionPoints(key)?pathValue(getState(),request.path):null;
    const pointsActive=pointTrack?.mode==='points'&&pointTrack.points?.length>1;
    const advanced=document.createElement('details');advanced.className='animation-advanced';advanced.innerHTML='<summary>Regola andamento e fase</summary>';advanced.open=popupAdvanced;
    for(const e of [...track.querySelectorAll('input:not(.number),select')]){
     const path=e.dataset.path||e.dataset.pathCheck||e.dataset.pathSelect;if(!path)continue;const row=e.closest('.param,.field,.check');if(!row)continue;
-    if(pointsActive&&!/\.(enabled|mode)$/.test(path))continue;
-    const basic=/\.(enabled|mode|amplitude|cycles)$/.test(path);(basic?body:advanced).append(row);
+    if(pointsActive&&!/\.(enabled|mode|axis)$/.test(path))continue;
+    const basic=/\.(enabled|mode|axis|amplitude|cycles)$/.test(path);(basic?body:advanced).append(row);
     const label=row.querySelector('label');if(label&&path.endsWith('.amplitude'))label.textContent='Ampiezza';if(label&&path.endsWith('.cycles'))label.textContent='Ripetizioni nel loop';
     if(path.endsWith('.mode')){
      for(const n of row.childNodes)if(n.nodeType===3)n.textContent='Stile';

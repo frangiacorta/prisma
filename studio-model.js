@@ -1,11 +1,11 @@
-import {PALETTE_TRACKS} from './finish-palette.js?v=b3646b8af04a';
-import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=b3646b8af04a';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=b3646b8af04a';
-import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=b3646b8af04a';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=b3646b8af04a';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=b3646b8af04a';
-import {PARTICLE_CELL_TRACKS,PARTICLE_META,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=b3646b8af04a';
-import {BODY_LAYER_META,GRAIN_MOTION_DEFAULTS} from './body-layers.js?v=b3646b8af04a';
+import {PALETTE_TRACKS} from './finish-palette.js?v=b4b76e9bdb82';
+import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=b4b76e9bdb82';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=b4b76e9bdb82';
+import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=b4b76e9bdb82';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=b4b76e9bdb82';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=b4b76e9bdb82';
+import {PARTICLE_CELL_TRACKS,PARTICLE_META,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=b4b76e9bdb82';
+import {BODY_LAYER_META,GRAIN_MOTION_DEFAULTS} from './body-layers.js?v=b4b76e9bdb82';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
@@ -24,7 +24,7 @@ export const TRACK_META={
  pVortex:['Vorticità',0,2,.01],pTravel:PARTICLE_META.pTravel,
  stretchX:['Larghezza',0,.6,.01],stretchY:['Altezza',0,.6,.01],stretchZ:['Profondità',0,.6,.01],
  exposure:['Esposizione',0,2,.01],
- focusBlur:['Sfocatura fuori fuoco',0,1,.01],focusDepth:['Piano di fuoco',0,4.7,.01],
+ focusBlur:['Sfocatura fuori fuoco',0,1,.01],focusDepth:['Piano di fuoco',0,4.7,.01],focusTilt:['Inclinazione del fuoco (°)',0,60,.1],
  ...FRACTAL_TRACKS,
  pVeilStyle:['Petali / aureola / ventaglio',0,2,.01],pVeilMorph:['Trasformazione forma / veli',0,1,.01],pVeilSpread:['Apertura dei veli',0,1,.01],
  petalFlowPhase:['Scorrimento lungo le radici',0,1,.01],petalOrbitPhase:['Avanzamento continuo sulla sfera',0,1,.01],petalWeave:['Ampiezza intreccio',0,1,.01],
@@ -50,7 +50,7 @@ export const EXTRA_BASE={
  roundness:0,taper:0,bendX:0,bendY:0,lobeAmount:0,lobes:5,pinch:0,rimRound:0,holeAspect:1,cutAspect:1,rotateZ:0,
  coat:0,coatRoughness:.1,fresnel:1,iridShift:0,iridScale:1,dispersion:0,absorption:.15,tintStrength:.15,anisotropy:0,anisotropyAngle:0,surfaceTexture:0,
  hollow:0,wallThickness:.08,translucency:0,scattering:0,scatterDirection:.25,thinFilm:0,filmThickness:420,subsurface:0,sssRadius:.35,sssColor:'#ffc49b',
- exposure:0,brightness:0,contrast:1,saturation:1,temperature:0,photoTint:0,gamma:1,blacks:0,highlights:0,vignette:0,lensDistortion:0,grainSize:1,photoAll:false,focusBlur:0,focusDepth:0,
+ exposure:0,brightness:0,contrast:1,saturation:1,temperature:0,photoTint:0,gamma:1,blacks:0,highlights:0,vignette:0,lensDistortion:0,grainSize:1,photoAll:false,focusBlur:0,focusDepth:0,focusTilt:0,
  motions:Object.fromEntries(Object.keys(TRACK_META).map(k=>[k,track(k==='filWidth'?.003:k==='rotateY'?360:k==='volume'?.12:k==='deform'?.048:k==='twist'?.4:k.startsWith('rotate')?30:.2,k==='volume'||k==='deform',k==='rotateY'||k==='gradientOffset'||k==='petalFlowPhase'||k==='petalOrbitPhase'||k==='structFlowPhase'||k==='loopPhase'||k==='filPhase'?'cycle':'wave')]))
 };
 export function newLight(id=1){return{id,enabled:true,visible:true,type:'circle',color:'#e0eaff',x:-1.4,y:1.8,z:2.5,power:1.8,size:.9,length:.6,roll:0,softness:.3,cone:30,grid:5,orbit:{...track(35),axis:'y'},pulse:track(.3)}}

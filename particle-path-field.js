@@ -1,4 +1,4 @@
-import {packPathCurves,PATH_SAMPLES} from './particle-paths.js?v=b3646b8af04a';
+import {packPathCurves,PATH_SAMPLES} from './particle-paths.js?v=b4b76e9bdb82';
 
 export const guideGLSL=`
 uniform highp sampler2D uGuideCurves,uGuideMap;

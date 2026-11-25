@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=b3646b8af04a';
-import {EXTRA_HELP} from './control-help-extra.js?v=b3646b8af04a';
-import {FRACTAL_HELP} from './fractal-form.js?v=b3646b8af04a';
-import {CELLULAR_HELP} from './cellular-form.js?v=b3646b8af04a';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=b3646b8af04a';
-import {trailLightCompensation} from './particle-model.js?v=b3646b8af04a';
+import {AUDIO_HELP} from './audio-model.js?v=b4b76e9bdb82';
+import {EXTRA_HELP} from './control-help-extra.js?v=b4b76e9bdb82';
+import {FRACTAL_HELP} from './fractal-form.js?v=b4b76e9bdb82';
+import {CELLULAR_HELP} from './cellular-form.js?v=b4b76e9bdb82';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=b4b76e9bdb82';
+import {trailLightCompensation} from './particle-model.js?v=b4b76e9bdb82';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishPalette:'Converte il chiaroscuro della scena in una palette ordinata da scuro a chiaro. La trasparenza resta invariata.',
@@ -383,8 +383,8 @@ export function controlCondition(s,key){
  if(key==='filPhase')return need('filWind','Aumenta Ampiezza di oscillazione delle punte sopra zero.');
  if(key.startsWith('petal')&&key!=='petalAmount'&&!positive('petalAmount'))return 'Aumenta Appendici in Forma → Petali e radici.';
  if(key==='petalDirectionSpread'&&!['petalCoil','petalReentry','petalCurl','petalWander'].some(positive))return 'Aggiungi una curva, una deviazione o un avvolgimento al percorso.';
- if(key==='focusDepth'&&!positive('focusBlur'))return 'Aumenta la sfocatura fuori fuoco.';
- if(key==='motion'&&!Object.values(s.motions||{}).some(t=>t.enabled&&t.mode!=='cycle'&&t.mode!=='points'&&Math.abs(t.amplitude)>1e-6)&&!s.lights?.some(l=>l.pulse?.enabled||l.orbit?.enabled&&l.orbit.mode!=='cycle'))return 'Attiva una traccia in oscillazione per usare l’ampiezza generale. I punti nel tempo usano i valori impostati nella traccia.';
+ if((key==='focusDepth'||key==='focusTilt')&&!positive('focusBlur'))return 'Aumenta la sfocatura fuori fuoco.';
+ if(key==='motion'&&!Object.values(s.motions||{}).some(t=>t.enabled&&t.mode!=='cycle'&&t.mode!=='points'&&Math.abs(t.amplitude)>1e-6)&&!s.lights?.some(l=>l.pulse?.enabled||l.orbit?.enabled&&l.orbit.mode!=='cycle'&&l.orbit.mode!=='points'))return 'Attiva una traccia in oscillazione per usare l’ampiezza generale. I punti nel tempo usano i valori impostati nella traccia.';
  return '';
 }
 // Changes suggested inline are opt-in edits. The same values are useful for
@@ -464,6 +464,7 @@ export function conditionActivation(s,key,condition=controlCondition(s,key)){
 }
 export function controlHelp(key,engine){
  if(key==='focusBlur')return 'Regola quanto si ammorbidiscono i dettagli davanti e dietro il piano di fuoco.';
+ if(key==='focusTilt')return 'Inclina il piano nitido attorno al centro dell’immagine. Con valori positivi il fuoco si avvicina in alto e si allontana in basso. Con valori negativi avviene il contrario.';
  if(key==='focusDepth')return 'Sposta il piano nitido lungo la profondità della scena. I valori positivi sono più vicini alla camera.';
 
  if(key==='sceneGrains')return 'Miscela superficie e granelli della stessa geometria, mantenendo il suo movimento. Il cursore cambia la rappresentazione; il riempimento distribuisce i granelli anche dentro il volume.';

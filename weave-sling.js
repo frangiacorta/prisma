@@ -19,12 +19,29 @@ const hemGores=[
  [7,18,19],[7,19,20],[14,20,21],[14,21,22],[15,22,23],
  [14,7,20],[14,22,15],[1,18,7],[12,7,1],[12,24,1],
  [9,24,12],[11,12,9],[3,25,11],[4,26,3],[2,23,15],
- [1,16,13],[14,13,16]
+ [1,16,13],[14,13,16],
+ // The last row retains a loose backing between its two lower sockets.
+ // Individual strands can be seen through it from the opposite face.
+ [9,17,11]
 ];
 // Silk coming off the transverse rib doubles back into the side seam.
 // Yarn redistribution tapers continuously to a single ply at the free edge.
 const seamPlies={1:.03,5:.28,6:.03,9:.75,11:.15,12:.72,17:.03,24:.35,25:.08};
+// A loose facing is caught on the outward shoulders of the fruit. It spans
+// the air between them and can obscure fruit lying farther down the pocket.
+const frontGores=[[7,14,1],[1,14,16],[14,13,16],[14,15,13],[1,16,13],
+ [1,13,6],[13,2,6],[1,6,5],[12,1,5],[9,12,5],[5,6,17],[9,5,17]];
 const plyWeights=[...pouchGores,...hemGores].map(ids=>'vec3('+ids.map(id=>(seamPlies[id]||0).toFixed(2)).join(',')+')').join(',');
+// Only a free edge loses optical density. A sewn internal edge continues
+// through the neighbouring panel with the same areal mass.
+const edgeKey=(a,b)=>a<b?a+','+b:b+','+a;
+const edgeCounts=new Map();
+for(const ids of frontGores)for(let j=0;j<3;j++){
+ const edge=edgeKey(ids[j],ids[(j+1)%3]);
+ edgeCounts.set(edge,(edgeCounts.get(edge)||0)+1);
+}
+const freeEdges=frontGores.map(([a,b,c])=>[edgeCounts.get(edgeKey(b,c)),edgeCounts.get(edgeKey(c,a)),edgeCounts.get(edgeKey(a,b))]
+ .map(count=>count===1?'1.':'0.').join(',')).map(values=>'vec3('+values+')').join(',');
 
 function hemPins(ends) {
  const pins=Array.from(ends),left=7*4,right=15*4,stem=12*4,foot=3*4,outer=4*4;
@@ -127,7 +144,8 @@ export function slingPose(ends,rank,phase,flex,lag,growth,amount,pocket=0){
    for(const v of [A,B,C])for(let d=0;d<2;d++){
     lo[d]=Math.min(lo[d],v[d]);hi[d]=Math.max(hi[d],v[d]);
    }
-   vertices.push(...A,.014*pocket,...B,0,...C,(1-.36*growth)*Math.sqrt(amount)*pocket);
+   const backing=i===hemGores.length-1;
+   vertices.push(...A,(backing?.033:.014)*pocket,...B,0,...C,(backing?.70:1.)*(1-.36*growth)*Math.sqrt(amount)*pocket);
   }
  }
  return {vertices:new Float32Array(vertices),bounds:[...lo,...hi],pocket};
@@ -135,24 +153,24 @@ export function slingPose(ends,rank,phase,flex,lag,growth,amount,pocket=0){
 
 // Distances in barycentric coordinates are converted back into tissue units.
 // The normal displacement is zero along all three sewn edges.
-function pouchThread(u,t,a,bb,bc,cc,area,ha,edge,fine,phase,i){
+function pouchThread(u,t,a,bb,bc,cc,area,ha,fine,phase,i){
  const radial=Math.max(.04,u+t),across=u/radial;
  const bow=a*t*u*(1.18+.38*Math.sin(6*t+phase));
  // Measure the width perpendicular to this fan. A fixed count would fill
  // every gap when a gore is narrow or two berries catch up with each other.
  const chord=Math.max(.001,Math.sqrt(Math.max(0.,u*u*bb+2*u*t*bc+t*t*cc)));
  const fanWidth=area*2/Math.max(.001,Math.sqrt(Math.max(0.,bb+2*bc+cc)));
- const ends=Math.max(1.8,Math.min(29.,fanWidth*(30.+6.*Math.cos(1.87*i))*fine));
- const warp=(across+bow+.012*Math.sin(13*t-7*u+phase))*ends;
+ const ends=Math.max(2.8,Math.min(64.,fanWidth*(65.+17.*Math.cos(1.87*i))*fine));
+ const warp=(across+bow+.024*Math.sin(13*t-7*u+phase)+.007*Math.sin(37*t+13*u+phase))*ends;
  const id=Math.round(warp),group=.5+.5*Math.sin(Math.floor(id*.5)*2.39+phase);
  const wander=.21*Math.sin(id*3.11+phase)+.16*Math.sin(radial*7+id*1.31+phase);
  const along=Math.abs(warp-id-wander)*area*radial*radial/(chord*ends);
  // Sparse knotted ties join the long strands. Their curvature increases
  // towards the hanging centre while the load-bearing outside stays taut.
- const picks=Math.max(1.1,Math.min(13.,ha*(12.+3.*Math.sin(2.73*i))*fine));
+ const picks=Math.max(1.5,Math.min(22.,ha*(20.+7.*Math.sin(2.73*i))*fine));
  const cross=(radial+.22*u*t-.065*Math.sin(6*across+phase)*radial)*picks;
  const gap=Math.abs(cross-Math.round(cross)-.19*Math.sin(across*6+phase))*ha/picks;
- return Math.min(along/(.55+.92*group),gap*(2.1+.84*Math.cos(3*across+phase)),-edge*1.9);
+ return Math.min(along/(.41+.98*group*group),gap*(2.6+1.15*Math.cos(3*across+phase)));
 }
 export function slingDistance(x,y,z,v,i,finesse,web,pocket=0){
  const o=12*i;
@@ -192,9 +210,9 @@ export function slingDistance(x,y,z,v,i,finesse,web,pocket=0){
  // taper between them, leaving irregular windows where the gauze is slack.
  const vein=.5+.5*Math.sin(gi*4.31+phase);
  const stitch=.5+.5*Math.sin(hi*3.1+phase+7*u);
- const width=.00074+.00125*web;
+ const width=(.00074+.00125*web)*(1-.40*pocket);
  let thread=Math.min(f/(.77+.42*vein),cross*1.42,diagonalGap*(1.35+2.4*stitch),-edge*.76);
- if(pocket>0)thread=Math.min(thread+.007*pocket,pouchThread(u,t,a,bb,bc,cc,area,ha,edge,finesse,phase,i)+.007*(1-pocket));
+ if(pocket>0)thread=Math.min(thread+.007*pocket,pouchThread(u,t,a,bb,bc,cc,area,ha,finesse,phase,i)+.007*(1-pocket));
  // The free silk withdraws towards its three contacts under tension.
  // Squared distance keeps a soft round cuff of fibres on each nodule.
  const p2=px*px+py*py+pz*pz,d2=p2+Math.min(0,bb-2*pb,cc-2*pc);
@@ -204,11 +222,21 @@ export function slingDistance(x,y,z,v,i,finesse,web,pocket=0){
   // Fine fibres also entangle into patches of gauze behind the stronger
   // warps. Open windows, individual strands and the rim are separate depths.
   const across=u/Math.max(.05,u+t);
-  const wave=.5+.28*Math.cos(17*across+7*t+1.2*Math.sin(8*t+phase))+.22*Math.sin(19*t-7*u+phase);
+  const wave=.5+.25*Math.cos(14*across+6*t+1.5*Math.sin(7*t+phase))+.18*Math.sin(17*t-6*u+phase)+.07*Math.sin(42*t+19*u+phase);
   const binding=i<8||i>=faces&&i<faces+12;
   const seam=i===6||i===7||i>=faces+8&&i<=faces+11;
-  const threshold=seam?.085:binding?.23:.50;
-  const veil=Math.max(edge-.0008,Math.abs(plane+.004+.003*belly)-.00092*pocket,(threshold-wave)*.034+.013*(1-pocket));
+  // Curl and fray coincide with low yarn density. There is no taut cord
+  // along an interior triangle edge unless its strands actually meet there.
+  const backing=i===faces+hemGores.length-1;
+  // At the two middle stitches beneath the lip the warp is pulled taut,
+  // leaving a gauzy window between the outer hem and the nearby sockets.
+  const crown=i===faces+1||i===faces+2||i===faces+5;
+  const depth=(lip?a:1-t)-.41;
+  const opening=crown?Math.exp(-22*depth*depth):0;
+  const threshold=(seam?.028:binding?.10:backing?.35:.22)+.60*opening;
+  const fuzz=.004*Math.sin(37*u+19*t+phase)*Math.sin(23*t-41*u);
+  const drift=belly*(.004+.002*Math.cos(18*t-9*u+phase));
+  const veil=Math.max(edge+fuzz-.002,Math.abs(plane+.003+drift)-.00105*pocket,(threshold-wave)*.042+.014*(1-pocket));
   d=Math.min(d,veil);
   if(lip){
    const hem=Math.hypot(ha*(a-.022*t*u),plane*.83)-(.004+.0024*web)*pocket;
@@ -224,20 +252,37 @@ export const SLING_GLSL=`
 uniform vec4 uTissueSling[${SLING_COUNT*3}];
 uniform float uTissueSlingLoad;
 const vec3 tissueSeamPlies[${SLING_COUNT}]=vec3[${SLING_COUNT}](${plyWeights});
-float tissuePouchThread(float u,float t,float a,float bb,float bc,float cc,float area,float ha,float edge,float fine,float phase,float i){
+
+#ifdef WEAVE_HIT_TAG
+// Expected coverage of crimped fibres across a pixel. Fibre diameters and
+// spacing vary independently. Distant pieces retain their integrated mass.
+float tissueBatt(vec2 uv,float footprint){
+ float first=floor(uv.x),mass=0.;
+ for(int k=-1;k<=1;k++){
+  float id=first+float(k);
+  vec2 seed=fract(sin(id*vec2(12.49,29.36)+vec2(3.11,7.3))*vec2(1513.71,3098.93));
+  float crimp=(.12+.21*seed.y)*sin((1.+.81*seed.x)*uv.y+id*3.42)+.09*cos(2.58*uv.y+id*2.11);
+  float dx=uv.x-id-(.08+.84*seed.x)-crimp;
+  float r=.031+.118*seed.y*seed.y,variance=r*r+footprint*footprint*.08333;
+  mass+=r*inversesqrt(variance)*exp(-.5*dx*dx/variance);
+ }
+ return mix(mass,.18,smoothstep(.65,1.6,footprint));
+}
+#endif
+float tissuePouchThread(float u,float t,float a,float bb,float bc,float cc,float area,float ha,float fine,float phase,float i){
  float radial=max(.04,u+t),across=u/radial;
  float bow=a*t*u*(1.18+.38*sin(6.*t+phase));
  float chord=max(.001,sqrt(max(0.,u*u*bb+2.*u*t*bc+t*t*cc)));
  float fanWidth=area*2./max(.001,sqrt(max(0.,bb+2.*bc+cc)));
- float ends=clamp(fanWidth*(30.+6.*cos(1.87*i))*fine,1.8,29.);
- float warp=(across+bow+.012*sin(13.*t-7.*u+phase))*ends;
+ float ends=clamp(fanWidth*(65.+17.*cos(1.87*i))*fine,2.8,64.);
+ float warp=(across+bow+.024*sin(13.*t-7.*u+phase)+.007*sin(37.*t+13.*u+phase))*ends;
  float id=floor(warp+.5),group=.5+.5*sin(floor(id*.5)*2.39+phase);
  float wander=.21*sin(id*3.11+phase)+.16*sin(radial*7.+id*1.31+phase);
  float along=abs(warp-id-wander)*area*radial*radial/(chord*ends);
- float picks=clamp(ha*(12.+3.*sin(2.73*i))*fine,1.1,13.);
+ float picks=clamp(ha*(20.+7.*sin(2.73*i))*fine,1.5,22.);
  float weft=(radial+.22*u*t-.065*sin(6.*across+phase)*radial)*picks;
  float gap=abs(weft-floor(weft+.5)-.19*sin(across*6.+phase))*ha/picks;
- return min(min(along/(.55+.92*group),gap*(2.1+.84*cos(3.*across+phase))),-edge*1.9);
+ return min(along/(.41+.98*group*group),gap*(2.6+1.15*cos(3.*across+phase)));
 }
 float tissueSling(vec3 q,int i,float fine,float web,out float silkMaterial){
  silkMaterial=.91;
@@ -271,17 +316,27 @@ float tissueSling(vec3 q,int i,float fine,float web,out float silkMaterial){
  float diaGap=abs(diagonal-floor(diagonal+.5))*min(hu/counts.x,ht/counts.y);
  float vein=.5+.5*sin(site.x*4.31+phase),stitch=.5+.5*sin(site.y*3.1+phase+7.*u);
  float thread=min(min(lines.x/(.77+.42*vein),lines.y*1.42),min(diaGap*(1.35+2.4*stitch),-edge*.76));
- if(uTissueSlingLoad>0.)thread=min(thread+.007*uTissueSlingLoad,tissuePouchThread(u,t,a,bb,bc,cc,area,ha,edge,fine,phase,float(i))+.007*(1.-uTissueSlingLoad));
+ if(uTissueSlingLoad>0.)thread=min(thread+.007*uTissueSlingLoad,tissuePouchThread(u,t,a,bb,bc,cc,area,ha,fine,phase,float(i))+.007*(1.-uTissueSlingLoad));
  float support2=dot(p,p)+min(0.,min(bb-2.*pb,cc-2.*pc));
  float taper=.023*B.w*smoothstep(.0025,.0335,support2);
- float d=max(edge-.0015,length(vec2(thread,plane*.75))-(.00074+.00125*web)*C.w+taper);
+ float d=max(edge-.0015,length(vec2(thread,plane*.75))-(.00074+.00125*web)*(1.-.40*uTissueSlingLoad)*C.w+taper);
  if(uTissueSlingLoad>0.){
   float across=u/max(.05,u+t);
-  float density=.5+.28*cos(17.*across+7.*t+1.2*sin(8.*t+phase))+.22*sin(19.*t-7.*u+phase);
+  float density=.5+.25*cos(14.*across+6.*t+1.5*sin(7.*t+phase))+.18*sin(17.*t-6.*u+phase)+.07*sin(42.*t+19.*u+phase);
   bool binding=i<8||i>=${faces}&&i<${faces+12},seam=i==6||i==7||i>=${faces+8}&&i<=${faces+11};
-  float threshold=seam?.085:binding?.23:.50;
-  float veil=max(edge-.0008,max(abs(plane+.004+.003*belly)-.00092*uTissueSlingLoad,(threshold-density)*.034+.013*(1.-uTissueSlingLoad)));
-  if(veil<d){d=veil;silkMaterial=binding?.419+.031*density:.39+.06*density;}
+  bool backing=i==${faces+hemGores.length-1};
+  bool crown=i==${faces+1}||i==${faces+2}||i==${faces+5};
+  float depth=(lip?a:1.-t)-.41;
+  float opening=crown?exp(-22.*depth*depth):0.;
+  float threshold=(seam?.028:binding?.10:backing?.35:.22)+.60*opening;
+  float fuzz=.004*sin(37.*u+19.*t+phase)*sin(23.*t-41.*u);
+  float drift=belly*(.004+.002*cos(18.*t-9.*u+phase));
+  float veil=max(edge+fuzz-.002,max(abs(plane+.003+drift)-.00105*uTissueSlingLoad,(threshold-density)*.042+.014*(1.-uTissueSlingLoad)));
+  if(veil<d){
+   d=veil;
+   float mass=smoothstep(threshold-.03,threshold+.53,density)*mix(.20,1.,smoothstep(-.003,.033,-edge-fuzz));
+   silkMaterial=.39+.06*mass*(backing?.75:1.);
+  }
   if(lip){
    float hem=length(vec2(ha*(a-.022*t*u),plane*.83))-(.004+.0024*web)*uTissueSlingLoad;
    hem=max(hem,max(-u*hu,-t*ht)-.003);
@@ -296,4 +351,43 @@ float tissueSling(vec3 q,int i,float fine,float web,out float silkMaterial){
  }
  return d;
 }
+`;
+
+// The web has loose surface fibres above the stronger yarn. They contribute
+// optical depth at nearby surfaces, independently of their solid intersection.
+export const FACING_GLSL=`
+#ifdef WEAVE_HIT_TAG
+const ivec3 facingTips[${frontGores.length}]=ivec3[${frontGores.length}](${frontGores.map(ids=>'ivec3('+ids.join(',')+')').join(',')});
+const vec3 facingHems[${frontGores.length}]=vec3[${frontGores.length}](${freeEdges});
+vec3 silkShoulder(int id){
+ vec4 tip=uTissueEnd[id];
+ return tip.xyz+tip.w*vec3(-.22,.25,1.08+.24*cos(float(id)*2.4));
+}
+float tissueFacing(vec3 q){
+ float coverage=0.;
+ for(int i=0;i<${frontGores.length};i++){
+  ivec3 ids=facingTips[i];vec3 a=silkShoulder(ids.x),b=silkShoulder(ids.y),c=silkShoulder(ids.z);
+  vec2 outside=max(min(a.xy,min(b.xy,c.xy))-q.xy,q.xy-max(a.xy,max(b.xy,c.xy)));
+  if(max(outside.x,outside.y)>.045)continue;
+  vec2 ab=b.xy-a.xy,ac=c.xy-a.xy,ap=q.xy-a.xy;
+  float det=ab.x*ac.y-ab.y*ac.x;
+  if(abs(det)<.00001)continue;
+  float u=(ap.x*ac.y-ap.y*ac.x)/det,v=(ab.x*ap.y-ab.y*ap.x)/det;
+  vec3 bary=vec3(1.-u-v,u,v);
+  vec3 inset=bary*abs(det)/max(vec3(.001),vec3(length(c.xy-b.xy),length(ac),length(ab)));
+  vec3 hem=inset+.15*(1.-facingHems[i]);
+  float silhouette=smoothstep(-.044,.063,min(hem.x,min(hem.y,hem.z)));
+  float seat=smoothstep(-.036,.001,min(inset.x,min(inset.y,inset.z)));
+  float gap=dot(bary,vec3(a.z,b.z,c.z))-q.z;
+  float thickness=smoothstep(-.038,.030,gap)*(1.-smoothstep(.09,.32,gap));
+  coverage=max(coverage,seat*silhouette*thickness);
+ }
+ // Loose silk is gathered at the upper attachments. The facing thins
+ // down the hanging pocket, exposing the fruit against the darker yarn.
+ float foot=.5*(uTissueEnd[3].y+uTissueEnd[4].y);
+ float crown=.5*(uTissueEnd[7].y+uTissueEnd[14].y);
+ float height=(q.y-foot)/max(.045,crown-foot);
+ return coverage*mix(.16,1.,smoothstep(.54,.91,height));
+}
+#endif
 `;

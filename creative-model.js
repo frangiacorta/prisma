@@ -1,19 +1,19 @@
-import {normalizeFinishPalette} from './finish-palette.js?v=b3646b8af04a';
-import {normalizePlayground} from './playground-model.js?v=b3646b8af04a';
-import {hasGrainLayer,normalizeBodyLayers} from './body-layers.js?v=b3646b8af04a';
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=b3646b8af04a';
-import {FRACTAL_META} from './fractal-form.js?v=b3646b8af04a';
-import {CELLULAR_META} from './cellular-form.js?v=b3646b8af04a';
-import {normalizeFinishRegions,normalizeFinishOrder,normalizeBrushStrokes} from './finishing.js?v=b3646b8af04a';
-import {normalizeAudioClip} from './audio-recording.js?v=b3646b8af04a';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=b3646b8af04a';
-import {hasMotionPoints,normalizeMotionPoints,supportsMotionPoints} from './motion-keyframes.js?v=b3646b8af04a';
-import {normalizeAudio} from './audio-model.js?v=b3646b8af04a';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=b3646b8af04a';
-import {normalizeForcePaths} from './particle-paths.js?v=b3646b8af04a';
-import {normalizeForcePoints} from './particle-forces.js?v=b3646b8af04a';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=b3646b8af04a';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META,syncMaterialControl} from './studio-model.js?v=b3646b8af04a';
+import {normalizeFinishPalette} from './finish-palette.js?v=b4b76e9bdb82';
+import {normalizePlayground} from './playground-model.js?v=b4b76e9bdb82';
+import {hasGrainLayer,normalizeBodyLayers} from './body-layers.js?v=b4b76e9bdb82';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=b4b76e9bdb82';
+import {FRACTAL_META} from './fractal-form.js?v=b4b76e9bdb82';
+import {CELLULAR_META} from './cellular-form.js?v=b4b76e9bdb82';
+import {normalizeFinishRegions,normalizeFinishOrder,normalizeBrushStrokes} from './finishing.js?v=b4b76e9bdb82';
+import {normalizeAudioClip} from './audio-recording.js?v=b4b76e9bdb82';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=b4b76e9bdb82';
+import {hasMotionPoints,LIGHT_ORBIT_RANGE,normalizeMotionPoints,supportsMotionPoints} from './motion-keyframes.js?v=b4b76e9bdb82';
+import {normalizeAudio} from './audio-model.js?v=b4b76e9bdb82';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=b4b76e9bdb82';
+import {normalizeForcePaths} from './particle-paths.js?v=b4b76e9bdb82';
+import {normalizeForcePoints} from './particle-forces.js?v=b4b76e9bdb82';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=b4b76e9bdb82';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META,syncMaterialControl} from './studio-model.js?v=b4b76e9bdb82';
 
 export function setFullness(s,value){s.fullness=value;syncMaterialControl(s,'fullness');}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -140,12 +140,9 @@ export function normalizeCreation(raw){
  if(MATERIAL_STYLES.some(m=>m.name===raw.materialName))s.materialName=raw.materialName;
  for(const k of ['dynObstacle','dynFloor','growthAge','growthCycles','growthSeed'])s[k]=Math.round(s[k]);s.baseForm=Math.round(s.baseForm||0);s.renderVersion=raw.renderVersion>=2?2:1;s.thinShell=Math.max(0,Math.min(1,Number(raw.thinShell)||0));s.seed=Number(raw.seed)>>>0;s.engine=raw.engine==='particles'?'particles':'solid';s.particleVersion=PARTICLE_VERSION;for(const [key,meta]of Object.entries(PARTICLE_META))if(meta[3]>=1)s[key]=Math.round(s[key]);if(s.pDirection!==-1)s.pDirection=1;
  migrateGrainSizes(s,raw);
- if(Array.isArray(raw.lights))s.lights=raw.lights.slice(0,8).map((l,i)=>{const v=newLight(i+1);for(const k of ['x','y','z'])if(Number.isFinite(l[k]))v[k]=Math.max(-5,Math.min(5,l[k]));for(const k of ['power','size','length','roll','softness','cone','grid'])if(Number.isFinite(l[k]))v[k]=Math.max(k==='roll'?-180:0,Math.min(k==='power'?6:k==='roll'?180:k==='cone'?85:k==='grid'?12:3,l[k]));if(/^#[0-9a-f]{6}$/i.test(l.color))v.color=l.color;if(['circle','bar','spot','diffuser','grid','ring','orb'].includes(l.type))v.type=l.type;v.enabled=l.enabled!==false;v.visible=l.visible===true;for(const key of ['orbit','pulse'])if(l[key])v[key]=safeTrack(v[key],l[key],s.perfectLoop);return v;});
+ if(Array.isArray(raw.lights))s.lights=raw.lights.slice(0,8).map((l,i)=>{const v=newLight(i+1);for(const k of ['x','y','z'])if(Number.isFinite(l[k]))v[k]=Math.max(-5,Math.min(5,l[k]));for(const k of ['power','size','length','roll','softness','cone','grid'])if(Number.isFinite(l[k]))v[k]=Math.max(k==='roll'?-180:0,Math.min(k==='power'?6:k==='roll'?180:k==='cone'?85:k==='grid'?12:3,l[k]));if(/^#[0-9a-f]{6}$/i.test(l.color))v.color=l.color;if(['circle','bar','spot','diffuser','grid','ring','orb'].includes(l.type))v.type=l.type;v.enabled=l.enabled!==false;v.visible=l.visible===true;for(const key of ['orbit','pulse'])if(l[key])v[key]=safeTrack(v[key],l[key],s.perfectLoop,key==='orbit'?LIGHT_ORBIT_RANGE:null);return v;});
  for(const k of Object.keys(s.motions))if(raw.motions?.[k]){
-  const input=raw.motions[k],track=safeTrack(s.motions[k],input,s.perfectLoop);
-  const points=supportsMotionPoints(k)?normalizeMotionPoints(input.points,META[k]):[];
-  if(points.length>1){track.points=points;if(input.mode==='points')track.mode='points';}
-  s.motions[k]=track;
+  s.motions[k]=safeTrack(s.motions[k],raw.motions[k],s.perfectLoop,supportsMotionPoints(k)?META[k]:null);
  }
  for(const k of ['internalColor','sssColor'])if(!/^#[0-9a-f]{6}$/i.test(s[k]||''))s[k]=k==='internalColor'?'#e6f5ff':'#ffc49b';
  for(const k of ['photoAll','environmentRotate'])s[k]=raw[k]===true;
@@ -172,7 +169,11 @@ export function normalizeCreation(raw){
  s.animateColor=s.motions.gradientOffset.enabled||s.motions.colorWavePhase.enabled;s.animateLight=s.lights.some(l=>l.orbit.enabled);
  return s;
 }
-function safeTrack(base,raw,perfectLoop=true){const t={...base,enabled:raw.enabled===true};for(const k of ['pace','pacePhase','hold'])if(Number.isFinite(raw[k]))t[k]=Math.max(0,Math.min(k==='pace'?.95:k==='hold'?.8:360,raw[k]));for(const k of ['amplitude','cycles','phase'])if(Number.isFinite(raw[k]))t[k]=Math.max(0,Math.min(k==='amplitude'?360:k==='cycles'?8:360,raw[k]));t.cycles=perfectLoop?Math.max(1,Math.round(t.cycles)):Math.max(.1,t.cycles);t.direction=raw.direction===-1?-1:1;if(['sine','soft','triangle'].includes(raw.curve))t.curve=raw.curve;if(['wave','cycle'].includes(raw.mode))t.mode=raw.mode;if(['x','y','z'].includes(raw.axis))t.axis=raw.axis;return t;}
+function safeTrack(base,raw,perfectLoop=true,pointRange=null){const t={...base,enabled:raw.enabled===true};for(const k of ['pace','pacePhase','hold'])if(Number.isFinite(raw[k]))t[k]=Math.max(0,Math.min(k==='pace'?.95:k==='hold'?.8:360,raw[k]));for(const k of ['amplitude','cycles','phase'])if(Number.isFinite(raw[k]))t[k]=Math.max(0,Math.min(k==='amplitude'?360:k==='cycles'?8:360,raw[k]));t.cycles=perfectLoop?Math.max(1,Math.round(t.cycles)):Math.max(.1,t.cycles);t.direction=raw.direction===-1?-1:1;if(['sine','soft','triangle'].includes(raw.curve))t.curve=raw.curve;if(['wave','cycle'].includes(raw.mode))t.mode=raw.mode;if(['x','y','z'].includes(raw.axis))t.axis=raw.axis;
+ const points=normalizeMotionPoints(raw.points,pointRange);
+ if(points.length>1){t.points=points;if(raw.mode==='points')t.mode='points';}
+ return t;
+}
 
 // Scoped variations never switch renderer or revive unrelated controls from a stale anchor.
 export function varyCreation(source,seed,amount=.45,scope='all',locks={}){

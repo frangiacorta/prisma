@@ -1,25 +1,39 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=b3646b8af04a';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=b3646b8af04a';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=b3646b8af04a';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=b3646b8af04a';
-import {knotTurns} from './structure-model.js?v=b3646b8af04a';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=b3646b8af04a';
-import {shadowLight} from './particle-shadow.js?v=b3646b8af04a';
-import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=b3646b8af04a';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=b3646b8af04a';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=b3646b8af04a';
-import {ParticleLinks} from './particle-links.js?v=b3646b8af04a';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=b3646b8af04a';
-import {LayeredVeils} from './layered-veils.js?v=b3646b8af04a';
-import {LivingStructures} from './living-structures.js?v=b3646b8af04a';
-import {ParticleSurface} from './particle-surface.js?v=b3646b8af04a';
-import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=b3646b8af04a';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=b3646b8af04a';
-import {forceBarrierGLSL} from './particle-forces.js?v=b3646b8af04a';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=b3646b8af04a';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=b4b76e9bdb82';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=b4b76e9bdb82';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=b4b76e9bdb82';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=b4b76e9bdb82';
+import {knotTurns} from './structure-model.js?v=b4b76e9bdb82';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=b4b76e9bdb82';
+import {shadowLight} from './particle-shadow.js?v=b4b76e9bdb82';
+import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=b4b76e9bdb82';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=b4b76e9bdb82';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=b4b76e9bdb82';
+import {ParticleLinks} from './particle-links.js?v=b4b76e9bdb82';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=b4b76e9bdb82';
+import {LayeredVeils} from './layered-veils.js?v=b4b76e9bdb82';
+import {LivingStructures} from './living-structures.js?v=b4b76e9bdb82';
+import {ParticleSurface} from './particle-surface.js?v=b4b76e9bdb82';
+import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=b4b76e9bdb82';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=b4b76e9bdb82';
+import {forceBarrierGLSL} from './particle-forces.js?v=b4b76e9bdb82';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=b4b76e9bdb82';
+import {focusSlope} from './finishing.js?v=b4b76e9bdb82';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
-uniform vec2 uFocus;
-float particleDefocus(vec3 p){return uFocus.x*smoothstep(.06,1.4,abs(p.z-uFocus.y))*uResolution.y/58.;}
+uniform vec3 uFocus;
+float particleDefocus(vec3 p){
+ float plane=uFocus.y;
+ if(uFocus.z!=0.){
+  if(uStudioPerspective>.5)plane+=uFocus.z*p.y;
+  else{
+   // The cloud camera projects with y/(7.5-z). Intersect that same ray
+   // with z = focusDepth + slope*y, including the near projection clamp.
+   float tiltOnRay=uFocus.z*p.y/max(2.,7.5-p.z);
+   float rayDepth=max(2.,(7.5-plane)/max(.0001,1.+tiltOnRay));
+   plane+=tiltOnRay*rayDepth;
+  }
+ }
+ return uFocus.x*smoothstep(.06,1.4,abs(p.z-plane))*uResolution.y/58.;
+}
 `;
 const grainGLSL=`${common}\n${livingAttachmentGLSL}\n${grainSizingGLSL}`;
 const trailSampling=`
@@ -352,7 +366,7 @@ export class ParticleRenderer{
  bind(t){const gl=this.gl;gl.bindFramebuffer(gl.FRAMEBUFFER,t?.fbo||null);gl.viewport(0,0,t?.w||this.width,t?.h||this.height);}
  tex(p,key,texture,unit){const gl=this.gl;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(this.loc(p,key),unit);}
  settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);bindDynamics(gl,p.program,s);this.guides.bind(p);gl.uniform1ui(this.loc(p,'uGrainSeed'),s.seed>>>0);
-  this.u(p,'uFocus',this.shadowPass?0:s.focusBlur||0,s.focusDepth||0);
+  this.u(p,'uFocus',this.shadowPass?0:s.focusBlur||0,s.focusDepth||0,this.shadowPass?0:focusSlope(s.focusTilt));
   this.u(p,'uShadowPass',this.shadowPass?(this.shadowPass.mode||1):0);if(this.optics)this.optics.uniforms(p,s);else{this.u(p,'uOpticalShadow',0,0,0,0);this.tex(p,'uOpticalMap',this.seedTexture,8);this.tex(p,'uVolumeMap',this.seedTexture,9);}this.u(p,'uShadowHeight',s.pShadowHeight??-1.6);this.u(p,'uShadowOpacity',p.materialAlpha?1:Math.max(0,1-s.transparency));if(this.shadowPass)this.u(p,'uShadowLight',this.shadowPass.light.x,this.shadowPass.light.y,this.shadowPass.light.z);
   const layer=this.studioLayer,attachment=layer?.attachment;
   this.u(p,'uStudioBody',attachment?.kind||0,s.grainDispersal||0,s.pFill||0,s.pCloudCore||0);

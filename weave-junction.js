@@ -1,7 +1,7 @@
-import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL} from './weave-sling.js?v=b3646b8af04a';
-import whorlAnatomy from './weave-whorl.js?v=b3646b8af04a';
-import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=b3646b8af04a';
-import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=b3646b8af04a';
+import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL,FACING_GLSL} from './weave-sling.js?v=b4b76e9bdb82';
+import whorlAnatomy from './weave-whorl.js?v=b4b76e9bdb82';
+import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=b4b76e9bdb82';
+import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=b4b76e9bdb82';
 
 // Attachment coordinates on one repeat of the tissue. Each bud keeps its identity
 // as the transverse bridges withdraw and the same bud becomes a hollow calyx.
@@ -696,8 +696,53 @@ float tissueLace(vec2 uv,float footprint){
 }
 #ifdef WEAVE_DETAIL
 ${SLING_GLSL}
+#ifdef WEAVE_HIT_TAG
+// Loose fibrils have little extinction individually. Their optical depth
+// adds where adjoining pieces of gauze wrap the same bud. Integrate across
+// the actual inclined panels, in material coordinates, once per shaded hit.
+float tissueNap(vec3 q,float radius){
+ float depth=0.;
+ float reach=max(.012,2.15*radius);
+ for(int i=0;i<${SLING_COUNT};i++){
+  vec3 a=uTissueSling[3*i].xyz,b=uTissueSling[3*i+1].xyz,c=uTissueSling[3*i+2].xyz;
+  vec3 gap=max(min(a,min(b,c))-q,q-max(a,max(b,c)));
+  if(max(gap.x,max(gap.y,gap.z))>reach)continue;
+  vec3 ab=b-a,ac=c-a,ap=q-a,n=cross(ab,ac);
+  float area2=dot(n,n);
+  if(area2<1.e-10)continue;
+  n*=inversesqrt(area2);
+  float u=dot(cross(ap,ac),n),v=dot(cross(ab,ap),n);
+  // Distances to the three sewn edges taper the density into open air.
+  float outside=max(-u/max(.002,length(ac)),max(-v/max(.002,length(ab)),(u+v-sqrt(area2))/max(.002,length(c-b))));
+  float across=1.-smoothstep(-.18*radius,.62*radius,outside);
+  float height=dot(ap,n);
+  depth+=across*exp(-2.7*height*height/(reach*reach));
+ }
+ return 1.-exp(-.86*depth);
+}
+#endif
 uniform vec4 uTissueRoot[${young.length}],uTissueBend[${young.length}],uTissueEnd[${young.length}],uTissueShape[${young.length}];
 uniform vec4 uTissueExtent;
+${FACING_GLSL}
+#ifdef WEAVE_HIT_TAG
+// Solid angle of the nearby fruit as seen from the silk. The same chart
+// metric rounds the fruit in tissueShoot, including on inclined surfaces.
+float tissueContactShade(vec3 q,mat2 metric,vec3 radialSlope){
+ float occlusion=0.;
+ for(int i=0;i<${young.length};i++){
+  vec4 tip=uTissueEnd[i];float radius=tip.w;
+  if(radius<.0001)continue;
+  vec2 xy=metric*(tip.xy-q.xy);
+  float dz=(tip.z-q.z-dot(radialSlope.xy,xy))/radialSlope.z;
+  float d2=dot(xy,xy)+dz*dz,r2=radius*radius;
+  if(d2>16.*r2)continue;
+  float cone=1.-sqrt(max(.002,1.-r2/max(.000001,d2)));
+  float outward=dz*inversesqrt(max(r2,d2));
+  occlusion+=cone*(.3+.7*smoothstep(-.32,.45,outward))*(1.-smoothstep(9.*r2,16.*r2,d2));
+ }
+ return 1.-exp(-2.7*occlusion);
+}
+#endif
 float tissueCalyx(float radial,float axial,float cap,float lift,float aperture,float flare,float scallop,out float height){
  float wall=cap*mix(.50,.045,max(lift,aperture)),mid=cap-wall;
  float cut=3.14159265-1.43*aperture,span=1.-cos(cut);
@@ -922,6 +967,9 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
   metric=mat2(dy.y,-dx.y,-dy.x,dx.x)*(k/max(.20*k*k,dx.x*dy.y-dy.x*dx.y));
  }
  float emptyBound=10000.;
+ #ifdef WEAVE_HIT_TAG
+ vec3 socketPoint=vec3(0.);float socketRadius=0.;
+ #endif
  if(uStructureH.z>0.||growth>0.)for(int row=-1;row<=1;row++)for(int col=-1;col<=1;col++){
   vec3 q=vec3(x+float(col)*strideX,y+float(row)*stride,z);
   vec2 boxDistance=max(uTissueExtent.xy-q.xy,q.xy-uTissueExtent.zw);
@@ -945,13 +993,17 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
    float branch=tissueShoot(q,A,uTissueBend[i],C,uTissueShape[i],float(i),uTissueRoot[i].w,cap,rib,lift,gather,growth,uWeaveGrowth.y*(1.-.80*uTissueYoung.y*(1.-lift)),web,shear,metric,radialSlope,rounding,detail);
    branch+=.17*back;
    skeleton=min(skeleton,branch);
-   if(branch<d)tag=detail;
+   if(branch<d){tag=detail;
+    #ifdef WEAVE_HIT_TAG
+    if(weaveEvaluateMaterial){socketPoint=q;socketRadius=cap;}
+    #endif
+   }
    #ifdef WEAVE_HIT_TAG
    else if(weaveEvaluateMaterial&&tag.x==1.&&detail.x>8.&&cradle>0.){
     // A film sewn onto a rounded bud shares its milky surface at contact.
     // Keep loose spans translucent once the bud has cleared the weave.
     float contactBand=.23*cap*cradle*(1.-smoothstep(.12,.42,growth));
-    if(branch<contactBand&&branch-d<contactBand)tag=detail;
+    if(branch<contactBand&&branch-d<contactBand){tag=detail;socketPoint=q;socketRadius=cap;}
    }
    #endif
    float joinWidth=(.004+.47*cap)*web*(1.-.93*gather);
@@ -962,6 +1014,13 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
  if(weaveEvaluateMaterial&&uTissueYoung.x>0.){
   float juvenile=uTissueYoung.x*(1.-smoothstep(.17,.68,release));
   tag.y=mix(tag.y,smoothstep(-.004,.052,skeleton),juvenile);
+  if(uTissueSlingLoad>.0001&&p.z>0.)weaveFacing=tissueFacing(vec3(closest,z))*web*uTissueSlingLoad*smoothstep(0.,.32,p.z);
+  if(uTissueSlingLoad>.0001&&tag.x==1.)
+   weaveContactShade=tissueContactShade(vec3(closest,z),metric,radialSlope)*web*uTissueSlingLoad;
+  if(uTissueSlingLoad>.0001&&tag.x==14.&&socketRadius>.0001){
+   float nap=tissueNap(socketPoint,socketRadius)*web*uTissueSlingLoad;
+   if(nap>.001)tag=vec3(15.,nap,tag.z);
+  }
  }
  #endif
  return min(d,emptyBound)/k*.65;

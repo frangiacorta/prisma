@@ -1,4 +1,4 @@
-import {PALETTE_DEFAULTS,PALETTE_META} from './finish-palette.js?v=b3646b8af04a';
+import {PALETTE_DEFAULTS,PALETTE_META} from './finish-palette.js?v=b4b76e9bdb82';
 // One final image pass, after the complete frame (including tiled/accumulated exports).
 export const FINISH_DEFAULTS={finishEnabled:true,finishTone:true,finishRgb:false,finishMosaic:false,finishCompare:false,finishRgbR:8,finishRgbG:0,finishRgbB:-8,finishRgbAngle:0,finishRgbMix:1,finishCellX:12,finishCellY:12,finishMosaicMix:1};
 export const FINISH_META={finishRgbR:['Spostamento rosso',-60,60,.1],finishRgbG:['Spostamento verde',-60,60,.1],finishRgbB:['Spostamento blu',-60,60,.1],finishRgbAngle:['Direzione RGB',-180,180,1],finishRgbMix:['Intensità RGB',0,1,.01],finishCellX:['Larghezza celle',1,160,1],finishCellY:['Altezza celle',1,160,1],finishMosaicMix:['Intensità mosaico',0,1,.01]};
@@ -114,19 +114,25 @@ export class FinishingPass{
 }
 
 
+export const focusSlope=(tilt=0)=>Math.tan(Math.max(-60,Math.min(60,tilt||0))*Math.PI/180);
+
 const FOCUS_FRAGMENT=`#version 300 es
 precision highp float;
-uniform sampler2D uImage,uDepth;uniform vec2 uSize,uFocus;uniform float uExactDepth;out vec4 color;
+uniform sampler2D uImage,uDepth;uniform vec2 uSize;uniform vec4 uFocus;uniform float uExactDepth;out vec4 color;
 vec2 depthAt(vec2 uv){
  vec4 packed=texture(uDepth,uv);
  if(uExactDepth>.5)return vec2(4.8-packed.a,packed.a>=0.?1.:0.);
  return vec2(16.-32.*(packed.x+packed.y/255.),packed.z);
 }
-float unfocused(float depth){return uFocus.x*smoothstep(.07,1.25,abs(depth-uFocus.y));}
+float unfocused(float depth,vec2 uv){
+ vec2 view=(uv-.5)*3.4*uSize/min(uSize.x,uSize.y);
+ float focus=uFocus.y+uFocus.z*view.y*(1.+uFocus.w*dot(view,view)*.18);
+ return uFocus.x*smoothstep(.07,1.25,abs(depth-focus));
+}
 void main(){
  vec2 uv=gl_FragCoord.xy/uSize,depth=depthAt(uv);
  vec4 center=texture(uImage,uv);
- float radius=depth.y>.5?unfocused(depth.x):uFocus.x*.72;
+ float radius=depth.y>.5?unfocused(depth.x,uv):uFocus.x*.72;
  if(radius<=.004){color=center;return;}
  float scale=min(uSize.x,uSize.y)*.033;
  float pixelRadius=radius*scale;
@@ -140,7 +146,7 @@ void main(){
   // A nearer fibre in focus cannot contribute through the aperture to
   // another pixel on a distant sheet. A defocused fibre can.
   float nearer=sampleDepth.y*(depth.y>.5?smoothstep(.045,.35,sampleDepth.x-depth.x):1.);
-  float sourceRadius=unfocused(sampleDepth.x)*scale;
+  float sourceRadius=unfocused(sampleDepth.x,p)*scale;
   float spread=1.-smoothstep(sourceRadius*.73+.25,sourceRadius+1.,dist);
   float acceptance=mix(1.,spread,nearer)*exp(-1.3*r2);
   vec4 a=texture(uImage,p);sum+=vec4(a.rgb*a.a,a.a)*acceptance;total+=acceptance;
@@ -159,7 +165,7 @@ export class FocusPass extends FinishingPass{
   if(this.width!==w||this.height!==h){g.texImage2D(g.TEXTURE_2D,0,g.RGBA8,w,h,0,g.RGBA,g.UNSIGNED_BYTE,null);this.width=w;this.height=h;}
   g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,depth);
   g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.SCISSOR_TEST);g.viewport(0,0,w,h);g.bindVertexArray(this.vao);g.useProgram(this.program);
-  g.uniform1i(u.uImage,0);g.uniform1i(u.uDepth,1);g.uniform2f(u.uSize,w,h);g.uniform2f(u.uFocus,s.focusBlur,s.focusDepth||0);g.uniform1f(u.uExactDepth,+exact);
+  g.uniform1i(u.uImage,0);g.uniform1i(u.uDepth,1);g.uniform2f(u.uSize,w,h);g.uniform4f(u.uFocus,s.focusBlur,s.focusDepth||0,focusSlope(s.focusTilt),s.lensDistortion||0);g.uniform1f(u.uExactDepth,+exact);
   g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);g.activeTexture(g.TEXTURE0);
  }
 }

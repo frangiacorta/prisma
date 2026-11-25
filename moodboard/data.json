@@ -14836,9 +14836,9 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "reticolo-giunzioni",
-      "where": "Forma → Costruzione → Reticolo di fibre · Materiale → Ottica del reticolo · Movimento → Struttura",
+      "where": "Forma → Costruzione → Reticolo di fibre · Materiale → Ottica del reticolo · Luci",
       "platform": "",
-      "next": "Confrontare la luce sul lembo sinistro, l’irregolarità delle microfibre e il profilo dei rami sul fondo.",
+      "next": "Affinare la trama sotto le palline inferiori e la diffusione della luce nei fili della spalla superiore.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -14876,7 +14876,7 @@
         "Fedeltà alle reference e fluidità su telefono fisico da verificare con l’utente."
       ],
       "integration": "Proprietà combinabili sulla forma corrente; nessun selettore esclusivo di membrane, tessuti o veli in Forme.",
-      "resultVersion": "106",
+      "resultVersion": "107",
       "evidence": "reports/structure/source.json; reports/structure/source-ui.json; reports/structure/export.json",
       "checks": [
         "26 controlli con impatto sui pixel",
@@ -14906,12 +14906,12 @@
       "engine": "solid",
       "procedure": {
         "name": "Reticolo sulla superficie",
-        "description": "In Trama e giunzioni, Rete attorno ai noduli tende il velo attorno alle palline. Con Rilievo alle giunzioni ne cambi la dimensione e con Densità delle microfibre infittisci la trama. In Steli e coppe, Lunghezza degli steli solleva il ciuffo ed Elasticità dei rami ne ritarda le punte. La luce interna delle coppe risponde ai fari della scena.",
+        "description": "In Trama e giunzioni, Rete attorno ai noduli tende il velo e Densità delle microfibre ne infittisce la trama. Rilievo alle giunzioni regola la dimensione delle palline. In Materiale, Trasparenza regola quanto si vede attraverso la seta. In Luci puoi modificare i punti dell’orbita del primo faro. Inclinazione del fuoco orienta la zona nitida lungo la tasca.",
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/reticolo-giunzioni.prisma.json",
-      "compareNote": "Al secondo 12 si possono seguire le 18 palline nella forcella. Il velo si tende fra i loro punti di attacco. Nel confronto affiancato questo istante cade a 4,16 secondi. Restano differenze nella luce sul lembo sinistro e nelle maglie più fini.",
+      "compareNote": "Al secondo 12 la luce arriva da destra. Le fibre velano alcune palline e lasciano scoperte le altre. Nella tasca in basso la reference mostra fili più nitidi e irregolari. Il dettaglio cade a 4,16 secondi nel confronto affiancato.",
       "comparisonRef": "s07-05",
       "comparisonDate": "2026-11-25",
       "comparisonOutcome": "parziale",

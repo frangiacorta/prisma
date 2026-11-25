@@ -1,13 +1,13 @@
-import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=b3646b8af04a';
-import {GROWTH_DEFAULTS} from './growth-material.js?v=b3646b8af04a';
-import {FINISH_DEFAULTS} from './finishing.js?v=b3646b8af04a';
-import {FIGURE_SCALE} from './base-forms.js?v=b3646b8af04a';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=b3646b8af04a';
-import {FRACTAL_KEYS} from './fractal-form.js?v=b3646b8af04a';
-import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=b3646b8af04a';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=b3646b8af04a';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=b3646b8af04a';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=b3646b8af04a';
+import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=b4b76e9bdb82';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=b4b76e9bdb82';
+import {FINISH_DEFAULTS} from './finishing.js?v=b4b76e9bdb82';
+import {FIGURE_SCALE} from './base-forms.js?v=b4b76e9bdb82';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=b4b76e9bdb82';
+import {FRACTAL_KEYS} from './fractal-form.js?v=b4b76e9bdb82';
+import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=b4b76e9bdb82';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=b4b76e9bdb82';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=b4b76e9bdb82';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=b4b76e9bdb82';
 export const BASE = {
  ...DYNAMICS_DEFAULTS,...PARTICLE_DEFAULTS,engine:'solid',keepMotionSpeed:true,motionPeriod:0,
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -119,8 +119,8 @@ GROUPS.photo=GROUPS.photo.filter(k=>!GROUPS.tone.includes(k));
 
 GROUPS.material.push(...Object.keys(GROWTH_DEFAULTS).filter(k=>!['growthFlow','growthCycles'].includes(k)));GROUPS.motion.push('growthFlow','growthCycles');
 
-Object.assign(META,{focusBlur:['Sfocatura fuori fuoco',0,1,.01],focusDepth:['Piano di fuoco',-3,4.7,.01]});
-GROUPS.background.push('focusBlur','focusDepth');
+Object.assign(META,{focusBlur:['Sfocatura fuori fuoco',0,1,.01],focusDepth:['Piano di fuoco',-3,4.7,.01],focusTilt:['Inclinazione del fuoco (°)',-60,60,.1]});
+GROUPS.background.push('focusBlur','focusDepth','focusTilt');
 GROUPS.motion.push('keepMotionSpeed','motionPeriod');
 
 Object.assign(META,DYNAMICS_META);GROUPS.motion.push(...Object.keys(DYNAMICS_DEFAULTS));

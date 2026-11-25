@@ -26,7 +26,7 @@ void main(){
  for(int step=0;step<int(uHitBudget.x);step++){
   if(t>end||layer>=uHitCount)break;
 #ifdef WEAVE_HIT_TAG
-  weaveSurface=vec3(0.);
+  weaveSurface=vec3(0.);weaveFacing=0.;weaveContactShade=0.;
   weaveEvaluateMaterial=mode==3;
 #endif
   float distance=field(samplePoint);
@@ -83,6 +83,10 @@ void main(){
     vec2 oct=entryNormal.xy/dot(abs(entryNormal),vec3(1.));
     vec2 terminal=floor(weaveSurface.yz*1023.+.5);
     float packed=weaveSurface.x*1048576.+terminal.x*1024.+terminal.y;
+    // An optional 8-bit silk coverage shares a float with a 16-bit
+    // normal coordinate. The remaining material coordinates stay intact.
+    if(weaveFacing>.002)oct.x=2.+floor((oct.x*.5+.5)*65535.+.5)+65536.*floor(254.*clamp(weaveFacing,0.,1.)+.5);
+    if(weaveContactShade>.002)oct.y=2.+floor((oct.y*.5+.5)*65535.+.5)+65536.*floor(254.*clamp(weaveContactShade,0.,1.)+.5);
     hits[layer]=vec4(oct,packed,hitT);
 #else
     hits[layer]=vec4(entryNormal,hitT);

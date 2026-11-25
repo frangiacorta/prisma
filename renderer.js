@@ -1,24 +1,24 @@
-import {CooperativePreview} from './cooperative-preview.js?v=b3646b8af04a';
-import {PaletteFinishPass} from './finish-palette.js?v=b3646b8af04a';
-import {Dynamics,disposeDynamics} from './dynamics.js?v=b3646b8af04a';
-import {motionPeriod} from './animation-clock.js?v=b3646b8af04a';
-import {animationPhase} from './animation-clock.js?v=b3646b8af04a';
-import {ScanlinePass} from './finish-scanlines.js?v=b3646b8af04a';
-import {FilamentPass} from './filament-renderer.js?v=b3646b8af04a';
-import {VeilTransition} from './veil-transition.js?v=b3646b8af04a';
-import {BodySamples} from './body-samples.js?v=b3646b8af04a';
-import {BodyComposite} from './body-composite.js?v=b3646b8af04a';
-import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=b3646b8af04a';
-import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=b3646b8af04a';
-import {ParticleRenderer} from './particle-renderer.js?v=b3646b8af04a';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=b3646b8af04a';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=b3646b8af04a';
+import {CooperativePreview} from './cooperative-preview.js?v=b4b76e9bdb82';
+import {PaletteFinishPass} from './finish-palette.js?v=b4b76e9bdb82';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=b4b76e9bdb82';
+import {motionPeriod} from './animation-clock.js?v=b4b76e9bdb82';
+import {animationPhase} from './animation-clock.js?v=b4b76e9bdb82';
+import {ScanlinePass} from './finish-scanlines.js?v=b4b76e9bdb82';
+import {FilamentPass} from './filament-renderer.js?v=b4b76e9bdb82';
+import {VeilTransition} from './veil-transition.js?v=b4b76e9bdb82';
+import {BodySamples} from './body-samples.js?v=b4b76e9bdb82';
+import {BodyComposite} from './body-composite.js?v=b4b76e9bdb82';
+import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=b4b76e9bdb82';
+import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=b4b76e9bdb82';
+import {ParticleRenderer} from './particle-renderer.js?v=b4b76e9bdb82';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=b4b76e9bdb82';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=b4b76e9bdb82';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
 const solidBody=s=>({...s,engine:'solid',pLiving:0});
 const focusOptions={layers:true,focusDepthOnly:true,preview:true,quality:'fast',trackTiming:false,deferCompletion:true,keepCanvas:true};
-const focusFrame=(s,p)=>s.motions?.focusBlur?.enabled||s.motions?.focusDepth?.enabled?sampleFrame(s,p):s;
+const focusFrame=(s,p)=>s.motions?.focusBlur?.enabled||s.motions?.focusDepth?.enabled||s.motions?.focusTilt?.enabled?sampleFrame(s,p):s;
 // A scene owns a clock, a simulation and a shared graphics context.
 export class Renderer{
  constructor(canvas){this.dynamics=new Dynamics(sampleFrame);this.liveDynamics=new Dynamics(sampleFrame,true);this.canvas=canvas;this.context=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!this.context)throw Error('WebGL 2 non disponibile.');this.frameTimer=this.context.getExtension('EXT_disjoint_timer_query_webgl2');this.frameQueries=[];this.frameGpuSample=0;this.frameGpuMs=null;}

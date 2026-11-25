@@ -26,7 +26,15 @@ void main(){
   vec4 intersection=implicitLayer(layer,pixel);if(intersection.w<0.||max(max(through.r,through.g),through.b)<.001)break;
   vec3 p=origin+direction*intersection.w;
 #ifdef WEAVE_HIT_TAG
-  vec2 oct=intersection.xy;
+  vec2 oct=intersection.xy;weaveLitFacing=0.;weaveLitContactShade=0.;
+  if(oct.x>1.){
+   float mass=oct.x-2.;oct.x=mod(mass,65536.)*(2./65535.)-1.;
+   if(layer==0&&uImplicitContinue<.5)weaveLitFacing=floor(mass/65536.)/254.;
+  }
+  if(oct.y>1.){
+   float contact=oct.y-2.;oct.y=mod(contact,65536.)*(2./65535.)-1.;
+   weaveLitContactShade=floor(contact/65536.)/254.;
+  }
   vec3 n=normalize(vec3(oct,max(0.,1.-abs(oct.x)-abs(oct.y))));
   float region=floor(intersection.z/1048576.);
   float packed=intersection.z-region*1048576.;

@@ -1,9 +1,10 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=b3646b8af04a';
-import {BASE_FORM_GLSL} from './base-forms.js?v=b3646b8af04a';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=b3646b8af04a';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,uploadFractalMaterial} from './solid-renderer.js?v=b3646b8af04a';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=b3646b8af04a';
-import {materialCavity} from './particle-shading.js?v=b3646b8af04a';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=b4b76e9bdb82';
+import {BASE_FORM_GLSL} from './base-forms.js?v=b4b76e9bdb82';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=b4b76e9bdb82';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,uploadFractalMaterial} from './solid-renderer.js?v=b4b76e9bdb82';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=b4b76e9bdb82';
+import {materialCavity} from './particle-shading.js?v=b4b76e9bdb82';
+import {focusSlope} from './finishing.js?v=b4b76e9bdb82';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -70,7 +71,7 @@ void main(){vec2 uv=(gl_FragCoord.xy/uCameraSize.zw*2.-1.)*uCameraSize.xy;uv*=1.
 const GROOM=`
 uniform sampler2D uRoots,uNormals;
 uniform vec4 uHairA,uHairB,uHairC,uHairD,uHairBase,uHairBranch;
-uniform vec2 uFocus;
+uniform vec3 uFocus;
 uniform float uSeed,uSegments,uHairScatter,uTube,uSides,uRootCore,uTubeDepth;uniform ivec2 uRootOrder;
 uniform int uInstanceStart;
 float rnd(float x){return fract(sin(x*127.1+uSeed)*43758.5453);}
@@ -189,7 +190,8 @@ void main(){
  float radius=strandRadius(materialT,len)*uFrame.x*branchTaper;
  float rootRadius=uHairA.y*.5*min(1.,uHairA.x/.025),height=len*t-min(uHairA.y*.65,len*.08)*(1.-smoothstep(0.,.3,t));
  vJoin=uRootCore*uHairBase.w*smoothstep(0.,.15,uHairBase.x)*(1.-smoothstep(0.,max(.00001,baseHeight(len,rootRadius)),height));
- float pixel=2.*uCameraSize.y/uCameraSize.w,defocus=uFocus.x*smoothstep(.06,1.2,abs(p.z-uFocus.y))*.038;
+ float plane=uFocus.y+uFocus.z*dot(p,uCameraY);
+ float pixel=2.*uCameraSize.y/uCameraSize.w,defocus=uFocus.x*smoothstep(.06,1.2,abs(dot(p,uCameraZ)-plane))*.038;
  float sigma=defocus*.5,aa=max(radius,pixel*.55)+3.*sigma,coverage=min(1.,radius/max(pixel*.55,radius));vBlur=sigma;
  vRootNormal=normalWorld(nr.xyz);vRootLocal=root.xyz*uAxes.xyz;vNormal=vec3(0);vWorld=p;vTangent=tangent;vAcross=vec2(side,radius);vAlong=materialT;vRandom=rnd(float(id)+4.);vCoverage=coverage;
  if(branch)vJoin=0.;
@@ -360,11 +362,11 @@ export class FilamentPass{
   this.u(p,'uHairD',s.filPhase,s.filWind,s.filRibbon,0);
   this.u(p,'uHairBase',s.filBaseWidth,s.filBaseHeight,s.filBaseCurve,s.filBaseBlend);
   this.u(p,'uHairBranch',0,s.filBranchLength,s.filBranchSpread,branches);
-  this.u(p,'uFocus',this.focus.blur,this.focus.depth);
+  this.u(p,'uFocus',this.focus.blur,this.focus.depth,this.focus.slope);
  }
  *drawStrands(p,s,camera,w,h,tube,segments,sides,count,rootStride,branches){
   const g=this.gl,faces=tube?sides:1,capacity=Math.min(this.axisCapacity,Math.max(96,Math.floor((this.useAxes?1500000:140000)/(segments*faces))));
-  this.focus=camera.shadow?{blur:0,depth:0}:{blur:s.focusBlur||0,depth:s.focusDepth||0};
+  this.focus=camera.shadow?{blur:0,depth:0,slope:0}:{blur:s.focusBlur||0,depth:s.focusDepth||0,slope:focusSlope(s.focusTilt)};
   this.hairGeometry(p,s,tube,segments,rootStride,branches);
   if(!this.useAxes){
    g.uniform1i(p.locations.uInstanceStart,0);
