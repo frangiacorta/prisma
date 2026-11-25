@@ -23,6 +23,11 @@ function apply(state,patch){
  }
 }
 for(const [name,s] of scenes){
+ const controls=parameterCatalog({...s,forcePoints:[{enabled:true,radius:1}],forcePaths:[{enabled:true,closed:true,radius:1}]});
+ for(const field of ['path','name']){
+  const values=controls.map(entry=>entry[field]);
+  assert.equal(new Set(values).size,values.length,name+' duplicate Playground '+field);
+ }
  const catalog=parameterCatalog(s).map(item=>item.path);
  for(const key of [...Object.values(VEIL_GROUPS).flat(),'fiberGrowth','structWeaveRearY','structWeaveSpread','lightWrap'])assert(catalog.includes(key),name+' in Playground: '+key);
  for(const key of ['veilAmount','fiberGrowth','lightWrap'])assert(audioTargets(s.engine).includes(key),name+' in audio: '+key);

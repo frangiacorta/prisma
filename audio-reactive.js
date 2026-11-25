@@ -1,8 +1,10 @@
-import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=01db4603d134';
-import {RhythmClock,TapTempo} from './audio-rhythm.js?v=01db4603d134';
-import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=01db4603d134';
-import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=01db4603d134';
-import {META} from './model.js?v=01db4603d134';
+import {SignalRecorder,sampleAudioClip,emptySignals} from './audio-recording.js?v=c820880a7bd1';
+import {RhythmClock,TapTempo} from './audio-rhythm.js?v=c820880a7bd1';
+import {OrbAudioInput,silentBands} from './vendor/orb/orb-audio.js?v=c820880a7bd1';
+import {AUDIO_BANDS,AUDIO_META,normalizeAudio,audioPreset,audioTargets,audioTargetGroups,audioMappingHint,audioPreviewState} from './audio-model.js?v=c820880a7bd1';
+import {META} from './model.js?v=c820880a7bd1';
+import {CONTROL_NAMES} from './control-vocabulary.js?v=c820880a7bd1';
+const targetName=key=>CONTROL_NAMES[key]||META[key][0];
 
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountAudioReactive({getState,remember,mark,renderControls,showTab,toast,invalidate,setPlaying}) {
@@ -91,17 +93,16 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
     return `<div class="param"><div class="param-line"><label for="${id}">${name}</label><input data-audio class="number" type="number" ${attr}="${key}" aria-label="${name}: valore" min="${lo}" max="${hi}" step="${increment}" value="${Number(value.toFixed(3))}"></div><input data-audio id="${id}" type="range" ${attr}="${key}" min="${lo}" max="${hi}" step="${increment}" value="${value}"></div>`;
   };
   const options=(values,current)=>Object.entries(values).map(([id,label])=>`<option value="${escape(id)}" ${id===current?'selected':''}>${escape(label)}</option>`).join('');
-  const targetOptions=current=>Object.entries(audioTargetGroups(getState().engine)).map(([group,keys])=>`<optgroup label="${escape(group)}">${options(Object.fromEntries(keys.filter(k=>META[k]).map(k=>[k,META[k][0]])),current)}</optgroup>`).join('')+(!audioTargets(getState().engine).includes(current)?`<option selected value="${escape(current)}">${escape(META[current][0])} · altro motore</option>`:'');
+  const targetOptions=current=>Object.entries(audioTargetGroups(getState().engine)).map(([group,keys])=>`<optgroup label="${escape(group)}">${options(Object.fromEntries(keys.filter(k=>META[k]).map(k=>[k,targetName(k)])),current)}</optgroup>`).join('')+(!audioTargets(getState().engine).includes(current)?`<option selected value="${escape(current)}">${escape(targetName(current))} · altro motore</option>`:'');
   function panel() {
-    const c=settings(),targets=Object.fromEntries(audioTargets(getState().engine).map(key=>[key,META[key][0]]));
+    const c=settings(),targets=Object.fromEntries(audioTargets(getState().engine).map(key=>[key,targetName(key)]));
     return `<details id="audio-input-controls" class="control-details primary-section"><summary>Ascolto</summary>
       <label class="field">Sorgente<select data-audio data-audio-setting="source">${options({microphone:'Microfono · voce e ambiente',file:'File musicale sul dispositivo'},c.source)}</select></label>
       ${c.source==='microphone'?'<label class="field">Microfono<select data-audio id="audio-device" aria-label="Microfono"><option value="">Microfono predefinito</option></select></label>':''}
       <div class="force-actions"><button type="button" class="primary" data-audio-action="start">${c.source==='file'?'Scegli e riproduci file':'Avvia ascolto'}</button><button type="button" class="outline" data-audio-action="stop">Ferma ascolto</button></div>
       <input data-audio id="audio-file" type="file" accept="audio/*,.wav,.mp3,.m4a,.ogg,.flac" hidden><p id="audio-status" class="help" role="status"></p><p id="audio-filename" class="help audio-filename"></p><div id="audio-player"></div>
       <div class="audio-levels">${Object.entries(AUDIO_BANDS).filter(([key])=>key!=='beat').map(([key,label])=>`<label>${label}<meter data-audio-meter="${key}" min="0" max="1" value="0" aria-label="Livello ${label.toLowerCase()}"></meter><output data-audio-level="${key}">0%</output></label>`).join('')}</div>
-      <div class="force-actions"><button type="button" class="primary" data-audio-preset="diretta">Diretta · moto completo</button></div>
-      ${slider('gain',c.gain)}${slider('mix',c.mix)}<label class="check"><input data-audio type="checkbox" data-audio-setting="autoLevel" ${c.autoLevel?'checked':''}>Adatta il livello alla sorgente</label><label class="check"><input data-audio type="checkbox" data-audio-setting="animate" ${c.animate?'checked':''}>Avvia anche il moto</label><p class="help">Diretta collega subito correnti, orbite e warp. Elaborazione sul dispositivo; nessun ascolto automatico.</p></details>
+      ${slider('gain',c.gain)}${slider('mix',c.mix)}<label class="check"><input data-audio type="checkbox" data-audio-setting="autoLevel" ${c.autoLevel?'checked':''}>Adatta il livello alla sorgente</label><label class="check"><input data-audio type="checkbox" data-audio-setting="animate" ${c.animate?'checked':''}>Avvia anche il moto</label><p class="help">Scegli Diretta in Collegamenti per muovere la scena con il suono. Elaborazione sul dispositivo; nessun ascolto automatico.</p></details>
       <details id="audio-rhythm-controls" class="control-details primary-section"><summary>Ritmo</summary>
       <p class="help">Impulsi regolari per muovere la scena, anche senza microfono. Puoi combinarli con voce e musica.</p>
       <div class="force-actions"><button type="button" class="primary" data-audio-action="rhythm-start">Avvia ritmo</button><button type="button" class="outline" data-audio-action="rhythm-stop">Ferma ritmo</button></div>
@@ -123,7 +124,7 @@ export function mountAudioReactive({getState,remember,mark,renderControls,showTa
       <details class="control-details"><summary>Salvataggio e limiti</summary><p class="help">Avvia prima microfono, file o Ritmo. Una registrazione per preset: quella nuova sostituisce la precedente solo quando è completa. Il replay ferma gli ingressi live e usa i collegamenti attuali. I segnali si salvano nel preset, senza voce né file sonoro. Il raccordo chiude la reazione, non garantisce un loop perfetto della geometria. Replay ed esportazione video non sono ancora collegati.</p><button type="button" class="quiet" data-audio-action="clip-delete">Elimina registrazione</button></details></details>
       <details id="audio-response-controls" class="control-details primary-section"><summary>Collegamenti · ${c.mappings.length}/24</summary><div class="force-actions audio-presets">${Object.entries({diretta:'Diretta',respiro:'Respiro',marea:'Orbite',tentacoli:'Tentacoli',impulsi:'Impulsi',timbro:'Timbro'}).map(([id,label])=>`<button type="button" class="outline" data-audio-preset="${id}">${label}</button>`).join('')}</div><p class="help">Cambiano i collegamenti e i tempi audio. Timbro lega suoni brillanti ai riflessi e suoni rumorosi a correnti e deformazioni. I valori originali restano recuperabili.</p>
       ${slider('attack',c.attack)}${slider('release',c.release)}${slider('curve',c.curve)}
-      ${c.mappings.map((row,i)=>`<details class="control-details audio-mapping"><summary>${escape(AUDIO_BANDS[row.band])} → ${escape(META[row.target][0])}${row.enabled?'':' · spento'}</summary>
+      ${c.mappings.map((row,i)=>`<details class="control-details audio-mapping"><summary>${escape(AUDIO_BANDS[row.band])} → ${escape(targetName(row.target))}${row.enabled?'':' · spento'}</summary>
         <label class="check"><input data-audio type="checkbox" data-audio-map="${i}.enabled" ${row.enabled?'checked':''}>Usa questo collegamento</label>
         <label class="field">Segnale<select data-audio data-audio-map="${i}.band">${options(AUDIO_BANDS,row.band)}</select></label>
         <label class="field">Parametro<select data-audio data-audio-map="${i}.target">${targetOptions(row.target)}</select></label>

@@ -1,13 +1,13 @@
 // Project-only data: never retain devices, canvases or a nested performance.
-import {META,GROUPS} from './model.js?v=01db4603d134';
-import {cloudBody,grainMix} from './body-layers.js?v=01db4603d134';
-import {CONTROL_NAMES,FIBER_TARGETS} from './control-vocabulary.js?v=01db4603d134';
-import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=01db4603d134';
-import {migrateFiberMaterial} from './fiber-material.js?v=01db4603d134';
-import {LIGHT_META,TRACK_META,syncMaterialControl} from './studio-model.js?v=01db4603d134';
-import {FORCE_META} from './particle-forces.js?v=01db4603d134';
-import {PATH_META} from './particle-paths.js?v=01db4603d134';
-import {normalizeFlow} from './flow-model.js?v=01db4603d134';
+import {META,GROUPS} from './model.js?v=c820880a7bd1';
+import {cloudBody,grainMix} from './body-layers.js?v=c820880a7bd1';
+import {CONTROL_NAMES,FIBER_TARGETS} from './control-vocabulary.js?v=c820880a7bd1';
+import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=c820880a7bd1';
+import {migrateFiberMaterial} from './fiber-material.js?v=c820880a7bd1';
+import {LIGHT_META,TRACK_META,syncMaterialControl} from './studio-model.js?v=c820880a7bd1';
+import {FORCE_META} from './particle-forces.js?v=c820880a7bd1';
+import {PATH_META} from './particle-paths.js?v=c820880a7bd1';
+import {normalizeFlow} from './flow-model.js?v=c820880a7bd1';
 export const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const number=(x,f,a,b)=>Number.isFinite(x)?clamp(x,a,b):f;
 const label=(x,f='',n=80)=>typeof x==='string'?x.replace(/[\x00-\x1f<>]/g,'').slice(0,n):f;
@@ -36,7 +36,8 @@ export function normalizePlayground(raw){
  if(!raw||typeof raw!=='object')return null;
  const deck=d=>{
   const state=sceneOnly(d?.state),hasScene=state&&typeof state==='object'&&!Array.isArray(state)&&Object.keys(state).length;
-  return {name:label(d?.name,'Scena'),state:hasScene?migrateFiberMaterial(state):{},phase:number(d?.phase,0,0,1e9),ratio:number(d?.ratio,number(raw.ratio,16/9,.1,10),.1,10),playing:d?.playing!==false};
+  if(hasScene){migrateGrainSizes(state,state);migrateFiberMaterial(state);}
+  return {name:label(d?.name,'Scena'),state:hasScene?state:{},phase:number(d?.phase,0,0,1e9),ratio:number(d?.ratio,number(raw.ratio,16/9,.1,10),.1,10),playing:d?.playing!==false};
  };
  const c={version:2,decks:{A:deck(raw.decks?.A),B:deck(raw.decks?.B)},mix:number(raw.mix,0,0,1),transition:TRANSITIONS.includes(raw.transition)?raw.transition:'fade',direction:number(raw.direction,0,0,3)|0,duration:number(raw.duration,2,.05,64),unit:raw.unit==='beats'?'beats':'seconds',bpm:number(raw.bpm,120,30,300),curve:['linear','smooth','in','out'].includes(raw.curve)?raw.curve:'smooth',quantize:!!raw.quantize,master:number(raw.master,1,0,1),blackout:false,resolution:[360,540,720,1080].includes(raw.resolution)?raw.resolution:540,autoQuality:raw.autoQuality!==false,macros:[],bindings:{},xyX:number(raw.xyX,0,0,7)|0,xyY:number(raw.xyY,1,0,7)|0};
  c.ratio=number(raw.ratio,16/9,.1,10);const old=Array.isArray(raw.slots)?raw.slots:[];
@@ -58,7 +59,6 @@ export function normalizePlayground(raw){
  for(const [k,v]of Object.entries(raw.bindings||{}).slice(0,400)){if(forbidden.has(k)||k.length>160)continue;const b=normalizeBinding(v?.input);if(b)c.bindings[k]={input:b,mode:['hold','toggle','step'].includes(v.mode)?v.mode:'toggle',invert:!!v.invert,pickup:v.pickup!==false};}
  // Old absolute grain sizes become ratios in the same macro, without dropping
  // its input assignment or changing the stored scene's starting appearance.
- for(const d of Object.values(c.decks))migrateGrainSizes(d.state,d.state);
  for(const macro of c.macros)for(const r of macro.routes){
   if(r.path==='pFilm')r.path='thinFilm';
   const legacy=/^light(2?)(Power|Size|Color)$/.exec(r.path);
@@ -93,7 +93,7 @@ export function parameterCatalog(s){
  for(const [key,value]of Object.entries(s)){
   if(forbidden.has(key)||['sceneGrains','pFilm','pVeilSourceKind','pVeilFromForm','pVeilMorph','finishGlitchSoftness'].includes(key)||legacyLight.test(key)||/Version$|^seed$|^duration$|^motionPeriod$/.test(key))continue;
   if(typeof value==='number'&&Object.hasOwn(meta,key)){const m=meta[key];add(key,CONTROL_NAMES[key]||m[0],'number',m[1],m[2],m[3]);}
-  else if(typeof value==='boolean'&&!/^(animate|perfectLoop|keepMotionSpeed|assistant)/.test(key))add(key,CONTROL_NAMES[key]||({finishEnabled:'Filtri',finishTone:'Correzione colore',photoAll:'Correggi anche il fondale',environmentRotate:'Ruota ambiente',light2:'Seconda luce',thinShellMode:'Lamiera trasparente'}[key]??humanName(key)),'boolean',0,1,1);
+  else if(typeof value==='boolean'&&!/^(animate|perfectLoop|keepMotionSpeed|assistant)/.test(key))add(key,CONTROL_NAMES[key]||({finishEnabled:'Filtri',finishTone:'Correzione colore',photoAll:'Correggi anche il fondale',environmentRotate:'Ruota ambiente',light2:'Seconda luce',thinShellMode:'Lamine trasparenti · senza rifrazione'}[key]??humanName(key)),'boolean',0,1,1);
   else if(typeof value==='string'&&/^#[a-f\d]{6}$/i.test(value))add(key,({background:'Colore del fondale',background2:'Secondo colore del fondale',internalColor:'Colore interno',sssColor:'Colore della diffusione'}[key]??humanName(key)),'color');
   else if(Object.hasOwn(enumValues,key)&&enumValues[key].includes(value))add(key,CONTROL_NAMES[key]||key,'enum',0,enumValues[key].length-1,1,enumValues[key]);
  }
@@ -101,8 +101,9 @@ export function parameterCatalog(s){
  for(const [key,t]of Object.entries(s.motions||{})){
   if(key==='pVeilMorph')continue;
   const m=Object.hasOwn(TRACK_META,key)?TRACK_META[key]:Object.hasOwn(meta,key)?meta[key]:[key,0,1,.01];
-  for(const [prop,min,max,step]of [['enabled',0,1,1],['amplitude',0,Math.max(Math.abs(m[1]),Math.abs(m[2])),m[3]],['cycles',.05,16,.05],['phase',0,360,1],['direction',-1,1,2],['pace',-1,1,.01],['pacePhase',0,360,1],['hold',0,.95,.01]])if(Object.hasOwn(t,prop))add(`motions.${key}.${prop}`,`Moto · ${m[0]} · ${{enabled:'attivo',amplitude:'ampiezza',cycles:'cicli',phase:'fase',direction:'verso',pace:'ritmo',pacePhase:'fase ritmo',hold:'sosta'}[prop]}`,prop==='enabled'?'boolean':'number',min,max,step);
-  for(const prop of ['mode','curve'])if(enumValues[prop].includes(t[prop]))add(`motions.${key}.${prop}`,`Moto · ${m[0]} · ${prop}`,'enum',0,enumValues[prop].length-1,1,enumValues[prop]);
+  const targetName=CONTROL_NAMES[key]||meta[key]?.[0]||m[0];
+  for(const [prop,min,max,step]of [['enabled',0,1,1],['amplitude',0,Math.max(Math.abs(m[1]),Math.abs(m[2])),m[3]],['cycles',.05,16,.05],['phase',0,360,1],['direction',-1,1,2],['pace',-1,1,.01],['pacePhase',0,360,1],['hold',0,.95,.01]])if(Object.hasOwn(t,prop))add(`motions.${key}.${prop}`,`Moto · ${targetName} · ${{enabled:'attivo',amplitude:'ampiezza',cycles:'cicli',phase:'fase',direction:'verso',pace:'ritmo',pacePhase:'fase ritmo',hold:'sosta'}[prop]}`,prop==='enabled'?'boolean':'number',min,max,step);
+  for(const prop of ['mode','curve'])if(enumValues[prop].includes(t[prop]))add(`motions.${key}.${prop}`,`Moto · ${targetName} · ${prop}`,'enum',0,enumValues[prop].length-1,1,enumValues[prop]);
  }
  for(const [i,l]of (s.lights||[]).entries()){
   for(const [k,m]of Object.entries(LIGHT_META))if(Number.isFinite(l[k]))add(`lights.${i}.${k}`,`Luce ${i+1} · ${m[0]}`,'number',m[1],m[2],m[3]);
@@ -114,7 +115,11 @@ export function parameterCatalog(s){
  for(const collection of ['forcePoints','forcePaths'])for(const [i,f]of (s[collection]||[]).entries())for(const [k,v]of Object.entries(f)){
   const fieldMeta=collection==='forcePaths'?PATH_META:FORCE_META;
   if(typeof v==='number'&&Object.hasOwn(fieldMeta,k)){const m=fieldMeta[k];add(`${collection}.${i}.${k}`,`${collection==='forcePaths'?'Percorso':'Campo'} ${i+1} · ${m[0]}`,'number',m[1],m[2],m[3]);}
-  if(typeof v==='boolean')add(`${collection}.${i}.${k}`,`Campo ${i+1} · ${k}`,'boolean',0,1,1);
+  if(typeof v==='boolean'){
+   const target=collection==='forcePaths'?'Percorso':'Campo';
+   const property={enabled:'attivo',closed:'chiuso'}[k]||k;
+   add(`${collection}.${i}.${k}`,`${target} ${i+1} · ${property}`,'boolean',0,1,1);
+  }
  }
  return entries;
 }

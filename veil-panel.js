@@ -1,4 +1,4 @@
-import {VEIL_META,VEIL_TRACK_KEYS} from './veil-model.js?v=01db4603d134';
+import {VEIL_META,VEIL_TRACK_KEYS} from './veil-model.js?v=c820880a7bd1';
 // The inspector follows the current geometry while the layers unfold.
 export function sharedVeilControls(tab,s,{slider,details,trackPanel}){
  if(s.pLiving===4)return '';
@@ -19,7 +19,7 @@ export function veilPanel(tab,s,h,shared,selectedLight){
  if(tab==='material')return section('Trasparenza degli strati',sl(['pVeilOpacity','pVeilEdge','pVeilFeather','refraction'])+'<p class="help">Ogni strato lascia vedere quelli dietro. L’opacità si accumula nelle sovrapposizioni.</p>')+details('Nucleo',sl(['pVeilCoreDark']))+details('Riflessi e luce propria',sl(['roughness','gloss','metal','emission']))+'<p class="help">Ombre reciproche e caustiche si attivano in Scena. Rifrazione modifica la caustica sul piano; non deforma ciò che si vede attraverso i veli.</p>';
  if(tab==='motion')return section('Movimento dei veli',sl(['duration','speed','pVeilCycles','pVeilBreath','pVeilFlow','pVeilDelay','pVeilRhythm'])+`<label class="field">Verso<select data-particle-select="pDirection"><option value="1" ${s.pDirection===1?'selected':''}>Normale</option><option value="-1" ${s.pDirection===-1?'selected':''}>Inverso</option></select></label><p class="help">Lo scorrimento fa viaggiare le pieghe. Apertura e chiusura regolano il respiro; a zero, la forma resta aperta al valore scelto. Tutti i cicli si raccordano nel loop.</p><p class="help">Durata effettiva: <strong id="effective-duration">${(s.duration/s.speed).toFixed(1)} s</strong>.</p>`)+shared('veil-motion',s,h,selectedLight);
  if(tab==='color')return shared(tab,s,{...h,particleColorPanel:()=>section('Colore sui veli',slider('pVeilLayerColor')+'<p class="help">La palette attraversa ciascun velo dalla radice al bordo. Questo controllo sfalsa i colori tra gli strati.</p>')},selectedLight);
- if(tab==='light')return section('Luce sui veli',slider('pLighting'))+shared('particle-light',s,h,selectedLight);
+ if(tab==='light')return section('Luce sui veli',slider('pLighting'));
  if(['grains','trails','fields'].includes(tab))return section('Strati continui','<p class="help">Questa forma usa veli continui. Granelli, scie e campi appartengono alle altre strutture: puoi sceglierle in Forma.</p>');
  return null;
 }

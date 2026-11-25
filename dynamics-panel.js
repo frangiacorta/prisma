@@ -1,6 +1,6 @@
 export function dynamicsPanel(s,{slider,details}){
- const rows=keys=>keys.map(slider).join('');
- const obstacle='<label class="field">Ostacolo<select data-particle-select="dynObstacle">'+['Nessuno','Sfera','Scatola','Capsula'].map((name,i)=>`<option value="${i}" ${Math.round(s.dynObstacle||0)===i?'selected':''}>${name}</option>`).join('')+'</select>';
+ const rows=keys=>keys.map(key=>slider(key)).join('');
+ const obstacle='<label class="field">Ostacolo<select data-particle-select="dynObstacle">'+['Nessuno','Sfera','Scatola','Capsula'].map((name,i)=>`<option value="${i}" ${Math.round(s.dynObstacle||0)===i?'selected':''}>${name}</option>`).join('')+'</select></label>';
  return '<details class="control-details" data-dynamics-panel data-default-open="true"><summary>Dinamica</summary>'+slider('dynAmount')+
  '<p class="help" role="status">A zero è disattivata. La simulazione muove insieme il volume, i granelli, i fili e le superfici presenti. Non richiede una forma di partenza specifica.</p>'+
  rows(['dynStiffness','dynDamping','dynGravity','dynWind','dynPin'])+

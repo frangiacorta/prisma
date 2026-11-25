@@ -1,8 +1,8 @@
-import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=01db4603d134';
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=01db4603d134';
-import {WEAVE_NETWORK_GLSL,weaveNetworkField} from './weave-network.js?v=01db4603d134';
-import {junctionUniforms} from './weave-junction.js?v=01db4603d134';
-import {hasMotionPoints} from './motion-keyframes.js?v=01db4603d134';
+import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=c820880a7bd1';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=c820880a7bd1';
+import {WEAVE_NETWORK_GLSL,weaveNetworkField} from './weave-network.js?v=c820880a7bd1';
+import {junctionUniforms} from './weave-junction.js?v=c820880a7bd1';
+import {hasMotionPoints} from './motion-keyframes.js?v=c820880a7bd1';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,
@@ -24,19 +24,19 @@ export const STRUCTURE_META={
  structShell:['Svuotamento · pieno → membrana',0,1,.01],structThickness:['Spessore della membrana',.005,.4,.001],
  structFibres:['Separazione in fibre',0,1,.01],structWeft:['Fili trasversali · tessitura',0,1,.01],structDensity:['Fili intorno alla forma',3,256,1],structThreadWidth:['Larghezza dei fili',.15,.9,.01],structWeave:['Intreccio sopra / sotto',0,.16,.005],
  structWeaveVariation:['Irregolarità del reticolo',0,1,.01],structWeaveNodes:['Noduli',0,1,.01],structWeaveMembrane:['Membrana',0,1,.01],structWeaveGrowth:['Crescita degli steli',0,1,.01],structWeaveCup:['Apertura delle coppe',0,1,.01],
- structWeaveBranching:['Ramificazione del reticolo',0,1,.01],structWeaveFinesse:['Densità delle microfibre',.35,2.4,.01],
+ structWeaveBranching:['Ponti tra le giunzioni',0,1,.01],structWeaveFinesse:['Densità delle microfibre',.35,2.4,.01],
  structWeaveCradle:['Ragnatela',0,1,.01],structWeaveFlex:['Elasticità dei rami',0,1,.01],
  structWeaveSlope:['Inclinazione dei ponti',-1,1,.01],structWeaveArch:['Curvatura dei ponti',-1,1,.01],
- structWeaveRelease:['Ritiro dei ponti',0,1,.01],structWeaveReach:['Lunghezza degli steli',.35,2.30,.01],
- structWeavePitch:['Passo lungo i rami',.55,1.8,.01],structWeaveRootBend:['Scarto della base',-.65,.65,.01],structWeaveTipBend:['Scarto della biforcazione',-.65,.65,.01],
+ structWeaveRelease:['Ritiro dei ponti',0,1,.01],structWeaveReach:['Lunghezza massima degli steli',.35,2.30,.01],
+ structWeavePitch:['Passo lungo i rami',.55,1.8,.01],structWeaveRootBend:['Flessione alla base degli steli',-.65,.65,.01],structWeaveTipBend:['Flessione alla punta degli steli',-.65,.65,.01],
  structWeaveRearX:['Rami posteriori · X',-1,1,.01],structWeaveRearY:['Rami posteriori · Y',-1,1,.01],
- structWeaveFront:['Posizione della germinazione',0,1,.01],structWeaveTension:['Tensione delle giunzioni',0,1,.01],structWeaveHierarchy:['Gerarchia dei rami',0,1,.01],structWeaveSpread:['Apertura laterale',.4,1.45,.01],
+ structWeaveFront:['Posizione della germinazione',0,1,.01],structWeaveTension:['Tensione delle giunzioni',0,1,.01],structWeaveHierarchy:['Gerarchia dei rami',0,1,.01],structWeaveSpread:['Apertura laterale degli steli',.4,1.45,.01],
  structWeaveAlignment:['Allineamento delle microfibre',0,1,.01],structWeaveCupLight:['Luce interna di noduli e coppe',0,1.6,.01],
  structWeaveCupSize:['Diametro dei noduli e delle coppe',.4,1.7,.01],structWeaveFlare:['Svasatura delle coppe',0,1,.01],
  structSlices:['Separazione in lamelle',0,1,.01],structSliceCount:['Numero di lamelle',2,12,1],structSliceWidth:['Spessore relativo delle lamelle',.12,.85,.01],structFan:['Lamine curve',0,1,.01],structFanBias:['Apertura in due direzioni',0,1,.01],
  structRadial:['Separazione radiale',0,1,.01],structPetalCount:['Divisioni radiali',3,20,1],structPetalWidth:['Larghezza delle divisioni',.1,.95,.01],
  structLayers:['Gusci concentrici',0,1,.01],structLayerCount:['Numero di strati concentrici',2,6,1],structLayerWidth:['Spessore relativo degli strati',.15,.85,.01],
- structGrowth:['Espansione radiale',0,.8,.01],structCurl:['Arricciamento dal centro',-1,1,.01],structFold:['Ampiezza delle pieghe',0,.4,.01],structFoldCount:['Pieghe intorno alla forma',1,12,1],
+ structGrowth:['Espansione radiale',0,.8,.01],structCurl:['Arricciamento dal centro',-1,1,.01],structFold:['Ampiezza delle pieghe della forma',0,.4,.01],structFoldCount:['Pieghe intorno alla forma',1,12,1],
  structBreath:['Dilatazione radiale',-.3,.3,.01],structFlap:['Flessione delle lamine',-.6,.6,.01],structFlowPhase:['Fase delle pieghe',0,1,.001],structDelay:['Sfasamento fra zone',0,1,.01],
  structScallop:['Arrotondamento dei petali',0,1,.01],structSpiral:['Avvolgimento a spirale',-1,1,.01],structStagger:['Sfasamento fra le lamine',0,1,.01],structRuffle:['Ondulazione fine dei bordi',0,.15,.005],structTaper:['Assottigliamento verso il bordo',0,1,.01],
  structCoreDark:['Oscurità del nucleo',0,1,.01],structCoreRadius:['Estensione del nucleo',.05,.8,.01]
@@ -755,7 +755,7 @@ export function structurePanel(tab,s,{slider,details,section}){
  +details('Suddivisione radiale e strati',sliders(['structFan','structFanBias','structScallop','structPetalCount','structRadial','structPetalWidth','structSlices','structSliceCount','structSliceWidth','structLayers','structLayerCount','structLayerWidth'])+'<p class="help">Lamine curve apre la forma in fogli sovrapposti. Larghezza, sfasamento e arricciamento ne cambiano i lembi. Gli strati interni diventano visibili con trasparenza o ritagli.</p>')
  +details('Piegatura e curvatura',sliders(['structGrowth','structCurl','structSpiral','structStagger','structFold','structFoldCount','structRuffle'])+'<p class="help">La posa e la sua animazione si regolano in Movimento. Trasparenza e rifrazione sono in Materia.</p>');
  if(tab==='color')return filamentPanel(tab,s,{slider,details})+ details('Fasce dell’anello',sliders(['loopBands','loopBandCount','loopBandAxis'])+'<p class="help">L’orientamento passa da fasce trasversali a strisce che seguono il percorso. Aumenta Apertura ad anello in Forma.</p>')+details('Nucleo scuro',sliders(['structCoreDark','structCoreRadius'])+(s.engine==='particles'?'<p class="help">Scurisce granelli e fili vicino all’asse centrale della forma, anche con pellicola e riflessi attivi. Estensione regola l’area; non aggiunge una sfera piena fra i granelli.</p>':''));
- if(tab==='motion')return filamentPanel(tab,s,{slider,details})+section('Posa',sliders(STRUCTURE_GROUPS.motion.filter(k=>k!=='loopPhase'&&!k.startsWith('fil')))+'<p class="help">Questi valori definiscono la posa. Apri le rispettive tracce qui sotto per animarla: ogni proprietà ha velocità, verso, fase e ritmo propri.</p>');
+ if(tab==='motion')return filamentPanel(tab,s,{slider,details})+section('Posa',sliders(['structBreath','structFlap','structFlowPhase'])+'<p class="help">Questi valori definiscono la posa. Ogni traccia ha velocità, verso, fase e ritmo propri.</p>');
  return '';
 }
 

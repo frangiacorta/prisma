@@ -1,5 +1,5 @@
-import {PANEL_GUIDES} from './workspace-layout.js?v=01db4603d134';
-import {SECTION_NAMES} from './control-vocabulary.js?v=01db4603d134';
+import {PANEL_GUIDES} from './workspace-layout.js?v=c820880a7bd1';
+import {SECTION_NAMES,recipeKey} from './control-vocabulary.js?v=c820880a7bd1';
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
  {id:'shape',label:'Forma',tabs:[['shape','Forma','shape']]},
@@ -88,6 +88,7 @@ export function mountControlSearch({getEngine,getMarkup,showTab,revealControl,pr
  function close(){results.hidden=true;status.textContent='';}
  function refresh(){
   entries=[];
+  const recipes=new Map();
   for(const tab of navigationTabs(getEngine())){
    const template=document.createElement('template');template.innerHTML=getMarkup(tab.id);
    if(tab.id==='library'){
@@ -99,9 +100,13 @@ export function mountControlSearch({getEngine,getMarkup,showTab,revealControl,pr
     const ancestors=[];let d=el.closest('details,section.control-section');while(d){ancestors.unshift(d.querySelector(':scope > summary,:scope > h2')?.textContent||'');d=d.parentElement?.closest('details,section.control-section');}
     const aliases={tone:'esposizione luminosita saturazione correzione colore fotografia',photo:'filtri effetti finitura post processing',motion:'moto animazione animare muovere movimento ritmo velocita',fields:'attrazione repulsione magneti',body:'webcam tracking mani braccia'};
     const oldNames=PROCEDURES.filter(t=>ancestors.some(a=>a.includes(t.label)||a.includes(SECTION_NAMES[t.label]||t.label))).flatMap(t=>[t.label,...t.aliases]);
-    const parameterAliases={veilAmount:['veli','aureola','ventaglio','lamine','sfera in veli'],fiberGrowth:['peluria durante la crescita','pelo dei germogli'],fiberPile:['pelo','pelosità','cotone','lana','velluto'],fiberLength:['lunghezza peluria','fibrille'],structWeaveCradle:['ragnatele','tela','rete','fili'],structWeaveNodes:['palline','nodulo','giunzioni'],structWeaveCupSize:['grandezza delle palline'],structWeaveCupLight:['controluce','coppe illuminate'],lightWrap:['luce morbida','ombra morbida'],pSelfShadow:['ombra di contatto','ombre reciproche'],hole:['buco','foro','buca','apertura'],rotateX:['gira','giro','ruota'],rotateY:['gira','giro','ruota'],rotateZ:['gira','giro','ruota'],transparency:['trasparente','vetro','opaco'],sceneGrains:['passaggio','morph','dissolvi','particelle','superficie'],pSize:['grandezza','ingrandisci','spessore granelli'],growthFeed:['Nutrimento'],growthKill:['Consumo'],growthAge:['Sviluppo della trama'],growthDepth:['Incisione / rilievo'],filPhase:['Scorrimento'],filWind:['Oscillazione delle punte'],structBreath:['Dilatazione del respiro'],structFlap:['Apertura del battito'],glow:['Diffusione alone'],emission:['Luce propria']};
+    const parameterAliases={veilAmount:['veli','aureola','ventaglio','lamine','sfera in veli'],fiberGrowth:['peluria durante la crescita','pelo dei germogli'],fiberPile:['pelo','pelosità','cotone','lana','velluto'],fiberLength:['lunghezza peluria','fibrille'],structWeaveCradle:['ragnatele','tela','rete','fili'],structWeaveNodes:['palline','nodulo','giunzioni'],structWeaveCupSize:['grandezza delle palline'],structWeaveCupLight:['controluce','coppe illuminate'],lightWrap:['luce morbida','ombra morbida'],pSelfShadow:['ombra di contatto','ombre reciproche'],hole:['buco','foro','buca','apertura'],rotateX:['gira','giro','ruota'],rotateY:['gira','giro','ruota'],rotateZ:['gira','giro','ruota'],transparency:['trasparente','vetro','opaco'],sceneGrains:['passaggio','morph','dissolvi','particelle','superficie'],pSize:['dimensione','grandezza','ingrandisci','spessore granelli'],pNodeRatio:['dimensione dei nodi'],structWeaveBranching:['ramificazione del reticolo','rami del reticolo'],pVeilTwist:['avvolgimento'],structDelay:['ritardo','sfasamento'],growthFeed:['Nutrimento'],growthKill:['Consumo'],growthAge:['Sviluppo della trama'],growthDepth:['Incisione / rilievo'],filPhase:['Scorrimento'],filWind:['Oscillazione delle punte'],structBreath:['Dilatazione del respiro'],structFlap:['Apertura del battito'],glow:['Diffusione alone'],emission:['Luce propria']};
     oldNames.push(...(parameterAliases[el.dataset.param]||[]));
-    entries.push({tab:tab.id,label,path:[...(tab.groupLabel===tab.label?[tab.label]:[tab.groupLabel,tab.label]),...ancestors].join(' › '),selector,haystack:clean([label,...ancestors,...oldNames,el.dataset.searchAliases||'',tab.label,({structure:'geometria forma',look:'materiale luce aspetto',post:'post processing filtri',interaction:'modulazione interazione'})[tab.group]||'',aliases[tab.id]||''].join(' '))});
+    const haystack=clean([label,...ancestors,...oldNames,el.dataset.searchAliases||'',tab.label,({structure:'geometria forma',look:'materiale luce aspetto',post:'post processing filtri',interaction:'modulazione interazione'})[tab.group]||'',aliases[tab.id]||''].join(' '));
+    const key=recipeKey(el);
+    if(key&&recipes.has(key)){recipes.get(key).haystack+=' '+haystack;continue;}
+    const entry={tab:tab.id,label,path:[...(tab.groupLabel===tab.label?[tab.label]:[tab.groupLabel,tab.label]),...ancestors].join(' › '),selector,haystack};
+    entries.push(entry);if(key)recipes.set(key,entry);
    }
   }
  }

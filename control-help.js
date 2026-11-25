@@ -1,10 +1,12 @@
-import {parameterHasSignal,structureSupport} from './structure-support.js?v=01db4603d134';
-import {AUDIO_HELP} from './audio-model.js?v=01db4603d134';
-import {EXTRA_HELP} from './control-help-extra.js?v=01db4603d134';
-import {FRACTAL_HELP} from './fractal-form.js?v=01db4603d134';
-import {CELLULAR_HELP} from './cellular-form.js?v=01db4603d134';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=01db4603d134';
-import {trailLightCompensation} from './particle-model.js?v=01db4603d134';
+import {parameterHasSignal,structureSupport} from './structure-support.js?v=c820880a7bd1';
+import {AUDIO_HELP} from './audio-model.js?v=c820880a7bd1';
+import {EXTRA_HELP} from './control-help-extra.js?v=c820880a7bd1';
+import {FRACTAL_HELP} from './fractal-form.js?v=c820880a7bd1';
+import {CELLULAR_HELP} from './cellular-form.js?v=c820880a7bd1';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=c820880a7bd1';
+import {livingWeights} from './living-composition.js?v=c820880a7bd1';
+import {surfaceWebWeights} from './surface-web-model.js?v=c820880a7bd1';
+import {trailLightCompensation} from './particle-model.js?v=c820880a7bd1';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishPalette:'Converte il chiaroscuro della scena in una palette ordinata da scuro a chiaro. La trasparenza resta invariata.',
@@ -14,7 +16,7 @@ const HELP={
  finishPaletteBlur:'Sfuma i colori dopo la mappa tonale, conservando la trasparenza originale. Zero mantiene i dettagli; la diffusione mantiene la stessa proporzione nell’export.',
  pSizeRatio:'Rapporto rispetto al diametro comune per la quota scelta di granelli. 1 = stessa misura, 4 = quattro volte più grandi. Il diametro comune cambia anche questa quota. Il renderer limita ogni diametro finale a 1024 px a 1080p.',
  pNodeRatio:'0 usa la stessa distribuzione degli altri granelli; un valore maggiore di 0 assegna ai nodi un rapporto rispetto al diametro comune. 1 = diametro comune, 4 = quattro volte. Non crea una popolazione separata. Richiede connessioni e granelli visibili.',
- pSizeSpread:'Allarga in modo logaritmico le dimensioni intorno al diametro impostato. A 4 va da 1/16 a 16 volte, con limite finale di 1024 px a 1080p. A 0 conserva il preset precedente. Vale anche per i nodi.',
+ pSizeSpread:'Ogni unità raddoppia il diametro massimo e dimezza il minimo. A 4 il moltiplicatore va da 1/16 a 16. Si combina con la variazione fine e vale anche per i nodi. Il diametro finale arriva fino a 1024 px a 1080p.',
  pSizeBias:'Con Escursione sopra zero: valori negativi danno più granelli grandi; positivi favoriscono molti piccoli e pochi grandi. Cambia la distribuzione, non il numero totale.',
  pLargeCount:'Quantità dei granelli esistenti che usa il Rapporto dimensioni. Gli altri usano il diametro comune. Non aggiunge particelle e non può superare il numero totale visibile; il valore salvato viene conservato se riduci il totale.',
  pLargeSize:'Diametro dei granelli grandi a 1080p. È indipendente dal fondo. I nodi con diametro dedicato mantengono la priorità: imposta Diametro nodi a 0 per usare queste dimensioni anche sui nodi.',
@@ -206,7 +208,7 @@ const HELP={
  pVolumeContinuity:'Fonde la diffusione dei granelli con un volume 3D continuo. Richiede una quota di Granelli in Forma → Rappresentazione.',pVolumeTurbulence:'Regola l’irregolarità delle volute sulla superficie e all’interno del volume.',pVolumeFilaments:'Concentra la luce in filamenti connessi dentro il volume. Emissione, Pulsazione e alone ne aumentano il contrasto.',
  pSelfShadow:'Attenua la luce scelta sulle parti coperte dalla geometria. Richiede Risposta alle luci sopra zero. Non attenua emissione e luce ambiente.',pSelfShadowSoftness:'Sfumatura della mappa di ombre reciproche. Valori alti ammorbidiscono i bordi sottili.',pSelfShadowBias:'Distanza minima fra superficie e ombra: aumentala per eliminare puntinature, riducila se spariscono contatti ravvicinati.',pCausticSoftness:'Sfuma l’accumulo dei raggi rifratti sul piano. Valori bassi conservano dettaglio; valori alti attenuano la trama puntiforme.',pCaustic:'Concentra sul piano la luce rifratta dalla prima superficie visibile alla sorgente. Richiede trasparenza, rifrazione maggiore di 1 e materiale non metallico. Approssimazione a un solo passaggio, senza rifrazioni interne multiple.',pOpticalExtent:'Semilarghezza della mappa vista dalla luce. Aumentala se parti della figura escono dalla zona delle ombre; riducila per avere più dettaglio.',
  pShadow:'Ombra dei granelli e degli strati attivi sul piano orizzontale. A zero il passaggio grafico è disattivato. Sul nero puro non è visibile.',pShadowHeight:'Quota del piano, indipendente dalla posizione della figura. Le parti sotto il piano non proiettano ombra.',pShadowSoftness:'Sfuma i bordi della proiezione. Anche la dimensione della luce scelta allarga la sfumatura.',pShadowLight:'Automatica usa la luce attiva più intensa sopra il piano. Puoi scegliere una sorgente precisa; spegnendola si spegne anche la sua ombra.',background:'Colore principale dello sfondo.',background2:'Secondo colore del gradiente o fondale.',bgAngle:'Ruota il gradiente di sfondo.',bgHeight:'Sposta in alto o in basso la transizione del fondale.',bgSoftness:'Allarga e ammorbidisce la transizione del fondale.',bgWash:'Aggiunge una zona più luminosa al centro del fondale.',bgShade:'Scurisce i bordi del fondale.',grounding:'Intensità complessiva di ombra e caustica sul fondale.',groundShadow:'Intensità dell’ombra proiettata sul fondale.',groundCaustic:'Intensità della luce concentrata sul fondale.',
- pCount:'Fino a due milioni di granelli. L’anteprima adattiva campiona le scene più dense e compensa la copertura. Le fibre hanno un conteggio indipendente.',pSize:'Diametro comune a 1080p: scala insieme granelli, quota con misura diversa e nodi. I rapporti della distribuzione restano invariati. Valori sotto 1 producono polvere fine; il cursore è più preciso alle misure piccole.',pSizeVar:'Differenza di diametro tra granelli piccoli e grandi.',pSprite:'Sagoma di ogni granello, distinta dalla forma dell’intera struttura.',pOpacity:'Visibilità dei granelli. A 0 restano solo le fibre, se attive.',pSoftness:'Sfuma il bordo dei singoli granelli.',
+ pCount:'Fino a due milioni di granelli. L’anteprima adattiva campiona le scene più dense e compensa la copertura. Le fibre hanno un conteggio indipendente.',pSize:'Diametro comune a 1080p: scala insieme granelli, quota con misura diversa e nodi. I rapporti della distribuzione restano invariati. Valori sotto 1 producono polvere fine; il cursore è più preciso alle misure piccole.',pSizeVar:'Varia il diametro di ogni granello intorno alla misura assegnata. Al massimo la variazione va da −85% a +85%. Puoi combinarla con Escursione dei diametri per ampliare l’intervallo.',pSprite:'Sagoma di ogni granello, distinta dalla forma dell’intera struttura.',pOpacity:'Visibilità dei granelli. A 0 restano solo le fibre, se attive.',pSoftness:'Sfuma il bordo dei singoli granelli.',
  pOpening:'A 0 il nucleo è sferico e senza foro. Aumentando apre gradualmente un anello. Le deformazioni restano indipendenti.',pThickness:'Raggio del corpo sferico o spessore del tubo dell’anello.',pFill:'A 0 distribuisce le particelle sulla superficie; a 1 le distribuisce anche dentro il volume.',pClumps:'Concentra la materia in addensamenti lungo la forma.',pLobes:'Numero dei lobi; agisce quando Profondità lobi è sopra 0.',pLobeDepth:'Fa crescere lobi sulla forma. A 0 elimina le sporgenze regolari.',
  pOrganic:'Intensità delle pieghe organiche del campo. A 0 conserva la base geometrica.',pFrequency:'Aumentando, le pieghe organiche diventano più fitte.',pDetail:'Numero di scale di dettaglio sovrapposte al campo organico.',pRough:'Quanto contano le scale più piccole del dettaglio.',pWarp:'Deforma il campo che genera le pieghe organiche.',pNeural:'Raggruppa i percorsi in fasci simili a connessioni neuronali.',pNodes:'Numero dei gruppi della rete; richiede Rete di percorsi sopra 0.',pConnect:'Avvolge e collega i fasci neuronali.',pSymmetry:'Ripete il campo in settori radiali. A 1 non impone simmetria.',
  pLife:'Intensità delle pulsazioni coordinate della materia.',pPulse:'Quante pulsazioni si completano nel loop.',pSignal:'Enfatizza segnali luminosi che attraversano i filamenti.',pPropagation:'Sfalsa l’arrivo delle pulsazioni tra le zone.',pCohesion:'Rende il campo organico più coordinato tra le particelle.',pRandom:'Irregolarità e sfasamento dei percorsi individuali.',pJitter:'Piccoli tremolii della materia.',pVortex:'Avvolge il nucleo in un vortice; il segno cambia il verso.',pReentry:'Richiama periodicamente la materia verso il centro.',pBreath:'Espande e contrae il nucleo insieme.',pTravel:'Ampiezza delle orbite lungo il percorso condiviso da superficie e granelli. A zero elimina la componente orbitale, lasciando le altre correnti e pulsazioni. Il controllo Movimento dei granelli ferma il moto locale nella posa attuale.',pMotionSoftness:'Riduce accelerazioni brusche, dettagli rapidi e microfluttuazioni.',pFollow:'Sfalsa la risposta delle fibre, come un ritardo elastico.',
@@ -331,8 +333,15 @@ export function controlCondition(s,key){
  if(['pReach','pBranches'].includes(key)&&!positive('pOuter'))return 'Aumenta Fasci esterni in Forma.';
  if(key==='pFlowBalance'&&!positive('pWander'))return 'Aumenta Deriva in Movimento.';
  if(/^pShadow(Height|Softness|Light|Bias|Center|Span)/.test(key)&&!(key==='pShadowLight'&&positive('pSelfShadow'))&&!positive('pShadow')&&!positive('pCaustic'))return 'Aumenta l’ombra sul piano o la caustica.';
- if(['pFiberSheen','pFiberSpread'].includes(key)&&!positive('pTrailCount')&&!positive('pLinks'))return 'Attiva scie o fili per vedere il riflesso delle fibre.';
- if(key==='pFiberSpread'&&!positive('pFiberSheen'))return 'Aumenta Intensità del riflesso delle fibre.';
+ if(key==='pFiberSheen'||key==='pFiberSpread'){
+  const [web,nodes,membrane]=surfaceWebWeights(s),weights=livingWeights(s);
+  const strokes=positive('pLinks')||['pTrailCount','pTrailLength','pTrailOpacity'].every(positive);
+  const threads=particles&&(weights.core>0&&strokes||weights.structure>0&&s.pLiving!==4&&positive('pThreadOpacity'));
+  if(!threads&&!web&&!membrane&&!(nodes&&positive('structWeaveGrowth')))return 'Attiva una ragnatela, una scia o i fili della pelle per vedere il riflesso.';
+  if(!positive('gloss'))return 'Aumenta Lucentezza per vedere il riflesso delle fibre.';
+  if(!positive('pLighting'))return 'Aumenta Risposta alle luci per vedere il riflesso delle fibre.';
+  if(key==='pFiberSpread'&&!positive('pFiberSheen'))return 'Aumenta Riflesso setoso.';
+ }
  if(['pNodes','pConnect'].includes(key)&&!positive('pNeural'))return 'Aumenta la struttura neuronale.';
  if(/^pTentacle(Count|Length|Taper|Curl|Wave|Cycles)$/.test(key)&&!positive('pTentacle'))return 'Aumenta i tentacoli del nucleo.';
  if(/^pWarp(Scale|Cycles|Twist)$/.test(key)&&!positive('pSpaceWarp'))return 'Aumenta Distorsione spaziale.';
@@ -350,7 +359,11 @@ export function controlCondition(s,key){
   const effect=[['Rgb','Rgb'],['Mosaic','Mosaic'],['Cell','Mosaic'],['Glyph','Glyph'],['Edge','Edge'],['Glitch','Glitch'],['Warp','Warp'],['Glass','Glass'],['Scan','Scan'],['Palette','Palette']].find(([prefix])=>key.startsWith('finish'+prefix));
   if(effect&&key!=='finish'+effect[1]&&!s['finish'+effect[1]])return 'Attiva questo filtro per vedere il risultato.';
  }
- if(key==='pSizeRatio')return need('pLargeCount','Scegli quanti granelli usano una misura diversa, in Distribuzione dimensioni.');
+ if(key==='pSizeRatio'){
+  if(!particles)return 'Porta Superficie ↔ granelli sopra zero in Forma.';
+  if(!positive('pCount'))return 'Aggiungi granelli in Forma.';
+  return need('pLargeCount','Scegli quanti granelli usano una misura diversa, in Distribuzione dimensioni.');
+ }
  if(key==='pSizeBias')return need('pSizeSpread','Aumenta Escursione dei diametri sopra zero.');
  if(key==='pNodeRatio')return need('pLinks','Attiva i fili: questo rapporto riguarda i granelli usati come nodi.');
  if(key==='pDistributionCells'&&Math.abs((s.pGrainSpacing??1)-1)+Math.abs((s.pGroupSpacing??1)-1)<1e-6)return 'Porta Dispersione o Distanza dei gruppi a un valore diverso da 1.';
@@ -410,7 +423,7 @@ const conditionValues={
   'Aumenta Lunghezza in Forma → Filamenti su superficie.':{filLength:.28},
   'Aumenta Quota di filamenti ramificati.':{filBranchAmount:.36},
   'Aumenta Ampiezza di oscillazione delle punte sopra zero.':{filWind:.36},
-  'Scegli quanti granelli usano una misura diversa, in Distribuzione dimensioni.':{pLargeCount:.25},
+  'Aggiungi granelli in Forma.':{pCount:400},
   'Aumenta Escursione dei diametri sopra zero.':{pSizeSpread:.7},
   'Aumenta la sfocatura fuori fuoco.':{focusBlur:.48},
   'Aumenta l’intensità della dinamica.':{dynAmount:.55},'Aumenta Vento.':{dynWind:.8},
@@ -423,12 +436,12 @@ const conditionValues={
   'Aumenta Onde di colore.':{colorWaveAmount:.61},'Scegli Fondale morbido.':{bgMode:'studio'},'Aumenta la grana.':{grain:.07},
   'Apri l’anello e appiattisci la sezione per vedere la torsione.':{loopAmount:.75,loopFlat:.63},'Aumenta Separazione radiale.':{structRadial:.63},
   'Aumenta la caustica.':{pCaustic:.72},'Aumenta l’ombra sul piano o la caustica.':{pShadow:.78},
-  'Attiva scie o fili per vedere il riflesso delle fibre.':{pTrailCount:260,pTrailOpacity:.75},'Aumenta la struttura neuronale.':{pNeural:.7},
+  'Aumenta Lucentezza per vedere il riflesso delle fibre.':{gloss:.65},'Aumenta Risposta alle luci per vedere il riflesso delle fibre.':{pLighting:1},'Aumenta la struttura neuronale.':{pNeural:.7},
   'Aumenta i tentacoli del nucleo.':{pTentacle:.65},'Aumenta Distorsione spaziale.':{pSpaceWarp:.64},'Aumenta Deriva.':{pWander:.62},
   'Aumenta la coesione dei ciuffi.':{filClump:.58},'Aumenta il gambo.':{stemAmount:.67},
   'Aumenta Diffusione sotto la superficie.':{subsurface:.54},'Aumenta Trasparenza o Diffusione interna.':{transparency:.54},
   'Scegli Gradiente per ruotare il passaggio fra i colori.':{bgMode:'gradient'},'Aumenta Fasci esterni in Forma.':{pOuter:.63},
-  'Aumenta Deriva in Movimento.':{pWander:.63},'Aumenta Intensità del riflesso delle fibre.':{pFiberSheen:.7,pLighting:1},
+  'Aumenta Deriva in Movimento.':{pWander:.63},'Aumenta Riflesso setoso.':{pFiberSheen:.7},
   'Attiva Ombre reciproche, granelli visibili e Risposta alle luci.':{pSelfShadow:.75,pLighting:1,pCount:16000,pOpacity:.76},
   'Attiva ombre reciproche o caustiche.':{pSelfShadow:.75,pLighting:1},'Aumenta Particelle nell’alone.':{pCloudHalo:.54},
   'Porta Dispersione o Distanza dei gruppi a un valore diverso da 1.':{pGrainSpacing:1.8},
@@ -444,6 +457,14 @@ export function conditionActivation(s,key,condition=controlCondition(s,key)){
  const support=structureSupport(s,key);
  if(support?.message===condition)return support.patch;
  if(Object.hasOwn(conditionValues,condition))return conditionValues[condition];
+ if(condition==='Attiva una ragnatela, una scia o i fili della pelle per vedere il riflesso.'){
+  if(s.grainSource==='cloud'&&s.pCount===0&&!s.pLiving)return {structWeaveCradle:.65,pCount:2400};
+  if(surfaceWebWeights({...s,structWeaveCradle:.65})[0]>0)return {structWeaveCradle:.65};
+  return null;
+ }
+ if(key==='pSizeRatio'&&condition==='Scegli quanti granelli usano una misura diversa, in Distribuzione dimensioni.'){
+  return {pLargeCount:Math.min(s.pCount,Math.max(100,Math.round(s.pCount/400)*100))};
+ }
  if(condition==='Aggiungi un secondo colore nella palette.')return {palette:[...(s.palette||[]),'#35a5c0']};
  if(condition==='Aumenta lo spessore dei filamenti per distinguere il profilo.')return {filWidth:.045,filLength:Math.max(.25,s.filLength||0)};
  if(condition==='Aumenta Quota di scie ramificate.')return {pTrailFork:.52,pTrailCount:Math.max(100,s.pTrailCount||0)};

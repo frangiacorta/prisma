@@ -1,7 +1,7 @@
-import {VEIL_GROUPS} from './veil-model.js?v=01db4603d134';
-import {clockStatus} from './animation-clock.js?v=01db4603d134';
-import {hasMotionPoints} from './motion-keyframes.js?v=01db4603d134';
-import {nameControls,CONTROL_NAMES,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=01db4603d134';
+import {VEIL_GROUPS} from './veil-model.js?v=c820880a7bd1';
+import {clockStatus} from './animation-clock.js?v=c820880a7bd1';
+import {hasMotionPoints} from './motion-keyframes.js?v=c820880a7bd1';
+import {nameControls,CONTROL_NAMES,recipeKey,essentialKeys,EXPERT_KEYS,ESSENTIAL_FLAGS,ESSENTIAL_FIELDS,ESSENTIAL_BUTTONS} from './control-vocabulary.js?v=c820880a7bd1';
 export const WORK_TABS=[['shape','Forma'],['material','Materiale'],['color','Colori'],['light','Luci'],['background','Scena'],['photo','Filtri'],['motion','Movimento'],['library','Preset']];
 const html=s=>{const d=document.createElement('div');d.innerHTML=s;return d;};
 const section=(title,id)=>{const d=document.createElement('details');d.className='control-details';if(id)d.id=id;const h=document.createElement('summary');h.textContent=title;d.append(h);return d;};
@@ -41,7 +41,7 @@ export function composePanel(id,raw,state){
  if(id==='library'){
   const root=html('<p class="help">Le scene aprono un progetto completo. Gli ingredienti cambiano solo la parte indicata.</p><button type="button" id="library-saved" class="outline full">I miei preset · importa ed esporta</button><details class="control-details" data-default-open="true" data-library-category="complete"><summary>Scene complete</summary><div id="complete-presets-slot"></div></details>');
   const seen=new Set();for(const [tab,label]of WORK_TABS.filter(([t])=>t!=='library')){const source=baseMarkup(tab,raw,state),group=section(label),subgroups=new Map();group.dataset.libraryCategory=tab;
-   for(const e of [...source.querySelectorAll(exampleSelector)]){if(seen.has(e.outerHTML))continue;seen.add(e.outerHTML);if(e.id==='material-picker'){for(const o of e.options)if(o.value!==''){const b=document.createElement('button');b.type='button';b.className='outline library-card';b.dataset.material=o.value;b.textContent=o.textContent;group.append(b);}continue;}const title=e.closest('details')?.querySelector(':scope > summary')?.textContent||label;let target=subgroups.get(title);if(!target){target=section(title);target.dataset.librarySubgroup=title;subgroups.set(title,target);group.append(target);}target.append(e.matches('select')?rowFor(e):e);}
+   for(const e of [...source.querySelectorAll(exampleSelector)]){const key=recipeKey(e)||e.id;if(seen.has(key))continue;seen.add(key);if(e.id==='material-picker'){for(const o of e.options)if(o.value!==''){const b=document.createElement('button');b.type='button';b.className='outline library-card';b.dataset.material=o.value;b.textContent=o.textContent;group.append(b);}continue;}const title=e.closest('details')?.querySelector(':scope > summary')?.textContent||label;let target=subgroups.get(title);if(!target){target=section(title);target.dataset.librarySubgroup=title;subgroups.set(title,target);group.append(target);}target.append(e.matches('select')?rowFor(e):e);}
    const cards=[...group.querySelectorAll(':scope > [data-material],:scope > [data-mood]')];if(cards.length){const grid=document.createElement('div');grid.className='library-card-grid';cards[0].before(grid);for(const c of cards)c.classList.add('library-card');grid.append(...cards);}if(group.querySelector('button,select'))root.append(group);
   }return root.innerHTML;
  }

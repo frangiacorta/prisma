@@ -1,12 +1,12 @@
-import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=01db4603d134';
+import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=c820880a7bd1';
 // Layered sheets share Prisma's renderer, palette, lights, loop and export.
 export const VEIL_DEFAULTS={veilAmount:0,pVeilSourceKind:0,pVeilFromForm:0,pVeilMorph:1,pVeilMemory:.35,pVeilStyle:0,pVeilLayers:6,pVeilSpread:.72,pVeilSpacing:.09,pVeilTwist:.6,pVeilRipple:.12,pVeilCrease:0,pVeilFolds:5,pVeilAsymmetry:.55,pVeilOpacity:.27,pVeilEdge:.55,pVeilFeather:.025,pVeilCoreRadius:.2,pVeilCoreDark:1,pVeilLayerColor:.25,pVeilBreath:.18,pVeilFlow:.3,pVeilDelay:.18,pVeilCycles:1,pVeilRhythm:.25};
 export const VEIL_META={
  veilAmount:['Trasformazione in veli',0,1,.01],
  pVeilSourceKind:['Forma sorgente',0,4,1],
  pVeilFromForm:['Usa forma di partenza',0,1,1],pVeilMorph:['Trasformazione in veli',0,1,.01],pVeilMemory:['Rilievo ereditato dalla forma',0,1,.01],
- pVeilStyle:['Petali → aureola → ventaglio',0,2,.01],pVeilLayers:['Numero di strati',1,16,1],pVeilSpread:['Apertura dei veli',0,1,.01],pVeilSpacing:['Distanza fra gli strati',0,.3,.005],pVeilTwist:['Avvolgimento',-2,2,.01],pVeilRipple:['Ondulazione dei bordi',0,.35,.005],pVeilCrease:['Pieghe verso il centro',0,1,.01],pVeilFolds:['Pieghe per strato',1,12,1],pVeilAsymmetry:['Asimmetria',0,1,.01],
- pVeilOpacity:['Opacità di ogni velo',0,1,.01],pVeilEdge:['Risalto dei bordi',0,1,.01],pVeilFeather:['Sfumatura del bordo',.002,.15,.002],pVeilCoreRadius:['Dimensione del nucleo',0,.65,.01],pVeilCoreDark:['Oscurità del nucleo',0,1,.01],pVeilLayerColor:['Variazione colore fra strati',0,1,.01],
+ pVeilStyle:['Petali → aureola → ventaglio',0,2,.01],pVeilLayers:['Numero di strati',1,16,1],pVeilSpread:['Apertura dei veli',0,1,.01],pVeilSpacing:['Distanza fra gli strati',0,.3,.005],pVeilTwist:['Avvolgimento dei veli',-2,2,.01],pVeilRipple:['Ondulazione dei bordi',0,.35,.005],pVeilCrease:['Pieghe verso il centro',0,1,.01],pVeilFolds:['Pieghe per strato',1,12,1],pVeilAsymmetry:['Asimmetria dei veli',0,1,.01],
+ pVeilOpacity:['Opacità di ogni velo',0,1,.01],pVeilEdge:['Risalto dei bordi',0,1,.01],pVeilFeather:['Sfumatura del bordo',.002,.15,.002],pVeilCoreRadius:['Dimensione del nucleo dei veli',0,.65,.01],pVeilCoreDark:['Oscurità del nucleo dei veli',0,1,.01],pVeilLayerColor:['Variazione colore fra strati',0,1,.01],
  pVeilBreath:['Ampiezza apertura e chiusura',0,.5,.01],pVeilFlow:['Scorrimento delle pieghe',0,1,.01],pVeilDelay:['Ritardo fra gli strati',0,1,.01],pVeilCycles:['Cicli dei veli nel loop',1,8,1],pVeilRhythm:['Accelerazioni e rallentamenti dei veli',0,.9,.01]
 };
 export const VEIL_GROUPS={shape:['veilAmount','pVeilMemory','pVeilStyle','pVeilLayers','pVeilSpread','pVeilSpacing','pVeilTwist','pVeilRipple','pVeilCrease','pVeilFolds','pVeilAsymmetry','pVeilCoreRadius'],material:['pVeilOpacity','pVeilEdge','pVeilFeather','pVeilCoreDark'],color:['pVeilLayerColor'],motion:['pVeilBreath','pVeilFlow','pVeilDelay','pVeilCycles','pVeilRhythm']};

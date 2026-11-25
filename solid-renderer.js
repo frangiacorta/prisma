@@ -1,20 +1,20 @@
-import {ImplicitRayStatus} from './implicit-ray-status.js?v=01db4603d134';
-import {FIBER_MATERIAL_GLSL,fiberMaterialUniform} from './fiber-material.js?v=01db4603d134';
-import {focusSlope} from './finishing.js?v=01db4603d134';
-import {pouchWeight} from './weave-pouch.js?v=01db4603d134';
-import {SURFACE_LIGHT_GLSL} from './surface-light.js?v=01db4603d134';
-import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=01db4603d134';
-import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=01db4603d134';
-import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=01db4603d134';
-import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=01db4603d134';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=01db4603d134';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=01db4603d134';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=01db4603d134';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=01db4603d134';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=01db4603d134';
-import {META} from './model.js?v=01db4603d134';
-import {hasMotionPoints,isMotionAngle,motionPointOffset,motionPointValue} from './motion-keyframes.js?v=01db4603d134';
-import {motionPeriod} from './animation-clock.js?v=01db4603d134';
+import {ImplicitRayStatus} from './implicit-ray-status.js?v=c820880a7bd1';
+import {FIBER_MATERIAL_GLSL,fiberMaterialUniform} from './fiber-material.js?v=c820880a7bd1';
+import {focusSlope} from './finishing.js?v=c820880a7bd1';
+import {pouchWeight} from './weave-pouch.js?v=c820880a7bd1';
+import {SURFACE_LIGHT_GLSL} from './surface-light.js?v=c820880a7bd1';
+import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=c820880a7bd1';
+import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=c820880a7bd1';
+import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=c820880a7bd1';
+import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=c820880a7bd1';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=c820880a7bd1';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=c820880a7bd1';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=c820880a7bd1';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=c820880a7bd1';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=c820880a7bd1';
+import {META} from './model.js?v=c820880a7bd1';
+import {hasMotionPoints,isMotionAngle,motionPointOffset,motionPointValue} from './motion-keyframes.js?v=c820880a7bd1';
+import {motionPeriod} from './animation-clock.js?v=c820880a7bd1';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.

@@ -1,5 +1,5 @@
-import {MAX_COLORS} from './studio-model.js?v=01db4603d134';
-import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=01db4603d134';
+import {MAX_COLORS} from './studio-model.js?v=c820880a7bd1';
+import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=c820880a7bd1';
 
 // Return only missing inputs, so applying a suggestion preserves an artist's
 // existing strengths, lights and colour choices.
@@ -27,8 +27,8 @@ export function structureSupport(s,key){
  };
  if(veil){
   require(on('veilAmount')||s.pLiving===4,'veilAmount',.65,'Trasformazione in veli');
-  if(key==='pVeilCoreRadius')require(on('pVeilCoreDark'),'pVeilCoreDark',.7,'Oscurità del nucleo');
-  if(key==='pVeilCoreDark')require(on('pVeilCoreRadius'),'pVeilCoreRadius',.24,'Dimensione del nucleo');
+  if(key==='pVeilCoreRadius')require(on('pVeilCoreDark'),'pVeilCoreDark',.7,'Oscurità del nucleo dei veli');
+  if(key==='pVeilCoreDark')require(on('pVeilCoreRadius'),'pVeilCoreRadius',.24,'Dimensione del nucleo dei veli');
   if(key==='pVeilCrease'||key==='pVeilFolds')require(on('pVeilRipple'),'pVeilRipple',.16,'Ondulazione dei bordi');
   if(key==='pVeilLayerColor'&&new Set(s.palette||[]).size<2){
    const palette=s.palette?.length?s.palette:['#d9dce2'];

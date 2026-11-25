@@ -1,5 +1,12 @@
 // Public wording and search aliases share one source. State/preset keys stay stable.
 export const FIBER_TARGETS={all:'Tutta la superficie',nodes:'Solo noduli'};
+// A shortcut and a library card can run the same command under different captions.
+const recipeAttributes=['data-sculpt','data-material','data-legacy-material','data-film-look','data-film-light','data-texture-style','data-motion-preset','data-mood','data-light-source','data-backdrop','data-audio-preset','data-growth-study','data-particle-material','data-particle-film','data-fiber-style','data-link-style','data-living-style','data-veil-look'];
+export function recipeKey(element){
+ if(element.tagName!=='BUTTON')return '';
+ for(const attr of recipeAttributes)if(element.hasAttribute(attr))return attr+'='+element.getAttribute(attr);
+ return '';
+}
 export const CONTROL_NAMES={
  fiberTarget:'Peluria · applica a',veilAmount:'Trasformazione in veli',
  structWeaveCradle:'Ragnatela',structWeaveNodes:'Noduli',structWeaveMembrane:'Membrana',structWeaveCupSize:'Diametro dei noduli e delle coppe',
@@ -8,10 +15,12 @@ export const CONTROL_NAMES={
  hollow:'Svuotamento degli elementi',wallThickness:'Spessore della parete',scattering:'Diffusione interna',translucency:'Luce in controluce',thinFilm:'Intensità della pellicola',coat:'Vernice trasparente',coatRoughness:'Rugosità della vernice',
  volume:'Profondità della forma',deform:'Irregolarità della forma',scale:'Dimensione della figura',positionX:'Posizione orizzontale',positionY:'Posizione verticale',
  structShell:'Svuotamento',structThickness:'Spessore del guscio',structWeave:'Intreccio della trama',petalWeave:'Intreccio delle appendici',filLength:'Lunghezza dei filamenti',petalLength:'Lunghezza delle appendici',
- pFilm:'Intensità della pellicola',pTrailLength:'Lunghezza della scia',pBundles:'Fasci di fibre',pBranches:'Rami esterni',filmThickness:'Colore dell’iridescenza',pSize:'Dimensione',pNodeRatio:'Dimensione dei nodi',pCellDensity:'Suddivisione delle cellule',
- subsurface:'Luce sotto la superficie',sssRadius:'Profondità della diffusione',textureDepth:'Intensità del rilievo',growthFeed:'Alimentazione',growthKill:'Rimozione',growthAge:'Iterazioni',
- finishScanMix:'Quantità',finishWarpMix:'Quantità',finishGlassMix:'Quantità',finishGlyphMix:'Quantità',finishEdgeMix:'Quantità',finishGlitchMix:'Quantità',finishMosaicMix:'Quantità',finishRgbMix:'Quantità',
- finishWarpSeed:'Variante',finishGlyphSeed:'Variante',finishGlitchSeed:'Variante',textureSeed:'Variante',growthSeed:'Variante',pMotionSeed:'Variante del movimento'
+ pFilm:'Intensità della pellicola',pTrailLength:'Lunghezza della scia',pBundles:'Fasci di fibre',pBranches:'Rami esterni',filmThickness:'Colore dell’iridescenza',pCellDensity:'Suddivisione delle cellule',
+ subsurface:'Luce sotto la superficie',sssRadius:'Profondità della diffusione',textureDepth:'Intensità del rilievo',growthFeed:'Alimentazione',growthKill:'Rimozione',growthAge:'Iterazioni di crescita',fractalLevels:'Iterazioni del frattale',
+ waves:'Onde della forma',textureRipples:'Increspature di superficie',cellSpineTaper:'Affusolamento delle spine',refraction:'Indice di rifrazione',finishGlassAmount:'Spostamento ottico · px',finishGlassRipple:'Ondulazione del vetro',finishScanWave:'Ondulazione delle linee',
+ dynFloorY:'Altezza del piano di collisione',dynMargin:'Margine di collisione',finishGlitchSizeRandom:'Variabilità dei blocchi',
+ finishScanMix:'Mix delle linee',finishWarpMix:'Mix della distorsione',finishGlassMix:'Mix del vetro',finishGlyphMix:'Mix dei caratteri',finishEdgeMix:'Mix dei contorni',finishGlitchMix:'Mix del glitch',finishMosaicMix:'Mix del mosaico',finishRgbMix:'Mix della separazione RGB',
+ finishWarpSeed:'Variante della distorsione',finishGlyphSeed:'Variante dei caratteri',finishGlitchSeed:'Variante del glitch',textureSeed:'Variante della texture',growthSeed:'Variante della crescita',pMotionSeed:'Variante del movimento'
 };
 export const SECTION_NAMES={'Ombra e caustica':'Ombre e caustiche','Materia':'Superficie','Materia e riflessi':'Superficie','Pellicola':'Iridescenza','Interferenza di pellicola':'Iridescenza','Bump procedurale':'Rilievo di superficie','Ritmo':'Andamento','Composizione':'Inquadratura','Distorsione ricorsiva 2D':'Distorsione ricorsiva','Rifrazione 2D':'Vetro ottico','ASCII e segni':'Segni e caratteri','Separazione RGB':'Separazione dei colori','Campi sferici 3d':'Campi sferici 3D','Struttura':'Costruzione','Petali e radici':'Appendici: petali e radici','Trasparenza e diffusione':'Trasparenza e luce interna','Proprietà':'Composizione della struttura','Reazione-diffusione':'Motivi organici'};
 export const FILTER_NAMES={scan:'Linee modulate',warp:'Distorsione ricorsiva',glass:'Vetro ottico',glyph:'Segni e caratteri',rgb:'Separazione dei colori',edge:'Contorni',mosaic:'Mosaico',glitch:'Glitch'};
