@@ -1,4 +1,4 @@
-import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=c820880a7bd1';
+import {VEIL_DEFAULTS,VEIL_META,VEIL_GROUPS} from './veil-model.js?v=30f747c2b880';
 // Continuous, periodic particle fields. Units for point and trail sizes are pixels at 1080p.
 export const PARTICLE_VERSION=14;
 // Normalize the light accumulated by long, persistent trails.
@@ -38,10 +38,10 @@ export const PARTICLE_META={...VEIL_META,
  pGrainSpacing:['Dispersione nei gruppi',.05,3,.01],pGroupSpacing:['Distanza tra gruppi',.1,4,.01],pDistributionCells:['Suddivisione dei gruppi',2,12,1],
  pSizeRatio:['Rapporto del gruppo · ×',.0003125,3200,.001],pNodeRatio:['Rapporto dei nodi · ×',0,3200,.001],
  pLargeCount:['Granelli con diametro dedicato',0,2000000,100],pSizeSpread:['Escursione dei diametri',0,4,.01],pSizeBias:['Prevalenza · grandi / piccoli',-1,1,.01],
- pCount:['Numero di particelle',0,2000000,100],pSize:['Diametro dei granelli · px',.08,256,.01],pSizeVar:['Variazione fine del diametro',0,1,.01],pSprite:['Sagoma del granello',0,3,1],pOpacity:['Opacità particelle',0,1,.01],pSoftness:['Morbidezza granello',0,1,.01],
+ pCount:['Numero di particelle',0,2000000,100],pSize:['Diametro dei granelli · px',.08,256,.01],pSizeVar:['Variazione fine del diametro',0,1,.01],pSprite:['Sagoma del granello',0,3,1],pOpacity:['Opacità particelle',0,1,.01],pSoftness:['Morbidezza granello',0,2,.01],
  pOpening:['Vuoto centrale · sfera / anello',0,1,.01],pThickness:['Spessore / raggio del nucleo',.02,1,.01],pFill:['Riempimento del volume',0,1,.01],pClumps:['Addensamenti',0,1,.01],pLobes:['Lobi / ramificazioni',1,12,1],pLobeDepth:['Profondità lobi',0,1,.01],
  pOrganic:['Organicità',0,2,.01],pFrequency:['Scala del campo organico',.3,8,.01],pDetail:['Ottave del dettaglio',1,5,1],pRough:['Peso del dettaglio fine',0,1,.01],pWarp:['Distorsione del campo',0,1,.01],
- pCohesion:['Coesione del movimento',0,1,.01],pRandom:['Irregolarità del moto',0,1,.01],pJitter:['Microfluttuazioni',0,1,.01],pVortex:['Vorticità',-2,2,.01],pCounterflow:['Rotazione differenziale',-2,2,.01],pReentry:['Rientro verso il nucleo',0,1,.01],pBreath:['Respiro',0,1,.01],pTravel:['Ampiezza delle orbite',0,3,.01],
+ pCohesion:['Coesione del movimento',0,1,.01],pRandom:['Irregolarità del moto',0,1,.01],pJitter:['Microfluttuazioni',0,1,.01],pVortex:['Vorticità',-2,2,.01],pCounterflow:['Rotazione differenziale',-2,2,.01],pReentry:['Rientro verso il nucleo',0,2,.01],pBreath:['Respiro',0,1,.01],pTravel:['Ampiezza delle orbite',0,3,.01],
  pMotionSoftness:['Morbidezza del movimento',0,1,.01],pFollow:['Ritardo tra le fibre',0,1,.01],
  pOrbitOval:['Ellitticità delle orbite',0,1,.01],pOrbitTilt:['Inclinazione orbite · °',-90,90,1],pOrbitPrecession:['Precessione delle orbite',0,1,.01],pOrbitSpread:['Sfasamento delle orbite',0,1,.01],pOrbitDrift:['Deriva orbitale',0,1,.01],
  pWander:['Esplorazione casuale',0,1,.01],pWanderScale:['Dimensione delle correnti',.2,5,.01],pWanderCycles:['Evoluzioni casuali nel loop',1,8,1],pFlowBalance:['Movimento corale / individuale',0,1,.01],pMotionSeed:['Seed del movimento',0,9999,1],

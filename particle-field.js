@@ -1,8 +1,8 @@
-import {bodySampleGLSL} from './body-samples.js?v=c820880a7bd1';
-import {DYNAMICS_GLSL} from './dynamics.js?v=c820880a7bd1';
+import {bodySampleGLSL} from './body-samples.js?v=30f747c2b880';
+import {DYNAMICS_GLSL} from './dynamics.js?v=30f747c2b880';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=c820880a7bd1';
-import {forceBarrierGLSL} from './particle-forces.js?v=c820880a7bd1';
+import {guideGLSL} from './particle-path-field.js?v=30f747c2b880';
+import {forceBarrierGLSL} from './particle-forces.js?v=30f747c2b880';
 export const grainSizingGLSL=`
 uniform vec2 uNodeStyle,uLargeGrains,uGrainDistribution;
 float grainDiameter(vec4 seed,int index){
@@ -72,8 +72,15 @@ vec3 shapeBase(vec4 r,float t,float family){
  float cluster=.6+.4*cos(a*uStructure.y+t)*cos(b*2.-t);
  p*=mix(1.,cluster,uStructure.w*.6);
  if(uCloudShape.y>0.){
-  float haze=step(1.-uCloudShape.y,r.w);
-  p*=1.+haze*uCloudShape.z*(.35+.65*r.z);
+  float haze=step(1.-uCloudShape.y,r.w)*(.35+.65*r.z);
+  if(uDynamics.y>1.){
+   // For a returning sheet, fibres shed progressively from the trailing cap.
+   // The inner end of its halo stays in contact with the denser material.
+   float mass=clamp((r.w-1.+uCloudShape.y)/uCloudShape.y,0.,1.);
+   float lee=.24+.76*smoothstep(-.8,.8,dot(p,vec3(.36,.82,-.45))/max(.001,length(p)));
+   haze=mix(haze,mass*mass*lee,smoothstep(1.,2.,uDynamics.y));
+  }
+  p*=1.+haze*uCloudShape.z;
  }
  return p;
 }
@@ -182,7 +189,8 @@ vec3 cloudMotion(vec4 r,float phase,vec3 rest){
   float twist=sin(global)*shell+.35*cos(global)*sin(2.*p.y);
   p.xz=rot(uCounterflow*twist)*p.xz;
  }
- p*=1.-uDynamics.y*(.5+.5*sin(t+r.y*TAU))*.78;
+ float radialReturn=uDynamics.y<=1.?uDynamics.y:2.-uDynamics.y;
+ p*=1.-radialReturn*(.5+.5*sin(t+r.y*TAU))*.78;
  p*=1.+uBreath*.35*sin(global+uSeed);
  float pulse=global*uLife.y-r.x*TAU*uLife.w;
  p*=1.+uLife.x*(.16*sin(pulse)+.065*sin(2.*pulse));
@@ -208,6 +216,105 @@ vec3 cloudMotion(vec4 r,float phase,vec3 rest){
  }
  return p;
 }
+#ifdef RETURN_FLOW_NORMAL
+vec3 returnFlowNormal=vec3(0.,0.,1.);
+float returnFlowWeight=0.;
+// Inverse-transpose of the local shear p += (f(y), g(z), h(x)), up to scale.
+vec3 shearNormal(vec3 n,vec3 slopes){
+ vec3 jx=vec3(1.,0.,slopes.z),jy=vec3(slopes.x,1.,0.),jz=vec3(0.,slopes.y,1.);
+ return mat3(cross(jy,jz),cross(jz,jx),cross(jx,jy))*n;
+}
+#endif
+// A material band returns across its incoming latitude. Radial displacement
+// separates its two sides, and advection moves the trailing cap off axis.
+vec3 rollReturnFlow(vec3 point,float phase,float mobility){
+ if(uDynamics.y<=1.||mobility<=0.)return point;
+ float strength=smoothstep(1.,2.,uDynamics.y)*mobility;
+ float radius=length(point);
+ if(radius<.00001)return point;
+ float time=clockAt(phase*uClock.x),offset=(uMotionSeed-417.)*.013,tide=sin(time+offset);
+ float rho=length(point.xz),lat=atan(point.y,rho),side=clamp(rho/radius,0.,1.);
+ vec2 radial=rho>.00001?point.xz/rho:vec2(1.,0.);
+ float bearing=atan(radial.y,radial.x)+offset,asym=.24+.11*uCounterflow;
+ float bend=asym*sin(bearing+time)+.12*sin(2.*bearing-time);
+ float inlet=lat+.19+.13*tide+bend*side;
+ float span=TAU*.5*(1.04+.16*uShape.z),band=span*(.5+.5*sin(inlet));
+ float waveform=2.*band+.18*cos(bearing-time)*side;
+ float reach=1.17+.27*tide+.18*uDynamics.x+.28*sin(time+bearing)*side;
+ float envelope=pow(side,1.6),latitude=lat+strength*reach*sin(waveform)*envelope;
+ float waveCos=cos(2.*band),returnSide=.5+.5*waveCos;
+ float extent=1.+strength*(.18*waveCos*side-.36*returnSide*returnSide);
+ float crown=smoothstep(-.18,.92,point.y/radius);
+ vec2 dRuffleAngle=vec2(0.),dRuffleRadius=vec2(0.);
+ float radialExpansion=1.;
+ float back=smoothstep(-.64,.72,point.y/radius);
+ if(uNoise.x>0.&&uFlow.w>0.&&back>0.){
+  // Connected filaments are transported by a smooth curl on the cap.
+  // Their ridge rolls sideways at the same time as it rises from the sheet.
+  vec3 unit=point/radius;
+  vec3 eddyAxis=vec3(4.6,-3.4,2.8),sweepAxis=vec3(-4.1,6.4,3.65),ridgeAxis=vec3(8.2,10.7,-5.5);
+  float eddy=dot(unit,eddyAxis)+.42*sin(time+offset);
+  float sweep=dot(unit,sweepAxis)+.38*cos(time+offset);
+  float turn=eddy+1.28*cos(sweep),branch=sweep-.72*sin(eddy);
+  float driftAmount=1.3+2.8*uFlow.w;
+  float ridge=dot(unit,ridgeAxis)+driftAmount*sin(turn);
+  float split=2.13*ridge+1.45*cos(branch);
+  float ribbon=.58+.42*cos(sweep+.46*sin(eddy));
+  float tuft=.24+.76*ribbon*ribbon;
+  float organic=2.*uNoise.x/(1.4+uNoise.x);
+  float gain=strength*organic*uFlow.w*(.544-.204*uFlow.x);
+  float crest=gain*back*tuft;
+  vec2 corrugation=vec2(.48*cos(ridge)+.22*uFlow.w*cos(split),.70*sin(ridge)+.24*uFlow.w*sin(split));
+  latitude+=crest*corrugation.x;
+  radialExpansion=exp(crest*corrugation.y);
+  extent*=radialExpansion;
+#ifdef RETURN_FLOW_NORMAL
+  vec3 gTurn=eddyAxis-1.28*sin(sweep)*sweepAxis;
+  vec3 gRidge=ridgeAxis+driftAmount*cos(turn)*gTurn;
+  vec3 gBranch=sweepAxis-.72*cos(eddy)*eddyAxis;
+  vec3 gSplit=2.13*gRidge-1.45*sin(branch)*gBranch;
+  vec3 gTuft=-.6384*ribbon*sin(sweep+.46*sin(eddy))*(sweepAxis+.46*cos(eddy)*eddyAxis);
+  float capT=clamp((unit.y+.64)/1.36,0.,1.);
+  vec3 gCrest=gain*(tuft*vec3(0.,6.*capT*(1.-capT)/1.36,0.)+back*gTuft);
+  vec3 gLatitude=gCrest*corrugation.x-crest*(.48*sin(ridge)*gRidge+.22*uFlow.w*sin(split)*gSplit);
+  vec3 gExtent=gCrest*corrugation.y+crest*(.70*cos(ridge)*gRidge+.24*uFlow.w*cos(split)*gSplit);
+  vec3 dUnitLat=vec3(-radial.x*unit.y,side,-radial.y*unit.y);
+  vec3 dUnitAz=vec3(-unit.z,0.,unit.x);
+  dRuffleAngle=vec2(dot(gLatitude,dUnitLat),dot(gLatitude,dUnitAz));
+  dRuffleRadius=extent*vec2(dot(gExtent,dUnitLat),dot(gExtent,dUnitAz));
+#endif
+ }
+ float radialExtent=extent*cos(latitude);
+ vec2 capDrift=(.17+.25*uCounterflow)*vec2(.65+.72*cos(time+offset),.71*sin(time+offset));
+ vec2 drift=vec2(.23*sin(band-.5)*sin(band-.5),.14*cos(band-time))+crown*capDrift;
+ vec2 horizontal=radius*(radialExtent*radial+strength*drift);
+ float height=radius*(extent*sin(latitude)+strength*crown*(.28+.18*tide));
+#ifdef RETURN_FLOW_NORMAL
+ // Both derivatives of this same map. Components are (latitude, azimuth);
+ // no neighbour searches or repeated calls to the turbulence field.
+ vec2 dSide=vec2(-point.y/radius,0.);
+ vec2 dBend=vec2(0.,asym*cos(bearing+time)+.24*cos(2.*bearing-time));
+ vec2 dBand=.5*span*cos(inlet)*(vec2(1.,0.)+bend*dSide+side*dBend);
+ vec2 dWave=2.*dBand+.18*(cos(bearing-time)*dSide-vec2(0.,sin(bearing-time)*side));
+ vec2 dReach=.28*(sin(time+bearing)*dSide+vec2(0.,cos(time+bearing)*side));
+ vec2 dLatitude=dRuffleAngle+vec2(1.,0.)+strength*(envelope*(dReach*sin(waveform)+reach*cos(waveform)*dWave)
+                           +reach*sin(waveform)*1.6*pow(side,.6)*dSide);
+ vec2 dWaveCos=-2.*sin(2.*band)*dBand;
+ vec2 dExtent=dRuffleRadius+radialExpansion*strength*(.18*waveCos*dSide+(.18*side-.36*returnSide)*dWaveCos);
+ vec2 dRadial=dExtent*cos(latitude)-extent*sin(latitude)*dLatitude;
+ float capT=clamp((point.y/radius+.18)/1.1,0.,1.);
+ float dCrown=6.*capT*(1.-capT)*side/1.1;
+ vec2 dHeight=dExtent*sin(latitude)+extent*cos(latitude)*dLatitude+vec2(strength*(.28+.18*tide)*dCrown,0.);
+ vec2 dDrift=strength*vec2(.23*sin(2.*band-1.),-.14*sin(band-time));
+ vec2 meridian=radial*dRadial.x+dDrift*dBand.x+strength*dCrown*capDrift;
+ vec2 parallel=radial*dRadial.y+dDrift*dBand.y+radialExtent*vec2(-radial.y,radial.x);
+ vec3 normal=cross(vec3(meridian.x,dHeight.x,meridian.y),vec3(parallel.x,dHeight.y,parallel.y));
+ float normalSize=length(normal);
+ returnFlowNormal=normalSize>.00001?normal/normalSize:point/radius;
+ returnFlowWeight=clamp(strength,0.,1.);
+#endif
+ return vec3(horizontal.x,height,horizontal.y);
+}
 vec3 positionUnconstrained(vec4 r,float phase){
  vec3 p;
  if(uStudioBody.x>0.){
@@ -217,12 +324,37 @@ vec3 positionUnconstrained(vec4 r,float phase){
    vec3 rest=cloudRestPoint(r);
    anchor+=(cloudMotion(r,phase,rest)-rest)*uStudioBody.y;
   }
-  p=studioTransform(anchor);
+  p=studioTransform(rollReturnFlow(anchor,phase,uStudioBody.y));
+#ifdef RETURN_FLOW_NORMAL
+  if(returnFlowWeight>0.){
+   vec3 n=returnFlowNormal/vec3(uForm.xy,max(.06,uForm.z*uForm.w));
+   n.yz=rot(-uRotation.x)*n.yz;n.xz=rot(-uRotation.y)*n.xz;n.xy=rot(-uRotation.z)*n.xy;
+   returnFlowNormal=normalize(n);
+  }
+#endif
  }else{
   float global=clockAt(phase*uClock.x);
   vec3 rest=cloudRestPoint(r);p=mix(rest,cloudMotion(r,phase,rest),uGrainMotionAmount);
+  p=rollReturnFlow(p,phase,uGrainMotionAmount);
   p*=vec3(uForm.xy,uForm.z*uForm.w);p.xz=rot(uWarp.y*p.y)*p.xz;
+#ifdef RETURN_FLOW_NORMAL
+  if(returnFlowWeight>0.){
+   vec3 n=returnFlowNormal/max(vec3(.0001),vec3(uForm.xy,uForm.z*uForm.w));
+   n.xz=rot(uWarp.y*p.y)*n.xz;
+   n.y-=uWarp.y*dot(n.xz,vec2(p.z,-p.x));
+   if(uWarp.x!=0.)n=shearNormal(n,uWarp.x*.4*vec3(2.6*cos(p.y*2.6+global),-3.*sin(p.z*3.+global),3.4*cos(p.x*3.4-global)));
+   returnFlowNormal=n;
+  }
+#endif
   p+=uWarp.x*.4*vec3(sin(p.y*2.6+global),cos(p.z*3.+global),sin(p.x*3.4-global));
+#ifdef RETURN_FLOW_NORMAL
+  if(returnFlowWeight>0.){
+   vec3 n=returnFlowNormal;
+   if(uWarp.z!=0.)n=shearNormal(n,uWarp.z*.3*uWarp.w*cos(p.yzx*uWarp.w+vec3(global,-global,global)));
+   n.xy=rot(uRotation.z)*n.xy;n.yz=rot(uRotation.x)*n.yz;n.xz=rot(uRotation.y)*n.xz;
+   returnFlowNormal=n/max(.00001,length(n));
+  }
+#endif
   p+=uWarp.z*.3*sin(p.yzx*uWarp.w+vec3(global,-global,global));
   p.xy=rot(uRotation.z)*p.xy;p.yz=rot(uRotation.x)*p.yz;p.xz=rot(uRotation.y)*p.xz;
   p*=uFrame.x;p.xy+=uFrame.yz;

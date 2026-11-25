@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it" data-release="c820880a7bd1">
+<html lang="it" data-release="30f747c2b880">
 <head>
  <meta charset="utf-8">
  <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,7 +32,7 @@
   try{
    const data=await fetch(asset('../moodboard/data.json'),{cache:'no-cache'}).then(response=>{if(!response.ok)throw Error();return response.json();});
    const rendered=new Set();
-   for(const item of data.items.filter(item=>item.kind==='project'&&item.comparisonDate&&item.resultPreset)){
+   for(const item of data.items.filter(item=>(item.kind==='project'||item.resultVersion&&item.comparisonClip)&&item.comparisonDate&&item.resultPreset)){
     const slug=item.resultPreset.match(/^previews\/([a-z0-9-]+)\.prisma\.json$/)?.[1];
     if(!cssSafe.test(slug||'')||rendered.has(slug))continue;
     rendered.add(slug);

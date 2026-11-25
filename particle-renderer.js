@@ -1,26 +1,26 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=c820880a7bd1';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=c820880a7bd1';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=c820880a7bd1';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=c820880a7bd1';
-import {knotTurns} from './structure-model.js?v=c820880a7bd1';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=c820880a7bd1';
-import {shadowLight} from './particle-shadow.js?v=c820880a7bd1';
-import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=c820880a7bd1';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=c820880a7bd1';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=c820880a7bd1';
-import {ParticleLinks} from './particle-links.js?v=c820880a7bd1';
-import {SurfaceWeb} from './surface-web.js?v=c820880a7bd1';
-import {surfaceWebStrength} from './surface-web-model.js?v=c820880a7bd1';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=c820880a7bd1';
-import {LayeredVeils} from './layered-veils.js?v=c820880a7bd1';
-import {LivingStructures} from './living-structures.js?v=c820880a7bd1';
-import {ParticleSurface} from './particle-surface.js?v=c820880a7bd1';
-import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=c820880a7bd1';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=c820880a7bd1';
-import {forceBarrierGLSL} from './particle-forces.js?v=c820880a7bd1';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=c820880a7bd1';
-import {focusSlope} from './finishing.js?v=c820880a7bd1';
-import {fiberMaterialUniform} from './fiber-material.js?v=c820880a7bd1';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=30f747c2b880';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=30f747c2b880';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=30f747c2b880';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=30f747c2b880';
+import {knotTurns} from './structure-model.js?v=30f747c2b880';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=30f747c2b880';
+import {shadowLight} from './particle-shadow.js?v=30f747c2b880';
+import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=30f747c2b880';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=30f747c2b880';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=30f747c2b880';
+import {ParticleLinks} from './particle-links.js?v=30f747c2b880';
+import {SurfaceWeb} from './surface-web.js?v=30f747c2b880';
+import {surfaceWebStrength} from './surface-web-model.js?v=30f747c2b880';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=30f747c2b880';
+import {LayeredVeils} from './layered-veils.js?v=30f747c2b880';
+import {LivingStructures} from './living-structures.js?v=30f747c2b880';
+import {ParticleSurface} from './particle-surface.js?v=30f747c2b880';
+import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=30f747c2b880';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=30f747c2b880';
+import {forceBarrierGLSL} from './particle-forces.js?v=30f747c2b880';
+import {grainReliefGLSL,materialCavity,prismaShadingGLSL} from './particle-shading.js?v=30f747c2b880';
+import {focusSlope} from './finishing.js?v=30f747c2b880';
+import {fiberMaterialUniform} from './fiber-material.js?v=30f747c2b880';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec3 uFocus;
 float particleDefocus(vec3 p){
@@ -76,8 +76,11 @@ vec3 trailPosition(int j,vec4 seed){
 const pointVert=`#version 300 es
 precision highp float;
 layout(location=0) in vec4 aRandom;
+#define RETURN_FLOW_NORMAL
 ${grainGLSL}
-out vec3 vColor,vPosition;flat out vec4 vForceSeed;flat out float vFleece;out float vOpacity,vCellLight,vRadius;out vec2 vSpriteUV;uniform float uPointQuad;
+${grainReliefGLSL}
+out vec3 vColor,vPosition;flat out vec4 vForceSeed,vFlowNormal;flat out vec3 vScatterAxis;flat out float vFleece;out float vOpacity,vCellLight,vRadius;out vec2 vSpriteUV;uniform float uPointQuad;
+uniform vec3 uGrainAnisotropy;
 uniform int uSeedOffset;
 void main(){
  int index=uPointQuad>.5?gl_InstanceID:gl_VertexID;
@@ -88,25 +91,58 @@ void main(){
  vec4 seed=aRandom;
  #endif
  vec3 p=attachedPosition(seed,uPhase);gl_Position=project(p);
+ vFlowNormal=vec4(returnFlowNormal,returnFlowWeight*(1.-uSurfaceBind));
  float trueSize=grainDiameter(seed,index)*uResolution.y/1080.;
  vRadius=trueSize*mix(max(2.,7.5-p.z)/(2.6*uResolution.y),1.7/min(uResolution.x,uResolution.y),uStudioPerspective);
  bool isNode=float(index)<uNodeStyle.x;
  vFleece=isNode?uFiberPile.x*fiberGrowthWeight(0.):(uFiberPile.z<.5?uFiberPile.x:0.);
  float extent=vFleece*mix(.024,.23,uFiberPile.y);
  float px=trueSize*(1.+extent)+particleDefocus(p);
+ float haloMass=uCloudShape.y>0.?clamp((seed.w-1.+uCloudShape.y)/uCloudShape.y,0.,1.):0.;
+ float detached=vFlowNormal.w*min(1.,uCloudShape.z)*haloMass*haloMass;
+ float blur=(22.*max(0.,uPoints.w-1.)+48.*detached)*uResolution.y/1080.;
+ float footprintSquared=max(4.,px*px)+blur*blur;
+ float footprint=sqrt(footprintSquared);
+ float deposit=uGrainRelief.x+uGrainRelief.y>0.?grainReliefDepth(restPoint(seed)):1.;
+ vScatterAxis=vec3(1.,0.,1.);
+ if(uGrainAnisotropy.x>0.&&vFlowNormal.w>0.&&uPoints.w>1.){
+  // The projected tangent to the rolled material orients the diffuse lobe.
+  // Stretch one axis and contract the other by the same factor to keep flux.
+  vec3 tangent=cross(vFlowNormal.xyz,normalize(vec3(0.,0.,7.5)-p));
+  float projected=length(tangent.xy),angleWeight=smoothstep(.08,.6,projected);
+  vec2 axis=vec2(tangent.x,-tangent.y)/max(.0001,projected);
+  axis=mat2(uGrainAnisotropy.y,uGrainAnisotropy.z,-uGrainAnisotropy.z,uGrainAnisotropy.y)*axis;
+  if(angleWeight>0.){
+   // Connected creases contain both aligned fibres and diffuse dust. Their
+   // variation is carried by material coordinates throughout the animation.
+   float irregularity=min(1.,uGrainRelief.x+uGrainRelief.y)*uGrainReliefVariation.x;
+   float current=sin(TAU*(3.*seed.x+2.*seed.y)+.75*sin(TAU*seed.y));
+   axis=rot(irregularity*(.55*current+.48*(seed.z-.5)))*axis;
+   float bundle=mix(1.,.18+.82*smoothstep(.18,1.8,deposit)*(.66+.34*current*current),irregularity);
+   vScatterAxis.xy=axis;
+   vScatterAxis.z+=2.9*uGrainAnisotropy.x*bundle*angleWeight*vFlowNormal.w*smoothstep(1.,1.65,uPoints.w);
+  }
+  footprint*=vScatterAxis.z;
+ }
  vSpriteUV=vec2(0.);
  if(uPointQuad>.5){
   int vertex=gl_VertexID%6;
   vec2 corner=vertex==0?vec2(-1.,-1.):vertex==1?vec2(1.,-1.):vertex==2?vec2(-1.,1.):vertex==3?vec2(-1.,1.):vertex==4?vec2(1.,-1.):vec2(1.,1.);
-  gl_Position.xy+=corner*max(2.,px)/uResolution*gl_Position.w;
+  vec2 offset=corner;
+  if(vScatterAxis.z>1.){
+   vec2 axis=vec2(vScatterAxis.x,-vScatterAxis.y);
+   offset=axis*corner.x+vec2(-axis.y,axis.x)*corner.y/(vScatterAxis.z*vScatterAxis.z);
+  }
+  gl_Position.xy+=offset*footprint/uResolution*gl_Position.w;
   vSpriteUV=vec2(corner.x,-corner.y)*.5+.5;
  }
- gl_PointSize=clamp(px,2.,64.);
- vForceSeed=seed;vOpacity=uPoints.z*3.*min(1.,trueSize*trueSize/max(4.,px*px));vPosition=p;vColor=particleColor(seed,p);vCellLight=cellLightFactor(seed);
+ gl_PointSize=clamp(footprint,2.,64.);
+ vForceSeed=seed;vOpacity=uPoints.z*3.*min(1.,trueSize*trueSize/footprintSquared)*deposit;vPosition=p;vColor=particleColor(seed,p);vCellLight=cellLightFactor(seed);
+ vOpacity/=1.+detached*(4.+7.*detached);
 }`;
 const pointFrag=`#version 300 es
 precision highp float;
-in vec3 vColor,vPosition;flat in vec4 vForceSeed;flat in float vFleece;in float vOpacity,vCellLight,vRadius;in vec2 vSpriteUV;uniform float uPointQuad,uSphereGrain;out vec4 color;
+in vec3 vColor,vPosition;flat in vec4 vForceSeed,vFlowNormal;flat in vec3 vScatterAxis;flat in float vFleece;in float vOpacity,vCellLight,vRadius;in vec2 vSpriteUV;uniform float uPointQuad,uSphereGrain;out vec4 color;
 ${prismaShadingGLSL}
 ${forceBarrierGLSL}
 ${guideGLSL}
@@ -114,7 +150,17 @@ ${DYNAMICS_GLSL}
 uniform float uPhase;
 ${livingOcclusionGLSL}
 uniform vec4 uPoints;uniform float uSprite;uniform vec3 uShadeOrigin;
-void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;vec2 xy=(uPointQuad>.5?vSpriteUV:gl_PointCoord)*2.-1.;float d=length(xy),aa=max(fwidth(d),.04);
+vec2 cubicWindow(vec2 axis){
+ vec2 x=2.*abs(axis),tail=max(vec2(0.),2.-x);
+ return mix(vec2(2./3.)-x*x+.5*x*x*x,tail*tail*tail/6.,step(vec2(1.),x));
+}
+void main(){vec2 xy=(uPointQuad>.5?vSpriteUV:gl_PointCoord)*2.-1.;
+ if(vScatterAxis.z>1.&&uPointQuad<.5){
+  xy=vec2(dot(xy,vScatterAxis.xy),dot(xy,vec2(-vScatterAxis.y,vScatterAxis.x))*vScatterAxis.z*vScatterAxis.z);
+  if(max(abs(xy.x),abs(xy.y))>1.)discard;
+ }
+ vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;
+ float d=length(xy),aa=max(fwidth(d),.04);
  float coverage=1.-smoothstep(1.-aa,1.,d);
  float fiberSample=0.;
  if(vFleece>0.){
@@ -127,14 +173,57 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
  }
  if(uSprite>1.5&&uSprite<2.5){float inner=.45+.36*uParticleOptical.w;coverage*=smoothstep(inner-.1,inner+.1,d);}
  if(uSprite>2.5)coverage*=exp(-min(abs(xy.x),abs(xy.y))*12.);
- float profile=uSprite<.5?exp(-d*d*mix(.2,3.,uPoints.w)):mix(1.,exp(-d*d*3.),uPoints.w);
- float a=coverage*profile*vOpacity*livingVisibility(vPosition.z)*particleWallCoverage(d);
+ float softness=min(1.,uPoints.w);
+ float profile=uSprite<.5?exp(-d*d*mix(.2,3.,softness)):mix(1.,exp(-d*d*3.),softness);
+ float signal=coverage*profile;
+ if(uPoints.w>1.&&uSprite<.5&&vFleece<=0.){
+  // Integrated separable cubic: overlapping subpixel grains retain the
+  // same total light as the sampling grid changes from preview to export.
+  vec2 kernel=cubicWindow(xy);
+  signal=mix(signal,3.58*kernel.x*kernel.y,smoothstep(1.,1.45,uPoints.w));
+ }
+ float a=signal*vOpacity*livingVisibility(vPosition.z)*particleWallCoverage(d);
  vec3 micro=vec3(xy.x,-xy.y,sqrt(max(.01,1.-d*d)));
  vec3 n=normalize(normalize(vPosition-uShadeOrigin+vec3(0.,0.,.0001))+micro*.28);
+ if(vFlowNormal.w>0.){
+  vec3 sheet=dot(n,vFlowNormal.xyz)<0.?-vFlowNormal.xyz:vFlowNormal.xyz;
+  n=normalize(mix(n,sheet,vFlowNormal.w));
+ }
  // The local sphere normal remains stable as visibility and edge softness vary.
  vec3 world=vPosition;
  if(uSphereGrain>.5){vec3 sphere=vec3(xy.x,-xy.y,sqrt(max(0.,1.-d*d)));n=normalize(sphere);world+=sphere*vRadius;}
  vec3 shaded=shadeFiberMaterial(vColor,world,n,vec3(0.),0.,fiberSample,vFleece);
+ if(vFlowNormal.w>0.&&uSphereGrain<.5){
+  // The rolled sheet presents a longer optical path at grazing incidence.
+  // Gradually transfer scattered light from face-on areas to the lip.
+  vec3 view=normalize(vec3(0.,0.,7.5)-world);
+  vec3 incidence=dot(n,view)<0.?-n:n;
+  float cosine=abs(dot(n,view));
+  float rim=(1.-cosine)*(1.-cosine);
+  float lightSide=1.;
+  if(uLightCount>0){
+   vec3 light=normalize(uLights[0].xyz-world);
+   lightSide=.12+.88*smoothstep(-.25,.68,dot(incidence,light));
+  }
+  float grazing=.34+(1.25+1.75*lightSide)*rim;
+  // A rough membrane reflects diffusely. It does not keep a mirror-bright
+  // silhouette where the rolled edge turns away from the illuminant.
+  float diffuseRim=mix(1.,max(.08,cosine+lightSide*.38),rim*uMaterial.y*(1.-uMaterial.x));
+  shaded*=mix(1.,grazing,vFlowNormal.w*(1.-uFinish.z)*uFinish.y)
+    *mix(1.,diffuseRim,vFlowNormal.w*uFinish.y);
+  // A folded transparent sheet can return transmitted light toward the eye.
+  // Resolve its narrow grazing lobe separately for the three wavelengths.
+  float spread=uParticleOptical.z;
+  if(spread>0.&&uLightCount>0){
+   vec3 eta=max(vec3(1.001),uParticleOptical.x+spread*vec3(-.115,0.,.18));
+   vec3 critical=sqrt(1.-1./(eta*eta));
+   vec3 width=(1.-cosine-critical)/(.025+.055*uMaterial.y);
+   vec3 lobe=exp(-width*width);
+   float transmission=.12+.88*smoothstep(-.15,.64,-dot(incidence,normalize(uLights[0].xyz-world)));
+   float spectral=vFlowNormal.w*(1.-uFinish.z)*uFinish.y*transmission*spread;
+   shaded*=max(vec3(0.),1.+(lobe-dot(lobe,vec3(.2126,.7152,.0722)))*(4.+6.*spread)*spectral);
+  }
+ }
  color=vec4(shaded*(a*vCellLight),a);
 }`;
 const trailVert=`#version 300 es
@@ -142,6 +231,7 @@ precision highp float;
 precision highp sampler2D;
 ${common}
 ${trailSampling}
+${grainReliefGLSL}
 uniform sampler2D uPaths;uniform bool uBaked;uniform vec3 uShadeOrigin;
 out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vForcePhase;out float vOpacity,vSide;
 uniform vec2 uTrailPulse;
@@ -186,6 +276,7 @@ void main(){
  }
  vColor*=cellLightFactor(original);
  vOpacity=uTrails.z*mix(pow(max(0.,1.-materialAge),uTail.x),1.,uFiber.x)*min(1.,width/max(1.,drawWidth))*uFiber.w*particleWallCoverage(.35);
+ if(uGrainRelief.x+uGrainRelief.y>0.)vOpacity*=grainReliefDepth(restPoint(original));
  float appearance=pow(.5+.5*sin(clockAt(uPhase*uClock.x)+original.x*TAU),5.);
  vOpacity*=mix(1.,.045+appearance*1.5,uTrailLine*uLife.z);
 }`;
@@ -427,6 +518,12 @@ export class ParticleRenderer{
   this.u(p,'uFiberLight',s.pFiberSheen,s.pFiberSpread);this.u(p,'uTrailLine',s.pTrailStraighten||0);
   const forces=[...(s.forcePoints||[]).filter(f=>f.enabled).slice(0,8),...(s.bodyForces||[]).filter(f=>f.enabled).slice(0,3)];gl.uniform1i(this.loc(p,'uForcePasses'),3);gl.uniform1i(this.loc(p,'uForceCount'),forces.length);if(forces.length){gl.uniform4fv(this.loc(p,'uForcePoints'),forces.flatMap(f=>[f.x,f.y,f.z,f.strength]));gl.uniform2fv(this.loc(p,'uForceOptions'),forces.flatMap(f=>[f.radius,f.swirl]));}
   this.u(p,'uColor',s.pColorMode,s.pColorScatter,s.pLumaVar,s.pDepthFade);
+  const reliefDepth=s.textureDepth??.35,reliefAngle=(s.textureAngle||0)*rad;
+  this.u(p,'uGrainRelief',(s.textureWrinkles||0)*reliefDepth,(s.textureFolds||0)*reliefDepth,0,s.texturePatch||0);
+  this.u(p,'uGrainReliefMap',s.textureScale??1,Math.cos(reliefAngle),Math.sin(reliefAngle),s.textureOrganic??.65);
+  this.u(p,'uGrainReliefVariation',s.textureRandomness||0,s.textureWarp||0,s.textureLink||0,s.textureSeed||0);
+  const satinAngle=(s.anisotropyAngle||0)*rad;
+  this.u(p,'uGrainAnisotropy',s.pSprite<.5?s.anisotropy||0:0,Math.cos(satinAngle),Math.sin(satinAngle));
   this.u(p,'uLife',s.pLife,s.pPulse,s.pSignal,s.pPropagation);this.u(p,'uTrailPulse',s.pTrailPulse,s.pTrailPulseWidth);this.u(p,'uNetwork',s.pNeural,s.pNodes,s.pConnect,0);this.u(p,'uSymmetry',s.pSymmetry);
   this.u(p,'uMotionQuality',s.pMotionSoftness,s.pFollow);this.u(p,'uMotionSeed',s.pMotionSeed);
   this.u(p,'uOrbit',s.pOrbitOval,s.pOrbitTilt*rad,s.pOrbitPrecession,s.pOrbitSpread);this.u(p,'uDrift',s.pOrbitDrift,0,0,0);
@@ -627,7 +724,10 @@ export class ParticleRenderer{
   const nodeSize=s.pLinks>0&&s.pLinkNodes>0?(sizes.node>0?Math.min(1024,sizes.node*radiiScale):commonSize):0;
   const [amount,length,target,growth]=fiberMaterialUniform(s),extent=amount*(.024+.206*length);
   const size=Math.max(commonSize*(1.+(target===0?extent:0.)),nodeSize*(1.+extent*(1.-growth)));
-  const quad=size*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
+  const haloBlur=s.pReentry>1&&s.pCloudHalo>0?48*Math.min(1,s.pCloudRadius):0;
+  const blur=22*Math.max(0,s.pSoftness-1)+haloBlur;
+  const scatterStretch=s.pReentry>1&&s.pSoftness>1&&s.pSprite<.5?1+2.9*(s.anisotropy||0):1;
+  const quad=Math.hypot(size,blur)*scatterStretch*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
   this.opticalDrawState();
   this.drawPoints(this.grainProgram(),points,phase,quad,Math.min(storedGrains,count),0);
   if(count>storedGrains)this.drawPoints(this.generatedPoints(),points,phase,quad,count-storedGrains,storedGrains);

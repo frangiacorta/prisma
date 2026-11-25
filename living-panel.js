@@ -1,6 +1,6 @@
-import {STRUCTURE_DEFAULTS} from './structure-model.js?v=c820880a7bd1';
-import {cloudBody} from './body-layers.js?v=c820880a7bd1';
-import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=c820880a7bd1';
+import {STRUCTURE_DEFAULTS} from './structure-model.js?v=30f747c2b880';
+import {cloudBody} from './body-layers.js?v=30f747c2b880';
+import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=30f747c2b880';
 export function applyLivingStyle(s,style){
  if(style==='veils'){s.veilAmount=s.veilAmount||.65;return;}
  if(!cloudBody(s)){

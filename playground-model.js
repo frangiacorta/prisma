@@ -1,13 +1,13 @@
 // Project-only data: never retain devices, canvases or a nested performance.
-import {META,GROUPS} from './model.js?v=c820880a7bd1';
-import {cloudBody,grainMix} from './body-layers.js?v=c820880a7bd1';
-import {CONTROL_NAMES,FIBER_TARGETS} from './control-vocabulary.js?v=c820880a7bd1';
-import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=c820880a7bd1';
-import {migrateFiberMaterial} from './fiber-material.js?v=c820880a7bd1';
-import {LIGHT_META,TRACK_META,syncMaterialControl} from './studio-model.js?v=c820880a7bd1';
-import {FORCE_META} from './particle-forces.js?v=c820880a7bd1';
-import {PATH_META} from './particle-paths.js?v=c820880a7bd1';
-import {normalizeFlow} from './flow-model.js?v=c820880a7bd1';
+import {META,GROUPS} from './model.js?v=30f747c2b880';
+import {cloudBody,grainMix} from './body-layers.js?v=30f747c2b880';
+import {CONTROL_NAMES,FIBER_TARGETS} from './control-vocabulary.js?v=30f747c2b880';
+import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=30f747c2b880';
+import {migrateFiberMaterial} from './fiber-material.js?v=30f747c2b880';
+import {LIGHT_META,TRACK_META,syncMaterialControl} from './studio-model.js?v=30f747c2b880';
+import {FORCE_META} from './particle-forces.js?v=30f747c2b880';
+import {PATH_META} from './particle-paths.js?v=30f747c2b880';
+import {normalizeFlow} from './flow-model.js?v=30f747c2b880';
 export const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const number=(x,f,a,b)=>Number.isFinite(x)?clamp(x,a,b):f;
 const label=(x,f='',n=80)=>typeof x==='string'?x.replace(/[\x00-\x1f<>]/g,'').slice(0,n):f;

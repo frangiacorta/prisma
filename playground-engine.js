@@ -1,9 +1,9 @@
-import {Renderer} from './renderer.js?v=c820880a7bd1';
-import {FlowDirector} from './playground-flow.js?v=c820880a7bd1';
-import {PlaygroundMixer} from './playground-mixer.js?v=c820880a7bd1';
-import {normalizeCreation} from './creative-model.js?v=c820880a7bd1';
-import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=c820880a7bd1';
-import {filterOverlay,mutationBetween} from './playground-performance.js?v=c820880a7bd1';
+import {Renderer} from './renderer.js?v=30f747c2b880';
+import {FlowDirector} from './playground-flow.js?v=30f747c2b880';
+import {PlaygroundMixer} from './playground-mixer.js?v=30f747c2b880';
+import {normalizeCreation} from './creative-model.js?v=30f747c2b880';
+import {sceneOnly,parameterCatalog,readParameter,writeParameter,parameterFromUnit,colorMix,clamp,transitionSeconds,transitionValue} from './playground-model.js?v=30f747c2b880';
+import {filterOverlay,mutationBetween} from './playground-performance.js?v=30f747c2b880';
 
 export class PlaygroundEngine{
  constructor(canvas,config,notify=()=>{}){
@@ -49,7 +49,7 @@ export class PlaygroundEngine{
  nextBeat(){return this.clock+(1-this.beats%1)*60/this.config.bpm;}
  async startAudio(file,host){
   const token=this.audioRevision=(this.audioRevision||0)+1;
-  const {OrbAudioInput}=await import('./vendor/orb/orb-audio.js?v=c820880a7bd1');
+  const {OrbAudioInput}=await import('./vendor/orb/orb-audio.js?v=30f747c2b880');
   if(this.closed||token!==this.audioRevision)return false;
   this.audio??=new OrbAudioInput();
   this.audio.attack=.055;this.audio.release=.2;

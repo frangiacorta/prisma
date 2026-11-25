@@ -1,4 +1,4 @@
-import {junctionField,JUNCTION_GLSL} from './weave-junction.js?v=c820880a7bd1';
+import {junctionField,JUNCTION_GLSL} from './weave-junction.js?v=30f747c2b880';
 
 const TAU = Math.PI * 2;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));

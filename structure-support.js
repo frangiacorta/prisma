@@ -1,5 +1,5 @@
-import {MAX_COLORS} from './studio-model.js?v=c820880a7bd1';
-import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=c820880a7bd1';
+import {MAX_COLORS} from './studio-model.js?v=30f747c2b880';
+import {cloudBody,grainMix,hasGrainLayer} from './body-layers.js?v=30f747c2b880';
 
 // Return only missing inputs, so applying a suggestion preserves an artist's
 // existing strengths, lights and colour choices.

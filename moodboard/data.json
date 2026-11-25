@@ -1378,9 +1378,9 @@
       ],
       "familyBasis": "Proposta editoriale basata sulle descrizioni; modificabile con il feedback.",
       "result": "",
-      "where": "",
+      "where": "Movimento → Animazioni → Orbite → Rotazione e ricircolo · Forma → Granelli · Materiale → Rilievo di superficie",
       "platform": "",
-      "next": "",
+      "next": "Avvicinare la biforcazione del lembo e la continuità dei riflessi nelle pieghe più strette.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -1438,7 +1438,22 @@
         "fibres"
       ],
       "category": "form",
-      "addedOn": "2026-10-10"
+      "addedOn": "2026-10-10",
+      "compareNote": "Il lembo si ripiega e i granelli scorrono nella cavità. Nel confronto affiancato il bordo della reference si divide in fibre più sottili e irregolari, soprattutto durante l’apertura laterale.",
+      "comparisonOutcome": "parziale",
+      "comparisonDate": "2026-11-25",
+      "resultDuration": 20,
+      "resultVersion": "113",
+      "comparisonClip": "../previews/membrana-ricircolo-confronto.mp4",
+      "procedure": {
+        "name": "Ricircolo dei granelli su un guscio",
+        "verification": "code-reviewed",
+        "description": "Parti da una sfera di granelli. Abbassa Riempimento del volume per distribuirli sul guscio. In Movimento alza Ampiezza del movimento e porta Rientro verso il nucleo oltre 1 per rivoltare il lembo. Anima il riempimento per far passare una velatura davanti alla cavità. Morbidezza granello fonde la polvere più fitta. Grinze, Pieghe e Dispersione cromatica regolano la luce che si raccoglie sul bordo."
+      },
+      "resultPreset": "previews/membrana-ricircolo.prisma.json",
+      "resultImage": "../previews/membrana-ricircolo.webp",
+      "resultVideo": "../previews/membrana-ricircolo.mp4",
+      "resultUrl": "../previews/verifica-visiva.html#membrana-ricircolo"
     },
     {
       "id": "s02-02",

@@ -41,6 +41,7 @@ function relatedHtml(records){
  }).join('');
 }
 function locationHtml(r,related){
+ if(r.kind!=='project'&&r.resultPreset&&r.where)return `<section class="location"><h3>Dove in Prisma</h3><p>${esc(r.where)}</p></section>`;
  if(r.kind==='project')return `<section class="location"><h3>Dove in Prisma</h3><p>${esc(r.where||(r.state==='proposed'?'Da sviluppare: non ancora disponibile nei controlli.':'Apri il progetto per i dettagli di integrazione; percorso dei controlli da verificare.'))}</p><small>${esc(states[r.state])} · lo stato riguarda questo progetto.</small></section>`;
  const projects=related.filter(p=>p.kind==='project');
  return `<section class="location"><h3>Collegamento con Prisma</h3><p>Questa scheda è un riferimento, non un effetto pronto da applicare.</p>${projects.filter(p=>p.where&&p.state!=='proposed').map(p=>`<p><button class="text-link" data-open="${esc(p.id)}">${esc(p.name)}</button> · ${esc(states[p.state])}<br>${esc(p.where)}</p>`).join('')}${!projects.length?'<small>Nessun progetto collegato: riferimento ancora da valutare.</small>':''}</section>`;
@@ -167,7 +168,7 @@ $('#import').onchange=async e=>{try{const file=e.target.files[0];if(!file)return
 window.addEventListener('popstate',()=>{const id=decodeURIComponent(location.hash.slice(1));if(byId?.has(id))openDetail(id,false);else if($('#detail').open){stopVideos();$('#detail').close();document.body.classList.remove('modal-open');current=null;}});
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!$('#detail').open){e.preventDefault();$('#search').focus();}});
 try{
- const response=await fetch('data.json?v=c820880a7bd1');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
+ const response=await fetch('data.json?v=30f747c2b880');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
  for(const item of data.items)if(item.kind==='project'||item.comparisonClip){
   item.resultImage=projectMedia(item.resultImage);
   item.resultVideo=projectMedia(item.resultVideo);

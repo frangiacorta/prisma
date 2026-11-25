@@ -1,8 +1,8 @@
-import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL,FACING_GLSL} from './weave-sling.js?v=c820880a7bd1';
-import whorlAnatomy from './weave-whorl.js?v=c820880a7bd1';
-import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=c820880a7bd1';
-import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=c820880a7bd1';
-import {fiberMaterialUniform} from './fiber-material.js?v=c820880a7bd1';
+import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL,FACING_GLSL} from './weave-sling.js?v=30f747c2b880';
+import whorlAnatomy from './weave-whorl.js?v=30f747c2b880';
+import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=30f747c2b880';
+import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=30f747c2b880';
+import {fiberMaterialUniform} from './fiber-material.js?v=30f747c2b880';
 
 // Attachment coordinates on one repeat of the tissue. Each bud keeps its identity
 // as the transverse bridges withdraw and the same bud becomes a hollow calyx.

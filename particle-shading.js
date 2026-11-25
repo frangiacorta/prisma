@@ -1,9 +1,39 @@
-import {FILM_PATTERN_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,FRACTAL_PARTICLE_PALETTE_GLSL} from './solid-renderer.js?v=c820880a7bd1';
-import {LOOP_PALETTE_GLSL} from './structure-model.js?v=c820880a7bd1';
-import {opticalGLSL} from './particle-optics.js?v=c820880a7bd1';
-import {FIBER_MATERIAL_GLSL} from './fiber-material.js?v=c820880a7bd1';
-import {SURFACE_LIGHT_GLSL} from './surface-light.js?v=c820880a7bd1';
+import {FILM_PATTERN_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,FRACTAL_PARTICLE_PALETTE_GLSL} from './solid-renderer.js?v=30f747c2b880';
+import {LOOP_PALETTE_GLSL} from './structure-model.js?v=30f747c2b880';
+import {opticalGLSL} from './particle-optics.js?v=30f747c2b880';
+import {FIBER_MATERIAL_GLSL} from './fiber-material.js?v=30f747c2b880';
+import {SURFACE_LIGHT_GLSL} from './surface-light.js?v=30f747c2b880';
 export const materialCavity=s=>Math.max(0,Math.min(1,(s.hollow||0)*(1-(s.wallThickness??.08))));
+
+// A material-space relief redistributes optical thickness across a sampled
+// sheet. Sampling the rest position keeps the pattern on the same grains and
+// trails as they bend. No spatial hash or temporal noise changes their IDs.
+export const grainReliefGLSL=`
+uniform vec4 uGrainRelief,uGrainReliefMap,uGrainReliefVariation;
+float grainReliefDepth(vec3 rest){
+ vec3 p=rest;
+ p.xy=mat2(uGrainReliefMap.y,-uGrainReliefMap.z,uGrainReliefMap.z,uGrainReliefMap.y)*p.xy;
+ p=p*uGrainReliefMap.x+uGrainReliefVariation.w*vec3(.127,.237,.167);
+ float a=dot(p,vec3(3.1,2.3,1.7)),b=dot(p,vec3(-1.8,3.7,2.9)),c=dot(p,vec3(2.7,-1.5,4.1));
+ vec3 field=vec3(sin(a+.63*sin(b)),cos(b+.72*sin(c)),sin(c+.85*cos(a)));
+ p+=field*(uGrainReliefVariation.x*.86+uGrainReliefVariation.y*.62);
+ float warp=dot(sin(vec3(a,b,c)+field.zxy),vec3(.55,.30,.15))*uGrainReliefMap.w;
+ float twist=sin(b*1.75+cos(a*2.3+c))+cos(c*1.91+field.x*2.);
+ float fold=dot(p,vec3(1.,8.,1.3))+2.6*warp+uGrainReliefMap.w*uGrainReliefVariation.x*1.8*twist;
+ float crease=dot(p,vec3(4.,32.,3.))+warp*5.+uGrainReliefVariation.z*(sin(fold)*3.7+field.x*4.3);
+ // Wraparound ridges with several widths keep overlaps distinct. At
+ // grazing angles the changing projected sample density supplies the rim.
+ float folded=.5+.5*cos(fold),fine=.5+.5*cos(crease);
+ float threads=.5+.5*cos(crease*2.27+3.*field.z+fold*.72);
+ float thin=pow(fine,9.)*(.32+.68*threads)+.3*pow(threads,14.);
+ float wrinkleDensity=.115+3.95*thin;
+ float foldDensity=.22+2.85*pow(folded,5.);
+ // Low-frequency patches leave lengths of nearly transparent fibre between
+ // the bright bundles. Keep the patch attached to the rest material.
+ float sector=.57*field.z+.28*field.x+.15*field.y;
+ float coveragePatch=mix(1.,.018+2.35*smoothstep(-.22,.52,sector),uGrainRelief.w);
+ return mix(1.,wrinkleDensity,uGrainRelief.x)*mix(1.,foldDensity,uGrainRelief.y)*coveragePatch;
+}`;
 
 export const prismaPaletteGLSL=`
 uniform vec4 uGradient,uColorLayers,uColorWave,uColorWave2;

@@ -1,19 +1,19 @@
-import {CooperativePreview} from './cooperative-preview.js?v=c820880a7bd1';
-import {surfaceWebStrength} from './surface-web-model.js?v=c820880a7bd1';
-import {PaletteFinishPass} from './finish-palette.js?v=c820880a7bd1';
-import {Dynamics,disposeDynamics} from './dynamics.js?v=c820880a7bd1';
-import {motionPeriod} from './animation-clock.js?v=c820880a7bd1';
-import {animationPhase} from './animation-clock.js?v=c820880a7bd1';
-import {ScanlinePass} from './finish-scanlines.js?v=c820880a7bd1';
-import {FilamentPass} from './filament-renderer.js?v=c820880a7bd1';
-import {VeilTransition} from './veil-transition.js?v=c820880a7bd1';
-import {BodySamples} from './body-samples.js?v=c820880a7bd1';
-import {BodyComposite} from './body-composite.js?v=c820880a7bd1';
-import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=c820880a7bd1';
-import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=c820880a7bd1';
-import {ParticleRenderer} from './particle-renderer.js?v=c820880a7bd1';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=c820880a7bd1';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=c820880a7bd1';
+import {CooperativePreview} from './cooperative-preview.js?v=30f747c2b880';
+import {surfaceWebStrength} from './surface-web-model.js?v=30f747c2b880';
+import {PaletteFinishPass} from './finish-palette.js?v=30f747c2b880';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=30f747c2b880';
+import {motionPeriod} from './animation-clock.js?v=30f747c2b880';
+import {animationPhase} from './animation-clock.js?v=30f747c2b880';
+import {ScanlinePass} from './finish-scanlines.js?v=30f747c2b880';
+import {FilamentPass} from './filament-renderer.js?v=30f747c2b880';
+import {VeilTransition} from './veil-transition.js?v=30f747c2b880';
+import {BodySamples} from './body-samples.js?v=30f747c2b880';
+import {BodyComposite} from './body-composite.js?v=30f747c2b880';
+import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=30f747c2b880';
+import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=30f747c2b880';
+import {ParticleRenderer} from './particle-renderer.js?v=30f747c2b880';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=30f747c2b880';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=30f747c2b880';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
@@ -241,7 +241,8 @@ export class Renderer{
  finish(s,o={},phase=0,timeline=phase){
   if(finishingOff(s,o)){this.feedbackFinishing?.release();this.paletteFinishing?.release();return false;}
   const values={...FINISH_DEFAULTS,...s},order=normalizeFinishOrder(s.finishOrder),w=this.canvas.width,h=this.canvas.height;
-  for(const key of ['finishPrintNegative','finishPaletteMap','finishPaletteScale','finishPaletteOffset','finishPaletteBlur'])if(s.motions?.[key]?.enabled)values[key]=sampleFrame(s,phase)[key];
+  const animatedFilters=['finishRgbMix','finishPrintNegative','finishPaletteMap','finishPaletteScale','finishPaletteOffset','finishPaletteBlur'].filter(key=>s.motions?.[key]?.enabled);
+  if(animatedFilters.length){const at=sampleFrame(s,phase);for(const key of animatedFilters)values[key]=at[key];}
   const active={palette:values.finishPalette&&values.finishPaletteMap>0,feedback:values.finishFeedback&&values.finishFeedbackMix>0,scan:values.finishScan&&values.finishScanMix>0,warp:values.finishWarp&&values.finishWarpMix>0,glass:values.finishGlass&&values.finishGlassMix>0,mosaic:values.finishMosaic&&values.finishMosaicMix>0,rgb:values.finishRgb&&values.finishRgbMix>0,edge:values.finishEdge&&values.finishEdgeMix>0,glyph:values.finishGlyph&&values.finishGlyphMix>0,glitch:values.finishGlitch&&values.finishGlitchMix>0&&values.finishGlitchCoverage>0&&(values.finishGlitchAmount>0||values.finishGlitchSplit>0)};
   if(!active.feedback)this.feedbackFinishing?.release();
   if(!active.palette)this.paletteFinishing?.release();
