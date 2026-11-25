@@ -1,7 +1,7 @@
-import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL,FACING_GLSL} from './weave-sling.js?v=b4b76e9bdb82';
-import whorlAnatomy from './weave-whorl.js?v=b4b76e9bdb82';
-import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=b4b76e9bdb82';
-import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=b4b76e9bdb82';
+import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL,FACING_GLSL} from './weave-sling.js?v=db658b02e410';
+import whorlAnatomy from './weave-whorl.js?v=db658b02e410';
+import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=db658b02e410';
+import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=db658b02e410';
 
 // Attachment coordinates on one repeat of the tissue. Each bud keeps its identity
 // as the transverse bridges withdraw and the same bud becomes a hollow calyx.
@@ -303,6 +303,7 @@ export function junctionUniforms(s,u,upload){
   else for(let i=0;i<cage.length;i+=4)u('uTissueCage['+(i/4)+']',cage.subarray(i,i+4));
  }
  u('uTissueSlingLoad',[pose.sling?.pocket||0]);
+ u('uTissueCottonWeight',[pouchWeight(s.structWeaveRelease)*(1-smooth(.36,.63,s.structWeaveGrowth))]);
  if(pose.sling){
   const data=pose.sling.vertices;
   if(upload)upload('uTissueSling',data);
@@ -696,7 +697,13 @@ float tissueLace(vec2 uv,float footprint){
 }
 #ifdef WEAVE_DETAIL
 ${SLING_GLSL}
+uniform float uTissueCottonWeight;
 #ifdef WEAVE_HIT_TAG
+// The tagged optical pass intersects the outside of the pile. The solid
+// used for particle attachment and the opening of the calyx stay at the core.
+float tissueCottonHeight(){return .164*uTissueCottonWeight*uTexture.z*(.32+.68*uMat.w)*(1.-uMat.z);}
+int weaveBudIndex=-1;
+float weaveBudImpact=-1.;
 // Loose fibrils have little extinction individually. Their optical depth
 // adds where adjoining pieces of gauze wrap the same bud. Integrate across
 // the actual inclined panels, in material coordinates, once per shaded hit.
@@ -820,6 +827,9 @@ float tissueShoot(vec3 q,vec3 A,vec4 handle,vec3 C,vec4 profile,float index,floa
   float dz=(q.z-C.z-dot(radialSlope.xy,xy))/radialSlope.z;
   cup=mix(cup,length(vec3(xy,dz))-cap,rounding);
  }
+ #ifdef WEAVE_HIT_TAG
+ cup-=cap*tissueCottonHeight();
+ #endif
  #ifdef WEAVE_HIT_TAG
  if(weaveEvaluateMaterial&&uTissueSlingLoad>0.){
   // In a stretched pouch chart distance is anisotropic. Classify the
@@ -968,7 +978,7 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
  }
  float emptyBound=10000.;
  #ifdef WEAVE_HIT_TAG
- vec3 socketPoint=vec3(0.);float socketRadius=0.;
+ vec3 socketPoint=vec3(0.);float socketRadius=0.;int socketIndex=-1;
  #endif
  if(uStructureH.z>0.||growth>0.)for(int row=-1;row<=1;row++)for(int col=-1;col<=1;col++){
   vec3 q=vec3(x+float(col)*strideX,y+float(row)*stride,z);
@@ -995,7 +1005,7 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
    skeleton=min(skeleton,branch);
    if(branch<d){tag=detail;
     #ifdef WEAVE_HIT_TAG
-    if(weaveEvaluateMaterial){socketPoint=q;socketRadius=cap;}
+    if(weaveEvaluateMaterial){socketPoint=q;socketRadius=cap;socketIndex=i;}
     #endif
    }
    #ifdef WEAVE_HIT_TAG
@@ -1003,7 +1013,7 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
     // A film sewn onto a rounded bud shares its milky surface at contact.
     // Keep loose spans translucent once the bud has cleared the weave.
     float contactBand=.23*cap*cradle*(1.-smoothstep(.12,.42,growth));
-    if(branch<contactBand&&branch-d<contactBand){tag=detail;socketPoint=q;socketRadius=cap;}
+    if(branch<contactBand&&branch-d<contactBand){tag=detail;socketPoint=q;socketRadius=cap;socketIndex=i;}
    }
    #endif
    float joinWidth=(.004+.47*cap)*web*(1.-.93*gather);
@@ -1020,6 +1030,19 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
   if(uTissueSlingLoad>.0001&&tag.x==14.&&socketRadius>.0001){
    float nap=tissueNap(socketPoint,socketRadius)*web*uTissueSlingLoad;
    if(nap>.001)tag=vec3(15.,nap,tag.z);
+  }
+ }
+ if(weaveEvaluateMaterial&&tissueCottonHeight()>.00001&&tag.x>=12.&&socketIndex>=0){
+  weaveBudIndex=socketIndex;
+  if(rounding>.72){
+   // Measure the camera ray's actual offset from the compact core. A
+   // crossing strand can turn the local SDF normal almost sideways on the
+   // face of a fruit; that does not punch a pinhole through its centre.
+   vec3 delta=socketPoint-uTissueEnd[socketIndex].xyz;
+   vec2 xy=metric*delta.xy;
+   float dz=(delta.z-dot(radialSlope.xy,xy))/radialSlope.z;
+   vec3 camera=normalize((transform(vec3(0.,0.,1.))-transform(vec3(0.)))/vec3(uShape.y,uShape.z,max(.06,uShape.x*uShape.w)));
+   weaveBudImpact=length(cross(vec3(xy,dz),camera))/max(.0001,socketRadius);
   }
  }
  #endif

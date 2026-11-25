@@ -1,8 +1,8 @@
-import {META,MOODS,GROUPS} from './model.js?v=b4b76e9bdb82';
-import {particleSphere} from './particle-model.js?v=b4b76e9bdb82';
-import {PATH_META} from './particle-paths.js?v=b4b76e9bdb82';
-import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES,syncMaterialControl} from './studio-model.js?v=b4b76e9bdb82';
-import {material,sculpt,motionPreset,upgrade,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=b4b76e9bdb82';
+import {META,MOODS,GROUPS} from './model.js?v=db658b02e410';
+import {particleSphere} from './particle-model.js?v=db658b02e410';
+import {PATH_META} from './particle-paths.js?v=db658b02e410';
+import {newLight,MAX_LIGHTS,MAX_COLORS,LIGHT_META,LIGHT_TYPES,MATERIAL_STYLES,SHAPE_TRACKS,TRACK_META,track,TEXTURE_STYLES,syncMaterialControl} from './studio-model.js?v=db658b02e410';
+import {material,sculpt,motionPreset,upgrade,SCULPT_EXAMPLES,MOTION_PRESETS,textureStyle} from './creative-model.js?v=db658b02e410';
 
 const normalize=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ').trim();
 const isColor=c=>typeof c==='string'&&/^#[0-9a-f]{6}$/i.test(c);

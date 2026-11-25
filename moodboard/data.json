@@ -4771,7 +4771,8 @@
       "resultImage": "../previews/reticolo-giunzioni.webp",
       "resultVideo": "../previews/reticolo-giunzioni.mp4",
       "comparisonClip": "../previews/reticolo-giunzioni-confronto.mp4",
-      "resultUrl": "../previews/reticolo-giunzioni-confronto.mp4"
+      "resultUrl": "../previews/reticolo-giunzioni-confronto.mp4",
+      "comparisonDetail": "../previews/reticolo-noduli-cotone.jpg"
     },
     {
       "id": "s07-06",
@@ -14876,7 +14877,7 @@
         "Fedeltà alle reference e fluidità su telefono fisico da verificare con l’utente."
       ],
       "integration": "Proprietà combinabili sulla forma corrente; nessun selettore esclusivo di membrane, tessuti o veli in Forme.",
-      "resultVersion": "107",
+      "resultVersion": "108",
       "evidence": "reports/structure/source.json; reports/structure/source-ui.json; reports/structure/export.json",
       "checks": [
         "26 controlli con impatto sui pixel",
@@ -14906,16 +14907,17 @@
       "engine": "solid",
       "procedure": {
         "name": "Reticolo sulla superficie",
-        "description": "In Trama e giunzioni, Rete attorno ai noduli tende il velo e Densità delle microfibre ne infittisce la trama. Rilievo alle giunzioni regola la dimensione delle palline. In Materiale, Trasparenza regola quanto si vede attraverso la seta. In Luci puoi modificare i punti dell’orbita del primo faro. Inclinazione del fuoco orienta la zona nitida lungo la tasca.",
+        "description": "In Trama e giunzioni, Rilievo alle giunzioni regola la dimensione delle palline. Rete attorno ai noduli tende il velo e Densità delle microfibre ne infittisce la trama. In Materiale → Rilievo di superficie, Microtexture regola la peluria dei noduli. A zero il bordo torna liscio. Rugosità ammorbidisce la luce sulle palline. Trasparenza regola quanto si vede attraverso la seta. In Luci puoi modificare l’orbita del primo faro. Inclinazione del fuoco orienta la zona nitida lungo la tasca.",
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/reticolo-giunzioni.prisma.json",
-      "compareNote": "Al secondo 12 la luce arriva da destra. Le fibre velano alcune palline e lasciano scoperte le altre. Nella tasca in basso la reference mostra fili più nitidi e irregolari. Il dettaglio cade a 4,16 secondi nel confronto affiancato.",
+      "compareNote": "Nel primo piano al secondo 12, osserva il bordo scoperto delle palline a destra e il passaggio dalla luce all’ombra sulla coppia centrale. Nella tasca in basso la reference mostra fili più irregolari. Il dettaglio cade a 4,16 secondi nel confronto affiancato.",
       "comparisonRef": "s07-05",
       "comparisonDate": "2026-11-25",
       "comparisonOutcome": "parziale",
-      "comparisonClip": "../previews/reticolo-giunzioni-confronto.mp4"
+      "comparisonClip": "../previews/reticolo-giunzioni-confronto.mp4",
+      "comparisonDetail": "../previews/reticolo-noduli-cotone.jpg"
     },
     {
       "id": "roadmap-4d",

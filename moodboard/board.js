@@ -132,6 +132,13 @@ document.addEventListener('click',async e=>{
  if(e.target.closest('[data-compare]')){
   if(current.comparisonClip){
    replaceHero(videoHtml(current.comparisonClip),'Reference a sinistra, Prisma a destra. I due video mostrano lo stesso intervallo.');
+   if(current.comparisonDetail){
+    const detail=document.createElement('a');
+    detail.href=current.comparisonDetail;
+    detail.className='source-link';
+    detail.textContent='Ingrandisci i noduli';
+    $('#media-note').append(' ',detail);
+   }
    return;
   }
   const ref=current.kind==='project'?byId.get(current.comparisonRef):current;
@@ -160,11 +167,12 @@ $('#import').onchange=async e=>{try{const file=e.target.files[0];if(!file)return
 window.addEventListener('popstate',()=>{const id=decodeURIComponent(location.hash.slice(1));if(byId?.has(id))openDetail(id,false);else if($('#detail').open){stopVideos();$('#detail').close();document.body.classList.remove('modal-open');current=null;}});
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)&&!$('#detail').open){e.preventDefault();$('#search').focus();}});
 try{
- const response=await fetch('data.json?v=b4b76e9bdb82');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
+ const response=await fetch('data.json?v=db658b02e410');if(!response.ok)throw Error('Archivio non disponibile');data=await response.json();
  for(const item of data.items)if(item.kind==='project'||item.comparisonClip){
   item.resultImage=projectMedia(item.resultImage);
   item.resultVideo=projectMedia(item.resultVideo);
   item.comparisonClip=projectMedia(item.comparisonClip);
+  item.comparisonDetail=projectMedia(item.comparisonDetail);
  }
  byId=new Map(data.items.map(r=>[r.id,r]));
  $('#archive-count').textContent=`${data.stats.videos} video · ${data.stats.images} immagini · ${data.stats.tools} strumenti · ${data.stats.projects} progetti`;

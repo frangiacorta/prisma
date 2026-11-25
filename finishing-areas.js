@@ -1,4 +1,4 @@
-import {MAX_FINISH_REGIONS,MAX_BRUSH_POINTS,MAX_BRUSH_STROKES} from './finishing.js?v=b4b76e9bdb82';
+import {MAX_FINISH_REGIONS,MAX_BRUSH_POINTS,MAX_BRUSH_STROKES} from './finishing.js?v=db658b02e410';
 
 // Editor handles are DOM-only; exported pixels contain the effect, never its handles.
 export function mountFinishingAreas({board,getState,getTab,remember,mark,renderControls,toast}){

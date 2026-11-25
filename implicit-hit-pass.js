@@ -26,7 +26,7 @@ void main(){
  for(int step=0;step<int(uHitBudget.x);step++){
   if(t>end||layer>=uHitCount)break;
 #ifdef WEAVE_HIT_TAG
-  weaveSurface=vec3(0.);weaveFacing=0.;weaveContactShade=0.;
+  weaveSurface=vec3(0.);weaveFacing=0.;weaveContactShade=0.;weaveBudIndex=-1;weaveBudImpact=-1.;
   weaveEvaluateMaterial=mode==3;
 #endif
   float distance=field(samplePoint);
@@ -87,6 +87,12 @@ void main(){
     // normal coordinate. The remaining material coordinates stay intact.
     if(weaveFacing>.002)oct.x=2.+floor((oct.x*.5+.5)*65535.+.5)+65536.*floor(254.*clamp(weaveFacing,0.,1.)+.5);
     if(weaveContactShade>.002)oct.y=2.+floor((oct.y*.5+.5)*65535.+.5)+65536.*floor(254.*clamp(weaveContactShade,0.,1.)+.5);
+    // On a fruit, retain its identity and projected core offset alongside
+    // a 10-bit normal. Their combined integer is exactly representable.
+    if(weaveBudIndex>=0&&weaveSurface.x>=12.){
+     float impact=weaveBudImpact<0.?511.:floor(clamp(weaveBudImpact/1.35,0.,1.)*510.+.5);
+     oct.y=-2.-floor((oct.y*.5+.5)*1023.+.5)-1024.*(impact+512.*float(weaveBudIndex));
+    }
     hits[layer]=vec4(oct,packed,hitT);
 #else
     hits[layer]=vec4(entryNormal,hitT);

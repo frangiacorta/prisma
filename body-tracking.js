@@ -1,5 +1,5 @@
-import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=b4b76e9bdb82';
-import {BodyCamera} from './body-camera.js?v=b4b76e9bdb82';
+import {BODY_META,BODY_LABELS,normalizeBodyTracking,BodyTrackingState,bodyPreviewState} from './body-tracking-model.js?v=db658b02e410';
+import {BodyCamera} from './body-camera.js?v=db658b02e410';
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function mountBodyTracking({board,getState,remember,mark,renderControls,showTab,toast,invalidate}){
  const runtime=new BodyTrackingState(),overlay=document.createElement('div');
