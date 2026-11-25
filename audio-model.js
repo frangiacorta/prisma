@@ -1,5 +1,5 @@
-import {WEAVE_TRACKS} from './structure-model.js?v=3b2269386819';
-import {META} from './model.js?v=3b2269386819';
+import {WEAVE_TRACKS} from './structure-model.js?v=01db4603d134';
+import {META} from './model.js?v=01db4603d134';
 
 export const AUDIO_BANDS = {all:'Volume',low:'Bassi',mid:'Medi',high:'Alti',peak:'Picchi',onset:'Impulsi',brightness:'Brillantezza',texture:'Rumorosità',beat:'Ritmo'};
 export const AUDIO_META = {

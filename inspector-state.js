@@ -1,8 +1,8 @@
-import {structureSupport} from './structure-support.js?v=3b2269386819';
-import {controlCondition,conditionActivation} from './control-help.js?v=3b2269386819';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=3b2269386819';
-import {syncMaterialControl} from './studio-model.js?v=3b2269386819';
-import {hasMotionPoints} from './motion-keyframes.js?v=3b2269386819';
+import {structureSupport} from './structure-support.js?v=01db4603d134';
+import {controlCondition,conditionActivation} from './control-help.js?v=01db4603d134';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=01db4603d134';
+import {syncMaterialControl} from './studio-model.js?v=01db4603d134';
+import {hasMotionPoints} from './motion-keyframes.js?v=01db4603d134';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
 export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','veilAmount','structWeaveCradle','structWeaveNodes','structWeaveMembrane','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pCloudCore','pCloudHalo','pCellAmount','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];

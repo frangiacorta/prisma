@@ -1,12 +1,12 @@
 // Sample the same local distance field the surface uses, before the camera
 // transform. Sampling is deterministic at any phase, including export seeks.
-import {BASE_FORM_GLSL} from './base-forms.js?v=3b2269386819';
+import {BASE_FORM_GLSL} from './base-forms.js?v=01db4603d134';
 
 export const bodyFieldGLSL = `
 uniform highp sampler2D uField;
 uniform vec4 uAtlas;
 uniform vec3 uMin,uMax;
-uniform vec2 uWarp;
+uniform vec2 uFieldWarp;
 uniform float uFloat,uPrimitive,uDeferred,uCavity;
 ${BASE_FORM_GLSL}
 vec2 sliceAt(vec2 xy,float z){
@@ -17,7 +17,7 @@ vec2 sliceAt(vec2 xy,float z){
 }
 float outerDistance(vec3 p){
  if(uPrimitive>.5)return baseFormField(p);
- if(any(notEqual(uWarp,vec2(0.)))){float a=uWarp.x*p.y*.7+uWarp.y;p.xz=mat2(cos(a),-sin(a),sin(a),cos(a))*p.xz;}
+ if(any(notEqual(uFieldWarp,vec2(0.)))){float a=uFieldWarp.x*p.y*.7+uFieldWarp.y;p.xz=mat2(cos(a),-sin(a),sin(a),cos(a))*p.xz;}
  vec3 clamped=clamp(p,uMin,uMax);
  vec3 index=(clamped-uMin)/(uMax-uMin)*(uAtlas.x-1.);
  float slice=floor(index.z);
@@ -30,12 +30,12 @@ float distanceAt(vec3 p){
 }
 `;
 
-export function bindBodyField(gl,field,placeholder,loc){
- gl.activeTexture(gl.TEXTURE0);
+export function bindBodyField(gl,field,placeholder,loc,unit=0){
+ gl.activeTexture(gl.TEXTURE0+unit);
  gl.bindTexture(gl.TEXTURE_2D,field?.texture||placeholder);
- gl.uniform1i(loc('uField'),0);
+ gl.uniform1i(loc('uField'),unit);
  gl.uniform3fv(loc('uMin'),field?.lo||[-1,-1,-1]);gl.uniform3fv(loc('uMax'),field?.hi||[1,1,1]);
- gl.uniform4fv(loc('uAtlas'),field?.atlas||[1,1,1,1]);gl.uniform2fv(loc('uWarp'),field?.warp||[0,0]);
+ gl.uniform4fv(loc('uAtlas'),field?.atlas||[1,1,1,1]);gl.uniform2fv(loc('uFieldWarp'),field?.warp||[0,0]);
  gl.uniform1f(loc('uFloat'),+!!field?.float);gl.uniform1f(loc('uPrimitive'),field?.sphere||field?.primitive?1:0);
  gl.uniform1f(loc('uBaseForm'),field?.form||0);gl.uniform1f(loc('uDeferred'),+!!field?.deferred);
  gl.uniform1f(loc('uCavity'),field?.inner||0);

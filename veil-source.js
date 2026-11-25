@@ -1,13 +1,13 @@
-import {prepareFieldQuery,geometryRadius} from './solid-renderer.js?v=3b2269386819';
-import {extractVeilSurface} from './veil-surface.js?v=3b2269386819';
-import {makeVeilMesh,veilPoint} from './veil-geometry.js?v=3b2269386819';
+import {prepareFieldQuery,geometryRadius} from './solid-renderer.js?v=01db4603d134';
+import {extractVeilSurface} from './veil-surface.js?v=01db4603d134';
+import {makeVeilMesh,veilPoint} from './veil-geometry.js?v=01db4603d134';
 // A regular sheet atlas receives the full source surface during opening.
 // The atlas alone retains the outer profile at the completely open endpoint.
-import {STRUCTURE_FIELD_KEYS} from './structure-model.js?v=3b2269386819';
-import {CELLULAR_FIELD_KEYS} from './cellular-form.js?v=3b2269386819';
-import {FRACTAL_KEYS} from './fractal-form.js?v=3b2269386819';
-import {GROWTH_GEOMETRY_KEYS} from './growth-material.js?v=3b2269386819';
-import {bindBodyField,bodyFieldGLSL} from './body-samples.js?v=3b2269386819';
+import {STRUCTURE_FIELD_KEYS} from './structure-model.js?v=01db4603d134';
+import {CELLULAR_FIELD_KEYS} from './cellular-form.js?v=01db4603d134';
+import {FRACTAL_KEYS} from './fractal-form.js?v=01db4603d134';
+import {GROWTH_GEOMETRY_KEYS} from './growth-material.js?v=01db4603d134';
+import {bindBodyField,bodyFieldGLSL} from './body-samples.js?v=01db4603d134';
 export const VEIL_SOURCE_KEYS=['baseForm','forcePoints','forcePaths','bodyForces',...STRUCTURE_FIELD_KEYS,...CELLULAR_FIELD_KEYS,...FRACTAL_KEYS,...GROWTH_GEOMETRY_KEYS,'seed','renderVersion','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','rimRound','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','petalDirectionSpread','petalWeave','petalWeaveTurns','petalFlow','petalFlowPhase','petalOrbitPhase','petalCollision','petalSphereCollision','petalContactGap','petalContactStiffness','petalContactPasses','stemAmount','stemRadius','stemBend'];
 const TAU=Math.PI*2;
 const localState=s=>({...s,scale:1,volume:1,stretchX:1,stretchY:1,stretchZ:1,positionX:0,positionY:0,rotateX:0,rotateY:0,rotateZ:0});

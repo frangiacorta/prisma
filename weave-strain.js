@@ -1,4 +1,4 @@
-import profiles from './weave-strain-profiles.js?v=3b2269386819';
+import profiles from './weave-strain-profiles.js?v=01db4603d134';
 
 // Cubic deformation of the material coordinates on the near and far sides
 // of a growing tissue. The surface still lives on the underlying 3D form.

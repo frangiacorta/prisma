@@ -1,5 +1,6 @@
-import {livingAttachmentGLSL,livingOcclusionGLSL} from './living-composition.js?v=3b2269386819';
-import {surfaceWebGraph,surfaceWebWeights} from './surface-web-model.js?v=3b2269386819';
+import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=01db4603d134';
+import {livingAttachmentGLSL,livingOcclusionGLSL} from './living-composition.js?v=01db4603d134';
+import {surfaceWebGraph,surfaceWebWeights} from './surface-web-model.js?v=01db4603d134';
 
 // Three fibres meet on one actual surface patch. Sampling the same stable
 // anchor IDs for membranes, stalks and fruit keeps the junctions sewn in motion.
@@ -22,9 +23,48 @@ void main(){
  point=vec4(p,valid?1.:0.);pigment=vec4(particleColor(aSeed,p),aSeed.w);
  gl_Position=vec4(0.,0.,0.,1.);
 }`;
-const vertex=common=>`#version 300 es
+// Project only samples that enter the supporting body. The net may bridge
+// empty space (including a hole) and its stitches keep their authored lift.
+const supportField=bodyFieldGLSL+`
+uniform float uWebContact;
+vec3 webLocal(vec3 world){
+ vec3 q=(dynamicsInverse(world)-vec3(uFrame.yz,0.))/uFrame.x;
+ q.xy=rot(uRotation.z)*q.xy;q.xz=rot(uRotation.y)*q.xz;q.yz=rot(uRotation.x)*q.yz;
+ return q/vec3(uForm.xy,max(.06,uForm.z*uForm.w));
+}
+`;
+const contactVertex=`
+vec3 outsideSupport(vec3 world){
+ if(uWebContact==0.)return world;
+ vec3 q=webLocal(world);
+ // Unchanged arches avoid any projection work beyond this first lookup.
+ float d=distanceAt(q);
+ if(d>=0.)return world;
+ if(uPrimitive>.5&&uCavity<=0.){
+  // For convex primitives, a ray from the centre gives a continuous path
+  // around a sharp edge. Nearest-face projection would jump between faces.
+  vec3 outward=normalize(q+vec3(.000001));
+  q+=outward*(.002-d)/max(.04,dot(baseFormGradient(q),outward));
+ }else{
+  float h=clamp(length(uMax-uMin)/max(12.,uAtlas.x)*.18,.001,.015);
+  vec2 e=vec2(h,0.);
+  for(int step=0;step<4;step++){
+   vec3 gradient=vec3(distanceAt(q+e.xyy)-distanceAt(q-e.xyy),
+                      distanceAt(q+e.yxy)-distanceAt(q-e.yxy),
+                      distanceAt(q+e.yyx)-distanceAt(q-e.yyx))/(2.*h);
+   float length2=dot(gradient,gradient);
+   if(length2<.0001)break;
+   q+=gradient*min(.32/sqrt(length2),(.002-d)/length2);
+   d=distanceAt(q);if(d>=-.0002)break;
+  }
+ }
+ return dynamicsForward(studioTransform(q));
+}
+`;
+const vertex=(common,body)=>`#version 300 es
 precision highp float;precision highp int;precision highp sampler2D;
 ${common}
+${body?supportField+contactVertex:'vec3 outsideSupport(vec3 p){return p;}'}
 layout(location=0) in vec4 aIds;layout(location=1) in vec3 aCoord;
 uniform sampler2D uAnchors;uniform vec4 uNet,uYarn,uStalk,uBranch,uBend,uGerm;
 uniform vec3 uRear;uniform float uSceneTime,uVeilCamera,uBranching;uniform int uDrawKind;
@@ -96,6 +136,7 @@ void main(){
    vPosition+=a.side*len*3.*t*q*(q*uBend.z-t*uBend.w);
    tangent+=a.side*len*3.*(q*(1.-3.*t)*uBend.z+t*(3.*t-2.)*uBend.w);
   }
+  if(t>0.&&t<1.)vPosition=outsideSupport(vPosition);
   vec4 clip=webProject(vPosition);vec2 screen=(webProject(vPosition+tangent*.01).xy-clip.xy)*uResolution;
   vec2 normal=normalize(vec2(-screen.y,screen.x)+vec2(.000001));
   float width=uNet.w*scale*(stalk?.45:.10)*(.35+1.75*uYarn.y)*abs(webProject(vPosition+vec3(1,0,0)).x-clip.x)*uResolution.x;
@@ -115,13 +156,15 @@ void main(){
  float sag=(.21+.16*uBend.x-.09*uYarn.w+.09*uBend.y*sin(uSceneTime+a.seed*TAU));
  vPosition+=outward*span*sag*(1.-dot(weights,weights));
  vPosition+=normalize(cross(b.tip-a.tip,outward)+vec3(.00001))*span*.25*uRear.z*pocket;
+ if(max(weights.x,max(weights.y,weights.z))<1.)vPosition=outsideSupport(vPosition);
  vDye=a.dye*weights.x+b.dye*weights.y+c.dye*weights.z;vSeed=fract(a.seed+b.seed*.43+c.seed*.27);
  vCoverage=presence*(1.-uBranch.x)*(1.-.18*pocket);gl_Position=webProject(vPosition);
 }`;
-const fragment=common=>`#version 300 es
+const fragment=(common,body)=>`#version 300 es
 precision highp float;precision highp int;
 ${common}
 ${livingOcclusionGLSL}
+${body?supportField:''}
 uniform int uDrawKind;uniform vec4 uNet,uYarn,uStalk,uBranch,uGerm;
 in vec3 vPosition,vDye,vNormal,vBary;in vec2 vBall;in float vSeed,vCoverage,vGrowth,vPixel,vRadius;out vec4 color;
 float filament(float phase,float width){
@@ -131,6 +174,9 @@ float filament(float phase,float width){
 void main(){
  float alpha=vCoverage;vec3 n=normalize(vNormal),light;float depth=vPosition.z;
  if(alpha<=0.||dynamicsBarrier(vPosition)>.0001)discard;
+ // The rasterizer interpolates between projected vertices. Clip residual
+ // crossings at sharp creases, including interior walls of cut-out solids.
+ ${body?'if(uWebContact>.5&&uDrawKind!=1&&distanceAt(webLocal(vPosition))<-.004)discard;':''}
  if(uDrawKind==1){
   float radius=length(vBall),extent=fiberGrainExtent()*fiberGrowthWeight(vGrowth);
   float z=sqrt(max(.0001,1.-min(1.,radius*radius)));
@@ -210,7 +256,8 @@ export class SurfaceWeb{
  constructor(owner,common){
   this.owner=owner;const gl=this.gl=owner.gl;
   this.capture=owner.program(capture(common),emptyFragment,['point','pigment']);
-  this.render=owner.program(vertex(common),fragment(common),null,true);
+  this.bodyProjection=!!owner.featureVariant?.body;
+  this.render=owner.program(vertex(common,this.bodyProjection),fragment(common,this.bodyProjection),null,true);
   this.feedback=gl.createTransformFeedback();this.positions=gl.createBuffer();
   this.texture=gl.createTexture();this.captureVAO=gl.createVertexArray();this.veilBuffer=gl.createBuffer();
   this.meshes=[patchCoordinates(),quad,ribbon].map(coords=>{
@@ -299,6 +346,11 @@ export class SurfaceWeb{
   }
   this.sample(s,phase,false);
   const p=this.render;o.settings(p,s,phase);o.tex(p,'uAnchors',this.texture,3);
+  if(this.bodyProjection){
+   const field=attached&&!s.pLiving&&!(s.grainDispersal>0)?o.studioLayer.field:null;
+   if(field)bindBodyField(gl,field,o.seedTexture,key=>o.loc(p,key),2);
+   o.u(p,'uWebContact',field?1:0);
+  }
   const radius=.057*Math.pow(118/n,.38);
   o.u(p,'uNet',web,nodes,sheet,radius);
   o.u(p,'uBranching',s.structWeaveBranching||0);
