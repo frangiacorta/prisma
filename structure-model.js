@@ -1,8 +1,8 @@
-import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=e537543adb5a';
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=e537543adb5a';
-import {WEAVE_NETWORK_GLSL,weaveNetworkField} from './weave-network.js?v=e537543adb5a';
-import {junctionUniforms} from './weave-junction.js?v=e537543adb5a';
-import {hasMotionPoints} from './motion-keyframes.js?v=e537543adb5a';
+import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=15c42a1bace2';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=15c42a1bace2';
+import {WEAVE_NETWORK_GLSL,weaveNetworkField} from './weave-network.js?v=15c42a1bace2';
+import {junctionUniforms} from './weave-junction.js?v=15c42a1bace2';
+import {hasMotionPoints} from './motion-keyframes.js?v=15c42a1bace2';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,

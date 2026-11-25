@@ -14771,7 +14771,7 @@
       "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "I noduli poggiano su fibre semitrasparenti. Quando gli steli si allungano, la maglia si tende fra i punti di attacco. Le estremità si aprono in coppe.",
+      "summary": "Le palline si raccolgono nella forcella. La seta aderisce al bordo dei noduli e lascia passare la luce negli interstizi. Gli steli si aprono a ventaglio e le estremità diventano coppe.",
       "sources": [
         "https://frangiacorta.github.io/prisma/previews/tessuto-connesso.html"
       ],
@@ -14838,7 +14838,7 @@
       "result": "reticolo-giunzioni",
       "where": "Forma → Costruzione → Reticolo di fibre · Materiale → Ottica del reticolo · Movimento → Struttura",
       "platform": "",
-      "next": "Confrontare la traiettoria delle punte durante la risalita e la densità delle microfibre attorno ai noduli a riposo.",
+      "next": "Avvicinare l’inclinazione dei ponti posteriori e la velocità locale durante il rientro degli steli.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -14876,7 +14876,7 @@
         "Fedeltà alle reference e fluidità su telefono fisico da verificare con l’utente."
       ],
       "integration": "Proprietà combinabili sulla forma corrente; nessun selettore esclusivo di membrane, tessuti o veli in Forme.",
-      "resultVersion": "104",
+      "resultVersion": "105",
       "evidence": "reports/structure/source.json; reports/structure/source-ui.json; reports/structure/export.json",
       "checks": [
         "26 controlli con impatto sui pixel",
@@ -14911,7 +14911,7 @@
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/reticolo-giunzioni.prisma.json",
-      "compareNote": "Nel risultato Prisma i primi 12 secondi mostrano le palline che sollevano la maglia e ricadono nella biforcazione. Il video affiancato copre il tratto da 7,84 a 17,84 secondi. Il percorso di alcune punte e la densità delle microfibre differiscono ancora dalla reference.",
+      "compareNote": "Nei primi 12 secondi i germogli si aprono a ventaglio da uno stelo comune. Le palline tendono le fibre e tornano nella maglia. Il confronto pubblico affianca i secondi 7,84–17,84. Alcuni rami di fondo e le traiettorie delle fibre si distinguono ancora dalla reference.",
       "comparisonRef": "s07-05",
       "comparisonDate": "2026-11-25",
       "comparisonOutcome": "parziale",

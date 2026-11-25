@@ -1,9 +1,9 @@
-import {FIGURE_SCALE} from './base-forms.js?v=e537543adb5a';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META} from './structure-model.js?v=e537543adb5a';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META} from './cellular-form.js?v=e537543adb5a';
-import {FRACTAL_DEFAULTS,FRACTAL_META} from './fractal-form.js?v=e537543adb5a';
-import {PARTICLE_DEFAULTS,PARTICLE_META} from './particle-model.js?v=e537543adb5a';
-import {hasMotionPoints,normalizeMotionPoints} from './motion-keyframes.js?v=e537543adb5a';
+import {FIGURE_SCALE} from './base-forms.js?v=15c42a1bace2';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META} from './structure-model.js?v=15c42a1bace2';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META} from './cellular-form.js?v=15c42a1bace2';
+import {FRACTAL_DEFAULTS,FRACTAL_META} from './fractal-form.js?v=15c42a1bace2';
+import {PARTICLE_DEFAULTS,PARTICLE_META} from './particle-model.js?v=15c42a1bace2';
+import {hasMotionPoints,normalizeMotionPoints} from './motion-keyframes.js?v=15c42a1bace2';
 
 export const BODY_LAYER_META = {
  sceneGrains:['Superficie ↔ granelli',0,1,.001],

@@ -1,16 +1,16 @@
-import {ImplicitRayStatus} from './implicit-ray-status.js?v=e537543adb5a';
-import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=e537543adb5a';
-import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=e537543adb5a';
-import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=e537543adb5a';
-import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=e537543adb5a';
-import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=e537543adb5a';
-import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=e537543adb5a';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=e537543adb5a';
-import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=e537543adb5a';
-import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=e537543adb5a';
-import {META} from './model.js?v=e537543adb5a';
-import {hasMotionPoints,isMotionAngle,motionPointOffset,motionPointValue} from './motion-keyframes.js?v=e537543adb5a';
-import {motionPeriod} from './animation-clock.js?v=e537543adb5a';
+import {ImplicitRayStatus} from './implicit-ray-status.js?v=15c42a1bace2';
+import {INDEPENDENT_FAN_HIT_MAIN,INDEPENDENT_FAN_ACCUMULATE_MAIN,independentFanGeometry,independentFanMaterialPoint} from './implicit-fan-geometry.js?v=15c42a1bace2';
+import {GROWTH_GLSL,GROWTH_GEOMETRY_KEYS,growthGeometryEnabled,growthFieldAt,growthNormalOffset,prepareGrowth,prepareGrowthAsync,bindGrowth,disposeGrowth} from './growth-material.js?v=15c42a1bace2';
+import {IMPLICIT_SURFACE_UNIFORMS,IMPLICIT_SURFACE_MAIN,IMPLICIT_ACCUMULATE_MAIN} from './implicit-surface-pass.js?v=15c42a1bace2';
+import {ImplicitHitPass,IMPLICIT_HIT_MAIN,FRACTAL_HIT_MAIN} from './implicit-hit-pass.js?v=15c42a1bace2';
+import {hasSolidForces,solidForceSlope,solidForceMap,withSolidForces,uploadSolidForces} from './solid-forces.js?v=15c42a1bace2';
+import {baseFormField,baseFormUniforms,BASE_FORM_GLSL,FIGURE_SCALE} from './base-forms.js?v=15c42a1bace2';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META,STRUCTURE_GLSL,hasStructure,structureMayChange,structureBounds,structureUniforms,structureWarp,structureField,loopBlend} from './structure-model.js?v=15c42a1bace2';
+import {CELLULAR_FIELD_KEYS,CELLULAR_GLSL,CELLULAR_META,CELLULAR_PHASES,cellularBounds,cellularField,cellularMayChange,uploadCellular} from './cellular-form.js?v=15c42a1bace2';
+import {FRACTAL_GLSL,FRACTAL_KEYS,FRACTAL_META,fractalBounds,fractalField,uploadFractal} from './fractal-form.js?v=15c42a1bace2';
+import {META} from './model.js?v=15c42a1bace2';
+import {hasMotionPoints,isMotionAngle,motionPointOffset,motionPointValue} from './motion-keyframes.js?v=15c42a1bace2';
+import {motionPeriod} from './animation-clock.js?v=15c42a1bace2';
 // This module is intentionally self-contained: exported HTML wallpapers run offline.
 // Shared procedural coating; reuses Prisma's spectral thin-film reflection below.
 // Periodic 3D domain warp changes optical thickness, never screen-space pigment.
@@ -785,7 +785,7 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  float fibreWeight=0.,fibreDensity=1.;vec3 fibreTangent=vec3(0.,1.,0.);
  float branches=0.,weaveTip=0.,weaveThroat=0.,weaveRelease=0.,weaveStriae=0.,weaveSpeckle=0.;
  float cupDiffusion=0.,cupSeed=0.,cupHeight=0.,weaveDepth=1.,tissue=0.,tissueFilm=0.,tissueFibre=0.,tissuePulp=0.,cupGlow=0.,wallCloud=0.;
- float youngTissue=0.,silkGap=0.,silkDensity=0.;
+ float youngTissue=0.,silkGap=0.,silkDensity=0.,silkRelief=0.,loadedWeb=0.,carrierLight=0.;
  #if defined(WEAVE_DETAIL) && !defined(WEAVE_BANDS_ONLY)
  branches=uWeaveNetwork.x*uStructureA.x*uStructureA.z*uStructureA.w;
  #endif
@@ -930,12 +930,41 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
    silkGap=max(smoothstep(.007,.069,support),suspended)*(1.-weaveTip);
    // A germinating stalk takes up the load carried by silk at rest.
    silkGap*=1.-.90*uWeaveGrowth.x*(1.-bareWeb);
-   silkGap=mix(silkGap,weaveLitTip.y,load);
+   float supportGap=weaveLitTip.y;
+   // The thin binder stops being opaque immediately outside the nodule.
+   // Use its actual distance to the support to soften the sewn attachment.
+   float freeSpan=mix(supportGap,sqrt(max(0.,supportGap)),bareWeb);
+   silkGap=mix(silkGap,freeSpan,load);
+   // The broad web is a sparse veil of crossing, unevenly loaded strands.
+   // Below one pixel integrate the high-frequency fibrils to their mean.
    float fineMesh=max(filigree,.72*crossed);
-   silkDensity=mix(.16,.025+.33*fineMesh+.12*fibrils+.073*coarse,uTexture.z);
+   // The web spans two ribs at their intersection. Farther along a single
+   // rib the same sheet lies against a solid support, even without buds.
+   float settled=1.-smoothstep(.12,.42,uWeaveGrowth.x);
+   float carrier=(1.-smoothstep(.034,.123,support))*smoothstep(.075,.255,max(abs(along),across));
+   carrierLight=settled*carrier*(1.-weaveTip)*smoothstep(-.26,.45,domain.z);
+   silkGap*=1.-settled*carrier*bareWeb;
+   loadedWeb=settled*bareWeb*(1.-carrier);
+   float fineLoad=mix(.28,fibrils,fibreAA);
+   float lock=.5+.5*sin(23.*chart.y+13.*chart.x+2.1*sin(14.*chart.x-21.*chart.y));
+   float fibreLoad=.57*fineMesh+.23*fineLoad+.28*filigree*crossed;
+   silkDensity=mix(.16,.007+fibreLoad*(.27+.73*lock)+.037*coarse,uTexture.z);
    float gauze=bareWeb*smoothstep(.37,.388,weaveLitTip.z)*(1.-smoothstep(.452,.47,weaveLitTip.z));
    float loadDensity=clamp((weaveLitTip.z-.39)/.06,0.,1.);
-   silkDensity=mix(silkDensity,.025+loadDensity*(.13+.18*coarse+.34*fineMesh),gauze*uTexture.z);
+   silkDensity=mix(silkDensity,.013+loadDensity*(.042+.13*coarse+.62*fibreLoad),gauze*uTexture.z);
+   // Physical sling fibres and loose ends have a real cross section. Let
+   // their illuminated cores read against the holes between neighbouring
+   // strands, even when the much thinner film sharing the node is clear.
+   float loose=bareWeb*smoothstep(.65,.71,weaveLitTip.z)*(1.-smoothstep(.76,.82,weaveLitTip.z));
+   float cord=bareWeb*smoothstep(.84,.91,weaveLitTip.z);
+   float catchLight=smoothstep(.54,.86,.48*coarse+.30*fineLoad+.22*lock);
+   silkDensity=mix(silkDensity,.17+.18*coarse+.27*catchLight,cord*uTexture.z);
+   silkDensity=mix(silkDensity,.017+.045*coarse+.30*catchLight,loose*uTexture.z);
+   silkGap=mix(silkGap,max(silkGap,.97*loose),load);
+   // Crossed fibres also leave relief in the opaque part of the sheet.
+   // The stretched stem and the centre of each bud keep a smooth surface.
+   silkRelief=(fibreLoad-.34)*uTexture.z*(1.-weaveTip)
+      *bareWeb*freeSpan*(1.-max(cord,loose))*(.25+.75*(1.-smoothstep(.20,.79,uWeaveGrowth.x)));
    float pore=tissuePore(chart,abs(along),across);
    float bundle=1.-smoothstep(-.006,.006,pore);
    tissuePulp=mix(.21,.44+.56*bundle,weaveLitTip.y)*(.21+.79*tissueFibre);
@@ -1027,7 +1056,12 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
   diffuse*=1.+tissueFilm*(.17+.48*tissueFibre);
  }
  if(youngTissue>0.){
-  float depth=mix(2.48,.17+.92*silkDensity,silkGap);
+  float silkPath=inversesqrt(.33+.67*facing*facing);
+  float depth=mix(2.48,(.065+1.05*silkDensity)*silkPath,silkGap);
+  // A resting veil can lie close to several beads without becoming solid.
+  // Its own fibre coverage governs the light passed to deeper intersections.
+  float webDepth=(.048+.36*silkDensity+.60*smoothstep(.34,.67,silkDensity))*silkPath;
+  depth=mix(depth,webDepth,loadedWeb);
   transmission=mix(transmission,pow(clamp(uMat.x,0.,1.),depth),youngTissue);
  }
  #endif
@@ -1164,13 +1198,22 @@ MODERN_FRAG=shaderFunction(MODERN_FRAG,'shade',`vec4 shade(vec3 p,vec3 geometric
  if(youngTissue>0.){
   vec3 key=uLightCount>0?normalize(uLights[0].xyz-p):normalize(vec3(-1.,1.,1.));
   float lambert=clamp(.5+.5*dot(geometricNormal,key),0.,1.);
-  float wrap=.17+.83*lambert*lambert;
-  vec3 scatter=mix(base,uInternalColor,.21)*(.32*diffuseLight+.59*cupLight*wrap);
-  // Light scattered back through a rounded nodule gives the front seeds
-  // a broad highlight while the younger, buried ones stay in shadow.
-  scatter+=base*cupLight*weaveTip*(.035+.23*lambert*lambert)*(.25+.75*uTexture.z);
-  vec3 threads=mix(base,uInternalColor,.18)*cupLight*(.48+1.06*silkDensity);
+  // Broad diffuse return from below the skin lifts the silhouette of the
+  // milky buds. Surface texture and volume scattering remain independent.
+  float scatterDepth=1.-exp(-3.*(uInterior.w+uInterior.z));
+  float wrap=mix(.24+.76*lambert*lambert,.52+.48*lambert,scatterDepth);
+  vec3 pulp=mix(base,uInternalColor,.21);
+  vec3 scatter=pulp*(.31*diffuseLight+.67*cupLight*wrap)*(1.+.53*silkRelief);
+  scatter*=1.+1.2*carrierLight*scatterDepth;
+  float budLight=.031+.16*lambert*lambert+.09*scatterDepth;
+  scatter+=base*cupLight*weaveTip*(budLight+.12*uWeaveDetail.w*scatterDepth)*(.25+.75*uTexture.z);
+  vec3 threads=mix(base,uInternalColor,.18)*cupLight*(.48+.95*silkDensity);
   vec3 slender=(mix(scatter,threads,silkGap)+specular*(.008+.033*wetRim)*uSurface.z)*(1.-transmission)+glass.rgb*transmission;
+  // Where a film and its support share a surface, light returning from that
+  // contact softens the edge; clear openings still transmit the layers behind.
+  float backing=1.-smoothstep(.021,.20,weaveLitTip.y);
+  vec3 webLight=threads*(1.-transmission)+mix(glass.rgb,scatter,backing*.55)*transmission;
+  slender=mix(slender,webLight,loadedWeb);
   below=mix(below,slender,youngTissue*(1.-.32*uMat.z));
  }
  #endif

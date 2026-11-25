@@ -6,7 +6,7 @@ import { newCreation, normalizeCreation } from '../creative-model.js';
 import { sampleFrame } from '../solid-renderer.js';
 import { presetDocument, readPreset } from '../preset-files.js';
 import { structureField, STRUCTURE_DEFAULTS } from '../structure-model.js';
-import { slingPose } from '../weave-sling.js';
+import { slingDistance, slingPose } from '../weave-sling.js';
 
 const source=existsSync('web/studio/index.html')?'web/studio':'.';
 const path='/previews/reticolo-giunzioni.prisma.json';
@@ -30,6 +30,23 @@ assert.deepEqual(stretched.slice(0,3),pouch.slice(0,3));
 assert(Math.abs((stretched[4]-pouch[4])-.63)<1e-6);
 assert.equal(stretched[5],pouch[5]);
 assert.equal(stretched[6],pouch[6]);
+// Once the available silk runs out, a long span must open while its
+// attachment on the nodule remains sewn. Check the actual field on the face.
+assert(stretched[7]>pouch[7]);
+const gauze=new Float32Array([0,0,0,0,.8,0,0,0,0,.4,0,1]);
+function thinnestDistance(face,x0,x1,y0,y1){
+ let closest=Infinity;
+ for(let j=0;j<=12;j++)for(let i=0;i<=30;i++){
+  const x=x0+(x1-x0)*i/30,y=y0+(y1-y0)*j/12;
+  closest=Math.min(closest,slingDistance(x,y,0,face,0,1.7,1));
+ }
+ return closest;
+}
+const sewn=thinnestDistance(gauze,.005,.032,.002,.022);
+assert(sewn<0&&thinnestDistance(gauze,.31,.46,.034,.10)<0);
+gauze[7]=1;
+assert.equal(thinnestDistance(gauze,.005,.032,.002,.022),sewn);
+assert(thinnestDistance(gauze,.31,.46,.034,.10)>.01);
 const dormant={...original,...STRUCTURE_DEFAULTS,structWeaveBranching:1};
 const opticsAt=at(24);
 for(const point of [[0,0,0],[1,0,0],[0,1.2,.86]]){
@@ -212,6 +229,17 @@ try{
   const state=project?.state;
   return Math.abs((state?.structWeaveRelease||0)+(state?.motions?.structWeaveRelease?.points?.[0]?.offset||0)-.17)<.00001;
  });
+ const durations=await page.evaluate(async()=>{
+  const duration=name=>new Promise((resolve,reject)=>{
+   const v=document.createElement('video');
+   const timeout=setTimeout(()=>reject(Error('Preview metadata timed out: '+name)),15000);
+   v.onloadedmetadata=()=>{clearTimeout(timeout);resolve(v.duration);};
+   v.onerror=()=>{clearTimeout(timeout);reject(Error('Unreadable preview: '+name));};
+   v.preload='metadata';v.src='/previews/'+name+'.mp4';
+  });
+  return Promise.all(['reticolo-apertura','reticolo-giunzioni'].map(duration));
+ });
+ assert.deepEqual(durations,[12,30]);
  assert.deepEqual(errors,[]);
  console.log(JSON.stringify(report,null,2));
 }finally{await browser.close();}

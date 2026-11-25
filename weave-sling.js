@@ -44,11 +44,17 @@ export function slingPose(ends,rank,phase,flex,lag,growth,amount){
    C[1]=midY+(side>0?.064:-.049)*(1-.55*growth);
    C[0]=spine(C[1]);C[2]=.010*Math.cos(Math.PI*C[1]/1.65);
   }
+  // A finite veil of silk is carried at each insertion. The longest span
+  // takes up that reserve first. Below the natural span both hems stay sewn.
+  const freeLength=Math.max(span,Math.hypot(C[0]-A[0],C[1]-A[1],C[2]-A[2]),Math.hypot(C[0]-B[0],C[1]-B[1],C[2]-B[2]));
+  const reserve=.30+1.25*(ends[ai+3]+ends[bi+3]);
+  const pull=Math.max(0,Math.min(1,(freeLength-reserve)/.25));
+  const runout=pull*pull*(3-2*pull);
   for(let k=0;k<3;k++){B[k]=mix(A[k],B[k],unfold);C[k]=mix(A[k],C[k],unfold);}
   for(const q of [A,B,C]){
    lo[0]=Math.min(lo[0],q[0]);lo[1]=Math.min(lo[1],q[1]);hi[0]=Math.max(hi[0],q[0]);hi[1]=Math.max(hi[1],q[1]);
   }
-  vertices.push(...A,slack*unfold,...B,i*.633,...C,(1-.36*growth)*unfold);
+  vertices.push(...A,slack*unfold,...B,runout,...C,(1-.36*growth)*unfold);
  }
  return {vertices:new Float32Array(vertices),bounds:[...lo,...hi]};
 }
@@ -69,20 +75,33 @@ export function slingDistance(x,y,z,v,i,finesse,web){
  const hu=area/Math.max(.001,Math.sqrt(cc)),ht=area/Math.max(.001,Math.sqrt(bb)),ha=area/Math.max(.001,Math.hypot(bx-cx,by-cy,bz-cz));
  const edge=Math.max((-u+.23*t*a)*hu,(-t+.12*u*a)*ht,(-a+.20*t*u)*ha);
  if(edge>.012)return edge;
- const sag=slack*Math.max(0,27*a*u*t),plane=(px*nx+py*ny+pz*nz)/area+(nz<0?-1:1)*sag;
- const bend=a*t*(.48+.22*Math.sin(6*u+v[o+7]));
+ // A hanging sheet cups more deeply on the unloaded side. The deflection
+ // and its fine folds vanish at every seam, including when two beads meet.
+ const phase=i*.633;
+ const belly=Math.max(0,27*a*u*t),skew=.81+.26*Math.sin(5*u-3*t+phase);
+ const sag=slack*belly*skew,plane=(px*nx+py*ny+pz*nz)/area+(nz<0?-1:1)*sag;
+ const bend=a*t*(.48+.22*Math.sin(6*u+phase));
  // Filaments are sewn at rest. Stretching changes the weave spacing, never
  // the number of strands already holding a bead.
  const m=(5.1+2.4*Math.cos(i*2.31))*finesse,n=(8.3+3.6*Math.sin(i*1.87))*finesse;
- const wave=Math.sin(14*u+3*t+v[o+7])+Math.sin(7*u-13*t);
+ const wave=Math.sin(14*u+3*t+phase)+Math.sin(7*u-13*t);
  const fan=Math.max(.19,.25+u+t);
- const g=(u/fan+bend+.17*a*t*wave)*n,h=(t+.28*u*a+.16*a*u*wave)*m;
- const gi=Math.round(g),hi=Math.round(h),f=Math.abs(g-gi-.26*Math.sin(gi*9.31+v[o+7]))*hu*fan/n;
- const cross=Math.abs(h-hi-.32*Math.sin(hi*7.81+1.17*v[o+7]+u*5))*ht/m;
- const diagonal=(g*.49+h*.66+.34*Math.sin(8*u+12*t+v[o+7]));
+ const tuck=belly*.035*Math.sin(11*u+5*t+phase);
+ const g=(u/fan+bend+.17*a*t*wave+tuck)*n,h=(t+.28*u*a+.16*a*u*wave-.69*tuck)*m;
+ const gi=Math.round(g),hi=Math.round(h),f=Math.abs(g-gi-.26*Math.sin(gi*9.31+phase))*hu*fan/n;
+ const cross=Math.abs(h-hi-.32*Math.sin(hi*7.81+1.17*phase+u*5))*ht/m;
+ const diagonal=(g*.49+h*.66+.34*Math.sin(8*u+12*t+phase));
  const diagonalGap=Math.abs(diagonal-Math.round(diagonal))*Math.min(hu/n,ht/m);
- const width=.00074+.00125*web,thread=Math.min(f,cross*1.42,diagonalGap*1.94,-edge*.76);
- return Math.max(edge-.0015,Math.hypot(thread,plane*.75)-width*v[o+11]);
+ // Paired fibres thicken along the load-bearing spokes. Oblique stitches
+ // taper between them, leaving irregular windows where the gauze is slack.
+ const vein=.5+.5*Math.sin(gi*4.31+phase);
+ const stitch=.5+.5*Math.sin(hi*3.1+phase+7*u);
+ const width=.00074+.00125*web,thread=Math.min(f/(.77+.42*vein),cross*1.42,diagonalGap*(1.35+2.4*stitch),-edge*.76);
+ // The free silk withdraws towards its three contacts under tension.
+ // Squared distance keeps a soft round cuff of fibres on each nodule.
+ const p2=px*px+py*py+pz*pz,d2=p2+Math.min(0,bb-2*pb,cc-2*pc);
+ const fade=Math.max(0,Math.min(1,(d2-.0025)/.031));
+ return Math.max(edge-.0015,Math.hypot(thread,plane*.75)-width*v[o+11]+.023*v[o+7]*fade*fade*(3-2*fade));
 }
 
 export const SLING_COUNT=faces;
@@ -100,18 +119,24 @@ float tissueSling(vec3 q,int i,float fine,float web){
  float hu=area/max(.001,sqrt(cc)),ht=area/max(.001,sqrt(bb)),ha=area/max(.001,length(b-c));
  float edge=max((-u+.23*t*a)*hu,max((-t+.12*u*a)*ht,(-a+.20*t*u)*ha));
  if(edge>.012)return edge;
- float sag=A.w*max(0.,27.*a*u*t),plane=dot(p,normal)/area+(normal.z<0.?-1.:1.)*sag;
- float bend=a*t*(.48+.22*sin(6.*u+B.w));
+ float phase=float(i)*.633;
+ float belly=max(0.,27.*a*u*t),skew=.81+.26*sin(5.*u-3.*t+phase);
+ float sag=A.w*belly*skew,plane=dot(p,normal)/area+(normal.z<0.?-1.:1.)*sag;
+ float bend=a*t*(.48+.22*sin(6.*u+phase));
  vec2 counts=vec2(8.3+3.6*sin(float(i)*1.87),5.1+2.4*cos(float(i)*2.31))*fine;
- float wave=sin(14.*u+3.*t+B.w)+sin(7.*u-13.*t);
+ float wave=sin(14.*u+3.*t+phase)+sin(7.*u-13.*t);
  float fan=max(.19,.25+u+t);
- vec2 cells=vec2(u/fan+bend+.17*a*t*wave,t+.28*u*a+.16*a*u*wave)*counts;
+ float tuck=belly*.035*sin(11.*u+5.*t+phase);
+ vec2 cells=vec2(u/fan+bend+.17*a*t*wave+tuck,t+.28*u*a+.16*a*u*wave-.69*tuck)*counts;
  vec2 site=floor(cells+.5);
- vec2 jitter=vec2(.26*sin(site.x*9.31+B.w),.32*sin(site.y*7.81+1.17*B.w+u*5.));
+ vec2 jitter=vec2(.26*sin(site.x*9.31+phase),.32*sin(site.y*7.81+1.17*phase+u*5.));
  vec2 lines=abs(cells-site-jitter)*vec2(hu*fan,ht)/counts;
- float diagonal=dot(cells,vec2(.49,.66))+.34*sin(8.*u+12.*t+B.w);
+ float diagonal=dot(cells,vec2(.49,.66))+.34*sin(8.*u+12.*t+phase);
  float diaGap=abs(diagonal-floor(diagonal+.5))*min(hu/counts.x,ht/counts.y);
- float thread=min(min(lines.x,lines.y*1.42),min(diaGap*1.94,-edge*.76));
- return max(edge-.0015,length(vec2(thread,plane*.75))-(.00074+.00125*web)*C.w);
+ float vein=.5+.5*sin(site.x*4.31+phase),stitch=.5+.5*sin(site.y*3.1+phase+7.*u);
+ float thread=min(min(lines.x/(.77+.42*vein),lines.y*1.42),min(diaGap*(1.35+2.4*stitch),-edge*.76));
+ float support2=dot(p,p)+min(0.,min(bb-2.*pb,cc-2.*pc));
+ float taper=.023*B.w*smoothstep(.0025,.0335,support2);
+ return max(edge-.0015,length(vec2(thread,plane*.75))-(.00074+.00125*web)*C.w+taper);
 }
 `;

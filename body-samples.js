@@ -1,6 +1,6 @@
 // Sample the same local distance field the surface uses, before the camera
 // transform. Sampling is deterministic at any phase, including export seeks.
-import {BASE_FORM_GLSL} from './base-forms.js?v=e537543adb5a';
+import {BASE_FORM_GLSL} from './base-forms.js?v=15c42a1bace2';
 
 export const bodyFieldGLSL = `
 uniform highp sampler2D uField;

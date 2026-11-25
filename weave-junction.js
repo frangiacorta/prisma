@@ -1,6 +1,6 @@
-import {slingPose,slingDistance,SLING_COUNT,SLING_GLSL} from './weave-sling.js?v=e537543adb5a';
-import whorlAnatomy from './weave-whorl.js?v=e537543adb5a';
-import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=e537543adb5a';
+import {slingPose,slingDistance,SLING_COUNT,SLING_GLSL} from './weave-sling.js?v=15c42a1bace2';
+import whorlAnatomy from './weave-whorl.js?v=15c42a1bace2';
+import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=15c42a1bace2';
 
 // Attachment coordinates on one repeat of the tissue. Each bud keeps its identity
 // as the transverse bridges withdraw and the same bud becomes a hollow calyx.
@@ -37,6 +37,12 @@ const elongation=[
 // Alternate axes of the lateral whorl. Long and short internodes share
 // one insertion, then fork at different heights along the maturing shoot.
 const whorl=[[-.54,.095],[-.39,.19],[-.17,.29],[.035,.24],[.21,.21],[.36,.15]];
+// Shoot, transverse position and height along the scalloped terminal rim.
+const crownBuds=[
+ [1,-.369,-.013],[2,-.171,-.013],[5,-.391,-.025],[6,.117,-.047],
+ [7,-.048,.011],[8,.165,-.027],[12,-.501,.009],[13,-.314,.014],
+ [14,-.109,-.002],[15,.134,-.03],[16,.292,-.025],[17,-.048,-.007]
+];
 
 const spine=(y,style)=>style*(-.164*Math.sin(y*TAU/pitch)-.081*(1-Math.cos(y*TAU/pitch)));
 const fibreStretch=s=>(s.structWeavePitch??1)*(1+.65*s.structDelay*smooth(.32,.79,s.structWeaveFront)*(1-smooth(.11,.56,s.structWeaveRelease)));
@@ -162,35 +168,66 @@ export function junctionPose(s){
   extent[2]=Math.max(extent[2],rootX+margin,tx+margin,controls[i*4]+margin);
   extent[3]=Math.max(extent[3],rootY+margin,ty+margin,controls[i*4+1]+margin);
  }
- // Apical elongation carries the upper whorl as a group. The basal beads
- // keep their insertion while the growing shoots narrow towards the tip.
- const apical=(s.structWeaveCradle||0)*(1-lift)*smooth(1.10,2.20,reach);
+ // A whorl first opens into a low fan. As its internode extends, the
+ // shoulder lifts the whole fan above the same stalk. Its side bud stays
+ // below the crown, attached to the stalk all the way through recoil.
+ const cradle=(s.structWeaveCradle||0)*(1-lift);
+ const apical=cradle*smooth(1.10,2.20,reach);
+ const shoulder=cradle*rank*flex*smooth(1.11,1.64,reach);
  if(apical>0){
-  const upper=[1,2,5,6,7,8,10,12,13,14,15,16,17];
-  const highest=Math.max(...upper.map(i=>ends[4*i+1]));
-  for(const i of upper){
+  const spread=s.structWeaveSpread;
+  const highest=Math.max(...crownBuds.map(([i])=>ends[4*i+1]));
+  const crown=shoulder*(1-smooth(1.94,2.18,reach));
+  const swept=rank*flex*cradle*smooth(.49,.86,growth)*smooth(1.10,1.14,reach)*(1-smooth(1.17,1.52,reach));
+  const extension=smooth(1.62,2.02,reach)*shoulder;
+  const overhang=-1.04*lagDrive*shoulder*smooth(1.76,2.12,reach);
+  const rebound=.11*extension*(1-smooth(.13,.22,growth));
+  for(const [i,offset,level] of crownBuds){
    const j=4*i,a=smooth(0,.79,apical)*(.85+.15*profile[j]),oldY=ends[j+1];
-   const rise=.62*smooth(.48,1,apical);
-   const tipY=mix(oldY,highest-.026+rise+.037*profile[j+3],a);
-   const tipX=spine(tipY,rank)+(ends[j]-spine(oldY,rank))*(1-.56*a);
+   const rise=.62*smooth(.48,1,apical)-.30*extension+rebound;
+   let tipY=mix(oldY,highest-.026+rise+.037*profile[j+3],a);
+   let tipX=spine(tipY,rank)+(ends[j]-spine(oldY,rank))*(1-.56*a);
+   tipY=mix(tipY,highest+.035+level+rise,crown);
+   tipX=mix(tipX,spine(tipY,rank)-.021+.44*offset*spread,crown);
+   tipX+=.030*swept+overhang;tipY-=.032*swept;
    const dx=tipX-ends[j],dy=tipY-oldY;
    roots[j+1]+=.21*dy;roots[j]+=.13*dx;
    controls[j+1]+=.62*dy;controls[j]+=.46*dx;
-   ends[j]=tipX;ends[j+1]=tipY;ends[j+3]*=1+.16*a;
+   // A quadratic tangent rising from a shared collar gives the stem its
+   // narrow neck. Let the outer ribs peel away only near the terminal rim.
+   const footY=.26+.047*profile[j+3],neckY=mix(footY,tipY,.78);
+   roots[j+1]=mix(roots[j+1],footY,shoulder);
+   roots[j]=mix(roots[j],spine(footY,rank)+.026*offset,shoulder);
+   controls[j+1]=mix(controls[j+1],neckY,shoulder);
+   controls[j]=mix(controls[j],spine(neckY,rank)-.005-.095*offset*spread+.46*overhang,shoulder);
+   const neckZ=.055+.032*profile[j+3];
+   controls[j+2]=mix(controls[j+2],neckZ,shoulder);
+   ends[j]=tipX;ends[j+1]=tipY;ends[j+3]*=1+.16*a+.30*shoulder;
    const margin=2*ends[j+3];
    for(let axis=0;axis<2;axis++){
     extent[axis]=Math.min(extent[axis],roots[j+axis]-margin,controls[j+axis]-margin,ends[j+axis]-margin);
     extent[axis+2]=Math.max(extent[axis+2],roots[j+axis]+margin,controls[j+axis]+margin,ends[j+axis]+margin);
    }
   }
+  const j=4*10,sideFold=shoulder*(1-smooth(.08,.39,growth));
+  const sideY=ends[j+1]+.305*shoulder+.23*sideFold*sideFold;
+  const sideFoot=mix(roots[j+1],sideY,.58);
+  roots[j]=mix(roots[j],spine(sideFoot,rank),shoulder);
+  roots[j+1]=mix(roots[j+1],sideFoot,shoulder);
+  controls[j]=mix(controls[j],spine(sideFoot,rank)+.028,shoulder);
+  controls[j+1]=mix(controls[j+1],sideY-.025,shoulder);
+  ends[j]-=.065*swept+.355*sideFold;
+  ends[j+1]=sideY;
+  extent[0]=Math.min(extent[0],ends[j]-2*ends[j+3]);
+  extent[3]=Math.max(extent[3],sideY+2*ends[j+3]);
  }
  // Lateral buds attach partway along a parent shoot. Moving the parent
  // carries the fork and its first tangent, including on the return stroke.
- const branching=flex*(s.structWeaveCradle||0)*smooth(.20,.74,growth);
+ const branching=Math.max(flex*cradle*smooth(.20,.74,growth),shoulder);
  if(branching>0){
   const parents=[1,1,2,6,6,2];
   for(let n=0;n<parents.length;n++){
-   const j=4*(12+n),h=4*parents[n],t=.45+.23*((n*3+1)%5)/4;
+   const j=4*(12+n),h=4*parents[n],t=.45+.23*((n*3+1)%5)/4+.19*shoulder;
    for(let d=0;d<3;d++){
     const a=roots[h+d],b=controls[h+d],c=ends[h+d];
     const attachment=(1-t)*(1-t)*a+2*t*(1-t)*b+t*t*c;
@@ -425,14 +462,18 @@ export function junctionField(s,field,p,wall){
  const warp=s.structWeave*.45*Math.cos(Math.PI*u/width)*Math.cos(Math.PI*v/pitch);
  const cradle=(s.structWeaveCradle||0)*web*bridges;
  const weld=bridges*web;
- let fieldD=longitudinal>0?Math.hypot(along*.92,z-warp)-rib*(.84+.33*rank)*(1-.42*weld)*longitudinal:10000;
+ let fieldD=longitudinal>0?Math.hypot(along*.92,z-warp)-rib*(.84+.33*rank)*(1-.42*weld+.20*cradle)*longitudinal:10000;
  if(bridges>0){
-  const secondary=Math.hypot(trans,z+warp)-rib*.63*(1-.29*weld)*bridges;
+  const secondary=Math.hypot(trans,z+warp)-rib*.63*(1-.29*weld+.18*cradle)*bridges;
   fieldD=smin(fieldD,secondary,(.003+rib*.75)*bridges);
  }
  if(bridges*web>.0001){
-  const sideA=Math.abs(along)*.91-rib*.51*longitudinal,sideB=trans-rib*.33*bridges;
-  const coupling=bridges*web*(.082+.063*rank)*rear*(1-.21*cradle);
+  // A loaded web opens into a saddle at a crossing. Along a single arm
+  // its edges draw back onto the rounded rib instead of forming a frill.
+  const trim=cradle*smooth(.17,.41,Math.max(Math.abs(along),trans));
+  const sideA=Math.abs(along)*.91-rib*.51*longitudinal+.42*rib*trim;
+  const sideB=trans-rib*.33*bridges+.28*rib*trim;
+  const coupling=bridges*web*(.082+.063*rank)*rear*(1-.21*cradle)*(1-.50*trim);
   const edge=.5*(sideA+sideB-Math.hypot(sideA-sideB,2*coupling));
   const depth=warp*.3+.017*Math.sin(6*u+2*v)*Math.sin(4*v);
   const nearest=Math.min(Math.abs(along),trans),core=Math.exp(-nearest*nearest/(rib*rib*8));
@@ -726,12 +767,12 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
  if(back>.01&&bridges>0.)trans=min(trans,tissueBridgeDistance(uv,1.07,-.10*rank,.07)/(.48+.44*back)+.24*(1.-back));
  float warp=uStructureB.z*.45*cos(3.14159265*uv.x/width)*cos(3.14159265*uv.y/pitch);
  float cradle=uTissueYoung.x*web*bridges,weld=bridges*web;
- float d=longitudinal>0.?length(vec2(along*.92,z-warp))-rib*(.84+.33*rank)*(1.-.42*weld)*longitudinal:10000.;
+ float d=longitudinal>0.?length(vec2(along*.92,z-warp))-rib*(.84+.33*rank)*(1.-.42*weld+.20*cradle)*longitudinal:10000.;
  #ifdef WEAVE_HIT_TAG
  if(weaveEvaluateMaterial)tag=vec3(2.,fract(uv.y/pitch+.5),fract(atan(z-warp,along*.92)/6.2831853+1.));
  #endif
  if(bridges>0.){
-  float secondary=length(vec2(trans,z+warp))-rib*.63*(1.-.29*weld)*bridges;
+  float secondary=length(vec2(trans,z+warp))-rib*.63*(1.-.29*weld+.18*cradle)*bridges;
   #ifdef WEAVE_HIT_TAG
   if(weaveEvaluateMaterial&&secondary<d)tag=vec3(2.,fract(uv.x/width+.5),fract(atan(z+warp,crossing)/6.2831853+1.));
   #endif
@@ -741,7 +782,9 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
  // lookup. A shoot crossing a sheet stays solid on both sides of the join.
  float skeleton=d;
  if(bridges*web>.0001){
-  float sideA=abs(along)*.91-rib*.51*longitudinal,sideB=trans-rib*.33*bridges,coupling=bridges*web*(.082+.063*rank)*rear*(1.-.21*cradle);
+  float trim=cradle*smoothstep(.17,.41,max(abs(along),trans));
+  float sideA=abs(along)*.91-rib*.51*longitudinal+.42*rib*trim,sideB=trans-rib*.33*bridges+.28*rib*trim;
+  float coupling=bridges*web*(.082+.063*rank)*rear*(1.-.21*cradle)*(1.-.50*trim);
   float edge=.5*(sideA+sideB-length(vec2(sideA-sideB,2.*coupling)));
   float depth=warp*.3+.017*sin(6.*uv.x+2.*uv.y)*sin(4.*uv.y);
   float reach=min(abs(along),trans),core=exp(-reach*reach/(rib*rib*8.));
@@ -812,6 +855,14 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
    branch+=.17*back;
    skeleton=min(skeleton,branch);
    if(branch<d)tag=detail;
+   #ifdef WEAVE_HIT_TAG
+   else if(weaveEvaluateMaterial&&tag.x==1.&&detail.x>8.&&cradle>0.){
+    // A film sewn onto a rounded bud shares its milky surface at contact.
+    // Keep loose spans translucent once the bud has cleared the weave.
+    float contactBand=.23*cap*cradle*(1.-smoothstep(.12,.42,growth));
+    if(branch<contactBand&&branch-d<contactBand)tag=detail;
+   }
+   #endif
    float joinWidth=(.004+.47*cap)*web*(1.-.93*gather);
    d=networkJoin(d,branch,max(.0001,joinWidth));
   }
