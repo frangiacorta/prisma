@@ -1,9 +1,14 @@
-import {prepareFieldQuery,geometryRadius} from './solid-renderer.js?v=1882d3ed81c1';
-import {extractVeilSurface} from './veil-surface.js?v=1882d3ed81c1';
-import {makeVeilMesh,veilPoint} from './veil-geometry.js?v=1882d3ed81c1';
+import {prepareFieldQuery,geometryRadius} from './solid-renderer.js?v=3b2269386819';
+import {extractVeilSurface} from './veil-surface.js?v=3b2269386819';
+import {makeVeilMesh,veilPoint} from './veil-geometry.js?v=3b2269386819';
 // A regular sheet atlas receives the full source surface during opening.
 // The atlas alone retains the outer profile at the completely open endpoint.
-export const VEIL_SOURCE_KEYS=['seed','renderVersion','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','rimRound','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','petalDirectionSpread','petalWeave','petalWeaveTurns','petalFlow','petalFlowPhase','petalOrbitPhase','petalCollision','petalSphereCollision','petalContactGap','petalContactStiffness','petalContactPasses','stemAmount','stemRadius','stemBend'];
+import {STRUCTURE_FIELD_KEYS} from './structure-model.js?v=3b2269386819';
+import {CELLULAR_FIELD_KEYS} from './cellular-form.js?v=3b2269386819';
+import {FRACTAL_KEYS} from './fractal-form.js?v=3b2269386819';
+import {GROWTH_GEOMETRY_KEYS} from './growth-material.js?v=3b2269386819';
+import {bindBodyField,bodyFieldGLSL} from './body-samples.js?v=3b2269386819';
+export const VEIL_SOURCE_KEYS=['baseForm','forcePoints','forcePaths','bodyForces',...STRUCTURE_FIELD_KEYS,...CELLULAR_FIELD_KEYS,...FRACTAL_KEYS,...GROWTH_GEOMETRY_KEYS,'seed','renderVersion','deform','asymmetry','twist','waves','waveScale','hole','holeX','holeY','holeShape','holeAspect','cut','cutX','cutY','cutAspect','rimRound','roundness','taper','bendX','bendY','lobeAmount','lobes','pinch','petalAmount','petalCount','petalOpen','petalCurl','petalLength','petalWidth','petalInflate','petalSharp','petalCoverage','petalRows','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','petalDirectionSpread','petalWeave','petalWeaveTurns','petalFlow','petalFlowPhase','petalOrbitPhase','petalCollision','petalSphereCollision','petalContactGap','petalContactStiffness','petalContactPasses','stemAmount','stemRadius','stemBend'];
 const TAU=Math.PI*2;
 const localState=s=>({...s,scale:1,volume:1,stretchX:1,stretchY:1,stretchZ:1,positionX:0,positionY:0,rotateX:0,rotateY:0,rotateZ:0});
 export function extractVeilSource(s,resolution=32){
@@ -17,6 +22,58 @@ export function extractVeilSource(s,resolution=32){
  }
  for(let y=0;y<=rows;y++){radii[y*(columns+1)+columns]=radii[y*(columns+1)];valid[y*(columns+1)+columns]=valid[y*(columns+1)];}
  return {radii,valid,columns,rows,radius,resolution,local};
+}
+// Project the outermost occupied point on each ray onto the sheet coordinates.
+ // Equal endpoints share a longitude and both poles remain watertight.
+export const veilFieldVertex=`#version 300 es
+void main(){vec2 xy=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(xy*2.-1.,0.,1.);}`;
+export const veilFieldFragment=`#version 300 es
+precision highp float;
+${bodyFieldGLSL}
+uniform vec2 uGrid;uniform float uRadius;out vec4 packedField;
+void main(){
+ vec2 uv=(gl_FragCoord.xy-.5)/uGrid;
+ float theta=uv.x*6.28318530718,phi=uv.y*3.14159265359;
+ vec3 direction=vec3(sin(phi)*cos(theta),sin(phi)*sin(theta),cos(phi));
+ float r=uRadius;
+ for(int i=0;i<96;i++){
+  float outer=r,d=outerDistance(r*direction);
+  r-=max(uRadius/96.,d*.7);
+  if(r<0.)break;
+  if(outerDistance(r*direction)<0.){
+   for(int j=0;j<9;j++){float mid=(r+outer)*.5;if(outerDistance(mid*direction)<0.)r=mid;else outer=mid;}
+   float n=floor((r+outer)*.5/uRadius*65535.+.5);
+   packedField=vec4(floor(n/256.),mod(n,256.),255.,255.)/255.;return;
+  }
+ }
+ packedField=vec4(0.);
+}`;
+export function readVeilField(owner,program,field,resolution,target){
+ const g=owner.gl,columns=resolution*3,rows=resolution*2,w=columns+1,h=rows+1;
+ const radii=new Float32Array(w*h),valid=new Float32Array(w*h);
+ if(field.sphere){radii.fill(1);valid.fill(1);return {radii,valid,rows,columns};}
+ const radius=Math.max(.01,Math.hypot(...field.hi.map((v,i)=>Math.max(Math.abs(v),Math.abs(field.lo[i])))));
+ const framebuffer=g.getParameter(g.FRAMEBUFFER_BINDING),viewport=g.getParameter(g.VIEWPORT);
+ const blend=g.isEnabled(g.BLEND),depth=g.isEnabled(g.DEPTH_TEST),scissor=g.isEnabled(g.SCISSOR_TEST),dither=g.isEnabled(g.DITHER);
+ try{
+  g.bindFramebuffer(g.FRAMEBUFFER,target.fbo);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,target.texture);
+  if(w!==target.width||h!==target.height){
+   g.texImage2D(g.TEXTURE_2D,0,g.RGBA8,w,h,0,g.RGBA,g.UNSIGNED_BYTE,null);
+   g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.NEAREST);
+   g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,target.texture,0);
+   target.width=w;target.height=h;
+  }
+  g.viewport(0,0,w,h);g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.SCISSOR_TEST);g.disable(g.DITHER);
+  owner.finishProgram(program);g.useProgram(program.program);g.bindVertexArray(owner.empty);
+  bindBodyField(g,field,owner.seedTexture,name=>owner.loc(program,name));
+  owner.u(program,'uRadius',radius);owner.u(program,'uGrid',columns,rows);g.drawArrays(g.TRIANGLES,0,3);
+  const pixels=new Uint8Array(w*h*4);g.readPixels(0,0,w,h,g.RGBA,g.UNSIGNED_BYTE,pixels);
+  for(let i=0;i<radii.length;i++){valid[i]=pixels[i*4+2]/255;radii[i]=(pixels[i*4]*256+pixels[i*4+1])/65535*radius;}
+  return {radii,valid,rows,columns};
+ }finally{
+  g.bindFramebuffer(g.FRAMEBUFFER,framebuffer);g.viewport(...viewport);
+  for(const [on,cap] of [[blend,g.BLEND],[depth,g.DEPTH_TEST],[scissor,g.SCISSOR_TEST],[dither,g.DITHER]])g[on?'enable':'disable'](cap);
+ }
 }
 export function makeSourceVeilMesh(source,layers,style,columns=64,rows=32,details=false){
  const mesh=makeVeilMesh(layers,columns,rows),origins=new Float32Array(mesh.coords.length),valid=new Float32Array(mesh.coords.length/3);
@@ -37,7 +94,12 @@ export function updateSourceVeilMesh(mesh,s,phase){
  const rad=Math.PI/180,cx=Math.cos(s.rotateX*rad),sx=Math.sin(s.rotateX*rad),cy=Math.cos(s.rotateY*rad),sy=Math.sin(s.rotateY*rad),cz=Math.cos(s.rotateZ*rad),sz=Math.sin(s.rotateZ*rad);
  for(let i=0;i<origins.length/3;i++){
   const q=i*3,j=i*9,u=coords[q],v=coords[q+1],l=coords[q+2],target=veilPoint(world?s:local,u,v,l,phase),source=origins.subarray(q,q+3),radius=Math.hypot(...source)||1,memory=(s.pVeilMemory||0)*(radius-1)*Math.abs(mesh.valid[i]);
-  if(world){for(let k=0;k<3;k++)vertices[j+k]=source[k]*(1-smooth)+target[k]*smooth;vertices[j+6]=u;vertices[j+7]=v;vertices[j+8]=l/Math.max(1,mesh.layers-1);continue;}
+  if(world){
+   const cx=s.positionX,cy=s.positionY;
+   const radial=Math.hypot(source[0]-cx,source[1]-cy,source[2])/Math.max(.001,s.scale);
+   const relief=(s.pVeilMemory||0)*Math.max(-.95,Math.min(3,radial-1));
+   for(let k=0;k<3;k++){const center=k===0?cx:k===1?cy:0;vertices[j+k]=source[k]*(1-smooth)+(target[k]+(target[k]-center)*relief)*smooth;}
+   vertices[j+6]=u;vertices[j+7]=v;vertices[j+8]=l/Math.max(1,mesh.layers-1);continue;}
   let x=(source[0]*(1-smooth)+target[0]*(1+memory)*smooth)*s.scale*s.stretchX,y=(source[1]*(1-smooth)+target[1]*(1+memory)*smooth)*s.scale*s.stretchY,z=(source[2]*(1-smooth)+target[2]*(1+memory)*smooth)*s.scale*Math.max(.06,s.volume*s.stretchZ);
   let a=y*cx-z*sx;z=y*sx+z*cx;y=a;a=x*cy-z*sy;z=x*sy+z*cy;x=a;a=x*cz-y*sz;y=x*sz+y*cz;x=a;
   vertices[j]=x+s.positionX;vertices[j+1]=y+s.positionY;vertices[j+2]=z;vertices[j+6]=u;vertices[j+7]=v;vertices[j+8]=l/Math.max(1,mesh.layers-1);

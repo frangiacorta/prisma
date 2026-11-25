@@ -1,8 +1,8 @@
-import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=1882d3ed81c1';
-import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=1882d3ed81c1';
-import {WEAVE_NETWORK_GLSL,weaveNetworkField} from './weave-network.js?v=1882d3ed81c1';
-import {junctionUniforms} from './weave-junction.js?v=1882d3ed81c1';
-import {hasMotionPoints} from './motion-keyframes.js?v=1882d3ed81c1';
+import {FAN_COMPONENT_GLSL} from './implicit-fan-geometry.js?v=3b2269386819';
+import {FILAMENT_DEFAULTS,FILAMENT_META,FILAMENT_TRACKS,filamentPanel} from './filament-model.js?v=3b2269386819';
+import {WEAVE_NETWORK_GLSL,weaveNetworkField} from './weave-network.js?v=3b2269386819';
+import {junctionUniforms} from './weave-junction.js?v=3b2269386819';
+import {hasMotionPoints} from './motion-keyframes.js?v=3b2269386819';
 // Composable properties of the existing implicit form. Zero amounts are identity.
 export const STRUCTURE_DEFAULTS={
  ...FILAMENT_DEFAULTS,
@@ -590,6 +590,47 @@ float fanGuideResidual=0.;bool fanGuideValid=false;
 vec3 fanGuidePoint(vec2 uv,float normalOffset,int id){return fanGuidePoint(uv,normalOffset,id,fanGuideResidual,fanGuideValid);}
 
 #endif
+#ifndef WEAVE_NETWORK_ONLY
+vec4 weaveGridCoordinates(vec3 p,float phi,float theta){
+ vec2 angle=vec2(phi,theta)*uStructureB.x,scale=vec2(1.);
+ float variation=uStructureH.y*sin(theta);
+ if(variation>0.){
+  angle.x+=variation*(2.2*sin(4.*phi+2.3*sin(theta*6.))+1.12*sin(13.*phi-theta*7.));
+  angle.y+=variation*(1.9*sin(5.*phi-theta*3.)+1.26*sin(11.*phi+theta*8.));
+ }
+#ifdef FAN_FIELD
+ float drapeBlend=uStructureFan*fanDrapeBlend();
+ if(drapeBlend>0.){
+  vec4 q=fanDrapeCoordinates(p);
+  angle=mix(angle,q.xy*uStructureB.x*3.14159265359,drapeBlend);
+  scale=mix(scale,vec2(clamp(q.w*.18,.02,.1),.2*sqrt(fanDrapeBlend())),drapeBlend);
+ }
+#endif
+ return vec4(angle,scale);
+}
+float weaveJunction(vec2 angle){vec2 crest=.5+.5*cos(angle);return pow(crest.x*crest.y,3.);}
+float weaveNoduleMask(vec3 p){
+ float radius=length(p),phi=atan(p.y,p.x),theta=acos(clamp(p.z/max(radius,.000001),-1.,1.));
+ float variation=uStructureH.y*uStructureA.x*uStructureA.z*uStructureA.w;
+ float mask=variation<1.?weaveJunction(weaveGridCoordinates(p,phi,theta).xy):0.;
+ if(variation>0.){
+  float wall=uStructureA.y*(1.-uStructureH.x*.85*min(1.,length(p.xy)));
+  float width=mix(1.,uStructureB.y,uStructureA.z);
+  float base=max(wall*.13,min(wall*.36,width*1.25/uStructureB.x));
+  float size=base*(1.-.52*uWeaveGrowth.x*uStructureA.z*uStructureA.w)*(.86+.35*uStructureH.z);
+  vec2 chart;weaveMetric(phi,theta,radius,chart);
+  float distanceToNode=100.;
+  for(int corner=0;corner<2;corner++){
+   float shift;vec2 normal,node;weaveSite(chart,float(corner),shift,normal,node);
+   vec2 angle=weaveNodeAngles(node),s=sin(angle),c=cos(angle);
+   vec2 offset=vec2(dot(p.xy,vec2(-s.x,c.x)),c.y*dot(p.xy,vec2(c.x,s.x))-s.y*p.z);
+   distanceToNode=min(distanceToNode,length(offset));
+  }
+  mask=mix(mask,1.-smoothstep(.82*size,1.32*size,distanceToNode),variation);
+ }
+ return mask;
+}
+#endif
 float structureComponentField(float d,vec3 p){
  float branching=uWeaveNetwork.x*uStructureA.x*uStructureA.z*uStructureA.w;
  float r=length(p),phi=atan(p.y,p.x);
@@ -607,12 +648,7 @@ float structureComponentField(float d,vec3 p){
   float empty=max(lower-midSurface,midSurface-upper);
   if(empty>.025)return empty*.45;
  }
- float theta=acos(clamp(p.z/max(r,.000001),-1.,1.)),a=phi*uStructureB.x,b=theta*uStructureB.x;
- float variation=uStructureH.y*sin(theta);
- if(variation>0.&&!networkOnly){
-  a+=variation*(2.2*sin(4.*phi+2.3*sin(theta*6.))+1.12*sin(13.*phi-theta*7.));
-  b+=variation*(1.9*sin(5.*phi-theta*3.)+1.26*sin(11.*phi+theta*8.));
- }
+ float theta=acos(clamp(p.z/max(r,.000001),-1.,1.));
 #endif
 #ifdef FAN_FIELD
  if(uStructureFan>0.){
@@ -626,17 +662,10 @@ float structureComponentField(float d,vec3 p){
  if(uStructureA.z>0.&&branching<1.){
   float width=mix(1.,uStructureB.y,uStructureA.z);
   if(!networkOnly){
-   float scaleA=1.,scaleB=1.;
-#ifdef FAN_FIELD
-   float drapeBlend=uStructureFan*fanDrapeBlend();
-   if(drapeBlend>0.){
-    vec4 q=fanDrapeCoordinates(p);a=mix(a,q.x*uStructureB.x*3.14159265359,drapeBlend);b=mix(b,q.y*uStructureB.x*3.14159265359,drapeBlend);
-    scaleA=mix(1.,clamp(q.w*.18,.02,.1),drapeBlend);scaleB=mix(1.,.2*sqrt(fanDrapeBlend()),drapeBlend);
-   }
-#endif
-   float warp=(abs(sin(a*.5))-width)/uStructureB.x*2.*scaleA,weft=(abs(sin(b*.5))-width*uStructureA.w)/uStructureB.x*2.*scaleB;
+   vec4 grid=weaveGridCoordinates(p,phi,theta);float a=grid.x,b=grid.y;
+   float warp=(abs(sin(a*.5))-width)/uStructureB.x*2.*grid.z,weft=(abs(sin(b*.5))-width*uStructureA.w)/uStructureB.x*2.*grid.w;
    d=max(d,uStructureA.w>0.?min(warp,weft):warp);
-   float junction=pow((.5+.5*cos(a))*(.5+.5*cos(b)),3.);
+   float junction=weaveJunction(grid.xy);
    d+=uStructureA.z*(uStructureB.z*cos(a)*cos(b)*cos(uStructureF.z*6.28318530718)-uStructureH.z*uStructureA.w*junction*.095);
   }
   float sprouts=0.,web=0.;
@@ -714,8 +743,8 @@ export function weavePanel({slider,details},cloud=false){
  return details('Reticolo di fibre',
   rows(['structWeaveCradle','structWeaveNodes','structWeaveMembrane'])+
   details('Fili e noduli',rows(['structDensity','structThreadWidth','structWeaveCupSize','structWeaveVariation','structWeaveFinesse','structWeaveAlignment']))+
-  details('Rami e tensione',rows(['structWeaveBranching','structWeaveHierarchy','structWeaveTension','structWeaveFlex','structWeaveSlope','structWeaveArch','structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY']))+
-  details('Steli e coppe',rows(['structWeaveGrowth','structWeaveFront','structWeaveReach','structWeaveSpread','structWeaveRelease','structWeaveCup','structWeaveFlare']))+
+  details('Rami e tensione',rows(['structWeaveBranching','structWeaveHierarchy','structWeaveTension','structWeaveFlex','structWeaveSlope','structWeaveArch','structWeavePitch','structWeaveRelease']))+
+  details('Steli e coppe',rows(['structWeaveGrowth','structWeaveFront','structDelay','structWeaveReach','structWeaveSpread','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY','structWeaveCup','structWeaveFlare']))+
   geometry+'<p class="help">Aumenta Ragnatela, Noduli o Membrana per lavorare sulla forma corrente. Puoi combinarli in qualsiasi proporzione. La peluria si regola in Materiale e la luce in Luci.</p>');
 }
 export function structurePanel(tab,s,{slider,details,section}){

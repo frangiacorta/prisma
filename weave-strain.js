@@ -1,9 +1,9 @@
-import profiles from './weave-strain-profiles.js?v=1882d3ed81c1';
+import profiles from './weave-strain-profiles.js?v=3b2269386819';
 
 // Cubic deformation of the material coordinates on the near and far sides
 // of a growing tissue. The surface still lives on the underlying 3D form.
 // Poses are driven by tissue parameters and load, independently of the clock.
-export function strainPose(s,amount){
+export function strainPose(s,amount,roots,ends){
  if(amount<=0)return null;
  const drive=[s.structWeaveGrowth,s.structWeaveFront,s.structWeaveRelease,s.structFlowPhase,s._weaveLag||0];
  const range=[.29,.16,.075,.14,.18];
@@ -17,6 +17,25 @@ export function strainPose(s,amount){
  for(let i=0;i<weights.length;i++){
   const weight=weights[i]*scale;
   if(weight>1e-6)for(let j=0;j<cage.length;j++)cage[j]+=profiles[i].points[j]*weight;
+ }
+ // Away from the sampled material poses, interpolate displacement from the
+ // actual nearby junctions. A long shoot pulls the adjacent sheet in its own
+ // direction; front and back react to the shoots on their respective sides.
+ const distance=Math.min(1,Math.max(0,(nearest-9)/15));
+ const elastic=distance*distance*(3-2*distance)*amount;
+ if(elastic>0&&roots?.length&&ends?.length){
+  for(let row=0;row<4;row++)for(let col=0;col<4;col++)for(let side=0;side<2;side++){
+   const x=(col/3-.5)*1.46,y=(row/3-.5)*1.68,z=side?-.26:.26;
+   let dx=0,dy=0,total=.035;
+   for(let i=0;i<roots.length;i+=4){
+    const ex=ends[i]-roots[i],ey=ends[i+1]-roots[i+1];
+    const sx=x-(roots[i]+.6*ex),sy=y-(roots[i+1]+.6*ey),sz=z-ends[i+2];
+    const w=Math.exp(-4*sx*sx-5*sy*sy-3*sz*sz);
+    dx+=w*ex;dy+=w*ey;total+=w;
+   }
+   const j=(row*4+col)*4+side*2;
+   cage[j]+=.38*elastic*Math.tanh(dx/total);cage[j+1]+=.38*elastic*Math.tanh(dy/total);
+  }
  }
  return cage;
 }

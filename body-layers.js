@@ -1,12 +1,12 @@
-import {FIGURE_SCALE} from './base-forms.js?v=1882d3ed81c1';
-import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META} from './structure-model.js?v=1882d3ed81c1';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META} from './cellular-form.js?v=1882d3ed81c1';
-import {FRACTAL_DEFAULTS,FRACTAL_META} from './fractal-form.js?v=1882d3ed81c1';
-import {PARTICLE_DEFAULTS,PARTICLE_META} from './particle-model.js?v=1882d3ed81c1';
-import {hasMotionPoints,normalizeMotionPoints} from './motion-keyframes.js?v=1882d3ed81c1';
+import {FIGURE_SCALE} from './base-forms.js?v=3b2269386819';
+import {STRUCTURE_DEFAULTS,STRUCTURE_FIELD_KEYS,STRUCTURE_META} from './structure-model.js?v=3b2269386819';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META} from './cellular-form.js?v=3b2269386819';
+import {FRACTAL_DEFAULTS,FRACTAL_META} from './fractal-form.js?v=3b2269386819';
+import {PARTICLE_DEFAULTS,PARTICLE_META} from './particle-model.js?v=3b2269386819';
+import {hasMotionPoints,normalizeMotionPoints} from './motion-keyframes.js?v=3b2269386819';
 
 export const BODY_LAYER_META = {
- sceneGrains:['Superficie ↔ granelli',0,1,.001],
+ sceneGrains:['Superficie â†” granelli',0,1,.001],
  grainDispersal:['Ampiezza del movimento',0,1,.01]
 };
 
@@ -14,7 +14,7 @@ export const BODY_LAYER_META = {
 // Phases/offsets are measured in turns, not wrapped: fractional pCycles and
 // animationPhase values beyond one turn must retain their exact current time.
 // These are transport state, deliberately not animatable parameter tracks.
-export const GRAIN_MOTION_DEFAULTS={grainMotion:true,grainMotionPhase:0,grainMotionOffset:0};
+export const GRAIN_MOTION_DEFAULTS={grainMotionVersion:1,grainMotion:true,grainMotionPhase:0,grainMotionOffset:0};
 const TAU=Math.PI*2;
 function finitePhase(value){if(!Number.isFinite(value))throw new TypeError('La fase del movimento deve essere finita.');return value;}
 function savedTurns(value){return Number.isFinite(value)&&Number.isFinite(value*TAU)?value:0;}
@@ -151,7 +151,7 @@ function conversion(input,target){
  }
  const mapped=new Set(report.mappedTracks.map(t=>t.from));
  for(const k of sourceKeys)if(input.motions?.[k]?.enabled&&!mapped.has(k))report.unmapped.push('motions.'+k);
- if(input.motions?.pOpening?.enabled||input.motions?.pThickness?.enabled||input.motions?.loopAmount?.enabled||input.motions?.loopTube?.enabled)report.limitations.push('La scala è raccordata alla posa di base; variazioni di apertura o spessore possono cambiare l’ingombro durante il moto.');
+ if(input.motions?.pOpening?.enabled||input.motions?.pThickness?.enabled||input.motions?.loopAmount?.enabled||input.motions?.loopTube?.enabled)report.limitations.push('La scala Ã¨ raccordata alla posa di base; variazioni di apertura o spessore possono cambiare lâ€™ingombro durante il moto.');
  report.unmapped=[...new Set(report.unmapped)];
  report.clipped=[...new Set(report.clipped)];
  return {out,report};

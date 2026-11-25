@@ -1,12 +1,13 @@
 // Project-only data: never retain devices, canvases or a nested performance.
-import {META,GROUPS} from './model.js?v=1882d3ed81c1';
-import {cloudBody,grainMix} from './body-layers.js?v=1882d3ed81c1';
-import {CONTROL_NAMES,FIBER_TARGETS} from './control-vocabulary.js?v=1882d3ed81c1';
-import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=1882d3ed81c1';
-import {LIGHT_META,TRACK_META,syncMaterialControl} from './studio-model.js?v=1882d3ed81c1';
-import {FORCE_META} from './particle-forces.js?v=1882d3ed81c1';
-import {PATH_META} from './particle-paths.js?v=1882d3ed81c1';
-import {normalizeFlow} from './flow-model.js?v=1882d3ed81c1';
+import {META,GROUPS} from './model.js?v=3b2269386819';
+import {cloudBody,grainMix} from './body-layers.js?v=3b2269386819';
+import {CONTROL_NAMES,FIBER_TARGETS} from './control-vocabulary.js?v=3b2269386819';
+import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=3b2269386819';
+import {migrateFiberMaterial} from './fiber-material.js?v=3b2269386819';
+import {LIGHT_META,TRACK_META,syncMaterialControl} from './studio-model.js?v=3b2269386819';
+import {FORCE_META} from './particle-forces.js?v=3b2269386819';
+import {PATH_META} from './particle-paths.js?v=3b2269386819';
+import {normalizeFlow} from './flow-model.js?v=3b2269386819';
 export const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const number=(x,f,a,b)=>Number.isFinite(x)?clamp(x,a,b):f;
 const label=(x,f='',n=80)=>typeof x==='string'?x.replace(/[\x00-\x1f<>]/g,'').slice(0,n):f;
@@ -33,7 +34,10 @@ const humanName=key=>key.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/^finish /,'
 function route(v){return {deck:v?.deck==='B'?'B':'A',path:label(v?.path,'scale',120),min:number(v?.min,0,-1e6,1e6),max:number(v?.max,1,-1e6,1e6),from:/^#[a-f\d]{6}$/i.test(v?.from)?v.from:'#000000',to:/^#[a-f\d]{6}$/i.test(v?.to)?v.to:'#ffffff'};}
 export function normalizePlayground(raw){
  if(!raw||typeof raw!=='object')return null;
- const deck=d=>({name:label(d?.name,'Scena'),state:sceneOnly(d?.state),phase:number(d?.phase,0,0,1e9),ratio:number(d?.ratio,number(raw.ratio,16/9,.1,10),.1,10),playing:d?.playing!==false});
+ const deck=d=>{
+  const state=sceneOnly(d?.state),hasScene=state&&typeof state==='object'&&!Array.isArray(state)&&Object.keys(state).length;
+  return {name:label(d?.name,'Scena'),state:hasScene?migrateFiberMaterial(state):{},phase:number(d?.phase,0,0,1e9),ratio:number(d?.ratio,number(raw.ratio,16/9,.1,10),.1,10),playing:d?.playing!==false};
+ };
  const c={version:2,decks:{A:deck(raw.decks?.A),B:deck(raw.decks?.B)},mix:number(raw.mix,0,0,1),transition:TRANSITIONS.includes(raw.transition)?raw.transition:'fade',direction:number(raw.direction,0,0,3)|0,duration:number(raw.duration,2,.05,64),unit:raw.unit==='beats'?'beats':'seconds',bpm:number(raw.bpm,120,30,300),curve:['linear','smooth','in','out'].includes(raw.curve)?raw.curve:'smooth',quantize:!!raw.quantize,master:number(raw.master,1,0,1),blackout:false,resolution:[360,540,720,1080].includes(raw.resolution)?raw.resolution:540,autoQuality:raw.autoQuality!==false,macros:[],bindings:{},xyX:number(raw.xyX,0,0,7)|0,xyY:number(raw.xyY,1,0,7)|0};
  c.ratio=number(raw.ratio,16/9,.1,10);const old=Array.isArray(raw.slots)?raw.slots:[];
  c.flow=normalizeFlow(raw.flow);
@@ -87,8 +91,7 @@ export function parameterCatalog(s){
  add('sceneGrains','Superficie ↔ granelli','number',0,1,.001);
  const meta={...META,...PARTICLE_META};
  for(const [key,value]of Object.entries(s)){
-  if(forbidden.has(key)||['sceneGrains','pFilm','pVeilSourceKind','pVeilFromForm','finishGlitchSoftness'].includes(key)||legacyLight.test(key)||/Version$|^seed$|^duration$|^motionPeriod$/.test(key))continue;
-  if(key.startsWith('pVeil')&&s.pLiving!==4)continue;
+  if(forbidden.has(key)||['sceneGrains','pFilm','pVeilSourceKind','pVeilFromForm','pVeilMorph','finishGlitchSoftness'].includes(key)||legacyLight.test(key)||/Version$|^seed$|^duration$|^motionPeriod$/.test(key))continue;
   if(typeof value==='number'&&Object.hasOwn(meta,key)){const m=meta[key];add(key,CONTROL_NAMES[key]||m[0],'number',m[1],m[2],m[3]);}
   else if(typeof value==='boolean'&&!/^(animate|perfectLoop|keepMotionSpeed|assistant)/.test(key))add(key,CONTROL_NAMES[key]||({finishEnabled:'Filtri',finishTone:'Correzione colore',photoAll:'Correggi anche il fondale',environmentRotate:'Ruota ambiente',light2:'Seconda luce',thinShellMode:'Lamiera trasparente'}[key]??humanName(key)),'boolean',0,1,1);
   else if(typeof value==='string'&&/^#[a-f\d]{6}$/i.test(value))add(key,({background:'Colore del fondale',background2:'Secondo colore del fondale',internalColor:'Colore interno',sssColor:'Colore della diffusione'}[key]??humanName(key)),'color');
@@ -96,6 +99,7 @@ export function parameterCatalog(s){
  }
  for(const [i,color]of (s.palette||[]).entries())if(/^#[a-f\d]{6}$/i.test(color))add('palette.'+i,'Palette · colore '+(i+1),'color');
  for(const [key,t]of Object.entries(s.motions||{})){
+  if(key==='pVeilMorph')continue;
   const m=Object.hasOwn(TRACK_META,key)?TRACK_META[key]:Object.hasOwn(meta,key)?meta[key]:[key,0,1,.01];
   for(const [prop,min,max,step]of [['enabled',0,1,1],['amplitude',0,Math.max(Math.abs(m[1]),Math.abs(m[2])),m[3]],['cycles',.05,16,.05],['phase',0,360,1],['direction',-1,1,2],['pace',-1,1,.01],['pacePhase',0,360,1],['hold',0,.95,.01]])if(Object.hasOwn(t,prop))add(`motions.${key}.${prop}`,`Moto · ${m[0]} · ${{enabled:'attivo',amplitude:'ampiezza',cycles:'cicli',phase:'fase',direction:'verso',pace:'ritmo',pacePhase:'fase ritmo',hold:'sosta'}[prop]}`,prop==='enabled'?'boolean':'number',min,max,step);
   for(const prop of ['mode','curve'])if(enumValues[prop].includes(t[prop]))add(`motions.${key}.${prop}`,`Moto · ${m[0]} · ${prop}`,'enum',0,enumValues[prop].length-1,1,enumValues[prop]);

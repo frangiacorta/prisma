@@ -1,9 +1,10 @@
-import {AUDIO_HELP} from './audio-model.js?v=1882d3ed81c1';
-import {EXTRA_HELP} from './control-help-extra.js?v=1882d3ed81c1';
-import {FRACTAL_HELP} from './fractal-form.js?v=1882d3ed81c1';
-import {CELLULAR_HELP} from './cellular-form.js?v=1882d3ed81c1';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=1882d3ed81c1';
-import {trailLightCompensation} from './particle-model.js?v=1882d3ed81c1';
+import {parameterHasSignal,structureSupport} from './structure-support.js?v=3b2269386819';
+import {AUDIO_HELP} from './audio-model.js?v=3b2269386819';
+import {EXTRA_HELP} from './control-help-extra.js?v=3b2269386819';
+import {FRACTAL_HELP} from './fractal-form.js?v=3b2269386819';
+import {CELLULAR_HELP} from './cellular-form.js?v=3b2269386819';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=3b2269386819';
+import {trailLightCompensation} from './particle-model.js?v=3b2269386819';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishPalette:'Converte il chiaroscuro della scena in una palette ordinata da scuro a chiaro. La trasparenza resta invariata.',
@@ -247,7 +248,9 @@ Object.assign(HELP,{
 // Conditions are explanatory: controls remain editable so a disabled effect can
 // be prepared without altering the user's composition or enabling it silently.
 export function controlCondition(s,key){
- const positive=k=>Math.abs(Number(s[k])||0)>1e-6||s.motions?.[k]?.enabled&&Math.abs(s.motions[k].amplitude||0)>1e-6;
+ const support=structureSupport(s,key);
+ if(support)return support.message;
+ const positive=k=>parameterHasSignal(s,k);
  const need=(k,text)=>positive(k)?'':text;
  const particles=hasGrainLayer(s),surface=grainMix(s)<1||s.motions?.sceneGrains?.enabled;
  if(/^dyn[A-Z]/.test(key)&&key!=='dynAmount'&&!positive('dynAmount'))return 'Aumenta l’intensità della dinamica.';
@@ -281,7 +284,8 @@ export function controlCondition(s,key){
  if(['groundShadow','pShadow','grounding'].includes(key)&&s.bgMode==='solid'&&s.background==='#000000')return 'Scegli un fondale più chiaro per vedere l’ombra.';
  if(key==='filmIslands'&&!positive('filmPattern'))return 'Aumenta Venature di interferenza.';
  if(['filmIslands','filmThickness','iridShift','iridScale','filmPattern','pFilmScale','pFilmVariation'].includes(key)&&!positive('thinFilm')&&!positive('pFilm')&&!positive('iridescence'))return 'Attiva la pellicola o aumenta l’iridescenza.';
- if(['pLighting','pColorMode','pColorScatter','pLumaVar','pDepthFade','pLinks','pTrailCount','pOpacity','pCount','pSize'].includes(key)&&!particles)return 'Porta Superficie ↔ granelli sopra zero in Forma.';
+ if(key==='pLighting'&&!particles&&!positive('structWeaveNodes')&&!positive('veilAmount')&&!positive('structWeaveMembrane')&&!positive('structWeaveCradle'))return 'Porta Superficie ↔ granelli sopra zero in Forma.';
+ if(['pColorMode','pColorScatter','pLumaVar','pDepthFade','pLinks','pTrailCount','pOpacity','pCount','pSize'].includes(key)&&!particles)return 'Porta Superficie ↔ granelli sopra zero in Forma.';
  if(key==='pFill'&&!particles)return 'Porta Superficie ↔ granelli sopra zero in Forma.';
  if(key==='refraction'&&!positive('transparency'))return 'Aumenta Trasparenza per vedere la rifrazione.';
  if(key==='dispersion'&&!surface&&!positive('pLighting'))return 'Attiva Risposta alle luci per separare i colori sui granelli.';
@@ -291,15 +295,6 @@ export function controlCondition(s,key){
  if(key==='structPetalWidth'&&!positive('structRadial')&&!positive('structFan'))return 'Aumenta Separazione radiale o Lamine curve.';
  if(key==='structFanBias'&&!positive('structFan'))return 'Aumenta Lamine curve.';
  if(key==='loopTurns'&&(!positive('loopAmount')||!positive('loopKnot')))return 'Aumenta Apertura ad anello e Intreccio del nodo.';
- const net=positive('structWeaveCradle'),nodes=positive('structWeaveNodes'),sheet=positive('structWeaveMembrane');
- const woven=positive('structFibres')&&positive('structWeft')&&positive('structShell');
- if(key==='fiberLength'&&!positive('fiberPile'))return 'Aumenta Peluria in Materiale.';
- if(key==='structWeaveCradle'||key==='structWeaveNodes'||key==='structWeaveMembrane')return '';
- if(['structWeaveGrowth','structWeaveCupSize','structWeaveCupLight','structWeaveHierarchy'].includes(key)&&!nodes&&!woven)return 'Aumenta Noduli in Forma.';
- if(['structWeaveReach','structWeaveCup','structWeaveFront','structWeaveSpread','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY'].includes(key)&&!positive('structWeaveGrowth'))return 'Aumenta Crescita degli steli.';
- if(key==='structWeaveFlare'&&(!positive('structWeaveGrowth')||!positive('structWeaveCup')))return 'Aumenta crescita e apertura delle coppe.';
- if(['structWeaveRelease','structWeaveAlignment','structWeaveFinesse','structWeaveTension'].includes(key)&&!net&&!sheet&&!woven)return 'Aumenta Ragnatela o Membrana in Forma.';
- if((key.startsWith('structWeave')||['structDensity','structThreadWidth'].includes(key))&&!['structWeave','structWeft'].includes(key)&&!net&&!nodes&&!sheet&&!positive('structFibres'))return 'Aumenta Ragnatela in Forma.';
  if(['pSelfShadowSoftness','pSelfShadowBias'].includes(key)&&!positive('pSelfShadow'))return 'Aumenta Ombre di contatto in Luci.';
  if(key==='pOpticalExtent'&&!positive('pSelfShadow')&&!positive('pCaustic'))return 'Attiva ombre reciproche o caustiche.';
  if((key==='grainDispersal'||/^p(?:Orbit|Travel|Vortex|Counterflow|Wander|SpaceWarp|Warp|Reentry|Breath|Life|Random|Jitter|MotionSoftness|Rhythm|Pause|SpeedSpread|TentacleWave|TentacleCycles)/.test(key))&&s.grainMotion===false)return 'Riprendi Movimento dei granelli in Movimento.';
@@ -326,7 +321,6 @@ export function controlCondition(s,key){
  if(/^filPulse/.test(key)&&!s.filLength)return 'Aumenta Lunghezza in Forma → Filamenti su superficie.';
  if(/^filPulse(Cycles|Width)$/.test(key)&&!positive('filPulse'))return 'Aumenta l’intensità degli impulsi sui filamenti.';
  if(/^growth[A-Z]/.test(key)&&key!=='growthAmount'&&!positive('growthAmount'))return 'Aumenta Intensità della reazione-diffusione.';
- if(key==='pVeilCrease'&&!s.pVeilRipple)return 'Aumenta Ondulazione dei bordi.';
  if(['loopBandCount','loopBandAxis'].includes(key)&&!s.loopBands)return 'Aumenta Intensità fasce.';
  if(key==='pContactClearance'&&(!s.pSelfContact||(s.pLiving===1&&!s.pSkin)))return 'Aumenta Contatto tra pieghe in un tessuto o su una superficie.';
  if(key==='pVolumeShadow'&&!positive('pVolumeContinuity')&&(!positive('pSelfShadow')||!s.pCount||!s.pOpacity||!s.pLighting))return 'Attiva Ombre reciproche, granelli visibili e Risposta alle luci.';
@@ -386,10 +380,6 @@ export function controlCondition(s,key){
 // Changes suggested inline are opt-in edits. The same values are useful for
 // exercising a dependent control with the procedural renderer.
 const conditionValues={
-  'Aumenta Peluria in Materiale.':{fiberPile:.65},'Aumenta Noduli in Forma.':{structWeaveNodes:.7},
-  'Aumenta Ragnatela in Forma.':{structWeaveCradle:.7},'Aumenta Ragnatela o Membrana in Forma.':{structWeaveCradle:.7},
-  'Aumenta Crescita degli steli.':{structWeaveGrowth:.7,structWeaveNodes:.7},
-  'Aumenta crescita e apertura delle coppe.':{structWeaveGrowth:.75,structWeaveCup:.6,structWeaveNodes:.7},
   'Aumenta Ombre di contatto in Luci.':{pSelfShadow:.7},
   'Aumenta l’ampiezza dei lobi.':{lobeAmount:.18},'Aumenta la profondità dei lobi.':{pLobeDepth:.24},
   'Aumenta l’irregolarità della nuvola.':{pOrganic:.38},'Aumenta l’apertura del foro.':{hole:.24},'Aumenta il ritaglio.':{cut:.25},
@@ -451,6 +441,8 @@ const conditionValues={
 };
 export function conditionActivation(s,key,condition=controlCondition(s,key)){
  if(!condition)return null;
+ const support=structureSupport(s,key);
+ if(support?.message===condition)return support.patch;
  if(Object.hasOwn(conditionValues,condition))return conditionValues[condition];
  if(condition==='Aggiungi un secondo colore nella palette.')return {palette:[...(s.palette||[]),'#35a5c0']};
  if(condition==='Aumenta lo spessore dei filamenti per distinguere il profilo.')return {filWidth:.045,filLength:Math.max(.25,s.filLength||0)};

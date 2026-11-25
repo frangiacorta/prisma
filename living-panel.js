@@ -1,13 +1,12 @@
-import {STRUCTURE_DEFAULTS,integrateStructure} from './structure-model.js?v=1882d3ed81c1';
-import {beginVeilTransform} from './veil-model.js?v=1882d3ed81c1';
-import {cloudBody} from './body-layers.js?v=1882d3ed81c1';
-import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=1882d3ed81c1';
+import {STRUCTURE_DEFAULTS} from './structure-model.js?v=3b2269386819';
+import {cloudBody} from './body-layers.js?v=3b2269386819';
+import {LIVING_STYLES,PARTICLE_STUDIES,SPHERE_FORM} from './particle-model.js?v=3b2269386819';
 export function applyLivingStyle(s,style){
+ if(style==='veils'){s.veilAmount=s.veilAmount||.65;return;}
  if(!cloudBody(s)){
-  const values={off:STRUCTURE_DEFAULTS,fibres:{structShell:1,structFibres:1},tissue:{structShell:1,structFibres:1,structWeft:1},membrane:{structShell:1},veils:{structShell:1,structRadial:.65,structCurl:.4}}[style];
+  const values={off:STRUCTURE_DEFAULTS,fibres:{structShell:1,structFibres:1},tissue:{structShell:1,structFibres:1,structWeft:1},membrane:{structShell:1}}[style];
   if(values)Object.assign(s,values,{pLiving:0,renderVersion:2});return;
  }
- if(style==='veils'){beginVeilTransform(s);integrateStructure(s);return;}
  const values=LIVING_STYLES[style];if(values)Object.assign(s,values);
 }
 export function livingChooser(s,h){return (s.pLiving===0?h.section('Transizione',`<button class="outline full" data-veil-transform="true">Suddividi questa forma in lamine</button><p class="help">Parti dalla forma che stai creando. Conservi colori, luci e animazioni.</p>`):'')+h.details('Tipo di forma',`<label class="field">Struttura<select data-particle-select="pLiving">${['Volume scolpito','Fibre a posa periodica','Tessuto connesso','Superficie continua','Lamine sovrapposte'].map((n,i)=>`<option value="${i}" ${s.pLiving===i?'selected':''}>${n}</option>`).join('')}</select></label><p class="help">Geometria qui; animazione in Movimento. ${s.pLiving===4?'Apri gradualmente la forma in strati: nessun preset viene caricato.':s.pLiving?"Per aggiungere particelle apri Particelle.":"Scegli una struttura viva per aggiungere granelli."}</p>`);}

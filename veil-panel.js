@@ -1,3 +1,18 @@
+import {VEIL_META,VEIL_TRACK_KEYS} from './veil-model.js?v=3b2269386819';
+// The inspector follows the current geometry while the layers unfold.
+export function sharedVeilControls(tab,s,{slider,details,trackPanel}){
+ if(s.pLiving===4)return '';
+ const rows=keys=>keys.map(key=>slider(key)).join('');
+ if(tab==='shape')return details('Veli',
+  slider('veilAmount',['Forma corrente','Veli'])+rows(['pVeilStyle','pVeilLayers','pVeilSpread','pVeilSpacing','pVeilTwist'])+
+  details('Profilo dei veli',rows(['pVeilMemory','pVeilAsymmetry','pVeilCoreRadius']))+
+  details('Pieghe dei veli',rows(['pVeilRipple','pVeilFolds','pVeilCrease'])));
+ if(tab==='material')return details('Materiale dei veli',rows(['pVeilOpacity','pVeilEdge','pVeilFeather','pVeilCoreDark']));
+ if(tab==='color')return details('Colore dei veli',slider('pVeilLayerColor'));
+ if(tab==='motion')return details('Movimento dei veli',rows(['pVeilBreath','pVeilFlow','pVeilCycles','pVeilRhythm','pVeilDelay'])+
+  details('Animazione dei veli',VEIL_TRACK_KEYS.map(key=>trackPanel('motions.'+key,VEIL_META[key][0])).join('')));
+ return '';
+}
 export function veilPanel(tab,s,h,shared,selectedLight){
  const {slider,section,details,check}=h,sl=keys=>keys.map(k=>slider(k)).join('');
  if(tab==='shape')return section('Dalla forma ai veli',(s.pVeilFromForm?slider('pVeilMorph',['Forma di partenza','Veli aperti'])+(s.pVeilSourceKind>0?'':slider('pVeilMemory',['Profilo dei veli','Mantieni rilievo']))+'<button class="quiet full" data-veil-return="true">Torna alla forma di partenza</button>':'<button class="outline" data-veil-transform="true">Collega alla forma di base</button>')+'<p class="help">Il cursore apre la forma in strati, accompagnando anche cavità e ramificazioni. A zero ritrovi la forma di partenza, inclusa la sua materia; puoi animare il passaggio in Movimento. I parametri degli strati agiscono aumentando la trasformazione.</p>')+section('Disposizione degli strati',`<div class="fiber-styles"><button data-veil-look="petals">Petali di velo</button><button data-veil-look="halo">Aureola</button><button data-veil-look="fan">Ventaglio</button></div>`+(s.engine==='particles'?`<label class="field">Struttura<select data-particle-select="pLiving"><option value="0">Particelle</option><option value="1">Fibre</option><option value="2">Tessuto</option><option value="3">Membrana</option><option value="4" selected>Veli e aureole</option></select></label>`:'')+slider('pVeilStyle',['Petali','Ventaglio'])+'<p class="help">Al centro: aureola. Puoi fermarti su qualsiasi forma intermedia. I tre pulsanti cambiano solo gli strati.</p>'+sl(['pVeilLayers','pVeilSpread','pVeilSpacing','pVeilTwist'])+details('Bordi e asimmetria',sl(['pVeilRipple','pVeilCrease','pVeilFolds','pVeilAsymmetry']))+details('Nucleo facoltativo',sl(['pVeilCoreRadius'])+'<p class="help">A zero il nucleo scompare. La sua oscurità è in Materia.</p>'))+(s.pVeilFromForm?details('Modifica la forma di partenza', '<p class="help">La forma resta modificabile. Pareti interne e ramificazioni si distendono durante l’apertura. Le punte più fini possono essere smussate; la prima apertura di forme complesse richiede qualche istante.</p>'+(s.pVeilSourceKind>0?h.baseShapePanel():shared('shape',s,h,selectedLight))):details('Inquadratura',sl(['scale','positionX','positionY','rotateX','rotateY','rotateZ','stretchX','stretchY','stretchZ','volume'])));

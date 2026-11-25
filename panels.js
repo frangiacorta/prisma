@@ -1,24 +1,25 @@
-import {FIBER_TARGETS} from './control-vocabulary.js?v=1882d3ed81c1';
-import {paletteTonePanel} from './finish-palette-panel.js?v=1882d3ed81c1';
-import {dynamicsPanel} from './dynamics-panel.js?v=1882d3ed81c1';
-import {motionPeriod} from './animation-clock.js?v=1882d3ed81c1';
-import {GROWTH_STUDIES} from './growth-material.js?v=1882d3ed81c1';
-import {GLYPH_FONTS} from './finishing.js?v=1882d3ed81c1';
-import {BASE_FORMS} from './base-forms.js?v=1882d3ed81c1';
-import {structurePanel,weavePanel,STRUCTURE_TRACKS,WEAVE_TRACKS} from './structure-model.js?v=1882d3ed81c1';
-import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=1882d3ed81c1';
-import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=1882d3ed81c1';
-import {finishingOrderPanel} from './finishing-order.js?v=1882d3ed81c1';
-import {rootMotionSuspended} from './solid-renderer.js?v=1882d3ed81c1';
-import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=1882d3ed81c1';
-import {MOODS} from './model.js?v=1882d3ed81c1';
-import {supportsMotionPoints} from './motion-keyframes.js?v=1882d3ed81c1';
-import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=1882d3ed81c1';
+import {sharedVeilControls} from './veil-panel.js?v=3b2269386819';
+import {FIBER_TARGETS} from './control-vocabulary.js?v=3b2269386819';
+import {paletteTonePanel} from './finish-palette-panel.js?v=3b2269386819';
+import {dynamicsPanel} from './dynamics-panel.js?v=3b2269386819';
+import {motionPeriod} from './animation-clock.js?v=3b2269386819';
+import {GROWTH_STUDIES} from './growth-material.js?v=3b2269386819';
+import {GLYPH_FONTS} from './finishing.js?v=3b2269386819';
+import {BASE_FORMS} from './base-forms.js?v=3b2269386819';
+import {structurePanel,weavePanel,STRUCTURE_TRACKS,WEAVE_TRACKS} from './structure-model.js?v=3b2269386819';
+import {FRACTAL_FORMULAS,FRACTAL_TRACKS} from './fractal-form.js?v=3b2269386819';
+import {CELLULAR_TRACKS,CELLULAR_PHASES} from './cellular-form.js?v=3b2269386819';
+import {finishingOrderPanel} from './finishing-order.js?v=3b2269386819';
+import {rootMotionSuspended} from './solid-renderer.js?v=3b2269386819';
+import {MAX_COLORS,MAX_LIGHTS,LIGHT_META,LIGHT_TYPES,TRACK_META,MATERIAL_STYLES,LEGACY_MATERIAL_STYLES,ENVIRONMENTS,BACKDROPS,LIGHT_SOURCES,LIGHT_RIGS,TEXTURE_STYLES} from './studio-model.js?v=3b2269386819';
+import {MOODS} from './model.js?v=3b2269386819';
+import {supportsMotionPoints} from './motion-keyframes.js?v=3b2269386819';
+import {MOTION_PRESETS,SCULPT_EXAMPLES} from './creative-model.js?v=3b2269386819';
 export function pathValue(s,path){const parts=path.split('.');let value=s;for(let i=0;i<parts.length;i++){if(i===1&&parts[0]==='lights')value=value.find(l=>l.id===Number(parts[i]));else value=value?.[parts[i]];}return value}
 export function pathMeta(path,state){const parts=path.split('.'),last=parts.at(-1);if(last==='cycles')return state?.perfectLoop===false?['Ripetizioni nel ciclo',.1,8,.1]:['Ripetizioni nel loop',1,8,1];if(last==='pace')return['Accelerazione / decelerazione',0,.95,.01];if(last==='pacePhase')return['Punto di massima velocità',0,360,1];if(last==='hold')return['Pausa a ogni giro',0,.8,.01];if(last==='phase')return['Fase di partenza',0,360,1];if(last==='amplitude'){if(parts[0]==='motions'){const m=TRACK_META[parts[1]];return ['Ampiezza',m[1],m[2],m[3]]}return parts[2]==='orbit'?['Ampiezza orbita',0,180,1]:['Ampiezza pulsazione',0,1,.01]}return LIGHT_META[last]}
 export function writePath(s,path,value){const parts=path.split('.');let object=s;for(let i=0;i<parts.length-1;i++){if(i===1&&parts[0]==='lights')object=object.find(l=>l.id===Number(parts[i]));else object=object[parts[i]];}if(object)object[parts.at(-1)]=value}
-import {livingChooser} from './living-panel.js?v=1882d3ed81c1';
-import {particlePanel} from './particle-panel.js?v=1882d3ed81c1';
+import {livingChooser} from './living-panel.js?v=3b2269386819';
+import {particlePanel} from './particle-panel.js?v=3b2269386819';
 function uniqueControls(primary,extra){
  const main=document.createElement('div'),addition=document.createElement('div');
  main.innerHTML=primary;addition.innerHTML=extra;
@@ -38,7 +39,7 @@ function uniqueControls(primary,extra){
  for(const p of addition.querySelectorAll(':scope > p.help,:scope > p.control-intro'))p.remove();
  return main.innerHTML+addition.innerHTML;
 }
-import {cloudBody,grainMix} from './body-layers.js?v=1882d3ed81c1';
+import {cloudBody,grainMix} from './body-layers.js?v=3b2269386819';
 export function buildPanel(tab,s,h,selectedLight){
  const cloud=cloudBody(s),base=(id=tab)=>sharedPanel(id,s,h,selectedLight),particles=(id=tab)=>particlePanel(id,s,{...h,cloud,grainMix:grainMix(s)},sharedPanel,selectedLight);
  if(tab==='shape'){
@@ -46,7 +47,7 @@ export function buildPanel(tab,s,h,selectedLight){
   // Keep the existing filament group and its controls intact, after the
   // representation slider rather than among the generator's parameters.
   let filaments='',weavePlaced=false;
-  const web=weavePanel(h,cloud);
+  const web=weavePanel(h,cloud)+sharedVeilControls('shape',s,h);
   const shapeHelpers={...h,section:(label,content,...rest)=>{
    const section=h.section(label,content,...rest);
    if(!weavePlaced&&['Forma di base','Corpo'].includes(label)){weavePlaced=true;return section+web;}
@@ -60,8 +61,8 @@ export function buildPanel(tab,s,h,selectedLight){
   const representation=h.section('Rappresentazione',h.slider('sceneGrains',['Superficie','Granelli'])+'<p class="help">Miscela superficie e granelli della stessa geometria, con lo stesso movimento. Il cursore cambia come viene mostrata la forma. Il riempimento distribuisce i granelli anche dentro il volume.</p>');
   return geometry+(weavePlaced?'':web)+representation+filaments+particles('grains')+particles('trails');
  }
- if(tab==='color')return particles();
- if(tab==='material')return uniqueControls(base(),particles());
+ if(tab==='color')return particles()+sharedVeilControls(tab,s,h);
+ if(tab==='material')return uniqueControls(base(),particles())+sharedVeilControls(tab,s,h);
  if(tab==='background'||tab==='light')return uniqueControls(base(),particles());
  if(tab==='motion')return `<details class="control-details" data-grain-motion-panel data-default-open="true" open><summary>Movimento dei granelli</summary><label class="check"><input type="checkbox" data-grain-motion ${s.grainMotion!==false?'checked':''}>Movimento dei granelli</label>${h.slider('grainDispersal',['Fermo','Ampio'])}<p class="help">Superficie e granelli seguono lo stesso movimento. Disattiva l’interruttore per fermarlo nella posa attuale e riattivalo per ripartire da lì. Rotazione dell’insieme, luci e colori possono continuare. Ampiezza zero elimina questi spostamenti; orbite, correnti e pulsazioni qui sotto ne definiscono il percorso.</p></details>`+uniqueControls(base(),particles())+dynamicsPanel(s,h);
  return base();
@@ -110,7 +111,7 @@ export function sharedPanel(tab,s,h,selectedLight){
  +details('Peluria',slider('fiberPile',['Liscia','Fitta'])+slider('fiberLength',['Corto','Lungo'])+
   `<label class="field">Applica a<select id="fiber-target" data-path-select="fiberTarget">
    ${Object.entries(FIBER_TARGETS).map(([key,label])=>`<option value="${key}" ${s.fiberTarget===key?'selected':''}>${label}</option>`).join('')}
-  </select></label><p class="help">Con Tutta la superficie il pelo segue anche i singoli granelli. Solo noduli riveste le giunzioni della rete. Noduli in crescita lega la peluria allo sviluppo dei noduli.</p>`)
+  </select></label>`+slider('fiberGrowth',['Costante','Segue la crescita']))
  +details('Trasparenza e diffusione',slider('refraction')+slider('dispersion')+slider('absorption')+slider('tintStrength')+slider('translucency')+slider('scattering')+slider('scatterDirection')+slider('subsurface')+slider('sssRadius')+colorField('sssColor','Colore sottopelle')+`<button id="add-inside-light" class="outline">${icon('sun')}Una luce dentro la forma</button><p class="help">In Colori → Strati di colore puoi sovrapporre i colori della palette anche in profondità.</p>`)
  +details('Volume dei granelli',slider('pVolumeContinuity',['Granelli','Volume continuo'])+slider('pVolumeTurbulence')+slider('pVolumeFilaments')+'<p class="help">Aumenta Granelli in Forma → Rappresentazione. Diffusione interna regola la densità. Assorbimento della nube in Scena regola le ombre interne. Ampiezza, Ricircolo e Pulsazione in Movimento animano il volume.</p>')
  +details('Interferenza di pellicola',slider('iridescence',['Spenta','Intensa'])+slider('thinFilm',['Riflesso di palette','Interferenza ottica'])+slider('filmIslands',['Venature','Isole'])+['filmThickness','filmPattern','filmPatternScale','filmPatternWarp','filmPatternDetail','filmChroma','filmDuo'].map(k=>slider(k)).join('')+'<p class="help">I comandi funzionano su qualsiasi materia: aumenta Iridescenza per vedere i riflessi e Interferenza ottica per le bande della pellicola. Cobalto e oro è una combinazione facoltativa di questi valori.</p>'+details('Esempi di interferenza','<button class="outline" data-film-look="cobalt">Cobalto e oro · solo interferenza</button><p class="help">Conserva geometria, palette, trasparenza, rugosità, luci e movimenti.</p>'))
@@ -135,7 +136,7 @@ export function sharedPanel(tab,s,h,selectedLight){
    +environment+presets
    +details('Animazione',trackPanel(prefix+'.orbit','Orbita',true)+trackPanel(prefix+'.pulse','Pulsazione di intensità'));
  }
- if(tab==='motion')return details('Materiale e luce',['fiberPile','fiberLength','lightWrap','pSelfShadow'].map(key=>trackPanel('motions.'+key,TRACK_META[key][0])).join(''))+details('Rappresentazione',trackPanel('motions.sceneGrains','Superficie ↔ granelli')+trackPanel('motions.grainDispersal','Ampiezza del movimento'))+'<p class="control-intro">Scegli un movimento base o attiva una traccia. Premi Riproduci per vederlo; Velocità e Durata valgono per tutta la scena.</p><div class="motion-shortcuts"><button data-jump-tab="photo">Anima glitch e ASCII</button><button data-jump-tab="light">Configura luci</button></div>'+structurePanel(tab,s,h)+details('Curve toroidali e nodi',slider('loopPhase')+'<p class="help">Scorrimento sposta la variazione di spessore e la torsione lungo il percorso. Su un tubo uniforme non cambia la geometria.</p>'+Object.keys(STRUCTURE_TRACKS).filter(k=>k.startsWith('loop')).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='loopPhase')).join(''))+details('Filamenti su superficie','<p class="help">Aggiungi filamenti in Forma → Filamenti su superficie, poi regola qui scorrimento e vento. Per cambiare forma nel tempo attiva le singole tracce.</p>'+slider('filPhase')+slider('filWind')+Object.keys(STRUCTURE_TRACKS).filter(k=>k.startsWith('fil')).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='filPhase')).join(''))+details('Reticolo di fibre',WEAVE_TRACKS.map(k=>trackPanel('motions.'+k,TRACK_META[k][0])).join(''))+details('Animazione',Object.keys(STRUCTURE_TRACKS).filter(k=>!k.startsWith('loop')&&!k.startsWith('fil')&&!WEAVE_TRACKS.includes(k)).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='structFlowPhase')).join(''))+section('Tempo',slider('speed')+slider('duration')+slider('motion')+check('perfectLoop','Loop continuo')+`<p class="help">Durata effettiva: <strong id="effective-duration">${(s.duration/s.speed).toFixed(1)} s</strong> (durata ÷ velocità).</p><p class="help">${s.perfectLoop!==false?'Ogni movimento completa un numero intero di cicli: l’ultimo istante torna al primo, senza salti.':'Le ripetizioni possono essere frazionarie. Alla ripartenza del ciclo forma, colori o luci possono cambiare bruscamente.'}</p>`)
+ if(tab==='motion')return sharedVeilControls(tab,s,{...h,trackPanel})+details('Materiale e luce',['fiberPile','fiberLength','fiberGrowth','lightWrap','pSelfShadow'].map(key=>trackPanel('motions.'+key,TRACK_META[key][0])).join(''))+details('Rappresentazione',trackPanel('motions.sceneGrains','Superficie ↔ granelli')+trackPanel('motions.grainDispersal','Ampiezza del movimento'))+'<p class="control-intro">Scegli un movimento base o attiva una traccia. Premi Riproduci per vederlo; Velocità e Durata valgono per tutta la scena.</p><div class="motion-shortcuts"><button data-jump-tab="photo">Anima glitch e ASCII</button><button data-jump-tab="light">Configura luci</button></div>'+structurePanel(tab,s,h)+details('Curve toroidali e nodi',slider('loopPhase')+'<p class="help">Scorrimento sposta la variazione di spessore e la torsione lungo il percorso. Su un tubo uniforme non cambia la geometria.</p>'+Object.keys(STRUCTURE_TRACKS).filter(k=>k.startsWith('loop')).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='loopPhase')).join(''))+details('Filamenti su superficie','<p class="help">Aggiungi filamenti in Forma → Filamenti su superficie, poi regola qui scorrimento e vento. Per cambiare forma nel tempo attiva le singole tracce.</p>'+slider('filPhase')+slider('filWind')+Object.keys(STRUCTURE_TRACKS).filter(k=>k.startsWith('fil')).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='filPhase')).join(''))+details('Reticolo di fibre',WEAVE_TRACKS.map(k=>trackPanel('motions.'+k,TRACK_META[k][0])).join(''))+details('Animazione',Object.keys(STRUCTURE_TRACKS).filter(k=>!k.startsWith('loop')&&!k.startsWith('fil')&&!WEAVE_TRACKS.includes(k)).map(k=>trackPanel('motions.'+k,TRACK_META[k][0],false,k==='structFlowPhase')).join(''))+section('Tempo',slider('speed')+slider('duration')+slider('motion')+check('perfectLoop','Loop continuo')+`<p class="help">Durata effettiva: <strong id="effective-duration">${(s.duration/s.speed).toFixed(1)} s</strong> (durata ÷ velocità).</p><p class="help">${s.perfectLoop!==false?'Ogni movimento completa un numero intero di cicli: l’ultimo istante torna al primo, senza salti.':'Le ripetizioni possono essere frazionarie. Alla ripartenza del ciclo forma, colori o luci possono cambiare bruscamente.'}</p>`)
   +details('Mappa tonale',['finishPaletteMap','finishPaletteScale','finishPaletteOffset','finishPaletteBlur'].map(key=>trackPanel('motions.'+key,TRACK_META[key][0])).join(''))
   +details('Frattali 3D',Object.entries(FRACTAL_TRACKS).map(([k,[label]])=>trackPanel('motions.'+k,label)).join(''))
   +details('Cellule e spine','<button class="outline" data-cell-loop="true">Anima forma → cellule → forma</button>'

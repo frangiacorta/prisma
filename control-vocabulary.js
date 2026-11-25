@@ -1,7 +1,7 @@
 // Public wording and search aliases share one source. State/preset keys stay stable.
-export const FIBER_TARGETS={all:'Tutta la superficie',nodes:'Solo noduli',growth:'Noduli in crescita'};
+export const FIBER_TARGETS={all:'Tutta la superficie',nodes:'Solo noduli'};
 export const CONTROL_NAMES={
- fiberTarget:'Peluria · applica a',
+ fiberTarget:'Peluria · applica a',veilAmount:'Trasformazione in veli',
  structWeaveCradle:'Ragnatela',structWeaveNodes:'Noduli',structWeaveMembrane:'Membrana',structWeaveCupSize:'Diametro dei noduli e delle coppe',
  structWeaveCupLight:'Luce interna di noduli e coppe',pSelfShadow:'Ombre di contatto',
  grainDispersal:'Ampiezza del movimento',
@@ -28,7 +28,7 @@ export function nameControls(root){
 // Explicit editorial selections. Arrays are deliberately curated, never positional.
 export const ESSENTIALS={
  solid:{
-  shape:{base:['volume','deform'],profile:['twist','hole','cut'],shell:['structShell','structThickness'],fibre:['structWeaveCradle','structWeaveNodes','structWeaveMembrane','structWeaveCupSize','structFibres','structWeft'],layers:['structRadial','structLayers'],folds:['structCurl','structFold'],appendices:['petalAmount','petalLength','petalOpen'],filaments:['filLength','filWidth'],curves:['loopAmount','loopRadius'],fractals:['fractalAmount','fractalPower','fractalLevels','fractalFold','fractalDetail'],cells:['cellMorph','cellBubbles','cellSize','cellSpines','cellSpineLength']},
+  shape:{veils:['veilAmount','pVeilStyle','pVeilLayers'],base:['volume','deform'],profile:['twist','hole','cut'],shell:['structShell','structThickness'],fibre:['structWeaveCradle','structWeaveNodes','structWeaveMembrane','structWeaveCupSize','structFibres','structWeft'],layers:['structRadial','structLayers'],folds:['structCurl','structFold'],appendices:['petalAmount','petalLength','petalOpen'],filaments:['filLength','filWidth'],curves:['loopAmount','loopRadius'],fractals:['fractalAmount','fractalPower','fractalLevels','fractalFold','fractalDetail'],cells:['cellMorph','cellBubbles','cellSize','cellSpines','cellSpineLength']},
   material:{surface:['metal','roughness','gloss','fiberPile','fiberLength'],glass:['transparency','refraction'],film:['iridescence','filmThickness'],relief:['textureDepth','textureScale'],growth:['growthAmount','growthScale'],emission:['emission'],cells:['cellPearl','cellClarity']},
   color:{core:['structCoreDark','structCoreRadius'],gradient:['gradientAngle','gradientScale'],layers:['colorLayers'],waves:['colorWaveAmount'],glow:['glow']},
   light:{environment:['environmentPower','lightWrap','pSelfShadow','structWeaveCupLight'],source:['power','size'],motion:['environmentCycles']},

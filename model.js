@@ -1,13 +1,13 @@
-import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=1882d3ed81c1';
-import {GROWTH_DEFAULTS} from './growth-material.js?v=1882d3ed81c1';
-import {FINISH_DEFAULTS} from './finishing.js?v=1882d3ed81c1';
-import {FIGURE_SCALE} from './base-forms.js?v=1882d3ed81c1';
-import {STRUCTURE_GROUPS} from './structure-model.js?v=1882d3ed81c1';
-import {FRACTAL_KEYS} from './fractal-form.js?v=1882d3ed81c1';
-import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=1882d3ed81c1';
-import {REFERENCE_PALETTES} from './reference-palettes.js?v=1882d3ed81c1';
-import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=1882d3ed81c1';
-import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=1882d3ed81c1';
+import {DYNAMICS_DEFAULTS,DYNAMICS_META} from './dynamics.js?v=3b2269386819';
+import {GROWTH_DEFAULTS} from './growth-material.js?v=3b2269386819';
+import {FINISH_DEFAULTS} from './finishing.js?v=3b2269386819';
+import {FIGURE_SCALE} from './base-forms.js?v=3b2269386819';
+import {STRUCTURE_GROUPS} from './structure-model.js?v=3b2269386819';
+import {FRACTAL_KEYS} from './fractal-form.js?v=3b2269386819';
+import {CELLULAR_SHAPE,CELLULAR_MATERIAL,CELLULAR_POSE} from './cellular-form.js?v=3b2269386819';
+import {REFERENCE_PALETTES} from './reference-palettes.js?v=3b2269386819';
+import {EXTRA_BASE,EXTRA_META,MORE_MOODS,legacyLights,newLight,MATERIAL_STYLES} from './studio-model.js?v=3b2269386819';
+import {PARTICLE_META,PARTICLE_DEFAULTS,PARTICLE_GROUPS} from './particle-model.js?v=3b2269386819';
 export const BASE = {
  ...DYNAMICS_DEFAULTS,...PARTICLE_DEFAULTS,engine:'solid',keepMotionSpeed:true,motionPeriod:0,
   volume:1, stretchX:1, stretchY:1, stretchZ:1, deform:.22, asymmetry:.08, twist:.3, waves:.12, waveScale:3.5,
@@ -121,7 +121,7 @@ GROUPS.material.push(...Object.keys(GROWTH_DEFAULTS).filter(k=>!['growthFlow','g
 
 Object.assign(META,{focusBlur:['Sfocatura fuori fuoco',0,1,.01],focusDepth:['Piano di fuoco',-3,4.7,.01],focusTilt:['Inclinazione del fuoco (°)',-60,60,.1]});
 GROUPS.background.push('focusBlur','focusDepth','focusTilt');
-GROUPS.material.push('fiberPile','fiberLength','fiberTarget');
+GROUPS.material.push('fiberPile','fiberLength','fiberGrowth','fiberTarget');
 GROUPS.light.push('lightWrap','structWeaveCupLight');
 // Contact lighting follows the surface when mixing it with grains.
 GROUPS.background=GROUPS.background.filter(key=>!['pSelfShadow','pSelfShadowSoftness','pSelfShadowBias','pShadowLight'].includes(key));

@@ -6,14 +6,14 @@ export function makeVeilMesh(layers,columns=96,rows=40){
  for(let l=0;l<layers;l++)grid(l,columns,rows);
  return {layers,columns,rows,coords:new Float32Array(coords),triangles:new Uint32Array(triangles),vertices:new Float32Array(coords.length*3),indices:new Uint32Array(triangles.length),order:Array.from({length:triangles.length/3},(_,i)=>i),depths:new Float32Array(triangles.length/3)};
 }
-export function veilPoint(s,u,v,layer,phase){
- const style=Math.max(0,Math.min(2,s.pVeilStyle));if(style!==Math.floor(style)){const low=Math.floor(style),f=style-low,a=veilPoint({...s,pVeilStyle:low},u,v,layer,phase),b=veilPoint({...s,pVeilStyle:low+1},u,v,layer,phase);return a.map((v,i)=>v+(b[i]-v)*f);}
+export function veilPoint(s,u,v,layer,phase,style=Math.max(0,Math.min(2,s.pVeilStyle))){
+ if(style!==Math.floor(style)){const low=Math.floor(style),f=style-low,a=veilPoint(s,u,v,layer,phase,low),b=veilPoint(s,u,v,layer,phase,low+1);return a.map((v,i)=>v+(b[i]-v)*f);}
  const t=TAU*phase*s.pVeilCycles,clock=t-s.pVeilRhythm*Math.sin(t),l=layer,shift=l*2.39996323;
  let x,y,z;
  if(l<0){const a=u*TAU,b=v*Math.PI,r=s.pVeilCoreRadius;x=r*Math.sin(b)*Math.cos(a);y=r*Math.sin(b)*Math.sin(a);z=r*Math.cos(b);}
  else{
   const lag=clock-l*s.pVeilDelay,open=.035+s.pVeilSpread*(1+s.pVeilBreath*Math.sin(lag)),wave=s.pVeilFlow*Math.sin(lag-v*TAU),a=(u-.5)*TAU;
-  if(s.pVeilStyle===1){
+  if(style===1){
    const angle=u*TAU+s.pVeilTwist*v*1.8+shift*.12;
    const r=v*(.62+open*.72)*(1-l/Math.max(1,s.pVeilLayers)*.34)*(1+s.pVeilAsymmetry*(.2*Math.sin(angle+shift)+.1*Math.sin(3*angle-shift)));
    const crease=s.pVeilCrease||0;
@@ -21,7 +21,7 @@ export function veilPoint(s,u,v,layer,phase){
    x=r*Math.cos(angle);y=r*Math.sin(angle);z=(l-(s.pVeilLayers-1)/2)*s.pVeilSpacing*v+.16*Math.sin(v*Math.PI)+ripple+wave*.1*v;
    z+=s.pVeilAsymmetry*.2*Math.sin(angle+shift)*v;
   }else{
-   const width=(s.pVeilStyle===2?.8:.38)+open*(s.pVeilStyle===2?1.15:1.45);
+   const width=(style===2?.8:.38)+open*(style===2?1.15:1.45);
    const angle=shift+a*width*.42+s.pVeilTwist*(1-v)*2+wave*.18*v;
    const radius=(v*(.75+open*.8))*(1+s.pVeilAsymmetry*.2*Math.sin(shift));
    const rib=Math.sin(a*s.pVeilFolds+v*5-lag);

@@ -3,13 +3,13 @@ export const MAX_MOTION_POINTS = 48;
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const wrap = (value, period) => value - Math.floor((value + period/2)/period)*period;
 const parameters = new Set(['scale','positionX','positionY','rotateX','rotateY','rotateZ','stretchX','stretchY','stretchZ',
- 'fiberPile','fiberLength','lightWrap','pSelfShadow',
+ 'fiberPile','fiberLength','fiberGrowth','lightWrap','pSelfShadow',
  'pBreath','pSignal','pPropagation','pOpening','pTravel','pVortex','exposure','transparency','roughness','focusBlur','focusDepth','focusTilt',
  'structWeaveBranching','structWeaveNodes','structWeaveMembrane','structWeaveFinesse','structWeaveGrowth','structWeaveReach','structWeaveRelease','structWeaveCup',
  'structWeaveCradle','structWeaveFlex','structWeaveSlope','structWeaveArch','structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY','structWeaveFront','structWeaveTension','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupLight','structWeaveCupSize','structWeaveFlare','structDelay','structFlowPhase']);
 
 export const LIGHT_ORBIT_RANGE = ['Angolo dell’orbita',-180,180,1];
-export const supportsMotionPoints = key => parameters.has(key) || key === 'orbit';
+export const supportsMotionPoints = key => parameters.has(key) || key === 'orbit' || key === 'veilAmount' || key.startsWith('pVeil');
 export const isMotionAngle = key => ['rotateX','rotateY','rotateZ','orbit'].includes(key);
 
 export function motionPointValue(key, base, offset, range) {

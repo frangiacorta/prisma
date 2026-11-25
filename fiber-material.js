@@ -3,16 +3,29 @@
 export function legacyFiberWeave(state){
  return ['structWeaveBranching','structShell','structFibres','structWeft'].every(key=>state[key]>0||state.motions?.[key]?.enabled);
 }
+const clamp01=value=>Math.max(0,Math.min(1,value));
+export function migrateFiberMaterial(state,raw=state){
+ const legacy=raw.fiberPile==null&&legacyFiberWeave(raw);
+ const follows=legacy||raw.fiberTarget==='growth';
+ state.fiberTarget=follows||raw.fiberTarget==='nodes'?'nodes':'all';
+ state.fiberGrowth=follows?1:Number.isFinite(raw.fiberGrowth)?clamp01(raw.fiberGrowth):0;
+ state.fiberPile=legacy?clamp01(Number(raw.surfaceTexture)||0):clamp01(Number(raw.fiberPile)||0);
+ state.fiberLength=Number.isFinite(raw.fiberLength)?clamp01(raw.fiberLength):.35;
+ return state;
+}
 export function fiberMaterialUniform(state){
- const legacy=state.fiberPile==null&&legacyFiberWeave(state);
- const target=state.fiberTarget??(legacy?'growth':'all');
- return [state.fiberPile??(legacy?state.surfaceTexture||0:0),state.fiberLength??.35,target==='growth'?2:target==='nodes'?1:0];
+ // Standalone renderers can also receive a deck or saved state directly.
+ const s=state.fiberGrowth==null||state.fiberTarget==='growth'?migrateFiberMaterial({},state):state;
+ return [s.fiberPile??0,s.fiberLength??.35,Number(s.fiberTarget==='nodes'),s.fiberGrowth];
 }
 
 // All functions use object/grain coordinates. The footprint is in the same
 // coordinates per output pixel, including when a sprite is rendered as a quad.
 export const FIBER_MATERIAL_GLSL=`
-uniform vec3 uFiberPile;
+uniform vec4 uFiberPile;
+float fiberGrowthWeight(float development){
+ return mix(1.,clamp(development,0.,1.),uFiberPile.w);
+}
 float fiberGrainExtent(){
  return uFiberPile.x*mix(.024,.23,uFiberPile.y);
 }

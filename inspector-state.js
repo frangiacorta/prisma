@@ -1,11 +1,12 @@
-import {controlCondition,conditionActivation} from './control-help.js?v=1882d3ed81c1';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=1882d3ed81c1';
-import {syncMaterialControl} from './studio-model.js?v=1882d3ed81c1';
-import {hasMotionPoints} from './motion-keyframes.js?v=1882d3ed81c1';
+import {structureSupport} from './structure-support.js?v=3b2269386819';
+import {controlCondition,conditionActivation} from './control-help.js?v=3b2269386819';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=3b2269386819';
+import {syncMaterialControl} from './studio-model.js?v=3b2269386819';
+import {hasMotionPoints} from './motion-keyframes.js?v=3b2269386819';
 // Inspector actions are explicit state edits, recorded by the app's undo history.
-export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','structWeaveCradle','structWeaveNodes','structWeaveMembrane','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
+export const SHAPE_ZERO=['deform','asymmetry','twist','waves','hole','cut','roundness','taper','bendX','bendY','lobeAmount','pinch','rimRound','petalAmount','stemAmount','loopAmount','veilAmount','structWeaveCradle','structWeaveNodes','structWeaveMembrane','structShell','structFibres','structWeft','structSlices','structRadial','structLayers','structGrowth','structCurl','structFold','structBreath','structFlap','structScallop','structSpiral','structStagger','structRuffle','structTaper','filLength'];
 const PARTICLE_ZERO=['pOpening','pCloudCore','pCloudHalo','pCellAmount','pClumps','pLobeDepth','pOrganic','pWarp','pNeural','pTentacle','pOuter','pBundleAmount','pFoldDepth','pInflate','pContract','pPores','pSkinOpening'];
-export const MOTION_ZERO=['structWeaveFlex','dynAmount','growthFlow','filmFlow','filmSwirl','pTravel','pVortex','pReentry','pLife','pSignal','pBreath','pRandom','pJitter','pWander','pSpaceWarp','pOrbitPrecession','pOrbitDrift','pTentacleWave','pInflate','pContract','finishWarpMotion','finishGlassMotion','finishGlyphVariation'];
+export const MOTION_ZERO=['structWeaveFlex','pVeilFlow','pVeilBreath','dynAmount','growthFlow','filmFlow','filmSwirl','pTravel','pVortex','pReentry','pLife','pSignal','pBreath','pRandom','pJitter','pWander','pSpaceWarp','pOrbitPrecession','pOrbitDrift','pTentacleWave','pInflate','pContract','finishWarpMotion','finishGlassMotion','finishGlyphVariation'];
 export function simplifyShape(state,amount=0){
  const keys=[...SHAPE_ZERO,'cellMorph','fractalAmount',...(state.engine==='particles'?PARTICLE_ZERO:[])];
  for(const k of keys)if(Number.isFinite(state[k]))state[k]*=amount;
@@ -30,7 +31,7 @@ export function simplifyMotion(state,amount=0){
 // such as density or frequency do not falsely make an inactive effect active.
 const EFFECTS=[
  ['deform','Irregolarità'],['asymmetry','Asimmetria'],['twist','Torsione'],['bendX','Curvatura','bendY'],['taper','Rastremazione'],
- ['transparency','Trasparenza'],['thinFilm','Pellicola ottica'],['coat','Rivestimento'],['subsurface','Diffusione interna'],['lightWrap','Luce avvolgente'],['fiberPile','Peluria'],['structWeaveCradle','Ragnatela'],['structWeaveNodes','Noduli'],['structWeaveMembrane','Membrana'],['emission','Emissione'],
+ ['transparency','Trasparenza'],['thinFilm','Pellicola ottica'],['coat','Rivestimento'],['subsurface','Diffusione interna'],['lightWrap','Luce avvolgente'],['fiberPile','Peluria'],['veilAmount','Veli'],['structWeaveCradle','Ragnatela'],['structWeaveNodes','Noduli'],['structWeaveMembrane','Membrana'],['emission','Emissione'],
  ['pCloudCore','Concentrazione del nucleo'],['pCloudHalo','Alone'],['pCellAmount','Cellule instanziate'],['pOrganic','Deformazione delle particelle'],['pClumps','Addensamenti'],['pWarp','Distorsione delle particelle'],
  ['dynAmount','Dinamica'],['cellMorph','Cellule e spine'],['fractalAmount','Frattali 3D'],
  ['loopAmount','Curve toroidali e nodi'],['structShell','Guscio e spessore'],['structFibres','Reticolo di fibre'],['structRadial','Suddivisione radiale e strati','structSlices','structLayers'],
@@ -135,7 +136,7 @@ export function decorateInspector({root,state,baseline,tab,edit}){
   }
   activeList.replaceChildren();
   for(const r of records){
-   const on=r.path?!!at(state,r.path):r.keys.some(k=>active(at(state,k))||state.motions?.[k]?.enabled)&&(r.keys[0]==='pSelfShadow'||!/^p[A-Z]/.test(r.keys[0])||hasGrainLayer(state))&&(!r.keys[0].startsWith('finish')||state.finishEnabled!==false&&(state[r.keys[0]+'Mix']??1)>0);r.on=on;
+   const on=r.path?!!at(state,r.path):r.keys.some(k=>(active(at(state,k))||state.motions?.[k]?.enabled)&&!structureSupport(state,k))&&(r.keys[0]==='pSelfShadow'||!/^p[A-Z]/.test(r.keys[0])||hasGrainLayer(state))&&(!r.keys[0].startsWith('finish')||state.finishEnabled!==false&&(state[r.keys[0]+'Mix']??1)>0);r.on=on;
    if(on){let d=r.el.closest('details');while(d){d.classList.add('has-changes');d=d.parentElement.closest('details');}const chip=document.createElement('span');chip.className='active-effect';const jump=document.createElement('button');jump.type='button';jump.textContent=r.label;jump.onclick=()=>r.el.matches('[data-animate-path]')?r.el.click():reveal(r.el);const off=document.createElement('button');off.type='button';off.textContent='Disattiva';off.setAttribute('aria-label','Disattiva '+r.label);off.onclick=()=>{if(r.path){edit(s=>assign(s,r.path,false),r.label+' disattivata');}else edit(s=>{for(const k of r.keys){s[k]=typeof s[k]==='boolean'?false:0;if(s.motions?.[k])s.motions[k].enabled=false;}},r.label+' disattivato');};chip.append(jump,off);activeList.append(chip);}
   }
   const omitted=(root.omittedControls||[]).filter(r=>!equal(at(state,r.key),at(baseline,r.key)));

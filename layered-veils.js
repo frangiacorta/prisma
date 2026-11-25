@@ -1,6 +1,6 @@
-import {LivingStructures} from './living-structures.js?v=1882d3ed81c1';
-import {VEIL_SOURCE_KEYS,extractVeilSource,makeSourceVeilMesh,updateSourceVeilMesh,sampleLivingVeilSource} from './veil-source.js?v=1882d3ed81c1';
-import {makeVeilMesh,updateVeilMesh} from './veil-geometry.js?v=1882d3ed81c1';
+import {LivingStructures} from './living-structures.js?v=3b2269386819';
+import {veilFieldVertex,veilFieldFragment,readVeilField,VEIL_SOURCE_KEYS,extractVeilSource,makeSourceVeilMesh,updateSourceVeilMesh,sampleLivingVeilSource} from './veil-source.js?v=3b2269386819';
+import {makeVeilMesh,updateVeilMesh} from './veil-geometry.js?v=3b2269386819';
 export class LayeredVeils{
  constructor(owner,common){this.common=common;this.owner=owner;const gl=this.gl=owner.gl;this.program=owner.program(`#version 300 es
 precision highp float;precision highp int;
@@ -37,22 +37,30 @@ void main(){
  color=vec4(lit*alpha,alpha);
 }`,null,true);this.vao=gl.createVertexArray();this.buffer=gl.createBuffer();this.indices=gl.createBuffer();this.validBuffer=gl.createBuffer();gl.bindVertexArray(this.vao);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);for(let k=0;k<3;k++){gl.enableVertexAttribArray(k);gl.vertexAttribPointer(k,3,gl.FLOAT,false,36,k*12);}gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indices);gl.bindVertexArray(null);}
  draw(s,phase,options={}){const gl=this.gl,o=this.owner,p=this.program,layers=Math.round(s.pVeilLayers),start=performance.now();if(!o.shadowPass&&!o.reuseGeometry){const low=options.preview&&Math.min(o.width,o.height)<700,columns=low?64:96,rows=low?28:40;if(!s.pVeilFromForm&&(this.mesh?.source||this.mesh?.layers!==layers||this.mesh?.columns!==columns)){this.mesh=makeVeilMesh(layers,columns,rows);this.key='';}
- if(s.pVeilFromForm&&s.pVeilSourceKind>0){this.sourceLiving??=new LivingStructures(o,this.common);const base={...s,pLiving:s.pVeilSourceKind===4?3:s.pVeilSourceKind};for(const k of Object.keys(base))if(k.startsWith('pVeil'))delete base[k];this.sourceLiving.sample({...base,dynAmount:0,_dynamics:null},phase);if(!this.liveMesh||this.liveMesh.layers!==layers||this.liveMesh.columns!==columns){this.liveMesh=makeVeilMesh(layers,columns,rows);this.liveMesh.source=true;this.liveMesh.origins=new Float32Array(this.liveMesh.coords.length);this.liveMesh.valid=new Float32Array(this.liveMesh.coords.length/3).fill(1);}sampleLivingVeilSource(this.liveMesh,this.sourceLiving);this.mesh=this.liveMesh;this.key='';}
+ if(s.pVeilFromForm&&s.pVeilSourceKind>0){this.sourceLiving??=new LivingStructures(o,this.common);const base={...s,pCount:s._veilSource?.pCount??s.pCount,pLiving:s.pVeilSourceKind===4?0:s.pVeilSourceKind};
+ if(s._veilSource&&s.pVeilSourceKind===4)Object.assign(base,{pSkinOpening:0,pSkinScale:1,pSkinOffset:0,pSkinFollow:0,pFoldDepth:0,pInflate:0,pContract:0,pBundleAmount:0,pBundleDelay:0,pFray:0,pSelfContact:0,pVolumeHold:0,pElastic:0,pBend:0});
+ for(const k of Object.keys(base))if(k.startsWith('pVeil'))delete base[k];this.sourceLiving.sample({...base,dynAmount:0,_dynamics:null},phase);if(!this.liveMesh||this.liveMesh.layers!==layers||this.liveMesh.columns!==columns){this.liveMesh=makeVeilMesh(layers,columns,rows);this.liveMesh.source=true;this.liveMesh.origins=new Float32Array(this.liveMesh.coords.length);this.liveMesh.valid=new Float32Array(this.liveMesh.coords.length/3).fill(1);}sampleLivingVeilSource(this.liveMesh,this.sourceLiving);this.mesh=this.liveMesh;this.key='';}
 
  else if(s.pVeilFromForm){
-  const details=s.pVeilMorph<.8,sourceKey=JSON.stringify([!!options.preview,...VEIL_SOURCE_KEYS.map(k=>s[k])]);
-  if(sourceKey!==this.sourceKey){this.source=extractVeilSource(s,options.preview?24:40);this.sourceKey=sourceKey;this.sourceMeshes=new Map();}
+  const field=options.veilField,details=!field&&s.pVeilMorph<.8;
+  const sourceKey=field?JSON.stringify(['field',field.key||'sphere',!!options.preview]):JSON.stringify([!!options.preview,...VEIL_SOURCE_KEYS.map(k=>s[k])]);
+  if(sourceKey!==this.sourceKey){if(field){
+    this.fieldProgram??=o.program(veilFieldVertex,veilFieldFragment);
+    this.fieldTarget??={fbo:gl.createFramebuffer(),texture:gl.createTexture()};
+    this.source=readVeilField(o,this.fieldProgram,field,options.preview?32:48,this.fieldTarget);
+   }else this.source=extractVeilSource(s,options.preview?24:40);this.sourceKey=sourceKey;this.sourceMeshes=new Map();}
   const meshKey=[layers,columns,rows,details].join(':');
   if(!this.sourceMeshes.has(meshKey)){if(this.sourceMeshes.size>=4)this.sourceMeshes.delete(this.sourceMeshes.keys().next().value);this.sourceMeshes.set(meshKey,makeSourceVeilMesh(this.source,layers,s.pVeilStyle,columns,rows,details));}
   const next=this.sourceMeshes.get(meshKey);if(this.mesh!==next)this.key='';this.mesh=next;
  }
 
- const key=JSON.stringify([phase,s.pVeilFromForm?this.sourceKey:'',...Object.entries(s).filter(([k])=>k.startsWith('pVeil')||['scale','volume','stretchX','stretchY','stretchZ','positionX','positionY','rotateX','rotateY','rotateZ'].includes(k))]);
+ const clock=s._veilPhase??phase,sheetClock=s.perfectLoop!==false?((clock%1)+1)%1:clock;
+ const key=JSON.stringify([sheetClock,s.pVeilFromForm?this.sourceKey:'',...Object.entries(s).filter(([k])=>k.startsWith('pVeil')||['scale','volume','stretchX','stretchY','stretchZ','positionX','positionY','rotateX','rotateY','rotateZ'].includes(k))]);
  gl.bindVertexArray(this.vao);if(s.pVeilFromForm){gl.enableVertexAttribArray(3);gl.bindBuffer(gl.ARRAY_BUFFER,this.validBuffer);if(this.validMesh!==this.mesh){gl.bufferData(gl.ARRAY_BUFFER,this.mesh.valid,gl.STATIC_DRAW);this.validMesh=this.mesh;}gl.vertexAttribPointer(3,1,gl.FLOAT,false,4,0);}else{gl.disableVertexAttribArray(3);gl.vertexAttrib1f(3,1);}
- if(key!==this.key){if(s.pVeilFromForm)updateSourceVeilMesh(this.mesh,s,phase);else updateVeilMesh(this.mesh,s,phase);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.bufferData(gl.ARRAY_BUFFER,this.mesh.vertices,gl.DYNAMIC_DRAW);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indices);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.mesh.indices,gl.DYNAMIC_DRAW);this.key=key;}
+ if(key!==this.key){if(s.pVeilFromForm)updateSourceVeilMesh(this.mesh,s,sheetClock);else updateVeilMesh(this.mesh,s,sheetClock);gl.bindBuffer(gl.ARRAY_BUFFER,this.buffer);gl.bufferData(gl.ARRAY_BUFFER,this.mesh.vertices,gl.DYNAMIC_DRAW);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,this.indices);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,this.mesh.indices,gl.DYNAMIC_DRAW);this.key=key;}
  }
  gl.bindVertexArray(this.vao);o.settings(p,{...s,transparency:0},phase);o.u(p,'uVeilDetails',this.mesh.detailStart!==undefined?1:0);o.u(p,'uVeilSourceKind',s.pVeilSourceKind||0);o.u(p,'uVeilMorph',s.pVeilFromForm?s.pVeilMorph:1);o.u(p,'uVeilMaterial',s.pVeilOpacity,s.pVeilEdge,s.pVeilFeather,0);o.u(p,'uVeilColor',s.pVeilStyle,s.pVeilLayerColor,s.pVeilCoreRadius>0?s.pVeilCoreDark:0,s.pVeilCoreRadius);
  gl.disable(gl.CULL_FACE);gl.disable(gl.DEPTH_TEST);gl.depthMask(false);gl.enable(gl.BLEND);gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);o.opticalDrawState?.();gl.drawElements(gl.TRIANGLES,this.mesh.indices.length,gl.UNSIGNED_INT,0);gl.depthMask(true);gl.blendFunc(gl.ONE,o.shadowPass?gl.ONE_MINUS_SRC_ALPHA:gl.ONE);this.milliseconds=performance.now()-start;
  }
- dispose(){this.sourceLiving?.dispose();const g=this.gl;g.deleteProgram(this.program.program);g.deleteBuffer(this.buffer);g.deleteBuffer(this.indices);g.deleteBuffer(this.validBuffer);g.deleteVertexArray(this.vao);}
+ dispose(){this.sourceLiving?.dispose();const g=this.gl;if(this.fieldTarget){g.deleteFramebuffer(this.fieldTarget.fbo);g.deleteTexture(this.fieldTarget.texture);}if(this.fieldProgram)g.deleteProgram(this.fieldProgram.program);g.deleteProgram(this.program.program);g.deleteBuffer(this.buffer);g.deleteBuffer(this.indices);g.deleteBuffer(this.validBuffer);g.deleteVertexArray(this.vao);}
 }

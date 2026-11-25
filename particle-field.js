@@ -1,8 +1,8 @@
-import {bodySampleGLSL} from './body-samples.js?v=1882d3ed81c1';
-import {DYNAMICS_GLSL} from './dynamics.js?v=1882d3ed81c1';
+import {bodySampleGLSL} from './body-samples.js?v=3b2269386819';
+import {DYNAMICS_GLSL} from './dynamics.js?v=3b2269386819';
 // Analytic periodic fields, not an accumulating particle simulation: any frame is seekable.
-import {guideGLSL} from './particle-path-field.js?v=1882d3ed81c1';
-import {forceBarrierGLSL} from './particle-forces.js?v=1882d3ed81c1';
+import {guideGLSL} from './particle-path-field.js?v=3b2269386819';
+import {forceBarrierGLSL} from './particle-forces.js?v=3b2269386819';
 export const grainSizingGLSL=`
 uniform vec2 uNodeStyle,uLargeGrains,uGrainDistribution;
 float grainDiameter(vec4 seed,int index){

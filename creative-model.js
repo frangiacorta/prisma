@@ -1,21 +1,21 @@
-import {surfaceWebStrength} from './surface-web-model.js?v=1882d3ed81c1';
-import {legacyFiberWeave} from './fiber-material.js?v=1882d3ed81c1';
-import {normalizeFinishPalette} from './finish-palette.js?v=1882d3ed81c1';
-import {normalizePlayground} from './playground-model.js?v=1882d3ed81c1';
-import {hasGrainLayer,normalizeBodyLayers} from './body-layers.js?v=1882d3ed81c1';
-import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=1882d3ed81c1';
-import {FRACTAL_META} from './fractal-form.js?v=1882d3ed81c1';
-import {CELLULAR_META} from './cellular-form.js?v=1882d3ed81c1';
-import {normalizeFinishRegions,normalizeFinishOrder,normalizeBrushStrokes} from './finishing.js?v=1882d3ed81c1';
-import {normalizeAudioClip} from './audio-recording.js?v=1882d3ed81c1';
-import {normalizeBodyTracking} from './body-tracking-model.js?v=1882d3ed81c1';
-import {hasMotionPoints,LIGHT_ORBIT_RANGE,normalizeMotionPoints,supportsMotionPoints} from './motion-keyframes.js?v=1882d3ed81c1';
-import {normalizeAudio} from './audio-model.js?v=1882d3ed81c1';
-import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=1882d3ed81c1';
-import {normalizeForcePaths} from './particle-paths.js?v=1882d3ed81c1';
-import {normalizeForcePoints} from './particle-forces.js?v=1882d3ed81c1';
-import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=1882d3ed81c1';
-import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META,syncMaterialControl} from './studio-model.js?v=1882d3ed81c1';
+import {surfaceWebStrength} from './surface-web-model.js?v=3b2269386819';
+import {migrateFiberMaterial} from './fiber-material.js?v=3b2269386819';
+import {normalizeFinishPalette} from './finish-palette.js?v=3b2269386819';
+import {normalizePlayground} from './playground-model.js?v=3b2269386819';
+import {hasGrainLayer,normalizeBodyLayers} from './body-layers.js?v=3b2269386819';
+import {integrateStructure,STRUCTURE_META} from './structure-model.js?v=3b2269386819';
+import {FRACTAL_META} from './fractal-form.js?v=3b2269386819';
+import {CELLULAR_META} from './cellular-form.js?v=3b2269386819';
+import {normalizeFinishRegions,normalizeFinishOrder,normalizeBrushStrokes} from './finishing.js?v=3b2269386819';
+import {normalizeAudioClip} from './audio-recording.js?v=3b2269386819';
+import {normalizeBodyTracking} from './body-tracking-model.js?v=3b2269386819';
+import {hasMotionPoints,LIGHT_ORBIT_RANGE,normalizeMotionPoints,supportsMotionPoints} from './motion-keyframes.js?v=3b2269386819';
+import {normalizeAudio} from './audio-model.js?v=3b2269386819';
+import {PARTICLE_META,PARTICLE_VERSION,varyParticles,migrateGrainSizes} from './particle-model.js?v=3b2269386819';
+import {normalizeForcePaths} from './particle-paths.js?v=3b2269386819';
+import {normalizeForcePoints} from './particle-forces.js?v=3b2269386819';
+import {preset,MOODS,META,GROUPS,random,randomize} from './model.js?v=3b2269386819';
+import {newLight,MATERIAL_STYLES,MODERN_BASE,EXTRA_BASE,SHAPE_TRACKS,LIGHT_RIGS,TEXTURE_STYLES,ORGANIC_DETAIL_DEFAULTS,TRACK_META,syncMaterialControl} from './studio-model.js?v=3b2269386819';
 
 export function setFullness(s,value){s.fullness=value;syncMaterialControl(s,'fullness');}
 export function upgrade(s){if((s.renderVersion||1)<2){Object.assign(s,MODERN_BASE,{fullness:1-(s.hollow||0)*(1-(s.wallThickness??.08))});}return s;}
@@ -47,7 +47,7 @@ export function motionPreset(s,key){
  if(key==='chromatic'){s.colorWaveAmount=1;s.motions.colorWavePhase={...s.motions.colorWavePhase,enabled:true,mode:'cycle',cycles:1,phase:0,direction:1};}
  return s;
 }
-export function hasMotion(s){return (s.grainMotion!==false&&s.structWeaveFlex>0&&surfaceWebStrength(s)>0)||s.dynAmount>0||(hasGrainLayer(s)&&s.grainDispersal>0)||(s.filLength>0&&s.filPulse>0)||(s.finishEnabled!==false&&s.finishScan&&s.finishScanMix>0&&s.finishScanAnimate&&s.finishScanCycles!==0)||(s.growthAmount>0&&s.growthFlow>0)||(s.finishEnabled!==false&&((s.finishWarp&&s.finishWarpMix>0&&s.finishWarpMotion>0)||(s.finishGlass&&s.finishGlassMix>0&&s.finishGlassMotion>0)))||(s.finishEnabled!==false&&s.finishGlitch&&s.finishGlitchAnimate&&s.finishGlitchMix>0&&s.finishGlitchCoverage>0&&(s.finishGlitchAmount>0||s.finishGlitchSplit>0))||(s.finishEnabled!==false&&s.finishGlyph&&s.finishGlyphMix>0&&s.finishGlyphVariation>0)||s.engine==='particles'||s.pLiving>0|| Object.values(s.motions||{}).some(t=>t.enabled)||s.lights.some(l=>l.orbit?.enabled||l.pulse?.enabled)||!!s.environmentRotate||(s.filmFlow||0)>0||(s.filmSwirl||0)>0;}
+export function hasMotion(s){return (s.veilAmount>0&&(s.pVeilFlow>0||s.pVeilBreath>0||s.pVeilRipple>0))||(s.grainMotion!==false&&s.structWeaveFlex>0&&surfaceWebStrength(s)>0)||s.dynAmount>0||(hasGrainLayer(s)&&s.grainDispersal>0)||(s.filLength>0&&s.filPulse>0)||(s.finishEnabled!==false&&s.finishScan&&s.finishScanMix>0&&s.finishScanAnimate&&s.finishScanCycles!==0)||(s.growthAmount>0&&s.growthFlow>0)||(s.finishEnabled!==false&&((s.finishWarp&&s.finishWarpMix>0&&s.finishWarpMotion>0)||(s.finishGlass&&s.finishGlassMix>0&&s.finishGlassMotion>0)))||(s.finishEnabled!==false&&s.finishGlitch&&s.finishGlitchAnimate&&s.finishGlitchMix>0&&s.finishGlitchCoverage>0&&(s.finishGlitchAmount>0||s.finishGlitchSplit>0))||(s.finishEnabled!==false&&s.finishGlyph&&s.finishGlyphMix>0&&s.finishGlyphVariation>0)||s.engine==='particles'||s.pLiving>0|| Object.values(s.motions||{}).some(t=>t.enabled)||s.lights.some(l=>l.orbit?.enabled||l.pulse?.enabled)||!!s.environmentRotate||(s.filmFlow||0)>0||(s.filmSwirl||0)>0;}
 function hue(hex,angle){let [r,g,b]=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255),max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;let h=d?(max===r?(g-b)/d:max===g?(b-r)/d+2:(r-g)/d+4)/6:0;h=(h+angle/360+1)%1;const sat=max?d/max:0,x=h*6,j=Math.floor(x),f=x-j,p=max*(1-sat),q=max*(1-f*sat),t=max*(1-(1-f)*sat);const c=[[max,t,p],[q,max,p],[p,max,t],[p,q,max],[t,p,max],[max,p,q]][j%6];return '#'+c.map(v=>Math.round(v*255).toString(16).padStart(2,'0')).join('');}
 const clamp=(key,value)=>META[key]?Math.max(META[key][1],Math.min(META[key][2],value)):value;
 export function similar(s,seed,count=8,strength=.7){const r=random(seed),profiles=[[1,.4,.45],[.45,1,.45],[.5,.45,1],[.9,.9,.5],[.6,.9,.9],[1,.5,.9],[.7,1,.6],[1,1,1]],amount=Math.max(0,Math.min(1,strength));return Array.from({length:count},(_,i)=>{
@@ -135,11 +135,7 @@ export function normalizeCreation(raw){
  for(const k of ['background','background2','internalColor','sssColor','finishGlyphColor','finishEdgeColor','finishScanColor'])if(/^#[0-9a-f]{6}$/i.test(raw[k]||''))s[k]=raw[k];
  s.finishPaletteColors=normalizeFinishPalette(raw.finishPaletteColors);
  // Older woven projects tied the coat of growing nodules to their surface texture.
- // Keep that relationship on import, and expose it as an editable material target.
- if(!Object.hasOwn(raw,'fiberPile')&&legacyFiberWeave(raw)){
-  s.fiberPile=s.surfaceTexture;
-  s.fiberTarget='growth';
- }else s.fiberTarget=['nodes','growth'].includes(raw.fiberTarget)?raw.fiberTarget:'all';
+ migrateFiberMaterial(s,raw);
  if(Array.isArray(raw.palette)&&raw.palette.length&&raw.palette.every(c=>/^#[0-9a-f]{6}$/i.test(c)))s.palette=raw.palette.slice(0,12);
  if(['solid','gradient','transparent','studio'].includes(raw.bgMode))s.bgMode=raw.bgMode;
  Object.assign(s,{...MODERN_BASE,renderVersion:raw.renderVersion>=2?2:1});
@@ -184,6 +180,16 @@ export function normalizeCreation(raw){
  if(s.perfectLoop)for(const k of ['environmentCycles','filmCycles'])s[k]=Math.max(1,Math.round(s[k]||1));
  // Existing v33 veil creations gain the editable source bridge on reopen.
  if(s.pLiving===4&&raw.pVeilFromForm===undefined){s.pVeilFromForm=1;s.pVeilMorph=1;s.pVeilSourceKind=0;s.pVeilMemory=0;}
+ // The old bridge used a renderer selector to store the source alongside its morph.
+ // Earlier standalone files without layered bodies keep their original archive migration.
+ if(s.pLiving===4&&(Number.isFinite(raw.sceneGrains)||raw.veilProjectionVersion===1)){
+  s.veilAmount=s.pVeilFromForm?s.pVeilMorph:1;
+  s.pLiving=s.pVeilSourceKind===4?0:s.pVeilSourceKind;
+  s.engine=s.pVeilSourceKind>0?'particles':'solid';
+  s.grainSource=s.pVeilSourceKind>0?'cloud':'body';
+  if(s.motions.pVeilMorph.enabled)s.motions.veilAmount={...s.motions.pVeilMorph};
+  s.motions.pVeilMorph.enabled=false;
+ }
  for(const [k,m] of Object.entries(STRUCTURE_META))if(m[3]>=1)s[k]=Math.round(s[k]);
  for(const meta of [CELLULAR_META,FRACTAL_META])for(const [k,m] of Object.entries(meta))if(m[3]===1)s[k]=Math.round(s[k]);
  if(raw.structureOriginal&&typeof raw.structureOriginal==='object'&&!Array.isArray(raw.structureOriginal)){s.structureOriginal=structuredClone(raw.structureOriginal);delete s.structureOriginal.structureOriginal;}

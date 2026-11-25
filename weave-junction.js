@@ -1,7 +1,8 @@
-import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL,FACING_GLSL} from './weave-sling.js?v=1882d3ed81c1';
-import whorlAnatomy from './weave-whorl.js?v=1882d3ed81c1';
-import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=1882d3ed81c1';
-import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=1882d3ed81c1';
+import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL,FACING_GLSL} from './weave-sling.js?v=3b2269386819';
+import whorlAnatomy from './weave-whorl.js?v=3b2269386819';
+import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=3b2269386819';
+import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=3b2269386819';
+import {fiberMaterialUniform} from './fiber-material.js?v=3b2269386819';
 
 // Attachment coordinates on one repeat of the tissue. Each bud keeps its identity
 // as the transverse bridges withdraw and the same bud becomes a hollow calyx.
@@ -283,7 +284,7 @@ export function junctionPose(s){
  if(sling){
   for(let a=0;a<2;a++){extent[a]=Math.min(extent[a],sling.bounds[a]-.07);extent[a+2]=Math.max(extent[a+2],sling.bounds[a+2]+.07);}
  }
- return lastPose={roots:new Float32Array(roots),ends:new Float32Array(ends),controls:new Float32Array(controls),profile:new Float32Array(profile),extent,sling,cage:strainPose(s,flex)};
+ return lastPose={roots:new Float32Array(roots),ends:new Float32Array(ends),controls:new Float32Array(controls),profile:new Float32Array(profile),extent,sling,cage:strainPose(s,flex,roots,ends)};
 }
 
 export function junctionUniforms(s,u,upload){
@@ -304,7 +305,7 @@ export function junctionUniforms(s,u,upload){
  }
  u('uTissueSlingLoad',[pose.sling?.pocket||0]);
  const growthFleece=pouchWeight(s.structWeaveRelease)*(1-smooth(.36,.63,s.structWeaveGrowth));
- u('uTissueCottonWeight',[s.fiberTarget==='growth'||s.fiberPile==null?growthFleece:1]);
+ u('uTissueCottonWeight',[mix(1,growthFleece,fiberMaterialUniform(s)[3])]);
  if(pose.sling){
   const data=pose.sling.vertices;
   if(upload)upload('uTissueSling',data);

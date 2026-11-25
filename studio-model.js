@@ -1,11 +1,12 @@
-import {PALETTE_TRACKS} from './finish-palette.js?v=1882d3ed81c1';
-import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=1882d3ed81c1';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=1882d3ed81c1';
-import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=1882d3ed81c1';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=1882d3ed81c1';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=1882d3ed81c1';
-import {PARTICLE_CELL_TRACKS,PARTICLE_META,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=1882d3ed81c1';
-import {BODY_LAYER_META,GRAIN_MOTION_DEFAULTS} from './body-layers.js?v=1882d3ed81c1';
+import {VEIL_META,VEIL_TRACK_KEYS} from './veil-model.js?v=3b2269386819';
+import {PALETTE_TRACKS} from './finish-palette.js?v=3b2269386819';
+import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=3b2269386819';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=3b2269386819';
+import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=3b2269386819';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=3b2269386819';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=3b2269386819';
+import {PARTICLE_CELL_TRACKS,PARTICLE_META,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=3b2269386819';
+import {BODY_LAYER_META,GRAIN_MOTION_DEFAULTS} from './body-layers.js?v=3b2269386819';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
@@ -14,6 +15,7 @@ export const SHAPE_TRACKS=[...Object.keys(STRUCTURE_TRACKS),...Object.keys(FRACT
 const FIBRE_LIGHT_META={
  fiberPile:['Peluria',0,1,.01],
  fiberLength:['Lunghezza del pelo',0,1,.01],
+ fiberGrowth:['Peluria legata alla crescita',0,1,.01],
  lightWrap:['Luce avvolgente',0,1,.01]
 };
 export const TRACK_META={
@@ -32,14 +34,14 @@ export const TRACK_META={
  exposure:['Esposizione',0,2,.01],
  focusBlur:['Sfocatura fuori fuoco',0,1,.01],focusDepth:['Piano di fuoco',0,4.7,.01],focusTilt:['Inclinazione del fuoco (°)',0,60,.1],
  ...FRACTAL_TRACKS,
- pVeilStyle:['Petali / aureola / ventaglio',0,2,.01],pVeilMorph:['Trasformazione forma / veli',0,1,.01],pVeilSpread:['Apertura dei veli',0,1,.01],
+ ...Object.fromEntries(VEIL_TRACK_KEYS.map(key=>[key,VEIL_META[key]])),pVeilMorph:['Trasformazione forma / veli',0,1,.01],
  petalFlowPhase:['Scorrimento lungo le radici',0,1,.01],petalOrbitPhase:['Avanzamento continuo sulla sfera',0,1,.01],petalWeave:['Ampiezza intreccio',0,1,.01],
  petalGrowth:['Emersione delle radici',0,1,.01],petalWander:['Sinuosità delle radici',0,1,.01],petalCoil:['Avvolgimento intorno alla sfera',0,1,.01],petalReentry:['Rientro nella sfera',0,1,.01],petalKnots:['Nodosità delle radici',0,1,.01],petalRidges:['Nervature della superficie',0,1,.01],petalDisorder:['Disordine della crescita',0,1,.01],
  petalOpen:['Apertura dei petali',0,.6,.01],petalCurl:['Arricciatura dei petali',0,1,.01],petalInflate:['Gonfiore dei petali',0,.7,.01],petalSharp:['Petali / punte',0,.7,.01],petalPhase:['Rotazione della corona',0,360,1],petalBlend:['Fusione con la sfera',0,1,.01],petalRoot:['Ampiezza delle radici',0,1,.01],petalRandom:['Irregolarità delle punte',0,1,.01],stemBend:['Oscillazione del gambo',0,.8,.01],colorWavePhase:['Onde di colore',0,1,.01],
  rotateY:['Rotazione orizzontale',0,360,1],rotateX:['Rotazione verticale',0,180,1],rotateZ:['Rotazione sul piano',0,360,1],volume:['Volume',0,.6,.01],deform:['Deformazione',0,.4,.01],twist:['Torsione',0,2,.01],waves:['Increspature',0,.3,.01],hole:['Apertura del vuoto',0,.6,.01],cut:['Ritaglio',0,.8,.01],scale:['Dimensione',0,.7,.01],positionX:['Posizione orizzontale',0,4.5,.01],positionY:['Posizione verticale',0,4.5,.01],gradientOffset:['Scorrimento colori',0,1,.01],iridescence:['Iridescenza',0,.7,.01],roughness:['Rugosità',0,.6,.01],transparency:['Trasparenza',0,.7,.01]
 };
 export const EXTRA_BASE={
- fiberPile:0,fiberLength:.35,fiberTarget:'all',lightWrap:0,
+ fiberPile:0,fiberLength:.35,fiberGrowth:0,fiberTarget:'all',lightWrap:0,
  baseForm:0,
  grainDispersal:0,
  ...GRAIN_MOTION_DEFAULTS,
