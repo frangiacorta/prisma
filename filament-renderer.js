@@ -1,10 +1,12 @@
-import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=db658b02e410';
-import {BASE_FORM_GLSL} from './base-forms.js?v=db658b02e410';
-import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=db658b02e410';
-import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,uploadFractalMaterial} from './solid-renderer.js?v=db658b02e410';
-import {FILAMENT_DEFAULTS} from './filament-model.js?v=db658b02e410';
-import {materialCavity} from './particle-shading.js?v=db658b02e410';
-import {focusSlope} from './finishing.js?v=db658b02e410';
+import {GROWTH_GLSL,bindGrowth} from './growth-material.js?v=1882d3ed81c1';
+import {FIBER_MATERIAL_GLSL,fiberMaterialUniform} from './fiber-material.js?v=1882d3ed81c1';
+import {BASE_FORM_GLSL} from './base-forms.js?v=1882d3ed81c1';
+import {SOLID_FORCES_GLSL,uploadSolidForces} from './solid-forces.js?v=1882d3ed81c1';
+import {FILM_SPECTRUM,FILM_PATTERN_GLSL,FORM_MATERIAL_GLSL,FRACTAL_LOCAL_MATERIAL_GLSL,uploadFractalMaterial} from './solid-renderer.js?v=1882d3ed81c1';
+import {FILAMENT_DEFAULTS} from './filament-model.js?v=1882d3ed81c1';
+import {materialCavity} from './particle-shading.js?v=1882d3ed81c1';
+import {focusSlope} from './finishing.js?v=1882d3ed81c1';
+import {SURFACE_LIGHT_GLSL} from './surface-light.js?v=1882d3ed81c1';
 
 // Instanced tapered strands attached to the existing implicit surface. Geometry,
 // depth, shadows and colour share the same pass for preview and export.
@@ -219,6 +221,8 @@ const float PI=3.141592653589793;
 uniform vec3 uPalette[12],uPaletteMean,uLightColors[8],uInternalColor,uSssColor;
 uniform int uPaletteCount,uLightCount;
 uniform vec4 uGradient,uColorWave,uColorAxis,uColorLayers,uEnvironment,uLights[8],uLightProps[8],uLightExtra[8];
+${SURFACE_LIGHT_GLSL}
+${FIBER_MATERIAL_GLSL}
 uniform vec4 uMat,uSurface,uCoat,uOptics,uTexture,uScatter,uModern,uFilmMotion,uTransport,uMaterialDetail,uMaterialLayers,uOrganicDetail,uRuntime,uOther,uExtraShape3;
 uniform vec2 uResolution;uniform float uSeed,uTextureSeed,uSurfaceSeed,uHairCavity;
 uniform vec3 uHairDarkCore;
@@ -250,7 +254,11 @@ vec4 strandMaterial(vec3 base,vec3 local,vec3 p,vec3 normal,vec3 tangent,float r
  // Filter unresolved normal variation instead of turning it into coloured glitter.
  rough=max(rough,max(mix(.38,0.,resolved),min(.7,sqrt(length(fwidth(n)))*.3)));
  float facing=max(.001,dot(n,view));vec3 spec=environment(reflect(-view,n),p,rough),diffuse=environment(n,p,1.)*.14;
- for(int i=0;i<uLightCount;i++){vec3 off=uLights[i].xyz-p;float shadow=i==0?hairShadow(p):1.;diffuse+=uLightColors[i]*max(dot(n,normalize(off)),0.)*uLights[i].w*.35/(1.+dot(off,off)*.08)*shadow;}
+ for(int i=0;i<uLightCount;i++){vec3 off=uLights[i].xyz-p;float shadow=i==0?hairShadow(p):1.;
+  float incident=emitterDiffuse(n,p,uLights[i],uLightProps[i],uLightExtra[i],max(dot(n,normalize(off)),0.));
+  float inner=1.-exp(-uSharedLightResponse.y-uSharedLightResponse.z);
+  incident+=inner*diffuseThrough(dot(n,normalize(off)),facing,uSharedLightResponse.z)*(1.-uMat.z);
+  diffuse+=uLightColors[i]*incident*uLights[i].w*.35/(1.+dot(off,off)*.08)*shadow;}
  vec3 dielectric=fresnel(facing,1.,max(1.,uMat.y),local),sigma=absorptionCoefficient(base);
  // Optical thickness comes from the cylinder diameter, not a fixed alpha per strand.
  float path=2.*radius*(1.-uHairCavity)/max(.15,sqrt(max(0.,1.-pow(dot(tangent,view),2.))));
@@ -266,6 +274,11 @@ vec4 strandMaterial(vec3 base,vec3 local,vec3 p,vec3 normal,vec3 tangent,float r
  below=below*(1.-filmF)+spec*filmF;alpha=1.-(1.-alpha)*(1.-max(max(filmF.r,filmF.g),filmF.b));
  if(uCoat.x>.001){vec3 f=fresnel(facing,1.,1.5,local)*uCoat.x;below=below*(1.-f)+environment(reflect(-view,n),p,uCoat.y)*f;alpha=1.-(1.-alpha)*(1.-max(max(f.r,f.g),f.b));}
  below+=base*uSurface.w*(1.-transmission+transmission*pow(1.-facing,3.));
+ if(uFiberPile.x>0.&&uFiberPile.z<.5){
+  float signal=fiberThreads(local,max(.001,length(fwidth(local))));
+  below=fiberScatter(base,below,diffuse+environment(n,p,1.)*.19+uSurface.w,facing,rough,signal,uFiberPile.x);
+  alpha=mix(alpha,1.,uFiberPile.x);
+ }
  float coreVisibility=strandCoreVisibility(p);below*=coreVisibility;alpha=1.-(1.-clamp(alpha,0.,1.))*coreVisibility;
  return vec4(below/max(.0001,alpha),alpha);
 }
@@ -363,6 +376,8 @@ export class FilamentPass{
   this.u(p,'uHairBase',s.filBaseWidth,s.filBaseHeight,s.filBaseCurve,s.filBaseBlend);
   this.u(p,'uHairBranch',0,s.filBranchLength,s.filBranchSpread,branches);
   this.u(p,'uFocus',this.focus.blur,this.focus.depth,this.focus.slope);
+  this.u(p,'uSharedLightResponse',s.lightWrap||0,s.translucency||0,s.scattering||0,s.subsurface||0);
+  this.u(p,'uFiberPile',...fiberMaterialUniform(s));
  }
  *drawStrands(p,s,camera,w,h,tube,segments,sides,count,rootStride,branches){
   const g=this.gl,faces=tube?sides:1,capacity=Math.min(this.axisCapacity,Math.max(96,Math.floor((this.useAxes?1500000:140000)/(segments*faces))));

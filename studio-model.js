@@ -1,17 +1,23 @@
-import {PALETTE_TRACKS} from './finish-palette.js?v=db658b02e410';
-import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=db658b02e410';
-import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=db658b02e410';
-import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=db658b02e410';
-import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=db658b02e410';
-import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=db658b02e410';
-import {PARTICLE_CELL_TRACKS,PARTICLE_META,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=db658b02e410';
-import {BODY_LAYER_META,GRAIN_MOTION_DEFAULTS} from './body-layers.js?v=db658b02e410';
+import {PALETTE_TRACKS} from './finish-palette.js?v=1882d3ed81c1';
+import {GROWTH_DEFAULTS,GROWTH_META,GROWTH_TRACKS} from './growth-material.js?v=1882d3ed81c1';
+import {STRUCTURE_DEFAULTS,STRUCTURE_META,STRUCTURE_TRACKS} from './structure-model.js?v=1882d3ed81c1';
+import {FRACTAL_DEFAULTS,FRACTAL_META,FRACTAL_TRACKS} from './fractal-form.js?v=1882d3ed81c1';
+import {CELLULAR_DEFAULTS,CELLULAR_FIELD_KEYS,CELLULAR_META,CELLULAR_TRACKS} from './cellular-form.js?v=1882d3ed81c1';
+import {FINISH_DEFAULTS,FINISH_META} from './finishing.js?v=1882d3ed81c1';
+import {PARTICLE_CELL_TRACKS,PARTICLE_META,PARTICLE_VOLUME_TRACKS,PARTICLE_TRAIL_TRACKS} from './particle-model.js?v=1882d3ed81c1';
+import {BODY_LAYER_META,GRAIN_MOTION_DEFAULTS} from './body-layers.js?v=1882d3ed81c1';
 export const MAX_COLORS=12,MAX_LIGHTS=8;
 export const LIGHT_TYPES=[['circle','Circolare'],['bar','Barra'],['spot','Faro'],['diffuser','Diffusore'],['grid','Griglia'],['ring','Anello luminoso'],['orb','Sfera omnidirezionale']];
 export const LIGHT_META={x:['X · destra / sinistra',-5,5,.01],y:['Y · alto / basso',-5,5,.01],z:['Z · davanti / dietro',-5,5,.01],power:['Intensità',0,6,.01],size:['Larghezza sorgente',.05,3,.01],length:['Altezza sorgente',.05,3,.01],roll:['Rotazione sorgente',-180,180,1],softness:['Diffusione',.01,1,.01],cone:['Apertura faro',5,85,1],grid:['Divisioni griglia',2,12,1]};
 export function track(amplitude=1,enabled=false,mode='wave'){return{enabled,amplitude,cycles:1,phase:0,direction:1,curve:'sine',pace:0,pacePhase:0,hold:0,mode}}
 export const SHAPE_TRACKS=[...Object.keys(STRUCTURE_TRACKS),...Object.keys(FRACTAL_TRACKS),...CELLULAR_FIELD_KEYS.filter(key=>CELLULAR_TRACKS[key]),'petalFlowPhase','petalOrbitPhase','petalWeave','volume','deform','twist','waves','hole','cut','petalOpen','petalCurl','petalInflate','petalSharp','petalPhase','petalBlend','petalRoot','petalRandom','petalGrowth','petalWander','petalCoil','petalReentry','petalKnots','petalRidges','petalDisorder','stemBend'];
+const FIBRE_LIGHT_META={
+ fiberPile:['Peluria',0,1,.01],
+ fiberLength:['Lunghezza del pelo',0,1,.01],
+ lightWrap:['Luce avvolgente',0,1,.01]
+};
 export const TRACK_META={
+ ...FIBRE_LIGHT_META,pSelfShadow:PARTICLE_META.pSelfShadow,
  ...PALETTE_TRACKS,
  pOpening:['Apertura del campo orbitale',0,1,.01],pThickness:['Spessore del campo orbitale',0,1,.01],pLobeDepth:['Profondità dei lobi del campo',0,1,.01],lobeAmount:['Profondità dei lobi della forma',0,.4,.01],
  finishPrintNegative:['Negativo delle impronte',0,1,.01],
@@ -33,6 +39,7 @@ export const TRACK_META={
  rotateY:['Rotazione orizzontale',0,360,1],rotateX:['Rotazione verticale',0,180,1],rotateZ:['Rotazione sul piano',0,360,1],volume:['Volume',0,.6,.01],deform:['Deformazione',0,.4,.01],twist:['Torsione',0,2,.01],waves:['Increspature',0,.3,.01],hole:['Apertura del vuoto',0,.6,.01],cut:['Ritaglio',0,.8,.01],scale:['Dimensione',0,.7,.01],positionX:['Posizione orizzontale',0,4.5,.01],positionY:['Posizione verticale',0,4.5,.01],gradientOffset:['Scorrimento colori',0,1,.01],iridescence:['Iridescenza',0,.7,.01],roughness:['Rugosità',0,.6,.01],transparency:['Trasparenza',0,.7,.01]
 };
 export const EXTRA_BASE={
+ fiberPile:0,fiberLength:.35,fiberTarget:'all',lightWrap:0,
  baseForm:0,
  grainDispersal:0,
  ...GRAIN_MOTION_DEFAULTS,
@@ -70,6 +77,7 @@ export const LIGHT_RIGS=[
 ];
 export function legacyLights(s){const build=(id,p)=>{const angle=s[p+'Angle']*Math.PI/180,height=s[p+'Height']*Math.PI/180;return{...newLight(id),visible:true,type:'bar',x:3.2*Math.sin(angle)*Math.cos(height),y:3.2*Math.sin(height),z:3.2*Math.cos(angle)*Math.cos(height),color:s[p+'Color'],power:s[p+'Power'],size:1.7,length:s[p+'Size']*.6,softness:s[p+'Size'],enabled:id===1||s.light2}};return[build(1,'light'),build(2,'light2')]}
 export const EXTRA_META={
+ ...FIBRE_LIGHT_META,
  ...BODY_LAYER_META,
  baseForm:['Forma di base',0,6,1],
  ...STRUCTURE_META,

@@ -1,6 +1,6 @@
 // Sample the same local distance field the surface uses, before the camera
 // transform. Sampling is deterministic at any phase, including export seeks.
-import {BASE_FORM_GLSL} from './base-forms.js?v=db658b02e410';
+import {BASE_FORM_GLSL} from './base-forms.js?v=1882d3ed81c1';
 
 export const bodyFieldGLSL = `
 uniform highp sampler2D uField;
@@ -115,10 +115,11 @@ vec3 studioTransform(vec3 p){
 `;
 
 export class BodySamples {
- constructor(gl){this.gl=gl;this.vao=gl.createVertexArray();this.width=512;this.height=192;this.key='';}
+ constructor(gl,sharedProgram=null){this.gl=gl;this.sharedProgram=sharedProgram;this.vao=gl.createVertexArray();this.width=512;this.height=192;this.key='';}
  prepare(){
   const gl=this.gl;
   if(this.program)return;
+  if(this.sharedProgram){this.sharedProgram.prepare();this.program=this.sharedProgram.program;this.parallel=this.sharedProgram.parallel;return;}
   this.program=gl.createProgram();
   for(const [type,source] of [[gl.VERTEX_SHADER,vertex],[gl.FRAGMENT_SHADER,fragment]]){
    const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);
@@ -167,6 +168,6 @@ export class BodySamples {
   return {kind:2,texture:this.texture,lo:field.lo,hi:field.hi,width:this.width,height:this.height,key};
  }
  dispose(){
-  const gl=this.gl;gl.deleteTexture(this.texture);gl.deleteFramebuffer(this.framebuffer);gl.deleteProgram(this.program);gl.deleteVertexArray(this.vao);
+  const gl=this.gl;gl.deleteTexture(this.texture);gl.deleteFramebuffer(this.framebuffer);if(!this.sharedProgram)gl.deleteProgram(this.program);gl.deleteVertexArray(this.vao);
  }
 }

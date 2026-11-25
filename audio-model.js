@@ -1,4 +1,5 @@
-import {META} from './model.js?v=db658b02e410';
+import {WEAVE_TRACKS} from './structure-model.js?v=1882d3ed81c1';
+import {META} from './model.js?v=1882d3ed81c1';
 
 export const AUDIO_BANDS = {all:'Volume',low:'Bassi',mid:'Medi',high:'Alti',peak:'Picchi',onset:'Impulsi',brightness:'Brillantezza',texture:'Rumorosità',beat:'Ritmo'};
 export const AUDIO_META = {
@@ -12,7 +13,8 @@ export const AUDIO_META = {
 const shared={
  'Moto globale':['speed','motion','rotateX','rotateY','rotateZ','positionX','positionY'],
  'Dimensioni e deformazione':['scale','stretchX','stretchY','stretchZ','deform','twist','waves'],
- 'Luce e materia':['glow','emission','roughness','iridescence','gradientOffset','metal','transparency']
+ 'Reticolo di fibre':WEAVE_TRACKS.filter(k=>k!=='structWeaveCupLight'),
+ 'Luce e materia':['fiberPile','fiberLength','lightWrap','pSelfShadow','structWeaveCupLight','glow','emission','roughness','iridescence','gradientOffset','metal','transparency']
 };
 export const audioTargetGroups=engine=>engine==='particles'?{
  'Moto · orbite':['pTravel','pOrbitOval','pOrbitTilt','pOrbitPrecession','pOrbitSpread','pOrbitDrift','pVortex'],

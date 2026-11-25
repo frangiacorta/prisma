@@ -1,16 +1,17 @@
-import {onlineDirector,DIRECTOR_ONLINE_URL} from './director-connection.js?v=db658b02e410';
-import {PlaygroundDirector} from './playground-director.js?v=db658b02e410';
-import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=db658b02e410';
-import {familyName,presetFamily} from './preset-families.js?v=db658b02e410';
-import {closeLivingSkin} from './living-panel.js?v=db658b02e410';
-import {PlaygroundEngine} from './playground-engine.js?v=db658b02e410';
-import {PlaygroundInputs} from './playground-inputs.js?v=db658b02e410';
-import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=db658b02e410';
-import {particleCreation} from './particle-model.js?v=db658b02e410';
-import {readPreset} from './preset-files.js?v=db658b02e410';
-import {controlHelp,controlCondition} from './control-help.js?v=db658b02e410';
-import {MUTATIONS} from './playground-performance.js?v=db658b02e410';
-import {LIVE_FILTERS,LIVE_BUSES,MOD_SOURCES,TRANSITIONS,normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=db658b02e410';
+import {FIBER_TARGETS} from './control-vocabulary.js?v=1882d3ed81c1';
+import {onlineDirector,DIRECTOR_ONLINE_URL} from './director-connection.js?v=1882d3ed81c1';
+import {PlaygroundDirector} from './playground-director.js?v=1882d3ed81c1';
+import {FLOW_MOODS,FLOW_COLORS,FLOW_PALETTES,flowTiming,flowPalette} from './flow-model.js?v=1882d3ed81c1';
+import {familyName,presetFamily} from './preset-families.js?v=1882d3ed81c1';
+import {closeLivingSkin} from './living-panel.js?v=1882d3ed81c1';
+import {PlaygroundEngine} from './playground-engine.js?v=1882d3ed81c1';
+import {PlaygroundInputs} from './playground-inputs.js?v=1882d3ed81c1';
+import {newCreation,normalizeCreation,motionPreset} from './creative-model.js?v=1882d3ed81c1';
+import {particleCreation} from './particle-model.js?v=1882d3ed81c1';
+import {readPreset} from './preset-files.js?v=1882d3ed81c1';
+import {controlHelp,controlCondition} from './control-help.js?v=1882d3ed81c1';
+import {MUTATIONS} from './playground-performance.js?v=1882d3ed81c1';
+import {LIVE_FILTERS,LIVE_BUSES,MOD_SOURCES,TRANSITIONS,normalizePlayground,defaultPlayground,sceneOnly,bindingName,readParameter,parameterFromUnit,parameterCatalog,clamp} from './playground-model.js?v=1882d3ed81c1';
 
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
 const button=(text,fn,cls='outline')=>{const b=el('button',cls,text);b.type='button';b.onclick=fn;return b;};
@@ -278,7 +279,7 @@ export function mountPlayground(api){
  function openParameters(id){focusedDeck=id;dialogHead(parameterDialog,'Parametri · scena '+id);const search=el('input');search.type='search';search.placeholder='Cerca forma, colore, luce, moto…';search.setAttribute('aria-label','Cerca parametri scena '+id);const list=el('div','pg-parameter-list'),group=select([['all','Tutti i gruppi'],['shape','Forma / particelle'],['material','Materiale'],['color','Colore'],['light','Luce'],['motion','Movimento'],['interaction','Dinamica e campi'],['filters','Filtri'],['photo','Correzione colore'],['background','Sfondo']], 'shape',()=>draw());parameterDialog.append(search,field('Gruppo',group),actionButton('Chiudi pelle','close.'+id),el('p','pg-help','Gli stessi parametri dell’editor. Gli interruttori attivano i moduli; poi puoi regolarli, assegnarli a un dispositivo o collegarli a una macro. Un parametro guidato anche da un’animazione conserva quella modulazione.'),button('Aggiungi rotazione continua',()=>{const d=engine.decks[id];if(d){motionPreset(d.state,'turn');d.catalog=parameterCatalogFor(d.state);engine.refresh(id);d.playing=true;changed();draw();}}),list);
   function draw(){list.replaceChildren();const query=search.value.toLocaleLowerCase();for(const p of engine.decks[id]?.catalog||[]){if(!query&&group.value!=='all'&&p.group!==group.value)continue;if(query&&!`${p.name} ${p.path}`.toLocaleLowerCase().includes(query))continue;const row=el('div','pg-param'),value=readParameter(engine.decks[id].state,p.path),key=`param:${id}:${p.path}`;let control;
     if(p.kind==='color'){control=el('input');control.type='color';control.value=value;control.oninput=()=>{engine.setParameter(id,p.path,control.value);changed();};}
-    else if(p.kind==='enum')control=select(p.values.map(x=>[x,x]),value,v=>{engine.setParameter(id,p.path,v);changed();});
+    else if(p.kind==='enum')control=select(p.values.map(x=>[x,p.path==='fiberTarget'?FIBER_TARGETS[x]:x]),value,v=>{engine.setParameter(id,p.path,v);changed();});
     else if(p.kind==='boolean'){control=el('input');control.type='checkbox';control.checked=value;control.onchange=()=>{engine.setParameter(id,p.path,control.checked);changed();};}
     else {control=el('div','pg-param-value');const range=el('input');range.type='range';range.min=p.min;range.max=p.max;range.step=p.step;range.value=value;range.setAttribute('aria-label',p.name);const n=numeric(value,p.min,p.max,p.step,v=>{range.value=v;engine.setParameter(id,p.path,v);changed();});range.oninput=()=>{n.value=range.value;engine.setParameter(id,p.path,+range.value);changed();};control.append(range,n);}
     row.append(field(p.name,control));const help=controlHelp(p.path,engine.decks[id].state.engine),condition=controlCondition(engine.decks[id].state,p.path);if(help||condition){const info=el('details','pg-info');info.append(el('summary','','i'),el('p','pg-help',[help,condition].filter(x=>typeof x==='string').join(' ')));row.append(info);}if(p.kind!=='color')row.append(learnButton(key));else row.append(el('small','','Via macro: scegli i due colori'));row.dataset.parameter=p.path;list.append(row);

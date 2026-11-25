@@ -1,9 +1,9 @@
-import {AUDIO_HELP} from './audio-model.js?v=db658b02e410';
-import {EXTRA_HELP} from './control-help-extra.js?v=db658b02e410';
-import {FRACTAL_HELP} from './fractal-form.js?v=db658b02e410';
-import {CELLULAR_HELP} from './cellular-form.js?v=db658b02e410';
-import {grainMix,hasGrainLayer} from './body-layers.js?v=db658b02e410';
-import {trailLightCompensation} from './particle-model.js?v=db658b02e410';
+import {AUDIO_HELP} from './audio-model.js?v=1882d3ed81c1';
+import {EXTRA_HELP} from './control-help-extra.js?v=1882d3ed81c1';
+import {FRACTAL_HELP} from './fractal-form.js?v=1882d3ed81c1';
+import {CELLULAR_HELP} from './cellular-form.js?v=1882d3ed81c1';
+import {grainMix,hasGrainLayer} from './body-layers.js?v=1882d3ed81c1';
+import {trailLightCompensation} from './particle-model.js?v=1882d3ed81c1';
 // Short explanations shared by hover, keyboard focus and touch.
 const HELP={
  finishPalette:'Converte il chiaroscuro della scena in una palette ordinata da scuro a chiaro. La trasparenza resta invariata.',
@@ -191,7 +191,7 @@ const HELP={
  refraction:'Indice ottico: cambia quanto la materia trasparente devia la luce.',thickness:'Aumenta il percorso ottico dentro la materia.',fullness:'Da pellicola sottile a oggetto pieno: regola insieme guscio e spessore.',hollow:'Svuota l’interno di superficie, granelli e scie. I granelli trasparenti mantengono un bordo più denso.',wallThickness:'Regola quanto materiale resta attorno alla cavità.',thinShellMode:'Attiva un guscio sottile con poca distorsione dello sfondo.',
  filmDuo:'Orienta i riflessi verso blu cobalto, ciano e oro. A zero usa i colori spettrali originali; non cambia la palette della materia.',filmIslands:'Distribuisce lo spessore ottico fra venature collegate e isole. È continuo e si combina con Densità, Distorsione e Dettaglio; non modifica la forma. A zero conserva esattamente le venature precedenti. Serve Venature di interferenza sopra zero.',filmPattern:'Mescola il disegno organico nello spessore della pellicola: a zero conserva la distribuzione precedente.',filmPatternScale:'Densità delle venature sulla forma 3D: basso per macchie ampie, alto per bande fitte.',filmPatternWarp:'Piega e intreccia le bande di colore senza deformare la geometria.',filmPatternDetail:'Aggiunge increspature più piccole alle venature grandi.',filmChroma:'Separa e intensifica i colori riflessi dalla pellicola. È un accento artistico, non una nuova palette.',thinFilm:'Intensità della pellicola che produce riflessi iridescenti.',filmThickness:'Spessore ottico in nanometri: cambia i colori di interferenza della pellicola.',iridShift:'Sposta le tinte del riflesso iridescente senza cambiare la palette.',iridScale:'Cambia la variazione cromatica dell’iridescenza sulla superficie.',
  coat:'Aggiunge uno strato di vernice trasparente sopra la materia.',coatRoughness:'Sfoca i riflessi dello strato di vernice.',fresnel:'Aumenta i riflessi visti di taglio, lungo i bordi.',dispersion:'Separa leggermente i colori nelle rifrazioni.',absorption:'Assorbe più luce lungo i percorsi dentro la materia.',tintStrength:'Intensità del colore interno nelle parti trasparenti.',internalColor:'Tinta della luce che attraversa la materia.',
- translucency:'Lascia filtrare la luce dal lato opposto della superficie.',scattering:'Diffonde la luce dentro la materia, rendendola più lattiginosa.',scatterDirection:'Orienta la diffusione interna in avanti o all’indietro.',subsurface:'Aumenta la luce diffusa sotto la superficie.',sssRadius:'Distanza percorsa dalla luce sotto la superficie.',sssColor:'Colore della diffusione sotto la superficie.',anisotropy:'Allunga i riflessi come su una superficie satinata.',anisotropyAngle:'Ruota la direzione dei riflessi allungati.',surfaceTexture:'Regola la grana fine della superficie. Sui noduli del reticolo fa emergere una peluria corta. Portalo a zero per un nodulo liscio.',
+ translucency:'Lascia filtrare la luce dal lato opposto della superficie.',scattering:'Diffonde la luce dentro la materia, rendendola più lattiginosa.',scatterDirection:'Orienta la diffusione interna in avanti o all’indietro.',subsurface:'Aumenta la luce diffusa sotto la superficie.',sssRadius:'Distanza percorsa dalla luce sotto la superficie.',sssColor:'Colore della diffusione sotto la superficie.',anisotropy:'Allunga i riflessi come su una superficie satinata.',anisotropyAngle:'Ruota la direzione dei riflessi allungati.',surfaceTexture:'Regola la grana fine della superficie.',
  textureDepth:'Intensità del rilievo. A 0 la superficie è liscia.',textureScale:'Aumentando, la texture diventa più fitta e fine.',textureOrganic:'Rende meno regolare la distribuzione della texture.',textureAngle:'Ruota la direzione della texture.',textureWrinkles:'Quantità di grinze sottili.',textureFolds:'Quantità di pieghe ampie.',textureWear:'Quantità di abrasioni irregolari.',textureRipples:'Quantità di increspature ripetute.',
  petalAmount:'Mescola la sfera di base con petali, punte e appendici.',petalGrowth:'Fa emergere le appendici dalla superficie: 0 rientrate, 1 sviluppate.',petalCount:'Numero di appendici in ogni corona.',petalOpen:'Apre i petali verso l’esterno.',petalCurl:'Curva le estremità verso l’interno o l’esterno.',petalLength:'Allunga le appendici.',petalWidth:'Larghezza delle appendici.',petalInflate:'Gonfia il corpo dei petali.',petalSharp:'Assottiglia le estremità fino a punte acute.',petalCoverage:'Da una sola corona a distribuzione su tutta la sfera.',petalRows:'Numero di file di appendici sulla sfera.',petalPhase:'Ruota la disposizione delle appendici.',petalBlend:'Ammorbidisce il raccordo tra appendici e sfera.',petalRoot:'Allarga la base di innesto delle appendici.',petalRandom:'Rende irregolare la lunghezza delle appendici.',petalWander:'Rende sinuoso il percorso delle appendici.',petalCoil:'Avvolge le appendici attorno alla sfera; il segno cambia verso.',petalReentry:'Curva le estremità per farle rientrare nella sfera.',petalKnots:'Aggiunge rigonfiamenti alle appendici.',petalRidges:'Aggiunge nervature lungo le appendici.',petalDisorder:'Sfalsa la disposizione regolare delle appendici.',stemAmount:'Fa crescere un gambo opzionale.',stemRadius:'Regola lo spessore del gambo.',stemBend:'Piega il gambo.',
  gradientAngle:'Ruota la direzione in cui i colori attraversano la materia.',gradientScale:'Cambia quante volte il gradiente attraversa la figura.',gradientOffset:'Fa scorrere i colori lungo il gradiente.',colorSoftness:'Da 0 a 1 sfuma i colori vicini. Da 1 a 3 li fonde sempre più ampiamente; a 3 la palette diventa un unico colore medio.',colorWaveAmount:'Deforma la distribuzione dei colori in onde.',colorWaveBands:'Numero delle fasce cromatiche; richiede Onde di colore sopra 0.',colorWavePhase:'Sposta le onde cromatiche lungo il loro ciclo.',colorWaveHeight:'Distribuisce le onde cromatiche lungo l’altezza.',colorWaveRadius:'Distribuisce le onde cromatiche per distanza dal centro 3D: punti alla stessa distanza hanno la stessa fase radiale, anche in profondità. Puoi combinarle con altezza e vortice.',colorWaveSwirl:'Avvolge i colori in un vortice.',colorWaveWarp:'Rende ondulati i confini delle fasce cromatiche.',glow:'Diffonde un alone attorno alle zone luminose. Un valore alto può nascondere dettagli e colori.',
@@ -291,21 +291,17 @@ export function controlCondition(s,key){
  if(key==='structPetalWidth'&&!positive('structRadial')&&!positive('structFan'))return 'Aumenta Separazione radiale o Lamine curve.';
  if(key==='structFanBias'&&!positive('structFan'))return 'Aumenta Lamine curve.';
  if(key==='loopTurns'&&(!positive('loopAmount')||!positive('loopKnot')))return 'Aumenta Apertura ad anello e Intreccio del nodo.';
- if(/^structWeave(Variation|Nodes)$/.test(key)&&!positive('structFibres'))return 'Aumenta Separazione in fibre per aprire il reticolo.';
- if(key==='structWeaveMembrane'&&(!positive('structFibres')||!positive('structWeft')||!positive('structShell')))return 'Aumenta fibre, tessitura e svuotamento per aprire la membrana fra i rami.';
- if(key==='structWeaveCup'&&!positive('structWeaveGrowth'))return 'Aumenta Crescita degli steli.';
- if(key==='structWeaveBranching'&&(!positive('structFibres')||!positive('structWeft')||!positive('structShell')))return 'Aumenta fibre, tessitura e svuotamento.';
- if(['structWeaveTension','structWeaveFront','structWeaveFinesse','structWeaveRelease','structWeaveReach','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupLight','structWeaveCupSize'].includes(key)&&!positive('structWeaveBranching'))return 'Aumenta Ramificazione del reticolo.';
- if(['structWeaveCradle','structWeaveFlex','structWeaveSlope','structWeaveArch','structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY'].includes(key)&&(!positive('structWeaveBranching')||!positive('structWeaveTension')))return 'Aumenta Ramificazione del reticolo e Tensione delle giunzioni.';
- if(key==='structWeaveFront'&&(!positive('structWeaveTension')||!positive('structDelay')))return 'Aumenta Tensione delle giunzioni e Sfasamento fra zone.';
- if(key==='structWeaveFlare'&&(!positive('structWeaveTension')||!positive('structWeaveGrowth')||!positive('structWeaveCup')))return 'Aumenta Tensione delle giunzioni, Crescita degli steli e Apertura delle coppe.';
- if(key==='structWeaveCupSize'&&(s.structWeaveRelease||0)<=.27&&(s.structWeaveCup||0)<=.10&&!s.motions?.structWeaveRelease?.enabled&&!s.motions?.structWeaveCup?.enabled)return 'Aumenta Apertura delle coppe o Ritiro dei ponti.';
- if(key==='structWeaveReach'&&!positive('structWeaveGrowth'))return 'Aumenta Crescita degli steli.';
- if(key==='structWeaveAlignment'&&!positive('structWeaveMembrane'))return 'Aumenta Membrana fra i rami.';
- if(key==='structWeaveCupLight'&&!positive('structWeaveRelease')&&!positive('structWeaveCup'))return 'Aumenta Apertura delle coppe o Ritiro dei ponti.';
- if(key==='structWeaveGrowth'&&(!positive('structFibres')||!positive('structWeft')||!positive('structShell')))return 'Aumenta fibre, tessitura e svuotamento per creare le giunzioni.';
- if(key==='structWeaveNodes'&&!positive('structWeft'))return 'Aumenta i fili trasversali per creare giunzioni.';
- if(['pSelfShadowSoftness','pSelfShadowBias','pOpticalExtent'].includes(key)&&!positive('pSelfShadow')&&!positive('pCaustic'))return 'Attiva ombre reciproche o caustiche.';
+ const net=positive('structWeaveCradle'),nodes=positive('structWeaveNodes'),sheet=positive('structWeaveMembrane');
+ const woven=positive('structFibres')&&positive('structWeft')&&positive('structShell');
+ if(key==='fiberLength'&&!positive('fiberPile'))return 'Aumenta Peluria in Materiale.';
+ if(key==='structWeaveCradle'||key==='structWeaveNodes'||key==='structWeaveMembrane')return '';
+ if(['structWeaveGrowth','structWeaveCupSize','structWeaveCupLight','structWeaveHierarchy'].includes(key)&&!nodes&&!woven)return 'Aumenta Noduli in Forma.';
+ if(['structWeaveReach','structWeaveCup','structWeaveFront','structWeaveSpread','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY'].includes(key)&&!positive('structWeaveGrowth'))return 'Aumenta Crescita degli steli.';
+ if(key==='structWeaveFlare'&&(!positive('structWeaveGrowth')||!positive('structWeaveCup')))return 'Aumenta crescita e apertura delle coppe.';
+ if(['structWeaveRelease','structWeaveAlignment','structWeaveFinesse','structWeaveTension'].includes(key)&&!net&&!sheet&&!woven)return 'Aumenta Ragnatela o Membrana in Forma.';
+ if((key.startsWith('structWeave')||['structDensity','structThreadWidth'].includes(key))&&!['structWeave','structWeft'].includes(key)&&!net&&!nodes&&!sheet&&!positive('structFibres'))return 'Aumenta Ragnatela in Forma.';
+ if(['pSelfShadowSoftness','pSelfShadowBias'].includes(key)&&!positive('pSelfShadow'))return 'Aumenta Ombre di contatto in Luci.';
+ if(key==='pOpticalExtent'&&!positive('pSelfShadow')&&!positive('pCaustic'))return 'Attiva ombre reciproche o caustiche.';
  if((key==='grainDispersal'||/^p(?:Orbit|Travel|Vortex|Counterflow|Wander|SpaceWarp|Warp|Reentry|Breath|Life|Random|Jitter|MotionSoftness|Rhythm|Pause|SpeedSpread|TentacleWave|TentacleCycles)/.test(key))&&s.grainMotion===false)return 'Riprendi Movimento dei granelli in Movimento.';
  if(/^p(?:Orbit|Travel|Vortex|Counterflow|Wander|SpaceWarp|Warp|Reentry|Breath|Life|Random|Jitter)/.test(key)&&!positive('grainDispersal'))return 'Aumenta Ampiezza del movimento in Movimento.';
  if(['filBaseWidth','filBaseHeight','filBaseCurve','filRibbon'].includes(key)&&!(s.filWidth>.02))return 'Aumenta lo spessore dei filamenti per distinguere il profilo.';
@@ -323,7 +319,7 @@ export function controlCondition(s,key){
  if(key==='pPoreCount'&&!positive('pPores'))return 'Aumenta i pori della pelle.';
  if(['pFoldCount','pFoldPhase'].includes(key)&&!positive('pFoldDepth'))return 'Aumenta la profondità delle pieghe.';
  if(['structThickness','structTaper'].includes(key)&&!positive('structShell')&&!positive('structFan'))return 'Aumenta Svuotamento o Lamine curve per regolare lo spessore della superficie.';
- if(['structDensity','structThreadWidth','structWeft','structWeave'].includes(key)&&!positive('structFibres'))return 'Aumenta Separazione in fibre per aprire il reticolo.';
+ if(['structWeft','structWeave'].includes(key)&&!positive('structFibres'))return 'Aumenta Separazione in fibre per aprire il reticolo.';
  if(['structSliceCount','structSliceWidth'].includes(key)&&!positive('structSlices'))return 'Aumenta Separazione delle sezioni.';
  if(['structLayerCount','structLayerWidth'].includes(key)&&!positive('structLayers'))return 'Aumenta Separazione degli strati.';
  if(key==='structCoreRadius'&&!positive('structCoreDark'))return 'Aumenta Oscurità del nucleo.';
@@ -340,7 +336,7 @@ export function controlCondition(s,key){
  if(key==='bgAngle'&&s.bgMode!=='gradient')return 'Scegli Gradiente per ruotare il passaggio fra i colori.';
  if(['pReach','pBranches'].includes(key)&&!positive('pOuter'))return 'Aumenta Fasci esterni in Forma.';
  if(key==='pFlowBalance'&&!positive('pWander'))return 'Aumenta Deriva in Movimento.';
- if(/^pShadow(Height|Softness|Light|Bias|Center|Span)/.test(key)&&!positive('pShadow')&&!positive('pCaustic'))return 'Aumenta l’ombra sul piano o la caustica.';
+ if(/^pShadow(Height|Softness|Light|Bias|Center|Span)/.test(key)&&!(key==='pShadowLight'&&positive('pSelfShadow'))&&!positive('pShadow')&&!positive('pCaustic'))return 'Aumenta l’ombra sul piano o la caustica.';
  if(['pFiberSheen','pFiberSpread'].includes(key)&&!positive('pTrailCount')&&!positive('pLinks'))return 'Attiva scie o fili per vedere il riflesso delle fibre.';
  if(key==='pFiberSpread'&&!positive('pFiberSheen'))return 'Aumenta Intensità del riflesso delle fibre.';
  if(['pNodes','pConnect'].includes(key)&&!positive('pNeural'))return 'Aumenta la struttura neuronale.';
@@ -390,6 +386,11 @@ export function controlCondition(s,key){
 // Changes suggested inline are opt-in edits. The same values are useful for
 // exercising a dependent control with the procedural renderer.
 const conditionValues={
+  'Aumenta Peluria in Materiale.':{fiberPile:.65},'Aumenta Noduli in Forma.':{structWeaveNodes:.7},
+  'Aumenta Ragnatela in Forma.':{structWeaveCradle:.7},'Aumenta Ragnatela o Membrana in Forma.':{structWeaveCradle:.7},
+  'Aumenta Crescita degli steli.':{structWeaveGrowth:.7,structWeaveNodes:.7},
+  'Aumenta crescita e apertura delle coppe.':{structWeaveGrowth:.75,structWeaveCup:.6,structWeaveNodes:.7},
+  'Aumenta Ombre di contatto in Luci.':{pSelfShadow:.7},
   'Aumenta l’ampiezza dei lobi.':{lobeAmount:.18},'Aumenta la profondità dei lobi.':{pLobeDepth:.24},
   'Aumenta l’irregolarità della nuvola.':{pOrganic:.38},'Aumenta l’apertura del foro.':{hole:.24},'Aumenta il ritaglio.':{cut:.25},
   'Aumenta la trasparenza.':{transparency:.42},'Aumenta Trasparenza per vedere la rifrazione.':{transparency:.42},

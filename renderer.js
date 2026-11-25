@@ -1,24 +1,26 @@
-import {CooperativePreview} from './cooperative-preview.js?v=db658b02e410';
-import {PaletteFinishPass} from './finish-palette.js?v=db658b02e410';
-import {Dynamics,disposeDynamics} from './dynamics.js?v=db658b02e410';
-import {motionPeriod} from './animation-clock.js?v=db658b02e410';
-import {animationPhase} from './animation-clock.js?v=db658b02e410';
-import {ScanlinePass} from './finish-scanlines.js?v=db658b02e410';
-import {FilamentPass} from './filament-renderer.js?v=db658b02e410';
-import {VeilTransition} from './veil-transition.js?v=db658b02e410';
-import {BodySamples} from './body-samples.js?v=db658b02e410';
-import {BodyComposite} from './body-composite.js?v=db658b02e410';
-import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=db658b02e410';
-import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=db658b02e410';
-import {ParticleRenderer} from './particle-renderer.js?v=db658b02e410';
-import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=db658b02e410';
-export {fieldAt,sampleFrame} from './solid-renderer.js?v=db658b02e410';
+import {CooperativePreview} from './cooperative-preview.js?v=1882d3ed81c1';
+import {surfaceWebStrength} from './surface-web-model.js?v=1882d3ed81c1';
+import {PaletteFinishPass} from './finish-palette.js?v=1882d3ed81c1';
+import {Dynamics,disposeDynamics} from './dynamics.js?v=1882d3ed81c1';
+import {motionPeriod} from './animation-clock.js?v=1882d3ed81c1';
+import {animationPhase} from './animation-clock.js?v=1882d3ed81c1';
+import {ScanlinePass} from './finish-scanlines.js?v=1882d3ed81c1';
+import {FilamentPass} from './filament-renderer.js?v=1882d3ed81c1';
+import {VeilTransition} from './veil-transition.js?v=1882d3ed81c1';
+import {BodySamples} from './body-samples.js?v=1882d3ed81c1';
+import {BodyComposite} from './body-composite.js?v=1882d3ed81c1';
+import {cloudBody,grainMix,grainFrame} from './body-layers.js?v=1882d3ed81c1';
+import {sampleFrame,independentFanMode,Renderer as SolidRenderer} from './solid-renderer.js?v=1882d3ed81c1';
+import {ParticleRenderer} from './particle-renderer.js?v=1882d3ed81c1';
+import {FinishingPass,GlyphPass,DetailPass,OpticalPass,FeedbackPass,FocusPass,FINISH_DEFAULTS,luminousPrintEnabled,normalizeFinishOrder,finishingOff,finishingSource} from './finishing.js?v=1882d3ed81c1';
+export {fieldAt,sampleFrame} from './solid-renderer.js?v=1882d3ed81c1';
 function printPreviewOptions(s,o){
  return o.preview&&s.bgMode==='transparent'&&!finishingOff(s,o)&&s.finishFeedback&&s.finishFeedbackMix>0&&luminousPrintEnabled(s)?{...o,alphaPreview:true}:o;
 }
 const solidBody=s=>({...s,engine:'solid',pLiving:0});
 const focusOptions={layers:true,focusDepthOnly:true,preview:true,quality:'fast',trackTiming:false,deferCompletion:true,keepCanvas:true};
-const focusFrame=(s,p)=>s.motions?.focusBlur?.enabled||s.motions?.focusDepth?.enabled||s.motions?.focusTilt?.enabled?sampleFrame(s,p):s;
+const depthEffectsEnabled=s=>s.focusBlur>0||s.pSelfShadow>0;
+const focusFrame=(s,p)=>s.pSelfShadow>0||s.motions?.pSelfShadow?.enabled||s.motions?.focusBlur?.enabled||s.motions?.focusDepth?.enabled||s.motions?.focusTilt?.enabled?sampleFrame(s,p):s;
 // A scene owns a clock, a simulation and a shared graphics context.
 export class Renderer{
  constructor(canvas){this.dynamics=new Dynamics(sampleFrame);this.liveDynamics=new Dynamics(sampleFrame,true);this.canvas=canvas;this.context=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:false,antialias:false,preserveDrawingBuffer:true,powerPreference:'high-performance'});if(!this.context)throw Error('WebGL 2 non disponibile.');this.frameTimer=this.context.getExtension('EXT_disjoint_timer_query_webgl2');this.frameQueries=[];this.frameGpuSample=0;this.frameGpuMs=null;}
@@ -40,18 +42,19 @@ export class Renderer{
  get completionSync(){return this.cooperativePreview?.busy||this.impl?.completionSync;}get completedFrames(){return this.impl?.completedFrames||0;}
  get gpuSample(){return this.frameGpuSample;}get gpuMilliseconds(){return this.frameGpuMs;}get timerExtension(){return this.frameTimer;}get bakeUploads(){return this.impl?.bakeUploads||0;}
  layerPlan(s,p){
-  if(s.sceneGrains===undefined&&!s.motions?.sceneGrains?.enabled)return null;
+  if(s.sceneGrains===undefined&&!s.motions?.sceneGrains?.enabled&&!surfaceWebStrength(s)&&!['structWeaveNodes','structWeaveMembrane','structWeaveCradle'].some(k=>s.motions?.[k]?.enabled))return null;
   const frame=grainFrame(s,p,sampleFrame),mix=grainMix(frame),cloud=cloudBody(s);
   if(mix>=1&&cloud&&s.engine==='particles'&&!s.motions?.sceneGrains?.enabled)return null;
   if(cloud)return {grains:{...s,engine:'particles',grainSource:'cloud',_cloudSurfaceMix:1-mix,_cloudSurfaceActive:true},mix};
   const surface=solidBody(s);
-  const grains={...s,engine:'particles',pLiving:cloud?s.pLiving:0};
+  const grains={...s,engine:'particles',grainSource:cloud?'cloud':'body',pLiving:cloud?s.pLiving:0};
   if(!cloud)grains.pFilm=s.thinFilm;
   if(!cloud&&(frame.grainDispersal>0||s.motions?.grainDispersal?.enabled)){
    return {body:surface,grains:{...grains,grainSource:'body',_cloudSurfaceMix:1-mix,_cloudSurfaceActive:true},attach:true,mix,frame};
   }
   if(mix>=1&&cloud)return {grains,mix};
-  if(mix<=0)return {surface,mix};
+  if(mix<=0&&!surfaceWebStrength(frame))return {surface,mix};
+  if(mix<=0)return {surface,grains:{...grains,_surfaceWebOnly:true},attach:true,mix,frame};
   // Scale layer strengths after sampling the animation and before drawing.
   for(const k of ['pOpacity','pTrailOpacity','pLinks','pSkin','pThreadOpacity','pShadow','pCaustic'])
    grains[k]=frame[k]*mix;
@@ -71,7 +74,8 @@ export class Renderer{
    surfaceReady=this.select(plan.body).prepareBodyField(plan.body,p);
    surfaceReady=this.prepareFilaments(plan.body,p)&&surfaceReady;
   }
-  if(plan.attach){this.bodySamples??=new BodySamples(this.gl);surfaceReady=this.bodySamples.ready()&&surfaceReady;}
+  if(plan.attach){this.bodySamples??=new BodySamples(this.gl);surfaceReady=this.bodySamples.ready()&&surfaceReady;
+   if(surfaceWebStrength(plan.frame)>0){this.webSamples??=new BodySamples(this.gl,this.bodySamples);surfaceReady=this.webSamples.ready()&&surfaceReady;}}
   const grainsReady=!plan.grains||this.select(plan.grains).prepare(plan.grains,p,o);
   return surfaceReady&&grainsReady;
  }
@@ -87,7 +91,8 @@ export class Renderer{
   }
   if(plan.attach){
    this.bodySamples??=new BodySamples(this.gl);
-   while(!this.bodySamples.ready()||(plan.body&&!this.select(plan.body).prepareBodyField(plan.body,p))){
+   if(surfaceWebStrength(plan.frame)>0)this.webSamples??=new BodySamples(this.gl,this.bodySamples);
+   while(!this.bodySamples.ready()||(this.webSamples&&!this.webSamples.ready())||(plan.body&&!this.select(plan.body).prepareBodyField(plan.body,p))){
     if(o.cancelled?.()||this.gl.isContextLost())return false;
     await new Promise(resolve=>setTimeout(resolve,12));
    }
@@ -96,21 +101,37 @@ export class Renderer{
  }
  grainOptions(plan,p,o){
   if(!plan.body)return o;
-  const field=this.select(plan.body).bodyField(plan.body,p,o);
-  return {...o,studioLayer:{field,attachment:this.bodySamples.update(field,plan.frame,o)}};
+  const solid=this.select(plan.body);
+  return {...o,studioLayer:this.bodyAttachments(solid,plan.body,plan,p,o)};
+ }
+ bodyAttachments(solid,source,plan,p,o){
+  const active=this.webSamples&&surfaceWebStrength(plan.frame)>0,restKey=active?solid.webReferenceKey(source):null;
+  let webRestAttachment;
+  if(restKey){
+   if(this.webRestKey!==restKey){
+    this.webRestSamples??=new BodySamples(this.gl,this.bodySamples);this.webRestSamples.ready();
+    const rest=solid.bodyField(source,0,o);
+    this.webRestAttachment=this.webRestSamples.update(rest,{pFill:0,pCloudCore:0},o);
+    this.webRestKey=restKey;
+   }
+   webRestAttachment=this.webRestAttachment;
+  }
+  const field=solid.bodyField(source,p,o),surfaceOnly=plan.grains._surfaceWebOnly||plan.frame.pFill===0;
+  const webAttachment=active?this.webSamples.update(field,{...plan.frame,pFill:0,pCloudCore:0},o):null;
+  const attachment=webAttachment&&surfaceOnly?webAttachment:this.bodySamples.update(field,plan.frame,o);
+  return {field,attachment,webAttachment,webRestAttachment};
  }
  compositeFrame(plan,p,w,h,o){
   const surface=finishingSource(plan.surface,o),solid=this.select(surface);
-  const field=plan.attach?solid.bodyField(surface,p,o):null;
-  const attachment=field?this.bodySamples.update(field,plan.frame,o):null;
+  const attachments=plan.attach?this.bodyAttachments(solid,surface,plan,p,o):{};
   this.select(surface);
   this.bodyComposite??=new BodyComposite(this.gl);
   const layers=this.bodyComposite.target(w,h);
-  return {surface,solid,layers,studioLayer:{color:layers.color,depth:layers.depth,field,attachment,grainMix:plan.mix}};
+  return {surface,solid,layers,studioLayer:{color:layers.color,depth:layers.depth,...attachments,grainMix:plan.mix}};
  }
  drawGrains(plan,frame,p,w,h,o,async=false){
   const {surface,solid,studioLayer}=frame;
-  if(focusFrame(surface,p).focusBlur>0){
+  if(depthEffectsEnabled(focusFrame(surface,p))){
    const g=this.gl;g.bindFramebuffer(g.READ_FRAMEBUFFER,frame.layers.framebuffer);g.readBuffer(g.COLOR_ATTACHMENT0);g.bindFramebuffer(g.DRAW_FRAMEBUFFER,null);g.blitFramebuffer(0,0,w,h,0,0,w,h,g.COLOR_BUFFER_BIT,g.NEAREST);g.bindFramebuffer(g.FRAMEBUFFER,null);
    this.applyFocus(surface,p,w,h,null,{...o,beforeFilaments:true});frame.layers.captureColor();
   }
@@ -162,7 +183,7 @@ export class Renderer{
   return this.drawGrains(plan,frame,p,w,h,inner,true);
  }
  focusBody(s,p,plan=this.layerPlan(s,p)){
-  if(!(focusFrame(s,p).focusBlur>0))return null;
+  if(!depthEffectsEnabled(focusFrame(s,p)))return null;
   const source=plan?plan.surface:this.endpoint(s,p);
   if(!source||source.engine==='particles'||source.pLiving>0)return null;
   return {...source,renderVersion:2};
@@ -274,5 +295,5 @@ export class Renderer{
  pollGpuTime(){this.impl?.pollGpuTime();const g=this.gl,e=this.frameTimer;if(!e||g.isContextLost())return;const disjoint=g.getParameter(e.GPU_DISJOINT_EXT);while(this.frameQueries.length&&(disjoint||g.getQueryParameter(this.frameQueries[0],g.QUERY_RESULT_AVAILABLE))){const q=this.frameQueries.shift();if(!disjoint){const ms=g.getQueryParameter(q,g.QUERY_RESULT)/1e6;if(Number.isFinite(ms)&&ms>0){this.frameGpuMs=ms;this.frameGpuSample++;}}g.deleteQuery(q);}if(disjoint)this.frameGpuMs=null;}pollCompletion(){this.cooperativePreview?.checkError();return this.impl?.pollCompletion();}async waitForGpu(o){if(this.cooperativePreview?.job)await this.cooperativePreview.job.promise;this.cooperativePreview?.checkError();return this.impl?this.impl.waitForGpu(o):true;}
  hardwareInfo(){if(this.impl)return this.impl.hardwareInfo();const gl=this.gl,e=gl.getExtension('WEBGL_debug_renderer_info'),name=gl.getParameter(e?e.UNMASKED_RENDERER_WEBGL:gl.RENDERER);return {name,software:/swiftshader|llvmpipe/i.test(name)};}
  pixels(){return this.impl.pixels();}releaseSurface(){if(this.cooperativePreview?.busy)return false;this.cooperativePreview?.worker.releaseSurface();const ok=this.impl?.releaseSurface()??true;if(ok){this.focusPass?.release();this.focusDepthTarget?.release();this.bodyComposite?.release();this.filamentPass?.release();this.feedbackFinishing?.release();this.finishing?.release();this.glyphFinishing?.release();this.detailFinishing?.release();this.opticalFinishing?.release();this.scanFinishing?.release();this.paletteFinishing?.release();}return ok;}
- dispose(o){this.cooperativePreview?.dispose();this.cooperativePreview=null;disposeDynamics(this.gl);if(!this.gl.isContextLost())for(const q of this.frameQueries)this.gl.deleteQuery(q);this.frameQueries=[];this.focusPass?.dispose();this.focusDepthTarget?.release();this.bodyComposite?.release();this.bodySamples?.dispose();this.bodySamples=null;this.filamentPass?.dispose();this.filamentPass=null;this.veilTransition?.dispose();this.veilTransition=null;this.scanFinishing?.dispose();this.scanFinishing=null;this.paletteFinishing?.dispose();this.paletteFinishing=null;this.opticalFinishing?.dispose();this.opticalFinishing=null;this.detailFinishing?.dispose();this.detailFinishing=null;this.feedbackFinishing?.dispose();this.feedbackFinishing=null;this.finishing?.dispose();this.finishing=null;this.glyphFinishing?.dispose();this.glyphFinishing=null;const implementations=new Set([...Object.values(this.implementations||{}),this.impl].filter(Boolean));for(const renderer of implementations)renderer.dispose({loseContext:false});if(o?.loseContext!==false)this.recoveryExtension?.loseContext();this.implementations={};this.impl=null;this.kind=null;}
+ dispose(o){this.cooperativePreview?.dispose();this.cooperativePreview=null;disposeDynamics(this.gl);if(!this.gl.isContextLost())for(const q of this.frameQueries)this.gl.deleteQuery(q);this.frameQueries=[];this.focusPass?.dispose();this.focusDepthTarget?.release();this.bodyComposite?.release();this.bodySamples?.dispose();this.bodySamples=null;this.webSamples?.dispose();this.webSamples=null;this.webRestSamples?.dispose();this.webRestSamples=null;this.filamentPass?.dispose();this.filamentPass=null;this.veilTransition?.dispose();this.veilTransition=null;this.scanFinishing?.dispose();this.scanFinishing=null;this.paletteFinishing?.dispose();this.paletteFinishing=null;this.opticalFinishing?.dispose();this.opticalFinishing=null;this.detailFinishing?.dispose();this.detailFinishing=null;this.feedbackFinishing?.dispose();this.feedbackFinishing=null;this.finishing?.dispose();this.finishing=null;this.glyphFinishing?.dispose();this.glyphFinishing=null;const implementations=new Set([...Object.values(this.implementations||{}),this.impl].filter(Boolean));for(const renderer of implementations)renderer.dispose({loseContext:false});if(o?.loseContext!==false)this.recoveryExtension?.loseContext();this.implementations={};this.impl=null;this.kind=null;}
 }

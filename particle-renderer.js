@@ -1,23 +1,26 @@
-import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=db658b02e410';
-import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=db658b02e410';
-import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=db658b02e410';
-import {ParticleMedium,mediumAmount} from './particle-medium.js?v=db658b02e410';
-import {knotTurns} from './structure-model.js?v=db658b02e410';
-import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=db658b02e410';
-import {shadowLight} from './particle-shadow.js?v=db658b02e410';
-import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=db658b02e410';
-import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=db658b02e410';
-import {GuideField,guideGLSL} from './particle-path-field.js?v=db658b02e410';
-import {ParticleLinks} from './particle-links.js?v=db658b02e410';
-import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=db658b02e410';
-import {LayeredVeils} from './layered-veils.js?v=db658b02e410';
-import {LivingStructures} from './living-structures.js?v=db658b02e410';
-import {ParticleSurface} from './particle-surface.js?v=db658b02e410';
-import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=db658b02e410';
-import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=db658b02e410';
-import {forceBarrierGLSL} from './particle-forces.js?v=db658b02e410';
-import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=db658b02e410';
-import {focusSlope} from './finishing.js?v=db658b02e410';
+import {bindDynamics,DYNAMICS_GLSL} from './dynamics.js?v=1882d3ed81c1';
+import {ParticleShadow,shadowProgram} from './particle-shadow.js?v=1882d3ed81c1';
+import {ParticleVolume,particleVolumeAmount,volumeResolveGLSL} from './particle-volume.js?v=1882d3ed81c1';
+import {ParticleMedium,mediumAmount} from './particle-medium.js?v=1882d3ed81c1';
+import {knotTurns} from './structure-model.js?v=1882d3ed81c1';
+import {ParticleOptics,usesCloudAbsorption} from './particle-optics.js?v=1882d3ed81c1';
+import {shadowLight} from './particle-shadow.js?v=1882d3ed81c1';
+import {sampleFrame,FILM_SPECTRUM,uploadFractalMaterial} from './solid-renderer.js?v=1882d3ed81c1';
+import {PARTICLE_DEFAULTS,rng,grainDiameters,migrateGrainSizes,trailLightCompensation} from './particle-model.js?v=1882d3ed81c1';
+import {GuideField,guideGLSL} from './particle-path-field.js?v=1882d3ed81c1';
+import {ParticleLinks} from './particle-links.js?v=1882d3ed81c1';
+import {SurfaceWeb} from './surface-web.js?v=1882d3ed81c1';
+import {surfaceWebStrength} from './surface-web-model.js?v=1882d3ed81c1';
+import {livingWeights,livingOcclusionGLSL,livingAttachmentGLSL} from './living-composition.js?v=1882d3ed81c1';
+import {LayeredVeils} from './layered-veils.js?v=1882d3ed81c1';
+import {LivingStructures} from './living-structures.js?v=1882d3ed81c1';
+import {ParticleSurface} from './particle-surface.js?v=1882d3ed81c1';
+import {cloudBody,grainFrame,grainPhaseRadians} from './body-layers.js?v=1882d3ed81c1';
+import {fieldGLSL,grainSizingGLSL} from './particle-field.js?v=1882d3ed81c1';
+import {forceBarrierGLSL} from './particle-forces.js?v=1882d3ed81c1';
+import {materialCavity,prismaShadingGLSL} from './particle-shading.js?v=1882d3ed81c1';
+import {focusSlope} from './finishing.js?v=1882d3ed81c1';
+import {fiberMaterialUniform} from './fiber-material.js?v=1882d3ed81c1';
 const common=`${prismaShadingGLSL}\n${fieldGLSL}
 uniform vec3 uFocus;
 float particleDefocus(vec3 p){
@@ -74,7 +77,7 @@ const pointVert=`#version 300 es
 precision highp float;
 layout(location=0) in vec4 aRandom;
 ${grainGLSL}
-out vec3 vColor,vPosition;flat out vec4 vForceSeed;out float vOpacity,vCellLight,vRadius;out vec2 vSpriteUV;uniform float uPointQuad;
+out vec3 vColor,vPosition;flat out vec4 vForceSeed;flat out float vFleece;out float vOpacity,vCellLight,vRadius;out vec2 vSpriteUV;uniform float uPointQuad;
 uniform int uSeedOffset;
 void main(){
  int index=uPointQuad>.5?gl_InstanceID:gl_VertexID;
@@ -87,7 +90,12 @@ void main(){
  vec3 p=attachedPosition(seed,uPhase);gl_Position=project(p);
  float trueSize=grainDiameter(seed,index)*uResolution.y/1080.;
  vRadius=trueSize*mix(max(2.,7.5-p.z)/(2.6*uResolution.y),1.7/min(uResolution.x,uResolution.y),uStudioPerspective);
- float px=trueSize+particleDefocus(p);
+ // A static connection node belongs to the node target. The growth target is
+ // evaluated on developing buds, which also supply their local growth phase.
+ bool coated=uFiberPile.z<.5||(uFiberPile.z<1.5&&float(index)<uNodeStyle.x);
+ vFleece=coated?uFiberPile.x:0.;
+ float extent=vFleece*mix(.024,.23,uFiberPile.y);
+ float px=trueSize*(1.+extent)+particleDefocus(p);
  vSpriteUV=vec2(0.);
  if(uPointQuad>.5){
   int vertex=gl_VertexID%6;
@@ -100,7 +108,7 @@ void main(){
 }`;
 const pointFrag=`#version 300 es
 precision highp float;
-in vec3 vColor,vPosition;flat in vec4 vForceSeed;in float vOpacity,vCellLight,vRadius;in vec2 vSpriteUV;uniform float uPointQuad,uSphereGrain;out vec4 color;
+in vec3 vColor,vPosition;flat in vec4 vForceSeed;flat in float vFleece;in float vOpacity,vCellLight,vRadius;in vec2 vSpriteUV;uniform float uPointQuad,uSphereGrain;out vec4 color;
 ${prismaShadingGLSL}
 ${forceBarrierGLSL}
 ${guideGLSL}
@@ -110,6 +118,15 @@ ${livingOcclusionGLSL}
 uniform vec4 uPoints;uniform float uSprite;uniform vec3 uShadeOrigin;
 void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(dynamicsBarrier(barrierPoint)>.0001||insideForceCore(barrierPoint)||insideGuideCore(barrierPoint,vForceSeed,uPhase)||outsideGuidePixel(gl_FragCoord.xy,vPosition,vForceSeed,uPhase))discard;vec2 xy=(uPointQuad>.5?vSpriteUV:gl_PointCoord)*2.-1.;float d=length(xy),aa=max(fwidth(d),.04);
  float coverage=1.-smoothstep(1.-aa,1.,d);
+ float fiberSample=0.;
+ if(vFleece>0.){
+  float extent=fiberGrainExtent();xy*=1.+extent;d=length(xy);
+  vec3 cap=normalize(vec3(xy.x,-xy.y,sqrt(max(.0001,1.-d*d))));
+  vec3 anchor=vForceSeed.xyz*7.3+fiberGrainLocal(cap)*.28;
+  float footprint=.28*max(fwidth(xy.x),fwidth(xy.y));
+  fiberSample=fiberThreads(anchor,footprint);
+  coverage=fiberEdgeOpacity(d,extent,fiberSample,aa);
+ }
  if(uSprite>1.5&&uSprite<2.5){float inner=.45+.36*uParticleOptical.w;coverage*=smoothstep(inner-.1,inner+.1,d);}
  if(uSprite>2.5)coverage*=exp(-min(abs(xy.x),abs(xy.y))*12.);
  float profile=uSprite<.5?exp(-d*d*mix(.2,3.,uPoints.w)):mix(1.,exp(-d*d*3.),uPoints.w);
@@ -119,7 +136,8 @@ void main(){vec3 barrierPoint=guidePixelPosition(gl_FragCoord.xy,vPosition);if(d
  // The local sphere normal remains stable as visibility and edge softness vary.
  vec3 world=vPosition;
  if(uSphereGrain>.5){vec3 sphere=vec3(xy.x,-xy.y,sqrt(max(0.,1.-d*d)));n=normalize(sphere);world+=sphere*vRadius;}
- color=vec4(shadeParticle(vColor,world,n)*(a*vCellLight),a);
+ vec3 shaded=shadeFiberMaterial(vColor,world,n,vec3(0.),0.,fiberSample,vFleece);
+ color=vec4(shaded*(a*vCellLight),a);
 }`;
 const trailVert=`#version 300 es
 precision highp float;
@@ -198,7 +216,8 @@ precision highp float;in vec2 uv;out vec4 color;uniform sampler2D uImage,uBloom,
 uniform vec4 uGrade,uPhoto,uTone,uLens,uBg;uniform vec3 uBackground,uBackground2;
 uniform float uBgShade;uniform vec2 uOutputSize;
 uniform highp sampler2D uStudioSurface;
-uniform float uStudioComposite,uStudioCamera;
+uniform float uStudioComposite,uStudioCamera,uWebActive;
+uniform highp sampler2D uWebLayer;
 uniform highp sampler2D uMedium;
 uniform vec2 uMediumMix;
 ${volumeResolveGLSL}
@@ -259,6 +278,19 @@ void main(){vec2 p=uv-.5,world=p*uOutputSize/min(uOutputSize.x,uOutputSize.y)*3.
   float combined=1.-remaining*(1.-surface.a);
   color=vec4(clamp((foreground+surface.rgb*surface.a*remaining)/max(.00001,combined),0.,1.),combined);
  }else{color=vec4(clamp(c,0.,1.),uBgMode>2.5?alpha:1.);}
+ // A translucent woven material covers the scene in front of it. Emissive
+ // grains and trails use accumulated optical density in their own pass.
+ if(uWebActive>.5){
+  vec4 web=texture(uWebLayer,q);
+  if(web.a>.00001){
+   vec3 light=max(vec3(0.),web.rgb/web.a);
+   vec3 mapped=light/(1.+max(light.r,max(light.g,light.b)));
+   vec3 dye=mix(mapped*12.92,1.055*pow(mapped,vec3(1./2.4))-.055,step(vec3(.0031308),mapped));
+   dye=grade(dye)*(1.-uPhoto.w*dot(p,p)*1.5);
+   float combined=web.a+(1.-web.a)*color.a;
+   color=vec4((dye*web.a+color.rgb*color.a*(1.-web.a))/max(.00001,combined),combined);
+  }
+ }
 }`;
 const rad=Math.PI/180,rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
 const linearRgb=hex=>rgb(hex).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));
@@ -266,6 +298,9 @@ const environments=['studio','sunset','neon','sky','aquarium','aurora','city'];
 const seedWidth=1024,seedHeight=293,storedGrains=seedWidth*seedHeight;
 const visibleGrains=s=>s.pLiving!==4&&s.pCount>0&&s.pOpacity>0;
 const visibleTrails=s=>s.pLiving!==4&&s.pTrailCount>0&&s.pTrailLength>0&&s.pTrailOpacity>0;
+function decorationOnly(s){
+ if(s._surfaceWebOnly)for(const k of ['pOpacity','pLinks','pTrailOpacity','pSkin','pVolumeContinuity','pCaustic','pCloudHalo','pCloudCore'])s[k]=0;
+}
 const previewGrainLimit=options=>options.preview&&options.quality!=='full'?(options.quality==='fast'?storedGrains:450000):Infinity;
 // The force and dynamics fragment masks still need pixel-space coordinates
 // even when there is no artist-drawn guide. Keep that camera mapping intact.
@@ -337,7 +372,7 @@ export class ParticleRenderer{
   if(active===this.guideVariant&&forces===this.forceVariant&&featureKey===this.featureKey)return;
   if(this.guideVariant!==undefined){
    for(const name of ['points','proceduralPoints','lines','pathProgram']){const p=this[name];if(p){this.pendingPrograms.delete(p);this.gl.deleteProgram(p.program);this[name]=null;}}
-   for(const name of ['connections','volume','medium','optics','living','veils','cloudSurface']){const pass=this[name];if(pass){for(const p of Object.values(pass))if(p?.uniforms instanceof Map)this.pendingPrograms.delete(p);pass.dispose();this[name]=null;}}
+   for(const name of ['connections','volume','medium','optics','living','veils','cloudSurface','surfaceWeb']){const pass=this[name];if(pass){for(const p of Object.values(pass))if(p?.uniforms instanceof Map)this.pendingPrograms.delete(p);pass.dispose();this[name]=null;}}
    this.shadow?.release();
   }
   this.guideVariant=active;this.forceVariant=forces;this.featureVariant=feature;this.featureKey=featureKey;
@@ -361,11 +396,12 @@ export class ParticleRenderer{
   if(this.float){this.pathTarget=this.target(segments+3,1024);gl.bindTexture(gl.TEXTURE_2D,this.pathTarget.texture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA32F,segments+3,1024,0,gl.RGBA,gl.FLOAT,null);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.NEAREST);}
  }
  target(w,h){const gl=this.gl,texture=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,texture);gl.texImage2D(gl.TEXTURE_2D,0,this.float?gl.RGBA16F:gl.RGBA8,w,h,0,gl.RGBA,this.float?gl.HALF_FLOAT:gl.UNSIGNED_BYTE,null);for(const k of [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER])gl.texParameteri(gl.TEXTURE_2D,k,gl.LINEAR);for(const k of [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T])gl.texParameteri(gl.TEXTURE_2D,k,gl.CLAMP_TO_EDGE);const fbo=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('Buffer grafico non disponibile.');return {texture,fbo,w,h};}
- releaseSurface(){this.volume?.release();this.medium?.release();this.optics?.release();this.shadow?.release();if(this.depthCopy){this.gl.deleteTexture(this.depthCopy.texture);this.gl.deleteFramebuffer(this.depthCopy.fbo);this.depthCopy=null;}for(const t of this.targets){this.gl.deleteTexture(t.texture);this.gl.deleteFramebuffer(t.fbo);if(t.depth)this.gl.deleteRenderbuffer(t.depth);}this.targets=[];this.width=0;this.height=0;this.canvas.width=1;this.canvas.height=1;return true;}
+ releaseSurface(){this.surfaceWeb?.releaseLayer();this.volume?.release();this.medium?.release();this.optics?.release();this.shadow?.release();if(this.depthCopy){this.gl.deleteTexture(this.depthCopy.texture);this.gl.deleteFramebuffer(this.depthCopy.fbo);this.depthCopy=null;}for(const t of this.targets){this.gl.deleteTexture(t.texture);this.gl.deleteFramebuffer(t.fbo);if(t.depth)this.gl.deleteRenderbuffer(t.depth);}this.targets=[];this.width=0;this.height=0;this.canvas.width=1;this.canvas.height=1;return true;}
  resize(w,h){if(this.width===w&&this.height===h){if(this.canvas.width!==w)this.canvas.width=w;if(this.canvas.height!==h)this.canvas.height=h;return;}this.releaseSurface();this.width=w;this.height=h;this.canvas.width=w;this.canvas.height=h;this.targets=[this.target(w,h),this.target(Math.ceil(w/4),Math.ceil(h/4)),this.target(Math.ceil(w/4),Math.ceil(h/4))];}
  bind(t){const gl=this.gl;gl.bindFramebuffer(gl.FRAMEBUFFER,t?.fbo||null);gl.viewport(0,0,t?.w||this.width,t?.h||this.height);}
  tex(p,key,texture,unit){const gl=this.gl;gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(this.loc(p,key),unit);}
  settings(p,s,phase){const gl=this.gl;gl.useProgram(p.program);bindDynamics(gl,p.program,s);this.guides.bind(p);gl.uniform1ui(this.loc(p,'uGrainSeed'),s.seed>>>0);
+  this.u(p,'uFiberPile',...fiberMaterialUniform(s));
   this.u(p,'uFocus',this.shadowPass?0:s.focusBlur||0,s.focusDepth||0,this.shadowPass?0:focusSlope(s.focusTilt));
   this.u(p,'uShadowPass',this.shadowPass?(this.shadowPass.mode||1):0);if(this.optics)this.optics.uniforms(p,s);else{this.u(p,'uOpticalShadow',0,0,0,0);this.tex(p,'uOpticalMap',this.seedTexture,8);this.tex(p,'uVolumeMap',this.seedTexture,9);}this.u(p,'uShadowHeight',s.pShadowHeight??-1.6);this.u(p,'uShadowOpacity',p.materialAlpha?1:Math.max(0,1-s.transparency));if(this.shadowPass)this.u(p,'uShadowLight',this.shadowPass.light.x,this.shadowPass.light.y,this.shadowPass.light.z);
   const layer=this.studioLayer,attachment=layer?.attachment;
@@ -425,6 +461,13 @@ export class ParticleRenderer{
   this.u(p,'uColorWave',s.colorWaveAmount,s.colorWaveBands,s.colorWavePhase*Math.PI*2,0);this.u(p,'uColorWave2',s.colorWaveHeight,s.colorWaveRadius,s.colorWaveSwirl,s.colorWaveWarp);
   gl.uniform1i(this.loc(p,'uPaletteCount'),s.palette.length);gl.uniform3fv(this.loc(p,'uPalette'),s.palette.flatMap(linearRgb));
   const lights=s.lights.filter(l=>l.enabled).slice(0,8);gl.uniform1i(this.loc(p,'uLightCount'),lights.length);
+  this.u(p,'uSharedLightResponse',s.lightWrap||0,s.translucency||0,s.scattering||0,s.subsurface||0);
+  this.u(p,'uDiffusionPigment',...linearRgb(s.internalColor||'#ffffff'));this.u(p,'uParticleSssColor',...linearRgb(s.sssColor||'#ffffff'));this.u(p,'uDiffusionRadius',s.sssRadius??.55);
+  if(lights.length&&s.lightWrap>0){
+   const types={circle:0,bar:1,spot:2,diffuser:3,grid:4,ring:5,orb:6};
+   gl.uniform4fv(this.loc(p,'uLightProps'),lights.flatMap(l=>[l.size,l.length,l.roll*Math.PI/180,types[l.type]??0]));
+   gl.uniform4fv(this.loc(p,'uLightExtra'),lights.flatMap(l=>[l.softness,Math.tan(l.cone*Math.PI/180),l.grid,+!!l.visible]));
+  }
   if(lights.length){gl.uniform4fv(this.loc(p,'uLights'),lights.flatMap(l=>[l.x,l.y,l.z,l.power]));gl.uniform3fv(this.loc(p,'uLightColors'),lights.flatMap(l=>linearRgb(l.color)));gl.uniform1fv(this.loc(p,'uLightSizes'),lights.map(l=>l.size));}
  }
  ensureTrails(s){
@@ -436,7 +479,7 @@ export class ParticleRenderer{
  }
  prepare(source,phase=0,options={}){
   if(this.gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');
-  const s={...PARTICLE_DEFAULTS,...grainFrame(source,phase,sampleFrame)};migrateGrainSizes(s,source);this.configureFields(s,options);this.ensureTrails(s);
+  const s={...PARTICLE_DEFAULTS,...grainFrame(source,phase,sampleFrame)};decorationOnly(s);migrateGrainSizes(s,source);this.configureFields(s,options);this.ensureTrails(s);
   // Queue optional geometry programs before drawing, without blocking the UI
   // on LINK_STATUS while the driver is still compiling them.
   if(s._cloudSurfaceActive&&s.pLiving>0&&s.pLiving!==4)s.pSkin=Math.max(s.pSkin,s._cloudSurfaceMix);
@@ -444,6 +487,7 @@ export class ParticleRenderer{
   else if(s.pLiving>0)this.living??=new LivingStructures(this,common);
   if(s.pLinks>0&&s.pLiving!==4)this.connections??=new ParticleLinks(this,common);
   const required=new Set([this.blur,this.compose]);
+  if(surfaceWebStrength(s)>0){this.surfaceWeb??=new SurfaceWeb(this,common);required.add(this.surfaceWeb.capture);required.add(this.surfaceWeb.render);}
   if(s._cloudSurfaceActive&&!(s.pLiving>0)){this.cloudSurface??=new ParticleSurface(this,grainGLSL);for(const p of this.cloudSurface.programs)required.add(p);}
   if(visibleGrains(s)||(s._cloudSurfaceMix>0&&!(s.pLiving>0)&&s.pCount>0)){
    required.add(this.grainProgram());
@@ -467,7 +511,8 @@ export class ParticleRenderer{
  async prepareAsync(s,p,o={}){let slow=false;const start=performance.now();o.onStage?.('preparing');while(!o.cancelled?.()){if(this.prepare(s,p,o)){o.onStage?.('rendering');return true;}if(!slow&&performance.now()-start>30000){slow=true;o.onStage?.('preparing-slow');}await new Promise(r=>setTimeout(r,16));}return false;}
  draw(source,phase=0,w=this.canvas.width,h=this.canvas.height,options={}){
   const gl=this.gl;if(gl.isContextLost())throw Error('La GPU è stata interrotta. Ricarica Prisma.');if(options.preview&&!this.prepare(source,phase,options))return false;
-  const s={...PARTICLE_DEFAULTS,...grainFrame(source,phase,sampleFrame)};migrateGrainSizes(s,source);this.configureFields(s,options);this.ensureTrails(s);
+  const s={...PARTICLE_DEFAULTS,...grainFrame(source,phase,sampleFrame)};decorationOnly(s);migrateGrainSizes(s,source);this.configureFields(s,options);this.ensureTrails(s);
+  this.webRestSource=source;
   phase=grainPhaseRadians(source,phase)/(Math.PI*2);if(s.perfectLoop!==false)phase=((phase%1)+1)%1;
   if(s.pLiving===4){s.pCount=0;s.pTrailCount=0;s.pLinks=0;s.pLivingBlend=1;}
   this.geometryBudget=options.preview&&options.quality==='fast'?Math.max(1/16,Math.min(1,options.geometryBudget??1)):1;this.previewCounts={};this.studioLayer=options.studioLayer;this.linkRestState={...s};for(const k of ['volume','stretchX','stretchY','stretchZ'])this.linkRestState[k]=source[k]??s[k];
@@ -482,12 +527,13 @@ export class ParticleRenderer{
   }
   if(this.seed!==s.seed)this.geometry(s.seed);this.resize(w,h);this.guides.update(s);this.pollGpuTime();const query=options.trackTiming!==false&&this.timerExtension&&this.queries.length<3?gl.createQuery():null;
   if(query)gl.beginQuery(this.timerExtension.TIME_ELAPSED_EXT,query);
-  const [scene,a,b]=this.targets;let sceneDrawn=false;
+  const [scene,a,b]=this.targets;let sceneDrawn=false;this.webLayer=null;
   const transmission=s.pLiving===4?1-s.pVeilOpacity:s.transparency;
   const caustics=s.pCaustic>0&&transmission>0&&s.refraction>1&&s.metal<1;
   const volume=usesCloudAbsorption(s,this.float);
-  const castsLight=s.pLiving>0||s._cloudSurfaceMix>0||visibleGrains(s)||visibleTrails(s)||s.pLinks>0;
-  const opticalLight=castsLight&&(s.pSelfShadow>0||caustics)?shadowLight(s,!volume):null;
+  const castsLight=s.pLiving>0||s._cloudSurfaceMix>0||visibleGrains(s)||visibleTrails(s)||s.pLinks>0||surfaceWebStrength(s)>0;
+  const opticalLight=castsLight&&(s.pSelfShadow>0||caustics)
+   ?shadowLight(s,caustics&&!volume)||(s.pSelfShadow>0?shadowLight(s,false):null):null;
   if(this.optics){this.optics.ready=false;this.optics.volumeReady=false;this.optics.causticActive=false;}
   try{if(opticalLight){
    this.optics??=new ParticleOptics(this);this.optics.configure(s,opticalLight);
@@ -516,6 +562,7 @@ export class ParticleRenderer{
   this.u(c,'uSurfaceEdgeAA',s.pLiving>0?0:(s._cloudSurfaceMix||0)*(1-s.transparency));
   this.u(c,'uBackground',...rgb(s.background));this.u(c,'uBackground2',...rgb(s.background2));this.u(c,'uBgMode',['solid','gradient','studio','transparent'].indexOf(s.bgMode));this.u(c,'uBg',s.bgAngle*rad,s.bgHeight,s.bgSoftness,s.bgWash);
   this.tex(c,'uStudioSurface',this.studioLayer?.color||scene.texture,13);this.u(c,'uStudioComposite',this.studioLayer?.color?1:0);this.u(c,'uStudioCamera',this.studioLayer?.attachment?1:0);
+  this.tex(c,'uWebLayer',this.webLayer||scene.texture,7);this.u(c,'uWebActive',this.webLayer?1:0);
   this.tex(c,'uMedium',medium||scene.texture,14);this.u(c,'uMediumMix',medium?continuum:0,this.studioLayer?.grainMix??1);
   this.tex(c,'uViewDensity',mist?.texture||scene.texture,10);this.u(c,'uViewVolume',mist?mist.amount*(1+s.transparency*.6):0,mist?mist.amount*2.3:0,mist?.width||1,mist?.height||1);
   if(mist){const light=s.lights.find(l=>l.enabled);const aim=light?[light.x-s.positionX,light.y-s.positionY,light.z]:[-.5,.6,.6],length=Math.hypot(...aim)||1;this.u(c,'uVolumeLight',...aim.map(component=>component/length));}
@@ -564,6 +611,12 @@ export class ParticleRenderer{
   }else this.previewTrailCount=0;
   if(s.pLinks>0){this.connections??=new ParticleLinks(this,common);this.connections.draw(s,phase*s.pDirection);}
   if(!surfaceMergedGrains&&visibleGrains(s))this.drawGrainLayer(s,phase,options);
+  if(surfaceWebStrength(s)>0){
+   this.surfaceWeb??=new SurfaceWeb(this,common);
+   if(!this.shadowPass)this.webLayer=this.surfaceWeb.bindLayer(w,h);
+   this.surfaceWeb.draw(s,phase*s.pDirection);
+   if(!this.shadowPass)this.bind(scene);
+  }
  }
  drawGrainLayer(s,phase,options){
   const cap=this.shadowPass?storedGrains:previewGrainLimit(options);
@@ -571,8 +624,12 @@ export class ParticleRenderer{
   const points={...s,pLargeCount:s.pCount>storedGrains?Math.round(s.pLargeCount*count/s.pCount):s.pLargeCount,pOpacity:s.pOpacity*Math.min(16,s.pCount/count)};
   this.previewCounts.points=count;
   const sizes=grainDiameters(s);
-  const size=Math.max(s.pSize,s.pLargeCount>0?sizes.large:0,s.pLinks>0?sizes.node:0);
-  const quad=Math.min(1024,size*(1+s.pSizeVar*.85)*Math.pow(2,s.pSizeSpread||0))*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
+  const radiiScale=(1+s.pSizeVar*.85)*Math.pow(2,s.pSizeSpread||0);
+  const commonSize=Math.min(1024,Math.max(s.pSize,s.pLargeCount>0?sizes.large:0)*radiiScale);
+  const nodeSize=s.pLinks>0&&s.pLinkNodes>0?(sizes.node>0?Math.min(1024,sizes.node*radiiScale):commonSize):0;
+  const [amount,length,target]=fiberMaterialUniform(s),pileScale=1.+amount*(.024+.206*length);
+  const size=Math.max(commonSize*(target===0?pileScale:1),nodeSize*(target<2?pileScale:1));
+  const quad=size*(this.shadowPass?.height||this.height)/1080>Math.min(64,this.pointSizeLimit);
   this.opticalDrawState();
   this.drawPoints(this.grainProgram(),points,phase,quad,Math.min(storedGrains,count),0);
   if(count>storedGrains)this.drawPoints(this.generatedPoints(),points,phase,quad,count-storedGrains,storedGrains);
@@ -600,5 +657,5 @@ export class ParticleRenderer{
  pollGpuTime(){const gl=this.gl,e=this.timerExtension;if(!e)return;const disjoint=gl.getParameter(e.GPU_DISJOINT_EXT);while(this.queries.length&&(disjoint||gl.getQueryParameter(this.queries[0],gl.QUERY_RESULT_AVAILABLE))){const q=this.queries.shift();if(!disjoint){this.gpuMilliseconds=gl.getQueryParameter(q,gl.QUERY_RESULT)/1e6;this.gpuSample++;}gl.deleteQuery(q);}}
  hardwareInfo(){const gl=this.gl,e=gl.getExtension('WEBGL_debug_renderer_info'),name=gl.getParameter(e?e.UNMASKED_RENDERER_WEBGL:gl.RENDERER);return {name,software:/swiftshader|llvmpipe/i.test(name),timingAvailable:!!this.timerExtension};}
  pixels(){const gl=this.gl,a=new Uint8Array(this.width*this.height*4),out=new Uint8Array(a.length),stride=this.width*4;gl.readPixels(0,0,this.width,this.height,gl.RGBA,gl.UNSIGNED_BYTE,a);for(let y=0;y<this.height;y++)out.set(a.subarray(y*stride,(y+1)*stride),(this.height-y-1)*stride);return out;}
- dispose({loseContext=false}={}){const gl=this.gl;if(this.completionSync)gl.deleteSync(this.completionSync);for(const q of this.queries)gl.deleteQuery(q);this.living?.dispose();this.cloudSurface?.dispose();this.veils?.dispose();this.connections?.dispose();this.guides.dispose();this.optics?.dispose();this.volume?.dispose();this.medium?.dispose();this.releaseSurface();if(this.buffer)gl.deleteBuffer(this.buffer);if(this.lineIndices)gl.deleteBuffer(this.lineIndices);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pathTarget){gl.deleteTexture(this.pathTarget.texture);gl.deleteFramebuffer(this.pathTarget.fbo);}for(const p of [this.points,this.proceduralPoints,this.lines,this.pathProgram,this.blur,this.compose])if(p)gl.deleteProgram(p.program);for(const v of [this.pointVAO,this.quadVAO,this.lineVAO,this.empty])if(v)gl.deleteVertexArray(v);gl.bindVertexArray(null);if(loseContext)this.recoveryExtension?.loseContext();}
+ dispose({loseContext=false}={}){const gl=this.gl;if(this.completionSync)gl.deleteSync(this.completionSync);for(const q of this.queries)gl.deleteQuery(q);this.living?.dispose();this.cloudSurface?.dispose();this.veils?.dispose();this.surfaceWeb?.dispose();this.connections?.dispose();this.guides.dispose();this.optics?.dispose();this.volume?.dispose();this.medium?.dispose();this.releaseSurface();if(this.buffer)gl.deleteBuffer(this.buffer);if(this.lineIndices)gl.deleteBuffer(this.lineIndices);if(this.seedTexture)gl.deleteTexture(this.seedTexture);if(this.pathTarget){gl.deleteTexture(this.pathTarget.texture);gl.deleteFramebuffer(this.pathTarget.fbo);}for(const p of [this.points,this.proceduralPoints,this.lines,this.pathProgram,this.blur,this.compose])if(p)gl.deleteProgram(p.program);for(const v of [this.pointVAO,this.quadVAO,this.lineVAO,this.empty])if(v)gl.deleteVertexArray(v);gl.bindVertexArray(null);if(loseContext)this.recoveryExtension?.loseContext();}
 }

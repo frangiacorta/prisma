@@ -64,13 +64,18 @@ void main(){
  vec3 origin=vec3(uv,4.8),direction=vec3(0.,0.,-1.);
  ivec2 pixel=ivec2(gl_FragCoord.xy);vec4 accumulated=texelFetch(uImplicitColor,pixel,0),through=texelFetch(uImplicitThrough,pixel,0);
  bool hit=through.a>.5,scattered=false;
+ float bodyPile=uFiberPile.z<.5?uFiberPile.x:0.;
+ float gatherFleece=bodyPile;
 #ifdef WEAVE_COTTON_RESOLVE
- if(uTissueCottonWeight*uTexture.z*(1.-uMat.z)>.001){
+ gatherFleece=max(gatherFleece,uTissueCottonWeight*uFiberPile.x*(1.-uMat.z));
+#endif
+ if(gatherFleece>.001){
   // Lateral transport in the layer of short fibres. Its scattering
   // distance is a fraction of the optically measured pile on each fruit.
   // Accumulate radiance and transmittance together so the same fibres
   // scatter correctly across a lit web, a black field or transparent PNG.
-  float sigma=max(0.,through.a-2.),total=1.,edge=0.;
+  float bodySigma=bodyPile*(.001+.006*uFiberPile.y)*min(uResolution.x,uResolution.y)*uFrame.x;
+  float sigma=through.a>2.?through.a-2.:(hit?bodySigma:0.),total=1.,edge=0.;
   vec3 light=accumulated.rgb,transmitted=through.rgb;
   float tap=max(1.,min(uResolution.x,uResolution.y)*uFrame.x/1620.);
   ivec2 last=textureSize(uImplicitThrough,0)-ivec2(1);
@@ -78,7 +83,8 @@ void main(){
    if((x==0&&y==0)||x*x+y*y>5)continue;
    ivec2 delta=ivec2(round(vec2(x,y)*tap)),q=clamp(pixel+delta,ivec2(0),last);
    vec4 nextThrough=texelFetch(uImplicitThrough,q,0);
-   float nextSigma=max(0.,nextThrough.a-2.),reach=max(sigma,nextSigma);
+   float nextSigma=nextThrough.a>2.?nextThrough.a-2.:(nextThrough.a>.5?bodySigma:0.);
+   float reach=max(sigma,nextSigma);
    if(reach<.08)continue;
    float w=exp(-.5*dot(vec2(delta),vec2(delta))/(reach*reach));
    if(w<.001)continue;
@@ -96,7 +102,6 @@ void main(){
   accumulated.rgb=mix(accumulated.rgb,light/total,amount);
   through.rgb=mix(through.rgb,transmitted/total,amount);
  }
-#endif
  vec3 point=origin+direction*max(0.,accumulated.a),normal=vec3(0.,0.,1.);
  float distance=accumulated.a,unused,issue=0.;vec4 back=sceneRay(origin,direction,unused);
  vec4 surface=vec4(accumulated.rgb+through.rgb*back.rgb,1.-min(min(through.r,through.g),through.b)*(1.-back.a));

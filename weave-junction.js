@@ -1,7 +1,7 @@
-import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL,FACING_GLSL} from './weave-sling.js?v=db658b02e410';
-import whorlAnatomy from './weave-whorl.js?v=db658b02e410';
-import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=db658b02e410';
-import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=db658b02e410';
+import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL,FACING_GLSL} from './weave-sling.js?v=1882d3ed81c1';
+import whorlAnatomy from './weave-whorl.js?v=1882d3ed81c1';
+import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=1882d3ed81c1';
+import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=1882d3ed81c1';
 
 // Attachment coordinates on one repeat of the tissue. Each bud keeps its identity
 // as the transverse bridges withdraw and the same bud becomes a hollow calyx.
@@ -303,7 +303,8 @@ export function junctionUniforms(s,u,upload){
   else for(let i=0;i<cage.length;i+=4)u('uTissueCage['+(i/4)+']',cage.subarray(i,i+4));
  }
  u('uTissueSlingLoad',[pose.sling?.pocket||0]);
- u('uTissueCottonWeight',[pouchWeight(s.structWeaveRelease)*(1-smooth(.36,.63,s.structWeaveGrowth))]);
+ const growthFleece=pouchWeight(s.structWeaveRelease)*(1-smooth(.36,.63,s.structWeaveGrowth));
+ u('uTissueCottonWeight',[s.fiberTarget==='growth'||s.fiberPile==null?growthFleece:1]);
  if(pose.sling){
   const data=pose.sling.vertices;
   if(upload)upload('uTissueSling',data);
@@ -701,7 +702,7 @@ uniform float uTissueCottonWeight;
 #ifdef WEAVE_HIT_TAG
 // The tagged optical pass intersects the outside of the pile. The solid
 // used for particle attachment and the opening of the calyx stay at the core.
-float tissueCottonHeight(){return .164*uTissueCottonWeight*uTexture.z*(.32+.68*uMat.w)*(1.-uMat.z);}
+float tissueCottonHeight(){return .164*uTissueCottonWeight*uFiberPile.x*(.32+.68*uMat.w)*(1.-uMat.z)*(1.+1.35*(uFiberPile.y-.35));}
 int weaveBudIndex=-1;
 float weaveBudImpact=-1.;
 // Loose fibrils have little extinction individually. Their optical depth

@@ -1,5 +1,5 @@
-import {PANEL_GUIDES} from './workspace-layout.js?v=db658b02e410';
-import {SECTION_NAMES} from './control-vocabulary.js?v=db658b02e410';
+import {PANEL_GUIDES} from './workspace-layout.js?v=1882d3ed81c1';
+import {SECTION_NAMES} from './control-vocabulary.js?v=1882d3ed81c1';
 // Navigation only: the creation and its renderer are never changed here.
 export const NAV_GROUPS=[
  {id:'shape',label:'Forma',tabs:[['shape','Forma','shape']]},
@@ -27,8 +27,8 @@ export function organizeSections(root,scope){
  if(scope.endsWith('/library'))return;
  // Shared tasks have the same location in both engines; engine-specific controls
  // retain their own sections instead of displacing the common workflow.
- const order=scope.endsWith('/material')?['Superficie','Trasparenza e luce interna','Iridescenza','Rivestimento','Rilievo di superficie','Reazione-diffusione','Fibre · riflessi','Satinatura ed emissione','Scorrimento del materiale']:
-  scope.endsWith('/light')?['Ambiente','Luci','Luce selezionata','Posizione','Sorgente','Riflessi ambiente','Illuminazione','Animazione','Rotazione dei riflessi']:null;
+ const order=scope.endsWith('/material')?['Superficie','Peluria','Trasparenza e luce interna','Iridescenza','Rivestimento','Rilievo di superficie','Reazione-diffusione','Fibre · riflessi','Satinatura ed emissione','Scorrimento del materiale']:
+  scope.endsWith('/light')?['Ambiente','Luci','Luce selezionata','Posizione','Sorgente','Luce e ombre','Riflessi ambiente','Illuminazione','Animazione','Rotazione dei riflessi']:null;
  if(order){const sections=[...root.children].filter(e=>e.matches('details'));const rank=e=>{let name=e.querySelector(':scope > summary')?.textContent;if(/^LUCE \d+$/i.test(name))name='Luce selezionata';const i=order.indexOf(name);return i<0?order.length:i;};for(const e of sections.sort((a,b)=>rank(a)-rank(b)))root.append(e);}
  // Deep shape controls belong under their parent instead of a long flat list.
  function group(label,id,titles){
@@ -43,7 +43,7 @@ export function organizeSections(root,scope){
  if(scope==='solid/shape'){
   const growth=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Appendici: petali e radici');
   if(growth){growth.id='shape-growth';const stem=[...root.children].find(d=>d.querySelector(':scope > summary')?.textContent==='Gambo');if(stem)growth.append(stem);}
-  group('Costruzione','shape-structure',['Composizione della struttura','Guscio e spessore','Reticolo di fibre','Suddivisione radiale e strati','Piegatura e curvatura']);
+  group('Costruzione','shape-structure',['Composizione della struttura','Guscio e spessore','Suddivisione radiale e strati','Piegatura e curvatura']);
   group('Deformazioni e ritagli','shape-profile',['Deformazioni','Foro','Ritaglio','Lobi e onde']);
  }
  if(scope==='particles/shape'&&!root.querySelector('[data-particle-layer]'))group('Costruzione','particle-structure',['Lobi, rami e addensamenti','Rumore multiscala','Rete di percorsi','Tentacoli del nucleo','Fasci esterni','Deformazioni']);
@@ -99,7 +99,7 @@ export function mountControlSearch({getEngine,getMarkup,showTab,revealControl,pr
     const ancestors=[];let d=el.closest('details,section.control-section');while(d){ancestors.unshift(d.querySelector(':scope > summary,:scope > h2')?.textContent||'');d=d.parentElement?.closest('details,section.control-section');}
     const aliases={tone:'esposizione luminosita saturazione correzione colore fotografia',photo:'filtri effetti finitura post processing',motion:'moto animazione animare muovere movimento ritmo velocita',fields:'attrazione repulsione magneti',body:'webcam tracking mani braccia'};
     const oldNames=PROCEDURES.filter(t=>ancestors.some(a=>a.includes(t.label)||a.includes(SECTION_NAMES[t.label]||t.label))).flatMap(t=>[t.label,...t.aliases]);
-    const parameterAliases={hole:['buco','foro','buca','apertura'],rotateX:['gira','giro','ruota'],rotateY:['gira','giro','ruota'],rotateZ:['gira','giro','ruota'],transparency:['trasparente','vetro','opaco'],sceneGrains:['passaggio','morph','dissolvi','particelle','superficie'],pSize:['grandezza','ingrandisci','spessore granelli'],growthFeed:['Nutrimento'],growthKill:['Consumo'],growthAge:['Sviluppo della trama'],growthDepth:['Incisione / rilievo'],filPhase:['Scorrimento'],filWind:['Oscillazione delle punte'],structBreath:['Dilatazione del respiro'],structFlap:['Apertura del battito'],glow:['Diffusione alone'],emission:['Luce propria']};
+    const parameterAliases={fiberPile:['pelo','pelosità','cotone','lana','velluto'],fiberLength:['lunghezza peluria','fibrille'],structWeaveCradle:['ragnatele','tela','rete','fili'],structWeaveNodes:['palline','nodulo','giunzioni'],structWeaveCupSize:['grandezza delle palline'],structWeaveCupLight:['controluce','coppe illuminate'],lightWrap:['luce morbida','ombra morbida'],pSelfShadow:['ombra di contatto','ombre reciproche'],hole:['buco','foro','buca','apertura'],rotateX:['gira','giro','ruota'],rotateY:['gira','giro','ruota'],rotateZ:['gira','giro','ruota'],transparency:['trasparente','vetro','opaco'],sceneGrains:['passaggio','morph','dissolvi','particelle','superficie'],pSize:['grandezza','ingrandisci','spessore granelli'],growthFeed:['Nutrimento'],growthKill:['Consumo'],growthAge:['Sviluppo della trama'],growthDepth:['Incisione / rilievo'],filPhase:['Scorrimento'],filWind:['Oscillazione delle punte'],structBreath:['Dilatazione del respiro'],structFlap:['Apertura del battito'],glow:['Diffusione alone'],emission:['Luce propria']};
     oldNames.push(...(parameterAliases[el.dataset.param]||[]));
     entries.push({tab:tab.id,label,path:[...(tab.groupLabel===tab.label?[tab.label]:[tab.groupLabel,tab.label]),...ancestors].join(' › '),selector,haystack:clean([label,...ancestors,...oldNames,el.dataset.searchAliases||'',tab.label,({structure:'geometria forma',look:'materiale luce aspetto',post:'post processing filtri',interaction:'modulazione interazione'})[tab.group]||'',aliases[tab.id]||''].join(' '))});
    }

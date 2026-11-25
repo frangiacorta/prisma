@@ -1,4 +1,5 @@
-import {PALETTE_DEFAULTS,PALETTE_META} from './finish-palette.js?v=db658b02e410';
+import {shadowLight} from './particle-shadow.js?v=1882d3ed81c1';
+import {PALETTE_DEFAULTS,PALETTE_META} from './finish-palette.js?v=1882d3ed81c1';
 // One final image pass, after the complete frame (including tiled/accumulated exports).
 export const FINISH_DEFAULTS={finishEnabled:true,finishTone:true,finishRgb:false,finishMosaic:false,finishCompare:false,finishRgbR:8,finishRgbG:0,finishRgbB:-8,finishRgbAngle:0,finishRgbMix:1,finishCellX:12,finishCellY:12,finishMosaicMix:1};
 export const FINISH_META={finishRgbR:['Spostamento rosso',-60,60,.1],finishRgbG:['Spostamento verde',-60,60,.1],finishRgbB:['Spostamento blu',-60,60,.1],finishRgbAngle:['Direzione RGB',-180,180,1],finishRgbMix:['Intensità RGB',0,1,.01],finishCellX:['Larghezza celle',1,160,1],finishCellY:['Altezza celle',1,160,1],finishMosaicMix:['Intensità mosaico',0,1,.01]};
@@ -119,6 +120,7 @@ export const focusSlope=(tilt=0)=>Math.tan(Math.max(-60,Math.min(60,tilt||0))*Ma
 const FOCUS_FRAGMENT=`#version 300 es
 precision highp float;
 uniform sampler2D uImage,uDepth;uniform vec2 uSize;uniform vec4 uFocus;uniform float uExactDepth;out vec4 color;
+uniform vec4 uContact;uniform vec3 uContactLight;
 vec2 depthAt(vec2 uv){
  vec4 packed=texture(uDepth,uv);
  if(uExactDepth>.5)return vec2(4.8-packed.a,packed.a>=0.?1.:0.);
@@ -129,9 +131,34 @@ float unfocused(float depth,vec2 uv){
  float focus=uFocus.y+uFocus.z*view.y*(1.+uFocus.w*dot(view,view)*.18);
  return uFocus.x*smoothstep(.07,1.25,abs(depth-focus));
 }
+float contactVisibility(vec2 uv,vec2 depth){
+ if(depth.y<=0.)return 1.;
+ vec2 viewSize=3.4*uSize/min(uSize.x,uSize.y);
+ vec3 toLight=uContactLight-vec3((uv-.5)*viewSize,depth.x);
+ float distance=length(toLight),reach=min(uContact.w,distance);
+ vec3 ray=toLight/max(.001,distance);
+ vec2 side=vec2(-ray.y,ray.x)/max(.001,length(ray.xy));
+ float blocked=0.;
+ for(int lane=-1;lane<=1;lane++){
+  float obstruction=0.;
+  for(int j=1;j<=7;j++){
+   float fraction=float(j)/7.,travel=reach*fraction*fraction;
+   vec2 sampleUV=uv+(ray.xy+side*(float(lane)*uContact.z*.025))*travel/viewSize;
+   if(any(lessThan(sampleUV,vec2(0.)))||any(greaterThan(sampleUV,vec2(1.))))continue;
+   vec2 blocker=depthAt(sampleUV);
+   float height=blocker.x-(depth.x+travel*ray.z);
+   float nearContact=(1.-smoothstep(reach*.75,reach*1.6,height))*(1.-.38*fraction);
+   float penumbra=uContact.y+.003+travel*uContact.z*.016;
+   obstruction=max(obstruction,blocker.y*nearContact*smoothstep(uContact.y,penumbra,height));
+  }
+  blocked+=obstruction;
+ }
+ return 1.-clamp(depth.y*uContact.x*blocked*(.72/3.),0.,.84);
+}
 void main(){
  vec2 uv=gl_FragCoord.xy/uSize,depth=depthAt(uv);
  vec4 center=texture(uImage,uv);
+ if(uContact.x>0.){color=vec4(center.rgb*contactVisibility(uv,depth),center.a);return;}
  float radius=depth.y>.5?unfocused(depth.x,uv):uFocus.x*.72;
  if(radius<=.004){color=center;return;}
  float scale=min(uSize.x,uSize.y)*.033;
@@ -154,7 +181,7 @@ void main(){
  vec4 result=sum/total;color=vec4(result.rgb/max(.00001,result.a),result.a);
 }`;
 export class FocusPass extends FinishingPass{
- constructor(gl){super(gl,FOCUS_FRAGMENT,['uImage','uDepth','uSize','uFocus','uExactDepth']);}
+ constructor(gl){super(gl,FOCUS_FRAGMENT,['uImage','uDepth','uSize','uFocus','uExactDepth','uContact','uContactLight']);}
  draw(s,w,h,depth,exact=false){
   const g=this.gl,u=this.uniforms;g.bindFramebuffer(g.FRAMEBUFFER,null);g.activeTexture(g.TEXTURE0);
   if(!this.texture){
@@ -166,7 +193,20 @@ export class FocusPass extends FinishingPass{
   g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);g.activeTexture(g.TEXTURE1);g.bindTexture(g.TEXTURE_2D,depth);
   g.disable(g.BLEND);g.disable(g.DEPTH_TEST);g.disable(g.SCISSOR_TEST);g.viewport(0,0,w,h);g.bindVertexArray(this.vao);g.useProgram(this.program);
   g.uniform1i(u.uImage,0);g.uniform1i(u.uDepth,1);g.uniform2f(u.uSize,w,h);g.uniform4f(u.uFocus,s.focusBlur,s.focusDepth||0,focusSlope(s.focusTilt),s.lensDistortion||0);g.uniform1f(u.uExactDepth,+exact);
-  g.drawArrays(g.TRIANGLES,0,3);g.bindVertexArray(null);g.activeTexture(g.TEXTURE0);
+  const lamp=shadowLight(s,false);
+  const strength=lamp?(s.pSelfShadow||0)*(1-Math.exp(-lamp.power))*(1-(s.transparency||0)):0;
+  if(strength>0){
+   g.uniform4f(u.uContact,strength,s.pSelfShadowBias??.02,s.pSelfShadowSoftness??1.5,.48*(s.scale||1));
+   g.uniform3f(u.uContactLight,lamp.x,lamp.y,lamp.z);
+   g.drawArrays(g.TRIANGLES,0,3);
+   if(s.focusBlur>0){
+    g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,this.texture);
+    g.copyTexSubImage2D(g.TEXTURE_2D,0,0,0,0,0,w,h);
+   }
+  }
+  g.uniform4f(u.uContact,0,0,0,0);
+  if(s.focusBlur>0)g.drawArrays(g.TRIANGLES,0,3);
+  g.bindVertexArray(null);g.activeTexture(g.TEXTURE0);
  }
 }
 

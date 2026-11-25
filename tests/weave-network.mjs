@@ -239,7 +239,7 @@ try{
  const controls=['structWeavePitch','structWeaveRootBend','structWeaveTipBend','structWeaveRearX','structWeaveRearY','structWeaveSlope','structWeaveArch','structWeaveCradle','structWeaveFlex','structWeaveBranching','structWeaveTension','structWeaveFront','structWeaveFinesse','structWeaveReach','structWeaveRelease','structWeaveHierarchy','structWeaveSpread','structWeaveAlignment','structWeaveCupSize','structWeaveFlare'];
  await page.locator('[data-tab="shape"]').click();
  for(const key of controls)assert.equal(await page.locator('[data-number="'+key+'"]').count(),1,key);
- await page.locator('[data-tab="material"]').click();
+ await page.locator('[data-tab="light"]').click();
  assert.equal(await page.locator('[data-number="structWeaveCupLight"]').count(),1);
  await page.locator('[data-tab="motion"]').click();
  await page.locator('[data-animate-path="motions.structWeaveRelease"]').click();

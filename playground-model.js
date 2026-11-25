@@ -1,12 +1,12 @@
 // Project-only data: never retain devices, canvases or a nested performance.
-import {META,GROUPS} from './model.js?v=db658b02e410';
-import {cloudBody,grainMix} from './body-layers.js?v=db658b02e410';
-import {CONTROL_NAMES} from './control-vocabulary.js?v=db658b02e410';
-import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=db658b02e410';
-import {LIGHT_META,TRACK_META,syncMaterialControl} from './studio-model.js?v=db658b02e410';
-import {FORCE_META} from './particle-forces.js?v=db658b02e410';
-import {PATH_META} from './particle-paths.js?v=db658b02e410';
-import {normalizeFlow} from './flow-model.js?v=db658b02e410';
+import {META,GROUPS} from './model.js?v=1882d3ed81c1';
+import {cloudBody,grainMix} from './body-layers.js?v=1882d3ed81c1';
+import {CONTROL_NAMES,FIBER_TARGETS} from './control-vocabulary.js?v=1882d3ed81c1';
+import {PARTICLE_META,migrateGrainSizes} from './particle-model.js?v=1882d3ed81c1';
+import {LIGHT_META,TRACK_META,syncMaterialControl} from './studio-model.js?v=1882d3ed81c1';
+import {FORCE_META} from './particle-forces.js?v=1882d3ed81c1';
+import {PATH_META} from './particle-paths.js?v=1882d3ed81c1';
+import {normalizeFlow} from './flow-model.js?v=1882d3ed81c1';
 export const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const number=(x,f,a,b)=>Number.isFinite(x)?clamp(x,a,b):f;
 const label=(x,f='',n=80)=>typeof x==='string'?x.replace(/[\x00-\x1f<>]/g,'').slice(0,n):f;
@@ -81,7 +81,7 @@ export function defaultPlayground(snapshot){
  c.macros[7].value=grainMix(s);
  c.bindings['take.B']={input:{kind:'key',code:'ArrowRight'},mode:'toggle',pickup:false};c.bindings['take.A']={input:{kind:'key',code:'ArrowLeft'},mode:'toggle',pickup:false};c.bindings.blackout={input:{kind:'key',code:'KeyB'},mode:'hold',pickup:false};return c;
 }
-const enumValues={bgMode:['solid','gradient','studio','transparent'],blendMode:['normal','add','screen'],curve:['sine','triangle','smooth','linear'],mode:['wave','cycle'],axis:['x','y','z']};
+const enumValues={fiberTarget:Object.keys(FIBER_TARGETS),bgMode:['solid','gradient','studio','transparent'],blendMode:['normal','add','screen'],curve:['sine','triangle','smooth','linear'],mode:['wave','cycle'],axis:['x','y','z']};
 export function parameterCatalog(s){
  const entries=[];const add=(path,name,kind,min=0,max=1,step=.01,values)=>{const base=path.split('.')[0],group=base==='motions'?'motion':base==='lights'?'light':/^force|^dyn/.test(base)?'interaction':/^finish/.test(base)?'filters':Object.entries(GROUPS).find(([,keys])=>keys.includes(base))?.[0]||'shape';entries.push({path,name,kind,min,max,step,values,group});};
  add('sceneGrains','Superficie ↔ granelli','number',0,1,.001);
@@ -92,7 +92,7 @@ export function parameterCatalog(s){
   if(typeof value==='number'&&Object.hasOwn(meta,key)){const m=meta[key];add(key,CONTROL_NAMES[key]||m[0],'number',m[1],m[2],m[3]);}
   else if(typeof value==='boolean'&&!/^(animate|perfectLoop|keepMotionSpeed|assistant)/.test(key))add(key,CONTROL_NAMES[key]||({finishEnabled:'Filtri',finishTone:'Correzione colore',photoAll:'Correggi anche il fondale',environmentRotate:'Ruota ambiente',light2:'Seconda luce',thinShellMode:'Lamiera trasparente'}[key]??humanName(key)),'boolean',0,1,1);
   else if(typeof value==='string'&&/^#[a-f\d]{6}$/i.test(value))add(key,({background:'Colore del fondale',background2:'Secondo colore del fondale',internalColor:'Colore interno',sssColor:'Colore della diffusione'}[key]??humanName(key)),'color');
-  else if(Object.hasOwn(enumValues,key)&&enumValues[key].includes(value))add(key,key,'enum',0,enumValues[key].length-1,1,enumValues[key]);
+  else if(Object.hasOwn(enumValues,key)&&enumValues[key].includes(value))add(key,CONTROL_NAMES[key]||key,'enum',0,enumValues[key].length-1,1,enumValues[key]);
  }
  for(const [i,color]of (s.palette||[]).entries())if(/^#[a-f\d]{6}$/i.test(color))add('palette.'+i,'Palette · colore '+(i+1),'color');
  for(const [key,t]of Object.entries(s.motions||{})){
