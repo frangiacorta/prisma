@@ -14771,7 +14771,7 @@
       "state": "implemented",
       "priority": false,
       "author": "",
-      "summary": "Le palline si raccolgono nella forcella. La seta aderisce al bordo dei noduli e lascia passare la luce negli interstizi. Gli steli si aprono a ventaglio e le estremità diventano coppe.",
+      "summary": "Le palline si raccolgono nella forcella. Le fibre si tendono attorno a ciascuna pallina e sostengono lembi di velo semitrasparente. Quando gli steli si aprono, la rete si distende con loro.",
       "sources": [
         "https://frangiacorta.github.io/prisma/previews/tessuto-connesso.html"
       ],
@@ -14838,7 +14838,7 @@
       "result": "reticolo-giunzioni",
       "where": "Forma → Costruzione → Reticolo di fibre · Materiale → Ottica del reticolo · Movimento → Struttura",
       "platform": "",
-      "next": "Avvicinare l’inclinazione dei ponti posteriori e la velocità locale durante il rientro degli steli.",
+      "next": "Confrontare la luce sul lembo sinistro, l’irregolarità delle microfibre e il profilo dei rami sul fondo.",
       "keep": "",
       "avoid": "",
       "detailsSource": [
@@ -14876,7 +14876,7 @@
         "Fedeltà alle reference e fluidità su telefono fisico da verificare con l’utente."
       ],
       "integration": "Proprietà combinabili sulla forma corrente; nessun selettore esclusivo di membrane, tessuti o veli in Forme.",
-      "resultVersion": "105",
+      "resultVersion": "106",
       "evidence": "reports/structure/source.json; reports/structure/source-ui.json; reports/structure/export.json",
       "checks": [
         "26 controlli con impatto sui pixel",
@@ -14906,12 +14906,12 @@
       "engine": "solid",
       "procedure": {
         "name": "Reticolo sulla superficie",
-        "description": "In Trama e giunzioni regola Rete attorno ai noduli e la finezza delle fibre. In Steli e coppe, Lunghezza degli steli solleva il ciuffo e Elasticità dei rami ne ritarda le punte. In Andamento dei rami regola inclinazione e curvatura dei ponti. La luce interna delle coppe risponde ai fari della scena.",
+        "description": "In Trama e giunzioni, Rete attorno ai noduli tende il velo attorno alle palline. Con Rilievo alle giunzioni ne cambi la dimensione e con Densità delle microfibre infittisci la trama. In Steli e coppe, Lunghezza degli steli solleva il ciuffo ed Elasticità dei rami ne ritarda le punte. La luce interna delle coppe risponde ai fari della scena.",
         "verification": "code-reviewed"
       },
       "addedOn": "2026-10-10",
       "resultPreset": "previews/reticolo-giunzioni.prisma.json",
-      "compareNote": "Nei primi 12 secondi i germogli si aprono a ventaglio da uno stelo comune. Le palline tendono le fibre e tornano nella maglia. Il confronto pubblico affianca i secondi 7,84–17,84. Alcuni rami di fondo e le traiettorie delle fibre si distinguono ancora dalla reference.",
+      "compareNote": "Al secondo 12 si possono seguire le 18 palline nella forcella. Il velo si tende fra i loro punti di attacco. Nel confronto affiancato questo istante cade a 4,16 secondi. Restano differenze nella luce sul lembo sinistro e nelle maglie più fini.",
       "comparisonRef": "s07-05",
       "comparisonDate": "2026-11-25",
       "comparisonOutcome": "parziale",

@@ -1,7 +1,7 @@
-import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=15c42a1bace2';
-import {prismaPaletteGLSL} from './particle-shading.js?v=15c42a1bace2';
-import {simplex3DGLSL} from './vendor/webgl-noise/simplex-3d.js?v=15c42a1bace2';
-import {hasMotionPoints} from './motion-keyframes.js?v=15c42a1bace2';
+import {bodyFieldGLSL,bindBodyField} from './body-samples.js?v=b3646b8af04a';
+import {prismaPaletteGLSL} from './particle-shading.js?v=b3646b8af04a';
+import {simplex3DGLSL} from './vendor/webgl-noise/simplex-3d.js?v=b3646b8af04a';
+import {hasMotionPoints} from './motion-keyframes.js?v=b3646b8af04a';
 
 const header=`#version 300 es
 precision highp float;

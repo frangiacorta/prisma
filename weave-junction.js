@@ -1,6 +1,7 @@
-import {slingPose,slingDistance,SLING_COUNT,SLING_GLSL} from './weave-sling.js?v=15c42a1bace2';
-import whorlAnatomy from './weave-whorl.js?v=15c42a1bace2';
-import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=15c42a1bace2';
+import {slingPose,slingDistance,SLING_BASE_COUNT,SLING_COUNT,SLING_GLSL} from './weave-sling.js?v=b3646b8af04a';
+import whorlAnatomy from './weave-whorl.js?v=b3646b8af04a';
+import {strainPoint,strainPose,STRAIN_GLSL} from './weave-strain.js?v=b3646b8af04a';
+import {pouchBuds,pouchWeight,pouchPosition} from './weave-pouch.js?v=b3646b8af04a';
 
 // Attachment coordinates on one repeat of the tissue. Each bud keeps its identity
 // as the transverse bridges withdraw and the same bud becomes a hollow calyx.
@@ -237,8 +238,48 @@ export function junctionPose(s){
    }
   }
  }
+ // On release the beads of each whorl are borne by two opposing edges of
+ // the pouch. Moving its edges carries the sockets and their first tangent.
+ const pocket=(s.structWeaveCradle||0)*pouchWeight(release)*(1-smooth(.36,.63,growth));
+ if(pocket>0){
+  const across=.56+.44*s.structWeaveSpread,along=.78+.34*reach;
+  for(let i=0;i<pouchBuds.length;i++){
+   const j=4*i,row=pouchBuds[i],[acrossRib,height]=pouchPosition(row,release);
+   const localY=.05+(height-.05)*along+.16*s.structDelay*(s.structWeaveFront-.33);
+   const localX=spine(localY,rank)+across*acrossRib+.021*s.structWeaveVariation*(profile[j+3]-.5);
+   const cap=row[8]*(.15+.85*s.structWeaveNodes)*(.39+.61*s.structWeaveCupSize);
+   const relief=.012+cap*(.4+.85*row[9]);
+   const footY=localY+.022*(profile[j+3]-.5);
+   // Beyond the bead the load transfers to the fine mesh. Keep its fleshy
+   // socket under the hemisphere even when the two sides spread far apart.
+   const lateralRoot=.35*(spine(footY,rank)-localX);
+   const footX=localX+Math.max(-.70*cap,Math.min(.70*cap,lateralRoot));
+   const radialAlign=.19+.15*profile[j+3];
+   roots[j]=mix(roots[j],footX,pocket);
+   roots[j+1]=mix(roots[j+1],footY,pocket);
+   roots[j+2]=mix(roots[j+2],.006,pocket);
+   // The upper inside shoulder shelters its buds. The outside edge and
+   // the lower row remain exposed to diffuse light through the open web.
+   const innerSide=1-smooth(-.07,.12,acrossRib);
+   const shoulder=smooth(.17,.52,localY)*innerSide;
+   const veilCover=smooth(-.59,.38,localY)*(.57+.43*innerSide);
+   roots[j+3]=mix(shoulder,.14+.86*veilCover,.46);
+   controls[j]=mix(controls[j],mix(footX,localX,.72),pocket);
+   controls[j+1]=mix(controls[j+1],mix(footY,localY,.49),pocket);
+   controls[j+2]=mix(controls[j+2],relief*radialAlign,pocket);
+   ends[j]=mix(ends[j],localX,pocket);
+   ends[j+1]=mix(ends[j+1],localY,pocket);
+   ends[j+2]=mix(ends[j+2],relief,pocket);
+   ends[j+3]=mix(ends[j+3],cap,pocket);
+   for(let axis=0;axis<2;axis++){
+    const margin=2*ends[j+3];
+    extent[axis]=Math.min(extent[axis],roots[j+axis]-margin,controls[j+axis]-margin,ends[j+axis]-margin);
+    extent[axis+2]=Math.max(extent[axis+2],roots[j+axis]+margin,controls[j+axis]+margin,ends[j+axis]+margin);
+   }
+  }
+ }
  lastSettings=poseKeys.map(key=>s[key]);
- const sling=s.structWeaveCradle>0?slingPose(ends,rank,phase,flex,lagDrive,growth,s.structWeaveCradle):null;
+ const sling=s.structWeaveCradle>0?slingPose(ends,rank,phase,flex,lagDrive,growth,s.structWeaveCradle,pocket):null;
  if(sling){
   for(let a=0;a<2;a++){extent[a]=Math.min(extent[a],sling.bounds[a]-.07);extent[a+2]=Math.max(extent[a+2],sling.bounds[a+2]+.07);}
  }
@@ -261,6 +302,7 @@ export function junctionUniforms(s,u,upload){
   if(upload)upload('uTissueCage',cage);
   else for(let i=0;i<cage.length;i+=4)u('uTissueCage['+(i/4)+']',cage.subarray(i,i+4));
  }
+ u('uTissueSlingLoad',[pose.sling?.pocket||0]);
  if(pose.sling){
   const data=pose.sling.vertices;
   if(upload)upload('uTissueSling',data);
@@ -450,19 +492,30 @@ export function junctionField(s,field,p,wall){
  const stem=u-spine(y,rank*(1-.46*lift)),along=stem-width*Math.round(stem/width);
  const longitudinal=1-smooth(.69,.97,release),bridges=1-smooth(.12,.65,release);
  const upper=.37+.18*rank;
+ const load=(s.structWeaveCradle||0)*web*smooth(.075,.18,release)*(1-smooth(.24,.48,release))*smooth(-.32,.24,p[2]);
  // Two distinct insertions on opposite sides prevent a four-way crossing.
  // A slender third arm develops above the advancing germination front.
  const lateral=growth*smooth(.27,.74,s.structWeaveFront);
  let trans=10000;
  if(bridges>0){
-  trans=Math.min(bridgeDistance(u,v,rank,.09*rank,-.10*rank,-.07),bridgeDistance(u,v,rank,1.07,upper,.105));
+  const travel=frac((u-spine(.09*rank,rank))/width);
+  const withdraw=.18*load*smooth(.018,.19,travel)*(1-smooth(.56,.89,travel));
+  trans=Math.min(bridgeDistance(u,v,rank,.09*rank,-.10*rank,-.07)+withdraw,bridgeDistance(u,v,rank,1.07,upper,.105));
   if(lateral>.001)trans=Math.min(trans,bridgeDistance(u,v,rank,upper-.20,pitch+upper,-.16)/(.28+.72*lateral)+.14*(1-lateral));
   if(back>.01)trans=Math.min(trans,bridgeDistance(u,v,rank,1.07,-.10*rank,.07)/(.48+.44*back)+.24*(1-back));
  }
  const warp=s.structWeave*.45*Math.cos(Math.PI*u/width)*Math.cos(Math.PI*v/pitch);
  const cradle=(s.structWeaveCradle||0)*web*bridges;
  const weld=bridges*web;
- let fieldD=longitudinal>0?Math.hypot(along*.92,z-warp)-rib*(.84+.33*rank)*(1-.42*weld+.20*cradle)*longitudinal:10000;
+ // Under a suspended load the axial bundle separates into two margins.
+ // They converge again at each insertion. The thin saddle between them
+ // passes light even where the nodule lies in front of the original axis.
+ const belly=Math.sin(Math.PI*(y+.48)/stride)**2;
+ const span=load*(.065+.12*s.structWeaveSpread)*belly;
+ const seam=along+.21*span*Math.sin(4.6*y);
+ const rail=Math.abs(seam)-span;
+ const rim=rib*(.84+.33*rank)*(1-.42*weld+.20*cradle)*longitudinal;
+ let fieldD=longitudinal>0?Math.hypot(rail*.92,z-warp)-rim*(1-.78*load*belly):10000;
  if(bridges>0){
   const secondary=Math.hypot(trans,z+warp)-rib*.63*(1-.29*weld+.18*cradle)*bridges;
   fieldD=smin(fieldD,secondary,(.003+rib*.75)*bridges);
@@ -487,6 +540,15 @@ export function junctionField(s,field,p,wall){
    if(gauze<.008)sheet=Math.min(sheet,Math.max(gauze,meshOpening(u+.28*v+.169,v-.27*u+.073,Math.abs(along),trans,s.structWeaveFinesse*.83)+.0013*(1-cradle)));
   }
   fieldD=smin(fieldD,sheet,.001+rib*.62*bridges*(1-.70*cradle));
+  if(span>.0001 && Math.abs(seam)<span+.006){
+   const across=sat(1-Math.abs(seam)/span);
+   const pocketZ=warp-.040*load*across*(2-across);
+   const hem=seam/span,grain=29*s.structWeaveFinesse;
+   const yarn=(seam+.009*Math.sin(14*y+4*hem)+.004*Math.sin(33*y-3*hem))*grain;
+   const gap=Math.abs(yarn-Math.round(yarn)-.25*Math.sin(Math.round(yarn)*4.33))/grain;
+   const mesh=Math.hypot(gap,(z-pocketZ)*.83)-load*(.0009+.0007*web);
+   fieldD=Math.min(fieldD,Math.max(rail,mesh));
+  }
   // The free edge of a loaded veil draws into the saddle, leaving the
   // outermost threads exposed between its attachment points.
   if(cradle>.0001&&edge<0){
@@ -518,8 +580,8 @@ export function junctionField(s,field,p,wall){
   const boundary=Math.max(extent[0]-px,extent[1]-py,px-extent[2],py-extent[3])-padding;
   if(boundary>0){emptyBound=Math.min(emptyBound,boundary+.012);continue;}
   if(cradle>0&&pose.sling){
-   for(let i=0;i<SLING_COUNT;i++){
-    const lace=slingDistance(px,py,z,pose.sling.vertices,i,s.structWeaveFinesse,web)+.0035*(1-cradle)+.09*back;
+   for(let i=0,n=pose.sling.pocket>0?SLING_COUNT:SLING_BASE_COUNT;i<n;i++){
+    const lace=slingDistance(px,py,z,pose.sling.vertices,i,s.structWeaveFinesse,web,pose.sling.pocket)+.0035*(1-cradle)+.09*back;
     fieldD=Math.min(fieldD,lace);
    }
   }
@@ -611,9 +673,11 @@ float tissueBridgeDistance(vec2 uv,float startY,float endY,float sag){
  if(max(gapX,gapY)<best)best=min(best,tissueArc(adjacent,span,sag));
  return best;
 }
-float tissueTransverse(vec2 uv){
+float tissueTransverse(vec2 uv,float load){
  float rank=uWeaveDetail.x,upper=.37+.18*rank;
- float d=min(tissueBridgeDistance(uv,.09*rank,-.10*rank,-.07),tissueBridgeDistance(uv,1.07,upper,.105));
+ float travel=fract((uv.x-tissueSpine(.09*rank))/1.22);
+ float withdraw=.18*load*smoothstep(.018,.19,travel)*(1.-smoothstep(.56,.89,travel));
+ float d=min(tissueBridgeDistance(uv,.09*rank,-.10*rank,-.07)+withdraw,tissueBridgeDistance(uv,1.07,upper,.105));
  if(uTissueLateral>.001)d=min(d,tissueBridgeDistance(uv,upper-.20,1.65+upper,-.16)/(.28+.72*uTissueLateral)+.14*(1.-uTissueLateral));
  return d;
 }
@@ -650,7 +714,7 @@ float tissueCalyx(float radial,float axial,float cap,float lift,float aperture,f
  float rimR=mid*mix(sin(cut)*(1.+lift*(.07-.19*cos(cut))),1.098,flare);
  return min(sqrt(best),min(length(vec2(radial-rimR,axial-top)),length(vec2(radial-mid*.078*flare,axial-bottom+tail))))-wall;
 }
-float tissueShoot(vec3 q,vec3 A,vec4 handle,vec3 C,vec4 profile,float index,float cap,float rib,float lift,float gather,float growth,float open,float web,vec3 shear,mat2 metric,vec3 radialSlope,float rounding,out vec3 detail){
+float tissueShoot(vec3 q,vec3 A,vec4 handle,vec3 C,vec4 profile,float index,float socketCover,float cap,float rib,float lift,float gather,float growth,float open,float web,vec3 shear,mat2 metric,vec3 radialSlope,float rounding,out vec3 detail){
  vec3 B=handle.xyz;
  vec3 axis=(C-B)/max(.0001,length(C-B));
  float face=.23*lift+.46*open*max(lift,growth);
@@ -711,6 +775,17 @@ float tissueShoot(vec3 q,vec3 A,vec4 handle,vec3 C,vec4 profile,float index,floa
   float dz=(q.z-C.z-dot(radialSlope.xy,xy))/radialSlope.z;
   cup=mix(cup,length(vec3(xy,dz))-cap,rounding);
  }
+ #ifdef WEAVE_HIT_TAG
+ if(weaveEvaluateMaterial&&uTissueSlingLoad>0.){
+  // In a stretched pouch chart distance is anisotropic. Classify the
+  // bead with the same round surface used for the intersection. A fixed
+  // chart-space disk would leave a band across the exposed hemisphere.
+  float socket=max(.0006,.29*cap);
+  float onBead=1.-smoothstep(-socket,socket,cup-branch);
+  detail.x=floor(.5+mix(detail.x,2.+12.*onBead,uTissueSlingLoad));
+  detail.z=mix(detail.z,socketCover,uTissueSlingLoad*onBead);
+ }
+ #endif
  branch=networkJoin(branch,cup,max(.0006,cap*(.29+.23*lift)*(1.-.68*aperture)));
  if(web>.0001&&lift>.01&&gather<.999&&abs(delta.x)>.04&&delta.y>.08&&q.y>A.y&&q.y<C.y){
   float u=clamp((q.y-A.y)/(b.y+sqrt(max(.0000001,b.y*b.y+k.y*(q.y-A.y)))),0.,1.),centre=A.x+u*(2.*b.x+u*k.x),main=tissueSpine(q.y)*(1.-.46*lift);
@@ -763,11 +838,16 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
  float angle=6.28318530718*uv.x/width,wave=sin(angle);
  float bend=(.030+.012*rank)*wave+.023*uStructureH.y*sin(6.*uv.x)+.081*(1.-cos(angle))*(.55-.45*wave)*rank;
  float crossing=mod(uv.y-bend+.5*pitch,pitch)-.5*pitch;
- float trans=bridges>0.?tissueTransverse(uv):10000.;
+ float pocketLoad=uTissueYoung.x*web*smoothstep(.075,.18,release)*(1.-smoothstep(.24,.48,release))*smoothstep(-.32,.24,p.z);
+ float trans=bridges>0.?tissueTransverse(uv,pocketLoad):10000.;
  if(back>.01&&bridges>0.)trans=min(trans,tissueBridgeDistance(uv,1.07,-.10*rank,.07)/(.48+.44*back)+.24*(1.-back));
  float warp=uStructureB.z*.45*cos(3.14159265*uv.x/width)*cos(3.14159265*uv.y/pitch);
  float cradle=uTissueYoung.x*web*bridges,weld=bridges*web;
- float d=longitudinal>0.?length(vec2(along*.92,z-warp))-rib*(.84+.33*rank)*(1.-.42*weld+.20*cradle)*longitudinal:10000.;
+ float belly=sin(3.14159265*(y+.48)/stride);belly*=belly;
+ float span=pocketLoad*(.065+.12*uWeaveDetail.y)*belly;
+ float seam=along+.21*span*sin(4.6*y),rail=abs(seam)-span;
+ float rim=rib*(.84+.33*rank)*(1.-.42*weld+.20*cradle)*longitudinal;
+ float d=longitudinal>0.?length(vec2(rail*.92,z-warp))-rim*(1.-.78*pocketLoad*belly):10000.;
  #ifdef WEAVE_HIT_TAG
  if(weaveEvaluateMaterial)tag=vec3(2.,fract(uv.y/pitch+.5),fract(atan(z-warp,along*.92)/6.2831853+1.));
  #endif
@@ -798,6 +878,15 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
    if(gauze<.008)sheet=min(sheet,max(gauze,tissueOpening(uv+vec2(.28*uv.y+.169,-.27*uv.x+.073),abs(along),trans,.83)+.0013*(1.-cradle)));
   }
   d=networkJoin(d,sheet,.001+rib*.62*bridges*(1.-.70*cradle));
+  if(span>.0001 && abs(seam)<span+.006){
+   float across=clamp(1.-abs(seam)/span,0.,1.);
+   float pocketZ=warp-.040*pocketLoad*across*(2.-across);
+   float hem=seam/span,grain=29.*uWeaveNetwork.y;
+   float yarn=(seam+.009*sin(14.*y+4.*hem)+.004*sin(33.*y-3.*hem))*grain;
+   float id=floor(yarn+.5),gap=abs(yarn-id-.25*sin(id*4.33))/grain;
+   float mesh=max(rail,length(vec2(gap,(z-pocketZ)*.83))-pocketLoad*(.0009+.0007*web));
+   if(mesh<d){d=mesh;tag=vec3(1.,.95,.73);}
+  }
   if(cradle>.0001&&edge<0.){
    float load=exp(-(along*along+trans*trans)/(.012+3.8*coupling*coupling));
    float hem=edge+.006+.037*(1.-load)+.08*(1.-cradle);
@@ -839,8 +928,10 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
   float boundary=max(boxDistance.x,boxDistance.y)-padding;
   if(boundary>0.){emptyBound=min(emptyBound,boundary+.012);continue;}
   if(cradle>0.)for(int i=0;i<${SLING_COUNT};i++){
-   float lace=tissueSling(q,i,uWeaveNetwork.y,web)+.0035*(1.-cradle)+.09*back;
-   if(lace<d){d=lace;tag=vec3(1.,.96,.91);}
+   if(i>=${SLING_BASE_COUNT}&&uTissueSlingLoad<=0.)break;
+   float silkMaterial;
+   float lace=tissueSling(q,i,uWeaveNetwork.y,web,silkMaterial)+.0035*(1.-cradle)+.09*back;
+   if(lace<d){d=lace;tag=vec3(1.,.96,silkMaterial);}
   }
   for(int i=0;i<${young.length};i++){
    vec3 A=uTissueRoot[i].xyz,B=uTissueBend[i].xyz,C=uTissueEnd[i].xyz;
@@ -851,7 +942,7 @@ float tissueField(float field,vec3 p,float wall,out vec3 tag){
    float bound=max(box.x,max(box.y,box.z))-margin;
    if(bound>0.){emptyBound=min(emptyBound,bound+.012);continue;}
    vec3 detail;
-   float branch=tissueShoot(q,A,uTissueBend[i],C,uTissueShape[i],float(i),cap,rib,lift,gather,growth,uWeaveGrowth.y*(1.-.80*uTissueYoung.y*(1.-lift)),web,shear,metric,radialSlope,rounding,detail);
+   float branch=tissueShoot(q,A,uTissueBend[i],C,uTissueShape[i],float(i),uTissueRoot[i].w,cap,rib,lift,gather,growth,uWeaveGrowth.y*(1.-.80*uTissueYoung.y*(1.-lift)),web,shear,metric,radialSlope,rounding,detail);
    branch+=.17*back;
    skeleton=min(skeleton,branch);
    if(branch<d)tag=detail;

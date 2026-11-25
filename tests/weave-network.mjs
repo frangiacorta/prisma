@@ -6,6 +6,7 @@ import { newCreation, normalizeCreation } from '../creative-model.js';
 import { sampleFrame } from '../solid-renderer.js';
 import { presetDocument, readPreset } from '../preset-files.js';
 import { structureField, STRUCTURE_DEFAULTS } from '../structure-model.js';
+import { junctionPose } from '../weave-junction.js';
 import { slingDistance, slingPose } from '../weave-sling.js';
 
 const source=existsSync('web/studio/index.html')?'web/studio':'.';
@@ -60,6 +61,29 @@ for(const [key,track] of Object.entries(state.motions).filter(([,track])=>track.
  assert.equal(at(0)[key],at(state.duration)[key],key+' seam');
 }
 assert(at(2).structWeaveGrowth>at(7).structWeaveGrowth+.6);
+// The final frame of the twelve-second close-up still carries the beads.
+// Sample both sides of the cut as well as its last encoded video frame.
+for(const sec of [11.6,359/30,12,12.2]){
+ assert(at(sec).structWeaveCradle>.85,'The web released its load at '+sec);
+ assert(at(sec).structWeaveFlex>.75,'The pocket lost its flex at '+sec);
+}
+assert.equal(at(14).structWeaveCradle,0);
+// At full load every suspended bead has a real attachment in the web.
+// Repeat after resizing the nodules to catch a net left in the old pose.
+for(const t of [11.6,359/30,12,12.2]){
+ const frame=at(t);
+ for(const size of [frame.structWeaveCupSize,.48,1.35]){
+  const {ends,sling}=junctionPose({...frame,structWeaveCupSize:size});
+  assert(sling.pocket>.95);
+  for(let j=0;j<ends.length;j+=4){
+   let nearest=Infinity;
+   for(let v=0;v<sling.vertices.length;v+=4){
+    nearest=Math.min(nearest,Math.hypot(...[0,1,2].map(k=>sling.vertices[v+k]-ends[j+k])));
+   }
+   assert(nearest<ends[j+3],`Web detached from bead ${j/4} at ${t}s, cup size ${size}`);
+  }
+ }
+}
 assert(at(17).structWeaveRelease>at(11).structWeaveRelease+.5);
 assert(at(24).structWeaveCup>at(17).structWeaveCup+.6);
 assert(at(5).transparency<.55 && at(24).transparency>.65 && at(24).transparency>at(5).transparency+.25);
